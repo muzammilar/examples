@@ -1,0 +1,8 @@
+version: '3.4'
+
+services:
+  jsonparser:
+    image: jsonparser
+    build:
+      context: .
+      dockerfile: ./Dockerfile
