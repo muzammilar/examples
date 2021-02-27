@@ -1,0 +1,16 @@
+version: "3.4"
+
+services:
+  chmtbulkingest-1:
+    image: chmtbulkingest
+    container_name: chmtbulkingest-1
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+  clickhouse-server-1:
+    image: "yandex/clickhouse-server:latest"
+    container_name: clickhouse-server-1
+    ports:
+      - 8123:8123 # http port
+      - 9000:9000 # native port
+      - 9009:9009 #
