@@ -15,7 +15,7 @@ import (
 func main() {
 	// add a wait group for all the routines
 	var wg sync.WaitGroup
-	wg.Add(1)
+	wg.Add(2)
 
 	// run the queries
 	go exampleIPv4Table(&wg)
