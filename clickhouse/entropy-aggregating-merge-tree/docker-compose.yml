@@ -1,0 +1,12 @@
+version: "3.8"
+
+services:
+  clickhouse-server-1:
+    image: "yandex/clickhouse-server:latest"
+    container_name: clickhouse-server-1
+    ports:
+      - 8123:8123 # http port
+      - 9000:9000 # native port
+      - 9009:9009 #
+    volumes: # mount the sql directory to
+      - ./sql:/ch-amt-example-sql
