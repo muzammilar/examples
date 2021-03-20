@@ -38,7 +38,7 @@ func exampleIPv4Table(wg *sync.WaitGroup) {
 		CREATE TABLE IF NOT EXISTS example_ipv4 (
 			country_code FixedString(2),
 			os_id        UInt8,
-			browser_id   UInt8,
+			browser_id   Nullable(UInt8),
 			browser_ip   IPv4,
 			categories   Array(Int16),
 			action_day   Date,
@@ -59,7 +59,7 @@ func exampleIPv4Table(wg *sync.WaitGroup) {
 		if _, err := stmt.Exec(
 			"US",
 			10+i,
-			100+i,
+			nil, // nullable field
 			"127.0.0.1",
 			clickhouse.Array([]int16{1, 2, 3}),
 			time.Now(),
@@ -91,7 +91,7 @@ func exampleIPv6Table(wg *sync.WaitGroup) {
 		CREATE TABLE IF NOT EXISTS example_ipv6 (
 			country_code LowCardinality(String),
 			os_id        UInt8,
-			browser_id   UInt8,
+			browser_id   Nullable(UInt8),
 			browser_ip   IPv6,
 			categories   Array(Int16),
 			action_day   Date,
@@ -160,8 +160,6 @@ func createConnection() *sql.DB {
 		return connect
 	}
 
-	// return nothing
-	return nil
 }
 
 func createTable(connect *sql.DB, createQ string) {
@@ -186,15 +184,24 @@ func queryTable(connect *sql.DB, tableName string) {
 	for rows.Next() {
 		var (
 			ip                    net.IP
-			country               string
-			os, browser           uint8
+			country, browser_id   string
+			os                    uint8
+			browser               *uint8
 			categories            []int16
 			actionDay, actionTime time.Time
 		)
 		if err := rows.Scan(&country, &os, &browser, &ip, &categories, &actionDay, &actionTime); err != nil {
 			log.Fatal(err)
 		}
-		log.Printf("country: %s, os: %d, browser: %d, categories: %v, action_day: %s, action_time: %s", country, os, browser, categories, actionDay, actionTime)
+
+		// check for nil (only for printing)
+		if browser != nil {
+			browser_id = fmt.Sprintf("%d", *browser)
+		} else {
+			browser_id = fmt.Sprintf("%#v", browser)
+		}
+
+		log.Printf("country: %s, os: %d, browser: %s, categories: %v, action_day: %s, action_time: %s, browser_ip: %s", country, os, browser_id, categories, actionDay, actionTime, ip)
 	}
 
 	if err := rows.Err(); err != nil {
