@@ -36,7 +36,7 @@ func exampleIPv6Table(wg *sync.WaitGroup, dataSize uint32) {
 
 	// strut to store time durations (and print execution times)
 	var (
-		executionTimes        = make(map[string]time.Duration)
+		executionTimes        = make(map[string]time.Duration) // ignore ordering of time for now
 		tableName      string = fmt.Sprintf("example_ipv6_%d", dataSize)
 	)
 	defer printExecutionTimes(executionTimes, dataSize)
@@ -69,34 +69,16 @@ func exampleIPv6Table(wg *sync.WaitGroup, dataSize uint32) {
 	// This behaviour may change in the future though
 	var (
 		httpRequest HTTPRequest
-		tx, _       = connect.Begin()
 		insertQ, _  = GetInsertStatement(tableName, httpRequest)
-		stmt, _     = tx.Prepare(insertQ)
 	)
-	defer stmt.Close()
 
-	// create a bulk ingest data (and time it)
-	start = time.Now()
-	var idx uint32
-	for idx = 0; idx < dataSize; idx++ {
-		// stmt.Exec using variadic args so we create a slice then make it variadic (see the ... at the end)
-		// see: https://gobyexample.com/variadic-functions
-		inputHTTPRequest := NewHTTPRequest()
-		if _, err := stmt.Exec(inputHTTPRequest.ConvertToSlice()...); err != nil {
-			log.Fatal(err)
-		}
-
+	// we try batch insert 10 times
+	var iteration uint32
+	for iteration = 0; iteration < 100; iteration++ {
+		batchInsert(connect, insertQ, dataSize, iteration, executionTimes)
 	}
-	executionTimes["Batch Prepration Time (includes struct creation time)"] = time.Since(start)
 
-	// send bulk data to clickhouse (and time it)
-	start = time.Now()
-	if err := tx.Commit(); err != nil {
-		log.Fatal(err)
-	}
-	executionTimes["Batch Insert Time"] = time.Since(start)
-
-	queryTable(connect, tableName)
+	//queryTable(connect, tableName)
 	dropTable(connect, tableName)
 
 }
@@ -127,6 +109,36 @@ func createConnection() *sql.DB {
 		}
 		return connect
 	}
+
+}
+
+func batchInsert(connect *sql.DB, insertQ string, dataSize uint32, iteration uint32, executionTimes map[string]time.Duration) {
+	var (
+		tx, _   = connect.Begin()
+		stmt, _ = tx.Prepare(insertQ)
+	)
+	defer stmt.Close()
+
+	// create a bulk ingest data (and time it)
+	start := time.Now()
+	var idx uint32
+	for idx = 0; idx < dataSize; idx++ {
+		// stmt.Exec using variadic args so we create a slice then make it variadic (see the ... at the end)
+		// see: https://gobyexample.com/variadic-functions
+		inputHTTPRequest := NewHTTPRequest()
+		if _, err := stmt.Exec(inputHTTPRequest.ConvertToSlice()...); err != nil {
+			log.Fatal(err)
+		}
+
+	}
+	executionTimes[fmt.Sprintf("Iteration %d - Batch Prepration Time (includes struct creation time)", iteration)] = time.Since(start)
+
+	// send bulk data to clickhouse (and time it)
+	start = time.Now()
+	if err := tx.Commit(); err != nil {
+		log.Fatal(err)
+	}
+	executionTimes[fmt.Sprintf("Iteration %d - Batch Insert Time", iteration)] = time.Since(start)
 
 }
 
