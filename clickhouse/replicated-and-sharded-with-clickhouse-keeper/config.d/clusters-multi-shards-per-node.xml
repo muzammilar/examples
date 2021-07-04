@@ -1,0 +1,139 @@
+<yandex>
+    <!--
+        NOTE: The following configuration does not work (for obvious reasons).
+        This was only for experimentation.
+    -->
+    <remote_servers replace="replace"> <!-- `replace` attribute ensures that configs are replaced and not merged with the base config.xml -->
+
+        <!-- A cluster with replication for ingest of data. -->
+        <replicated_with_keeper>
+            <!-- Shard 1 - 4 replicas instead of 3 -->
+            <shard>
+                <!-- Optional. Whether to write data to just one of the replicas. Default: false (write data to all replicas). -->
+                <!-- We do not use internal_replication since we don't have a keeper. -->
+                <internal_replication>true</internal_replication>
+                <replica>
+                    <!-- Optional. Priority of the replica for load balancing (see also load_balancing setting). Default: 1 (less value has more priority). -->
+                    <priority>1</priority>
+                    <host>clickhouse-server-01</host>
+                    <port>9000</port>
+                </replica>
+                <replica>
+                    <host>clickhouse-server-08</host>
+                    <port>9000</port>
+                </replica>
+                <replica>
+                    <host>clickhouse-server-09</host>
+                    <port>9000</port>
+                </replica>
+                <replica>
+                    <host>clickhouse-server-04</host>
+                    <port>9000</port>
+                    <!-- <secure>1</secure> - Use ssl for connection, usually you also should define port = 9440. Server should listen on <tcp_port_secure>9440</tcp_port_secure> and have correct certificates -->
+                </replica>
+            </shard>
+            <!-- Shard 2 -->
+            <shard>
+                <!-- Optional. Whether to write data to just one of the replicas. Default: false (write data to all replicas). -->
+                <!-- We do not use internal_replication since we don't have a keeper. -->
+                <internal_replication>true</internal_replication>
+                <replica>
+                    <!-- Optional. Priority of the replica for load balancing (see also load_balancing setting). Default: 1 (less value has more priority). -->
+                    <priority>1</priority>
+                    <host>clickhouse-server-02</host>
+                    <port>9000</port>
+                </replica>
+                <replica>
+                    <host>clickhouse-server-05</host>
+                    <port>9000</port>
+                </replica>
+                <replica>
+                    <host>clickhouse-server-06</host>
+                    <port>9000</port>
+                    <!-- <secure>1</secure> - Use ssl for connection, usually you also should define port = 9440. Server should listen on <tcp_port_secure>9440</tcp_port_secure> and have correct certificates -->
+                </replica>
+            </shard>
+            <!-- Shard 3 -->
+            <shard>
+                <!-- Optional. Whether to write data to just one of the replicas. Default: false (write data to all replicas). -->
+                <!-- We do not use internal_replication since we don't have a keeper. -->
+                <internal_replication>true</internal_replication>
+                <replica>
+                    <!-- Optional. Priority of the replica for load balancing (see also load_balancing setting). Default: 1 (less value has more priority). -->
+                    <priority>1</priority>
+                    <host>clickhouse-server-01</host>
+                    <port>9000</port>
+                </replica>
+                <replica>
+                    <host>clickhouse-server-04</host>
+                    <port>9000</port>
+                </replica>
+                <replica>
+                    <host>clickhouse-server-07</host>
+                    <port>9000</port>
+                    <!-- <secure>1</secure> - Use ssl for connection, usually you also should define port = 9440. Server should listen on <tcp_port_secure>9440</tcp_port_secure> and have correct certificates -->
+                </replica>
+            </shard>
+            <!-- Shard 4 - only 2 replicas -->
+            <shard>
+                <!-- Optional. Whether to write data to just one of the replicas. Default: false (write data to all replicas). -->
+                <!-- We do not use internal_replication since we don't have a keeper. -->
+                <internal_replication>true</internal_replication>
+                <replica>
+                    <!-- Optional. Priority of the replica for load balancing (see also load_balancing setting). Default: 1 (less value has more priority). -->
+                    <priority>1</priority>
+                    <host>clickhouse-server-02</host>
+                    <port>9000</port>
+                </replica>
+                <replica>
+                    <host>clickhouse-server-05</host>
+                    <port>9000</port>
+                </replica>
+            </shard>
+            <!-- Shard 5 -->
+            <shard>
+                <!-- Optional. Whether to write data to just one of the replicas. Default: false (write data to all replicas). -->
+                <!-- We do not use internal_replication since we don't have a keeper. -->
+                <internal_replication>true</internal_replication>
+                <replica>
+                    <!-- Optional. Priority of the replica for load balancing (see also load_balancing setting). Default: 1 (less value has more priority). -->
+                    <priority>1</priority>
+                    <host>clickhouse-server-03</host>
+                    <port>9000</port>
+                </replica>
+                <replica>
+                    <host>clickhouse-server-06</host>
+                    <port>9000</port>
+                </replica>
+                <replica>
+                    <host>clickhouse-server-07</host>
+                    <port>9000</port>
+                    <!-- <secure>1</secure> - Use ssl for connection, usually you also should define port = 9440. Server should listen on <tcp_port_secure>9440</tcp_port_secure> and have correct certificates -->
+                </replica>
+            </shard>
+            <!-- Shard 6 -->
+            <shard>
+                <!-- Optional. Whether to write data to just one of the replicas. Default: false (write data to all replicas). -->
+                <!-- We do not use internal_replication since we don't have a keeper. -->
+                <internal_replication>true</internal_replication>
+                <replica>
+                    <!-- Optional. Priority of the replica for load balancing (see also load_balancing setting). Default: 1 (less value has more priority). -->
+                    <priority>1</priority>
+                    <host>clickhouse-server-03</host>
+                    <port>9000</port>
+                </replica>
+                <replica>
+                    <host>clickhouse-server-08</host>
+                    <port>9000</port>
+                </replica>
+                <replica>
+                    <host>clickhouse-server-09</host>
+                    <port>9000</port>
+                    <!-- <secure>1</secure> - Use ssl for connection, usually you also should define port = 9440. Server should listen on <tcp_port_secure>9440</tcp_port_secure> and have correct certificates -->
+                </replica>
+            </shard>
+
+
+        </replicated_with_keeper>
+    </remote_servers>
+</yandex>

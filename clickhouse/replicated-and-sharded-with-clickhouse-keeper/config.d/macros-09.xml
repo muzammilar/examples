@@ -1,0 +1,8 @@
+<yandex>
+    <macros>
+        <datacenter>dclocation</datacenter>
+        <layer>07</layer>
+        <shard>03</shard>
+        <replica>clickhouse-server-09</replica>
+    </macros>
+</yandex>

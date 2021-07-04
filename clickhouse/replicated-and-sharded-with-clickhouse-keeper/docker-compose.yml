@@ -1,0 +1,93 @@
+version: "3.9"
+
+services:
+  # Server-1
+  clickhouse-server-01:
+    extends:
+      file: clickhouse-service.yml
+      service: clickhouse
+    container_name: clickhouse-server-01
+    hostname: ch01
+    volumes:
+      - ./config.d/keeper-server-01.xml:/etc/clickhouse-server/config.d/keeper-server.xml # clickhouse-keeper configs
+      - ./config.d/macros-01.xml:/etc/clickhouse-server/config.d/macros.xml # macros
+      #- ./setup/setup-ch-tables.sh:/docker-entrypoint-initdb.d/setup-ch-tables.sh  # setup clickhouse tables
+  # Server-2
+  clickhouse-server-02:
+    extends:
+      file: clickhouse-service.yml
+      service: clickhouse
+    container_name: clickhouse-server-02
+    hostname: ch02
+    volumes:
+      - ./config.d/keeper-server-02.xml:/etc/clickhouse-server/config.d/keeper-server.xml # clickhouse-keeper configs
+      - ./config.d/macros-02.xml:/etc/clickhouse-server/config.d/macros.xml # macros
+  # Server-3
+  clickhouse-server-03:
+    extends:
+      file: clickhouse-service.yml
+      service: clickhouse
+    container_name: clickhouse-server-03
+    hostname: ch03
+    volumes:
+      - ./config.d/keeper-server-03.xml:/etc/clickhouse-server/config.d/keeper-server.xml # clickhouse-keeper configs
+      - ./config.d/macros-03.xml:/etc/clickhouse-server/config.d/macros.xml # macros
+  # Server-4
+  clickhouse-server-04:
+    extends:
+      file: clickhouse-service.yml
+      service: clickhouse
+    container_name: clickhouse-server-04
+    hostname: ch04
+    volumes:
+      - ./config.d/macros-04.xml:/etc/clickhouse-server/config.d/macros.xml # macros
+  # Server-5
+  clickhouse-server-05:
+    extends:
+      file: clickhouse-service.yml
+      service: clickhouse
+    container_name: clickhouse-server-05
+    hostname: ch05
+    volumes:
+      - ./config.d/macros-05.xml:/etc/clickhouse-server/config.d/macros.xml # macros
+  # Server-6
+  clickhouse-server-06:
+    extends:
+      file: clickhouse-service.yml
+      service: clickhouse
+    container_name: clickhouse-server-06
+    hostname: ch06
+    volumes:
+      - ./config.d/macros-06.xml:/etc/clickhouse-server/config.d/macros.xml # macros
+  # Server-7
+  clickhouse-server-07:
+    extends:
+      file: clickhouse-service.yml
+      service: clickhouse
+    container_name: clickhouse-server-07
+    hostname: ch07
+    volumes:
+      - ./config.d/macros-07.xml:/etc/clickhouse-server/config.d/macros.xml # macros
+  # Server-8
+  clickhouse-server-08:
+    extends:
+      file: clickhouse-service.yml
+      service: clickhouse
+    container_name: clickhouse-server-08
+    hostname: ch08
+    volumes:
+      - ./config.d/macros-08.xml:/etc/clickhouse-server/config.d/macros.xml # macros
+  # Server-9
+  clickhouse-server-09:
+    extends:
+      file: clickhouse-service.yml
+      service: clickhouse
+    container_name: clickhouse-server-09
+    hostname: ch09
+    volumes:
+      - ./config.d/macros-09.xml:/etc/clickhouse-server/config.d/macros.xml # macros
+
+# Networks
+networks:
+  clickhouse:
+    driver: bridge
