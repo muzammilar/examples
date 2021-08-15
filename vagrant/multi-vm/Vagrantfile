@@ -1,0 +1,119 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# Development Vagrantfile example
+# Required Plugins:
+# vagrant plugin install vagrant-vbguest
+# vagrant plugin install vagrant-disksize
+# vagrant plugin install vagrant-timezone
+
+
+# cpp provision
+$cpp_provision = <<-SHELL
+  apt update
+  apt install -y build-essential g++ gcc python3 cmake
+  # Some language parsers
+  apt install -y build-essential bison flex
+
+SHELL
+
+# golang provision
+$golang_provision = <<-SHELL
+
+  ## Either:
+  # install golang using `snap` as it's simpler
+  snap install go --classic
+
+  # install protobuf using `snap` as it's simpler
+  snap install protobuf --classic
+
+  # OR
+  # GO_VERSION="1.16.5"
+  # wget https://dl.google.com/go/go${GO_VERSION}.linux-amd64.tar.gz
+  # tar -C /usr/local -xzf go${GO_VERSION}.linux-amd64.tar.gz
+  # export PATH=$PATH:/usr/local/go/bin
+  # go version  # test golang version
+
+SHELL
+
+
+Vagrant.configure("2") do |config|
+
+  # set timezone for all VMs
+  config.timezone.value = "UTC"
+  config.disksize.size = "60GB"
+
+  # define a server vagrant machine
+  config.vm.define "testserver", autostart: true do |testserver|
+
+    # hostname for the VM
+    testserver.vm.hostname = "testserver-focal"
+    # image for the VM
+    # See all images at https://app.vagrantup.com/boxes/search
+    testserver.vm.box = "ubuntu/focal64"
+
+    # Use Virtual Box as the provider
+    testserver.vm.provider "virtualbox" do |vb|
+      #  Virtual Box Settings - GUI for the VM
+      vb.gui = false
+      #  Virtual Box Settings - Name for the VM
+      vb.name = "Ubuntu 20.04 - Test Server"
+      #  Virtual Box Settings - Allocated memory
+      vb.memory = "2048"
+    end
+
+    # Sync Files (using absolute paths)
+    testserver.vm.synced_folder "./sync", "/home/vagrant/synced"
+    # Copy Files/Folders
+    testserver.vm.provision "file", source: "./code", destination: "$HOME/code"
+
+    # provision scripts
+    testserver.vm.provision "shell", path: "scripts/provision.sh"
+    testserver.vm.provision "shell", inline: $cpp_provision
+    testserver.vm.provision "shell", inline: $golang_provision
+
+  end
+
+
+  # define a focal client vagrant machine
+  config.vm.define "testclient-focal", autostart: true do |testclient|
+
+    testclient.vm.hostname = "testclient-focal"
+    testclient.vm.box = "ubuntu/focal64"
+
+    testclient.vm.provider "virtualbox" do |vb|
+      vb.gui = false
+      vb.name = "Ubuntu 20.04 - Test Client"
+      vb.memory = "1024"
+    end
+
+    # Copy Files/Folders
+    testclient.vm.provision "file", source: "./code", destination: "$HOME/code"
+
+    # Provision and setup
+    testclient.vm.provision "shell", inline: $cpp_provision
+
+  end
+
+
+  # define a bionic client vagrant machine
+  config.vm.define "testclient-bionic", autostart: true do |testclient|
+
+    testclient.vm.hostname = "testclient-bionic"
+    testclient.vm.box = "ubuntu/bionic64"
+
+    testclient.vm.provider "virtualbox" do |vb|
+      vb.gui = false
+      vb.name = "Ubuntu 18.04 - Test Client"
+      vb.memory = "1024"
+    end
+
+    # Copy Files/Folders
+    testclient.vm.provision "file", source: "./code", destination: "$HOME/code"
+
+    # Provision and setup
+    testclient.vm.provision "shell", inline: $cpp_provision
+
+  end
+
+end
