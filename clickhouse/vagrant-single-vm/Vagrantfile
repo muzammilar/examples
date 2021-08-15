@@ -1,0 +1,60 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# Development Vagrantfile example for ClickHouse
+# Required Plugins:
+# vagrant plugin install vagrant-timezone
+
+
+$clickhouse_provision = <<-SHELL
+
+  # update
+  apt update
+  apt install -y dirmngr    # optional
+
+  # add ClickHouse repo
+  echo "deb https://repo.clickhouse.tech/deb/stable/ main/" | sudo tee /etc/apt/sources.list.d/clickhouse.list
+  apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv E0C56BD4
+
+  # install ClickHouse
+  apt update
+  DEBIAN_FRONTEND=noninteractive apt install -y clickhouse-server clickhouse-client
+  clickhouse-server --version
+
+  # start ClickHouse Server if it is not running
+  systemctl start clickhouse-server
+  systemctl status clickhouse-server
+
+SHELL
+
+
+Vagrant.configure("2") do |config|
+
+  # set timezone for all VMs
+  config.timezone.value = "UTC"
+
+  # define a server vagrant machine
+  config.vm.define "clickhouse01", autostart: true do |chserver|
+
+    # hostname for the VM
+    chserver.vm.hostname = "clickhouse01-focal"
+    # image for the VM
+    # See all images at https://app.vagrantup.com/boxes/search
+    chserver.vm.box = "ubuntu/focal64"
+
+    # Use Virtual Box as the provider
+    chserver.vm.provider "virtualbox" do |vb|
+      #  Virtual Box Settings - GUI for the VM
+      vb.gui = false
+      #  Virtual Box Settings - Name for the VM
+      vb.name = "Ubuntu 20.04 - ClickHouse Server - 01"
+      #  Virtual Box Settings - Allocated memory
+      vb.memory = "2048"
+    end
+
+    # provision scripts
+    chserver.vm.provision "shell", inline: $clickhouse_provision
+
+  end
+
+end
