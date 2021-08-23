@@ -39,4 +39,8 @@ clickhouse-client --multiline --multiquery --format Pretty < /ch-replica-sql/2-*
 # add more data and see how the cluster behaves (for example SMT)
 clickhouse-client --multiline --multiquery --format Pretty < /ch-replica-sql/3-insert.sql
 
+# Check both replicated and unreplicated SMTs on all server
+# The unreplicated SMT would only have data on the insert server and not on the replica servers, since Materialized Views are triggered
+# only on insert and NOT on replication.
+
 ```
