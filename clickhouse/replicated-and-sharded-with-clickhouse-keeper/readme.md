@@ -44,3 +44,14 @@ clickhouse-client --multiline --multiquery --format Pretty < /ch-replica-sql/3-i
 # only on insert and NOT on replication.
 
 ```
+
+
+Delete *all* unused data after using docker (*Note*: It might have unintended consequences)
+
+```sh
+# less safe option (since it deletes lots of build caches, etc)
+docker system prune --volumes
+
+# alternatively, delete all dangling volumes
+docker volume prune
+```
