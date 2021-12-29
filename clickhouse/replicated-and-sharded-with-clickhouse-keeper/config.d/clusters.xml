@@ -6,7 +6,7 @@
             <!-- Shard 1 -->
             <shard>
                 <!-- Optional. Whether to write data to just one of the replicas. Default: false (write data to all replicas). -->
-                <!-- We do not use internal_replication since we don't have a keeper. -->
+                <!-- We use internal_replication since we have a keeper. -->
                 <internal_replication>true</internal_replication>
                 <replica>
                     <!-- Optional. Priority of the replica for load balancing (see also load_balancing setting). Default: 1 (less value has more priority). -->
@@ -27,7 +27,7 @@
             <!-- Shard 2 -->
             <shard>
                 <!-- Optional. Whether to write data to just one of the replicas. Default: false (write data to all replicas). -->
-                <!-- We do not use internal_replication since we don't have a keeper. -->
+                <!-- We duse internal_replication since we have a keeper. -->
                 <internal_replication>true</internal_replication>
                 <replica>
                     <!-- Optional. Priority of the replica for load balancing (see also load_balancing setting). Default: 1 (less value has more priority). -->
@@ -48,7 +48,7 @@
             <!-- Shard 3 -->
             <shard>
                 <!-- Optional. Whether to write data to just one of the replicas. Default: false (write data to all replicas). -->
-                <!-- We do not use internal_replication since we don't have a keeper. -->
+                <!-- We use internal_replication since we have a keeper. -->
                 <internal_replication>true</internal_replication>
                 <replica>
                     <!-- Optional. Priority of the replica for load balancing (see also load_balancing setting). Default: 1 (less value has more priority). -->
