@@ -1,0 +1,75 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# Development Vagrantfile example for Kafka
+# Required Plugins:
+# vagrant plugin install vagrant-timezone
+
+envvars = {
+  "KAFKA_VERSION" => "3.0.0"
+  "KAFKA_VERSION_FULL" => "kafk_2.13-3.0.0"
+  "KAFKA_HOME" => "/home/vagrant/kafka"
+}
+
+$kafka_provision = <<-SHELL
+
+  # For details see the quickstart guide: https://kafka.apache.org/quickstart
+
+  # update
+  apt update
+
+  # install a required java version
+  apt install -y default-jre    # optional
+
+  # create an output directory for kafka storage
+  mkdir $KAFKA_HOME
+
+  # download kafka tar and save it to a file
+  # In wget, using -q quiets and -O allows to pipe the file to tar
+  # In tar, --strip-components=1 allows for removing the directory name itself
+  wget -qO https://dlcdn.apache.org/kafka/$KAFKA_VERSION/$KAFKA_VERSION_FULL.tgz | tar -xzf --directory $KAFKA_HOME --strip-components=1
+
+  ## Zookeeper
+  # Start the ZooKeeper service
+  # Note: Soon, ZooKeeper will no longer be required by Apache Kafka.
+  nohup $KAFKA_HOME/bin/zookeeper-server-start.sh $KAFKA_HOME/config/zookeeper.properties > /var/log/zookeeper.log 2>&1 &
+  # Alternatively you could use the daemon mode `nohup $KAFKA_HOME/bin/zookeeper-server-start.sh -daemon $KAFKA_HOME/config/zookeeper.properties`
+
+  ## Kafka
+  # Start the Kafka broker service
+  nohup $KAFKA_HOME/bin/kafka-server-start.sh $KAFKA_HOME/config/server.properties > /var/log/kafka.log 2>&1 &
+  # Alternatively you could use the daemon mode `nohup $KAFKA_HOME/bin/kafka-server-start.sh -daemon $KAFKA_HOME/config/server.properties`
+
+SHELL
+
+
+Vagrant.configure("2") do |config|
+
+  # set timezone for all VMs
+  config.timezone.value = "UTC"
+
+  # define a server vagrant machine
+  config.vm.define "kafka01", autostart: true do |kfserver|
+
+    # hostname for the VM
+    kfserver.vm.hostname = "kafka01-focal"
+    # image for the VM
+    # See all images at https://app.vagrantup.com/boxes/search
+    kfserver.vm.box = "ubuntu/focal64"
+
+    # Use Virtual Box as the provider
+    kfserver.vm.provider "virtualbox" do |vb|
+      #  Virtual Box Settings - GUI for the VM
+      vb.gui = false
+      #  Virtual Box Settings - Name for the VM
+      vb.name = "Ubuntu 20.04 - Kafka Server - 01"
+      #  Virtual Box Settings - Allocated memory
+      vb.memory = "2048"
+    end
+
+    # provision scripts
+    kfserver.vm.provision "shell", inline: $kafka_provision, env: envvars
+
+  end
+
+end
