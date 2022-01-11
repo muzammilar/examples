@@ -6,7 +6,7 @@ An example of replicating data in ClickHouse.
 
 In this case, data is replicated by having `internal_replication=false`. The data is inserted into `Distributed` table over `MergeTree` tables. Inserts over `Distributed` Engine is generally less efficient than `MergeTree` Engine. Using `fsync` options in distributed insert can further slow down the inserts.
 
-The `SummingMergeTree` and `AggregatingMergeTree` (or other `MergeTree`) are triggered by the `MaterializedView` on the ingest table. So the workflow for remote servers (in this example) looks like following; Distributed Table(local) -> Ingest MergeTree (remote) -> MaterializedViews (remote) -> SummingMergeTree (remote)
+The `SummingMergeTree` and `AggregatingMergeTree` (or other `MergeTree`) are triggered by the `MaterializedView` at insert time (note: they don't directly read the ingest table but rather the insert blocks). So the workflow for remote servers (in this example) looks like following; Ingest (remote) -> MaterializedViews (remote) -> SummingMergeTree (remote). This [presentation by Denny Crane](https://den-crane.github.io/Everything_you_should_know_about_materialized_views_commented.pdf) provides an excellent view about Materialized Views.
 
 The `ON CLUSTER` notion (i.e. Distributed DDL queries) are only supported when a Keeper is used.
 
