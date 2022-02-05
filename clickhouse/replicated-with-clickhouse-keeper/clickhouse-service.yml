@@ -1,0 +1,16 @@
+version: "3.9"
+
+services:
+  # Generic ClickHouse Service
+  clickhouse:
+    image: "clickhouse/clickhouse-server:22.1"
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    volumes:
+      - ./configs/clickhouse/config_overrides.xml:/etc/clickhouse-server/config.d/config_overrides.xml # config overrides on default
+      - ./configs/clickhouse/keeper.xml:/etc/clickhouse-server/config.d/keeper.xml # zookeeper/keeper client configs
+      - ./configs/clickhouse/clusters.xml:/etc/clickhouse-server/config.d/clusters.xml # cluster configs
+      - ./configs/clickhouse/macros.xml:/etc/clickhouse-server/config.d/macros.xml # macros configs
+      - ./sql:/ch-replica-sql # sql files
