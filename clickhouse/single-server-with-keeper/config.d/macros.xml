@@ -1,0 +1,6 @@
+<clickhouse>
+    <macros>
+        <shard>0001</shard>
+        <replica>clickhouse-server-01</replica>
+    </macros>
+</clickhouse>

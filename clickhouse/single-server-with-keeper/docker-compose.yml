@@ -1,0 +1,19 @@
+version: "3.9"
+
+services:
+  # Server-1
+  clickhouse-server-01:
+    image: "clickhouse/clickhouse-server:22.1"
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    container_name: clickhouse-server-01
+    hostname: ch01
+    volumes:
+      - ./config.d/basic_config.xml:/etc/clickhouse-server/config.d/basic_config.xml # clickhouse config overrides
+      - ./config.d/keeper_config.xml:/etc/clickhouse-server/config.d/keeper_config.xml # clickhouse-keeper configs
+      - ./config.d/keeper_client.xml:/etc/clickhouse-server/config.d/keeper_client.xml # keeper client configs
+      - ./config.d/clusters.xml:/etc/clickhouse-server/config.d/clusters.xml # cluster configs
+      - ./config.d/macros.xml:/etc/clickhouse-server/config.d/macros.xml # macros
+      - ./sql:/ch-replica-sql # sql files

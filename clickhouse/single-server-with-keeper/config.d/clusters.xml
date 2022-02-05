@@ -1,0 +1,18 @@
+<clickhouse>
+    <remote_servers replace="replace"> <!-- `replace` attribute ensures that configs are replaced and not merged with the base config.xml -->
+
+        <!-- A cluster with replication for ingest of data. -->
+        <test_cluster>
+            <!-- Shard 1 -->
+            <shard>
+                <!-- Optional. Whether to write data to just one of the replicas. Default: false (write data to all replicas). -->
+                <internal_replication>true</internal_replication>
+                <replica>
+                    <host>localhost</host>
+                    <port>9000</port>
+                </replica>
+            </shard>
+
+        </test_cluster>
+    </remote_servers>
+</clickhouse>
