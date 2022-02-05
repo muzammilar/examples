@@ -1,4 +1,4 @@
-<yandex>
+<clickhouse>
     <!-- Experimental Zookeeper replacement -->
     <keeper_server>
         <!-- The TCP communication port for keeper's clients. Use tcp_port_secure and proper certs for security -->
@@ -45,4 +45,4 @@
             </server>
         </raft_configuration>
     </keeper_server>
-</yandex>
+</clickhouse>

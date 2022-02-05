@@ -3,7 +3,7 @@ version: "3.9"
 services:
   # Generic ClickHouse Service
   clickhouse:
-    image: "yandex/clickhouse-server:21.12"
+    image: "clickhouse/clickhouse-server:22.1"
     ulimits:
       nofile:
         soft: 262144

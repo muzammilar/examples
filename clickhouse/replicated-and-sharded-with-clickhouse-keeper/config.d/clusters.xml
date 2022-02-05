@@ -1,4 +1,4 @@
-<yandex>
+<clickhouse>
     <remote_servers replace="replace"> <!-- `replace` attribute ensures that configs are replaced and not merged with the base config.xml -->
 
         <!-- A cluster with replication for ingest of data. -->
@@ -69,4 +69,4 @@
 
         </replicated_with_keeper>
     </remote_servers>
-</yandex>
+</clickhouse>

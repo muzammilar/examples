@@ -1,4 +1,4 @@
-<yandex>
+<clickhouse>
     <!--
         NOTE: The following configuration does not work (for obvious reasons).
         This was only for experimentation.
@@ -136,4 +136,4 @@
 
         </replicated_with_keeper>
     </remote_servers>
-</yandex>
+</clickhouse>

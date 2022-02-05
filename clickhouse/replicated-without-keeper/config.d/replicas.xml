@@ -1,4 +1,4 @@
-<yandex>
+<clickhouse>
     <remote_servers replace="replace"> <!-- `replace` attribute ensures that configs are replaced and not merged with the base config.xml -->
         <!-- A cluster with to query replicated ingest. This avoids data duplication by querying localhost -->
         <query_replicated_without_keeper>
@@ -35,4 +35,4 @@
             </shard>
         </replicated_without_keeper>
     </remote_servers>
-</yandex>
+</clickhouse>
