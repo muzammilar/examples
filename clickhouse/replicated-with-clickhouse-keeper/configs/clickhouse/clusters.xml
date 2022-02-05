@@ -10,7 +10,7 @@
                 <internal_replication>true</internal_replication>
                 <replica>
                     <!-- Optional. Priority of the replica for load balancing (see also load_balancing setting). Default: 1 (less value has more priority). -->
-                    <priority>1</priority>
+                    <priority>100</priority>
                     <host>clickhouse-server-01</host>
                     <port>9000</port>
                 </replica>
