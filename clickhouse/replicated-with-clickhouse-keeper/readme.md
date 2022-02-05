@@ -17,6 +17,8 @@ docker-compose up --detach --build
 # under `sql` which maps to `/ch-replica-sql` in the container
 docker exec -it clickhouse-server-01 bash
 
+# debug command (to debug configs): `docker-compose run clickhouse-server-01 bash`
+
 clickhouse-client --multiline --multiquery --format Pretty < /ch-replica-sql/1-*.sql
 clickhouse-client --multiline --multiquery --format Pretty < /ch-replica-sql/2-*.sql
 
@@ -42,4 +44,8 @@ docker-compose down --volumes
 # Use `docker-compose down --rmi all --volumes` with above to images as well
 # Remove everything (and remove volumes). Networks are not removed here.
 docker-compose rm --force --stop -v
+
+# if the container is already stopped
+docker-compose rm --force -v
+
 ```

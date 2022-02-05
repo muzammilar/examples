@@ -6,9 +6,6 @@
     <!-- Remove PostgreSQL port -->
     <postgresql_port remove="remove" />
 
-    <!-- Disables lagging replicas for distributed queries. Sets the time in seconds. If a replica lags more than the set value, this replica is not used.-->
-    <max_replica_delay_for_distributed_queries>15</max_replica_delay_for_distributed_queries>
-
     <!--Default <default_replica_path>/clickhouse/tables/{uuid}/{shard}</default_replica_path> -->
     <default_replica_path replace="replace">/clickhouse/tables/{database}.{table}/{shard}</default_replica_path>
 
