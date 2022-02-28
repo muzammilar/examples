@@ -1,0 +1,12 @@
+version: '3.4'
+
+services:
+  mockgenerator:
+    image: mockgenerator
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      target: mockgen # stop after building this target
+    volumes:
+      - ./:/httpmock
+    working_dir: /httpmock
