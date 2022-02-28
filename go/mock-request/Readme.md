@@ -1,6 +1,6 @@
 # Example Mock
 
-A basic example of mocking an HTTP request in golang. See `docker-compose.yml` for details.
+A basic example of mocking an HTTP request using Golang's [mock](https://github.com/golang/mock) library. See `docker-compose.yml` for details.
 
 ```sh
 # build the containers
