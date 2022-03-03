@@ -1,0 +1,14 @@
+version: '3.4'
+
+services:
+  deadpool:
+    image: threadpool
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      target: pool # stop after building this target
+    volumes:
+      - ./:/httpmock
+    working_dir: /httpmock
+
+  prometheus:
