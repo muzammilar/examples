@@ -1,6 +1,6 @@
-[submodule "k8s/Book - Hands-On Microservices with Kubernetes/repo"]
-	path = k8s/Book - Hands-On Microservices with Kubernetes/repo
-	url = https://github.com/PacktPublishing/Hands-On-Microservices-with-Kubernetes.git
 [submodule "k8s/Book - Hands-On Microservices with Kubernetes/examples/delinkcious"]
 	path = k8s/Book - Hands-On Microservices with Kubernetes/examples/delinkcious
 	url = https://github.com/the-gigi/delinkcious
+[submodule "k8s/Book - Hands-On Microservices with Kubernetes/Hands-On-Microservices"]
+	path = k8s/Book - Hands-On Microservices with Kubernetes/Hands-On-Microservices
+	url = https://github.com/PacktPublishing/Hands-On-Microservices-with-Kubernetes.git
