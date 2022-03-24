@@ -4,6 +4,8 @@
 ## Setting up k8s on Windows (for Development)
 As of August 2021, some useful links/methods/options to setup k8s for development purposes.
 * Vagrantfiles and VMs
+    * microk8s:
+        * https://ubuntu.com/tutorials/install-microk8s-on-windows
 * WSL (and Docker):
     * Docker Desktop:
         * This generally installs its own version of `kubectl`
@@ -15,3 +17,5 @@ As of August 2021, some useful links/methods/options to setup k8s for developmen
     * KinD:
         * https://kubernetes.io/blog/2020/05/21/wsl-docker-kubernetes-on-the-windows-desktop/
     * K3d (K3s on Docker): https://k3d.io/
+* Helm (package manager):
+    * https://helm.sh/docs/intro/install/
