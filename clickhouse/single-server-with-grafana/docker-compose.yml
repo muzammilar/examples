@@ -1,0 +1,25 @@
+version: "3.9"
+
+services:
+  # Server-1
+  clickhouse-server-01:
+    image: clickhouse/clickhouse-server:22.10
+    ports:
+      - 8123:8123
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    container_name: clickhouse-server-01
+    hostname: ch01
+  # Server-1
+  grafana-server-01:
+    image: grafana/grafana:latest
+    ports:
+      - 3000:3000
+    container_name: grafana-server-01
+    hostname: gs01
+    environment:
+      - GF_INSTALL_PLUGINS=grafana-clock-panel,grafana-simple-json-datasource,grafana-clickhouse-datasource,vertamedia-clickhouse-datasource,grafana-worldmap-panel
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning
