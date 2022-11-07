@@ -1,0 +1,12 @@
+<clickhouse>
+    <remote_servers replace="replace"> <!-- `replace` attribute ensures that configs are replaced and not merged with the base config.xml -->
+
+        <!-- A cluster with replication for ingest of data. -->
+        <cluster_hits>
+            <!-- Service Discovery -->
+            <path>/clickhouse/discovery/cluster_hits</path>
+            <shard from_env="SHARD" />
+        </cluster_hits>
+
+    </remote_servers>
+</clickhouse>
