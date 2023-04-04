@@ -1,0 +1,9 @@
+/var/log/funcmapper/*.log
+{
+    maxsize 5M
+    weekly
+    rotate 5
+    compress
+    notifempty
+    missingok
+}

@@ -1,0 +1,21 @@
+[Unit]
+Description=Sample Mapping Function.
+ConditionPathExists=/opt/venv/funcmapper/bin/funk
+# make sure we have network connectivity (not that this program needs it)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+# user and group
+User=funkuser
+Group=funkuser
+TimeoutStartSec=45
+TimeoutStopSec=75
+ExecStart=/opt/venv/funcmapper/bin/funk
+# restart service on failures
+Restart=on-failure
+RestartSec=10s
+
+[Install]
+WantedBy=multi-user.target

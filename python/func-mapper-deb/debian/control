@@ -1,0 +1,12 @@
+Source: funkpkg
+Section: unknown
+Maintainer: Muzammil Abdul Rehman <example.email@foo.com>
+Build-Depends: debhelper (>=13), dh-sysuser
+Standards-Version: 4.0.0
+Homepage: github.com/muzammilar
+
+Package: funkpkg
+Architecture: any
+Pre-Depends: ${misc:Pre-Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: funcmapper is an example python project

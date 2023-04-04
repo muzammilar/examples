@@ -1,0 +1,36 @@
+#!/usr/bin/make -f
+
+# We check distribution here because Makefile can contain linting and tests which don't need distro name
+DISTRO := $(shell lsb_release -cs)
+
+ifndef DISTRO
+$(error DISTRO is not set, make sure you have `lsb-release` package installed)
+endif
+
+ifndef PKG_NAME
+$(error PKG_NAME is not set, should be exported by project Makefile)
+endif
+
+# use verbose logging to easily debug builds
+DH_VERBOSE = 1
+
+# set the root path for dh-virtualenv
+export DH_VIRTUALENV_INSTALL_ROOT=/opt/venv
+
+# dh-sysuser for creating a user (when package is installed)
+# dh-virtualenv creates a debian package for python
+%:
+	dh $@ --with sysuser,python-virtualenv --python=/usr/bin/python3 --install-suffix ${PY_INSTALL_SUFFIX}
+
+# override the output directory of the binary to be `dist` instead of `..`
+# Note that providing an explicit filename doesn't work when there are more than one debs
+override_dh_builddeb:
+	dh_builddeb --destdir=dist/ --filename=${PKG_NAME}
+
+# install systemd service file. Use a different name from the package itself
+override_dh_installsystemd:
+	dh_installsystemd --name=${PKG_SERVICE}
+
+# add logrotate support to the package
+override_dh_installlogrotate:
+	dh_installlogrotate --name=${PKG_SERVICE}
