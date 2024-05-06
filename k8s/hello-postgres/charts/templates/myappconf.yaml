@@ -1,0 +1,9 @@
+# Use a config map for non-secret configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: myappconf
+data:
+  NAME: "Testing Application Without Code, LOL"
+  ENV: "Certainly Not Production"
+  DBUSER: myuser
