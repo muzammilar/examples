@@ -47,6 +47,15 @@ spec:
               port: http
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+          envFrom:
+            - prefix: MYAPP_
+              configMapRef:
+                name: myappconf
+            - secretRef:
+                name: envsecret
+          env: # env overrides envFrom
+            - name: MYAPP_POSTGRES_URL
+              value: '{{ required "myapp.postgres.host must be set" .Values.myapp.postrgres.host }}:{{ .Values.myapp.postgres.host }}'
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

@@ -35,4 +35,6 @@ helm upgrade --debug --install  \
    --set postgresql-ha.postgresql.repmgrPassword="${POSTGRES_PASS_REPMGR_USER}" \
    --set postgresql-ha.pgpool.adminPassword="${POSTGRES_PASS_PGPOOL_ADMIN}" \
    --set myapp.postgres.host="${RELEASE_NAME}-postgresql-ha-pgpool"
+
+# Notes: See deployment.yml file in .charts/templates to add env varibles
 ```
