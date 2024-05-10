@@ -1,0 +1,108 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# Development Vagrantfile example
+# Required Plugins:
+# vagrant plugin install vagrant-vbguest
+# vagrant plugin install vagrant-timezone
+
+# A single Vagrantfile to create multiple VMs from a template
+# Since Ubuntu image doesn't exist for 24.04, we use bento/ubuntu-* images instead of ubuntu/* images.
+# Thanks Hashicorp Business Service License!
+
+## Variables
+# Development boxes - Virtual Box
+vboxvms = [
+  {
+    name: "multi-vm-noble",
+    os:   "bento/ubuntu-24.04",
+    vb: {
+      memory: "1024",
+      cpus: "1"
+    },
+    ports: {
+      http: 10080
+    }
+  },
+  {
+    name: "multi-vm-jammy",
+    os:   "bento/ubuntu-22.04",
+    primary: true,
+    autostart: false,
+    vb: {
+      memory: "1024",
+      cpus: "1"
+    },
+    ports: {
+      http: 20080
+    }
+  },
+]
+
+
+# database can be accessed as
+# psql -h localhost -U pgtestiser -d mytestdb -W
+postgresenv = {
+  "POSTGRES_ADDRESS" => "localhost",
+  "POSTGRES_VERSION" => "16",
+  "POSTGRES_USER" => "pgtestuser",
+  "POSTGRES_PASSWORD" => "password_security_done_wrong",
+  "POSTGRES_DB_NAME" => "mytestdb",
+}
+
+# Debugging tools for setup
+$debug_tools_provision = <<-SHELL
+  apt update
+  # install sar and graphviz
+  apt install -y sysstat graphviz jq
+SHELL
+
+# update bashrc
+$bashrc_provision = <<-SHELL
+  # This is a hack to add env variables to the guest vm as well
+  echo "export PATH=\"$HOME/go/bin:$PATH\"" >> /home/vagrant/.bashrc
+SHELL
+
+Vagrant.configure("2") do |config|
+
+  # add timezone plugin
+  config.vagrant.plugins = ["vagrant-timezone", "timezone"]
+
+  # set timezone for all VMs
+  config.timezone.value = "UTC"
+
+  # Setup Development vagrants
+  vboxvms.each do |box|
+
+    config.vm.define box[:name], primary: !!box[:primary], autostart: !!box[:autostart] do |boxcfg|
+      # box operating system and hostname
+      boxcfg.vm.hostname = box[:name]  # used for networking
+      boxcfg.vm.box = box[:os]
+
+      # virtual box provider
+      boxcfg.vm.provider "virtualbox" do |vb|
+        vb.gui = false
+        vb.memory = box[:vb][:memory]
+        vb.cpus = box[:vb][:cpus]
+      end
+
+      # file provisioning
+      boxcfg.vm.synced_folder "./", "/src"
+
+      # golang provision
+      boxcfg.vm.provision "shell", inline: $bashrc_provision, privileged: false # as non-root
+
+      # port forwarding
+      boxcfg.vm.network 'forwarded_port', guest:80, host:box[:ports][:http]
+
+      # build provision
+      boxcfg.vm.provision "shell", inline: $debug_tools_provision
+      boxcfg.vm.provision "shell", path: "scripts/postgres_repo.sh", env: postgresenv
+      boxcfg.vm.provision "shell", path: "scripts/postgres_provision.sh", env: postgresenv
+      boxcfg.vm.provision "shell", path: "scripts/postgres_bootstrap.sh", env: postgresenv
+
+    end # boxcfg
+
+  end # vboxvms boxes
+
+end
