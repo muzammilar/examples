@@ -1,0 +1,90 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# One Vagrant VM to rule them all; clickouse, elasticsearch, kafka, zookeeper!
+
+# Variables
+kafkaenv = {
+  "KAFKA_VERSION" => "3.9.0",
+  "KAFKA_DIR" => "kafka_2.13-3.9.0",
+  "KAFKA_HOME" => "/home/vagrant/kafka"
+}
+
+chenv = {
+  # Version specification
+  "CLICKHOUSE_VERSION" => "24.10"
+}
+
+esenv = {
+  # Version specification
+  "ES_VERSION" => "8.x"
+}
+
+# Development vagrant file for testvm
+
+$debug_tools_provision = <<-SHELL
+  apt update
+  # install sar and graphviz
+  apt install -y sysstat graphviz
+  # install make
+  apt install -y make
+SHELL
+
+$golang_provision = <<-SHELL
+  apt update
+  apt install -y libpcap-dev
+  apt install -y g++ gcc python3 subversion
+
+  # always install the latest version (or something close to that)
+  snap install go --classic
+
+  # always install the latest version (or something close to that)
+  snap install protobuf --classic
+  # snap install protobuf-compiler --classic
+SHELL
+
+
+$python_provision = <<-SHELL
+  apt update
+  apt install -y python3 python3-pip python3-dev python3-venv python3.10 python3.10-dev python3.10-venv
+SHELL
+
+
+Vagrant.configure("2") do |config|
+
+  # set timezone for all VMs
+  config.timezone.value = "UTC"
+  #config.disksize.size = "10GB"
+
+  config.vm.define "testvm", primary: true, autostart: true do |testvm|
+
+    testvm.vm.hostname = "testvm"
+    testvm.vm.box = "bento/ubuntu-22.04"
+
+    testvm.vm.provider "virtualbox" do |vb|
+      vb.gui = false
+      vb.name = "Ubuntu 22.04 - testvm machine"
+      vb.memory = "4096"
+    end
+
+    testvm.vm.synced_folder "./", "/home/vagrant/testvm"
+    # this is slow due to .git directory
+    # testvm.vm.provision "file", source: "./", destination: "$HOME/testvm"
+
+    # build provision
+    testvm.vm.provision "shell", inline: $debug_tools_provision
+    testvm.vm.provision "shell", inline: $golang_provision
+    testvm.vm.provision "shell", inline: $python_provision
+
+    # services provision
+    #testvm.vm.provision "shell", path: build/scripts/clickhouse.sh, env: chenv
+    #testvm.vm.provision "shell", path: build/scripts/elasticsearch.sh, env: esenv
+    #testvm.vm.provision "shell", path: "build/scripts/kafka.sh", env: kafkaenv
+    #testvm.vm.provision "shell", path: "build/scripts/kafka_always.sh", env: kafkaenv, run: "always"
+
+    # docker provision
+    #testvm.vm.provision "shell", path: "build/scripts/docker.sh"
+
+  end
+
+end
