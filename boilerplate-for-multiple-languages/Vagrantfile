@@ -20,6 +20,10 @@ esenv = {
   "ES_VERSION" => "8.x"
 }
 
+goenv = {
+  "GO_VERSION" => "1.23"
+}
+
 # Development vagrant file for testvm
 
 $debug_tools_provision = <<-SHELL
@@ -36,11 +40,12 @@ $golang_provision = <<-SHELL
   apt install -y g++ gcc python3 subversion
 
   # always install the latest version (or something close to that)
-  snap install go --classic
+snap install go --channel="$GO_VERSION"/stable --classic
 
-  # always install the latest version (or something close to that)
-  snap install protobuf --classic
-  # snap install protobuf-compiler --classic
+# always install the latest version (or something close to that)
+snap install protobuf --classic
+# snap install protobuf-compiler --classic
+
 SHELL
 
 
@@ -73,7 +78,7 @@ Vagrant.configure("2") do |config|
 
     # build provision
     testvm.vm.provision "shell", inline: $debug_tools_provision
-    testvm.vm.provision "shell", inline: $golang_provision
+    testvm.vm.provision "shell", inline: $golang_provision, env: goenv
     testvm.vm.provision "shell", inline: $python_provision
 
     # services provision
