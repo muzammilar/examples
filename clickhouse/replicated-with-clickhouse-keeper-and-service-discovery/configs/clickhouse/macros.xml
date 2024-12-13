@@ -1,0 +1,7 @@
+<clickhouse>
+    <macros>
+        <datacenter>neverland</datacenter>
+        <shard from_env="SHARD" />
+        <replica from_env="HOSTNAME" />
+    </macros>
+</clickhouse>
