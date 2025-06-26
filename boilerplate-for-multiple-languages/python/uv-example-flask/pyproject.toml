@@ -1,7 +1,13 @@
+[tool.uv]
+package = true
+
 [project]
-name = "uv-example"
+name = "uv-example-flask"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "flask>=3.1.1",
+    "pytest>=8.4.1",
+]
