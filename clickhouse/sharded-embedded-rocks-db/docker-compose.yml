@@ -1,0 +1,125 @@
+services:
+  # Prometheus Container
+  prometheus:
+    image: "prom/prometheus"
+    hostname: prometheus-svc-01
+    container_name: prometheus-svc-01
+    volumes:
+      - ./configs/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - 9090:9090 # http port
+
+  # Server-1
+  clickhouse-server-01:
+    extends:
+      file: clickhouse-service.yml
+      service: clickhouse-data
+    container_name: clickhouse-server-01
+    hostname: ch01
+    ports:
+      - 18123:8123
+    environment:
+      - SHARD=001
+  # Server-2
+  clickhouse-server-02:
+    extends:
+      file: clickhouse-service.yml
+      service: clickhouse-data
+    container_name: clickhouse-server-02
+    hostname: ch02
+    environment:
+      - SHARD=002
+  # Server-3
+  clickhouse-server-03:
+    extends:
+      file: clickhouse-service.yml
+      service: clickhouse-data
+    container_name: clickhouse-server-03
+    hostname: ch03
+    environment:
+      - SHARD=003
+  # Server-4
+  clickhouse-server-04:
+    extends:
+      file: clickhouse-service.yml
+      service: clickhouse-data
+    container_name: clickhouse-server-04
+    hostname: ch04
+    environment:
+      - SHARD=004
+  # Server-5
+  clickhouse-server-05:
+    extends:
+      file: clickhouse-service.yml
+      service: clickhouse-data
+    container_name: clickhouse-server-05
+    hostname: ch05
+    environment:
+      - SHARD=005
+  # Server-6
+  clickhouse-server-06:
+    extends:
+      file: clickhouse-service.yml
+      service: clickhouse-data
+    container_name: clickhouse-server-06
+    hostname: ch06
+    environment:
+      - SHARD=006
+  # Server-7
+  clickhouse-server-07:
+    extends:
+      file: clickhouse-service.yml
+      service: clickhouse-data
+    container_name: clickhouse-server-07
+    hostname: ch07
+    environment:
+      - SHARD=007
+  # Server-8
+  clickhouse-server-08:
+    extends:
+      file: clickhouse-service.yml
+      service: clickhouse-data
+    container_name: clickhouse-server-08
+    hostname: ch08
+    environment:
+      - SHARD=008
+  # Server-9
+  clickhouse-server-09:
+    extends:
+      file: clickhouse-service.yml
+      service: clickhouse-data
+    container_name: clickhouse-server-09
+    hostname: ch09
+    environment:
+      - SHARD=009
+
+  # Server-10 - Keeper Only
+  clickhouse-keeper-01:
+    extends:
+      file: clickhouse-service.yml
+      service: clickhouse-keeper
+    container_name: clickhouse-keeper-01
+    hostname: chkp01
+    environment:
+      - KEEPER_SERVER_ID=1001
+      - SHARD=pls-ignore-me
+  # Server-11 - Keeper Only
+  clickhouse-keeper-02:
+    extends:
+      file: clickhouse-service.yml
+      service: clickhouse-keeper
+    container_name: clickhouse-keeper-02
+    hostname: chkp02
+    environment:
+      - KEEPER_SERVER_ID=1002
+      - SHARD=pls-ignore-me
+  # Server-12 - Keeper Only
+  clickhouse-keeper-03:
+    extends:
+      file: clickhouse-service.yml
+      service: clickhouse-keeper
+    container_name: clickhouse-keeper-03
+    hostname: chkp03
+    environment:
+      - KEEPER_SERVER_ID=1003
+      - SHARD=pls-ignore-me
