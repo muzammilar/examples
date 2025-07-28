@@ -1,0 +1,53 @@
+services:
+  # Generic ClickHouse Service
+  clickhouse:
+    image: "clickhouse/clickhouse-server:25.6"
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    volumes:
+      - ./configs/clickhouse/config_overrides.xml:/etc/clickhouse-server/config.d/config_overrides.xml # config overrides on default
+      - ./configs/clickhouse/keeper.xml:/etc/clickhouse-server/config.d/keeper.xml # zookeeper/keeper client configs
+      - ./configs/clickhouse/clusters.xml:/etc/clickhouse-server/config.d/clusters.xml # cluster configs
+      - ./configs/clickhouse/macros.xml:/etc/clickhouse-server/config.d/macros.xml # macros configs
+
+  # ClickHouse Data Service
+  clickhouse-data:
+    extends:
+      file: clickhouse-service.yml
+      service: clickhouse
+    environment:
+      - CLICKHOUSE_SKIP_USER_SETUP=1 # NEVER USE THIS IN PRODUCTION. It allows us to use the default user for inter-server communication
+    volumes:
+      - ./sql:/ch-replica-sql # sql files
+      - ./sql:/docker-entrypoint-initdb.d # docker entry point database
+    healthcheck: # healthcheck data servers (This should be changed for production)
+      test: ['CMD', 'clickhouse-client', '--query', 'select 1']
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    # This is very hackish since it hides the details from the user
+    depends_on:
+      clickhouse-keeper-01:
+        condition: service_healthy
+      clickhouse-keeper-02:
+        condition: service_healthy
+      clickhouse-keeper-03:
+        condition: service_healthy
+
+
+
+  # ClickHouse Keeper Service
+  clickhouse-keeper:
+    extends:
+      file: clickhouse-service.yml
+      service: clickhouse
+    volumes:
+      - ./configs/clickhouse/keeper_server.xml:/etc/clickhouse-server/config.d/keeper_server.xml # clickhouse-keeper configs
+    healthcheck:
+      test: ["CMD-SHELL", "clickhouse-keeper-client --query stat"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s

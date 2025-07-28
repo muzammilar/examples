@@ -1,0 +1,23 @@
+<clickhouse>
+
+    <!-- Remove MySQL port -->
+    <mysql_port remove="remove" />
+
+    <!-- Remove PostgreSQL port -->
+    <postgresql_port remove="remove" />
+
+    <!-- Macro 'uuid' and empty arguments of ReplicatedMergeTree are supported only for ON CLUSTER queries with Atomic database engine. -->
+    <!--
+        <default_replica_path replace="replace">/clickhouse/tables/{uuid}/{shard}</default_replica_path>
+    -->
+
+    <!--Add prometheus based monitoring -->
+    <prometheus>
+        <endpoint>/metrics</endpoint>
+        <port>8001</port>
+        <metrics>true</metrics>
+        <events>true</events>
+        <asynchronous_metrics>true</asynchronous_metrics>
+    </prometheus>
+
+</clickhouse>
