@@ -47,7 +47,6 @@ services:
         condition: service_healthy
       kafka-broker-3:
         condition: service_healthy
-    command: echo "Kafka Commands Container"
     restart: on-failure:10
 
   # extra commands:
