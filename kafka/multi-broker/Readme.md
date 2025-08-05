@@ -4,9 +4,6 @@
 # run containers
 docker compose up --build --detach
 
-# Multiple Kafka consumers (you can stop individual consumer to see behaviour of others)
-docker-compose up --build --detach --scale consumer=5
-
 # Shutdown everything (and remove networks and local images). Networks are removed in this.
 # This is usually needed to cleanup kafka volumes (for the PoC)
 docker-compose down --volumes
