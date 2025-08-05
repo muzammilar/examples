@@ -71,7 +71,7 @@ services:
     extends:
       file: docker-kafka-base.yml
       service: kafka-commands
-      command: /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka-broker-1:19092,kafka-broker-2:19092,kafka-broker-3:19092 --create --if-not-exists --topic test-topic
+    command: /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka-broker-1:19092,kafka-broker-2:19092,kafka-broker-3:19092 --create --if-not-exists --topic test-topic
 
 # Network
 networks:
