@@ -1,0 +1,127 @@
+version: "3.9"
+
+services:
+  # Prometheus Container
+  prometheus:
+    image: "prom/prometheus"
+    hostname: prometheus-svc-01
+    container_name: prometheus-svc-01
+    volumes:
+      - ./configs/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - 9090:9090 # http port
+
+  # Server-1
+  clickhouse-server-01:
+    extends:
+      file: clickhouse-service.yml
+      service: clickhouse
+    container_name: clickhouse-server-01
+    hostname: ch01
+    ports:
+      - 18123:8123
+    volumes:
+      - ./configs/clickhouse/keeper_server.xml:/etc/clickhouse-server/config.d/keeper_server.xml # clickhouse-keeper configs
+    environment:
+      - SHARD=001
+      - KEEPER_SERVER_ID=1001
+  # Server-2
+  clickhouse-server-02:
+    extends:
+      file: clickhouse-service.yml
+      service: clickhouse
+    container_name: clickhouse-server-02
+    hostname: ch02
+    volumes:
+      - ./configs/clickhouse/keeper_server.xml:/etc/clickhouse-server/config.d/keeper_server.xml # clickhouse-keeper configs
+    environment:
+      - SHARD=002
+      - KEEPER_SERVER_ID=2002
+  # Server-3
+  clickhouse-server-03:
+    extends:
+      file: clickhouse-service.yml
+      service: clickhouse
+    container_name: clickhouse-server-03
+    hostname: ch03
+    volumes:
+      - ./configs/clickhouse/keeper_server.xml:/etc/clickhouse-server/config.d/keeper_server.xml # clickhouse-keeper configs
+    environment:
+      - SHARD=003
+      - KEEPER_SERVER_ID=3003
+  # Server-4
+  clickhouse-server-04:
+    extends:
+      file: clickhouse-service.yml
+      service: clickhouse
+    container_name: clickhouse-server-04
+    hostname: ch04
+    environment:
+      - SHARD=001
+  # Server-5
+  clickhouse-server-05:
+    extends:
+      file: clickhouse-service.yml
+      service: clickhouse
+    container_name: clickhouse-server-05
+    hostname: ch05
+    environment:
+      - SHARD=002
+  # Server-6
+  clickhouse-server-06:
+    extends:
+      file: clickhouse-service.yml
+      service: clickhouse
+    container_name: clickhouse-server-06
+    hostname: ch06
+    environment:
+      - SHARD=003
+  # Server-7
+  clickhouse-server-07:
+    extends:
+      file: clickhouse-service.yml
+      service: clickhouse
+    container_name: clickhouse-server-07
+    hostname: ch07
+    environment:
+      - SHARD=001
+  # Server-8
+  clickhouse-server-08:
+    extends:
+      file: clickhouse-service.yml
+      service: clickhouse
+    container_name: clickhouse-server-08
+    hostname: ch08
+    environment:
+      - SHARD=002
+  # Server-9
+  clickhouse-server-09:
+    extends:
+      file: clickhouse-service.yml
+      service: clickhouse
+    container_name: clickhouse-server-09
+    hostname: ch09
+    environment:
+      - SHARD=003
+  # Server-10
+  clickhouse-server-10:
+    extends:
+      file: clickhouse-service.yml
+      service: clickhouse
+    container_name: clickhouse-server-10
+    hostname: ch10
+    volumes:
+      - ./configs/clickhouse/keeper_server.xml:/etc/clickhouse-server/config.d/keeper_server.xml # clickhouse-keeper configs
+    environment:
+      - KEEPER_SERVER_ID=1000
+  # Server-11
+  clickhouse-server-11:
+    extends:
+      file: clickhouse-service.yml
+      service: clickhouse
+    container_name: clickhouse-server-11
+    hostname: ch11
+    volumes:
+      - ./configs/clickhouse/keeper_server.xml:/etc/clickhouse-server/config.d/keeper_server.xml # clickhouse-keeper configs
+    environment:
+      - KEEPER_SERVER_ID=1100
