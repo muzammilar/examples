@@ -1,0 +1,23 @@
+services:
+
+  roach-single-node:
+    container_name: roach-single
+    hostname: roach-single
+    image: cockroachdb/cockroach:latest-v25.2
+    ports:
+      - "26257:26257"
+      - "8080:8080"
+    command: start-single-node --insecure
+    environment:
+      COCKROACH_DATABASE: testdb
+    volumes:
+      #- "${PWD}/cockroach-data/crdb:/cockroach/cockroach-data"
+      - "./cockroach-data/crdb:/cockroach/cockroach-data"
+      - "./cockroach-data/sql:/sqlcommands"
+    networks:
+      - roach-network
+
+# create a netword called roachnet
+networks:
+  roach-network:
+    driver: bridge
