@@ -1,0 +1,17 @@
+#target-version = "py310"
+#src = ["src"]
+
+# Use a different line length.
+line-length = 130
+
+[lint.pydocstyle]
+# Use Google-style docstrings.
+convention = "google"
+
+[lint.isort]
+# docs.astral.sh/ruff/settings/#lint_isort_split-on-trailing-comma
+# split-on-trailing-comma = false
+
+[format]
+# https://docs.astral.sh/ruff/settings/#format_skip-magic-trailing-comma
+# skip-magic-trailing-comma = true
