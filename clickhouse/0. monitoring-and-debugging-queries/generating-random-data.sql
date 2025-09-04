@@ -36,10 +36,24 @@ ENGINE = GenerateRandom();
 -- GenerateRandom([random_seed [,max_string_length [,max_array_length]]])
 
 
-/* This is primarily used for testing statistical hypotheses - specifically whether a dataset matches a distribution.  */
+/* randChiSquared() - This is primarily used for testing statistical hypotheses - specifically whether a dataset matches a distribution.  */
 SELECT
     floor(randChiSquared(10)) AS k,
     bar(count(*), 0, 10000, 10) AS b1
 FROM numbers(100000)
 GROUP BY k
 ORDER BY k ASC
+
+/* Multi-Modal Binomial */
+SELECT
+    floor(randBinomial(24, 0.75)) AS k,
+    count(*) AS c,
+    number % 3 AS ord,
+    bar(c, 0, 10000)
+FROM numbers(100000)
+GROUP BY
+    k,
+    ord
+ORDER BY
+    ord ASC,
+    k ASC
