@@ -1,0 +1,15 @@
+
+# Your ansible playbook tasks
+---
+# Task to install python
+- name: Install Python3
+  become: true # Becomes root user
+  ansible.builtin.apt: # or yum
+    name:
+      - python3
+
+- name: Install UV Standalone Installer
+  ansible.builtin.shell: |
+    curl -LsSf https://astral.sh/uv/install.sh | sh
+  args:
+    creates: "{{ ansible_env.HOME }}/.cargo/bin/uv" # Adjust path if uv is installed elsewhere

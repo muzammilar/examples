@@ -1,0 +1,9 @@
+
+# Your localhost ansible playbook to install clickhouse
+---
+# Don't do this in production as it keeps creating files
+- host: all
+  connection: local
+  become: true
+  name: Install ClickHouse Server With A Single Command
+  ansible.builtin.shell: "curl https://clickhouse.com/ | sh"

@@ -1,0 +1,60 @@
+
+# Your ansible playbook tasks
+---
+# Task to install the pre-requisites
+- name: Install Pre-Requisites For ClickHouse
+  ansible.builtin.apt: # or yum
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - gnupg
+
+# Task to get the Debian architecture of the system
+- name: Get DEB architecture
+  shell: dpkg --print-architecture # Get the architecture of the Debian-based system
+  register: deb_architecture
+
+# Task to print the retrieved Debian architecture for debugging purposes
+#- name: Print DEB architecture
+#  debug:
+#    msg: "deb_architecture.stdout: {{ deb_architecture.stdout }}"
+
+# Block of tasks to install the ClickHouse GPG Key
+- name: Install ClickHouse GPG Key
+  block:
+    # Task to download the GPG key from the ClickHouse repository
+    - name: Download GPG key
+      ansible.builtin.get_url:
+        url: https://packages.clickhouse.com/rpm/lts/repodata/repomd.xml.key
+        dest: /tmp/clickhouse-key.xml.key
+        mode: 0644
+
+    # Task to dearmor the downloaded GPG key and place it in the keyrings directory
+    - name: Dearmor the GPG key
+      become: true
+      ansible.builtin.shell: |
+        gpg --batch --dearmor -o /usr/share/keyrings/clickhouse-keyring.gpg /tmp/clickhouse-key.xml.key
+      args:
+        creates: /usr/share/keyrings/clickhouse-keyring.gpg
+
+    # Task to add the ClickHouse APT repository to the system's sources list
+    - name: Add ClickHouse Repository
+      ansible.builtin.apt_repository:
+        repo: "deb [arch={{ deb_architecture.stdout }} signed-by=/usr/share/keyrings/clickhouse-keyring.gpg] https://packages.clickhouse.com/deb stable main"
+        filename: clickhouse # This becomes  /etc/apt/sources.list.d/clickhouse.list
+
+# Task to install the ClickHouse server, client, and common static packages
+- name: Install ClickHouse Packages
+  ansible.builtin.apt: # or yum
+    name:
+      - clickhouse-server
+      - clickhouse-client
+      - clickhouse-common-static
+
+# Task (commented out) to start and enable the ClickHouse server service
+#- name: Start and enable ClickHouse server
+#  ansible.builtin.service:
+#    name: clickhouse-server
+#    state: started
+#    enabled: yes

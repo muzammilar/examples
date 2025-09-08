@@ -1,0 +1,5 @@
+
+# Your localhost ansible playbook
+---
+#  - name: Install ClickHouse Server With A Single Command
+#    ansible.builtin.shell: "curl https://clickhouse.com/ | sh"

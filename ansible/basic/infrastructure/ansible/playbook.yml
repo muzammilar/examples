@@ -1,0 +1,13 @@
+---
+# Your localhost ansible playbook
+#- hosts: all # all hosts in the inventory.ini file (which doesn't exist for us)
+  #connection: local # localhost connection
+  #tasks:
+    # dummy task
+    #- debug: msg=test
+
+    # Include ClickHouse - # Avoid this since it downloads a binary every time
+    - name: Install ClickHouse As Playbook
+      ansible.builtin.import_playbook: clickhouse.yml
+    # or
+    # - import_playbook: clickhouse.yml

@@ -1,0 +1,4 @@
+
+---
+# import the local/relative install.yml file from clickhouse tasks
+- import_tasks: install.yml
