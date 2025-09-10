@@ -47,6 +47,7 @@ services:
       - ./configs/clickhouse/keeper_server.xml:/etc/clickhouse-server/config.d/keeper_server.xml # clickhouse-keeper configs
     healthcheck:
       test: ["CMD-SHELL", "clickhouse-keeper-client --query stat"]
+      # test: ["CMD-SHELL", "clickhouse-keeper-client --query stat | grep -e 'follower' -e 'leader'"]
       interval: 10s
       retries: 5
       start_period: 30s
