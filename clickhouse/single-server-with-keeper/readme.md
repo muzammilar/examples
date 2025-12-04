@@ -33,6 +33,6 @@ docker-compose down --volumes
 
 # Use `docker-compose down --rmi all --volumes` with above to images as well
 # Remove everything (and remove volumes). Networks are not removed here.
-docker-compose rm --force --stop -v
+docker-compose rm --force --stop --volumes
 
 ```
