@@ -1,0 +1,41 @@
+<dictionaries>
+
+    <!-- A dictionary which supports partial updates -->
+    <dictionary>
+        <name>test_dict</name>
+        <structure>
+            <id>
+                <name>key</name>
+                <type>UInt64</type>
+            </id>
+            <attribute>
+                <name>value</name>
+                <type>UInt64</type>
+                <null_value>0</null_value> <!-- if this was a nullable field in remote -->
+            </attribute>
+            <attribute>
+                <name>ts</name>
+                <type>DateTime</type>
+                <null_value></null_value> <!-- if this was a nullable field in remote -->
+            </attribute>
+        </structure>
+        <source>
+            <clickhouse>
+                <host>localhost</host>
+                <port>9000</port> <!-- Or your ClickHouse TCP port -->
+                <user>default</user>
+                <password></password>
+                <query>SELECT key, val as value, data_timestamp as ts FROM test.test_table</query>
+                <update_field>ts</update_field>
+                <update_lag>30</update_lag>
+            </clickhouse>
+        </source>
+        <layout>
+            <flat />
+        </layout>
+        <lifetime>
+            <min>60</min>
+            <max>120</max>
+        </lifetime>
+    </dictionary>
+</dictionaries>
