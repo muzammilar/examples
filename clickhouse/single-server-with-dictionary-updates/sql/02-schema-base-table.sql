@@ -20,4 +20,12 @@ SELECT
 FROM system.numbers
 LIMIT 15;
 
+/* Create a table from the dictionary but without the timestamp */
+CREATE TABLE IF NOT EXISTS test.test_dict_table
+(
+    `key` UInt64,
+    `value` UInt64,
+)
+ENGINE = Dictionary('test_dict');
+
 ;;

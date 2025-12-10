@@ -38,4 +38,55 @@
             <max>120</max>
         </lifetime>
     </dictionary>
+
+    <!-- A dictionary which supports partial updates -->
+    <dictionary>
+        <dictionaries_lazy_load>false</dictionaries_lazy_load>
+        <name>test_dict_dependent</name>
+        <structure>
+            <id>
+                <name>key</name>
+                <type>UInt64</type>
+            </id>
+            <attribute>
+                <name>val</name>
+                <type>UInt64</type>
+                <null_value>0</null_value> <!-- if this was a nullable field in remote -->
+            </attribute>
+            <attribute>
+                <name>data_timestamp</name>
+                <type>DateTime(3)</type>
+                <null_value></null_value> <!-- if this was a nullable field in remote -->
+            </attribute>
+            <!-- Uncomment the following to test the behavior -->
+            <!--
+            <attribute>
+                <name>ts_missing_field</name>
+                <type>DateTime</type>
+                <null_value></null_value>
+            </attribute>
+            -->
+        </structure>
+        <source>
+            <clickhouse>
+                <host>localhost</host>
+                <port>9000</port> <!-- Or your ClickHouse TCP port -->
+                <user>default</user>
+                <password></password>
+                <db>test</db>
+                <table>test_table</table>
+                <!-- Uncomment the following line to test the behavior -->
+                <!-- <update_field>ts_missing_field</update_field> -->
+                <update_lag>30</update_lag>
+            </clickhouse>
+        </source>
+        <layout>
+            <flat />
+        </layout>
+        <lifetime>
+            <min>15</min>
+            <max>30</max>
+        </lifetime>
+    </dictionary>
+
 </dictionaries>
