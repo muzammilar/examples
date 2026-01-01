@@ -1,0 +1,14 @@
+services:
+  # Server-1
+  clickhouse-server-01:
+    image: clickhouse/clickhouse-server:25.8
+    ports:
+      - 8123:8123
+      - 9000:9000
+    container_name: clickhouse-server-01
+    hostname: ch01
+    environment:
+      - CLICKHOUSE_SKIP_USER_SETUP=1 # NEVER USE THIS IN PRODUCTION. It allows us to use the default user for inter-server communication
+    volumes:
+      - ./sql:/ch-test/sql # sql files
+      - ./setup/setup-clickhouse.sh:/docker-entrypoint-initdb.d/setup-clickhouse.sh # setup clickhouse tables and permissions
