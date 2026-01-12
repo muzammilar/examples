@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<clickhouse>
+    <named_collections>
+        <!-- Kafka producer configuration -->
+        <!-- Complete configuration for producing messages to user_analytics topic -->
+        <kafka_producer_config>
+            <kafka_broker_list from_env="KAFKA_BROKERS"/>
+            <kafka_group_name from_env="KAFKA_PRODUCER_GROUP"/>
+            <kafka_topic_list from_env="KAFKA_TOPIC"/>
+            <kafka_format from_env="KAFKA_FORMAT"/>
+        </kafka_producer_config>
+
+        <!-- Kafka consumer configuration -->
+        <!-- Complete configuration for consuming messages from user_analytics topic -->
+        <kafka_consumer_config>
+            <kafka_broker_list from_env="KAFKA_BROKERS"/>
+            <kafka_group_name from_env="KAFKA_CONSUMER_GROUP"/>
+            <kafka_topic_list from_env="KAFKA_TOPIC"/>
+            <kafka_format from_env="KAFKA_FORMAT"/>
+        </kafka_consumer_config>
+
+        <!-- MySQL connection configuration for reading/writing data -->
+        <mysql_config>
+            <host from_env="MYSQL_HOST"/>
+            <port from_env="MYSQL_PORT"/>
+            <user from_env="MYSQL_USER"/>
+            <password from_env="MYSQL_PASSWORD"/>
+            <database from_env="MYSQL_DATABASE"/>
+        </mysql_config>
+    </named_collections>
+</clickhouse>

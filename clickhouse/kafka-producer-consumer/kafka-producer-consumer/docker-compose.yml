@@ -1,0 +1,140 @@
+services:
+  # MySQL Database Service
+  # Stores user data and serves as a source for data ingestion
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    environment:
+      # Root password for MySQL authentication
+      MYSQL_ROOT_PASSWORD: rootpass
+      # Default database created on startup
+      MYSQL_DATABASE: testdb
+    ports:
+      # Expose MySQL on default port 3306
+      - "3306:3306"
+    volumes:
+      # Mount SQL initialization scripts directory - executed in alphabetical order on first startup
+      # Files in /docker-entrypoint-initdb.d/ are executed in alphabetical order
+      - ./mysql/sql:/docker-entrypoint-initdb.d
+    healthcheck:
+      # Check if MySQL is ready and users table has at least one entry
+      # Uses -sN flags for silent mode without column names, then tests if count > 0
+      test: ["CMD", "sh", "-c", "test $$(mysql -uroot -p$$MYSQL_ROOT_PASSWORD testdb -sN -e 'SELECT COUNT(*) FROM users') -gt 0"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - app-network
+
+  # Apache Kafka Message Broker
+  # Runs in KRaft mode (without Zookeeper) for message streaming
+  kafka:
+    image: apache/kafka:3.9.1
+    container_name: kafka
+    ports:
+      # Expose Kafka broker on default port 9092
+      - "9092:9092"
+    environment:
+      # Unique node identifier for this Kafka instance
+      KAFKA_NODE_ID: 1
+      # Combined broker and controller role (KRaft mode)
+      KAFKA_PROCESS_ROLES: broker,controller
+      # Internal listener addresses for client and controller connections
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
+      # Advertised address that clients use to connect to this broker
+      # Uses kafka hostname for inter-container communication
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,CONTROLLER://localhost:9092
+      # Map listener names to security protocols (both use PLAINTEXT here)
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      # Specify which listener is used for controller communication
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      # Voter list for controller quorum (node_id@host:port)
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1 # default value is 3, we want 1 for local setup
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0 # start the consumer group immediately
+    volumes:
+      # Persist Kafka data to named volume for durability across restarts
+      - kafka-data:/var/lib/kafka/data
+    healthcheck:
+      # Check if Kafka broker is ready and accepting connections
+      # This tool retrieves the API versions supported by the broker
+      # A successful response signifies that the broker is responding to requests
+      test: ["CMD", "/opt/kafka/bin/kafka-broker-api-versions.sh", "--bootstrap-server", "localhost:9092"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - app-network
+
+  # Kafka Topic Initialization
+  # Creates required Kafka topics on startup
+  kafka-init:
+    image: apache/kafka:3.9.1
+    container_name: kafka-init
+    depends_on:
+      kafka:
+        condition: service_healthy
+    volumes:
+      # Mount topic creation script
+      - ./kafka/init/create-topics.sh:/create-topics.sh
+    command: bash /create-topics.sh
+    networks:
+      - app-network
+    restart: on-failure
+
+  # ClickHouse Analytics Database
+  # Provides fast analytical queries and integrations with Kafka and MySQL
+  clickhouse:
+    image: clickhouse/clickhouse-server:25.11
+    container_name: clickhouse
+    environment:
+      # Kafka configuration for named collections
+      KAFKA_BROKERS: kafka:9092
+      KAFKA_PRODUCER_GROUP: clickhouse_producer
+      KAFKA_CONSUMER_GROUP: clickhouse_consumer
+      KAFKA_TOPIC: user_analytics
+      KAFKA_FORMAT: JSONEachRow
+      # MySQL connection parameters used by named collections
+      MYSQL_HOST: mysql
+      MYSQL_PORT: 3306
+      MYSQL_USER: root
+      MYSQL_PASSWORD: rootpass
+      MYSQL_DATABASE: testdb
+    ports:
+      # HTTP interface for queries and monitoring
+      - "8123:8123"
+      # Native TCP protocol for clickhouse-client
+      - "9000:9000"
+    volumes:
+      # Mount named collections configuration for Kafka and MySQL connections
+      - ./clickhouse/config/named_collections.xml:/etc/clickhouse-server/config.d/named_collections.xml
+      # Mount initialization SQL scripts directory - executed in alphabetical order on first startup
+      - ./clickhouse/sql/init:/docker-entrypoint-initdb.d
+      # Mount query SQL files for on-demand execution
+      - ./clickhouse/sql:/queries
+      # Persist ClickHouse data to named volume for durability across restarts
+      - clickhouse-data:/var/lib/clickhouse
+    depends_on:
+      # Wait for MySQL and Kafka to be healthy before launching ClickHouse
+      # This ensures MySQL is ready with data and Kafka broker is accepting connections
+      mysql:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    networks:
+      - app-network
+
+# Named volumes for persistent data storage
+volumes:
+  # Kafka data volume to persist messages and metadata
+  kafka-data:
+  # ClickHouse data volume to persist databases and tables
+  clickhouse-data:
+
+# Custom bridge network for inter-service communication
+networks:
+  app-network:
+    driver: bridge
