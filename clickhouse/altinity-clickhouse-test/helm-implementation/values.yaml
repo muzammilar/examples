@@ -1,0 +1,15 @@
+chVersion: "26.3.9.8"
+chkVersion: "26.3.9.8"
+
+logger:
+  level: warning
+  formattingType: json
+
+chi:
+  name: test
+  shards: 2
+  replicas: 2
+
+chk:
+  name: keeper
+  replicas: 3

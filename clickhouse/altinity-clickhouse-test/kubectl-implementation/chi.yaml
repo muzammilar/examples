@@ -1,0 +1,32 @@
+apiVersion: "clickhouse.altinity.com/v1"
+kind: "ClickHouseInstallation"
+metadata:
+  name: "test"
+  namespace: "clickhouse-kubectl-test"
+spec:
+  configuration:
+    settings:
+      logger/level: warning
+      logger/formatting/type: json
+    zookeeper:
+      nodes:
+        - host: chk-keeper-keeper-0-0.clickhouse-kubectl-test.svc.cluster.local
+          port: 2181
+        - host: chk-keeper-keeper-0-1.clickhouse-kubectl-test.svc.cluster.local
+          port: 2181
+        - host: chk-keeper-keeper-0-2.clickhouse-kubectl-test.svc.cluster.local
+          port: 2181
+    clusters:
+      - name: "test"
+        layout:
+          shardsCount: 2
+          replicasCount: 2
+        templates:
+          podTemplate: clickhouse-pod
+  templates:
+    podTemplates:
+      - name: clickhouse-pod
+        spec:
+          containers:
+            - name: clickhouse
+              image: clickhouse/clickhouse-server:26.3.9.8

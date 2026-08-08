@@ -1,0 +1,24 @@
+apiVersion: "clickhouse-keeper.altinity.com/v1"
+kind: "ClickHouseKeeperInstallation"
+metadata:
+  name: "keeper"
+  namespace: "clickhouse-kubectl-test"
+spec:
+  configuration:
+    clusters:
+      - name: "keeper"
+        layout:
+          replicasCount: 3
+    settings:
+      logger/level: warning
+      logger/formatting/type: json
+  templates:
+    podTemplates:
+      - name: chk-pod-template
+        spec:
+          containers:
+            - name: clickhouse-keeper
+              image: clickhouse/clickhouse-keeper:${CHK_VERSION}
+  defaults:
+    templates:
+      podTemplate: chk-pod-template

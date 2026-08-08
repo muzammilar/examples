@@ -1,0 +1,24 @@
+apiVersion: "clickhouse-keeper.altinity.com/v1"
+kind: "ClickHouseKeeperInstallation"
+metadata:
+  name: {{ .Values.chk.name }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  configuration:
+    clusters:
+      - name: {{ .Values.chk.name }}
+        layout:
+          replicasCount: {{ .Values.chk.replicas }}
+    settings:
+      logger/level: {{ .Values.logger.level }}
+      logger/formatting/type: {{ .Values.logger.formattingType }}
+  templates:
+    podTemplates:
+      - name: chk-pod-template
+        spec:
+          containers:
+            - name: clickhouse-keeper
+              image: "clickhouse/clickhouse-keeper:{{ .Values.chkVersion }}"
+  defaults:
+    templates:
+      podTemplate: chk-pod-template

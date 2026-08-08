@@ -1,0 +1,30 @@
+apiVersion: "clickhouse.altinity.com/v1"
+kind: "ClickHouseInstallation"
+metadata:
+  name: {{ .Values.chi.name }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  configuration:
+    settings:
+      logger/level: {{ .Values.logger.level }}
+      logger/formatting/type: {{ .Values.logger.formattingType }}
+    zookeeper:
+      nodes:
+        {{- range $i := until (int .Values.chk.replicas) }}
+        - host: chk-{{ $.Values.chk.name }}-{{ $.Values.chk.name }}-0-{{ $i }}.{{ $.Release.Namespace }}.svc.cluster.local
+          port: 2181
+        {{- end }}
+    clusters:
+      - name: {{ .Values.chi.name }}
+        layout:
+          shardsCount: {{ .Values.chi.shards }}
+          replicasCount: {{ .Values.chi.replicas }}
+        templates:
+          podTemplate: clickhouse-pod
+  templates:
+    podTemplates:
+      - name: clickhouse-pod
+        spec:
+          containers:
+            - name: clickhouse
+              image: "clickhouse/clickhouse-server:{{ .Values.chVersion }}"

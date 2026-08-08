@@ -1,0 +1,6 @@
+apiVersion: v2
+name: clickhouse-logger-test
+description: Test ClickHouseInstallation + ClickHouseKeeperInstallation for validating logger/level and logger/formatting/type settings
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
