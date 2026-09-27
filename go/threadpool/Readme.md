@@ -62,12 +62,12 @@ An unbuffered queue (`queue=0`) is noticeably slower because every `Submit` has 
 ## Docker
 
 ```sh
-make docker-up     # docker compose up --build --detach
-make docker-logs   # follow the app logs
-make docker-down   # remove containers, networks, volumes, orphans and the built threadpool image
+make up     # docker compose up --build --detach, then waits until Grafana is ready
+make logs   # follow the app logs
+make down   # remove containers, networks, volumes, orphans and the built threadpool image
 ```
 
-The compose stack runs the demo in continuous mode (1200 msgs/sec, `-task-time 5ms`, 8 workers, metrics on `:8080` inside the compose network only), plus Prometheus and Grafana. `make docker-down` keeps the pulled `prom/prometheus` and `grafana/grafana` images.
+The compose stack runs the demo in continuous mode (1200 msgs/sec, `-task-time 5ms`, 8 workers, metrics on `:8080` inside the compose network only), plus Prometheus and Grafana. `make down` keeps the pulled `prom/prometheus` and `grafana/grafana` images.
 
 ## Monitoring
 

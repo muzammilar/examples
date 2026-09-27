@@ -1,4 +1,4 @@
-.PHONY: help deps fmt vet build run run-continuous test test-race bench bench-cpu test-all clean docker-build docker-up docker-logs docker-down
+.PHONY: help deps fmt vet build run run-continuous test test-race bench bench-cpu test-all clean docker-build up wait logs down
 
 # Variables
 APP_NAME := threadpool
@@ -7,9 +7,11 @@ BENCH ?= .
 BENCH_COUNT ?= 1
 BENCH_TIME ?= 1s
 RATE ?= 1000
-# Images built (not pulled) by docker-compose.yml; docker-down removes only these.
+# Images built (not pulled) by docker-compose.yml; down removes only these.
 BUILT_IMAGES := threadpool
 GRAFANA_URL := http://localhost:13013/d/threadpool-static
+# Grafana base URL polled by `make wait`
+GRAFANA_BASE := http://localhost:13013
 PROMETHEUS_URL := http://localhost:19113
 
 help: ## Display this help message
@@ -56,14 +58,23 @@ clean: ## Clean build artifacts
 docker-build: ## Build Docker image
 	docker compose build
 
-docker-up: ## Build and start the app, Prometheus and Grafana in the background
+up: ## Build and start the app, Prometheus and Grafana in the background
 	docker compose up --build --detach
+	@$(MAKE) --no-print-directory wait
 	@echo "Grafana:    $(GRAFANA_URL) (anonymous admin)"
 	@echo "Prometheus: $(PROMETHEUS_URL)"
 
-docker-logs: ## Follow the app logs
+wait: ## Wait (up to 4 minutes) until Grafana serves the Prometheus datasource and the dashboard
+	@echo "Waiting for Grafana at $(GRAFANA_BASE) ..."
+	@for i in $$(seq 1 120); do \
+		curl -sf $(GRAFANA_BASE)/api/datasources/uid/prometheus/health >/dev/null && \
+		curl -sf $(GRAFANA_BASE)/api/dashboards/uid/threadpool-static >/dev/null && { echo "Grafana is ready"; exit 0; }; \
+		sleep 2; \
+	done; echo "Grafana was not ready after 4 minutes (check make logs)"; exit 1
+
+logs: ## Follow the app logs
 	docker compose logs -f threadpool
 
-docker-down: ## Stop services; remove containers, networks, volumes, orphans and only the built images
+down: ## Stop services; remove containers, networks, volumes, orphans and only the built images
 	docker compose down --volumes --remove-orphans
 	-docker image rm $(BUILT_IMAGES)
