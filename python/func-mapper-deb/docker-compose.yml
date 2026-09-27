@@ -1,0 +1,30 @@
+name: funcmapper-deb
+
+# Monitoring demo: funk exposes Prometheus metrics on :8000 (inside the compose network only),
+# Prometheus scrapes it every 5s and Grafana shows the pre-provisioned "funcmapper" dashboard.
+# Usage: `make docker-up`, `make docker-logs`, `make docker-down`.
+services:
+  funk:
+    build:
+      context: .
+      dockerfile: Dockerfile.run
+    image: funkpkg-run:local
+    expose: ["8000"]
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:v3.15.0
+    ports: ["${PROMETHEUS_PORT:-19118}:9090"]
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    depends_on: [funk]
+
+  grafana:
+    image: grafana/grafana:13.2.2
+    ports: ["${GRAFANA_PORT:-13018}:3000"]
+    environment:
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Admin
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+    depends_on: [prometheus]

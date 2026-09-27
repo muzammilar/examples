@@ -8,6 +8,13 @@ from setuptools import setup
 PACKAGE_NAME = "funkpkg"
 LICENSE_NAME = "MIT"
 
+def requirements():
+    """Runtime dependencies, shared with dh-virtualenv (which installs requirements.txt)."""
+    here = os.path.dirname(os.path.abspath(__file__))
+    with open(os.path.join(here, "requirements.txt")) as f:
+        lines = (line.split("#", 1)[0].strip() for line in f)
+        return [line for line in lines if line]
+
 def version():
     if "PKG_VERSION" in os.environ and os.environ["PKG_VERSION"]:
         return os.environ["PKG_VERSION"]
@@ -26,8 +33,8 @@ setup(
         "Development Status :: 1 - Planning",
         "Programming Language :: Python :: 3",
     ],
-    python_requires=">=3.8",
-    install_requires=[],
+    python_requires=">=3.9",
+    install_requires=requirements(),
     packages=find_packages(exclude=["tests", "tests.*"]),
     include_package_data=True,
     data_files=[],

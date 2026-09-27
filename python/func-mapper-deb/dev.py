@@ -2,7 +2,8 @@
 """
 An entry point for testing funcmapper in local development setup.
 
-Usage: python3 dev.py [--interval SECONDS] [--log-file PATH] [--log-level LEVEL]
+Usage: python3 dev.py [--interval SECONDS] [--log-file PATH] [--log-level LEVEL] [--metrics-port PORT]
+(needs prometheus_client, e.g. `make dev-setup && make run RUN_ARGS=...`)
 """
 
 import sys

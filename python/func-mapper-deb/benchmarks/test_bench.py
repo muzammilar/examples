@@ -31,3 +31,22 @@ def test_maps_call(benchmark, name):
     benchmark.group = name
     result = benchmark(maps.call, name, *args, **kwargs)
     assert result.startswith(name)
+
+
+@pytest.mark.parametrize("name", sorted(CASES))
+def test_tracked_call(benchmark, name):
+    """`maps.call` wrapped in the metrics (what `funk.run` does when metrics are enabled)."""
+    from prometheus_client import CollectorRegistry
+
+    from funcmapper import metrics
+
+    args, kwargs = CASES[name]
+    m = metrics.Metrics(CollectorRegistry(), functions=sorted(CASES))
+    benchmark.group = name
+
+    def tracked():
+        with m.track_call(name):
+            return maps.call(name, *args, **kwargs)
+
+    result = benchmark(tracked)
+    assert result.startswith(name)

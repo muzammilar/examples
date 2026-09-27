@@ -35,6 +35,15 @@ PY_INSTALL_SUFFIX = funcmapper
 # build container
 BUILDER_IMAGE = funkpkg-builder
 
+# docker compose monitoring stack (funk + prometheus + grafana), see docker-compose.yml
+COMPOSE = docker compose --file ${MKFILE_DIR}docker-compose.yml
+# images built (not pulled) by docker-compose.yml; `make docker-down` removes only these
+COMPOSE_BUILT_IMAGES = funkpkg-run:local
+PROMETHEUS_PORT ?= 19118
+GRAFANA_PORT ?= 13018
+export PROMETHEUS_PORT
+export GRAFANA_PORT
+
 # exports (used by debian/rules and the #ENV.*# substitutions in debian/funkpkg.postinst)
 export DEB_OUT_DIR
 export PATH_PKG_LOGS
@@ -46,7 +55,8 @@ export PY_INSTALL_SUFFIX
 
 # Makefile
 .PHONY: all test test-all clean run dev-setup wheel wheel-clean wheel-build wheel-inspect \
-	bench deb deb-clean deb-clean-changelog deb-changelog-create deb-build deb-inspect buildcontainer
+	bench deb deb-clean deb-clean-changelog deb-changelog-create deb-build deb-inspect buildcontainer \
+	docker-up docker-down docker-logs
 all: clean test
 
 clean: deb-clean wheel-clean
@@ -75,9 +85,10 @@ bench:
 # run the unit tests, then the benchmarks
 test-all: test bench
 
-# run the program once from the source tree
+# run the program once from the source tree (run `make dev-setup` first, it installs prometheus_client)
+RUN_ARGS ?=
 run:
-	${SYSTEM_PYTHON} dev.py
+	${DEV_VENV_PATH}/bin/python3 dev.py ${RUN_ARGS}
 
 # wheel (requires `setuptools` and `wheel`)
 wheel: wheel-clean wheel-build wheel-inspect
@@ -129,3 +140,18 @@ deb-inspect:
 buildcontainer:
 	docker build -t ${BUILDER_IMAGE} .
 	docker run --rm --volume "${PWD}:/pkgbuilddir" --workdir="/pkgbuilddir" ${BUILDER_IMAGE} make deb
+
+# start the monitoring stack: funk (metrics on :8000 inside the network), prometheus and grafana
+docker-up:
+	${COMPOSE} up --build --detach
+	@echo "Prometheus: http://localhost:${PROMETHEUS_PORT}"
+	@echo "Grafana:    http://localhost:${GRAFANA_PORT}/d/funcmapper (anonymous admin)"
+
+# remove this project's containers, networks, volumes and orphans, and only the images it builds
+# (the pulled prometheus/grafana/python images are kept)
+docker-down:
+	${COMPOSE} down --volumes --remove-orphans
+	-docker image rm ${COMPOSE_BUILT_IMAGES}
+
+docker-logs:
+	${COMPOSE} logs --follow --tail=100

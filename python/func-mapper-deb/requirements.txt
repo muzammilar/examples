@@ -1,1 +1,3 @@
-# no third-party runtime dependencies (dh-virtualenv installs these into the venv)
+# third-party runtime dependencies (dh-virtualenv installs these into the deb's virtualenv,
+# and setup.py reads this file for `install_requires`)
+prometheus_client~=0.26.0

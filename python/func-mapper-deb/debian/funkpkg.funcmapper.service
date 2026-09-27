@@ -12,6 +12,8 @@ User=funkuser
 Group=funkuser
 TimeoutStartSec=45
 TimeoutStopSec=75
+# Prometheus metrics are off by default (no --metrics-port). To enable them, add a drop-in with
+# `systemctl edit funcmapper` that clears and resets ExecStart with e.g. `--metrics-port 9118`.
 ExecStart=/opt/venv/funcmapper/bin/funk --interval 60 --log-file /var/log/funcmapper/funcmapper.log
 # restart service on failures
 Restart=on-failure
