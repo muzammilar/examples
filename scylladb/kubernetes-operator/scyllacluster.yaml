@@ -1,0 +1,25 @@
+# Three members in one rack, developer mode, kind's default `standard` storage.
+apiVersion: scylla.scylladb.com/v1
+kind: ScyllaCluster
+metadata:
+  name: scylla
+  namespace: scylla
+spec:
+  version: 2026.1.13
+  developerMode: true
+  automaticOrphanedNodeCleanup: true
+  datacenter:
+    name: dc1
+    racks:
+      - name: rack1
+        members: 3
+        storage:
+          capacity: 1Gi
+          storageClassName: standard
+        resources:
+          requests:
+            cpu: 100m
+            memory: 512Mi
+          limits:
+            cpu: 1
+            memory: 1Gi
