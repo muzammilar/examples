@@ -1,59 +1,82 @@
+// The common package contains the shared code between the admin, producer and consumer binaries
+
 package common
 
 import (
 	"context"
-	"fmt"
-	"os"
+	"errors"
+	"log/slog"
 	"time"
 
 	"github.com/twmb/franz-go/pkg/kadm"
+	"github.com/twmb/franz-go/pkg/kerr"
 	"github.com/twmb/franz-go/pkg/kgo"
-	"github.com/twmb/franz-go/pkg/kversion"
 )
 
-func die(msg string, args ...any) {
-	fmt.Fprintf(os.Stderr, msg, args...)
-	os.Exit(1)
+// CreateTopicsIfNotExist creates the topics (with the given partitions and replication factor) that do not exist yet.
+// Existing topics are left untouched.
+// `configs` are optional topic configs (e.g. retention.ms), see ParseTopicConfigs.
+func CreateTopicsIfNotExist(ctx context.Context, client *kgo.Client, partitions int32, replicationFactor int16, configs map[string]*string, logger *slog.Logger, topics ...string) error {
+	adm := kadm.NewClient(client)
+
+	details, err := adm.ListTopics(ctx, topics...)
+	if err != nil {
+		return err
+	}
+
+	var missing []string
+	for _, topic := range topics {
+		if details.Has(topic) {
+			logger.Info("topic already exists", "topic", topic, "partitions", len(details[topic].Partitions))
+			continue
+		}
+		missing = append(missing, topic)
+	}
+	if len(missing) == 0 {
+		return nil
+	}
+
+	resps, err := adm.CreateTopics(ctx, partitions, replicationFactor, configs, missing...)
+	if err != nil {
+		return err
+	}
+	var errs []error
+	for _, r := range resps.Sorted() {
+		switch {
+		case errors.Is(r.Err, kerr.TopicAlreadyExists): // someone else created it in the meantime
+			logger.Info("topic already exists", "topic", r.Topic)
+		case r.Err != nil:
+			errs = append(errs, r.Err)
+			logger.Error("failed to create topic", "topic", r.Topic, "err", r.Err, "message", r.ErrMessage)
+		default:
+			logger.Info("created topic", "topic", r.Topic, "partitions", r.NumPartitions, "replication", r.ReplicationFactor)
+		}
+	}
+	return errors.Join(errs...)
 }
 
-func CreateTopicIfNotExists(topicName string) {
-	seeds := []string{"localhost:9092"}
-
-	var adminClient *kadm.Client
-	{
-		client, err := kgo.NewClient(
-			kgo.SeedBrokers(seeds...),
-
-			// Do not try to send requests newer than 2.4.0 to avoid breaking changes in the request struct.
-			// Sometimes there are breaking changes for newer versions where more properties are required to set.
-			kgo.MaxVersions(kversion.V2_4_0()),
-		)
-		if err != nil {
-			panic(err)
+// WaitForTopics blocks until all the topics exist with their partitions (e.g. the producer/consumer started before kafka or the admin job)
+func WaitForTopics(ctx context.Context, client *kgo.Client, logger *slog.Logger, topics ...string) error {
+	adm := kadm.NewClient(client)
+	for {
+		details, err := adm.ListTopics(ctx, topics...)
+		if err == nil {
+			ready := true
+			for _, t := range topics {
+				// a newly created topic can exist without partition leaders for a moment
+				if d, ok := details[t]; !ok || d.Err != nil || len(d.Partitions) == 0 {
+					ready = false
+				}
+			}
+			if ready {
+				return nil
+			}
 		}
-		defer client.Close()
-
-		adminClient = kadm.NewClient(client)
+		logger.Warn("waiting for topics to exist", "topics", topics, "err", err)
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case <-time.After(DefaultConnectionBackoffMs * time.Millisecond):
+		}
 	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
-	defer cancel()
-
-	// Create topic "franz-go" if it doesn't exist already
-	topicDetails, err := adminClient.ListTopics(ctx)
-	if err != nil {
-		die("failed to list topics: %v", err)
-	}
-
-	if topicDetails.Has(topicName) {
-		fmt.Printf("topic %v already exists\n", topicName)
-		return
-	}
-	fmt.Printf("Creating topic %v\n", topicName)
-
-	createTopicResponse, err := adminClient.CreateTopic(ctx, -1, -1, nil, topicName)
-	if err != nil {
-		die("failed to create topic: %v", err)
-	}
-	fmt.Printf("Successfully created topic %v\n", createTopicResponse.Topic)
 }

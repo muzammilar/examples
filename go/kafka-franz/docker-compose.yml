@@ -1,3 +1,83 @@
-# include docker files
+# include docker files (kafka cluster: 3 controllers and 3 brokers in KRaft mode)
 include:
   - docker-kafka.yml
+
+services:
+  ####################
+  # Kafka Admin (franz-go/kadm) - creates the topics and exits
+  ####################
+  admin:
+    image: tree-admin
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+      target: admin
+    command: ["/treeadmin", "-topics", "trees,test", "-partitions", "13", "-replication", "3"]
+    networks:
+      - kafka-network
+    depends_on:
+      kafka-broker-1:
+        condition: service_healthy
+      kafka-broker-2:
+        condition: service_healthy
+      kafka-broker-3:
+        condition: service_healthy
+
+  ####################
+  # Kafka Producers
+  ####################
+  producertree:
+    image: tree-producer
+    hostname: producertree
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+      target: producer
+    command: ["/treeproducer", "-topic", "trees", "-workers", "2"]
+    networks:
+      - kafka-network
+    depends_on:
+      admin:
+        condition: service_completed_successfully
+
+  producertest:
+    image: tree-producer
+    hostname: producertest
+    command: ["/treeproducer", "-topic", "test", "-workers", "3", "-partitioner", "roundrobin"]
+    networks:
+      - kafka-network
+    depends_on:
+      admin:
+        condition: service_completed_successfully
+
+  ####################
+  # Kafka Consumers (a consumer group, scale with `--scale consumer=N`)
+  ####################
+  consumer:
+    image: tree-consumer
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+      target: consumer
+    command: ["/treeconsumer", "-topics", "test,trees"]
+    networks:
+      - kafka-network
+    depends_on:
+      admin:
+        condition: service_completed_successfully
+    deploy:
+      mode: replicated
+      replicas: 1
+
+  ####################
+  # Prometheus
+  ####################
+  prometheus:
+    image: prom/prometheus
+    hostname: prometheus.svc
+    volumes:
+      - ./prometheus/config/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      - 9090:9090 # http port
+    networks:
+      - kafka-network

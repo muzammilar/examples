@@ -1,43 +1,37 @@
-ARG GO_VERSION=1.19
+ARG GO_VERSION=1.26
 
 ###############################################
 # Builder stage
 ###############################################
 
-# producer
-FROM golang:${GO_VERSION}-alpine AS producerbuilder
-RUN apk add --no-cache git
+# a single builder for all the binaries (admin, producer, consumer)
+FROM golang:${GO_VERSION}-alpine AS builder
 WORKDIR /go/src/app
+# download the dependencies first (cached layer)
+COPY ./trees/go.mod ./trees/go.sum ./
+RUN go mod download
 COPY ./trees .
-# add missing dependencies
-RUN go mod tidy
-# install the module
-RUN go install -v ./producer
-
-ARG GO_VERSION
-
-# consumer
-FROM golang:${GO_VERSION}-alpine AS consumerbuilder
-RUN apk add --no-cache git
-WORKDIR /go/src/app
-COPY ./trees .
-# add missing dependencies
-RUN go mod tidy
-# install the module
-RUN go install -v ./consumer
+# install the binaries
+RUN CGO_ENABLED=0 go install -v ./admin ./producer ./consumer
 
 ###############################################
 # Runner stage
 ###############################################
 
-#producer
+# admin (topic creation)
+FROM alpine:latest AS admin
+RUN apk --no-cache add ca-certificates
+COPY --from=builder /go/bin/admin /treeadmin
+CMD ["/treeadmin"]
+
+# producer
 FROM alpine:latest AS producer
 RUN apk --no-cache add ca-certificates
-COPY --from=producerbuilder /go/bin/producer /treeproducer
-CMD ./treeproducer
+COPY --from=builder /go/bin/producer /treeproducer
+CMD ["/treeproducer"]
 
-#consumer
+# consumer
 FROM alpine:latest AS consumer
 RUN apk --no-cache add ca-certificates
-COPY --from=consumerbuilder /go/bin/consumer /treeconsumer
-CMD ./treeconsumer
+COPY --from=builder /go/bin/consumer /treeconsumer
+CMD ["/treeconsumer"]

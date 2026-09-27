@@ -52,7 +52,7 @@ services:
   # extra commands:
   kafka-commands-utility:
     extends: kafka-commands
-    profile: ["utility"]
+    profiles: ["utility"]
 
 # Network
 networks:
