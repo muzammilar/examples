@@ -8,12 +8,11 @@ These directories were merged from standalone repos (now archived) using `git su
 | Directory | Former Repo |
 |-----------|-------------|
 | [`cpp/`](cpp) | [muzammilar/examples-cpp](https://github.com/muzammilar/examples-cpp) |
+| [`erlang/`](erlang) | N/A |
 | [`go/`](go) | [muzammilar/examples-go](https://github.com/muzammilar/examples-go) |
 | [`js/`](js) | [muzammilar/examples-js](https://github.com/muzammilar/examples-js) |
 | [`python/`](python) | [muzammilar/examples-python](https://github.com/muzammilar/examples-python) |
 | [`rust/`](rust) | [muzammilar/examples-rust](https://github.com/muzammilar/examples-rust) |
-
-[`erlang/`](erlang) holds the Erlang/OTP examples.
 
 Some Go modules still declare `github.com/muzammilar/examples-go/...` module paths; they build fine from their new location.
 

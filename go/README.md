@@ -15,6 +15,8 @@ The `ext` directory project that are imported as git submodules.
 
 `clickhouse-struct-ingest-performance`:  Performance evaluation of `clickhouse-go`.
 
+`dynamic-threadpool`: A worker pool that grows and shrinks between min/max bounds, with a controller that resizes it based on queue depth, graceful drain on close, Prometheus metrics and a provisioned Grafana dashboard.
+
 `ext/geomrpc`: An example of gRPC clients and servers, including both server-side and client-side streaming and gRPC metrics collection using Prometheus (including both connection stats and RPC stats).
 
 `file-shreder`: An example to implement a `shred` function like the [shred](https://manpages.ubuntu.com/manpages/jammy/man1/shred.1.html) command line utility with some tests.
@@ -25,9 +27,13 @@ The `ext` directory project that are imported as git submodules.
 
 `json-parser`: A basic JSON parser example that Unmarshals a JSON stream into different structs.
 
+`kafka-franz`: The `franz-go` equivalent of `kafka-trees`: topic creation with the `kadm` admin client, sync/async producers and a scalable consumer group on a 3-controller/3-broker KRaft cluster (Kafka 4), with `kprom` metrics, a provisioned Grafana dashboard, unit tests, benchmarks and tagged integration tests.
+
 `kafka-trees`: A multi-topic example of sync/async producers (publishers) and a consumer group (subsribers) allowing horizontal scaling of kafka consumers. The example uses tree names as references.
 
 `koanf-example`: An example of using koanf to read configuration from a file using environment variables and custom overrides.
+
+`mock-request`: Mocking HTTP requests in Go with a generated [gomock](https://github.com/uber-go/mock) mock, a hand-written fake and an `httptest` server (with benchmarks comparing them), plus an instrumented `Doer` decorator and a probe mode with Prometheus metrics and a Grafana dashboard.
 
 `mockery-of-the-language`: An example to use mockery to generate golang interfances for uses in tests.
 
@@ -36,6 +42,8 @@ The `ext` directory project that are imported as git submodules.
 `struct-embedding`: A basic struct embedding example in Golang.
 
 `sqlc-students`: A basic example of using sqlc to convert sql queries into golang structs.
+
+`threadpool`: A static (fixed-size) worker pool with a bounded task queue, backpressure on submit, context cancellation, graceful drain on close, an optional metrics observer, Prometheus metrics and a provisioned Grafana dashboard.
 
 `titan-prometheus`: A basic example of building a stats/metrics server for a running application using Prometheus.
 
