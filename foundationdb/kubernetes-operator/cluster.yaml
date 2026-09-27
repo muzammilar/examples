@@ -1,0 +1,84 @@
+# Minimal FoundationDB cluster for a single-node kind cluster, adapted from
+# config/samples/cluster.yaml in the operator repo. `double` redundancy with the
+# operator's default process counts (storage/log) and no dedicated stateless
+# processes. faultDomain `none` lets every process share the one kind node.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: fdb-kubernetes
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: fdb-kubernetes
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "watch", "update", "patch", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: fdb-kubernetes
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: fdb-kubernetes
+subjects:
+  - kind: ServiceAccount
+    name: fdb-kubernetes
+---
+apiVersion: apps.foundationdb.org/v1beta2
+kind: FoundationDBCluster
+metadata:
+  name: test-cluster
+spec:
+  version: 7.3.79
+  databaseConfiguration:
+    redundancy_mode: double
+    storage_engine: ssd-2
+  faultDomain:
+    key: foundationdb.org/none
+  processCounts:
+    cluster_controller: 1
+    stateless: -1
+  automationOptions:
+    replacements:
+      enabled: true
+  minimumUptimeSecondsForBounce: 60
+  processes:
+    general:
+      customParameters:
+        - knob_disable_posix_kernel_aio=1
+      podTemplate:
+        spec:
+          serviceAccountName: fdb-kubernetes
+          containers:
+            - name: foundationdb
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 128Mi
+              securityContext:
+                runAsUser: 0
+            - name: foundationdb-kubernetes-sidecar
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 128Mi
+                limits:
+                  cpu: 100m
+                  memory: 128Mi
+              securityContext:
+                runAsUser: 0
+      volumeClaimTemplate:
+        spec:
+          resources:
+            requests:
+              storage: 1Gi
+  routing:
+    defineDNSLocalityFields: true
+  sidecarContainer:
+    enableLivenessProbe: true
+    enableReadinessProbe: false
+  useExplicitListenAddress: true
