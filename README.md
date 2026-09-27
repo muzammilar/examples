@@ -14,8 +14,6 @@ These directories were merged from standalone repos (now archived) using `git su
 | [`python/`](python) | [muzammilar/examples-python](https://github.com/muzammilar/examples-python) |
 | [`rust/`](rust) | [muzammilar/examples-rust](https://github.com/muzammilar/examples-rust) |
 
-[`erlang/`](erlang) holds the Erlang/OTP examples.
-
 Some Go modules still declare `github.com/muzammilar/examples-go/...` module paths; they build fine from their new location.
 
 ## External Projects (Git Submodules)
