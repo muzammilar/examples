@@ -2,7 +2,7 @@ name: funcmapper-deb
 
 # Monitoring demo: funk exposes Prometheus metrics on :8000 (inside the compose network only),
 # Prometheus scrapes it every 5s and Grafana shows the pre-provisioned "funcmapper" dashboard.
-# Usage: `make docker-up`, `make docker-logs`, `make docker-down`.
+# Usage: `make up`, `make logs`, `make down`.
 services:
   funk:
     build:

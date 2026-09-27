@@ -35,7 +35,7 @@ benchmarks/           # pytest-benchmark benchmarks (`make bench`)
 dev.py                # run from the source tree without installing
 setup.py              # python packaging (used by dh-virtualenv)
 Dockerfile            # debian:trixie build container with all build deps (`make buildcontainer`)
-Dockerfile.run        # python:3.13-slim runtime image for the monitoring demo (`make docker-up`)
+Dockerfile.run        # python:3.13-slim runtime image for the monitoring demo (`make up`)
 docker-compose.yml    # funk + Prometheus + Grafana
 prometheus/prometheus.yml                  # scrapes funk:8000 every 5s
 grafana/provisioning/datasources/prometheus.yml
@@ -194,17 +194,17 @@ default registry; the tests use their own `Metrics(CollectorRegistry())`, so the
 ### Docker compose stack
 
 ```sh
-make docker-up     # builds Dockerfile.run and starts funk, Prometheus and Grafana
-make docker-logs   # follow the logs
-make docker-down   # remove the containers, network, volumes and the built funkpkg-run:local image
+make up     # builds Dockerfile.run, starts funk, Prometheus and Grafana, and waits until Grafana is ready
+make logs   # follow the logs
+make down   # remove the containers, network, volumes and the built funkpkg-run:local image
 ```
 
 * Prometheus: http://localhost:19118 (scrapes `funk:8000` every 5s; the app port is not published on the host)
 * Grafana: http://localhost:13018/d/funcmapper (anonymous Admin, no login)
 
-The host ports can be changed with `make docker-up PROMETHEUS_PORT=19119 GRAFANA_PORT=13019`.
+The host ports can be changed with `make up PROMETHEUS_PORT=19119 GRAFANA_PORT=13019`.
 The `funk` container runs `funk --interval 2 --metrics-port 8000`, pip-installed into `python:3.13-slim`
-(it doesn't use the deb, so it doesn't need the build container). `make docker-down` keeps the pulled
+(it doesn't use the deb, so it doesn't need the build container). `make down` keeps the pulled
 `python`, `prom/prometheus` and `grafana/grafana` images.
 
 Grafana is provisioned with a `Prometheus` datasource (uid `prometheus`) and the `funcmapper` dashboard

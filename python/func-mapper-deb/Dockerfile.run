@@ -1,4 +1,4 @@
-# Runtime image for the monitoring demo (`make docker-up`, see docker-compose.yml).
+# Runtime image for the monitoring demo (`make up`, see docker-compose.yml).
 # It pip-installs the package (and prometheus_client from requirements.txt) instead of the .deb,
 # so it doesn't need the debian build container. The build container is ./Dockerfile.
 FROM python:3.13-slim

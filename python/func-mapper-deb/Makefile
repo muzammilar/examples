@@ -40,10 +40,12 @@ BUILDER_IMAGE = funkpkg-builder
 
 # docker compose monitoring stack (funk + prometheus + grafana), see docker-compose.yml
 COMPOSE = docker compose --file ${MKFILE_DIR}docker-compose.yml
-# images built (not pulled) by docker-compose.yml; `make docker-down` removes only these
+# images built (not pulled) by docker-compose.yml; `make down` removes only these
 COMPOSE_BUILT_IMAGES = funkpkg-run:local
 PROMETHEUS_PORT ?= 19118
 GRAFANA_PORT ?= 13018
+# Grafana base URL polled by `make wait`
+GRAFANA_BASE = http://localhost:${GRAFANA_PORT}
 export PROMETHEUS_PORT
 export GRAFANA_PORT
 
@@ -57,9 +59,9 @@ export PKG_VERSION
 export PY_INSTALL_SUFFIX
 
 # Makefile
-.PHONY: all test test-all clean run dev-setup wheel wheel-clean wheel-build wheel-inspect \
+.PHONY: all test test-all clean wait run dev-setup wheel wheel-clean wheel-build wheel-inspect \
 	bench deb deb-clean deb-clean-changelog deb-changelog-create deb-build deb-inspect buildcontainer \
-	docker-up docker-down docker-logs
+	up down logs
 all: clean test
 
 clean: deb-clean wheel-clean
@@ -149,16 +151,26 @@ buildcontainer:
 	docker run --rm --volume "${PWD}:/pkgbuilddir" --workdir="/pkgbuilddir" ${BUILDER_IMAGE} make deb
 
 # start the monitoring stack: funk (metrics on :8000 inside the network), prometheus and grafana
-docker-up:
+up:
 	${COMPOSE} up --build --detach
+	@$(MAKE) --no-print-directory wait
 	@echo "Prometheus: http://localhost:${PROMETHEUS_PORT}"
 	@echo "Grafana:    http://localhost:${GRAFANA_PORT}/d/funcmapper (anonymous admin)"
 
+# wait (up to 4 minutes) until Grafana serves the Prometheus datasource and the dashboard
+wait:
+	@echo "Waiting for Grafana at $(GRAFANA_BASE) ..."
+	@for i in $$(seq 1 120); do \
+		curl -sf $(GRAFANA_BASE)/api/datasources/uid/prometheus/health >/dev/null && \
+		curl -sf $(GRAFANA_BASE)/api/dashboards/uid/funcmapper >/dev/null && { echo "Grafana is ready"; exit 0; }; \
+		sleep 2; \
+	done; echo "Grafana was not ready after 4 minutes (check make logs)"; exit 1
+
 # remove this project's containers, networks, volumes and orphans, and only the images it builds
 # (the pulled prometheus/grafana/python images are kept)
-docker-down:
+down:
 	${COMPOSE} down --volumes --remove-orphans
 	-docker image rm ${COMPOSE_BUILT_IMAGES}
 
-docker-logs:
+logs:
 	${COMPOSE} logs --follow --tail=100
