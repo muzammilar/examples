@@ -8,6 +8,8 @@ BENCH_TIME ?= 1s
 INTEGRATION_BENCH ?= Integration
 # The compose file lives in the parent directory (the go module is in `trees`)
 COMPOSE := docker compose --project-directory .. -f ../docker-compose.yml
+# Images built by the compose file (removed by `make docker-down`)
+BUILT_IMAGES := franz-tree-admin franz-tree-producer franz-tree-consumer
 # Kafka brokers exposed on the host by the docker compose setup (override for another cluster)
 KAFKA_BROKERS ?= localhost:29092,localhost:39092,localhost:49092
 export KAFKA_BROKERS
@@ -69,5 +71,6 @@ docker-build: ## Build the Docker images
 docker-up: ## Start kafka, the admin, producers, consumers and prometheus (detached)
 	$(COMPOSE) up --build --detach
 
-docker-down: ## Stop services and remove the locally built images and volumes
-	$(COMPOSE) down --rmi local --volumes
+docker-down: ## Stop services and remove containers, networks, volumes, orphans and the built images (keeps the shared kafka/prometheus images)
+	$(COMPOSE) down --volumes --remove-orphans
+	-docker image rm $(BUILT_IMAGES) 2>/dev/null

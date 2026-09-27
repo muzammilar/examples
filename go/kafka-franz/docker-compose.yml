@@ -7,7 +7,7 @@ services:
   # Kafka Admin (franz-go/kadm) - creates the topics and exits
   ####################
   admin:
-    image: tree-admin
+    image: franz-tree-admin
     build:
       context: ./
       dockerfile: ./Dockerfile
@@ -27,7 +27,7 @@ services:
   # Kafka Producers
   ####################
   producertree:
-    image: tree-producer
+    image: franz-tree-producer
     hostname: producertree
     build:
       context: ./
@@ -41,7 +41,7 @@ services:
         condition: service_completed_successfully
 
   producertest:
-    image: tree-producer
+    image: franz-tree-producer
     hostname: producertest
     command: ["/treeproducer", "-topic", "test", "-workers", "3", "-partitioner", "roundrobin"]
     networks:
@@ -54,7 +54,7 @@ services:
   # Kafka Consumers (a consumer group, scale with `--scale consumer=N`)
   ####################
   consumer:
-    image: tree-consumer
+    image: franz-tree-consumer
     build:
       context: ./
       dockerfile: ./Dockerfile
