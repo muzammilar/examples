@@ -15,17 +15,18 @@ Use a mock when you want to assert exactly how the dependency was called or to s
 
 ### Benchmarks
 
-`BenchmarkFetch` in `request/request_bench_test.go` runs the same `Fetcher.Fetch` call against each test double. Sample results (Apple M4 Pro, Go 1.26):
+`BenchmarkFetch` in `request/request_bench_test.go` runs the same `Fetcher.Fetch` call against each test double. Sample results (Apple M4 Pro, Go 1.26, `make bench BENCH_TIME=100ms`):
 
-| Backend    | ns/op  | B/op | allocs/op |
-|------------|-------:|-----:|----------:|
-| fake Doer  |    370 | 1616 |        10 |
-| gomock     |    947 | 1808 |        16 |
-| httptest   | 29,851 | 6350 |        68 |
+| Backend           |  ns/op | B/op | allocs/op |
+|-------------------|-------:|-----:|----------:|
+| fake Doer         |    483 | 1616 |        10 |
+| instrumented-fake |    797 | 1723 |        14 |
+| gomock            |  1,101 | 1808 |        16 |
+| httptest          | 41,523 | 6371 |        68 |
 
-The `instrumented-fake` case wraps the fake in the metrics decorator (see [Monitoring](#monitoring)); on the same machine it adds roughly 300 ns and 4 allocations per call over the plain fake.
+The `instrumented-fake` case wraps the fake in the metrics decorator (see [Monitoring](#monitoring)). It adds roughly 300 ns and 4 allocations per call over the plain fake.
 
-The hand-rolled fake has the lowest overhead. gomock costs roughly 2-3x more because it matches expectations and records calls through reflection, but that is still well under a microsecond. `httptest` is about 30-80x slower because every call goes through a real TCP loopback connection and the full `net/http` client and server stack. That cost buys realism, so it is usually worth it for a handful of integration-style tests. For large table-driven suites, prefer a fake or a mock.
+The hand-rolled fake has the lowest overhead. gomock costs roughly 2x more because it matches expectations and records calls through reflection, but that is still well under a microsecond. `httptest` is about 40-85x slower because every call goes through a real TCP loopback connection and the full `net/http` client and server stack. That cost buys realism, so it is usually worth it for a handful of integration-style tests. For large table-driven suites, prefer a fake or a mock.
 
 ### Running
 
@@ -45,9 +46,27 @@ make docker-mockgen    # docker compose --profile tools run --rm --build mockgen
 docker compose run --rm --build httpmock -url https://go.dev
 
 # start the prober with Prometheus and Grafana (see Monitoring), then clean up
-make docker-up
+make docker-up     # Prometheus http://localhost:19116, Grafana http://localhost:13016/d/mock-request
 make docker-down
 ```
+
+### CLI flags
+
+`cmd/httpmock.go` (`go run ./cmd`, or the `httpmock` image) accepts these flags:
+
+| Flag | Default | Meaning |
+|---|---|---|
+| `-url` | `https://example.com` | a single URL to fetch; ignored when `-urls` is set |
+| `-urls` | (none) | comma-separated URLs to fetch; can be repeated |
+| `-timeout` | `10s` | timeout for each request |
+| `-interval` | `0` | `0` fetches each URL once and exits; a positive duration probes every interval until SIGINT/SIGTERM |
+| `-metrics-addr` | (empty, disabled) | serve Prometheus metrics on this address at `/metrics`, e.g. `:8080` |
+
+In one-shot mode (`-interval 0`) the CLI fetches every URL, prints `URL -> status (N bytes)` or logs the error, then exits 1 if any fetch failed. A non-2xx status counts as a failure. In probe mode, failures are logged and probing continues.
+
+### Docker and the `tools` profile
+
+The compose project is `mockreq`. The `mockgenerator` service is in the `tools` profile, so `docker compose up` (and `make docker-up`) does not start it and does not rewrite files in the working tree. `make docker-mockgen` runs it (`docker compose --profile tools run --rm --build mockgenerator`). It mounts the example directory, runs `go generate ./...` to write the mocks back to the host, runs `go test -v ./...`, and exits.
 
 ## Monitoring
 
@@ -105,5 +124,5 @@ make docker-down     # remove containers, networks, volumes and the built images
 
 - Go 1.26 (`go 1.26.0` in `go.mod`; `golang:1.26-alpine` build image, `alpine:3.24` runtime images)
 - `go.uber.org/mock` and `mockgen` v0.6.0 (the `//go:generate` directive and the Dockerfile's `MOCKGEN_VERSION` must match `go.mod`; the `mockgen` stage fails the build if they differ)
-- `github.com/prometheus/client_golang` v1.24.1
+- `github.com/prometheus/client_golang` v1.24.1 (indirect: `client_model` v0.6.3, `common` v0.71.0, `procfs` v0.22.0, `golang.org/x/sys` v0.48.0, `google.golang.org/protobuf` v1.36.12)
 - `prom/prometheus:v3.15.0` and `grafana/grafana:13.2.2`
