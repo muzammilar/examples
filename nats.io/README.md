@@ -1,2 +1,5 @@
 # NATS.io
-Examples coming soon. For now, please see clickhouse, elasticsearch, k8s, kafka, or cockroach.
+
+Website: https://nats.io/
+
+- [`single-node/`](single-node) — one NATS server with JetStream on Docker Compose: pub/sub, request/reply, a stream with an explicit-ack consumer, and a KV bucket with history.
