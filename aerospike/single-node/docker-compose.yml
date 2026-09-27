@@ -1,0 +1,25 @@
+name: aerospike-single
+
+# The image's built-in template: one node, namespace `test`, file-backed storage.
+services:
+  aerospike:
+    image: aerospike/aerospike-server:${AEROSPIKE_VERSION:-8.1.2.5}
+    container_name: aerospike
+    hostname: aerospike
+    environment:
+      NAMESPACE: test
+      STORAGE_GB: 1
+    ports:
+      - "3000:3000" # client
+    volumes:
+      - aerospike-data:/opt/aerospike/data
+
+  # `make test` runs aql from here (the server image no longer ships it)
+  tools:
+    image: aerospike/aerospike-tools:13.1.0
+    profiles: [tools]
+    volumes:
+      - ./aql:/aql:ro
+
+volumes:
+  aerospike-data:
