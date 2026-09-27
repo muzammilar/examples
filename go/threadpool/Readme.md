@@ -15,8 +15,21 @@ backpressure without spawning a goroutine per task.
 ```sh
 go run . -workers 8 -queue 64 -producers 4 -messages 100000
 go test -race ./...
-go test -run x -bench . ./...
 ```
+
+## Benchmarks
+
+```sh
+go test -bench=. -benchmem ./...
+# benchmarks only, skipping the unit tests
+go test -run='^$' -bench=. -benchmem ./...
+```
+
+* `BenchmarkPoolSubmit`: single-producer `Submit` throughput (no-op task) for pool sizes 1/4/16/`GOMAXPROCS` and queue sizes 0/64/1024.
+* `BenchmarkPoolSubmitParallel`: `Submit` under contention from `GOMAXPROCS` producers.
+* `BenchmarkDemoWorkload`: the demo end to end (message generation, checksum, result aggregation); one op is one message.
+
+An unbuffered queue (`queue=0`) is noticeably slower because every `Submit` has to hand off directly to an idle worker.
 
 ## Docker
 
