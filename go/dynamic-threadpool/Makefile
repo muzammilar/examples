@@ -1,4 +1,4 @@
-.PHONY: help deps fmt vet build run test test-race bench bench-cpu test-all clean docker-build docker-up docker-logs docker-down
+.PHONY: help deps fmt vet build run test test-race bench bench-cpu test-all clean docker-build up wait logs down
 
 # Variables
 APP_NAME := workerpool
@@ -6,10 +6,12 @@ MAIN_PKG := ./cmd/workerpool
 BENCH ?= .
 BENCH_COUNT ?= 1
 BENCH_TIME ?= 1s
-# images built (not pulled) by docker-compose.yml; removed by docker-down
+# images built (not pulled) by docker-compose.yml; removed by down
 BUILT_IMAGES := dynamic-threadpool
 PROMETHEUS_URL := http://localhost:19115
 GRAFANA_URL := http://localhost:13015
+# Grafana base URL polled by `make wait`
+GRAFANA_BASE := http://localhost:13015
 
 help: ## Display this help message
 	@echo "Available targets:"
@@ -52,16 +54,25 @@ clean: ## Clean build artifacts
 docker-build: ## Build Docker image
 	docker compose build
 
-docker-up: ## Build and start the demo, Prometheus and Grafana in the background
+up: ## Build and start the demo, Prometheus and Grafana in the background
 	docker compose up --build --detach
+	@$(MAKE) --no-print-directory wait
 	@echo ""
 	@echo "Prometheus: $(PROMETHEUS_URL)  (targets: $(PROMETHEUS_URL)/targets)"
 	@echo "Grafana:    $(GRAFANA_URL)/d/dynamic-threadpool  (anonymous admin)"
-	@echo "Logs:       make docker-logs"
+	@echo "Logs:       make logs"
 
-docker-logs: ## Follow the demo's logs
+wait: ## Wait (up to 4 minutes) until Grafana serves the Prometheus datasource and the dashboard
+	@echo "Waiting for Grafana at $(GRAFANA_BASE) ..."
+	@for i in $$(seq 1 120); do \
+		curl -sf $(GRAFANA_BASE)/api/datasources/uid/prometheus/health >/dev/null && \
+		curl -sf $(GRAFANA_BASE)/api/dashboards/uid/dynamic-threadpool >/dev/null && { echo "Grafana is ready"; exit 0; }; \
+		sleep 2; \
+	done; echo "Grafana was not ready after 4 minutes (check make logs)"; exit 1
+
+logs: ## Follow the demo's logs
 	docker compose logs --follow dynamic-threadpool
 
-docker-down: ## Remove this project's containers, networks, volumes, orphans and built images (pulled images are kept)
+down: ## Remove this project's containers, networks, volumes, orphans and built images (pulled images are kept)
 	docker compose down --volumes --remove-orphans
 	-docker image rm $(BUILT_IMAGES)

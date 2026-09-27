@@ -38,11 +38,11 @@ go test -bench=. -benchmem ./...
 
 ```sh
 # build and start the demo, Prometheus and Grafana in the background
-make docker-up        # docker compose up --build --detach
-make docker-logs      # follow the demo's logs
+make up        # docker compose up --build --detach, then waits until Grafana is ready
+make logs      # follow the demo's logs
 # remove the containers, networks, volumes, orphans and the built image
 # (the pulled prometheus/grafana images are kept)
-make docker-down
+make down
 ```
 
 ## Monitoring
