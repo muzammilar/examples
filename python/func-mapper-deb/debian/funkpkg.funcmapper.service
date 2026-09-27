@@ -12,7 +12,7 @@ User=funkuser
 Group=funkuser
 TimeoutStartSec=45
 TimeoutStopSec=75
-ExecStart=/opt/venv/funcmapper/bin/funk
+ExecStart=/opt/venv/funcmapper/bin/funk --interval 60 --log-file /var/log/funcmapper/funcmapper.log
 # restart service on failures
 Restart=on-failure
 RestartSec=10s

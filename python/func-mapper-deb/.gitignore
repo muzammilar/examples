@@ -1,0 +1,12 @@
+dist/
+build/
+*.egg-info/
+.venv/
+debian/changelog
+debian/funkpkg/
+debian/.debhelper/
+debian/debhelper-build-stamp
+debian/files
+debian/*.substvars
+debian/*.debhelper
+debian/*.debhelper.log

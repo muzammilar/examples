@@ -1,12 +1,16 @@
 Source: funkpkg
-Section: unknown
+Section: python
+Priority: optional
 Maintainer: Muzammil Abdul Rehman <example.email@foo.com>
-Build-Depends: debhelper (>=13), dh-sysuser
-Standards-Version: 4.0.0
-Homepage: github.com/muzammilar
+Build-Depends: debhelper (>=13), dh-sysuser, dh-virtualenv (>=1.2), lsb-release, python3, python3-dev, python3-setuptools, python3-venv, python3-virtualenv
+Standards-Version: 4.6.2
+Homepage: https://github.com/muzammilar/examples
 
 Package: funkpkg
 Architecture: any
 Pre-Depends: ${misc:Pre-Depends}
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: ${misc:Depends}, python3
 Description: funcmapper is an example python project
+ Maps function names to python functions and calls them periodically.
+ Shipped as a self-contained virtualenv (dh-virtualenv) in /opt/venv/funcmapper
+ with a systemd service, a dedicated system user and logrotate config.
