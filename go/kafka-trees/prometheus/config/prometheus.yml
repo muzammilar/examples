@@ -1,0 +1,53 @@
+# Global config
+global:
+  scrape_interval: 15s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
+  evaluation_interval: 15s # Evaluate rules every 15 seconds. The default is every 1 minute.
+  # scrape_timeout is set to the global default (10s).
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          # - alertmanager:9093
+
+# Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
+rule_files:
+  # - "first_rules.yml"
+  # - "second_rules.yml"
+
+# A scrape configuration containing exactly one endpoint to scrape:
+# Here it's Prometheus itself.
+scrape_configs:
+  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
+  - job_name: "prometheus"
+
+    # metrics_path defaults to '/metrics'
+    # scheme defaults to 'http'.
+
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
+  - job_name: "treeproducer"
+    static_configs:
+      - targets:
+          - "producertest:8080"
+          - "producertree:8080"
+
+  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
+  - job_name: "treeconsumer"
+    static_configs:
+      - targets: # hard coding consumers for PoC (for up to 12 consumers)
+          - "kafka-trees_consumer_1:8080"
+          - "kafka-trees_consumer_2:8080"
+          - "kafka-trees_consumer_3:8080"
+          - "kafka-trees_consumer_4:8080"
+          - "kafka-trees_consumer_5:8080"
+          - "kafka-trees_consumer_6:8080"
+          - "kafka-trees_consumer_7:8080"
+          - "kafka-trees_consumer_8:8080"
+          - "kafka-trees_consumer_9:8080"
+          - "kafka-trees_consumer_10:8080"
+          - "kafka-trees_consumer_11:8080"
+          - "kafka-trees_consumer_12:8080"

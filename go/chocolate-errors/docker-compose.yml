@@ -1,0 +1,10 @@
+version: '3.9'
+
+services:
+  custom-errors:
+    # image to build
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+    # image to store
+    image: custom-errors:${TAG:-latest}

@@ -1,0 +1,59 @@
+version: '3.9'
+
+services:
+  # Kafka Producers
+  producertree:
+    image: tree-producer
+    hostname: producertree
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+      target: producer
+    depends_on:
+      - kafka
+  producertest:
+    image: tree-producer
+    hostname: producertest
+    command: ./treeproducer -topic test -workers 3
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+      target: producer
+    depends_on:
+      - kafka
+  # Kafka Consumers
+  consumer:
+    image: tree-consumer
+    command: ./treeconsumer -topics test,trees
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+      target: consumer
+    depends_on:
+      - kafka
+    deploy:
+      mode: replicated
+      replicas: 1 # if replicas: 0 is used, then none of the other containers are started either
+  # Zookeeper Service - Zookeeper is needed (as of Jan 2022) - but soon it won't be needed
+  zookeeper:
+    image: zookeeper:3.7
+  # Kafka container
+  kafka:
+    image: wurstmeister/kafka:2.13-2.8.1
+    # restart: on-failure # restart in case of crash
+    hostname: kafka # hardcoding for internal use - not needed by clients
+    environment:
+      KAFKA_LISTENERS: INSIDE://:9092,OUTSIDE://:9094
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
+      # TOPICS: `trees` will have 13 partitions and 1 replica, `test` will have 7 partitions and 1 replica
+      KAFKA_CREATE_TOPICS: "trees:13:1,test:37:1"
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+  # Prometheus
+  prometheus:
+    image: "prom/prometheus"
+    hostname: prometheus.svc
+    volumes:
+      - ./prometheus/config/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - 9090:9090 # http port

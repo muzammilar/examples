@@ -1,0 +1,8 @@
+version: '3.4'
+
+services:
+  shredder:
+    image: shredder
+    build:
+      context: .
+      dockerfile: ./Dockerfile

@@ -1,0 +1,26 @@
+
+services:
+  ingest-service:
+    # see: https://www.inngest.com/docs/dev-server
+    # docker run -p 8288:8288 inngest/inngest \
+    # inngest dev -u http://host.docker.internal:3000/api/inngest
+    image: inngest/inngest
+    ports:
+      - 8288:8288
+    # env variables are not directly supported without a shell
+    command: ["/bin/sh", "-c", "inngest dev"]
+
+  my-app:
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+    ports:
+      - 8000:8000
+    environment:
+      INNGEST_DEV: 1 # enable inngest dev debugging
+      INNGEST_BASE_URL: http://host.docker.internal:8288 # this tells the app where the inngest server is
+    # Run the application with uv
+    command: ["uv", "run", "app.py"]
+
+volumes:
+  ingest-data:

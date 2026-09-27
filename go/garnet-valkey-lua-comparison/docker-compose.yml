@@ -1,0 +1,53 @@
+services:
+  # Valkey service
+  valkey:
+    image: valkey/valkey:8.0
+    container_name: valkey
+    ports:
+      - "6379:6379"
+    networks:
+      - redis-net
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # Garnet service
+  garnet:
+    image: ghcr.io/microsoft/garnet:1.0
+    container_name: garnet
+    volumes:
+      - ./config/garnet.conf:/app/garnet.conf:ro
+    command: ["--lua", "--config-import-path", "/app/garnet.conf"]
+    ports:
+      - "6380:6379"
+    networks:
+      - redis-net
+    # healthcheck:
+    #   test: ["CMD", "redis-cli", "-p", "6379", "ping"]
+    #   interval: 5s
+    #   timeout: 3s
+    #   retries: 5
+
+  # Application service
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: garnet-valkey-app
+    environment:
+      - VALKEY_ADDR=valkey:6379
+      - GARNET_ADDR=garnet:6379
+      - LUA_SCRIPT_PATH=/app/scripts/example.lua
+    depends_on:
+      valkey:
+        condition: service_healthy
+      garnet:
+        condition: service_started
+    networks:
+      - redis-net
+
+networks:
+  redis-net:
+    driver: bridge

@@ -1,0 +1,10 @@
+[project]
+name = "hello-orchestration"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi[standard]>=0.118.0",
+    "inngest>=0.5.9",
+]

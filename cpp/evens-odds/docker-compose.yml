@@ -1,0 +1,27 @@
+version: '3.9'
+
+services:
+  # Base build image to be generated and not stored
+  builder-meson:
+    image: meson-ubuntu-focal
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    profiles:
+      - donotstart
+
+  # Even/odd example builder image generated from meson-builder
+  builder-evens-odds:
+    image: buildimg-evens-odds
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    profiles:
+      - donotstart
+
+  # Even/odd example runner image
+  runner-even-odd-numbers:
+    image: even-odd-numbers
+    build:
+      context: .
+      dockerfile: ./Dockerfile

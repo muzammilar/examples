@@ -1,0 +1,25 @@
+[project]
+name = "lang-rust-example"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = []
+
+
+[tool.uv]
+# Rebuild package when any rust files change
+cache-keys = [{file = "pyproject.toml"}, {file = "Cargo.toml"}, {file = "rust/Cargo.toml"}, {file = "**/*.rs"}]
+# Uncomment to build rust code in development mode - For production we skip this
+config-settings = { build-args = '--profile=dev' }
+
+# If a pyproject.toml with a [build-system] entry is present,
+# maturin can build a source distribution of your package when --sdist is specified.
+[build-system]
+requires = ["maturin>=1.5,<2.0"]
+build-backend = "maturin"
+
+# See full options here; https://www.maturin.rs/config.html
+[tool.maturin]
+#python="python3"
+module-name = "my_module.my_rs_lib"

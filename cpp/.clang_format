@@ -1,0 +1,15 @@
+BasedOnStyle: LLVM
+UseTab: Always
+IndentWidth: 4
+TabWidth: 4
+ColumnLimit: 120
+# Declarations and Variables
+AlignConsecutiveDeclarations: false
+# Indentation Styles
+BreakBeforeBraces: Stroustrup
+IndentPPDirectives: AfterHash
+# Constructors
+PackConstructorInitializers: Never
+BreakConstructorInitializers: AfterColon
+# Align Pointers and References
+PointerAlignment: Right

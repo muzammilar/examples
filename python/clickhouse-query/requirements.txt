@@ -1,0 +1,6 @@
+pyyaml~=6.0 # yaml config read
+python-box~=7.0 # convert yaml config to a class
+clickhouse-connect>=0.7.0
+requests>2.21,<3.0
+prometheus-client~=0.16.0
+humanize~=4.6

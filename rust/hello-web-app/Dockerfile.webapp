@@ -1,0 +1,44 @@
+
+# Use the official Rust image as a base
+FROM rust:latest AS builder
+
+# Set the working directory to /usr/src/helloapp_web_app
+WORKDIR /usr/src/helloapp_web_app
+
+# Copy the Cargo.toml file into the working directory
+COPY Cargo.toml .
+
+# Create a dummy source file to build dependencies only
+RUN mkdir src && echo 'fn main() {}' > src/main.rs
+RUN mkdir -p src/bin/web && echo 'fn main() {}' > src/bin/web/main.rs
+RUN mkdir -p src/bin/cli && echo 'fn main() {}' > src/bin/cli/main.rs
+
+# Build dependencies (this step is cached unless Cargo.toml or Cargo.lock changes)
+RUN cargo build --release
+
+# Now copy the actual source code
+COPY src ./src
+
+# Build the application
+RUN cargo install --path .
+
+# List the installed binaries
+RUN  cargo install --list
+
+# List the installed binaries
+RUN ls /usr/local/cargo/bin
+
+# Use a smaller base image for the final stage
+FROM rust:latest
+
+# Copy the binary from the builder stage to this stage
+COPY --from=builder /usr/local/cargo/bin/helloapp* /usr/local/bin/
+
+# List the installed binaries
+RUN ls /usr/local/bin
+
+# Expose port 8080 for incoming traffic
+EXPOSE 8080
+
+# Run the application when the container starts
+CMD ["helloapp_web"]

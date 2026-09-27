@@ -1,0 +1,10 @@
+name: mkry
+
+services:
+  mockereyexample:
+    image: xmpl/mockery:${TAG:-dev} # For additional tags, use Docker's build args https://docs.docker.com/reference/cli/docker/image/build/
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    environment:
+     - TAG=0.0.1
