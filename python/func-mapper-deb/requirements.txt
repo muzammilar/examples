@@ -1,1 +1,1 @@
-requests>2.18,<3.0 # python requests library
+# no third-party runtime dependencies (dh-virtualenv installs these into the venv)

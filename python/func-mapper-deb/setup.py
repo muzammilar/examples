@@ -2,7 +2,7 @@ import os
 from setuptools import find_packages
 from setuptools import setup
 
-#NOTE: Using setup.py is the legacy format. It's better to use setup.ini
+# NOTE: Using setup.py is the legacy format. It's better to use setup.cfg/pyproject.toml
 # since that avoids the circular dependency issue for wheel building
 
 PACKAGE_NAME = "funkpkg"
@@ -23,14 +23,12 @@ setup(
     author_email="foo@bar.com",
     license=LICENSE_NAME,
     classifiers=[
-        "Development Status :: 1",
+        "Development Status :: 1 - Planning",
         "Programming Language :: Python :: 3",
     ],
-    install_requires=[
-        "requests>2.18,<3.0"
-    ],
-    package_dir={"funcmapper": "funcmapper"},
-    packages=find_packages(),
+    python_requires=">=3.8",
+    install_requires=[],
+    packages=find_packages(exclude=["tests", "tests.*"]),
     include_package_data=True,
     data_files=[],
     entry_points={
