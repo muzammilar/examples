@@ -1,8 +1,16 @@
-.PHONY: up init test status cli down
+.PHONY: up dashboards init test status cli down
 
-up:
+# upstream dashboard from the exporter repo (the commit behind image 3.1.0 plus its dashboard fix)
+FDB_EXPORTER_REF := b8e124de1fd83b6467bafedb6ad438e48eaaed31
+
+up: dashboards
 	docker compose up --detach
 	$(MAKE) init
+
+# downloads into the gitignored grafana/provisioning/dashboards/upstream/ (skips existing files)
+dashboards:
+	grafana/fetch-dashboards.sh grafana/provisioning/dashboards/upstream \
+		https://raw.githubusercontent.com/aikoven/foundationdb-exporter/$(FDB_EXPORTER_REF) grafana/foundationdb.json
 
 # a brand-new cluster has no database until `configure new` is run once
 init:

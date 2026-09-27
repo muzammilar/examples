@@ -5,3 +5,4 @@ scrape_configs:
   - job_name: foundationdb
     static_configs:
       - targets: ["fdb-exporter:9444"]
+        labels: { namespace: foundationdb } # the upstream dashboard filters on it
