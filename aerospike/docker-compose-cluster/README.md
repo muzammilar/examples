@@ -8,10 +8,16 @@ next to it; Prometheus scrapes all three and Grafana shows a small dashboard.
 ```bash
 make up       # start and wait until the cluster is stable at size 3
 make test     # run aql/test.aql (via aerospike-tools): insert, select, delete, SHOW SETS
+make failover # stop aerospike-3: size 2, all records readable/writable; restart, wait for migrations
 make status   # asadm info
 make cli      # interactive asadm
 make down     # remove containers
 ```
+
+`make failover` writes [`failover/*.aql`](failover) records, stops `aerospike-3` and waits for the
+cluster to re-form at size 2: with RF=2 every partition still has one copy, so the surviving replicas
+become masters and all reads and writes keep working. It then starts the node again and waits for
+`cluster-stable:size=3;ignore-migrations=false` (migrations finished).
 
 - Client: `localhost:3000` (aerospike-1)
 - Prometheus: http://localhost:9090
