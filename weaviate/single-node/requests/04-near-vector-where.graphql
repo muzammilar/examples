@@ -1,0 +1,11 @@
+{
+  Get {
+    Landmark(
+      nearVector: { vector: [0.2, 0.1, 0.9, 0.7] }
+      where: { path: ["city"], operator: Equal, valueText: "London" }
+      limit: 3
+    ) {
+      name city _additional { distance }
+    }
+  }
+}

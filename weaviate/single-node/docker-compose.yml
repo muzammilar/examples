@@ -1,0 +1,39 @@
+name: weaviate-single
+
+services:
+  weaviate:
+    image: semitechnologies/weaviate:${WEAVIATE_VERSION:-1.39.7}
+    container_name: weaviate
+    hostname: weaviate
+    command: ["--host", "0.0.0.0", "--port", "8080", "--scheme", "http"]
+    environment:
+      AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: "true"
+      DEFAULT_VECTORIZER_MODULE: none # vectors are supplied by the client
+      PERSISTENCE_DATA_PATH: /var/lib/weaviate
+      CLUSTER_HOSTNAME: node1
+      QUERY_DEFAULTS_LIMIT: 10
+    ports:
+      - "8080:8080"   # REST + GraphQL
+      - "50051:50051" # gRPC (used by the v4 clients)
+    volumes:
+      - weaviate-data:/var/lib/weaviate
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:8080/v1/.well-known/ready"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
+  # curl + jq, used by `make test` and `make cli`
+  tools:
+    build:
+      dockerfile_inline: |
+        FROM alpine:3.22
+        RUN apk add --no-cache curl jq
+    profiles: [tools]
+    working_dir: /work
+    volumes:
+      - ./requests:/work/requests:ro
+      - ./scripts:/work/scripts:ro
+
+volumes:
+  weaviate-data:
