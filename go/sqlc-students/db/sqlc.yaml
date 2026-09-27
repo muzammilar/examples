@@ -1,0 +1,23 @@
+version: "2"
+sql:
+  - engine: "postgresql"
+    queries: "postgresql/queries/"
+    schema: "postgresql/schema/"
+    gen:
+      go:
+        package: "pgqueries"
+        sql_package: "pgx/v5"
+        out: "postgres"
+        emit_json_tags: true
+        overrides:
+          - db_type: "uuid"
+            go_type:
+              import: "github.com/google/uuid"
+              type: "UUID"
+#  - engine: "mysql"
+#    queries: "mysql/queries/"
+#    schema: "mysql/migrations/"
+#    gen:
+#      go:
+#        package: "myqueries"
+#        out: "myqueries"

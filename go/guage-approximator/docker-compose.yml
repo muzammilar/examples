@@ -1,0 +1,17 @@
+version: '3.4'
+
+services:
+  guageappx:
+    container_name: guageappx
+    image: guageappx
+    command: ./guageavg -buckets 30 -bucketinterval 5
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+  guageappx-help:
+    container_name: guageappx-help
+    image: guageappx
+    command: ./guageavg -h
+    build:
+      context: .
+      dockerfile: ./Dockerfile

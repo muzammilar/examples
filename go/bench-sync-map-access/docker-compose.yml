@@ -1,0 +1,8 @@
+version: '3.4'
+
+services:
+  syncmapaccess:
+    image: syncmapaccess
+    build:
+      context: .
+      dockerfile: ./Dockerfile

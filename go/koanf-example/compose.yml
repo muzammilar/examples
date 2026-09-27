@@ -1,0 +1,12 @@
+name: koanfxmpl
+
+services:
+  koanfexample:
+    image: xmpl/koanfexample:${TAG:-dev} # For additional tags, use Docker's build args https://docs.docker.com/reference/cli/docker/image/build/
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    env_file:
+     - ./Docker/example/nested.env
+    environment:
+     - TAG=0.0.1

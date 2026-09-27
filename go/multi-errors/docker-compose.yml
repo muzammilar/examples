@@ -1,0 +1,8 @@
+services:
+  multi-error:
+    container_name: multi-error
+    image: multi-error
+    command: ./multierror
+    build:
+      context: .
+      dockerfile: ./Dockerfile

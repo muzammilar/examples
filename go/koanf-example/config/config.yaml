@@ -1,0 +1,14 @@
+---
+ghardelli: "Gustavo Hardelli"
+kinder: "Kinder Bueno"
+hersheys: "Hershey's"
+kit_kat:
+  flavor: "Kit Kat"
+lindt:
+  lindor: "Lindor"
+mars_inc:
+  snickers_chocolate: "Snickers"
+  mars: "Mars"
+fererro_group:
+  fererro_rocher:
+    rafaello: "Rafaello"

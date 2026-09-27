@@ -1,0 +1,21 @@
+quiet: False
+# Use with-expecter: True to generate EXPECT() methods for your mocks. This is the preferred way to set up your mocks.
+with-expecter: True
+filename: "mock_{{.InterfaceName}}.go"
+dir: "{{.InterfaceDir}}/mocks"
+mockname: "Mock{{.InterfaceName}}"
+outpkg: "mock{{.PackageName}}"
+packages:
+  github.com/muzammilar/mockeryoflang/simple:
+    interfaces:
+      Stringer:
+
+#    github.com/muzammilar/mockeryoflang:
+#        # place your package-specific config here
+#        config:
+#        interfaces:
+#            # select the interfaces you want mocked
+#            Foo:
+#                # Modify package-level config for this specific interface (if applicable)
+#                config:
+                  # Something

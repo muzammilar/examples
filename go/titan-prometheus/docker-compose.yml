@@ -1,0 +1,39 @@
+version: '3.9'
+
+services:
+  # Titan Service
+  titan:
+    image: titan
+    container_name: titan-01
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    networks:
+      - titan
+    ports:
+      - 18080:8080 # http port
+
+  # Prometheus
+  prometheus-01:
+    image: "prom/prometheus"
+    container_name: prometheus-svc-01
+    volumes:
+      - ./prometheus/config/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - 9090:9090 # http port
+    networks:
+      - titan
+  # Grafana
+  grafana-01:
+    image: "grafana/grafana"  # latest grafana
+    container_name: grafana-svc-01
+    ports:
+      - 3000:3000 # http port
+    networks:
+      - titan
+    volumes:
+      - ./grafana/datasources/:/etc/grafana/provisioning/datasources/
+
+networks:
+  titan:
+    driver: bridge
