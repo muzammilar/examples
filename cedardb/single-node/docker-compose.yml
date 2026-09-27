@@ -1,0 +1,47 @@
+name: cedardb-single
+
+x-credentials: &credentials
+  # fixed demo password; CedarDB requires 8+ chars mixing upper, lower, digit and symbol
+  CEDAR_PASSWORD: Cedar-Demo-1
+
+services:
+  # CedarDB Community Edition, as in https://cedardb.com/docs/get_started/install_with_docker/
+  # The image is multi-arch (amd64 + arm64), so it runs natively on Apple silicon.
+  cedardb:
+    image: cedardb/cedardb:${CEDARDB_VERSION:-v2026-09-16}
+    container_name: cedardb
+    environment:
+      <<: *credentials
+      CEDAR_USER: postgres
+      CEDAR_DB: postgres
+    ports:
+      # host 5434, not 5432, to stay clear of a local PostgreSQL
+      - "${CEDARDB_PORT:-5434}:5432"
+    volumes:
+      - cedardb-data:/var/lib/cedardb/data
+    healthcheck:
+      # the image ships pg_isready but no psql
+      test: ["CMD", "pg_isready", "-h", "localhost", "-p", "5432", "-U", "postgres"]
+      interval: 3s
+      timeout: 5s
+      retries: 40
+      start_period: 5s
+
+  # psql client for `make test` / `make cli`; only started via `docker compose run`
+  psql:
+    image: postgres:17-alpine
+    profiles: [tools]
+    environment:
+      PGHOST: cedardb
+      PGUSER: postgres
+      PGDATABASE: postgres
+      PGPASSWORD: Cedar-Demo-1
+    volumes:
+      - ./sql:/sql:ro
+    entrypoint: ["psql", "-v", "ON_ERROR_STOP=1"]
+    depends_on:
+      cedardb:
+        condition: service_healthy
+
+volumes:
+  cedardb-data:
