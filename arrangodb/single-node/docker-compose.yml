@@ -1,0 +1,24 @@
+name: arrangodb-single
+
+# One ArangoDB server (single-server mode, RocksDB engine); root password is "demo".
+services:
+  arangodb:
+    image: arangodb:${ARANGODB_VERSION:-3.12.12}
+    container_name: arangodb
+    hostname: arangodb
+    environment:
+      ARANGO_ROOT_PASSWORD: demo
+    ports:
+      - "8529:8529" # HTTP API + web UI
+    volumes:
+      - arangodb-data:/var/lib/arangodb3
+      - ./aql:/aql:ro
+    healthcheck:
+      test: ["CMD", "arangosh", "--server.password", "demo", "--javascript.execute-string", "db._version()"]
+      interval: 5s
+      timeout: 10s
+      retries: 30
+      start_period: 10s
+
+volumes:
+  arangodb-data:
