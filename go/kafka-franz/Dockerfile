@@ -1,4 +1,5 @@
 ARG GO_VERSION=1.26
+ARG ALPINE_VERSION=3.24
 
 ###############################################
 # Builder stage
@@ -19,19 +20,19 @@ RUN CGO_ENABLED=0 go install -v ./admin ./producer ./consumer
 ###############################################
 
 # admin (topic creation)
-FROM alpine:latest AS admin
+FROM alpine:${ALPINE_VERSION} AS admin
 RUN apk --no-cache add ca-certificates
 COPY --from=builder /go/bin/admin /treeadmin
 CMD ["/treeadmin"]
 
 # producer
-FROM alpine:latest AS producer
+FROM alpine:${ALPINE_VERSION} AS producer
 RUN apk --no-cache add ca-certificates
 COPY --from=builder /go/bin/producer /treeproducer
 CMD ["/treeproducer"]
 
 # consumer
-FROM alpine:latest AS consumer
+FROM alpine:${ALPINE_VERSION} AS consumer
 RUN apk --no-cache add ca-certificates
 COPY --from=builder /go/bin/consumer /treeconsumer
 CMD ["/treeconsumer"]

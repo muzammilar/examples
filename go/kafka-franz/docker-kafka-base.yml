@@ -1,7 +1,7 @@
 services:
   # base
   kafka-base:
-    image: apache/kafka:3.9.1
+    image: apache/kafka:4.3.1
     networks:
       - kafka-network
 
@@ -11,8 +11,8 @@ services:
     environment:
       KAFKA_PROCESS_ROLES: controller
       KAFKA_LISTENERS: CONTROLLER://:9093
-      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT
       KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka-controller-1:9093,2@kafka-controller-2:9093,3@kafka-controller-3:9093
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
 
