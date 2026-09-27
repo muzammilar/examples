@@ -1,0 +1,63 @@
+name: foundationdb-cluster
+
+# Three fdbserver processes form one cluster; all three are coordinators.
+# The cluster file names coordinators by hostname (FDB 7.1+), so every process
+# and the exporter share the same static connection string.
+# `make init` configures the database in `double` redundancy.
+x-fdb: &fdb
+  image: foundationdb/foundationdb:${FDB_VERSION:-7.3.79}
+  environment:
+    FDB_NETWORKING_MODE: container
+    FDB_PORT: 4500
+    FDB_CLUSTER_FILE_CONTENTS: docker:docker@fdb-0:4500,fdb-1:4500,fdb-2:4500
+
+services:
+  fdb-0:
+    <<: *fdb
+    container_name: fdb-0
+    hostname: fdb-0
+    volumes: [fdb-0:/var/fdb/data]
+  fdb-1:
+    <<: *fdb
+    container_name: fdb-1
+    hostname: fdb-1
+    volumes: [fdb-1:/var/fdb/data]
+  fdb-2:
+    <<: *fdb
+    container_name: fdb-2
+    hostname: fdb-2
+    volumes: [fdb-2:/var/fdb/data]
+
+  # Exports `status json` as Prometheus metrics on :9444 (amd64-only image).
+  fdb-exporter:
+    image: aikoven/foundationdb-exporter:3.1.0
+    container_name: fdb-exporter
+    platform: linux/amd64
+    environment:
+      FDB_CLUSTER_FILE: /etc/foundationdb/fdb.cluster
+    volumes:
+      - ./fdb.cluster:/etc/foundationdb/fdb.cluster:ro
+    depends_on: [fdb-0]
+
+  prometheus:
+    image: prom/prometheus:v3.15.0
+    container_name: fdb-prometheus
+    ports: ["9090:9090"]
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+
+  grafana:
+    image: grafana/grafana:13.2.2
+    container_name: fdb-grafana
+    ports: ["3000:3000"]
+    environment:
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Admin
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+    depends_on: [prometheus]
+
+volumes:
+  fdb-0:
+  fdb-1:
+  fdb-2:
