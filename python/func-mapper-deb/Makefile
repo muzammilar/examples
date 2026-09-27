@@ -45,7 +45,7 @@ export PKG_VERSION
 export PY_INSTALL_SUFFIX
 
 # Makefile
-.PHONY: all test clean run dev-setup wheel wheel-clean wheel-build wheel-inspect \
+.PHONY: all test test-all clean run dev-setup wheel wheel-clean wheel-build wheel-inspect \
 	bench deb deb-clean deb-clean-changelog deb-changelog-create deb-build deb-inspect buildcontainer
 all: clean test
 
@@ -58,13 +58,22 @@ dev-setup:
 	${DEV_VENV_PATH}/bin/pip3 install -r ${MKFILE_DIR}/requirements.txt
 	${DEV_VENV_PATH}/bin/pip3 install -r ${MKFILE_DIR}/test_requirements.txt
 
+# pytest markers (see pytest.ini) keep the unit tests and the benchmarks apart:
+# `make test` deselects `benchmark`, `make bench` selects only `benchmark`.
+# Override with e.g. `make test MARKERS=unit` or `make bench BENCH_ARGS=--benchmark-min-rounds=50`.
+MARKERS ?= not benchmark
+BENCH_ARGS ?=
+
 # test the code (run `make dev-setup` first)
 test:
-	${DEV_VENV_PATH}/bin/python3 -m pytest tests
+	${DEV_VENV_PATH}/bin/python3 -m pytest tests benchmarks -m "${MARKERS}"
 
 # run the benchmarks (run `make dev-setup` first)
 bench:
-	${DEV_VENV_PATH}/bin/python3 -m pytest benchmarks --benchmark-only --benchmark-group-by=group --benchmark-columns=min,mean,median,ops,rounds
+	${DEV_VENV_PATH}/bin/python3 -m pytest tests benchmarks -m benchmark --benchmark-only ${BENCH_ARGS} --benchmark-group-by=group --benchmark-columns=min,mean,median,ops,rounds
+
+# run the unit tests, then the benchmarks
+test-all: test bench
 
 # run the program once from the source tree
 run:

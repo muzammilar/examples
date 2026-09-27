@@ -44,7 +44,15 @@ make test
 
 # run the benchmarks: each mapped function called directly vs. through `maps.call`
 make bench
+# unit tests, then benchmarks
+make test-all
 ```
+
+Unit tests and benchmarks are separated with pytest markers (registered in `pytest.ini`): tests are
+marked `unit` and benchmarks `benchmark`. `make test` runs `-m "not benchmark"` and `make bench` runs
+`-m benchmark`, so neither target runs the other's tests. Pick a different marker expression with
+`make test MARKERS=unit`, and pass extra pytest-benchmark flags with
+`make bench BENCH_ARGS=--benchmark-min-rounds=50`.
 
 `pytest` and `pytest-benchmark` are development dependencies only (`test_requirements.txt`).
 They are not part of the Debian package, which installs only `requirements.txt` into its virtualenv.
