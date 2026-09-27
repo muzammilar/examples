@@ -4,9 +4,10 @@ up:
 	docker compose up --detach --wait
 	docker exec scylla nodetool status
 
-# RF=1 keyspace, a few writes/reads at ONE
+# cqlsh does not echo statements, so each cql/*.cql file is printed before its output
 test:
-	docker exec scylla cqlsh --file /cql/test.cql
+	for f in cql/*.cql; do echo; echo "==== $$f"; cat $$f; echo "---- output"; \
+		docker exec scylla cqlsh --file /$$f || exit 1; done
 
 status:
 	docker exec scylla nodetool status
