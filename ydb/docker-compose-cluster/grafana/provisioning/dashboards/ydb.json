@@ -59,7 +59,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "sum by (instance) (rate(CpuMicrosec{job=\"ydb-utils\"}[1m])) / 1e6",
+          "expr": "sum by (instance) (rate(utils_CpuMicrosec{job=\"ydb-utils\"}[1m])) / 1e6",
           "legendFormat": "__auto"
         }
       ]
@@ -87,7 +87,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "sum by (instance) (rate(Requests_QueryExecute{job=\"ydb-kqp\"}[1m]))",
+          "expr": "sum by (instance) (rate(kqp_Requests_QueryExecute{job=\"ydb-kqp\"}[1m]))",
           "legendFormat": "__auto"
         }
       ]
@@ -115,7 +115,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "sum by (instance) (rate(Requests_QueryBytes{job=\"ydb-kqp\"}[1m]))",
+          "expr": "sum by (instance) (rate(kqp_Requests_QueryBytes{job=\"ydb-kqp\"}[1m]))",
           "legendFormat": "__auto"
         }
       ]
@@ -143,7 +143,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "Process_AnonRssSize{job=\"ydb-utils\"}",
+          "expr": "utils_Process_AnonRssSize{job=\"ydb-utils\"}",
           "legendFormat": "__auto"
         }
       ]
@@ -171,7 +171,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "Process_UptimeSeconds{job=\"ydb-utils\"}",
+          "expr": "utils_Process_UptimeSeconds{job=\"ydb-utils\"}",
           "legendFormat": "__auto"
         }
       ]

@@ -20,5 +20,11 @@ make down     # remove containers (disks live inside them)
 - Embedded UI: http://localhost:8765 (ydb-storage-1)
 - Prometheus: http://localhost:9090
 - Grafana: http://localhost:3000 (anonymous admin) → **YDB** dashboard
+- `make up` also fetches the CPU, DB overview, DB status, Actors, gRPC, Query engine, TxProxy and
+  DataShard dashboards from [ydb-platform/ydb@26.2.1.14](https://github.com/ydb-platform/ydb/tree/26.2.1.14/ydb/deploy/helm/ydb-prometheus/dashboards)
+  into the gitignored `grafana/provisioning/dashboards/upstream/` → Grafana folder **upstream**.
+  They expect the Helm chart's naming, so [`prometheus.yml`](prometheus/prometheus.yml) prefixes
+  metric names with their counter group (`utils_`, `kqp_`, …) and sets `container`. Per-pool panels
+  (User/System/Batch/IC) stay empty: with `use_auto_config` on 2 CPUs ydbd runs only Common and IO.
 
 `ydbd` is taken from the `local-ydb` image (amd64-only, emulated on Apple silicon).
