@@ -3,8 +3,8 @@ SHELL := /bin/bash  # use this instead of /bin/bash
 
 PROG_NAME := main.py
 
-.PHONY: all sync format format-check lint login run purge
-all: sync format-check lint
+.PHONY: all sync format format-check lint test login run purge
+all: sync format-check lint test
 
 # remove the virtualenv and caches (keeps browser profiles and scraped data)
 purge:
@@ -21,6 +21,10 @@ format-check:
 
 lint:
 	uvx ruff check .
+
+# unit tests (fake driver, no browser needed)
+test: sync
+	uv run pytest
 
 # sync the dependencies including venv
 sync:

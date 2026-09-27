@@ -32,6 +32,7 @@ stockscraper/
   sourceinfo.py            # SourceInfo / StockInfo types and CSV writer
   sources.py               # registry of scrape sources
   musaffa.py               # musaffa.com screener scraper
+tests/                     # pytest unit tests (fake driver, no browser)
 ```
 
 ## Usage
@@ -55,7 +56,19 @@ uv run main.py --browser firefox
 uv run main.py --help             # all flags
 ```
 
-`make login`, `make run`, `make format`, `make lint` wrap the same commands.
+`make login`, `make run`, `make format`, `make lint`, `make test` wrap the same commands.
+
+## Tests
+
+```sh
+uv run pytest    # or: make test
+```
+
+The unit tests cover argument parsing, the CSV writer, the source registry and the Musaffa
+paging/stop logic using a fake driver, so they need neither a browser nor network access.
+
+There is no benchmark: a scrape's runtime is dominated by the network and the browser, so timing
+this code would not measure anything meaningful.
 
 ### Reusing your existing browser profile
 

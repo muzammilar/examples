@@ -15,10 +15,6 @@ def main(argv: list[str] | None = None) -> int:
     args = parse_arguments(argv)
     source = SOURCES[args.source]
 
-    if args.initial_login and args.headless:
-        print("--initial-login needs a visible browser window; drop --headless.", file=sys.stderr)
-        return 2
-
     driver = create_driver(args)
     try:
         if args.initial_login:

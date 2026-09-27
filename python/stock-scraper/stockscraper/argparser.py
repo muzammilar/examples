@@ -65,4 +65,7 @@ def parse_arguments(argv: list[str] | None = None) -> argparse.Namespace:
         default="_userdatafirefox",
         help="Path to the Firefox profile directory (default: %(default)s).",
     )
-    return parser.parse_args(argv)
+    args = parser.parse_args(argv)
+    if args.initial_login and args.headless:
+        parser.error("--initial-login needs a visible browser window; drop --headless.")
+    return args

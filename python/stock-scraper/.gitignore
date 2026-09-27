@@ -22,3 +22,6 @@ _userdatafirefox/
 
 # scraped output
 data/
+
+# Pytest
+.pytest_cache/
