@@ -1,0 +1,14 @@
+name: foundationdb-single
+
+services:
+  fdb:
+    image: foundationdb/foundationdb:${FDB_VERSION:-7.3.79}
+    container_name: fdb
+    hostname: fdb
+    environment:
+      FDB_NETWORKING_MODE: container
+      FDB_PORT: 4500
+    volumes:
+      - fdb-data:/var/fdb/data
+volumes:
+  fdb-data:
