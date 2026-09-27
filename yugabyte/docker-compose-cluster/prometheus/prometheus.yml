@@ -1,0 +1,21 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: yb-master
+    metrics_path: /prometheus-metrics
+    static_configs:
+      - targets: ["yb-1:7000", "yb-2:7000", "yb-3:7000"]
+  - job_name: yb-tserver
+    metrics_path: /prometheus-metrics
+    static_configs:
+      - targets: ["yb-1:9000", "yb-2:9000", "yb-3:9000"]
+  # YSQL (postgres) and YCQL query-layer metrics
+  - job_name: ysql
+    metrics_path: /prometheus-metrics
+    static_configs:
+      - targets: ["yb-1:13000", "yb-2:13000", "yb-3:13000"]
+  - job_name: ycql
+    metrics_path: /prometheus-metrics
+    static_configs:
+      - targets: ["yb-1:12000", "yb-2:12000", "yb-3:12000"]
