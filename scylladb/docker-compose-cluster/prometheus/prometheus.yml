@@ -1,7 +1,25 @@
 global:
   scrape_interval: 15s
+  evaluation_interval: 15s
+
+# scylla-monitoring's recording rules (latency percentiles, CQL rates), fetched by `make dashboards`
+rule_files:
+  - /etc/prometheus/upstream/*.yml
 
 scrape_configs:
   - job_name: scylla
     static_configs:
       - targets: ["scylla-1:9180", "scylla-2:9180", "scylla-3:9180"]
+        # the upstream dashboards select on cluster and dc
+        labels: { cluster: scylladb-cluster, dc: datacenter1 }
+    relabel_configs:
+      # as in scylla-monitoring: instance is the node address without the port
+      - source_labels: [__address__]
+        regex: "(.+):\\d+"
+        target_label: instance
+    metric_relabel_configs:
+      # as in scylla-monitoring: per-shard summaries are tagged by="instance,shard"
+      - source_labels: [__name__]
+        regex: "scylla_.*_summary"
+        target_label: by
+        replacement: "instance,shard"

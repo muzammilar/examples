@@ -51,6 +51,7 @@ services:
     ports: ["9090:9090"]
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./prometheus/upstream:/etc/prometheus/upstream:ro # recording rules, fetched by `make dashboards`
 
   grafana:
     image: grafana/grafana:13.2.2
