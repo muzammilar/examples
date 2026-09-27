@@ -1,0 +1,33 @@
+name: qdrant-single
+
+services:
+  qdrant:
+    image: qdrant/qdrant:${QDRANT_VERSION:-v1.19.1}
+    container_name: qdrant
+    hostname: qdrant
+    ports:
+      - "6333:6333" # REST + web UI (/dashboard)
+      - "6334:6334" # gRPC
+    volumes:
+      - qdrant-data:/qdrant/storage
+    # the image has no curl/wget; probe /readyz over bash's /dev/tcp
+    healthcheck:
+      test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/127.0.0.1/6333 && printf 'GET /readyz HTTP/1.0\\r\\n\\r\\n' >&3 && grep -q ' 200 ' <&3"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  # curl + jq, used by `make test` and `make cli`
+  tools:
+    build:
+      dockerfile_inline: |
+        FROM alpine:3.22
+        RUN apk add --no-cache curl jq
+    profiles: [tools]
+    working_dir: /work
+    volumes:
+      - ./requests:/work/requests:ro
+      - ./scripts:/work/scripts:ro
+
+volumes:
+  qdrant-data:
