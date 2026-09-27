@@ -15,17 +15,16 @@ SELECT * FROM system.zookeeper WHERE path='/clickhouse/tables/test.test_table_lo
 
 SELECT * FROM system.zookeeper WHERE path='/clickhouse/tables/test.test_table_local/001/replicas';
 
-SELECT * FROM system.zookeeper WHERE path='/clickhouse/tables/test.test_table_local/001/replicas/ch04';
+SELECT * FROM system.zookeeper WHERE path='/clickhouse/tables/test.test_table_local/001/replicas/clickhouse-server-04';
 
-SELECT * FROM system.zookeeper WHERE path='/clickhouse/tables/test.test_table_local/001/replicas/ch04/parts';
+SELECT * FROM system.zookeeper WHERE path='/clickhouse/tables/test.test_table_local/001/replicas/clickhouse-server-04/parts';
 
-SELECT * FROM system.zookeeper WHERE path='/clickhouse/tables/test.test_table_local/001/replicas/ch04/queue';
+SELECT * FROM system.zookeeper WHERE path='/clickhouse/tables/test.test_table_local/001/replicas/clickhouse-server-04/queue';
 
-SELECT * FROM system.zookeeper WHERE path='/clickhouse/tables/test.test_table_local/001/replicas/ch04/is_active';
+SELECT * FROM system.zookeeper WHERE path='/clickhouse/tables/test.test_table_local/001/replicas/clickhouse-server-04/is_active';
 
-SELECT * FROM system.zookeeper WHERE path='/clickhouse/tables/test.test_table_local/001/replicas/ch04/is_lost';
+SELECT * FROM system.zookeeper WHERE path='/clickhouse/tables/test.test_table_local/001/replicas/clickhouse-server-04/is_lost';
 
 /* Dropping Dead Replica: https://clickhouse.com/docs/en/sql-reference/statements/system/#query_language-system-drop-replica */
 /* Live replicas use `DROP TABLE` */
 
-;;

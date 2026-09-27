@@ -7,4 +7,3 @@ FROM system.numbers
 LIMIT 500;
 
 
-;;

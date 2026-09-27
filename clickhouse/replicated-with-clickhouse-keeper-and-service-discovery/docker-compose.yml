@@ -1,127 +1,153 @@
-version: "3.9"
+name: ch-discovery
 
 services:
   # Prometheus Container
   prometheus:
-    image: "prom/prometheus"
-    hostname: prometheus-svc-01
-    container_name: prometheus-svc-01
+    image: "prom/prometheus:v3.15.0"
+    container_name: ch-discovery-prometheus
     volumes:
       - ./configs/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
-      - 9090:9090 # http port
+      - "${PROMETHEUS_PORT:-19090}:9090" # http port
 
-  # Server-1
+  # Grafana with a provisioned Prometheus datasource and dashboards (configs/grafana)
+  grafana:
+    image: "grafana/grafana:13.2.2"
+    container_name: ch-discovery-grafana
+    environment:
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Admin
+      GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /var/lib/grafana/dashboards/clickhouse-cluster.json
+    volumes:
+      - ./configs/grafana/provisioning:/etc/grafana/provisioning
+      - ./configs/grafana/dashboards:/var/lib/grafana/dashboards
+    ports:
+      - "${GRAFANA_PORT:-13000}:3000"
+    depends_on:
+      - prometheus
+
+  # Server-1 (keeper + data)
   clickhouse-server-01:
     extends:
       file: clickhouse-service.yml
-      service: clickhouse
+      service: clickhouse-keeper-data
     container_name: clickhouse-server-01
-    hostname: ch01
+    hostname: clickhouse-server-01 # registered in discovery as-is, so it must resolve from other nodes
     ports:
-      - 18123:8123
-    volumes:
-      - ./configs/clickhouse/keeper_server.xml:/etc/clickhouse-server/config.d/keeper_server.xml # clickhouse-keeper configs
+      - "${CLICKHOUSE_HTTP_PORT:-18123}:8123"
     environment:
       - SHARD=001
       - KEEPER_SERVER_ID=1001
-  # Server-2
+
+  # Server-2 (keeper + data)
   clickhouse-server-02:
     extends:
       file: clickhouse-service.yml
-      service: clickhouse
+      service: clickhouse-keeper-data
     container_name: clickhouse-server-02
-    hostname: ch02
-    volumes:
-      - ./configs/clickhouse/keeper_server.xml:/etc/clickhouse-server/config.d/keeper_server.xml # clickhouse-keeper configs
+    hostname: clickhouse-server-02 # registered in discovery as-is, so it must resolve from other nodes
     environment:
       - SHARD=002
       - KEEPER_SERVER_ID=2002
-  # Server-3
+
+  # Server-3 (keeper + data)
   clickhouse-server-03:
     extends:
       file: clickhouse-service.yml
-      service: clickhouse
+      service: clickhouse-keeper-data
     container_name: clickhouse-server-03
-    hostname: ch03
-    volumes:
-      - ./configs/clickhouse/keeper_server.xml:/etc/clickhouse-server/config.d/keeper_server.xml # clickhouse-keeper configs
+    hostname: clickhouse-server-03 # registered in discovery as-is, so it must resolve from other nodes
     environment:
       - SHARD=003
       - KEEPER_SERVER_ID=3003
+
   # Server-4
   clickhouse-server-04:
     extends:
       file: clickhouse-service.yml
-      service: clickhouse
+      service: clickhouse-data
     container_name: clickhouse-server-04
-    hostname: ch04
+    hostname: clickhouse-server-04 # registered in discovery as-is, so it must resolve from other nodes
     environment:
       - SHARD=001
+
   # Server-5
   clickhouse-server-05:
     extends:
       file: clickhouse-service.yml
-      service: clickhouse
+      service: clickhouse-data
     container_name: clickhouse-server-05
-    hostname: ch05
+    hostname: clickhouse-server-05 # registered in discovery as-is, so it must resolve from other nodes
     environment:
       - SHARD=002
+
   # Server-6
   clickhouse-server-06:
     extends:
       file: clickhouse-service.yml
-      service: clickhouse
+      service: clickhouse-data
     container_name: clickhouse-server-06
-    hostname: ch06
+    hostname: clickhouse-server-06 # registered in discovery as-is, so it must resolve from other nodes
     environment:
       - SHARD=003
+
   # Server-7
   clickhouse-server-07:
     extends:
       file: clickhouse-service.yml
-      service: clickhouse
+      service: clickhouse-data
     container_name: clickhouse-server-07
-    hostname: ch07
+    hostname: clickhouse-server-07 # registered in discovery as-is, so it must resolve from other nodes
     environment:
       - SHARD=001
+
   # Server-8
   clickhouse-server-08:
     extends:
       file: clickhouse-service.yml
-      service: clickhouse
+      service: clickhouse-data
     container_name: clickhouse-server-08
-    hostname: ch08
+    hostname: clickhouse-server-08 # registered in discovery as-is, so it must resolve from other nodes
     environment:
       - SHARD=002
+
   # Server-9
   clickhouse-server-09:
     extends:
       file: clickhouse-service.yml
-      service: clickhouse
+      service: clickhouse-data
     container_name: clickhouse-server-09
-    hostname: ch09
+    hostname: clickhouse-server-09 # registered in discovery as-is, so it must resolve from other nodes
     environment:
       - SHARD=003
-  # Server-10
+
+  # Server-10 (keeper, observer only)
   clickhouse-server-10:
     extends:
       file: clickhouse-service.yml
-      service: clickhouse
+      service: clickhouse-keeper
     container_name: clickhouse-server-10
-    hostname: ch10
-    volumes:
-      - ./configs/clickhouse/keeper_server.xml:/etc/clickhouse-server/config.d/keeper_server.xml # clickhouse-keeper configs
+    hostname: clickhouse-server-10 # registered in discovery as-is, so it must resolve from other nodes
     environment:
       - KEEPER_SERVER_ID=1000
-  # Server-11
+
+  # Server-11 (keeper, observer only)
   clickhouse-server-11:
     extends:
       file: clickhouse-service.yml
-      service: clickhouse
+      service: clickhouse-keeper
     container_name: clickhouse-server-11
-    hostname: ch11
-    volumes:
-      - ./configs/clickhouse/keeper_server.xml:/etc/clickhouse-server/config.d/keeper_server.xml # clickhouse-keeper configs
+    hostname: clickhouse-server-11 # registered in discovery as-is, so it must resolve from other nodes
     environment:
       - KEEPER_SERVER_ID=1100
+
+  # Server-12 (joins later: `make scale-out`)
+  clickhouse-server-12:
+    extends:
+      file: clickhouse-service.yml
+      service: clickhouse-data
+    container_name: clickhouse-server-12
+    profiles: ["scale-out"]
+    hostname: clickhouse-server-12 # registered in discovery as-is, so it must resolve from other nodes
+    environment:
+      - SHARD=001

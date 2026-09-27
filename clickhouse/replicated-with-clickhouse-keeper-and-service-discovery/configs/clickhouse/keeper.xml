@@ -12,5 +12,13 @@
             <host>clickhouse-server-03</host>
             <port>9181</port>
         </node>
+        <node index="4">
+            <host>clickhouse-server-10</host>
+            <port>9181</port>
+        </node>
+        <node index="5">
+            <host>clickhouse-server-11</host>
+            <port>9181</port>
+        </node>
     </zookeeper>
 </clickhouse>

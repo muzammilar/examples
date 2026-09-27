@@ -1,11 +1,17 @@
 <clickhouse>
+    <!-- Cluster discovery is still experimental: https://clickhouse.com/docs/operations/cluster-discovery -->
+    <allow_experimental_cluster_discovery>1</allow_experimental_cluster_discovery>
+
     <remote_servers replace="replace"> <!-- `replace` attribute ensures that configs are replaced and not merged with the base config.xml -->
 
-        <!-- A cluster with replication for ingest of data. -->
+        <!-- A cluster with replication for ingest of data. No static host list: -->
+        <!-- every node registers itself under <path> in ClickHouse Keeper and reads the other members from there. -->
         <cluster_hits>
-            <!-- Service Discovery -->
-            <path>/clickhouse/discovery/cluster_hits</path>
-            <shard from_env="SHARD" />
+            <discovery>
+                <path>/clickhouse/discovery/cluster_hits</path>
+                <!-- The shard this node joins; nodes with the same shard number are replicas of each other -->
+                <shard from_env="SHARD" />
+            </discovery>
         </cluster_hits>
 
     </remote_servers>

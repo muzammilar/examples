@@ -1,0 +1,16 @@
+<clickhouse>
+    <allow_experimental_cluster_discovery>1</allow_experimental_cluster_discovery>
+
+    <remote_servers replace="replace">
+
+        <!-- Observer: sees every member of cluster_hits (and can query Distributed tables) -->
+        <!-- but does not register itself, so it never becomes a shard/replica. -->
+        <cluster_hits>
+            <discovery>
+                <path>/clickhouse/discovery/cluster_hits</path>
+                <observer />
+            </discovery>
+        </cluster_hits>
+
+    </remote_servers>
+</clickhouse>

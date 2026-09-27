@@ -1,7 +1,7 @@
 # Global config
 global:
-  scrape_interval: 5s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
-  evaluation_interval: 5s # Evaluate rules every 15 seconds. The default is every 1 minute.
+  scrape_interval: 5s # Set the scrape interval to every 5 seconds. Default is every 1 minute.
+  evaluation_interval: 5s # Evaluate rules every 5 seconds. The default is every 1 minute.
   # scrape_timeout is set to the global default (10s).
 
 # Alertmanager configuration
@@ -32,7 +32,7 @@ scrape_configs:
   - job_name: "clickhouse-server"
     static_configs:
       - targets:
-          # for serv in {01..11}; do echo clickhouse-server-$serv:8001 ;done
+          # for serv in {01..12}; do echo clickhouse-server-$serv:8001 ;done
           - "clickhouse-server-01:8001"
           - "clickhouse-server-02:8001"
           - "clickhouse-server-03:8001"
@@ -44,3 +44,4 @@ scrape_configs:
           - "clickhouse-server-09:8001"
           - "clickhouse-server-10:8001"
           - "clickhouse-server-11:8001"
+          - "clickhouse-server-12:8001" # only up with `make scale-out`
