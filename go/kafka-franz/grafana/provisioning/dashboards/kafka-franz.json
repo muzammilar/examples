@@ -1026,7 +1026,7 @@
             "uid": "prometheus"
           },
           "refId": "B",
-          "expr": "sum by (job, node_id) (increase({__name__=~\"tree(producer|consumer)_disconnects_total\"}[5m]))",
+          "expr": "(sum by (job, node_id) (increase({__name__=~\"tree(producer|consumer)_disconnects_total\"}[5m]))) or on() vector(0)",
           "legendFormat": "disconnects {{job}} {{node_id}}",
           "range": true
         }
