@@ -1,0 +1,7 @@
+services:
+  threadpool:
+    container_name: threadpool
+    image: threadpool
+    build:
+      context: .
+      dockerfile: ./Dockerfile

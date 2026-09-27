@@ -1,0 +1,26 @@
+# Static ThreadPool
+
+A basic example of a static (fixed-size) worker pool in Go. A fixed number of
+worker goroutines are started up front and pull tasks from a bounded queue.
+Producers block in `Submit` when the queue is full, which gives natural
+backpressure without spawning a goroutine per task.
+
+* `pool.go`: the `Pool` type (`New`, `Submit`, `Close`).
+    * `Submit(ctx, task)` blocks while the queue is full; it returns `ctx.Err()` if the context ends first, or `ErrPoolClosed` after `Close`.
+    * `Close()` stops accepting tasks, drains the queue, and waits for all workers to exit. It is safe to call more than once.
+* `threadpool.go`: a demo where several producers submit messages, workers checksum them, and `main` aggregates per-worker counts.
+
+## Run
+
+```sh
+go run . -workers 8 -queue 64 -producers 4 -messages 100000
+go test -race ./...
+go test -run x -bench . ./...
+```
+
+## Docker
+
+```sh
+docker compose build
+docker compose up
+```

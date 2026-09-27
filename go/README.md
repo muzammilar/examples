@@ -37,6 +37,8 @@ The `ext` directory project that are imported as git submodules.
 
 `sqlc-students`: A basic example of using sqlc to convert sql queries into golang structs.
 
+`threadpool`: A static (fixed-size) worker pool with a bounded task queue, backpressure on submit, context cancellation, and graceful drain on close.
+
 `titan-prometheus`: A basic example of building a stats/metrics server for a running application using Prometheus.
 
 ## Call Visualizer
