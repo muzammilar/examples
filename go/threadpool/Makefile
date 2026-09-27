@@ -1,4 +1,4 @@
-.PHONY: help deps fmt vet build run test test-race bench bench-cpu test-all clean docker-build docker-up docker-down
+.PHONY: help deps fmt vet build run run-continuous test test-race bench bench-cpu test-all clean docker-build docker-up docker-logs docker-down
 
 # Variables
 APP_NAME := threadpool
@@ -6,6 +6,11 @@ MAIN_PKG := .
 BENCH ?= .
 BENCH_COUNT ?= 1
 BENCH_TIME ?= 1s
+RATE ?= 1000
+# Images built (not pulled) by docker-compose.yml; docker-down removes only these.
+BUILT_IMAGES := threadpool
+GRAFANA_URL := http://localhost:13013/d/threadpool-static
+PROMETHEUS_URL := http://localhost:19113
 
 help: ## Display this help message
 	@echo "Available targets:"
@@ -24,8 +29,11 @@ vet: ## Run go vet
 build: ## Build the application
 	go build -o bin/$(APP_NAME) $(MAIN_PKG)
 
-run: ## Run the application
+run: ## Run the application (one-shot: process -messages and exit)
 	go run $(MAIN_PKG)
+
+run-continuous: ## Run continuously at RATE msgs/sec with metrics on :8080 until Ctrl-C
+	go run $(MAIN_PKG) -rate $(RATE) -duration 0 -task-time 5ms -metrics-addr :8080
 
 test: ## Run unit tests only (benchmarks are skipped)
 	go test -v ./...
@@ -48,8 +56,14 @@ clean: ## Clean build artifacts
 docker-build: ## Build Docker image
 	docker compose build
 
-docker-up: ## Start services
-	docker compose up --build
+docker-up: ## Build and start the app, Prometheus and Grafana in the background
+	docker compose up --build --detach
+	@echo "Grafana:    $(GRAFANA_URL) (anonymous admin)"
+	@echo "Prometheus: $(PROMETHEUS_URL)"
 
-docker-down: ## Stop services and remove containers, networks, volumes, orphans and the built images
-	docker compose down --rmi all --volumes --remove-orphans
+docker-logs: ## Follow the app logs
+	docker compose logs -f threadpool
+
+docker-down: ## Stop services; remove containers, networks, volumes, orphans and only the built images
+	docker compose down --volumes --remove-orphans
+	-docker image rm $(BUILT_IMAGES)
