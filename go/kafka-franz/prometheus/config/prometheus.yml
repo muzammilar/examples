@@ -1,7 +1,7 @@
 # Global config
 global:
-  scrape_interval: 15s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
-  evaluation_interval: 15s # Evaluate rules every 15 seconds. The default is every 1 minute.
+  scrape_interval: 5s # scrape every 5 seconds so the dashboard fills in quickly
+  evaluation_interval: 5s
 
 scrape_configs:
   - job_name: "prometheus"
@@ -21,4 +21,4 @@ scrape_configs:
       - names: ["consumer"]
         type: A
         port: 8080
-        refresh_interval: 15s
+        refresh_interval: 5s

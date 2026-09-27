@@ -9,4 +9,4 @@ datasources:
     isDefault: true
     editable: false
     jsonData:
-      timeInterval: 15s # matches the prometheus scrape interval
+      timeInterval: 5s # matches the prometheus scrape interval

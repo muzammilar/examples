@@ -38,7 +38,7 @@ The `kafka-topics-creator` service also creates a `test-topic` with the Kafka CL
 
 ### Running with docker compose
 
-Run from this directory (`go/kafka-franz`), or use `make docker-up`/`make docker-down` from `trees` (the compose project is `kafka-franz`).
+Run from this directory (`go/kafka-franz`), or use `make up`/`make down` from `trees` (the compose project is `kafka-franz`).
 In order to experiment with the consumer group, change the number of consumer replicas to see the partitions being reassigned.
 
 ```sh
@@ -53,7 +53,7 @@ docker compose up --build --detach --scale consumer=5
 
 # Shutdown everything and remove the networks and volumes (needed to clean up the kafka data for the PoC)
 docker compose down --volumes --remove-orphans
-# `make docker-down` (in `trees`) does the same and also removes the locally built franz-tree-* images
+# `make down` (in `trees`) does the same and also removes the locally built franz-tree-* images
 ```
 
 The images built by the compose file are `franz-tree-admin`, `franz-tree-producer` and `franz-tree-consumer`.
@@ -110,10 +110,11 @@ make test-all            # vet + test-race + bench
 make clean               # remove trees/bin
 
 make docker-build        # build the images
-make docker-up           # start the compose stack (detached) and print the broker, Prometheus and Grafana addresses
+make up           # start the compose stack (detached), wait until Grafana is ready, and print the broker, Prometheus and Grafana addresses
 make test-integration    # topic creation, produce + consume with a consumer group, committed offsets (`-tags integration`)
 make bench-integration   # sync (ProduceSync) and async (Produce + Flush) produce benchmarks (`-tags integration`)
-make docker-down         # stop the stack, remove containers, networks, volumes, orphans and the franz-tree-* images
+make logs         # follow the producer and consumer logs
+make down         # stop the stack, remove containers, networks, volumes, orphans and the franz-tree-* images
                          # (the apache/kafka, prom/prometheus and grafana/grafana images are kept)
 ```
 
@@ -151,7 +152,7 @@ Grafana allows anonymous `Admin` access with the login form disabled, and the da
 
 The producers and consumers expose the franz-go client metrics (via the [kprom](https://github.com/twmb/franz-go/tree/master/plugin/kprom) plugin) on port `8080` at `/metrics`,
 prefixed with `treeproducer_` and `treeconsumer_`. Prometheus scrapes the producers statically and discovers the consumers through the docker DNS
-(`dns_sd_configs` on `consumer`), so scaling the consumer group is picked up within ~15s.
+(`dns_sd_configs` on `consumer`), so scaling the consumer group is picked up within ~5s.
 Besides the kprom defaults (bytes produced/fetched by topic and node, broker connects/disconnects, read/write bytes and the client buffers),
 the example enables the `produce_records_total`/`fetch_records_total` and `*_batches_total` counters and the `request_duration_e2e_seconds` histogram.
 

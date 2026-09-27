@@ -1,6 +1,6 @@
 //go:build integration
 
-// Integration tests and benchmarks against a running kafka cluster (see `make docker-up` and `make test-integration`).
+// Integration tests and benchmarks against a running kafka cluster (see `make up` and `make test-integration`).
 // The brokers default to the ones exposed on the host by the docker compose setup and can be overridden with KAFKA_BROKERS.
 
 package common
@@ -41,7 +41,7 @@ func newIntegrationClient(tb testing.TB, opts ...kgo.Opt) *kgo.Client {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	if err := client.Ping(ctx); err != nil {
-		tb.Fatalf("kafka is not reachable at %v (run `make docker-up` or set KAFKA_BROKERS): %v", integrationBrokers(), err)
+		tb.Fatalf("kafka is not reachable at %v (run `make up` or set KAFKA_BROKERS): %v", integrationBrokers(), err)
 	}
 	return client
 }
