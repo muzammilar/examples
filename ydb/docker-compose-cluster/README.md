@@ -11,10 +11,17 @@ in insecure mode (no TLS, no auth):
 ```bash
 make up       # start, `ydb admin cluster bootstrap`, create /Root/testdb, wait for SQL
 make test     # run sql/*.sql: create table, upsert, select, delete
+make failover # stop ydb-storage-3 + ydb-dynamic-2: SQL still works, self-check DEGRADED; restart
 make status   # cluster health from the viewer API
 make cli      # interactive YQL shell against /Root/testdb
 make down     # remove containers (disks live inside them)
 ```
+
+`make failover` stops one storage node (all of zone-c) and one dynamic node, then runs
+[`failover/*.sql`](failover) through `ydb-dynamic-1`: `mirror-3-dc` tolerates one data center down,
+so reads and writes keep working while the viewer's `healthcheck` reports `DEGRADED` ("Node is
+not available", "Ring has unavailable nodes", later "VDisk is not available"). It then starts both
+again and waits until the self-check is `GOOD` and all five nodes are alive (5–10 min emulated).
 
 - gRPC: `grpc://localhost:2136/Root/testdb` (ydb-dynamic-1)
 - Embedded UI: http://localhost:8765 (ydb-storage-1)
