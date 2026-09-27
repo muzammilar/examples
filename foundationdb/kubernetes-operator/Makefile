@@ -5,7 +5,7 @@ OPERATOR_URL := https://raw.githubusercontent.com/FoundationDB/fdb-kubernetes-op
 KUBECTL := kubectl --context kind-$(CLUSTER_NAME) -n $(NAMESPACE)
 FDB_POD = $$($(KUBECTL) get pod -l foundationdb.org/fdb-process-class=log -o name | head -1)
 
-.PHONY: up test status cli metrics down kind-cluster operator cluster exporter
+.PHONY: up test roles status cli metrics down kind-cluster operator cluster exporter
 
 up: kind-cluster operator cluster exporter
 
@@ -24,7 +24,7 @@ operator:
 	curl -fsSL $(OPERATOR_URL)/samples/deployment.yaml \
 		| sed 's/namespace: metadata.namespace/namespace: $(NAMESPACE)/' \
 		| $(KUBECTL) apply -f -
-	$(KUBECTL) rollout status deployment/fdb-kubernetes-operator-controller-manager --timeout=15m
+	$(KUBECTL) wait deployment/fdb-kubernetes-operator-controller-manager --for=condition=Available --timeout=15m
 
 cluster:
 	$(KUBECTL) apply -f cluster.yaml
@@ -33,14 +33,23 @@ cluster:
 
 exporter:
 	$(KUBECTL) apply -f exporter.yaml
-	$(KUBECTL) rollout status deployment/fdb-exporter --timeout=10m
+	$(KUBECTL) wait deployment/fdb-exporter --for=condition=Available --timeout=10m
 
-# every line of queries/test.fdbcli is run as one fdbcli command
+# every line of queries/test.fdbcli is run as one fdbcli command, then the
+# role view: which FDB roles each process (pod) currently holds
 test:
 	$(KUBECTL) exec $(FDB_POD) -c foundationdb -- fdbcli --exec "$$(paste -sd ';' queries/test.fdbcli)"
+	@$(MAKE) --no-print-directory roles
+
+roles:
+	$(KUBECTL) get pods -L foundationdb.org/fdb-process-class
+	$(KUBECTL) exec $(FDB_POD) -c foundationdb -- fdbcli --exec 'status json' \
+		| jq -r '["ADDRESS","CLASS","ROLES"], ([.cluster.processes[]] | sort_by(.class_type, .address)[] | [.address, .class_type, ([.roles[].role] | join(","))]) | @tsv' \
+		| column -t
 
 status:
-	$(KUBECTL) exec $(FDB_POD) -c foundationdb -- fdbcli --exec status
+	$(KUBECTL) get foundationdbcluster
+	$(KUBECTL) exec $(FDB_POD) -c foundationdb -- fdbcli --exec 'status details'
 
 cli:
 	$(KUBECTL) exec -it $(FDB_POD) -c foundationdb -- fdbcli

@@ -1,7 +1,17 @@
-# Minimal FoundationDB cluster for a single-node kind cluster, adapted from
-# config/samples/cluster.yaml in the operator repo. `double` redundancy with the
-# operator's default process counts (storage/log) and no dedicated stateless
-# processes. faultDomain `none` lets every process share the one kind node.
+# Small FoundationDB cluster for a single-node kind cluster, adapted from
+# config/samples/cluster.yaml in the operator repo. `double` redundancy on the
+# Redwood B+tree engine (ssd-redwood-1, FDB >= 7.3), with one pod per process and
+# explicit process classes so every role is visible. faultDomain `none` lets all
+# pods share the one kind node.
+#
+# Process classes (processCounts, one pod each) and the roles FDB recruits on them:
+#   cluster_controller  1  cluster controller: elects/monitors every other role
+#   stateless           3  master (sequencer), commit proxy, GRV proxy, resolver,
+#                          ratekeeper, data distributor
+#   log                 3  transaction logs (tlog): durable commit log; 2 in use
+#                          (databaseConfiguration.logs) + 1 spare
+#   storage             3  storage servers: hold the key/value data (2 replicas)
+# Coordinators are picked by the operator from the log/storage pods.
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -36,20 +46,30 @@ spec:
   version: 7.3.79
   databaseConfiguration:
     redundancy_mode: double
-    storage_engine: ssd-2
+    storage_engine: ssd-redwood-1
+    logs: 2
+    commit_proxies: 1
+    grv_proxies: 1
+    resolvers: 1
   faultDomain:
     key: foundationdb.org/none
   processCounts:
+    storage: 3
+    log: 3
+    stateless: 3
     cluster_controller: 1
-    stateless: -1
   automationOptions:
     replacements:
       enabled: true
   minimumUptimeSecondsForBounce: 60
   processes:
     general:
+      # The kind node's disk is the (shared) Docker VM disk; FDB throttles writes
+      # once it has < 5% free, so lower that floor to 1% / 256 MiB for local use.
       customParameters:
         - knob_disable_posix_kernel_aio=1
+        - knob_min_available_space_ratio=0.01
+        - knob_min_available_space=268435456
       podTemplate:
         spec:
           serviceAccountName: fdb-kubernetes
