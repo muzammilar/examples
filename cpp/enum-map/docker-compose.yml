@@ -1,0 +1,9 @@
+version: '3.9'
+
+services:
+  # Run the container
+  map:
+    image: const-char-map
+    build:
+      context: .
+      dockerfile: ./Dockerfile
