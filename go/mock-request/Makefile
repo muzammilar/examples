@@ -54,5 +54,5 @@ docker-build: ## Build Docker image
 docker-up: ## Start services
 	docker compose up --build
 
-docker-down: ## Stop services and remove images and volumes
-	docker compose down --rmi all --volumes
+docker-down: ## Stop services and remove containers, networks, volumes, orphans and the built images
+	docker compose down --rmi all --volumes --remove-orphans
