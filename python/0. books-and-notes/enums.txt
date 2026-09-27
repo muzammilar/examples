@@ -1,0 +1,72 @@
+class Materials:
+    Shaded, Shiny, Transparent, Matte = range(4)
+
+>>> print Materials.Matte
+3
+
+
+
+
+>>> from enum import Enum
+>>> class Color(Enum):
+...     red = 1
+...     green = 2
+...     blue = 3
+...
+
+Note
+
+Nomenclature
+
+    The class Color is an enumeration (or enum)
+    The attributes Color.red, Color.green, etc., are enumeration members (or enum members).
+    The enum members have names and values (the name of Color.red is red, the value of Color.blue is 3, etc.)
+
+Note
+
+Even though we use the class syntax to create Enums, Enums are not normal Python classes. See How are Enums different? for more details.
+
+Enumeration members have human readable string representations:
+>>>
+
+>>> print(Color.red)
+Color.red
+
+...while their repr has more information:
+>>>
+
+>>> print(repr(Color.red))
+<Color.red: 1>
+
+The type of an enumeration member is the enumeration it belongs to:
+>>>
+
+>>> type(Color.red)
+<enum 'Color'>
+>>> isinstance(Color.green, Color)
+True
+>>>
+
+Enum members also have a property that contains just their item name:
+>>>
+
+>>> print(Color.red.name)
+red
+
+Enumerations support iteration, in definition order:
+>>>
+
+>>> class Shake(Enum):
+...     vanilla = 7
+...     chocolate = 4
+...     cookies = 9
+...     mint = 3
+...
+>>> for shake in Shake:
+...     print(shake)
+...
+Shake.vanilla
+Shake.chocolate
+Shake.cookies
+Shake.mint
+

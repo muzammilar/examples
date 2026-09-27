@@ -1,0 +1,31 @@
+
+So if I have a class:
+
+ class Person(object):
+'''A class with several methods that revolve around a person's Name and Age.'''
+
+    def __init__(self, name = 'Jane Doe', year = 2012):
+        '''The default constructor for the Person class.'''
+        self.n = name
+        self.y = year
+
+        
+And then this subclass:
+
+ class Instructor(Person):
+'''A subclass of the Person class, overloads the constructor with a new parameter.'''
+def __init__(self, name, year, degree):
+        #Please write a constructor calling parent
+    
+    
+    
+Python recommends using super().
+
+Python 2:
+
+super(Instructor, self).__init__(name, year)
+
+Python 3:
+
+super().__init__(name, year)
+

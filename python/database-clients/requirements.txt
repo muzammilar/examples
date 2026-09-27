@@ -1,0 +1,3 @@
+sqlalchemy
+sqlalchemy-cockroachdb < 3.0.0 # requires psycopg2-binary sqlalchemy
+psycopg2-binary

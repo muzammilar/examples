@@ -1,0 +1,47 @@
+version: "3.4"
+
+services:
+  dbclient:
+    image: py-db-client
+    container_name: pyclient
+    restart: on-failure # or 'always'
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    depends_on:
+      - postgres-db
+      - cockroach-db
+  # single node postgres
+  postgres-db:
+    hostname: pgdb_-local
+    container_name: pgdb-local-1
+    image: "postgres:latest"
+    environment:
+      POSTGRES_USER: admin       # Default username
+      POSTGRES_PASSWORD: pass    # Default password
+      POSTGRES_DB: mydatabase    # Default database
+    volumes:
+      - postgres_data:/var/lib/postgresql/data  # Persists data even if the container is removed
+  # single node cockroach
+  cockroach-db:
+    container_name: crdb
+    hostname: crdb_local
+    image: cockroachdb/cockroach:latest
+    command: start-single-node --cluster-name=crdb-example-single-node --insecure
+    volumes:
+      - cockroach_data:/cockroach/cockroach-data  # Persistent storage for data
+    environment:
+      COCKROACH_MAX_HEAP: 1Gi  # Optional: Limit heap memory usage
+      COCKROACHDB_PASSWORD: mypassword  # Set the password for the root user
+    healthcheck:
+      test: ["CMD", "./cockroach", "sql", "--insecure", "--execute=SELECT 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+# Volume information
+volumes:
+  postgres_data:
+    driver: local
+  cockroach_data:
+    driver: local

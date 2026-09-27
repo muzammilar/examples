@@ -1,0 +1,82 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# One Vagrant VM to rule them all; clickouse, elasticsearch, kafka, zookeeper!
+
+# Variables
+buildenv = {
+  "VARIABLE" => "VALUE",
+}
+
+goenv = {
+  "GO_VERSION" => "1.24"
+}
+
+# Development vagrant file for tktburnvm
+
+$debug_tools_provision = <<-SHELL
+  apt update
+  # install sar and graphviz
+  apt install -y sysstat graphviz
+  # install make
+  apt install -y make
+SHELL
+
+$golang_provision = <<-SHELL
+  apt update
+  apt install -y libpcap-dev
+  apt install -y g++ gcc python3 subversion
+
+  # always install the latest version (or something close to that)
+snap install go --channel="$GO_VERSION"/stable --classic
+
+# always install the latest version (or something close to that)
+snap install protobuf --classic
+# snap install protobuf-compiler --classic
+
+SHELL
+
+
+$python_provision = <<-SHELL
+  apt update
+  apt install -y python3 python3-pip python3-dev
+  # install uv
+  snap install astral-uv --classic
+SHELL
+
+
+# All Vagrant configuration is done below. The "2" in Vagrant.configure
+# configures the configuration version (we support older styles for
+# backwards compatibility). Please don't change it unless you know what
+# you're doing.
+Vagrant.configure("2") do |config|
+  # The most common configuration options are documented and commented below.
+  # For a complete reference, please see the online documentation at
+  # https://docs.vagrantup.com.
+
+  config.vm.define "tktburnvm", primary: true, autostart: true do |tktburnvm|
+
+    tktburnvm.vm.hostname = "tktburnvm"
+    tktburnvm.vm.box = "bento/ubuntu-24.04"
+
+    tktburnvm.vm.provider "virtualbox" do |vb|
+      vb.gui = false
+      vb.name = "Ubuntu 24.04 - Ticket Burner"
+      vb.memory = "4096"
+    end
+
+    tktburnvm.vm.synced_folder "./", "/home/vagrant/tktburn"
+    # this is slow due to .git directory
+    # tktburnvm.vm.provision "file", source: "./", destination: "$HOME/tktburn"
+
+    # expose port 8000 to 8000
+    tktburnvm.vm.network "forwarded_port", guest: 8000, host: 8000
+
+    # build provision
+    tktburnvm.vm.provision "shell", inline: $debug_tools_provision
+    tktburnvm.vm.provision "shell", inline: $golang_provision, env: goenv
+    tktburnvm.vm.provision "shell", inline: $python_provision
+
+  end
+
+end
