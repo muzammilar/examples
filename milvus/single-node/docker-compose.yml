@@ -1,0 +1,81 @@
+name: milvus-single
+
+# Trimmed from upstream's milvus-standalone-docker-compose.yaml (v3.0.2):
+# etcd holds metadata, MinIO holds segment/index files, `standalone` runs every Milvus role.
+x-milvus-image: &milvus-image milvusdb/milvus:${MILVUS_VERSION:-v3.0.2}
+
+services:
+  etcd:
+    image: quay.io/coreos/etcd:v3.5.25
+    container_name: milvus-etcd
+    environment:
+      ETCD_AUTO_COMPACTION_MODE: revision
+      ETCD_AUTO_COMPACTION_RETENTION: "1000"
+      ETCD_QUOTA_BACKEND_BYTES: "4294967296"
+      ETCD_SNAPSHOT_COUNT: "50000"
+    command: etcd -advertise-client-urls=http://etcd:2379 -listen-client-urls http://0.0.0.0:2379 --data-dir /etcd
+    volumes:
+      - etcd-data:/etcd
+    healthcheck:
+      test: ["CMD", "etcdctl", "endpoint", "health"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  # MinIO no longer publishes community images (upstream's quay.io/minio tag now
+  # returns 401); Chainguard's free build is `latest` only, so it is pinned by digest.
+  minio:
+    image: cgr.dev/chainguard/minio:latest@sha256:6a1d0b45c8669726bba580ced0bfa4cb9fdeed1ed636dfabd81d1577beb6937b
+    container_name: milvus-minio
+    environment:
+      MINIO_ROOT_USER: minioadmin # Milvus' default credentials
+      MINIO_ROOT_PASSWORD: minioadmin
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio-data:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  standalone:
+    image: *milvus-image
+    container_name: milvus-standalone
+    command: ["milvus", "run", "standalone"]
+    security_opt:
+      - seccomp:unconfined
+    environment:
+      ETCD_ENDPOINTS: etcd:2379
+      MINIO_ADDRESS: minio:9000
+      MINIO_REGION: us-east-1
+    ports:
+      - "19530:19530" # gRPC + REST (/v2/vectordb)
+      - "9091:9091"   # health, metrics, web UI (/webui)
+    volumes:
+      - milvus-data:/var/lib/milvus
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9091/healthz"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 90s
+    depends_on:
+      etcd: { condition: service_healthy }
+      minio: { condition: service_healthy }
+
+  # python + pymilvus, used by `make test` and `make cli`
+  tools:
+    build:
+      dockerfile_inline: |
+        FROM python:3.13-slim
+        RUN pip install --no-cache-dir pymilvus==3.0.2
+    profiles: [tools]
+    working_dir: /work
+    volumes:
+      - ./scripts:/work/scripts:ro
+
+volumes:
+  etcd-data:
+  minio-data:
+  milvus-data:
