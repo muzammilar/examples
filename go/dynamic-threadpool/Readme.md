@@ -2,6 +2,8 @@
 
 A basic example of using Go routines to create a dynamically growing and shrinking worker pool (threadpool). For a fixed-size pool, see `../threadpool`.
 
+Requires Go 1.26 (`go.mod`: `go 1.26.0`, `github.com/prometheus/client_golang v1.24.1`). The Docker image builds with `golang:1.26-alpine` and runs on `alpine:3.24`.
+
 The example consists of three packages:
 
 * `pkg/worker`: A **worker** goroutine that pulls tasks (`func(context.Context)`) from a shared queue and uses a `select` statement to listen on channels so it can remove itself cleanly. Each worker has a **dedicated quit channel**, which allows the pool to deterministically remove a specific worker. A worker exits when:
