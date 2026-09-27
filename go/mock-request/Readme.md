@@ -72,7 +72,7 @@ Because the decorator depends on the interface, it is tested the same way as `Fe
 
 The `url` label is the request URL without its query string. A non-2xx response counts in `httpmock_requests_total` with its code, not as an error. `Fetcher` reports non-2xx as an error, but the transport succeeded.
 
-`make docker-up` starts the stack detached:
+`make docker-up` starts the stack detached and waits (up to 240s) until Prometheus is ready and Grafana has provisioned its datasource and dashboard (compose healthchecks):
 
 - `target`: a small local service (`cmd/target`, built from the same Dockerfile) with `/ok` (200), `/slow` (0-1.5s, so some requests exceed the prober's 1s timeout), `/flaky` (200/429/503), `/missing` (404) and `/error` (500). The demo therefore does not depend on the public internet.
 - `httpmock`: the prober, fetching the target endpoints and https://example.com every 2s, with metrics on `:8080` inside the compose network only.
@@ -95,8 +95,15 @@ make bench-cpu   # benchmarks at GOMAXPROCS 1, 4 and 8
 make generate    # regenerate the gomock mocks
 make test-all    # vet + race tests + benchmarks
 
-make docker-up       # prober + target + Prometheus + Grafana, detached; prints the URLs
+make docker-up       # prober + target + Prometheus + Grafana, detached; waits until healthy, prints the URLs
 make docker-logs     # follow the prober output
 make docker-mockgen  # regenerate mocks and run the tests in Docker, then exit
 make docker-down     # remove containers, networks, volumes and the built images
 ```
+
+## Versions
+
+- Go 1.26 (`go 1.26.0` in `go.mod`; `golang:1.26-alpine` build image, `alpine:3.24` runtime images)
+- `go.uber.org/mock` and `mockgen` v0.6.0 (the `//go:generate` directive and the Dockerfile's `MOCKGEN_VERSION` must match `go.mod`; the `mockgen` stage fails the build if they differ)
+- `github.com/prometheus/client_golang` v1.24.1
+- `prom/prometheus:v3.15.0` and `grafana/grafana:13.2.2`

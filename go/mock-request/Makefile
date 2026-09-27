@@ -60,8 +60,8 @@ clean: ## Clean build artifacts
 docker-build: ## Build the Docker images
 	$(COMPOSE) build
 
-docker-up: ## Start the prober, target, Prometheus and Grafana (detached)
-	docker compose up --build --detach
+docker-up: ## Start the prober, target, Prometheus and Grafana (detached, waits until healthy)
+	docker compose up --build --detach --wait --wait-timeout 240
 	@echo "Prometheus: $(PROMETHEUS_URL)"
 	@echo "Grafana:    $(GRAFANA_URL)/d/mock-request (anonymous admin)"
 
