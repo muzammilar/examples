@@ -36,7 +36,7 @@ docker compose up --build --detach --scale consumer=5
 # Shutdown everything (and remove networks and local images). Networks are removed in this.
 # This is usually needed to cleanup kafka volumes (for the PoC)
 docker compose down --volumes
-# Use `docker compose down --rmi all --volumes` with above to images as well
+# `make docker-down` (in `trees`) also removes the locally built franz-tree-* images
 # Remove everything (and remove volumes). Networks are not removed here.
 docker compose rm --force --stop -v
 ```
@@ -103,8 +103,34 @@ docker exec --workdir /opt/kafka/bin/ -it kafka-broker-1 sh
 
 Using the official Apache Kafka docker image [here](https://hub.docker.com/r/apache/kafka).
 
-## Prometheus
+## Monitoring
 
-Prometheus is available by default on port `9090`. Check the details about Prometheus docker [here](https://hub.docker.com/r/prom/prometheus).
+`docker compose up` also starts Prometheus and a pre-provisioned Grafana (the datasource and dashboard are provisioned from `grafana/provisioning`).
+
+| Service    | URL                                                                   | Notes                                                       |
+|------------|-----------------------------------------------------------------------|-------------------------------------------------------------|
+| Grafana    | [http://localhost:13014/d/kafka-franz](http://localhost:13014/d/kafka-franz) | anonymous `Admin`, no login; the dashboard is the home page |
+| Prometheus | [http://localhost:19114](http://localhost:19114)                      | host port `19114` (container port `9090`)                   |
+
 The producers and consumers expose the franz-go client metrics (via the [kprom](https://github.com/twmb/franz-go/tree/master/plugin/kprom) plugin) on port `8080` at `/metrics`,
-e.g. `treeproducer_produce_bytes_total` and `treeconsumer_fetch_bytes_total`.
+prefixed with `treeproducer_` and `treeconsumer_`. Prometheus scrapes the producers statically and discovers the consumers through the docker DNS
+(`dns_sd_configs` on `consumer`), so scaling the consumer group is picked up within ~15s.
+Besides the kprom defaults (bytes produced/fetched by topic and node, broker connects/disconnects, read/write bytes and the client buffers),
+the example enables the `produce_records_total`/`fetch_records_total` and `*_batches_total` counters and the `request_duration_e2e_seconds` histogram.
+
+The **Kafka franz-go clients** dashboard (`grafana/provisioning/dashboards/kafka-franz.json`, refresh 5s, last 15m) shows:
+
+* Overview: live consumer and producer instances (`count(up{job="treeconsumer"} == 1)`), total produced and fetched records/s.
+* Produce: bytes/s and records/s by topic and producer instance, records per batch.
+* Consume: fetch bytes/s and records/s by topic and consumer instance, records per batch.
+* Buffering (backpressure): records and bytes buffered for produce (producers) and fetched-but-not-polled (consumers).
+* Brokers: write/read bytes/s, connects/disconnects and end-to-end request latency (p50/p99) per broker `node_id`.
+
+```sh
+# scale the consumer group and watch "Live consumer instances" and the per-instance fetch panels
+docker compose up --detach --scale consumer=3 --no-recreate
+```
+
+The connect/read/write error counters are only exported by kprom once an error has happened, so they are not on the dashboard.
+Kafka broker (JMX) metrics are not collected: the `apache/kafka` image has no Prometheus exporter built in.
+Check the details about the Prometheus docker image [here](https://hub.docker.com/r/prom/prometheus) and Grafana [here](https://hub.docker.com/r/grafana/grafana).

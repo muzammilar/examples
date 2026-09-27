@@ -13,6 +13,9 @@ BUILT_IMAGES := franz-tree-admin franz-tree-producer franz-tree-consumer
 # Kafka brokers exposed on the host by the docker compose setup (override for another cluster)
 KAFKA_BROKERS ?= localhost:29092,localhost:39092,localhost:49092
 export KAFKA_BROKERS
+# Monitoring UIs exposed on the host by the docker compose setup
+PROMETHEUS_URL := http://localhost:19114
+GRAFANA_URL := http://localhost:13014
 
 help: ## Display this help message
 	@echo "Available targets:"
@@ -68,9 +71,12 @@ clean: ## Clean build artifacts
 docker-build: ## Build the Docker images
 	$(COMPOSE) build
 
-docker-up: ## Start kafka, the admin, producers, consumers and prometheus (detached)
+docker-up: ## Start kafka, the admin, producers, consumers, prometheus and grafana (detached)
 	$(COMPOSE) up --build --detach
+	@echo "Kafka brokers: $(KAFKA_BROKERS)"
+	@echo "Prometheus:    $(PROMETHEUS_URL)"
+	@echo "Grafana:       $(GRAFANA_URL)/d/kafka-franz (anonymous admin)"
 
-docker-down: ## Stop services and remove containers, networks, volumes, orphans and the built images (keeps the shared kafka/prometheus images)
+docker-down: ## Stop services and remove containers, networks, volumes, orphans and the built images (keeps the shared kafka/prometheus/grafana images)
 	$(COMPOSE) down --volumes --remove-orphans
 	-docker image rm $(BUILT_IMAGES) 2>/dev/null

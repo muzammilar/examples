@@ -73,11 +73,31 @@ services:
   # Prometheus
   ####################
   prometheus:
-    image: prom/prometheus
+    image: prom/prometheus:v3.15.0
     hostname: prometheus.svc
     volumes:
       - ./prometheus/config/prometheus.yml:/etc/prometheus/prometheus.yml:ro
     ports:
-      - 9090:9090 # http port
+      - 19114:9090 # http port (host 19114, 9090 is commonly taken by other stacks)
     networks:
       - kafka-network
+
+  ####################
+  # Grafana (pre-provisioned prometheus datasource and the kafka-franz dashboard)
+  ####################
+  grafana:
+    image: grafana/grafana:13.2.2
+    hostname: grafana.svc
+    environment:
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Admin
+      GF_AUTH_DISABLE_LOGIN_FORM: "true"
+      GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /etc/grafana/provisioning/dashboards/kafka-franz.json
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+    ports:
+      - 13014:3000 # http port
+    networks:
+      - kafka-network
+    depends_on:
+      - prometheus
