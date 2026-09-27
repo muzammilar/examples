@@ -1,6 +1,6 @@
 # Build container for the funkpkg debian package.
 # Usage: `make buildcontainer` (builds the image and runs `make deb` inside it)
-FROM debian:bookworm
+FROM debian:trixie
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV DEBEMAIL="example.email@foo.com"

@@ -10,7 +10,10 @@ DISTRO := $(shell lsb_release -cs 2>/dev/null)
 
 # Development only variables
 DEV_VENV_PATH := ./.venv
-SYSTEM_PYTHON := python3
+# interpreter used to create the dev virtualenv (the package requires Python >=3.13).
+# Override with e.g. `make dev-setup SYSTEM_PYTHON=/usr/bin/python3.13`; without a local 3.13,
+# `uv python install 3.13` provides a `python3.13` in ~/.local/bin (see README.md)
+SYSTEM_PYTHON ?= python3.13
 
 # Get the build/release version
 ifdef PKG_VERSION
@@ -24,7 +27,7 @@ DEB_OUT_DIR = dist
 
 # Package Info
 PKG_NAME = funkpkg
-# note: this must match debian/funkpkg.sysuser and debian/funkpkg.funcmapper.service
+# note: this must match debian/funkpkg.minsysusers and debian/funkpkg.funcmapper.service
 PKG_USER = funkuser
 
 # Install locations
@@ -64,7 +67,11 @@ clean: deb-clean wheel-clean
 
 # setup a development virtualenv
 dev-setup:
-	${SYSTEM_PYTHON} -m venv ${DEV_VENV_PATH}
+	@command -v ${SYSTEM_PYTHON} >/dev/null || { echo "${SYSTEM_PYTHON} not found: install Python 3.13 (e.g. 'uv python install 3.13') or set SYSTEM_PYTHON" >&2; exit 1; }
+# the venv is created from the resolved interpreter path: a venv made through a symlink (such as
+# uv's ~/.local/bin/python3.13) records the symlink's directory as its home and can't find the stdlib
+	$(realpath $(shell command -v ${SYSTEM_PYTHON})) -m venv ${DEV_VENV_PATH}
+	${DEV_VENV_PATH}/bin/pip3 install --upgrade pip
 	${DEV_VENV_PATH}/bin/pip3 install -r ${MKFILE_DIR}/requirements.txt
 	${DEV_VENV_PATH}/bin/pip3 install -r ${MKFILE_DIR}/test_requirements.txt
 
@@ -90,14 +97,14 @@ RUN_ARGS ?=
 run:
 	${DEV_VENV_PATH}/bin/python3 dev.py ${RUN_ARGS}
 
-# wheel (requires `setuptools` and `wheel`)
+# wheel (run `make dev-setup` first, it installs `setuptools` and `wheel`)
 wheel: wheel-clean wheel-build wheel-inspect
 
 wheel-clean:
 	-rm -rf dist/*.whl dist/package.zip
 
 wheel-build:
-	${SYSTEM_PYTHON} setup.py -q bdist_wheel
+	${DEV_VENV_PATH}/bin/pip3 wheel --quiet --no-deps --no-build-isolation --wheel-dir dist .
 
 wheel-inspect:
 	@echo WHEELCONTENTS:START

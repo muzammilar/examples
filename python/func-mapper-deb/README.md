@@ -4,11 +4,22 @@ A small Python program (`funcmapper`) that maps function *names* (strings) to
 Python functions and calls them, packaged as a Debian package with:
 
 * [dh-virtualenv](https://github.com/spotify/dh-virtualenv): ships the code in a self-contained virtualenv at `/opt/venv/funcmapper`
-* [dh-sysuser](https://salsa.debian.org/debian/dh-sysuser): creates the `funkuser` system user on install
+* [dh-sysuser](https://salsa.debian.org/debian/dh-sysuser): creates the `funkuser` system user on install (from a sysusers.d file)
 * `dh_installsystemd`: installs and enables the `funcmapper.service` unit
 * `dh_installlogrotate`: rotates `/var/log/funcmapper/*.log`
 * [prometheus_client](https://github.com/prometheus/client_python): optional `/metrics` endpoint (`--metrics-port`),
   plus a docker compose stack with Prometheus and a pre-provisioned Grafana dashboard (see [Monitoring](#monitoring))
+
+## Versions
+
+| component | version |
+|-----------|---------|
+| Python | 3.13 (`python_requires=">=3.13"`; trixie's system `python3` is 3.13.5) |
+| Build container (`Dockerfile`) | `debian:trixie` (Debian 13), debhelper 13.24.2 (compat 13, the recommended level; 14 is still experimental), dh-virtualenv 1.2.2-1.7, dh-sysuser 1.6.0 |
+| Runtime image (`Dockerfile.run`) | `python:3.13-slim` |
+| Runtime dependency (`requirements.txt`) | prometheus_client 0.26.0 (`~=0.26.0`) |
+| Dev dependencies (`test_requirements.txt`) | pytest 9.1.1, pytest-benchmark 5.3.0, setuptools 84.0.0, wheel 0.48.0 |
+| Monitoring stack (`docker-compose.yml`) | prom/prometheus v3.15.0, grafana/grafana 13.2.2 |
 
 ## Layout
 
@@ -23,8 +34,8 @@ tests/                # pytest unit tests (functions, maps, CLI, logger)
 benchmarks/           # pytest-benchmark benchmarks (`make bench`)
 dev.py                # run from the source tree without installing
 setup.py              # python packaging (used by dh-virtualenv)
-Dockerfile            # debian:bookworm build container with all build deps (`make buildcontainer`)
-Dockerfile.run        # python:3.12-slim runtime image for the monitoring demo (`make docker-up`)
+Dockerfile            # debian:trixie build container with all build deps (`make buildcontainer`)
+Dockerfile.run        # python:3.13-slim runtime image for the monitoring demo (`make docker-up`)
 docker-compose.yml    # funk + Prometheus + Grafana
 prometheus/prometheus.yml                  # scrapes funk:8000 every 5s
 grafana/provisioning/datasources/prometheus.yml
@@ -33,7 +44,7 @@ grafana/provisioning/dashboards/funcmapper.json  # the "funcmapper" dashboard
 debian/
   control             # package metadata and build dependencies
   rules               # dh with sysuser + python-virtualenv
-  funkpkg.sysuser     # system user to create
+  funkpkg.minsysusers # system user to create (sysusers.d format, installed as /usr/lib/sysusers.d/funkpkg.conf)
   funkpkg.postinst    # creates the log dir (uses #ENV.*# values exported by the Makefile)
   funkpkg.funcmapper.service    # installed as funcmapper.service
   funkpkg.funcmapper.logrotate  # installed as /etc/logrotate.d/funcmapper
@@ -41,16 +52,27 @@ debian/
 
 ## Local development
 
+`make dev-setup` creates `./.venv` with `python3.13` (override with `SYSTEM_PYTHON`, e.g.
+`make dev-setup SYSTEM_PYTHON=/usr/bin/python3.13`). If the host has no Python 3.13, install one with
+[uv](https://docs.astral.sh/uv/); it puts a `python3.13` into `~/.local/bin`, which must be on `PATH`:
+
 ```sh
-# create a virtualenv (./.venv) with the runtime (prometheus_client) and test dependencies
+uv python install 3.13
+```
+
+`make run`, `make test`, `make bench`, `make test-all` and `make wheel` use `./.venv`, so run
+`make dev-setup` first.
+
+```sh
+# create a virtualenv (./.venv) with the runtime (prometheus_client) and dev dependencies
 make dev-setup
 
-# run once from the source tree
+# run once from the source tree (funk --interval 0)
 make run
 # run every 5 seconds, also log to a file and serve metrics on http://localhost:8000/metrics
 make run RUN_ARGS="--interval 5 --log-file /tmp/funkmapper.log --metrics-port 8000"
 
-# run the tests
+# run the unit tests (benchmarks are excluded)
 make test
 
 # run the benchmarks: each mapped function called directly vs. through `maps.call`
@@ -65,27 +87,30 @@ marked `unit` and benchmarks `benchmark`. `make test` runs `-m "not benchmark"` 
 `make test MARKERS=unit`, and pass extra pytest-benchmark flags with
 `make bench BENCH_ARGS=--benchmark-min-rounds=50`.
 
-`pytest` and `pytest-benchmark` are development dependencies only (`test_requirements.txt`).
+`pytest`, `pytest-benchmark`, `setuptools` and `wheel` are development dependencies only (`test_requirements.txt`).
 They are not part of the Debian package, which installs only `requirements.txt` into its virtualenv.
 `make bench` also has a `test_tracked_call` case: `maps.call` wrapped in the metrics, which is what
 `funk` runs for every call.
 
-Example `make bench` output (Apple Silicon, Python 3.9, median): calling through
-`maps.call` adds roughly 70-170 ns (the dictionary lookup plus one extra call) compared to calling the function directly:
+Example `make bench` output (Apple Silicon, Python 3.13, median): calling through
+`maps.call` adds roughly 30-140 ns (the dictionary lookup plus one extra call) compared to calling the
+function directly, and the metrics (`test_tracked_call`) add about 2 µs per call:
 
-| function  | direct | `maps.call` |
-|-----------|-------:|------------:|
-| rails     |  91 ns |      158 ns |
-| cylinders | 250 ns |      354 ns |
-| oranges   | 573 ns |      748 ns |
+| function  | direct | `maps.call` | tracked |
+|-----------|-------:|------------:|--------:|
+| rails     |  46 ns |       80 ns | 2.0 µs |
+| cylinders | 108 ns |      250 ns | 2.2 µs |
+| oranges   | 371 ns |      500 ns | 2.5 µs |
+
+To build a wheel into `dist/` (and list its contents): `make wheel`.
 
 ## Building the Debian package
 
 ```sh
-# build the container (it contains all build dependencies) and run `make deb` inside it
+# build the debian:trixie container (it contains all build dependencies) and run `make deb` inside it
 make buildcontainer
 
-# or, on a Debian/Ubuntu machine with the build dependencies from debian/control installed
+# or, on a Debian 13 (trixie) machine with the build dependencies from debian/control installed
 make deb
 
 # the package (plus .buildinfo/.changes) is written to dist/
@@ -99,22 +124,39 @@ bundles it and the target machine doesn't need `python3-prometheus-client` or ne
 
 ```sh
 dpkg --contents dist/funkpkg_*.deb | grep 'site-packages/prometheus_client'
-# ./opt/venv/funcmapper/lib/python3.11/site-packages/prometheus_client/
-# ./opt/venv/funcmapper/lib/python3.11/site-packages/prometheus_client-0.26.0.dist-info/
+# ./opt/venv/funcmapper/lib/python3.13/site-packages/prometheus_client/
+# ./opt/venv/funcmapper/lib/python3.13/site-packages/prometheus_client-0.26.0.dist-info/
 ```
 
-The version defaults to `0.0.1-0` and can be set with `PKG_VERSION`, e.g. `make buildcontainer PKG_VERSION=0.0.2-1`.
+The virtualenv links to the target's `/usr/bin/python3`, so the package depends on
+`python3 (>= 3.13), python3 (<< 3.14)` (plus `sysuser-helper` from dh-sysuser). The changelog
+distribution is taken from `lsb_release -cs` (`trixie` in the build container).
+
+The version defaults to `0.0.1-0` (the Python package version, and the `funcmapper_build_info` label, is its
+PEP 440 form `0.0.1.post0`) and can be set with `PKG_VERSION`, e.g. `make buildcontainer PKG_VERSION=0.0.2-1`.
 The `debian/changelog` is generated by `make deb` (it's an example; normally it would be maintained with `dch -i`).
 
 ## Installing
 
 ```sh
-# install the deb on the target machine (the architecture depends on the build machine, e.g. amd64 or arm64)
+# install the deb on a Debian 13 (trixie) machine (the architecture depends on the build machine, e.g. amd64 or arm64)
 apt install -y ./dist/funkpkg_0.0.1-0_amd64.deb
 
 systemctl status funcmapper
 tail -f /var/log/funcmapper/funcmapper.log
 ```
+
+The service runs `funk --interval 60 --log-file /var/log/funcmapper/funcmapper.log` as `funkuser`.
+Results also go to stdout (the journal).
+
+`funk` flags:
+
+| flag | default | description |
+|------|---------|-------------|
+| `--interval SECONDS` | `0` | seconds between runs; `0` runs once and exits |
+| `--log-file PATH` | none | also write results to this file |
+| `--log-level LEVEL` | `info` | `debug`, `info`, `warning` or `error` |
+| `--metrics-port PORT` | `0` | serve Prometheus metrics on `PORT` at `/metrics`; `0` disables it |
 
 Note: `dh-sysuser` does not delete the `funkuser` user on `apt purge`.
 
@@ -161,7 +203,7 @@ make docker-down   # remove the containers, network, volumes and the built funkp
 * Grafana: http://localhost:13018/d/funcmapper (anonymous Admin, no login)
 
 The host ports can be changed with `make docker-up PROMETHEUS_PORT=19119 GRAFANA_PORT=13019`.
-The `funk` container runs `funk --interval 2 --metrics-port 8000`, pip-installed into `python:3.12-slim`
+The `funk` container runs `funk --interval 2 --metrics-port 8000`, pip-installed into `python:3.13-slim`
 (it doesn't use the deb, so it doesn't need the build container). `make docker-down` keeps the pulled
 `python`, `prom/prometheus` and `grafana/grafana` images.
 

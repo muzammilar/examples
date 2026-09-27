@@ -32,8 +32,10 @@ setup(
     classifiers=[
         "Development Status :: 1 - Planning",
         "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3 :: Only",
+        "Programming Language :: Python :: 3.13",
     ],
-    python_requires=">=3.9",
+    python_requires=">=3.13",
     install_requires=requirements(),
     packages=find_packages(exclude=["tests", "tests.*"]),
     include_package_data=True,
