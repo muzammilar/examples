@@ -27,5 +27,12 @@ services:
     volumes:
       - ./scripts:/scripts:ro
 
+  # `make app` runs the Python (nats-py) examples in app/*.py from here
+  app:
+    build: ./app
+    profiles: [tools]
+    environment:
+      NATS_URL: nats://nats:4222
+
 volumes:
   nats-data:
