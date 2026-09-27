@@ -1,0 +1,13 @@
+global:
+  scrape_interval: 5s
+  evaluation_interval: 5s
+
+scrape_configs:
+  # the prober's instrumented Doer (request.InstrumentedDoer)
+  - job_name: httpmock
+    static_configs:
+      - targets: ["httpmock:8080"]
+
+  - job_name: prometheus
+    static_configs:
+      - targets: ["localhost:9090"]

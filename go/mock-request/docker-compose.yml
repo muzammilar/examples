@@ -1,0 +1,92 @@
+name: mockreq
+
+services:
+  # regenerates the mocks (written back to the host via the volume) and runs the
+  # tests, then exits. It is in the "tools" profile so `docker compose up` does
+  # not rewrite files in the working tree; run it with `make docker-mockgen`.
+  mockgenerator:
+    image: xmpl/mockrequest-mockgen:${TAG:-dev}
+    profiles: ["tools"]
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      target: mockgen # stop after building this target
+    volumes:
+      - ./:/httpmock
+    working_dir: /httpmock
+    command: sh -c "go generate ./... && go test -v ./..."
+
+  # a local HTTP service returning 2xx, 4xx and 5xx with variable latency
+  target:
+    image: xmpl/mockrequest-target:${TAG:-dev}
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      target: target
+    expose:
+      - "8081"
+
+  # the CLI in probe mode: fetches every URL every 2s through the instrumented
+  # Doer and serves Prometheus metrics on :8080 (inside the compose network only)
+  httpmock:
+    image: xmpl/mockrequest:${TAG:-dev}
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      target: httpmock
+    command:
+      - -interval=2s
+      - -timeout=1s
+      - -metrics-addr=:8080
+      - -urls=http://target:8081/ok,http://target:8081/slow,http://target:8081/flaky
+      - -urls=http://target:8081/missing,http://target:8081/error
+      - -urls=https://example.com
+    expose:
+      - "8080"
+    depends_on:
+      - target
+
+  prometheus:
+    image: prom/prometheus:v3.15.0
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    ports:
+      - "19116:9090"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://localhost:9090/-/ready"]
+      interval: 10s
+      start_period: 60s
+      start_interval: 2s
+    depends_on:
+      - httpmock
+
+  grafana:
+    image: grafana/grafana:13.2.2
+    environment:
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Admin
+      GF_AUTH_DISABLE_LOGIN_FORM: "true"
+      GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /etc/grafana/provisioning/dashboards/mock-request.json
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - grafana-data:/var/lib/grafana
+    ports:
+      - "13016:3000"
+    # healthy once the datasource answers and the dashboard is provisioned;
+    # `make up` waits for this (the first start runs DB migrations)
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://localhost:3000/api/datasources/uid/prometheus/health && wget -q -O /dev/null http://localhost:3000/api/dashboards/uid/mock-request"]
+      interval: 10s
+      start_period: 180s
+      start_interval: 2s
+    depends_on:
+      prometheus:
+        condition: service_healthy
+
+volumes:
+  prometheus-data:
+  grafana-data:
