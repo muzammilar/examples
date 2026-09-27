@@ -2,6 +2,9 @@ package controller
 
 import (
 	"context"
+	"errors"
+	"io"
+	"log/slog"
 	"testing"
 	"time"
 
@@ -80,5 +83,45 @@ func waitFor(t *testing.T, cond func() bool) {
 			t.Fatal("condition not met in time")
 		}
 		time.Sleep(time.Millisecond)
+	}
+}
+
+type failingPool struct{ fakePool }
+
+func (f *failingPool) Grow(int) error   { return errors.New("grow failed") }
+func (f *failingPool) Shrink(int) error { return errors.New("shrink failed") }
+
+func TestTickResizeErrors(t *testing.T) {
+	logger := slog.New(slog.NewTextHandler(io.Discard, nil))
+	for _, queued := range []int{10, 0} {
+		f := &failingPool{fakePool{size: 4, queued: queued, min: 1, max: 8}}
+		c := &Controller{Pool: f, HighWater: 5, LowWater: 0, Step: 1, Logger: logger}
+		if got := c.Tick(); got != 0 {
+			t.Fatalf("queued=%d: delta %d on error, want 0", queued, got)
+		}
+	}
+}
+
+func TestTickDefaultStep(t *testing.T) {
+	f := &fakePool{size: 2, queued: 10, min: 1, max: 8}
+	c := &Controller{Pool: f, HighWater: 5} // Step 0 is treated as 1
+	if got := c.Tick(); got != 1 {
+		t.Fatalf("delta %d, want 1", got)
+	}
+}
+
+func TestRunStopsOnCancel(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	done := make(chan struct{})
+	c := &Controller{Pool: &fakePool{size: 1, min: 1, max: 1}, Interval: time.Millisecond}
+	go func() {
+		defer close(done)
+		c.Run(ctx)
+	}()
+	cancel()
+	select {
+	case <-done:
+	case <-time.After(2 * time.Second):
+		t.Fatal("Run did not return after cancel")
 	}
 }

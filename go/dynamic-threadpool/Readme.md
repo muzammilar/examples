@@ -25,6 +25,10 @@ go run ./cmd/workerpool -h
 
 # run the tests (with the race detector)
 go test -race ./...
+
+# run the benchmarks (Submit throughput, Grow/Shrink cost, Submit while
+# the controller is scaling, controller decision cost)
+go test -bench=. -benchmem ./...
 ```
 
 ```sh

@@ -177,3 +177,62 @@ func TestConcurrentUse(t *testing.T) {
 		t.Fatalf("submitted %d but processed %d", s, n)
 	}
 }
+
+func TestNegativeResize(t *testing.T) {
+	p := newPool(t, context.Background(), Config{Min: 1, Max: 4})
+	defer p.Close()
+	if err := p.Grow(-1); !errors.Is(err, ErrBounds) {
+		t.Fatalf("Grow(-1): got %v, want ErrBounds", err)
+	}
+	if err := p.Shrink(-1); !errors.Is(err, ErrBounds) {
+		t.Fatalf("Shrink(-1): got %v, want ErrBounds", err)
+	}
+	if got := p.Size(); got != 1 {
+		t.Fatalf("size %d, want 1", got)
+	}
+}
+
+func TestShrinkAfterClose(t *testing.T) {
+	p := newPool(t, context.Background(), Config{Min: 1, Max: 4})
+	p.Close()
+	if err := p.Shrink(0); !errors.Is(err, ErrClosed) {
+		t.Fatalf("Shrink after Close: got %v, want ErrClosed", err)
+	}
+	if got := p.Size(); got != 0 {
+		t.Fatalf("size %d after Close, want 0", got)
+	}
+}
+
+func TestSubmitRespectsCallerContext(t *testing.T) {
+	p := newPool(t, context.Background(), Config{Min: 1, Max: 1, QueueSize: 1})
+	release := make(chan struct{})
+	started := make(chan struct{})
+	block := func(context.Context) { <-release }
+	// occupy the only worker, then fill the queue
+	if err := p.Submit(context.Background(), func(context.Context) { close(started); <-release }); err != nil {
+		t.Fatal(err)
+	}
+	<-started
+	if err := p.Submit(context.Background(), block); err != nil {
+		t.Fatal(err)
+	}
+	if got := p.QueueLen(); got != 1 {
+		t.Fatalf("queue len %d, want 1", got)
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Millisecond)
+	defer cancel()
+	if err := p.Submit(ctx, block); !errors.Is(err, context.DeadlineExceeded) {
+		t.Fatalf("Submit on full queue: got %v, want DeadlineExceeded", err)
+	}
+	close(release)
+	p.Close()
+}
+
+func TestBounds(t *testing.T) {
+	p := newPool(t, context.Background(), Config{Min: 2, Max: 7})
+	defer p.Close()
+	if lo, hi := p.Bounds(); lo != 2 || hi != 7 {
+		t.Fatalf("Bounds() = %d, %d, want 2, 7", lo, hi)
+	}
+}
