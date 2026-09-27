@@ -4,3 +4,10 @@
 [submodule "k8s/Book - Hands-On Microservices with Kubernetes/Hands-On-Microservices"]
 	path = k8s/Book - Hands-On Microservices with Kubernetes/Hands-On-Microservices
 	url = https://github.com/PacktPublishing/Hands-On-Microservices-with-Kubernetes.git
+[submodule "go/ext/geomrpc"]
+	path = go/ext/geomrpc
+	url = https://github.com/muzammilar/geomrpc.git
+	branch = main
+[submodule "go/ext/ManGoDB"]
+	path = go/ext/ManGoDB
+	url = https://github.com/muzammilar/ManGoDB.git
