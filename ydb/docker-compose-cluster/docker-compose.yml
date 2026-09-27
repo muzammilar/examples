@@ -1,0 +1,85 @@
+name: ydb-cluster
+
+# 3 static (storage) nodes + 2 dynamic (compute) nodes serving /Root/testdb.
+# ydbd comes from the local-ydb image (amd64-only; emulated on Apple silicon).
+# `make init` bootstraps storage and creates the database; the dynamic nodes
+# restart until the database exists. Disks are sparse files inside each
+# container, so `make down` discards all data.
+x-ydb: &ydb
+  image: ydbplatform/local-ydb:${YDB_VERSION:-26.2.1.14}
+  platform: linux/amd64
+  entrypoint: ["/bin/sh", "-c"]
+  volumes:
+    - ./config.yaml:/config.yaml:ro
+  restart: unless-stopped
+  healthcheck:
+    disable: true # the image's check targets local-ydb's single-node layout
+
+x-storage-cmd: &storage-cmd
+  - >-
+    mkdir -p /opt/ydb/cfg &&
+    for d in 1 2 3; do [ -f /ydb_data/disk$$d.data ] || truncate -s 16G /ydb_data/disk$$d.data; done &&
+    ([ -f /opt/ydb/cfg/config.yaml ] || cp /config.yaml /opt/ydb/cfg/config.yaml) &&
+    exec /ydbd server --tcp --log-level 3 --node static
+    --yaml-config /opt/ydb/cfg/config.yaml --config-dir /opt/ydb/cfg
+    --grpc-port 2135 --ic-port 19001 --mon-port 8765
+
+x-dynamic-cmd: &dynamic-cmd
+  - >-
+    mkdir -p /opt/ydb/cfg &&
+    ([ -f /opt/ydb/cfg/config.yaml ] || cp /config.yaml /opt/ydb/cfg/config.yaml) &&
+    exec /ydbd server --tcp --log-level 3 --tenant /Root/testdb
+    --yaml-config /opt/ydb/cfg/config.yaml --config-dir /opt/ydb/cfg
+    --grpc-port 2136 --ic-port 19002 --mon-port 8766
+    --node-broker grpc://ydb-storage-1:2135
+    --node-broker grpc://ydb-storage-2:2135
+    --node-broker grpc://ydb-storage-3:2135
+
+services:
+  ydb-storage-1:
+    <<: *ydb
+    container_name: ydb-storage-1
+    hostname: ydb-storage-1
+    command: *storage-cmd
+    ports: ["8765:8765"] # embedded UI
+  ydb-storage-2:
+    <<: *ydb
+    container_name: ydb-storage-2
+    hostname: ydb-storage-2
+    command: *storage-cmd
+  ydb-storage-3:
+    <<: *ydb
+    container_name: ydb-storage-3
+    hostname: ydb-storage-3
+    command: *storage-cmd
+
+  ydb-dynamic-1:
+    <<: *ydb
+    container_name: ydb-dynamic-1
+    hostname: ydb-dynamic-1
+    command: *dynamic-cmd
+    ports: ["2136:2136"] # gRPC for /Root/testdb
+  ydb-dynamic-2:
+    <<: *ydb
+    container_name: ydb-dynamic-2
+    hostname: ydb-dynamic-2
+    command: *dynamic-cmd
+
+  # ydbd serves Prometheus text per counter group at /counters/counters=<group>/prometheus
+  prometheus:
+    image: prom/prometheus:v3.15.0
+    container_name: ydb-prometheus
+    ports: ["9090:9090"]
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+
+  grafana:
+    image: grafana/grafana:13.2.2
+    container_name: ydb-grafana
+    ports: ["3000:3000"]
+    environment:
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Admin
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+    depends_on: [prometheus]

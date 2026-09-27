@@ -1,0 +1,21 @@
+global:
+  scrape_interval: 15s
+
+# One job per ydbd counter group; static nodes on :8765, dynamic nodes on :8766.
+scrape_configs:
+  - job_name: ydb-utils
+    metrics_path: /counters/counters=utils/prometheus
+    static_configs: &targets
+      - targets: ["ydb-storage-1:8765", "ydb-storage-2:8765", "ydb-storage-3:8765"]
+        labels: { role: storage }
+      - targets: ["ydb-dynamic-1:8766", "ydb-dynamic-2:8766"]
+        labels: { role: dynamic }
+  - job_name: ydb-kqp
+    metrics_path: /counters/counters=kqp/prometheus
+    static_configs: *targets
+  - job_name: ydb-grpc
+    metrics_path: /counters/counters=grpc/prometheus
+    static_configs: *targets
+  - job_name: ydb-ydb
+    metrics_path: /counters/counters=ydb/prometheus
+    static_configs: *targets
