@@ -1,0 +1,89 @@
+name: milvus-single-rustfs
+
+# Trimmed from upstream's milvus-standalone-docker-compose.yaml (v3.0.2), with MinIO swapped
+# for RustFS: etcd holds metadata, RustFS holds segment/index files (S3 API),
+# `standalone` runs every Milvus role.
+x-milvus-image: &milvus-image milvusdb/milvus:${MILVUS_VERSION:-v3.0.2}
+
+services:
+  etcd:
+    image: quay.io/coreos/etcd:v3.5.25
+    container_name: milvus-rustfs-etcd
+    environment:
+      ETCD_AUTO_COMPACTION_MODE: revision
+      ETCD_AUTO_COMPACTION_RETENTION: "1000"
+      ETCD_QUOTA_BACKEND_BYTES: "4294967296"
+      ETCD_SNAPSHOT_COUNT: "50000"
+    command: etcd -advertise-client-urls=http://etcd:2379 -listen-client-urls http://0.0.0.0:2379 --data-dir /etcd
+    volumes:
+      - etcd-data:/etcd
+    healthcheck:
+      test: ["CMD", "etcdctl", "endpoint", "health"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  # RustFS: Apache-2.0, S3-compatible object store (drop-in for MinIO, whose community
+  # images are discontinued). Multi-arch (amd64/arm64) image; runs as uid 10001.
+  rustfs:
+    image: rustfs/rustfs:${RUSTFS_VERSION:-1.0.0}
+    container_name: milvus-rustfs
+    environment:
+      RUSTFS_VOLUMES: /data              # single-disk mode
+      RUSTFS_ADDRESS: 0.0.0.0:9000       # S3 API
+      RUSTFS_CONSOLE_ENABLE: "true"
+      RUSTFS_CONSOLE_ADDRESS: 0.0.0.0:9001 # web console (not published)
+      RUSTFS_ACCESS_KEY: rustfsadmin     # RustFS' default credentials, passed to Milvus below
+      RUSTFS_SECRET_KEY: rustfsadmin
+    volumes:
+      - rustfs-data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:9000/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  standalone:
+    image: *milvus-image
+    container_name: milvus-rustfs-standalone
+    command: ["milvus", "run", "standalone"]
+    security_opt:
+      - seccomp:unconfined
+    environment:
+      ETCD_ENDPOINTS: etcd:2379
+      # Milvus' S3 client is configured through the `minio.*` keys; it creates the
+      # bucket (minio.bucketName, default `a-bucket`) on first start.
+      MINIO_ADDRESS: rustfs:9000
+      MINIO_REGION: us-east-1
+      MINIO_ACCESS_KEY_ID: rustfsadmin
+      MINIO_SECRET_ACCESS_KEY: rustfsadmin
+    ports:
+      - "19530:19530" # gRPC + REST (/v2/vectordb)
+      - "9091:9091"   # health, metrics, web UI (/webui)
+    volumes:
+      - milvus-data:/var/lib/milvus
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9091/healthz"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 90s
+    depends_on:
+      etcd: { condition: service_healthy }
+      rustfs: { condition: service_healthy }
+
+  # python + pymilvus, used by `make test` and `make cli`
+  tools:
+    build:
+      dockerfile_inline: |
+        FROM python:3.13-slim
+        RUN pip install --no-cache-dir pymilvus==3.0.2
+    profiles: [tools]
+    working_dir: /work
+    volumes:
+      - ./scripts:/work/scripts:ro
+
+volumes:
+  etcd-data:
+  rustfs-data:
+  milvus-data:
