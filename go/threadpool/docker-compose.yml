@@ -1,0 +1,54 @@
+name: threadpool
+
+services:
+  threadpool:
+    image: threadpool
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    # Continuous mode: 1200 msgs/sec, tasks of ~5ms (plus sleep overshoot) on 8
+    # workers, i.e. close to saturation so queue depth and submit wait move.
+    # Runs until `docker compose down` (SIGTERM -> graceful drain). The metrics
+    # port is only reachable on the compose network.
+    command:
+      - -workers=8
+      - -queue=64
+      - -producers=4
+      - -rate=1200
+      - -duration=0
+      - -task-time=5ms
+      - -metrics-addr=:8080
+    expose:
+      - "8080"
+    stop_grace_period: 10s
+
+  prometheus:
+    image: prom/prometheus:v3.15.0
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    ports:
+      - "19113:9090"
+    depends_on:
+      - threadpool
+
+  grafana:
+    image: grafana/grafana:13.2.2
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_AUTH_DISABLE_LOGIN_FORM=true
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - grafana-data:/var/lib/grafana
+    ports:
+      - "13013:3000"
+    depends_on:
+      - prometheus
+
+volumes:
+  prometheus-data:
+  grafana-data:
