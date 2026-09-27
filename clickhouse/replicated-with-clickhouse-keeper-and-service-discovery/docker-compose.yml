@@ -5,8 +5,10 @@ services:
   prometheus:
     image: "prom/prometheus:v3.15.0"
     container_name: ch-discovery-prometheus
+    user: root # read the docker socket for service discovery of runtime-added nodes
     volumes:
       - ./configs/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - /var/run/docker.sock:/var/run/docker.sock:ro
     ports:
       - "${PROMETHEUS_PORT:-19090}:9090" # http port
 
@@ -18,7 +20,9 @@ services:
       GF_AUTH_ANONYMOUS_ENABLED: "true"
       GF_AUTH_ANONYMOUS_ORG_ROLE: Admin
       GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /var/lib/grafana/dashboards/clickhouse-cluster.json
+      GF_PLUGINS_PREINSTALL_SYNC: grafana-clickhouse-datasource # queries system.clusters for the membership panels
     volumes:
+      - grafana-plugins:/var/lib/grafana/plugins
       - ./configs/grafana/provisioning:/etc/grafana/provisioning
       - ./configs/grafana/dashboards:/var/lib/grafana/dashboards
     ports:
@@ -141,13 +145,16 @@ services:
     environment:
       - KEEPER_SERVER_ID=1100
 
-  # Server-12 (joins later: `make scale-out`)
-  clickhouse-server-12:
+  # Template for nodes added at runtime by `make add-node NAME=... SHARD=...` (scripts/add-node.sh).
+  # Started with `docker compose run`, so any number can run; NODE_NAME becomes the hostname it registers with.
+  clickhouse-node:
     extends:
       file: clickhouse-service.yml
       service: clickhouse-data
-    container_name: clickhouse-server-12
-    profiles: ["scale-out"]
-    hostname: clickhouse-server-12 # registered in discovery as-is, so it must resolve from other nodes
+    profiles: ["nodes"]
+    hostname: ${NODE_NAME:-clickhouse-node}
     environment:
-      - SHARD=001
+      - SHARD=${SHARD:-001}
+
+volumes:
+  grafana-plugins:

@@ -2,46 +2,32 @@
 global:
   scrape_interval: 5s # Set the scrape interval to every 5 seconds. Default is every 1 minute.
   evaluation_interval: 5s # Evaluate rules every 5 seconds. The default is every 1 minute.
-  # scrape_timeout is set to the global default (10s).
 
-# Alertmanager configuration
-alerting:
-  alertmanagers:
-    - static_configs:
-        - targets:
-          # - alertmanager:9093
-
-# Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
-rule_files:
-  # - "first_rules.yml"
-  # - "second_rules.yml"
-
-# A scrape configuration containing exactly one endpoint to scrape:
-# Here it's Prometheus itself.
 scrape_configs:
-  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
   - job_name: "prometheus"
-
-    # metrics_path defaults to '/metrics'
-    # scheme defaults to 'http'.
-
     static_configs:
       - targets: ["localhost:9090"]
 
-  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
+  # Every ClickHouse container of this compose project, including nodes added at runtime with
+  # `make add-node`, found through the docker API instead of a static target list.
   - job_name: "clickhouse-server"
-    static_configs:
-      - targets:
-          # for serv in {01..12}; do echo clickhouse-server-$serv:8001 ;done
-          - "clickhouse-server-01:8001"
-          - "clickhouse-server-02:8001"
-          - "clickhouse-server-03:8001"
-          - "clickhouse-server-04:8001"
-          - "clickhouse-server-05:8001"
-          - "clickhouse-server-06:8001"
-          - "clickhouse-server-07:8001"
-          - "clickhouse-server-08:8001"
-          - "clickhouse-server-09:8001"
-          - "clickhouse-server-10:8001"
-          - "clickhouse-server-11:8001"
-          - "clickhouse-server-12:8001" # only up with `make scale-out`
+    docker_sd_configs:
+      - host: unix:///var/run/docker.sock
+        refresh_interval: 5s
+        filters:
+          - name: label
+            values: ["com.docker.compose.project=ch-discovery"]
+    relabel_configs:
+      # keep only the ClickHouse containers
+      - source_labels: [__meta_docker_container_label_com_docker_compose_service]
+        regex: "clickhouse-.*"
+        action: keep
+      # docker_sd emits one target per port (only the published ones if a container publishes any), so
+      # don't filter on port: point every entry at the metrics port and identical targets are deduplicated.
+      # instance = container name (clickhouse-server-01:8001), same as the hostname it registers with
+      - source_labels: [__meta_docker_container_name]
+        regex: "/(.*)"
+        target_label: __address__
+        replacement: "$1:8001"
+      - source_labels: [__address__]
+        target_label: instance

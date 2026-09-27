@@ -48,7 +48,7 @@
   "panels": [
     {
       "type": "row",
-      "title": "Cluster",
+      "title": "Discovery (live from ClickHouse Keeper, via observer clickhouse-server-10)",
       "collapsed": false,
       "gridPos": {
         "x": 0,
@@ -61,6 +61,194 @@
     },
     {
       "type": "stat",
+      "title": "Members per discovered cluster",
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "clickhouse"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 1,
+        "w": 6,
+        "h": 5
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "clickhouse"
+          },
+          "refId": "A",
+          "editorType": "sql",
+          "queryType": "table",
+          "format": 1,
+          "rawSql": "SELECT cluster, count() AS members FROM system.clusters GROUP BY cluster ORDER BY cluster"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "/.*/",
+          "values": true
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "value_and_name"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "id": 2
+    },
+    {
+      "type": "table",
+      "title": "cluster_hits members",
+      "description": "Rows appear and disappear as nodes register / leave (make add-node / make remove-node).",
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "clickhouse"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 6,
+        "w": 6,
+        "h": 12
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "clickhouse"
+          },
+          "refId": "A",
+          "editorType": "sql",
+          "queryType": "table",
+          "format": 1,
+          "rawSql": "SELECT shard_num AS shard, replica_num AS replica, host_name AS host, port\nFROM system.clusters WHERE cluster = 'cluster_hits'\nORDER BY shard_num, host_name"
+        }
+      ],
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "id": 3
+    },
+    {
+      "type": "table",
+      "title": "Replica health (every data node)",
+      "description": "active_replicas < total_replicas means a replica is down or was removed without make remove-node.",
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "clickhouse"
+      },
+      "gridPos": {
+        "x": 6,
+        "y": 1,
+        "w": 18,
+        "h": 11
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "clickhouse"
+          },
+          "refId": "A",
+          "editorType": "sql",
+          "queryType": "table",
+          "format": 1,
+          "rawSql": "SELECT hostName() AS host, database, table, is_readonly, queue_size, absolute_delay, active_replicas, total_replicas\nFROM clusterAllReplicas('cluster_all_nodes', system.replicas)\nWHERE database = 'test'\nORDER BY table, host"
+        }
+      ],
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "id": 4
+    },
+    {
+      "type": "timeseries",
+      "title": "Servers scraped by Prometheus (docker service discovery)",
+      "description": "",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "x": 6,
+        "y": 12,
+        "w": 18,
+        "h": 6
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "count(up{job=\"clickhouse-server\"} == 1)",
+          "legendFormat": "servers up",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "custom": {
+            "fillOpacity": 10,
+            "showPoints": "never"
+          }
+        },
+        "overrides": []
+      },
+      "id": 5
+    },
+    {
+      "type": "row",
+      "title": "Cluster",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 19,
+        "w": 24,
+        "h": 1
+      },
+      "panels": [],
+      "id": 6
+    },
+    {
+      "type": "stat",
       "title": "ClickHouse servers up",
       "datasource": {
         "type": "prometheus",
@@ -68,7 +256,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 1,
+        "y": 20,
         "w": 6,
         "h": 4
       },
@@ -112,7 +300,7 @@
         },
         "overrides": []
       },
-      "id": 2
+      "id": 7
     },
     {
       "type": "stat",
@@ -123,7 +311,7 @@
       },
       "gridPos": {
         "x": 6,
-        "y": 1,
+        "y": 20,
         "w": 6,
         "h": 4
       },
@@ -163,7 +351,7 @@
         },
         "overrides": []
       },
-      "id": 3
+      "id": 8
     },
     {
       "type": "stat",
@@ -174,7 +362,7 @@
       },
       "gridPos": {
         "x": 12,
-        "y": 1,
+        "y": 20,
         "w": 6,
         "h": 4
       },
@@ -218,7 +406,7 @@
         },
         "overrides": []
       },
-      "id": 4
+      "id": 9
     },
     {
       "type": "stat",
@@ -229,7 +417,7 @@
       },
       "gridPos": {
         "x": 18,
-        "y": 1,
+        "y": 20,
         "w": 6,
         "h": 4
       },
@@ -273,7 +461,7 @@
         },
         "overrides": []
       },
-      "id": 5
+      "id": 10
     },
     {
       "type": "row",
@@ -281,12 +469,12 @@
       "collapsed": false,
       "gridPos": {
         "x": 0,
-        "y": 5,
+        "y": 24,
         "w": 24,
         "h": 1
       },
       "panels": [],
-      "id": 6
+      "id": 11
     },
     {
       "type": "timeseries",
@@ -298,7 +486,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 6,
+        "y": 25,
         "w": 12,
         "h": 8
       },
@@ -333,7 +521,7 @@
         },
         "overrides": []
       },
-      "id": 7
+      "id": 12
     },
     {
       "type": "timeseries",
@@ -345,7 +533,7 @@
       },
       "gridPos": {
         "x": 12,
-        "y": 6,
+        "y": 25,
         "w": 12,
         "h": 8
       },
@@ -380,7 +568,7 @@
         },
         "overrides": []
       },
-      "id": 8
+      "id": 13
     },
     {
       "type": "timeseries",
@@ -392,7 +580,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 14,
+        "y": 33,
         "w": 12,
         "h": 8
       },
@@ -427,7 +615,7 @@
         },
         "overrides": []
       },
-      "id": 9
+      "id": 14
     },
     {
       "type": "timeseries",
@@ -439,7 +627,7 @@
       },
       "gridPos": {
         "x": 12,
-        "y": 14,
+        "y": 33,
         "w": 12,
         "h": 8
       },
@@ -474,7 +662,7 @@
         },
         "overrides": []
       },
-      "id": 10
+      "id": 15
     },
     {
       "type": "row",
@@ -482,12 +670,12 @@
       "collapsed": false,
       "gridPos": {
         "x": 0,
-        "y": 22,
+        "y": 41,
         "w": 24,
         "h": 1
       },
       "panels": [],
-      "id": 11
+      "id": 16
     },
     {
       "type": "timeseries",
@@ -499,7 +687,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 23,
+        "y": 42,
         "w": 12,
         "h": 8
       },
@@ -534,7 +722,7 @@
         },
         "overrides": []
       },
-      "id": 12
+      "id": 17
     },
     {
       "type": "timeseries",
@@ -546,7 +734,7 @@
       },
       "gridPos": {
         "x": 12,
-        "y": 23,
+        "y": 42,
         "w": 12,
         "h": 8
       },
@@ -581,7 +769,7 @@
         },
         "overrides": []
       },
-      "id": 13
+      "id": 18
     },
     {
       "type": "timeseries",
@@ -593,7 +781,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 31,
+        "y": 50,
         "w": 12,
         "h": 8
       },
@@ -628,7 +816,7 @@
         },
         "overrides": []
       },
-      "id": 14
+      "id": 19
     },
     {
       "type": "timeseries",
@@ -640,7 +828,7 @@
       },
       "gridPos": {
         "x": 12,
-        "y": 31,
+        "y": 50,
         "w": 12,
         "h": 8
       },
@@ -675,7 +863,7 @@
         },
         "overrides": []
       },
-      "id": 15
+      "id": 20
     },
     {
       "type": "row",
@@ -683,12 +871,12 @@
       "collapsed": false,
       "gridPos": {
         "x": 0,
-        "y": 39,
+        "y": 58,
         "w": 24,
         "h": 1
       },
       "panels": [],
-      "id": 16
+      "id": 21
     },
     {
       "type": "timeseries",
@@ -700,7 +888,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 40,
+        "y": 59,
         "w": 8,
         "h": 8
       },
@@ -735,7 +923,7 @@
         },
         "overrides": []
       },
-      "id": 17
+      "id": 22
     },
     {
       "type": "timeseries",
@@ -747,7 +935,7 @@
       },
       "gridPos": {
         "x": 8,
-        "y": 40,
+        "y": 59,
         "w": 8,
         "h": 8
       },
@@ -782,7 +970,7 @@
         },
         "overrides": []
       },
-      "id": 18
+      "id": 23
     },
     {
       "type": "timeseries",
@@ -794,7 +982,7 @@
       },
       "gridPos": {
         "x": 16,
-        "y": 40,
+        "y": 59,
         "w": 8,
         "h": 8
       },
@@ -829,7 +1017,7 @@
         },
         "overrides": []
       },
-      "id": 19
+      "id": 24
     },
     {
       "type": "timeseries",
@@ -841,7 +1029,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 48,
+        "y": 67,
         "w": 8,
         "h": 8
       },
@@ -876,7 +1064,7 @@
         },
         "overrides": []
       },
-      "id": 20
+      "id": 25
     },
     {
       "type": "timeseries",
@@ -888,7 +1076,7 @@
       },
       "gridPos": {
         "x": 8,
-        "y": 48,
+        "y": 67,
         "w": 8,
         "h": 8
       },
@@ -923,7 +1111,7 @@
         },
         "overrides": []
       },
-      "id": 21
+      "id": 26
     },
     {
       "type": "timeseries",
@@ -935,7 +1123,7 @@
       },
       "gridPos": {
         "x": 16,
-        "y": 48,
+        "y": 67,
         "w": 8,
         "h": 8
       },
@@ -970,7 +1158,7 @@
         },
         "overrides": []
       },
-      "id": 22
+      "id": 27
     },
     {
       "type": "row",
@@ -978,12 +1166,12 @@
       "collapsed": false,
       "gridPos": {
         "x": 0,
-        "y": 56,
+        "y": 75,
         "w": 24,
         "h": 1
       },
       "panels": [],
-      "id": 23
+      "id": 28
     },
     {
       "type": "timeseries",
@@ -995,7 +1183,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 57,
+        "y": 76,
         "w": 8,
         "h": 8
       },
@@ -1030,7 +1218,7 @@
         },
         "overrides": []
       },
-      "id": 24
+      "id": 29
     },
     {
       "type": "timeseries",
@@ -1042,7 +1230,7 @@
       },
       "gridPos": {
         "x": 8,
-        "y": 57,
+        "y": 76,
         "w": 8,
         "h": 8
       },
@@ -1077,7 +1265,7 @@
         },
         "overrides": []
       },
-      "id": 25
+      "id": 30
     },
     {
       "type": "timeseries",
@@ -1089,7 +1277,7 @@
       },
       "gridPos": {
         "x": 16,
-        "y": 57,
+        "y": 76,
         "w": 8,
         "h": 8
       },
@@ -1133,7 +1321,7 @@
         },
         "overrides": []
       },
-      "id": 26
+      "id": 31
     }
   ],
   "annotations": {

@@ -1,26 +1,40 @@
-.PHONY: up test status scale-out cli down
+.PHONY: up test schema status add-node remove-node nodes cli down
+
+NAME ?= clickhouse-server-12
+SHARD ?= 001
 
 up:
 	docker compose up --detach --wait
 
-# discovery, ON CLUSTER schema, inserts on two shards, per-replica counts, Distributed read
+# discovery, Replicated databases + tables, inserts on two shards, per-replica counts, Distributed read
 test:
 	./scripts/test.sh
 
-status:
-	docker compose exec -T clickhouse-server-01 clickhouse-client --format PrettyCompact < sql/0-discovery.sql
+# only (re)create the schema on the current members; test does this too
+schema:
+	./scripts/schema.sh
 
-# start clickhouse-server-12 (SHARD=001); it registers itself and appears in cluster_hits with no config change.
-# ON CLUSTER DDL is not replayed for late joiners, so re-apply the (idempotent) schema; the new replica then
-# fetches the existing parts of shard 001 from its peers.
-scale-out:
-	docker compose --profile scale-out up --detach --wait clickhouse-server-12
-	docker compose exec -T clickhouse-server-12 clickhouse-client < sql/1-schema-base-tables.sql > /dev/null
-	docker compose exec -T clickhouse-server-12 clickhouse-client < sql/2-schema-distributed-tables.sql > /dev/null
-	$(MAKE) status
+status:
+	docker exec -i clickhouse-server-01 clickhouse-client --format PrettyCompact < sql/0-discovery.sql
+
+# add a data node at runtime, e.g. `make add-node NAME=clickhouse-server-13 SHARD=002`
+# it registers itself, gets the schema from its Replicated databases and fetches the shard's data
+add-node:
+	./scripts/add-node.sh $(NAME) $(SHARD)
+	@$(MAKE) --no-print-directory status
+
+# remove a data node, e.g. `make remove-node NAME=clickhouse-server-13`
+# stops it, waits for discovery to drop it, then deletes its replica metadata from Keeper
+remove-node:
+	./scripts/remove-node.sh $(NAME)
+	@$(MAKE) --no-print-directory status
+
+# nodes added with add-node
+nodes:
+	docker ps --filter label=com.docker.compose.project=ch-discovery --filter label=com.docker.compose.service=clickhouse-node --format 'table {{.Names}}\t{{.Status}}'
 
 cli:
-	docker compose exec clickhouse-server-01 clickhouse-client
+	docker exec -it clickhouse-server-01 clickhouse-client
 
 down:
-	docker compose --profile scale-out down --volumes --remove-orphans
+	docker compose --profile nodes down --volumes --remove-orphans

@@ -28,3 +28,6 @@ SELECT * FROM system.zookeeper WHERE path='/clickhouse/tables/test.test_table_lo
 /* Dropping Dead Replica: https://clickhouse.com/docs/en/sql-reference/statements/system/#query_language-system-drop-replica */
 /* Live replicas use `DROP TABLE` */
 
+
+/* Replicated databases: one replica entry per data node, named 'shard|replica' */
+SELECT name FROM system.zookeeper WHERE path = '/clickhouse/databases/test/replicas';

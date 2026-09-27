@@ -3,14 +3,16 @@
 
     <remote_servers replace="replace">
 
-        <!-- Observer: sees every member of cluster_hits (and can query Distributed tables) -->
-        <!-- but does not register itself, so it never becomes a shard/replica. -->
-        <cluster_hits>
+        <!-- Observer: finds every cluster registered under the root path (cluster_hits, cluster_all_nodes, ...) -->
+        <!-- but never registers itself, so it is never a shard or replica. -->
+        <!-- multicluster_root_path requires <observer/>; clusters are named after their path segment. -->
+        <all_discovered_clusters>
             <discovery>
-                <path>/clickhouse/discovery/cluster_hits</path>
+                <multicluster_root_path>/clickhouse/discovery</multicluster_root_path>
                 <observer />
+                <secret>cluster_hits_secret</secret>
             </discovery>
-        </cluster_hits>
+        </all_discovered_clusters>
 
     </remote_servers>
 </clickhouse>
