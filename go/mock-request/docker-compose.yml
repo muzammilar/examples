@@ -1,8 +1,9 @@
-version: '3.4'
+name: mockreq
 
 services:
+  # regenerates the mocks (written back to the host via the volume) and runs the tests
   mockgenerator:
-    image: mockgenerator
+    image: xmpl/mockrequest-mockgen:${TAG:-dev}
     build:
       context: .
       dockerfile: ./Dockerfile
@@ -10,3 +11,13 @@ services:
     volumes:
       - ./:/httpmock
     working_dir: /httpmock
+    command: sh -c "go generate ./... && go test -v ./..."
+
+  # performs a real HTTP request using the CLI
+  httpmock:
+    image: xmpl/mockrequest:${TAG:-dev}
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      target: httpmock
+    command: ["-url", "https://example.com"]

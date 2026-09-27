@@ -29,7 +29,7 @@ The `ext` directory project that are imported as git submodules.
 
 `koanf-example`: An example of using koanf to read configuration from a file using environment variables and custom overrides.
 
-`mock-request`: A simple example of using Golang's [mock](https://github.com/golang/mock) library.
+`mock-request`: An example of mocking HTTP requests in Go using a generated [gomock](https://github.com/uber-go/mock) mock and an `httptest` server.
 
 `mockery-of-the-language`: An example to use mockery to generate golang interfances for uses in tests.
 
