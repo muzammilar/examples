@@ -8,6 +8,7 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"time"
 
 	"go.uber.org/mock/gomock"
 
@@ -97,5 +98,94 @@ func TestFetchWithHTTPTestServer(t *testing.T) {
 				t.Fatalf("got %d bytes, want %d", page.Bytes, len(tc.body))
 			}
 		})
+	}
+}
+
+// fakeDoer is a hand-rolled test double: a plain function adapter, no
+// generated code or expectations.
+type fakeDoer func(*http.Request) (*http.Response, error)
+
+func (f fakeDoer) Do(r *http.Request) (*http.Response, error) { return f(r) }
+
+// errReader fails every Read, simulating a connection dropped mid-body.
+type errReader struct{ err error }
+
+func (e errReader) Read([]byte) (int, error) { return 0, e.err }
+
+func TestFetchSetsUserAgent(t *testing.T) {
+	var got string
+	doer := fakeDoer(func(r *http.Request) (*http.Response, error) {
+		got = r.Header.Get("User-Agent")
+		return &http.Response{StatusCode: http.StatusOK, Body: http.NoBody}, nil
+	})
+	if _, err := request.NewFetcher(doer).Fetch(context.Background(), "https://example.com"); err != nil {
+		t.Fatalf("Fetch returned error: %v", err)
+	}
+	if got != "mock-request-example" {
+		t.Fatalf("User-Agent = %q, want %q", got, "mock-request-example")
+	}
+}
+
+func TestFetchBodyReadError(t *testing.T) {
+	readErr := errors.New("connection reset")
+	doer := fakeDoer(func(*http.Request) (*http.Response, error) {
+		return &http.Response{StatusCode: http.StatusOK, Body: io.NopCloser(errReader{readErr})}, nil
+	})
+	_, err := request.NewFetcher(doer).Fetch(context.Background(), "https://example.com")
+	if !errors.Is(err, readErr) {
+		t.Fatalf("expected wrapped %v, got %v", readErr, err)
+	}
+}
+
+func TestFetchInvalidURL(t *testing.T) {
+	doer := fakeDoer(func(*http.Request) (*http.Response, error) {
+		t.Fatal("Do must not be called for an invalid URL")
+		return nil, nil
+	})
+	if _, err := request.NewFetcher(doer).Fetch(context.Background(), "://bad-url"); err == nil {
+		t.Fatal("expected error for invalid URL")
+	}
+}
+
+func TestFetchContextTimeout(t *testing.T) {
+	release := make(chan struct{})
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		select { // block until the client gives up or the test ends
+		case <-r.Context().Done():
+		case <-release:
+		}
+	}))
+	defer srv.Close()
+	defer close(release)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 50*time.Millisecond)
+	defer cancel()
+
+	_, err := request.NewFetcher(srv.Client()).Fetch(ctx, srv.URL)
+	if !errors.Is(err, context.DeadlineExceeded) {
+		t.Fatalf("expected context.DeadlineExceeded, got %v", err)
+	}
+}
+
+func TestFetchContextCanceled(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+	doer := fakeDoer(func(r *http.Request) (*http.Response, error) {
+		return nil, r.Context().Err() // a context-aware transport returns the ctx error
+	})
+	_, err := request.NewFetcher(doer).Fetch(ctx, "https://example.com")
+	if !errors.Is(err, context.Canceled) {
+		t.Fatalf("expected context.Canceled, got %v", err)
+	}
+}
+
+func TestNewFetcherNilUsesDefaultClient(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_, _ = io.WriteString(w, "ok")
+	}))
+	defer srv.Close()
+	page, err := request.NewFetcher(nil).Fetch(context.Background(), srv.URL)
+	if err != nil || page.Bytes != 2 {
+		t.Fatalf("got page %+v, err %v", page, err)
 	}
 }
