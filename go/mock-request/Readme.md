@@ -43,3 +43,16 @@ docker compose run --rm --build httpmock -url https://go.dev
 # delete the containers and their images
 docker compose down --rmi all --volumes
 ```
+
+## Make Targets
+
+Run `make help` to list all targets. Unit tests and benchmarks are kept separate (plain `go test` skips `Benchmark*` functions, and `-run='^$'` skips the tests when benchmarking):
+
+```sh
+make test        # unit tests only
+make test-race   # unit tests with the race detector
+make bench       # benchmarks only; filter with BENCH=<regex>, tune with BENCH_TIME=2s BENCH_COUNT=5
+make bench-cpu   # benchmarks at GOMAXPROCS 1, 4 and 8
+make generate    # regenerate the gomock mocks
+make test-all    # vet + race tests + benchmarks
+```
