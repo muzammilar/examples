@@ -16,7 +16,8 @@ funcmapper/
   maps.py             # name -> function map, and `call(name, *args, **kwargs)`
   funk.py             # `funk` console script (entry point of the service)
   logger/             # file logging via WatchedFileHandler (logrotate friendly)
-tests/                # pytest unit tests
+tests/                # pytest unit tests (functions, maps, CLI, logger)
+benchmarks/           # pytest-benchmark benchmarks (`make bench`)
 dev.py                # run from the source tree without installing
 setup.py              # python packaging (used by dh-virtualenv)
 Dockerfile            # debian:bookworm build container with all build deps
@@ -40,7 +41,22 @@ python3 dev.py --interval 5 --log-file /tmp/funkmapper.log
 # create a virtualenv (./.venv) with test dependencies and run the tests
 make dev-setup
 make test
+
+# run the benchmarks: each mapped function called directly vs. through `maps.call`
+make bench
 ```
+
+`pytest` and `pytest-benchmark` are development dependencies only (`test_requirements.txt`).
+They are not part of the Debian package, which installs only `requirements.txt` into its virtualenv.
+
+Example `make bench` output (Apple Silicon, Python 3.9, median): calling through
+`maps.call` adds roughly 70-170 ns (the dictionary lookup plus one extra call) compared to calling the function directly:
+
+| function  | direct | `maps.call` |
+|-----------|-------:|------------:|
+| rails     |  91 ns |      158 ns |
+| cylinders | 250 ns |      354 ns |
+| oranges   | 573 ns |      748 ns |
 
 ## Building the Debian package
 

@@ -1,1 +1,2 @@
 pytest~=7.2
+pytest-benchmark~=4.0 # only used by `make bench`, not packaged

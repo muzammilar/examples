@@ -46,11 +46,11 @@ export PY_INSTALL_SUFFIX
 
 # Makefile
 .PHONY: all test clean run dev-setup wheel wheel-clean wheel-build wheel-inspect \
-	deb deb-clean deb-clean-changelog deb-changelog-create deb-build deb-inspect buildcontainer
+	bench deb deb-clean deb-clean-changelog deb-changelog-create deb-build deb-inspect buildcontainer
 all: clean test
 
 clean: deb-clean wheel-clean
-	-rm -rf build/ *.egg-info .pytest_cache
+	-rm -rf build/ *.egg-info .pytest_cache .benchmarks
 
 # setup a development virtualenv
 dev-setup:
@@ -61,6 +61,10 @@ dev-setup:
 # test the code (run `make dev-setup` first)
 test:
 	${DEV_VENV_PATH}/bin/python3 -m pytest tests
+
+# run the benchmarks (run `make dev-setup` first)
+bench:
+	${DEV_VENV_PATH}/bin/python3 -m pytest benchmarks --benchmark-only --benchmark-group-by=group --benchmark-columns=min,mean,median,ops,rounds
 
 # run the program once from the source tree
 run:

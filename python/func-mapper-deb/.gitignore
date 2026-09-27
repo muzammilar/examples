@@ -10,3 +10,6 @@ debian/files
 debian/*.substvars
 debian/*.debhelper
 debian/*.debhelper.log
+.pytest_cache/
+.benchmarks/
+__pycache__/
