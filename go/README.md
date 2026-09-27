@@ -25,8 +25,6 @@ The `ext` directory project that are imported as git submodules.
 
 `json-parser`: A basic JSON parser example that Unmarshals a JSON stream into different structs.
 
-`kafka-franz`: The `franz-go` equivalent of `kafka-trees`: topic creation with the `kadm` admin client, sync/async producers and a scalable consumer group on a 3-broker KRaft cluster, with Prometheus metrics, unit tests, benchmarks and tagged integration tests.
-
 `kafka-trees`: A multi-topic example of sync/async producers (publishers) and a consumer group (subsribers) allowing horizontal scaling of kafka consumers. The example uses tree names as references.
 
 `koanf-example`: An example of using koanf to read configuration from a file using environment variables and custom overrides.
