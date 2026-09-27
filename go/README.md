@@ -15,8 +15,6 @@ The `ext` directory project that are imported as git submodules.
 
 `clickhouse-struct-ingest-performance`:  Performance evaluation of `clickhouse-go`.
 
-`dynamic-threadpool`: An example of a dynamically growing and shrinking worker pool (threadpool), with a controller that resizes the pool based on the queue depth.
-
 `ext/geomrpc`: An example of gRPC clients and servers, including both server-side and client-side streaming and gRPC metrics collection using Prometheus (including both connection stats and RPC stats).
 
 `file-shreder`: An example to implement a `shred` function like the [shred](https://manpages.ubuntu.com/manpages/jammy/man1/shred.1.html) command line utility with some tests.
