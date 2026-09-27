@@ -5,7 +5,8 @@
 
 ```bash
 make up       # start and wait for the image's healthcheck
-make test     # run sql/*.sql: create table, upsert, select, delete
+make test     # run sql/*.sql: row table with GLOBAL index (VIEW), TTL and Json column,
+              # window aggregate, a multi-statement transaction, column-store analytics
 make status   # cluster health from the viewer API
 make cli      # interactive YQL shell
 make down     # remove the container
