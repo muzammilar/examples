@@ -1,4 +1,4 @@
-#target-version = "py310"
+target-version = "py313"
 #src = ["src"]
 
 # Use a different line length.

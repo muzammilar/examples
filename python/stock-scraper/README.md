@@ -17,7 +17,8 @@ scraper; this example focuses on driving a real (Chrome or Firefox) profile.
 
 ## Requirements
 
-- [uv](https://docs.astral.sh/uv/) and Python 3.12+
+- [uv](https://docs.astral.sh/uv/) and Python 3.13+ (`.python-version`); `uv.lock` pins selenium 4.49.0
+  and pytest 9.1.1
 - Google Chrome or Firefox installed. The matching `chromedriver`/`geckodriver` is downloaded
   automatically by Selenium Manager (bundled with `selenium>=4.6`), which needs network access
   the first time.
