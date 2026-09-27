@@ -1,14 +1,18 @@
-version: '3.4'
 
 services:
-  deadpool:
-    image: threadpool
+  dynamic-threadpool:
+    container_name: dynamic-threadpool
+    image: dynamic-threadpool
+    command: ["-min", "1", "-max", "16", "-queue", "64", "-duration", "20s"]
     build:
       context: .
       dockerfile: ./Dockerfile
-      target: pool # stop after building this target
-    volumes:
-      - ./:/httpmock
-    working_dir: /httpmock
-
-  prometheus:
+      target: pool
+  dynamic-threadpool-help:
+    container_name: dynamic-threadpool-help
+    image: dynamic-threadpool
+    command: ["-h"]
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      target: pool
