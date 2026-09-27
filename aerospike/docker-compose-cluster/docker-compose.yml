@@ -10,6 +10,7 @@ x-aerospike: &aerospike
   volumes:
     - ./aerospike.conf:/opt/aerospike/etc/aerospike.conf:ro
 
+# AGENT_REFRESH_SYSTEM_STATS adds the host (Docker VM) stats the upstream dashboards chart
 x-exporter: &exporter
   image: aerospike/aerospike-prometheus-exporter:1.35.0
 
@@ -31,15 +32,15 @@ services:
   exporter-1:
     <<: *exporter
     container_name: aerospike-exporter-1
-    environment: { AS_HOST: aerospike-1 }
+    environment: { AS_HOST: aerospike-1, AGENT_REFRESH_SYSTEM_STATS: "true" }
   exporter-2:
     <<: *exporter
     container_name: aerospike-exporter-2
-    environment: { AS_HOST: aerospike-2 }
+    environment: { AS_HOST: aerospike-2, AGENT_REFRESH_SYSTEM_STATS: "true" }
   exporter-3:
     <<: *exporter
     container_name: aerospike-exporter-3
-    environment: { AS_HOST: aerospike-3 }
+    environment: { AS_HOST: aerospike-3, AGENT_REFRESH_SYSTEM_STATS: "true" }
 
   prometheus:
     image: prom/prometheus:v3.15.0

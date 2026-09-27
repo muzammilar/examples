@@ -16,6 +16,10 @@ make down     # remove containers
 - Client: `localhost:3000` (aerospike-1)
 - Prometheus: http://localhost:9090
 - Grafana: http://localhost:3001 (anonymous admin) → **Aerospike** dashboard
+- `make up` also fetches the Cluster, Node, Namespace, Set and Latency dashboards from
+  [aerospike-monitoring@v3.20.0](https://github.com/aerospike/aerospike-monitoring/tree/v3.20.0/config/grafana/dashboards)
+  into the gitignored `grafana/provisioning/dashboards/upstream/` → Grafana folder **upstream**.
+  Panels for device/pmem storage, strong consistency and alerts stay empty in this setup.
 
 `SHOW SETS` in the test output lists the remaining record on two of the three nodes (RF=2).
 The OS-tuning warnings in the server log (THP, swappiness, min-free-kbytes) are expected
