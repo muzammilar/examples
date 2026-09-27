@@ -19,3 +19,6 @@ wheels/
 _userdatadir/
 _userdatachrome/
 _userdatafirefox/
+
+# scraped output
+data/

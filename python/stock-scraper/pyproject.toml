@@ -1,7 +1,7 @@
 [project]
 name = "stock-scraper"
 version = "0.1.0"
-description = "Add your description here"
+description = "Scrape stock tickers from websites with Selenium and a persistent browser profile"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [

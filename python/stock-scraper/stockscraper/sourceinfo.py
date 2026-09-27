@@ -1,46 +1,52 @@
-import yaml
+"""Data types describing a scrape source and the stocks scraped from it."""
+
+import csv
+import dataclasses
 import os
+from collections.abc import Callable, Iterable
+
+from selenium.webdriver.remote.webdriver import WebDriver
 
 
+@dataclasses.dataclass(frozen=True)
+class StockInfo:
+    """A single stock listed on a source website."""
+
+    symbol: str
+    name: str
+    page_number: int
+
+
+@dataclasses.dataclass(frozen=True)
 class SourceInfo:
-    def __init__(
-        self,
-        url: str,
-        name: str,
-        destination_directory: str,
-        comment: str,
-        parsing_function,
-        expected_min_count: int,
-        check_intvl: int,
-    ):
-        self.url = url
-        self.comment = comment
-        self.parsing_function = parsing_function
-        self.destination_directory = destination_directory
-        self.name = name
-        self.expected_min_count = expected_min_count
-        self.check_intvl = check_intvl  # in seconds
-        self._file_path = os.path.join(destination_directory, f"{name}.yaml")
-        self._tmp_file_path = os.path.join(destination_directory, "temp", f"{name}.yml")
-        self._last_check = self._get_last_check()
-        self._stocks = []
+    """A website to scrape stock tickers from.
 
-    def _get_last_check(self):
-        if os.path.exists(self._file_path):
-            with open(self._file_path, "r") as f:
-                data = yaml.safe_load(f)
-                if data and "timestamp" in data:
-                    return data["timestamp"]
-        return None  # Return None if file doesn't exist or timestamp not found
+    Attributes:
+        name: Short identifier, also used as the output file name.
+        url: Page to open (for both login and scraping).
+        comment: Human-readable description.
+        scrape: Function that takes a driver and a max page count (0 = all) and yields stocks.
+    """
 
-    def create_temp_directory(self):
-        if os.path.exists(self.destination_directory):
-            os.makedirs(os.path.dirname(self._tmp_file_path), exist_ok=True)
+    name: str
+    url: str
+    comment: str
+    scrape: Callable[[WebDriver, int], Iterable[StockInfo]]
+
+    def output_path(self, output_dir: str) -> str:
+        """Returns the CSV path for this source inside `output_dir`."""
+        return os.path.join(output_dir, f"{self.name}.csv")
 
 
-class StocksInfo:
-    def __init__(self, symbol: str, name: str, exchange: str, country: str):
-        self.symbol = symbol
-        self.name = name
-        self.exchange = exchange
-        self.country = country
+def write_csv(path: str, stocks: Iterable[StockInfo]) -> int:
+    """Writes stocks to a CSV file as they are scraped, returning the number of rows written."""
+    os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
+    fields = [f.name for f in dataclasses.fields(StockInfo)]
+    count = 0
+    with open(path, "w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=fields)
+        writer.writeheader()
+        for stock in stocks:
+            writer.writerow(dataclasses.asdict(stock))
+            count += 1
+    return count
