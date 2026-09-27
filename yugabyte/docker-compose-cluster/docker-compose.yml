@@ -30,7 +30,7 @@ services:
       - "15433:15433" # yugabyted UI
       - "7000:7000"   # yb-master UI
       - "9000:9000"   # yb-tserver UI
-    volumes: [./ysql:/ysql:ro, ./ycql:/ycql:ro]
+    volumes: [./ysql:/ysql:ro, ./ycql:/ycql:ro, ./failover:/failover:ro]
   yb-2:
     <<: *yb
     container_name: yb-2
