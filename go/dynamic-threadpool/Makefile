@@ -1,4 +1,4 @@
-.PHONY: help deps fmt vet build run test test-race bench bench-cpu test-all clean docker-build docker-up docker-down
+.PHONY: help deps fmt vet build run test test-race bench bench-cpu test-all clean docker-build docker-up docker-logs docker-down
 
 # Variables
 APP_NAME := workerpool
@@ -6,6 +6,10 @@ MAIN_PKG := ./cmd/workerpool
 BENCH ?= .
 BENCH_COUNT ?= 1
 BENCH_TIME ?= 1s
+# images built (not pulled) by docker-compose.yml; removed by docker-down
+BUILT_IMAGES := dynamic-threadpool
+PROMETHEUS_URL := http://localhost:19115
+GRAFANA_URL := http://localhost:13015
 
 help: ## Display this help message
 	@echo "Available targets:"
@@ -48,8 +52,16 @@ clean: ## Clean build artifacts
 docker-build: ## Build Docker image
 	docker compose build
 
-docker-up: ## Start services
-	docker compose up --build
+docker-up: ## Build and start the demo, Prometheus and Grafana in the background
+	docker compose up --build --detach
+	@echo ""
+	@echo "Prometheus: $(PROMETHEUS_URL)  (targets: $(PROMETHEUS_URL)/targets)"
+	@echo "Grafana:    $(GRAFANA_URL)/d/dynamic-threadpool  (anonymous admin)"
+	@echo "Logs:       make docker-logs"
 
-docker-down: ## Stop services and remove containers, networks, volumes, orphans and the built images
-	docker compose down --rmi all --volumes --remove-orphans
+docker-logs: ## Follow the demo's logs
+	docker compose logs --follow dynamic-threadpool
+
+docker-down: ## Remove this project's containers, networks, volumes, orphans and built images (pulled images are kept)
+	docker compose down --volumes --remove-orphans
+	-docker image rm $(BUILT_IMAGES)

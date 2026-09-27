@@ -2,7 +2,7 @@ ARG GO_VERSION=1.23
 #build stage
 FROM golang:${GO_VERSION}-alpine AS builder
 WORKDIR /go/src/app
-COPY go.mod ./
+COPY go.mod go.sum ./
 RUN go mod download
 COPY . .
 RUN go vet ./...

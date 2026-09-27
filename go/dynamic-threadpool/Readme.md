@@ -14,14 +14,17 @@ The example consists of three packages:
   * `Submit(ctx, task)`: Enqueues a task (blocks while the queue is full).
   * `Close()`: Stops accepting tasks, drains the queue and waits for every worker to exit.
   * The pool is bounded by `[Min, Max]` workers, and all methods are safe for concurrent use.
+* `pkg/metrics`: Optional **Prometheus metrics** (see [Monitoring](#monitoring)). The other packages do not import Prometheus and nothing is registered globally: `metrics.New(reg, pool)` registers on the `prometheus.Registerer` you pass in.
 * `pkg/controller`: A single **controller** goroutine that periodically monitors the queue depth and resizes the pool. The logic is intentionally primitive: grow by `Step` when more than `HighWater` tasks are queued, shrink by `Step` when at most `LowWater` tasks are queued.
 
-The demo in `cmd/workerpool` produces tasks in alternating bursts and lulls (2 seconds each), so the pool can be seen growing and shrinking in the logs. It shuts down gracefully (draining the queue) when `-duration` elapses or on `Ctrl-C`.
+The demo in `cmd/workerpool` produces tasks in alternating bursts and lulls (2 seconds each), so the pool can be seen growing and shrinking in the logs. It shuts down gracefully (draining the queue) when `-duration` elapses or on `Ctrl-C`. Use `-duration 0` to run until `SIGINT`/`SIGTERM`, `-phase` to change the burst/lull length and `-metrics-addr :8080` to serve Prometheus metrics on `/metrics` (disabled by default).
 
 ```sh
 # run locally
 go run ./cmd/workerpool -min 1 -max 16 -queue 64 -duration 10s
 go run ./cmd/workerpool -h
+# run forever with metrics on http://localhost:8080/metrics
+go run ./cmd/workerpool -duration 0 -phase 20s -metrics-addr :8080
 
 # run the tests (with the race detector)
 go test -race ./...
@@ -32,13 +35,45 @@ go test -bench=. -benchmem ./...
 ```
 
 ```sh
-# build and run the containers
-docker-compose up --build
-# delete the containers and their images
-docker-compose down --rmi all --volumes
-# Remove volumes
-docker-compose rm --force --stop -v
+# build and start the demo, Prometheus and Grafana in the background
+make docker-up        # docker compose up --build --detach
+make docker-logs      # follow the demo's logs
+# remove the containers, networks, volumes, orphans and the built image
+# (the pulled prometheus/grafana images are kept)
+make docker-down
 ```
+
+## Monitoring
+
+`docker-compose.yml` runs the demo continuously (`-duration=0`) with 20 second bursts and lulls (`-phase=20s`) so the pool visibly grows towards the maximum and shrinks back to the minimum, and exposes metrics on `:8080` inside the compose network only. Two more services are started:
+
+| Service | Image | URL |
+| --- | --- | --- |
+| Prometheus | `prom/prometheus:v3.15.0` | <http://localhost:19115> (scrapes the demo every 5s, config in `prometheus/prometheus.yml`) |
+| Grafana | `grafana/grafana:13.2.2` | <http://localhost:13015/d/dynamic-threadpool> (anonymous Admin, no login) |
+
+Grafana is provisioned from `grafana/provisioning/` (mounted read-only): a `Prometheus` datasource (uid `prometheus`) and the **Dynamic Threadpool** dashboard (`dashboards/dynamic-threadpool.json`, refresh 5s, last 15 minutes) with these panels:
+
+* **Pool size vs running workers**: `workerpool_size`, `workerpool_running_workers`, `workerpool_min_workers`, `workerpool_max_workers`
+* **Queue length**: `workerpool_queue_length`
+* **Scale events rate**: `sum by (direction) (rate(workerpool_scale_events_total[$__rate_interval]))`
+* **Task throughput**: `rate(workerpool_tasks_submitted_total[...])` vs `rate(workerpool_tasks_processed_total[...])`
+* **Task duration percentiles**: p50/p95/p99 of `workerpool_task_duration_seconds`
+
+Metrics exported by `pkg/metrics` (plus the standard `go_*` and `process_*` collectors in the demo):
+
+| Metric | Type | Description |
+| --- | --- | --- |
+| `workerpool_size` | gauge | Target number of workers (active, not stopped) |
+| `workerpool_running_workers` | gauge | Worker goroutines that have not exited yet (briefly above size after a shrink) |
+| `workerpool_min_workers` / `workerpool_max_workers` | gauge | Configured pool bounds |
+| `workerpool_queue_length` | gauge | Tasks waiting in the queue |
+| `workerpool_scale_events_total{direction="grow\|shrink"}` | counter | Successful resizes by the controller |
+| `workerpool_tasks_submitted_total` | counter | Tasks accepted by `Submit` |
+| `workerpool_tasks_processed_total` | counter | Tasks that finished running |
+| `workerpool_task_duration_seconds` | histogram | Time spent running a task |
+
+The gauges are read from `Size()`, `Running()`, `QueueLen()` and `Bounds()` by a custom `prometheus.Collector` on every scrape, scale events are counted by wrapping the controller's `Scaler` (`m.WrapScaler(pool)`), and tasks are counted by wrapping each task (`m.WrapTask(task)`).
 
 ## Make Targets
 
