@@ -1,0 +1,24 @@
+# Global config
+global:
+  scrape_interval: 5s # scrape every 5 seconds so the dashboard fills in quickly
+  evaluation_interval: 5s
+
+scrape_configs:
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  # franz-go client metrics (kprom plugin) exposed by the producers
+  - job_name: "treeproducer"
+    static_configs:
+      - targets:
+          - "producertree:8080"
+          - "producertest:8080"
+
+  # docker DNS returns one A record per replica, so scaling the consumers is picked up automatically
+  - job_name: "treeconsumer"
+    dns_sd_configs:
+      - names: ["consumer"]
+        type: A
+        port: 8080
+        refresh_interval: 5s

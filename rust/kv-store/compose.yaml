@@ -1,0 +1,87 @@
+# A three-node cluster. `make up` starts it; `make kv ARGS="..."` runs the
+# client against it.
+
+x-node: &node
+  image: kv-store
+  pull_policy: never
+  restart: unless-stopped
+  environment: &node-env
+    KV_MEMBERS: 1=kv1:7000,2=kv2:7000,3=kv3:7000
+    KV_SNAPSHOT_EVERY: ${KV_SNAPSHOT_EVERY:-100}
+    KV_KEEP_LOGS: ${KV_KEEP_LOGS:-20}
+    RUST_LOG: ${RUST_LOG:-info,openraft=warn}
+
+services:
+  kv1:
+    <<: *node
+    build: .
+    environment:
+      <<: *node-env
+      KV_ID: 1
+      KV_BOOTSTRAP: "true"
+    ports: ["7001:7000"]
+    volumes: [kv1:/data]
+
+  kv2:
+    <<: *node
+    environment:
+      <<: *node-env
+      KV_ID: 2
+    ports: ["7002:7000"]
+    volumes: [kv2:/data]
+
+  kv3:
+    <<: *node
+    environment:
+      <<: *node-env
+      KV_ID: 3
+    ports: ["7003:7000"]
+    volumes: [kv3:/data]
+
+  # Leader redirects name nodes by their service names, which only resolve
+  # inside the compose network, so the client runs in a container too.
+  client:
+    image: kv-store
+    pull_policy: never
+    entrypoint: ["kv"]
+    environment:
+      KV_CLUSTER: kv1:7000,kv2:7000,kv3:7000
+    profiles: [client]
+
+  # Code-quality tools, run by `make quality`.
+  deny:
+    image: kv-store-tools
+    build:
+      context: .
+      dockerfile: tools.Dockerfile
+    volumes: [".:/src", "cargo-registry:/usr/local/cargo/registry"]
+    command: ["cargo", "deny", "--locked", "check"]
+    profiles: [quality]
+
+  machete:
+    image: ghcr.io/bnjbvr/cargo-machete:latest
+    volumes: [".:/src:ro"]
+    profiles: [quality]
+
+  hadolint:
+    image: hadolint/hadolint:latest
+    volumes: [".:/src:ro"]
+    working_dir: /src
+    command: ["hadolint", "Dockerfile", "tools.Dockerfile"]
+    profiles: [quality]
+
+  shellcheck:
+    image: koalaman/shellcheck:stable
+    volumes: [".:/src:ro"]
+    working_dir: /src
+    command: ["demo.sh"]
+    profiles: [quality]
+
+volumes:
+  kv1:
+  kv2:
+  kv3:
+  # Shared with the toolchain containers in the Makefile. External, so
+  # `make down` leaves the crate cache alone.
+  cargo-registry:
+    external: true
