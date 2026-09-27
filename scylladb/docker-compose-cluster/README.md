@@ -6,10 +6,15 @@ Grafana scraping ScyllaDB's built-in metrics endpoint (`:9180/metrics`).
 ```bash
 make up       # start; nodes join one after another (~1–2 min)
 make test     # run cql/test.cql: RF=3 keyspace, QUORUM insert, select, delete
+make failover # stop scylla-3: QUORUM + LWT still work, CONSISTENCY ALL fails; restart it
 make status   # nodetool status — three UN nodes
 make cli      # interactive cqlsh on scylla-1
 make down     # remove containers and volumes
 ```
+
+`make failover` stops `scylla-3`, runs [`failover/*.cql`](failover) on `scylla-1` while it is down
+(QUORUM and lightweight transactions only need 2 of 3 replicas; `CONSISTENCY ALL` fails with
+`Unavailable`), then starts it again and waits until all three nodes are `UN`.
 
 - CQL: `localhost:9042` (scylla-1)
 - Prometheus: http://localhost:9090
