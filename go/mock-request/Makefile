@@ -1,4 +1,4 @@
-.PHONY: help generate deps fmt vet build run test test-race bench bench-cpu test-all clean docker-build docker-up docker-down
+.PHONY: help generate deps fmt vet build run test test-race bench bench-cpu test-all clean docker-build docker-up docker-mockgen docker-logs docker-down
 
 # Variables
 APP_NAME := httpmock
@@ -6,6 +6,15 @@ MAIN_PKG := ./cmd
 BENCH ?= .
 BENCH_COUNT ?= 1
 BENCH_TIME ?= 1s
+
+# docker compose: the "tools" profile holds the mockgenerator service, and
+# BUILT_IMAGES are the images this compose file builds (pulled images such as
+# prometheus and grafana are kept on docker-down)
+export TAG ?= dev
+COMPOSE := docker compose --profile tools
+BUILT_IMAGES := xmpl/mockrequest:$(TAG) xmpl/mockrequest-target:$(TAG) xmpl/mockrequest-mockgen:$(TAG)
+PROMETHEUS_URL := http://localhost:19116
+GRAFANA_URL := http://localhost:13016
 
 help: ## Display this help message
 	@echo "Available targets:"
@@ -48,11 +57,20 @@ clean: ## Clean build artifacts
 	rm -rf bin/
 	go clean
 
-docker-build: ## Build Docker image
-	docker compose build
+docker-build: ## Build the Docker images
+	$(COMPOSE) build
 
-docker-up: ## Start services
-	docker compose up --build
+docker-up: ## Start the prober, target, Prometheus and Grafana (detached)
+	docker compose up --build --detach
+	@echo "Prometheus: $(PROMETHEUS_URL)"
+	@echo "Grafana:    $(GRAFANA_URL)/d/mock-request (anonymous admin)"
 
-docker-down: ## Stop services and remove containers, networks, volumes, orphans and the built images
-	docker compose down --rmi all --volumes --remove-orphans
+docker-mockgen: ## Regenerate the mocks and run the tests in Docker (exits when done)
+	$(COMPOSE) run --rm --build mockgenerator
+
+docker-logs: ## Follow the prober logs
+	docker compose logs --follow httpmock
+
+docker-down: ## Remove this project's containers, networks, volumes, orphans and built images
+	$(COMPOSE) down --volumes --remove-orphans
+	-docker image rm $(BUILT_IMAGES)

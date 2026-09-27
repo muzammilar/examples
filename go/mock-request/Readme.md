@@ -23,6 +23,8 @@ Use a mock when you want to assert exactly how the dependency was called or to s
 | gomock     |    947 | 1808 |        16 |
 | httptest   | 29,851 | 6350 |        68 |
 
+The `instrumented-fake` case wraps the fake in the metrics decorator (see [Monitoring](#monitoring)); on the same machine it adds roughly 300 ns and 4 allocations per call over the plain fake.
+
 The hand-rolled fake has the lowest overhead. gomock costs roughly 2-3x more because it matches expectations and records calls through reflection, but that is still well under a microsecond. `httptest` is about 30-80x slower because every call goes through a real TCP loopback connection and the full `net/http` client and server stack. That cost buys realism, so it is usually worth it for a handful of integration-style tests. For large table-driven suites, prefer a fake or a mock.
 
 ### Running
@@ -32,17 +34,54 @@ The hand-rolled fake has the lowest overhead. gomock costs roughly 2-3x more bec
 go generate ./...     # regenerate the mocks
 go test -v -race ./...
 go run ./cmd -url https://example.com
+go run ./cmd -urls https://example.com,https://go.dev   # several URLs, once each
+go run ./cmd -urls https://example.com -interval 5s -metrics-addr :8080   # probe until Ctrl-C
 
 # benchmarks comparing the test doubles
 go test -run='^$' -bench=. -benchmem ./...
 
-# or with docker: regenerate the mocks and run the tests, then run the CLI
-docker compose up --build mockgenerator
+# or with docker: regenerate the mocks and run the tests, then run the CLI once
+make docker-mockgen    # docker compose --profile tools run --rm --build mockgenerator
 docker compose run --rm --build httpmock -url https://go.dev
 
-# delete the containers and their images
-docker compose down --rmi all --volumes
+# start the prober with Prometheus and Grafana (see Monitoring), then clean up
+make docker-up
+make docker-down
 ```
+
+## Monitoring
+
+The CLI can also run as a long-lived prober: `-interval D` fetches every URL in `-urls` (comma-separated, repeatable) every `D` until SIGINT/SIGTERM, and `-metrics-addr` serves Prometheus metrics on `/metrics`. With `-interval 0` (the default) it fetches each URL once and exits non-zero if any fetch failed.
+
+The metrics come from `request.InstrumentedDoer` in `request/metrics.go`. It is a decorator: a `Doer` that wraps another `Doer` and records each call. `Fetcher` still sees only a `Doer`, so the instrumentation needs no change to the fetching code:
+
+```go
+doer := request.NewInstrumentedDoer(&http.Client{}, request.NewMetrics(registry))
+f := request.NewFetcher(doer)
+```
+
+Because the decorator depends on the interface, it is tested the same way as `Fetcher`. `request/metrics_test.go` wraps the generated gomock mock (and the hand-rolled fake), then checks the recorded series with `prometheus/testutil` against a private registry. A test-only clock hook (`export_test.go`) makes durations and timestamps deterministic.
+
+| Metric | Type | Labels | Meaning |
+|---|---|---|---|
+| `httpmock_requests_total` | counter | `url`, `code` | requests that got a response, by status code |
+| `httpmock_request_errors_total` | counter | `url` | requests with no response (transport errors, timeouts) |
+| `httpmock_request_duration_seconds` | histogram | `url` | time until the response headers arrived, or the request failed |
+| `httpmock_response_size_bytes` | histogram | `url` | body bytes read before the body was closed |
+| `httpmock_last_success_timestamp_seconds` | gauge | `url` | Unix time of the last 2xx response |
+
+The `url` label is the request URL without its query string. A non-2xx response counts in `httpmock_requests_total` with its code, not as an error. `Fetcher` reports non-2xx as an error, but the transport succeeded.
+
+`make docker-up` starts the stack detached:
+
+- `target`: a small local service (`cmd/target`, built from the same Dockerfile) with `/ok` (200), `/slow` (0-1.5s, so some requests exceed the prober's 1s timeout), `/flaky` (200/429/503), `/missing` (404) and `/error` (500). The demo therefore does not depend on the public internet.
+- `httpmock`: the prober, fetching the target endpoints and https://example.com every 2s, with metrics on `:8080` inside the compose network only.
+- `prometheus`: `prom/prometheus:v3.15.0`, scraping every 5s (`prometheus/prometheus.yml`), at http://localhost:19116.
+- `grafana`: `grafana/grafana:13.2.2` with anonymous admin access, at http://localhost:13016. The `Prometheus` datasource (uid `prometheus`) and the **Mock Request Prober** dashboard (http://localhost:13016/d/mock-request) are provisioned from `grafana/provisioning/`.
+
+The dashboard refreshes every 5s over the last 15 minutes. It shows the request rate, failure ratio, and 4xx and 5xx rates; the request rate by status code; non-2xx responses by URL; the transport error rate by URL; time since the last success per URL; latency p50, p95 and p99 by URL; and the average response size and bytes read per second by URL. `/missing` and `/error` never succeed, so they have no time-since-last-success series.
+
+`make docker-down` removes the project's containers, networks, volumes and orphans, plus the three images the compose file builds (`xmpl/mockrequest`, `xmpl/mockrequest-target`, `xmpl/mockrequest-mockgen`). It keeps the pulled Prometheus and Grafana images.
 
 ## Make Targets
 
@@ -55,4 +94,9 @@ make bench       # benchmarks only; filter with BENCH=<regex>, tune with BENCH_T
 make bench-cpu   # benchmarks at GOMAXPROCS 1, 4 and 8
 make generate    # regenerate the gomock mocks
 make test-all    # vet + race tests + benchmarks
+
+make docker-up       # prober + target + Prometheus + Grafana, detached; prints the URLs
+make docker-logs     # follow the prober output
+make docker-mockgen  # regenerate mocks and run the tests in Docker, then exit
+make docker-down     # remove containers, networks, volumes and the built images
 ```
