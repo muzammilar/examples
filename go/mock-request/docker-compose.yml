@@ -77,7 +77,7 @@ services:
     ports:
       - "13016:3000"
     # healthy once the datasource answers and the dashboard is provisioned;
-    # `make docker-up` waits for this (the first start runs DB migrations)
+    # `make up` waits for this (the first start runs DB migrations)
     healthcheck:
       test: ["CMD-SHELL", "wget -q -O /dev/null http://localhost:3000/api/datasources/uid/prometheus/health && wget -q -O /dev/null http://localhost:3000/api/dashboards/uid/mock-request"]
       interval: 10s

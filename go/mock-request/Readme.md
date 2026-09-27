@@ -46,8 +46,8 @@ make docker-mockgen    # docker compose --profile tools run --rm --build mockgen
 docker compose run --rm --build httpmock -url https://go.dev
 
 # start the prober with Prometheus and Grafana (see Monitoring), then clean up
-make docker-up     # Prometheus http://localhost:19116, Grafana http://localhost:13016/d/mock-request
-make docker-down
+make up     # Prometheus http://localhost:19116, Grafana http://localhost:13016/d/mock-request
+make down
 ```
 
 ### CLI flags
@@ -66,7 +66,7 @@ In one-shot mode (`-interval 0`) the CLI fetches every URL, prints `URL -> statu
 
 ### Docker and the `tools` profile
 
-The compose project is `mockreq`. The `mockgenerator` service is in the `tools` profile, so `docker compose up` (and `make docker-up`) does not start it and does not rewrite files in the working tree. `make docker-mockgen` runs it (`docker compose --profile tools run --rm --build mockgenerator`). It mounts the example directory, runs `go generate ./...` to write the mocks back to the host, runs `go test -v ./...`, and exits.
+The compose project is `mockreq`. The `mockgenerator` service is in the `tools` profile, so `docker compose up` (and `make up`) does not start it and does not rewrite files in the working tree. `make docker-mockgen` runs it (`docker compose --profile tools run --rm --build mockgenerator`). It mounts the example directory, runs `go generate ./...` to write the mocks back to the host, runs `go test -v ./...`, and exits.
 
 ## Monitoring
 
@@ -91,7 +91,7 @@ Because the decorator depends on the interface, it is tested the same way as `Fe
 
 The `url` label is the request URL without its query string. A non-2xx response counts in `httpmock_requests_total` with its code, not as an error. `Fetcher` reports non-2xx as an error, but the transport succeeded.
 
-`make docker-up` starts the stack detached and waits (up to 240s) until Prometheus is ready and Grafana has provisioned its datasource and dashboard (compose healthchecks):
+`make up` starts the stack detached and waits (up to 240s) until Prometheus is ready and Grafana has provisioned its datasource and dashboard (compose healthchecks):
 
 - `target`: a small local service (`cmd/target`, built from the same Dockerfile) with `/ok` (200), `/slow` (0-1.5s, so some requests exceed the prober's 1s timeout), `/flaky` (200/429/503), `/missing` (404) and `/error` (500). The demo therefore does not depend on the public internet.
 - `httpmock`: the prober, fetching the target endpoints and https://example.com every 2s, with metrics on `:8080` inside the compose network only.
@@ -100,7 +100,7 @@ The `url` label is the request URL without its query string. A non-2xx response 
 
 The dashboard refreshes every 5s over the last 15 minutes. It shows the request rate, failure ratio, and 4xx and 5xx rates; the request rate by status code; non-2xx responses by URL; the transport error rate by URL; time since the last success per URL; latency p50, p95 and p99 by URL; and the average response size and bytes read per second by URL. `/missing` and `/error` never succeed, so they have no time-since-last-success series.
 
-`make docker-down` removes the project's containers, networks, volumes and orphans, plus the three images the compose file builds (`xmpl/mockrequest`, `xmpl/mockrequest-target`, `xmpl/mockrequest-mockgen`). It keeps the pulled Prometheus and Grafana images.
+`make down` removes the project's containers, networks, volumes and orphans, plus the three images the compose file builds (`xmpl/mockrequest`, `xmpl/mockrequest-target`, `xmpl/mockrequest-mockgen`). It keeps the pulled Prometheus and Grafana images.
 
 ## Make Targets
 
@@ -114,10 +114,10 @@ make bench-cpu   # benchmarks at GOMAXPROCS 1, 4 and 8
 make generate    # regenerate the gomock mocks
 make test-all    # vet + race tests + benchmarks
 
-make docker-up       # prober + target + Prometheus + Grafana, detached; waits until healthy, prints the URLs
-make docker-logs     # follow the prober output
+make up       # prober + target + Prometheus + Grafana, detached; waits until healthy, prints the URLs
+make logs     # follow the prober output
 make docker-mockgen  # regenerate mocks and run the tests in Docker, then exit
-make docker-down     # remove containers, networks, volumes and the built images
+make down     # remove containers, networks, volumes and the built images
 ```
 
 ## Versions
