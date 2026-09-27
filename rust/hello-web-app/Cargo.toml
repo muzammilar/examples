@@ -1,0 +1,15 @@
+[package]
+name = "helloapp"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+actix-web = "4.0"
+
+[[bin]]
+name = "helloapp_web"
+path = "src/bin/web/main.rs"
+
+[[bin]]
+name = "helloapp_cli"
+path = "src/bin/cli/main.rs"
