@@ -1,0 +1,12 @@
+apiVersion: 1
+datasources:
+  # Queries system tables (system.clusters, ...) on clickhouse-server-10, an observer that sees every cluster
+  - name: ClickHouse
+    uid: clickhouse
+    type: grafana-clickhouse-datasource
+    jsonData:
+      host: clickhouse-server-10
+      port: 9000
+      protocol: native
+      username: default
+      defaultDatabase: system
