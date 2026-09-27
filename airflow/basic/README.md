@@ -10,7 +10,8 @@ Changes from upstream:
 - `AIRFLOW__CORE__LOAD_EXAMPLES: 'false'`, so the UI shows just [`dags/etl_example.py`](dags/etl_example.py),
   a TaskFlow extract → transform → load DAG.
 - StatsD metrics are on and go to `statsd-exporter` → Prometheus → Grafana. Grafana starts with a provisioned
-  Prometheus datasource, and loads any dashboard JSON placed in `metrics/grafana/dashboards/`;
+  Prometheus datasource and the **Airflow** dashboard ([`metrics/grafana/dashboards/airflow.json`](metrics/grafana/dashboards/airflow.json))
+  as its home page: scheduler health, task/DAG run outcomes and durations, executor and pool slots, DAG parsing;
   `metrics/statsd-mappings.yml` turns Airflow's dotted names into labelled Prometheus metrics.
 
 ```bash
