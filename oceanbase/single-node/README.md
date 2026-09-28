@@ -48,15 +48,39 @@ transactions commit one-phase and no replication or network hop is involved; the
 show the SQL layer and single-server transaction path of the `mini` tenant (3 GiB, capped
 by the observer's 6G `memory_limit`), not distributed OceanBase.
 
+**Resource budget.** For the run [`bench/limits.sh`](bench/limits.sh) caps the `oceanbase`
+container at `BENCH_CPUS=4` / `BENCH_MEM=8g` (no swap) with `docker update`, and restores the
+old limits afterwards. Docker cannot remove a memory limit from a running container, so
+"unlimited" comes back as the Docker VM's total memory; `make down && make up` starts clean.
+**Memory is 8 GB, not the 6 GB used for the other single-node databases**: the observer's own
+`memory_limit` is 6G (the smallest that bootstraps, see below), and the process needs headroom
+above that. The JSON records this, with the applied limits, under `limits`. The sysbench client
+has `cpus: 2` in compose (`BENCH_CLIENT_CPUS`). The CPU cap is only enforced by the cgroup:
+`mini` mode sets `cpu_count` 16, so the `test` tenant still reports a 13-CPU unit and schedules
+as if it had them. That is part of why 32 threads do worse than 8 on `oltp_read_write`.
+
 ### Sample results
 
-TODO: numbers from a quiet machine.
+2026-09-28, `make benchmark` (defaults: 4 × 50,000 rows, 60 s per run), Docker Desktop 29.5.3
+on an Apple M4 Pro (Docker VM: 11 CPUs, 24.4 GB, aarch64, native arm64 image), OceanBase CE
+4.4.2.1 (`mini`, tenant `test` 3 GiB) capped at 4 CPUs / 8 GB, sysbench 1.0.20 on 2 CPUs.
 
-| Workload | Threads | TPS | QPS | p95 ms |
-|---|---|---|---|---|
-| oltp_point_select | | | | |
-| oltp_read_only | | | | |
-| oltp_read_write | | | | |
+| Workload | Threads | TPS | QPS | avg ms | p95 ms |
+|---|---|---|---|---|---|
+| oltp_point_select | 1 | 11,475 | 11,475 | 0.09 | 0.19 |
+| oltp_point_select | 8 | 55,016 | 55,016 | 0.15 | 0.27 |
+| oltp_point_select | 32 | 82,218 | 82,218 | 0.39 | 0.60 |
+| oltp_read_only | 1 | 593 | 9,483 | 1.69 | 2.26 |
+| oltp_read_only | 8 | 3,110 | 49,766 | 2.57 | 3.19 |
+| oltp_read_only | 32 | 4,634 | 74,140 | 6.90 | 45.79 |
+| oltp_read_write | 1 | 429 | 8,574 | 2.33 | 3.13 |
+| oltp_read_write | 8 | 956 | 19,113 | 8.37 | 20.74 |
+| oltp_read_write | 32 | 490 | 9,809 | 65.21 | 110.66 |
+
+Reads scale well on 4 CPUs: 82k point selects/s at p95 0.6 ms. Writes peak at 8 threads
+(~960 tps) and then fall by half at 32. At that point there are far more runnable threads than
+the 4 capped CPUs, in a tenant that schedules as if it had 13. One `SMOKE=1` run started right after boot hit
+`error 6002 (Transaction rollbacked)` on `oltp_read_write`; the full run afterwards had no errors.
 
 ## Memory and disk
 

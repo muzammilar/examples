@@ -32,5 +32,6 @@ services:
   # started with `docker compose run`.
   sysbench:
     profiles: [bench]
+    cpus: ${BENCH_CLIENT_CPUS:-2}
     build: ./bench
     image: oceanbase-single-sysbench:1.0.20

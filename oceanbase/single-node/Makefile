@@ -30,11 +30,22 @@ test:
 		$(OBCLIENT) -u$$u < $$f || exit 1; \
 	done
 
+# resource budget for `make benchmark` (bench/limits.sh): BENCH_CPUS / BENCH_MEM in total for the
+# database containers in BENCH_SPEC (equal shares; service=CPUS:MEM is a fixed amount), set with
+# `docker update` for the run and restored afterwards; the bench client has BENCH_CLIENT_CPUS
+BENCH_CPUS ?= 4
+BENCH_MEM ?= 8g
+BENCH_SPEC ?= oceanbase
+export BENCH_CLIENT_CPUS ?= 2
+export BENCH_NOTE ?= memory raised from 6g to 8g: the observer memory_limit is 6G (the smallest that bootstraps) plus process overhead
+
 # prepare sbtest tables in the `test` tenant, run each workload x thread count for
 # BENCH_TIME seconds, print TPS/QPS/latency, clean up; raw + JSON in results/
 benchmark:
-	BENCH_TIME='$(BENCH_TIME)' BENCH_TABLES='$(BENCH_TABLES)' BENCH_SIZE='$(BENCH_SIZE)' \
-		BENCH_THREADS='$(BENCH_THREADS)' BENCH_WORKLOADS='$(BENCH_WORKLOADS)' bench/run.sh
+	@BENCH_LIMITS=$$(sh bench/limits.sh apply $(BENCH_CPUS) $(BENCH_MEM) $(BENCH_SPEC)) || { sh bench/limits.sh restore; exit 1; }; \
+	export BENCH_LIMITS; BENCH_TIME='$(BENCH_TIME)' BENCH_TABLES='$(BENCH_TABLES)' BENCH_SIZE='$(BENCH_SIZE)' \
+		BENCH_THREADS='$(BENCH_THREADS)' BENCH_WORKLOADS='$(BENCH_WORKLOADS)' bench/run.sh; \
+	rc=$$?; sh bench/limits.sh restore; exit $$rc
 
 status:
 	$(OBCLIENT) -uroot@sys -e "SELECT SVR_IP, ZONE, STATUS, BUILD_VERSION FROM oceanbase.DBA_OB_SERVERS; SELECT TENANT_ID, TENANT_NAME, TENANT_TYPE, COMPATIBILITY_MODE, STATUS FROM oceanbase.DBA_OB_TENANTS"

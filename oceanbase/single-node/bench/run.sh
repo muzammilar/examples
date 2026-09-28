@@ -3,7 +3,7 @@
 # thread count for a fixed time, print a table, then drop the sbtest tables and database.
 # Raw sysbench output and a JSON summary go to results/ (gitignored).
 # Env (set by `make benchmark`): BENCH_TIME, BENCH_TABLES, BENCH_SIZE, BENCH_THREADS,
-# BENCH_WORKLOADS.
+# BENCH_WORKLOADS, BENCH_LIMITS (bench/limits.sh, copied into the JSON).
 set -eu
 cd "$(dirname "$0")/.."
 
@@ -72,6 +72,7 @@ cat >"$json" <<JSON
   "parameters": {"time_s": $BENCH_TIME, "tables": $BENCH_TABLES, "table_size": $BENCH_SIZE,
                  "threads": "$BENCH_THREADS", "tenant": "test", "tenant_unit": "$unit"},
   "machine": {"docker_cpus": $cpus, "docker_mem_bytes": $mem, "host": "$(uname -sm)"},
+  "limits": ${BENCH_LIMITS:-null},
   "results": [$rows]
 }
 JSON
