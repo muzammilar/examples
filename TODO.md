@@ -106,6 +106,11 @@ Candidate databases and systems to add as examples. Branch names follow the exis
 - [ ] `valkey-cluster`: Valkey 9 cluster with atomic slot migration.
 - [ ] `redis8-single-node`: Redis 8 (AGPL option) with built-in JSON, search and vector sets.
 - [ ] `kvrocks-single-node`: Redis protocol on RocksDB.
+- [ ] `garnet-docker-compose-cluster`: Microsoft Garnet (.NET) standalone and cluster mode; Tsavorite storage with tiering to disk, checkpoints and AOF.
+- [ ] `keydb-active-replica`: multithreaded Redis fork (Snap) with active-active replicas; note slowed development.
+- [ ] `pika-single-node`: Redis protocol on RocksDB (OpenAtom); compare with Kvrocks for larger-than-memory data.
+- [ ] `redict-single-node`: LGPL fork of Redis 7.2.4; licensing comparison with Valkey and Redis 8.
+- [ ] Comparison example: same workload (GET/SET, pipelines, large values, persistence on) across Valkey, Redis 8, Dragonfly, Garnet, KeyDB, Kvrocks and Pika.
 - [ ] `etcd-docker-compose-cluster`: Raft, watches, leases.
 
 ## Graph and multi-model
