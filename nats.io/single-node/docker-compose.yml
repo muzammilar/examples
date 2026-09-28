@@ -38,6 +38,7 @@ services:
   bench:
     image: natsio/nats-box:${NATS_BOX_VERSION:-0.20.0}
     profiles: [bench]
+    cpus: ${BENCH_CLIENT_CPUS:-2}
     command: ["sh", "/bench/run.sh"]
     environment:
       NATS_URL: nats://nats:4222
@@ -66,6 +67,7 @@ services:
       NATS_BOX_VERSION: ${NATS_BOX_VERSION:-0.20.0}
       HOST_INFO: ${HOST_INFO:-}
       DOCKER_INFO: ${DOCKER_INFO:-}
+      BENCH_LIMITS: ${BENCH_LIMITS:-}
     volumes:
       - ./bench:/bench:ro
       - ./results:/results

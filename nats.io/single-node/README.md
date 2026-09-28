@@ -56,17 +56,30 @@ run with `uv run --frozen` in `ghcr.io/astral-sh/uv:0.12.19-python3.13-trixie-sl
 stream is deleted afterwards. The client runs in the same Docker VM as the server, so both compete
 for the same CPUs.
 
+**Resource budget.** For the run [`bench/limits.sh`](bench/limits.sh) caps the `nats` container at
+`BENCH_CPUS=4` / `BENCH_MEM=6g` (no swap) with `docker update` and restores it afterwards (Docker
+cannot remove a memory limit from a running container, so "unlimited" goes back as the Docker VM's
+total memory; `make down && make up` starts clean). The bench client has `cpus: 2` in compose
+(`BENCH_CLIENT_CPUS`). The applied limits are in the JSON under `limits`. nats-server is a Go
+program, and Go 1.25+ sizes `GOMAXPROCS` from the cgroup CPU limit and follows changes to it, so
+the cap is honoured.
+
 ### Sample results
 
-TODO: numbers from a quiet machine.
+2026-09-28, `make benchmark` (defaults), Docker Desktop 29.5.3 on an Apple M4 Pro (Docker VM:
+11 CPUs, 24.4 GB, aarch64, native images), NATS 2.15.0 capped at 4 CPUs / 6 GB, client 2 CPUs.
 
 | workload | side | msgs/s | MiB/s | p50 ms | p99 ms |
 |----------|------|-------:|------:|-------:|-------:|
-| pubsub-1x1-128B | pub / sub | TODO | TODO | | |
-| pubsub-1x1-1KiB | pub / sub | TODO | TODO | | |
-| pubsub-4x4-128B | pub / sub | TODO | TODO | | |
-| pubsub-4x4-1KiB | pub / sub | TODO | TODO | | |
-| request-reply | request | TODO | | TODO | TODO |
-| js-pub-sync | js pub sync | TODO | | TODO | TODO |
-| js-pub-async | js pub async | TODO | | TODO | TODO |
-| js-fetch | js fetch | TODO | | TODO | TODO |
+| pubsub-1x1-128B | pub / sub | 2,319,576 / 2,321,019 | 283 | | |
+| pubsub-1x1-1KiB | pub / sub | 1,287,140 / 1,247,431 | 1,229 | | |
+| pubsub-4x4-128B | pub / sub | 1,018,386 / 4,070,949 | 124 / 497 | | |
+| pubsub-4x4-1KiB | pub / sub | 767,831 / 3,013,418 | 750 / 2,970 | | |
+| request-reply | request | 8,143 | | 0.121 | 0.173 |
+| js-pub-sync | js pub sync | 15,642 | | 0.063 | 0.085 |
+| js-pub-async | js pub async | 322,332 | | 1.276 (per 500) | 3.904 |
+| js-fetch | js fetch | 339,677 | | 0.005 | 0.026 |
+
+Core NATS fans out millions of messages per second from memory; a JetStream publish that waits
+for its ack costs ~150x core throughput (15.6k/s). Pipelining 500 in flight gets back to ~320k/s.
+Request/reply is bound by the round trip (~0.12 ms), not by the server.

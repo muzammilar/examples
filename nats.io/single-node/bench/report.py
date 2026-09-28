@@ -95,6 +95,7 @@ def main():
         "server": {"nodes": 1, "jetstream_storage": "file", "stream_replicas": 1},
         "parameters": {k: int(meta[k]) for k in ("msgs", "clients", "req_msgs", "js_msgs", "js_sync_msgs")},
         "machine": machine(),
+        "limits": json.loads(os.environ.get("BENCH_LIMITS") or "null"),  # bench/limits.sh
         "workloads": workloads,
         "raw": os.path.basename(RAW),
     }
@@ -107,7 +108,11 @@ def main():
         f"core {p['msgs']:,} msgs per run, request/reply {p['req_msgs']:,}, "
         f"JetStream {p['js_sync_msgs']:,} sync / {p['js_msgs']:,} async + fetch"
     )
-    print(f"Docker VM: {m['docker_vm_cpus']} CPUs, {m['docker_vm_memory_gib']} GiB ({m['arch']})\n")
+    print(f"Docker VM: {m['docker_vm_cpus']} CPUs, {m['docker_vm_memory_gib']} GiB ({m['arch']})")
+    if lim := result["limits"]:
+        caps = ", ".join(f"{n} {c['cpus']} CPUs / {c['memory_mib']} MiB" for n, c in lim["containers"].items())
+        print(f"limits: {caps}; bench client {lim['bench_client_cpus']} CPUs")
+    print()
     hdr = f"{'workload':<20} {'side':<13} {'msgs/s':>11} {'MiB/s':>8} {'p50 ms':>8} {'p99 ms':>8}"
     print(hdr)
     print("-" * len(hdr))
