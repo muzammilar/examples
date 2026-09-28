@@ -62,17 +62,32 @@ stored degree instead of scanning edges. Transactional `UNWIND` is the online lo
 usable here. The heap (512 MiB) and page cache (256 MiB) from `docker-compose.yml` are
 left as they are.
 
+**Resource budget.** For the run [`bench/limits.sh`](bench/limits.sh) caps the `neo4j`
+container at `BENCH_CPUS=4` / `BENCH_MEM=6g` (no swap) with `docker update`, and restores the
+old limits afterwards. Docker cannot remove a memory limit from a running container, so
+"unlimited" comes back as the Docker VM's total memory; `make down && make up` starts clean.
+The bench client has `cpus: 2` in compose (`BENCH_CLIENT_CPUS`). The JSON records the applied
+limits under `limits`. Neo4j's own settings bind memory before the cgroup cap does: 512 MB heap
+and 256 MB page cache, per `docker-compose.yml`, so it peaked at ~1.2 GB. The JVM sized its GC
+and worker threads from the VM's 11 CPUs at startup, since the cap is applied later.
+
 ### Sample results
 
-TODO: fill in from a quiet machine (`make benchmark`, N=100k, ~950k edges).
+2026-09-28, `make benchmark` (N=100k, 952,309 edges), Docker Desktop 29.5.3 on an Apple M4 Pro
+(Docker VM: 11 CPUs, 24.4 GB, aarch64, native image), Neo4j 2026.09.0 Community capped at
+4 CPUs / 6 GB, client 2 CPUs.
 
 | metric | Neo4j |
 | --- | --- |
-| load persons (rows/s) | TODO |
-| load follows (rows/s) | TODO |
-| lookup by handle, 1 client: QPS / p99 ms | TODO |
-| lookup by handle, 8 clients: QPS / p99 ms | TODO |
-| 1-hop count p50 ms | TODO |
-| 2-hop count p50 ms | TODO |
-| shortest path p50 ms (% found) | TODO |
-| top-10 most-followed p50 ms | TODO |
+| load persons (rows/s) | 56,875 |
+| load follows (rows/s) | 78,249 |
+| lookup by handle, 1 client: QPS / p99 ms | 1,959 / 1.50 |
+| lookup by handle, 8 clients: QPS / p99 ms | 7,398 / 4.40 |
+| 1-hop count p50 ms | 0.36 |
+| 2-hop count p50 ms | 0.43 |
+| shortest path p50 ms (% found) | 0.70 (88%) |
+| top-10 most-followed p50 ms | 107 |
+
+Neo4j scales best under concurrency of the three graph examples (7.4k QPS with 8 clients,
+p99 4.4 ms). It has the fastest shortest path and whole-graph aggregation. Bulk loading through
+`UNWIND` batches is the slowest part, at about half ArangoDB's rate.
