@@ -80,6 +80,12 @@ Candidate databases and systems to add as examples. Branch names follow the exis
 - [ ] `seaweedfs-docker-compose-cluster`: master/volume/filer with `xyz` replication (`001`/`010`/`100`), S3 gateway, erasure coding for warm volumes, `filer.sync` cross-cluster replication.
 - [ ] Comparison example: 1-4 MB blob put/update/delete latency in SeaweedFS vs Aerospike (`write-block-size 8M`) vs ScyllaDB (large-cell threshold, 16 MB mutation cap); plus metadata-in-Scylla + blob-in-SeaweedFS pattern.
 
+## Low-latency and HPC storage
+
+- [ ] `daos-single-node`: DAOS (`daos-stack/daos`) over `ofi+tcp` in MD-on-SSD mode (no RDMA/PMem); `daos_server` + `daos_engine` + `daos_agent`, `dmg` pool setup, containers, `pydaos` KV API, `dfuse` POSIX mount, replication vs EC object classes.
+- [ ] `tidehunter-embedded`: Mysten Labs' WAL-as-storage KV engine (Rust, used by Sui validators); compare write amplification and point reads with RocksDB.
+- [ ] `cockroachdb-value-separation`: Pebble blob separation (v25.4+) on vs off for large values.
+
 ## Document
 
 - [ ] `mongodb-replicaset`: replica set and change streams.
