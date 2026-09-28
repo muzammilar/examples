@@ -120,3 +120,10 @@ Primary-key reads are what NDB is for: 19k/s through SQL at p99 0.47 ms. The ran
 aggregates in `oltp_read_only` / `read_write` fan out to both data nodes, and they cost 4-6 ms
 p50 with a ~55 ms tail. That is the data-node round trips plus a `mysqld` pinned at its 2 CPUs.
 `rest_pk_read` is capped by the REST server's 0.5 CPU (8 socket errors in 60 s).
+
+### Future work
+
+Run one common sysbench workload set (same scripts, table count/size, thread counts and duration)
+across every sysbench-capable example — TiDB, OceanBase (single node and cluster), SingleStore and
+RonDB over the MySQL protocol, YugabyteDB YSQL and CedarDB with sysbench's `pgsql` driver — so their
+numbers compare directly. Today each example uses its own parameters.
