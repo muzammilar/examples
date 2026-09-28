@@ -55,6 +55,7 @@ services:
   bench:
     image: ghcr.io/tigerbeetle/tigerbeetle:${TIGERBEETLE_VERSION:-0.17.9}
     profiles: [bench]
+    cpus: ${BENCH_CLIENT_CPUS:-2}
     security_opt: ["seccomp=unconfined"] # the client uses io_uring
     network_mode: service:tigerbeetle    # IP addresses only, like the test client
     entrypoint: ["sh", "/bench/run.sh"]
@@ -85,6 +86,7 @@ services:
       NAME: ${NAME:-}
       HOST_INFO: ${HOST_INFO:-}
       DOCKER_INFO: ${DOCKER_INFO:-}
+      BENCH_LIMITS: ${BENCH_LIMITS:-}
     volumes:
       - ./bench:/bench:ro
       - ./results:/results

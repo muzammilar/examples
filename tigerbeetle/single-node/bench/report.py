@@ -68,6 +68,7 @@ def main():
         "cluster": {"replicas": int(meta["replicas"]), "addresses": meta["addresses"]},
         "parameters": {k: int(meta[k]) for k in ("transfers", "accounts", "clients", "batch")},
         "machine": machine(),
+        "limits": json.loads(os.environ.get("BENCH_LIMITS") or "null"),  # bench/limits.sh
         "command": res.get("command"),
         "create_transfers": t,
         "get_account_transfers": q,
@@ -82,7 +83,12 @@ def main():
         f"tigerbeetle benchmark | {p['transfers']:,} transfers, {p['accounts']:,} accounts, "
         f"{p['clients']} client(s), batches of up to {p['batch']:,}"
     )
-    print(f"Docker VM: {m['docker_vm_cpus']} CPUs, {m['docker_vm_memory_gib']} GiB ({m['arch']})\n")
+    print(f"Docker VM: {m['docker_vm_cpus']} CPUs, {m['docker_vm_memory_gib']} GiB ({m['arch']})")
+    if lim := result["limits"]:
+        caps = ", ".join(f"{n} {c['cpus']} CPUs / {c['memory_mib']} MiB" for n, c in lim["containers"].items())
+        print(f"limits: {caps}; bench client {lim['bench_client_cpus']} CPUs\n")
+    else:
+        print()
     hdr = f"{'operation':<22} {'count':>10} {'seconds':>8} {'per s':>11} {'p50 ms':>7} {'p99 ms':>7} {'p100 ms':>8}"
     print(hdr)
     print("-" * len(hdr))
