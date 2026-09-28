@@ -57,14 +57,26 @@ than on DuckDB's native storage but need no load step at all. This is an
 in-process analytical engine, so compare it with other OLAP engines, not with the
 lookup- and traversal-oriented databases in this repo.
 
+**Resource budget.** The bench container is capped at `BENCH_CPUS=4` / `BENCH_MEM=6g`
+(compose `cpus` / `mem_limit`, no swap), the same single-node budget as the server
+databases in this repo; override with `make benchmark BENCH_CPUS=8 BENCH_MEM=12g`.
+DuckDB reads the cgroup limits itself: it runs 4 threads with a 4.7 GiB `memory_limit`
+(80% of the cap), both recorded in the results JSON next to `limits`.
+
 ### Sample results
 
-TODO: fill in from a quiet machine (`make benchmark`, SF1).
+2026-09-28, `make benchmark` (SF1, 3 rounds), Docker Desktop 29.5.3 on an Apple M4 Pro
+(Docker VM: 11 CPUs, 24.4 GB; linux/arm64 image, no emulation), budget 4 CPUs / 6 GB.
 
-| metric | DuckDB |
+| metric | DuckDB 1.5.5 |
 | --- | --- |
-| dbgen SF1 (s) | TODO |
-| 22 queries, sum of medians (s) | TODO |
-| 22 queries, geometric mean (ms) | TODO |
-| Parquet export (s) | TODO |
-| Q1/Q3/Q6/Q9/Q13/Q18: native vs Parquet (s) | TODO |
+| dbgen SF1 | 6.02 s |
+| 22 queries, sum of medians | 0.43 s |
+| 22 queries, geometric mean | 15.1 ms |
+| slowest (Q13 / Q9 / Q18) | 55 / 45 / 44 ms |
+| Parquet export | 1.07 s |
+| Q1/Q3/Q6/Q9/Q13/Q18: native vs Parquet | 0.20 s vs 0.65 s |
+| size: native vs Parquet | 252 MiB vs 311 MiB |
+
+All of TPC-H SF1 in under half a second on 4 cores: DuckDB is at home on scan/join/aggregate
+work; querying the Parquet files directly costs ~3.3x the native storage, but needs no load.

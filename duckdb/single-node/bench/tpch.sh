@@ -1,11 +1,11 @@
 #!/bin/sh
 # Prints the TPC-H benchmark as a duckdb CLI script (run by `make benchmark`):
-#   sh bench/tpch.sh SF TIMESTAMP DOCKER_CPUS DOCKER_MEM_BYTES | duckdb
+#   sh bench/tpch.sh SF TIMESTAMP DOCKER_CPUS DOCKER_MEM_BYTES LIMIT_CPUS LIMIT_MEM | duckdb
 # Every timed statement writes its JSON profile to /data/bench/prof/<phase>-<query>-<run>.json
 # (the pragma after it points the profiler at a scratch file); the summary at the end
 # reads those files back with read_json.
 set -eu
-sf=$1 ts=$2 cpus=$3 mem=$4
+sf=$1 ts=$2 cpus=$3 mem=$4 limit_cpus=$5 limit_mem=$6
 runs=3
 pq_queries="1 3 6 9 13 18" # re-run on Parquet: scan-heavy, join-heavy and aggregation-heavy
 tables="customer lineitem nation orders part partsupp region supplier"
@@ -94,6 +94,7 @@ COPY (
           threads: current_setting('threads'), memory_limit: current_setting('memory_limit')} AS params,
          {docker_vm_cpus: $cpus, docker_vm_mem_gb: round($mem / 1024 ^ 3, 1),
           platform: (SELECT platform FROM pragma_platform())} AS machine,
+         {cpus: $limit_cpus, memory: '$limit_mem'} AS limits,
          {summary: (SELECT summary FROM summary),
           queries: (SELECT list(per_query ORDER BY q) FROM per_query)} AS results
 ) TO '/results/duckdb-$ts.json' (FORMAT json);

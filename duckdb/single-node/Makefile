@@ -3,6 +3,10 @@
 SMOKE ?=
 # TPC-H scale factor: 1 (~1 GB of CSV-equivalent data), 0.1 with SMOKE=1
 SF ?= $(if $(filter-out 0,$(SMOKE)),0.1,1)
+# resource budget for `make benchmark`: DuckDB runs inside the bench container, so these are
+# its compose cpus/mem_limit (the same single-node budget as the server databases in this repo)
+export BENCH_CPUS ?= 4
+export BENCH_MEM ?= 6g
 
 export HOST_UID := $(shell id -u)
 export HOST_GID := $(shell id -g)
@@ -37,6 +41,7 @@ cli:
 benchmark:
 	rm -rf data/bench && mkdir -p data/bench/prof results
 	sh bench/tpch.sh $(SF) $$(date -u +%Y%m%dT%H%M%SZ) $$(docker info --format '{{.NCPU}} {{.MemTotal}}') \
+		$(BENCH_CPUS) $(BENCH_MEM) \
 		| docker compose --progress quiet --profile bench run --rm -T bench
 	rm -rf data/bench
 
