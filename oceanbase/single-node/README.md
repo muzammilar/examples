@@ -102,3 +102,10 @@ since `mini` sets `cpu_count` 16. It also takes about 6.5 GB of disk inside the 
 (the log disk and data file are preallocated) on top of the 1.9 GB image.
 
 Bootstrap data lives in the container layer and is discarded by `make down`.
+
+### Future work
+
+Run one common sysbench workload set (same scripts, table count/size, thread counts and duration)
+across every sysbench-capable example — TiDB, OceanBase (single node and cluster), SingleStore and
+RonDB over the MySQL protocol, YugabyteDB YSQL and CedarDB with sysbench's `pgsql` driver — so their
+numbers compare directly. Today each example uses its own parameters.
