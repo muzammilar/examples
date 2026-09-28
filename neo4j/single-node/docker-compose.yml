@@ -1,0 +1,49 @@
+name: neo4j-single
+
+# Neo4j Community Edition, one standalone server; user neo4j, password "demo-password".
+services:
+  neo4j:
+    image: neo4j:${NEO4J_VERSION:-2026.09.0-community}
+    container_name: neo4j
+    hostname: neo4j
+    environment:
+      NEO4J_AUTH: neo4j/demo-password
+      NEO4J_server_memory_heap_max__size: 512m
+      NEO4J_server_memory_pagecache_size: 256m
+    ports:
+      - "7474:7474" # HTTP + Browser
+      - "7687:7687" # Bolt
+    volumes:
+      - neo4j-data:/data
+    healthcheck:
+      test: ["CMD", "cypher-shell", "-u", "neo4j", "-p", "demo-password", "RETURN 1"]
+      interval: 5s
+      timeout: 10s
+      retries: 30
+      start_period: 15s
+
+  # uv + Python 3.13, used by `make benchmark` (bench/bench.py, deps pinned in bench/uv.lock)
+  bench:
+    image: ghcr.io/astral-sh/uv:0.12.19-python3.13-trixie-slim
+    profiles: [bench]
+    cpus: ${BENCH_CLIENT_CPUS:-2}
+    working_dir: /bench
+    command: ["uv", "run", "--frozen", "bench.py"]
+    environment:
+      BENCH_LIMITS: ${BENCH_LIMITS:-}      # bench/limits.sh, copied into the JSON
+      UV_CACHE_DIR: /uv/cache              # wheel cache and venv live in the uv volume,
+      UV_PROJECT_ENVIRONMENT: /uv/venv     # so reruns skip downloads and installs
+      UV_PYTHON_DOWNLOADS: never           # use the image's Python
+      PYTHONDONTWRITEBYTECODE: "1"
+      SMOKE: ${SMOKE:-}
+      N: ${N:-}
+      HOST_UID: ${HOST_UID:-}
+      HOST_GID: ${HOST_GID:-}
+    volumes:
+      - ./bench:/bench:ro
+      - ./results:/results
+      - uv-cache:/uv
+
+volumes:
+  neo4j-data:
+  uv-cache:
