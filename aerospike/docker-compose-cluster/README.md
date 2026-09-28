@@ -65,13 +65,30 @@ All three nodes, the client and the exporters share one Docker VM, so the number
 costs (read vs. write vs. replicated write), not what the hardware can do. To push further, raise
 `THREADS` until p99 climbs, run more than one bench container, or give the nodes their own hosts.
 
+**Resource budget.** For the run [`bench/limits.sh`](bench/limits.sh) gives the three
+Aerospike nodes `BENCH_CPUS=6` / `BENCH_MEM=12g` in total, i.e. 2 CPUs / 4 GB each (no swap),
+with `docker update`, and restores the old limits afterwards. Docker cannot remove a memory
+limit from a running container, so "unlimited" comes back as the Docker VM's total memory;
+`make down && make up` starts clean. The exporters, Prometheus and Grafana are left unlimited
+(they are idle apart from scrapes). The `asbench` client has `cpus: 2` in compose
+(`BENCH_CLIENT_CPUS`). The JSON records the applied limits under `limits`. Aerospike sizes
+`service-threads` from the CPUs it sees at startup, which is the whole VM, since the cap comes
+later, so each node runs more service threads than its 2-CPU quota. During the run all three
+nodes and the client sat at ~2 CPUs each, so client and servers were saturated together.
+
 ### Sample results
 
-TODO: numbers from a run on a quiet machine (`make benchmark`, defaults).
+2026-09-28, `make benchmark` (defaults: 1M keys × 100 B, 16 threads, 60 s per timed workload),
+Docker Desktop 29.5.3 on an Apple M4 Pro (Docker VM: 11 CPUs, 24.4 GB, aarch64, all images
+native arm64), Aerospike CE 8.1.2.5, RF=2 in memory, 2 CPUs / 4 GB per node, client 2 CPUs.
 
 | workload | op | ops/s | p50 ms | p95 ms | p99 ms | p99.9 ms |
 |---|---|---|---|---|---|---|
-| insert | write | TODO | TODO | TODO | TODO | TODO |
-| read | read | TODO | TODO | TODO | TODO | TODO |
-| read-update | read | TODO | TODO | TODO | TODO | TODO |
-| read-update | write | TODO | TODO | TODO | TODO | TODO |
+| insert | write | 74,884 | 0.164 | 0.309 | 0.440 | 14.959 |
+| read | read | 185,935 | 0.025 | 0.086 | 0.147 | 0.368 |
+| read-update (80/20) | read | 135,247 | 0.031 | 0.108 | 0.166 | 0.332 |
+| read-update (80/20) | write | 33,793 | 0.132 | 0.249 | 0.331 | 34.335 |
+
+Reads are sub-0.2 ms at p99 and reach 186k/s, limited as much by the 2-CPU client as by the
+nodes. A write replicates to the second copy before it acks, so it costs ~5x a read at p50. The
+p99.9 write tail of 15-34 ms comes from that synchronous replica hop on throttled CPUs.

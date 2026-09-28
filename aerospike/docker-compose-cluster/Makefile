@@ -64,14 +64,24 @@ failover:
 	docker exec aerospike-1 asadm -e 'info namespace object'
 	$(AQL) < failover/read.aql $(call AQL_EXPECT,15 rows in set)
 
+# resource budget for `make benchmark` (bench/limits.sh): BENCH_CPUS / BENCH_MEM in total for the
+# database containers in BENCH_SPEC (equal shares; service=CPUS:MEM is a fixed amount), set with
+# `docker update` for the run and restored afterwards; the bench client has BENCH_CLIENT_CPUS
+BENCH_CPUS ?= 6
+BENCH_MEM ?= 12g
+BENCH_SPEC ?= aerospike-1 aerospike-2 aerospike-3
+export BENCH_CLIENT_CPUS ?= 2
+
 # asbench (aerospike-tools): insert KEYS records, then DURATION s read-only and 80/20 read/update;
 # prints a summary table, keeps results/aerospike-<UTC time>.{txt,json}
 benchmark:
 	@docker compose ps --status running --services | grep -qx aerospike-1 || { echo 'run `make up` first'; exit 1; }
 	@mkdir -p results
-	@export NAME=aerospike-$$(date -u +%Y%m%dT%H%M%SZ) DURATION=$(DURATION) THREADS=$(THREADS) KEYS=$(KEYS) \
+	@BENCH_LIMITS=$$(sh bench/limits.sh apply $(BENCH_CPUS) $(BENCH_MEM) $(BENCH_SPEC)) || { sh bench/limits.sh restore; exit 1; }; \
+	export BENCH_LIMITS NAME=aerospike-$$(date -u +%Y%m%dT%H%M%SZ) DURATION=$(DURATION) THREADS=$(THREADS) KEYS=$(KEYS) \
 		HOST_INFO="$$(uname -sm)" DOCKER_INFO="$$(docker info --format 'Docker {{.ServerVersion}}, {{.NCPU}} CPUs, {{.MemTotal}} bytes')"; \
-	docker compose run --rm -T bench && docker compose run --rm -T bench-report
+	docker compose run --rm -T bench && docker compose run --rm -T bench-report; \
+	rc=$$?; sh bench/limits.sh restore; exit $$rc
 
 status:
 	docker exec aerospike-1 asadm -e 'info'
