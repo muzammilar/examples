@@ -91,6 +91,7 @@ def main():
             "max_tries": int(meta["max_tries"]),
         },
         "machine": machine(),
+        "limits": json.loads(os.environ.get("BENCH_LIMITS") or "null"),  # bench/limits.sh
         "ysql": runs,
         "ycql": "skipped: the image ships neither cassandra-stress nor yb-sample-apps (and no JRE)",
         "raw": os.path.basename(RAW),
@@ -105,8 +106,12 @@ def main():
     )
     print(
         f"scale {p['scale']} ({p['scale'] * 100_000:,} accounts), {p['duration_s']} s per run, clients split over "
-        f"{', '.join(c['nodes'])} | Docker VM: {m['docker_vm_cpus']} CPUs, {m['docker_vm_memory_gib']} GiB ({m['arch']})\n"
+        f"{', '.join(c['nodes'])} | Docker VM: {m['docker_vm_cpus']} CPUs, {m['docker_vm_memory_gib']} GiB ({m['arch']})"
     )
+    if lim := result["limits"]:
+        caps = ", ".join(f"{n} {c['cpus']} CPUs / {c['memory_mib']} MiB" for n, c in lim["containers"].items())
+        print(f"limits: {caps}; bench client {lim['bench_client_cpus']} CPUs")
+    print()
     hdr = f"{'workload':<12} {'clients':>7} {'tps':>9} {'avg ms':>8} {'p95 ms':>8} {'p99 ms':>8} {'failed':>7} {'retried':>8}"
     print(hdr)
     print("-" * len(hdr))

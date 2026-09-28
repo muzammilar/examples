@@ -73,6 +73,7 @@ services:
   bench:
     image: yugabytedb/yugabyte:${YB_VERSION:-2026.1.2.0-b137}
     profiles: [bench]
+    cpus: ${BENCH_CLIENT_CPUS:-2}
     entrypoint: ["bash", "/bench/run.sh"]
     environment:
       NAME: ${NAME:-}
@@ -97,6 +98,7 @@ services:
       NAME: ${NAME:-}
       HOST_INFO: ${HOST_INFO:-}
       DOCKER_INFO: ${DOCKER_INFO:-}
+      BENCH_LIMITS: ${BENCH_LIMITS:-}
     volumes:
       - ./bench:/bench:ro
       - ./results:/results

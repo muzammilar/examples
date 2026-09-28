@@ -87,15 +87,33 @@ standard-library Python run with `uv run --frozen` in the `ghcr.io/astral-sh/uv`
 The three nodes and the clients share one Docker VM, so the numbers compare workloads with each
 other rather than measure the hardware.
 
+**Resource budget.** For the run [`bench/limits.sh`](bench/limits.sh) gives the three
+`yugabyted` nodes `BENCH_CPUS=6` / `BENCH_MEM=12g` in total, i.e. 2 CPUs / 4 GB each (no swap),
+with `docker update`, and restores the old limits afterwards. Docker cannot remove a memory
+limit from a running container, so "unlimited" comes back as the Docker VM's total memory;
+`make down && make up` starts clean. Prometheus and Grafana are left unlimited. The
+`ysql_bench` client has `cpus: 2` in compose (`BENCH_CLIENT_CPUS`). The JSON records the
+applied limits under `limits`. yb-master and yb-tserver size their memory trackers and thread
+pools from the RAM and cores they see at startup, which is the whole VM, since the cap is applied
+to running containers. The cgroup caps what they actually get: all three nodes sat at their
+2 CPUs during the run and used ~1 to 1.2 GB.
+
 ### Sample results
 
-TODO: numbers from a run on a quiet machine (`make benchmark`, defaults).
+2026-09-28, `make benchmark` (defaults: scale 10, 60 s per run), Docker Desktop 29.5.3 on an
+Apple M4 Pro (Docker VM: 11 CPUs, 24.4 GB, aarch64, native arm64 image), YugabyteDB
+2026.1.2.0, 3 nodes RF=3, read committed, 2 CPUs / 4 GB per node, client 2 CPUs.
 
-| workload | clients | TPS | avg ms | p95 ms |
-|---|---|---|---|---|
-| tpcb | 1 | TODO | TODO | TODO |
-| tpcb | 8 | TODO | TODO | TODO |
-| tpcb | 16 | TODO | TODO | TODO |
-| select-only | 1 | TODO | TODO | TODO |
-| select-only | 8 | TODO | TODO | TODO |
-| select-only | 16 | TODO | TODO | TODO |
+| workload | clients | TPS | avg ms | p95 ms | p99 ms |
+|---|---|---|---|---|---|
+| tpcb | 1 | 275 | 3.64 | 4.49 | 5.37 |
+| tpcb | 8 | 692 | 11.55 | 47.63 | 60.66 |
+| tpcb | 16 | 733 | 21.81 | 75.55 | 97.89 |
+| select-only | 1 | 3,640 | 0.27 | 0.35 | 0.43 |
+| select-only | 8 | 13,964 | 0.57 | 0.51 | 0.83 |
+| select-only | 16 | 19,780 | 0.81 | 0.73 | 2.19 |
+
+No transaction failed or needed a retry. Single-row reads are served by the tablet leader and
+scale to ~20k TPS. A TPC-B transaction writes 4 rows across tablets and commits through Raft
+on 3 nodes. That makes it ~13x slower than a read with 1 client (3.6 ms vs 0.27 ms), and with
+the nodes CPU-bound it stops scaling at ~730 TPS.
