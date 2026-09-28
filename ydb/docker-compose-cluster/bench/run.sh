@@ -7,7 +7,7 @@
 # from Prometheus are printed at the end). Prints a table, saves raw
 # output and a JSON summary to results/ (gitignored), then drops the workload tables.
 # Env (set by `make benchmark`): BENCH_TIME, BENCH_THREADS, BENCH_KV_ROWS,
-# BENCH_PRODUCTS, BENCH_ORDERS, BENCH_PARTITIONS.
+# BENCH_PRODUCTS, BENCH_ORDERS, BENCH_PARTITIONS, BENCH_LIMITS (bench/limits.sh, copied into the JSON).
 set -eu
 cd "$(dirname "$0")/.."
 
@@ -34,6 +34,10 @@ clean() {
 trap 'clean; echo "workload tables removed"' EXIT
 clean # leftovers from an interrupted run
 
+# a PDisk that failed to open at startup leaves the cluster DEGRADED and skews the numbers
+selfcheck=$(curl -s --max-time 20 localhost:8765/viewer/json/healthcheck | sed -n 's/.*"self_check_result":"\([A-Z_]*\)".*/\1/p')
+echo "==> self-check: ${selfcheck:-unknown}" | tee -a "$raw"
+[ "$selfcheck" = GOOD ] || echo "WARNING: the cluster is not GOOD; see http://localhost:8765 (Healthcheck) before trusting these numbers" | tee -a "$raw"
 echo "==> endpoints" | tee -a "$raw"
 ydb discovery list | tee -a "$raw"
 endpoints=$(ydb discovery list | awk '{ print $1 }' | sed 's|.*//||' | paste -sd, -)
@@ -100,6 +104,8 @@ cat >"$json" <<JSON
                  "stock_orders": $BENCH_ORDERS, "min_partitions": $BENCH_PARTITIONS},
   "machine": {"docker_cpus": $cpus, "docker_mem_bytes": $mem, "docker_arch": "$arch",
               "host": "$(uname -sm)", "ydb_emulated": $([ "$arch" = x86_64 ] && echo false || echo true)},
+  "limits": ${BENCH_LIMITS:-null},
+  "self_check_at_start": "${selfcheck:-unknown}",
   "results": [$rows]
 }
 JSON

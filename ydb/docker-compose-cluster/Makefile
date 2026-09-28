@@ -1,4 +1,4 @@
-.PHONY: up dashboards init test benchmark failover status cli down
+.PHONY: up dashboards init test benchmark benchmark-extended failover status cli down
 
 # `make benchmark`: YDB CLI kv + stock workloads; SMOKE=1 for a quick run
 SMOKE ?=
@@ -27,26 +27,58 @@ dashboards:
 		https://raw.githubusercontent.com/ydb-platform/ydb/$(YDB_REF)/ydb/deploy/helm/ydb-prometheus/dashboards \
 		$(YDB_DASHBOARDS:=.json)
 
+# now and then a PDisk fails to open at first start ("Can't open file ... errno# 11", the file is
+# still locked), which leaves the cluster DEGRADED or unable to serve /Root/testdb: restart that
+# storage node once (checked after bootstrap and again once the database answers)
+PDISK_CHECK = @for n in 1 2 3; do \
+		docker logs --since "$$(docker inspect -f '{{.State.StartedAt}}' ydb-storage-$$n)" ydb-storage-$$n 2>&1 | \
+			grep -q 'BlockDevice initialization error' && { echo "restarting ydb-storage-$$n (PDisk failed to open)"; docker restart ydb-storage-$$n >/dev/null; }; \
+	done; true
+
 # One-time: assemble the static storage group, then create /Root/testdb.
 # Both steps are retried while the storage nodes finish starting.
 init:
 	until $(YDB) -y -e grpc://ydb-storage-1:2135 admin cluster bootstrap --uuid ydb-demo 2>/dev/null || \
 		$(YDB) -e grpc://ydb-storage-1:2135 -d /Root scheme ls >/dev/null 2>&1; do sleep 5; done
+	$(PDISK_CHECK)
 	until docker exec ydb-storage-1 /ydbd -s grpc://ydb-storage-1:2135 admin database /Root/testdb status 2>/dev/null | grep -q RUNNING || \
 		docker exec ydb-storage-1 /ydbd -s grpc://ydb-storage-1:2135 admin database /Root/testdb create ssd:1; do sleep 5; done
 	until $(YDB) $(DB) sql -s 'SELECT 1' >/dev/null 2>&1; do sleep 5; done
+	$(PDISK_CHECK)
+	@echo "waiting for the self-check to report GOOD"
+	@end=$$(( $$(date +%s) + 300 )); \
+	until $(VIEWER)/healthcheck | grep -q '"self_check_result":"GOOD"'; do \
+		[ $$(date +%s) -lt $$end ] || { echo "not GOOD after 5 min, see http://localhost:8765"; break; }; sleep 5; done
 	$(YDB) $(DB) discovery list
 
 # YDB runs DDL and DML as separate queries, hence one file each
 test:
 	for f in sql/*.sql; do echo "-- $$f"; cat $$f; $(YDB) $(DB) sql -f - < $$f || exit 1; done
 
+# resource budget for `make benchmark` (bench/limits.sh): BENCH_CPUS / BENCH_MEM in total for the
+# database containers in BENCH_SPEC (equal shares; service=CPUS:MEM is a fixed amount), set with
+# `docker update` for the run and restored afterwards; the bench client has BENCH_CLIENT_CPUS
+BENCH_CPUS ?= 6
+BENCH_MEM ?= 12g
+BENCH_SPEC ?= ydb-dynamic-1=1.5:2.25g ydb-dynamic-2=1.5:2.25g ydb-storage-1=1:2.5g ydb-storage-2=1:2.5g ydb-storage-3=1:2.5g
+export BENCH_CLIENT_CPUS ?= 0
+export BENCH_NOTE ?= no bench container: the ydb CLI load generator runs inside ydb-storage-1 (docker exec) and shares its limits
+
 # init the kv and stock workload tables, run each workload x thread count for
 # BENCH_TIME seconds, print txs/s + latency percentiles, clean up; raw + JSON in results/
 benchmark:
-	BENCH_TIME='$(BENCH_TIME)' BENCH_THREADS='$(BENCH_THREADS)' BENCH_KV_ROWS='$(BENCH_KV_ROWS)' \
+	@BENCH_LIMITS=$$(sh bench/limits.sh apply $(BENCH_CPUS) $(BENCH_MEM) $(BENCH_SPEC)) || { sh bench/limits.sh restore; exit 1; }; \
+	export BENCH_LIMITS; BENCH_TIME='$(BENCH_TIME)' BENCH_THREADS='$(BENCH_THREADS)' BENCH_KV_ROWS='$(BENCH_KV_ROWS)' \
 		BENCH_PRODUCTS='$(BENCH_PRODUCTS)' BENCH_ORDERS='$(BENCH_ORDERS)' \
-		BENCH_PARTITIONS='$(BENCH_PARTITIONS)' bench/run.sh
+		BENCH_PARTITIONS='$(BENCH_PARTITIONS)' bench/run.sh; \
+	rc=$$?; sh bench/limits.sh restore; exit $$rc
+
+# longer look under the same budget (bench/extended.sh, ~45 min): thread scaling, kv load while a
+# storage and a dynamic node are stopped and started again, tpcc + tpch row vs column, per-node load
+benchmark-extended:
+	@BENCH_LIMITS=$$(sh bench/limits.sh apply $(BENCH_CPUS) $(BENCH_MEM) $(BENCH_SPEC)) || { sh bench/limits.sh restore; exit 1; }; \
+	export BENCH_LIMITS; bench/extended.sh; \
+	rc=$$?; sh bench/limits.sh restore; exit $$rc
 
 # stop one storage node (zone-c) and one dynamic node: mirror-3-dc keeps /Root/testdb
 # serving through ydb-dynamic-1 while the viewer reports DEGRADED; then bring both back
