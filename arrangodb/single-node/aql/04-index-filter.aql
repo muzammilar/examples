@@ -1,0 +1,6 @@
+// Range filter served by the persistent index on age, joined with cities.
+FOR p IN people
+  FILTER p.age >= 30
+  SORT p.age DESC
+  LET c = DOCUMENT(cities, p.city)
+  RETURN { name: p.name, age: p.age, city: p.city, city_visits: c.visits }
