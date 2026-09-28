@@ -1,0 +1,5 @@
+{
+  "query": { "recommend": { "positive": [2], "negative": [4] } },
+  "limit": 3,
+  "with_payload": true
+}
