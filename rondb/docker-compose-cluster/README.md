@@ -85,13 +85,38 @@ sbtest` run at the end, also when a workload fails. Everything, clients included
 Docker VM with `NumCPUs=2` per data node, so this measures the example, not RonDB on dedicated
 machines.
 
+**Resource budget.** For the run [`bench/limits.sh`](bench/limits.sh) splits `BENCH_CPUS=6` /
+`BENCH_MEM=12g` (no swap) with `docker update`:
+
+| container | CPUs | memory | compose `mem_limit` (restored afterwards) |
+|---|---:|---:|---:|
+| `ndbd-1`, `ndbd-2` (data nodes) | 1.625 each | 4.375 GB each | 2500m |
+| `mysqld` (SQL path) | 2 | 2 GB | 1400m |
+| `rest` (REST API server) | 0.5 | 1 GB | 512m |
+| `mgmd` | 0.25 | 256 MB | 256m |
+
+The compose limits (memory only) come back afterwards. The bench client has `cpus: 2` in
+compose (`BENCH_CLIENT_CPUS`), and the JSON records the applied limits under `limits`. The data
+nodes size themselves from [`config/config.ini`](config/config.ini) (`NumCPUs=2`,
+`TotalMemoryConfig=2100M`), not from the cgroup, so they used ~2 GB and ~0.5 CPU each. A first
+run with `mysqld` at 1.25 CPUs was bound by mysqld: 11.2k point selects/s against 19.0k at
+2 CPUs. Even at 2 CPUs, `mysqld` is still the busiest container (at its cap), and `rest` sits
+at its 0.5 CPU.
+
 ### Sample results
 
-TODO: numbers from a quiet machine.
+2026-09-28, `make benchmark` (defaults: 8 threads, 4 × 50,000 rows, 60 s per workload), Docker
+Desktop 29.5.3 on an Apple M4 Pro (Docker VM: 11 CPUs, 24.4 GB, aarch64, native arm64 images),
+RonDB 26.02.10, 2 data nodes, NoOfReplicas=2, split as above, client 2 CPUs.
 
 | workload | tps | qps | avg ms | p50 ms | p99 ms |
 |----------|----:|----:|-------:|-------:|-------:|
-| oltp_point_select | TODO | TODO | TODO | TODO | TODO |
-| oltp_read_only | TODO | TODO | TODO | TODO | TODO |
-| oltp_read_write | TODO | TODO | TODO | TODO | TODO |
-| rest_pk_read | - | TODO | - | TODO | TODO |
+| oltp_point_select | 18,957 | 18,957 | 0.42 | 0.22 | 0.47 |
+| oltp_read_only | 912 | 14,592 | 8.77 | 4.33 | 57.87 |
+| oltp_read_write | 712 | 14,246 | 11.23 | 6.21 | 52.89 |
+| rest_pk_read | - | 7,097 | - | 0.53 | 71.27 |
+
+Primary-key reads are what NDB is for: 19k/s through SQL at p99 0.47 ms. The range scans and
+aggregates in `oltp_read_only` / `read_write` fan out to both data nodes, and they cost 4-6 ms
+p50 with a ~55 ms tail. That is the data-node round trips plus a `mysqld` pinned at its 2 CPUs.
+`rest_pk_read` is capped by the REST server's 0.5 CPU (8 socket errors in 60 s).

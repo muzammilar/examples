@@ -122,6 +122,7 @@ def main():
         },
         "prepare_s": meta.get("prepare_s"),
         "machine": machine(),
+        "limits": json.loads(os.environ.get("BENCH_LIMITS") or "null"),  # bench/limits.sh
         "workloads": workloads,
         "raw": os.path.basename(RAW),
     }
@@ -134,7 +135,12 @@ def main():
         f"ENGINE=NDB | {result['tool']} | {p['threads']} threads, {p['tables']} x {p['table_size']:,} rows, "
         f"{p['duration_s']} s per workload (load: {result['prepare_s']} s)"
     )
-    print(f"Docker VM: {m['docker_vm_cpus']} CPUs, {m['docker_vm_memory_gib']} GiB ({m['arch']})\n")
+    print(f"Docker VM: {m['docker_vm_cpus']} CPUs, {m['docker_vm_memory_gib']} GiB ({m['arch']})")
+    if lim := result["limits"]:
+        caps = ", ".join(f"{n} {c['cpus']} CPUs / {c['memory_mib']} MiB" for n, c in lim["containers"].items())
+        print(f"limits: {caps}; bench client {lim['bench_client_cpus']} CPUs\n")
+    else:
+        print()
     hdr = f"{'workload':<18} {'tps':>9} {'qps':>10} {'avg ms':>8} {'p50 ms':>8} {'p99 ms':>8} {'errors':>7}"
     print(hdr)
     print("-" * len(hdr))

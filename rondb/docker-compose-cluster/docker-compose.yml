@@ -116,6 +116,7 @@ services:
   bench:
     build: ./bench
     profiles: [bench]
+    cpus: ${BENCH_CLIENT_CPUS:-2}
     command: ["sh", "/bench/run.sh"]
     environment:
       NAME: ${NAME:-}
@@ -141,6 +142,7 @@ services:
       NAME: ${NAME:-}
       HOST_INFO: ${HOST_INFO:-}
       DOCKER_INFO: ${DOCKER_INFO:-}
+      BENCH_LIMITS: ${BENCH_LIMITS:-}
     volumes:
       - ./bench:/bench:ro
       - ./results:/results
