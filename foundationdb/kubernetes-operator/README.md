@@ -13,7 +13,7 @@ Requires `kind`, `kubectl`, `curl`, and `jq` + `column` for `make roles`.
 make up       # kind cluster, CRDs + operator, FoundationDBCluster, exporter
 make test     # run queries/test.fdbcli on a log pod, then `make roles`
 make roles    # pods by process class + address/class/roles table from `status json`
-make failover # delete one storage pod, wait until available + fully replicated, `make roles`
+make failover # freeze one storage server until FDB heals around it, resume it, `make roles`
 make status   # FoundationDBCluster + fdbcli `status details`
 make cli      # interactive fdbcli
 make metrics  # port-forward the exporter to localhost:9444
@@ -81,25 +81,45 @@ after recoveries, so the exact placement changes from run to run.
 
 ## Failover
 
-`make failover` deletes the first storage pod. The operator recreates it with the same name and
-PVC (new pod IP), and its storage server rejoins with the data already on its volume. From the
-delete on, the target polls `status json` every 2 s (bounded, 300 x 2 s) and prints each change of
-data state, `healthy`, fault tolerance (`max_zone_failures_without_losing_data`) and the number of
-processes holding a `storage` role, until the pod is Ready, the data is healthy, fault tolerance is
-back to 1 and every storage pod runs a storage server again. It then waits for the
-`FoundationDBCluster`'s `.status.health.available` and `.status.health.fullReplication` and ends
-with `make roles`, where the replacement pod shows up under its new address, e.g.:
+`make failover` freezes the `fdbserver` of one storage pod with `SIGSTOP` (`kubectl exec ...
+pkill -STOP -x fdbserver`). Deleting the pod is not enough on kind: the operator recreates it
+within seconds, before FDB gives up on the storage server, so nothing degrades. A frozen
+process is a hung server: the pod stays Running and the liveness probe (on the sidecar)
+passes, so Kubernetes and the operator replace nothing, and FDB has to detect the failure and
+re-replicate the data on its own. The victim is the storage server that has applied the most
+mutations (one holding data: with this little data there is a single shard on 2 of the 3
+servers, and freezing the third would not degrade anything).
+
+The target polls `status json` every 2 s and prints each change of data state, `healthy`,
+fault tolerance (`max_zone_failures_without_losing_data`), the number of processes holding a
+`storage` role, and whether `status` reports `unreachable_processes`. Once FDB is healthy with
+fault tolerance 1 *without* the frozen server, the process is resumed (`SIGCONT`, also on
+Ctrl-C or error) and the target waits until all storage servers are back, then for the
+`FoundationDBCluster`'s `.status.health.available` / `.fullReplication`, and ends with
+`make roles`. Bounded: it resumes after `FREEZE_MAX_POLLS` (150) polls even if nothing
+degraded, and gives up after 300 polls. A run on kind:
 
 ```
--- deleting pod/test-cluster-storage-19036 (3 storage pods)
-SECONDS  DATA_STATE  HEALTHY  FAULT_TOLERANCE  STORAGE_SERVERS
-8        healthy     true     1                3
+-- froze fdbserver in pod/test-cluster-storage-47656 (SIGSTOP; 3 storage pods)
+SECONDS  PHASE    DATA_STATE  HEALTHY  FAULT_TOLERANCE  STORAGE_SERVERS  UNREACHABLE
+4        frozen   healthy     true     1                3                true
+22       frozen   healthy     true     1                2                false
+87       frozen   healing     false    0                2                false
+95       frozen   healthy     true     1                2                false
+-- FDB re-replicated around the frozen server; resuming it (SIGCONT)
+97       resumed  healthy     true     1                2                false
+113      resumed  healthy     true     1                3                false
 ```
 
-On kind the pod is back within seconds, before data distribution gives up on the storage server,
-so FDB typically does not need to re-replicate anything and the table may show only the healthy
-end state. If the replacement took longer, the data state would first go through `healing`
-(data distribution re-replicating the lost copies) and fault tolerance would drop to 0.
+- ~4 s: the cluster controller cannot reach the process (`unreachable_processes`).
+- ~20 s: the failure monitor drops it; 2 storage servers are left. Fault tolerance still
+  reads 1: it follows data distribution's view, and DD does not treat the server as failed yet.
+- ~85 s: DD gives up on the server (about a minute after the failure), its shards have one
+  replica left, fault tolerance drops to 0 and the data state is `healing` while DD copies
+  them to the remaining storage server.
+- ~95 s: fully replicated again on the other two servers: healthy, fault tolerance 1.
+- After `SIGCONT` the old process rejoins; its storage server was removed, so it comes back
+  as a new, empty storage server (new ID) and the count returns to 3.
 
 The kind node's disk is the Docker VM's disk. FDB throttles writes once less than 5% of it is free,
 so `cluster.yaml` lowers that floor with `knob_min_available_space_ratio=0.01` (and 256 MiB absolute).

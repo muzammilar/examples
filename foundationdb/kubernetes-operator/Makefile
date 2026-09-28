@@ -66,27 +66,53 @@ roles:
 		| jq -r '["ADDRESS","CLASS","ROLES"], ([.cluster.processes[]] | sort_by(.class_type, .address)[] | [.address, .class_type, ([.roles[].role] | join(","))]) | @tsv' \
 		| column -t
 
-# delete one storage pod: the operator recreates it (same name, same PVC) and its storage
-# server rejoins. Polls `status json` every 2 s (bounded, 300 x 2 s) and prints each change of
-# data state / fault tolerance / storage servers until the pod is back, healthy, fault
-# tolerance >= 1 and every storage pod runs a storage role again.
+# freeze (SIGSTOP) the fdbserver of one storage pod that holds data. The pod stays Running
+# and its liveness probe (sidecar) passes, so Kubernetes and the operator replace nothing:
+# FDB alone has to notice the process is gone, mark the storage server failed and
+# re-replicate its data onto the remaining servers. Once FDB is healthy again (fault
+# tolerance back to 1 without the frozen server) the process is resumed (SIGCONT) and
+# rejoins. `status json` is polled every 2 s and every change of data state / healthy /
+# fault tolerance / storage servers / unreachable processes is printed. Bounded: resumes
+# after FREEZE_MAX_POLLS polls even without healing, gives up after 300 polls in total.
+# The victim is the storage server with the most applied mutations (a fresh or emptied
+# server has none, and freezing a server without data would not degrade anything).
+FREEZE_MAX_POLLS ?= 150
 FAILOVER_JQ := [.cluster.data.state.name, .cluster.data.state.healthy, \
 	.cluster.fault_tolerance.max_zone_failures_without_losing_data, \
-	([.cluster.processes[] | select(any(.roles[]?; .role == "storage"))] | length)] | @tsv
+	([.cluster.processes[] | select(any(.roles[]?; .role == "storage"))] | length), \
+	([.cluster.messages[]?.name] | any(. == "unreachable_processes"))] | @tsv
+FAILOVER_VICTIM_JQ := [.cluster.processes[] | select(any(.roles[]?; .role == "storage")) \
+	| {group: .locality.instance_id, mutations: ([.roles[] | select(.role == "storage") | .mutations.counter] | add)}] \
+	| max_by(.mutations) | .group
 
 failover:
-	@pod=$$($(KUBECTL) get pod -l foundationdb.org/fdb-process-class=storage -o name | head -1); \
+	@lp=$(FDB_POD); \
+	st() { $(KUBECTL) exec $$lp -c foundationdb -- fdbcli --exec 'status json' --timeout 5 2>/dev/null; }; \
 	want=$$($(KUBECTL) get pod -l foundationdb.org/fdb-process-class=storage -o name | wc -l | tr -d ' '); \
-	echo "-- deleting $$pod ($$want storage pods)"; $(KUBECTL) delete $$pod --wait=false; \
-	printf '%s\t%s\t%s\t%s\t%s\n' SECONDS DATA_STATE HEALTHY FAULT_TOLERANCE STORAGE_SERVERS; \
-	last=; start=$$(date +%s); \
+	group=$$(st | jq -r '$(FAILOVER_VICTIM_JQ)'); \
+	pod=$$($(KUBECTL) get pod -l foundationdb.org/fdb-process-group-id=$$group -o name); \
+	[ -n "$$pod" ] || { echo "no storage pod found for process group '$$group'"; exit 1; }; \
+	resume() { $(KUBECTL) exec $$pod -c foundationdb -- pkill -CONT -x fdbserver; }; \
+	trap resume EXIT; trap 'exit 130' INT TERM; \
+	$(KUBECTL) exec $$pod -c foundationdb -- pkill -STOP -x fdbserver || { trap - EXIT; exit 1; }; \
+	echo "-- froze fdbserver in $$pod (SIGSTOP; $$want storage pods)"; \
+	printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\n' SECONDS PHASE DATA_STATE HEALTHY FAULT_TOLERANCE STORAGE_SERVERS UNREACHABLE; \
+	phase=frozen; degraded=; last=; start=$$(date +%s); \
 	for i in $$(seq 300); do \
-		cur=$$($(KUBECTL) exec $(FDB_POD) -c foundationdb -- fdbcli --exec 'status json' --timeout 5 2>/dev/null \
-			| jq -r '$(FAILOVER_JQ)' 2>/dev/null); \
-		[ -n "$$cur" ] && [ "$$cur" != "$$last" ] && { printf '%s\t%s\n' $$(( $$(date +%s) - start )) "$$cur"; last=$$cur; }; \
-		ready=$$($(KUBECTL) get $$pod -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}' 2>/dev/null); \
-		[ $$i -gt 5 ] && [ "$$ready" = True ] && echo "$$cur" | awk -v w=$$want '$$2 == "true" && $$3 >= 1 && $$4 == w {ok=1} END {exit !ok}' && break; \
-		[ $$i -lt 300 ] || { echo 'not recovered after 600 s'; exit 1; }; sleep 2; done
+		cur=$$(st | jq -r '$(FAILOVER_JQ)' 2>/dev/null); \
+		if [ -n "$$cur" ]; then \
+			[ "$$phase $$cur" != "$$last" ] && { printf '%s\t%s\t%s\n' $$(( $$(date +%s) - start )) $$phase "$$cur"; last="$$phase $$cur"; }; \
+			ok=$$(echo "$$cur" | awk '$$1 == "healthy" && $$2 == "true" && $$3 >= 1 {print 1}'); \
+			if [ $$phase = frozen ]; then \
+				[ -z "$$ok" ] && degraded=1; \
+				if [ -n "$$degraded" ] && [ -n "$$ok" ] || [ $$i -ge $(FREEZE_MAX_POLLS) ]; then \
+					[ -n "$$degraded" ] && echo "-- FDB re-replicated around the frozen server; resuming it (SIGCONT)" \
+						|| echo "-- no degradation after $(FREEZE_MAX_POLLS) polls; resuming it (SIGCONT)"; \
+					resume; trap - EXIT; phase=resumed; \
+				fi; \
+			elif [ -n "$$ok" ] && [ "$$(echo "$$cur" | cut -f4)" = "$$want" ]; then break; fi; \
+		fi; \
+		[ $$i -lt 300 ] || { echo 'not recovered after 300 polls'; exit 1; }; sleep 2; done
 	$(KUBECTL) wait foundationdbcluster/test-cluster --timeout=10m \
 		--for=jsonpath='{.status.health.available}'=true
 	$(KUBECTL) wait foundationdbcluster/test-cluster --timeout=10m \
