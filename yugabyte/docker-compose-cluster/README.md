@@ -9,9 +9,10 @@ three replicas (RF=3) per zone. Prometheus scrapes each node's `/prometheus-metr
 ```bash
 make up         # start; nodes join one after another (~30 s), then zone-aware placement
 make dashboards # fetch the upstream Grafana dashboard (also run by `make up`; needs curl + jq on the host)
-make test       # run ysql/*.sql (sharding, tablet leaders/replicas, transaction, index) and ycql/*.cql (TTL, JSONB, transactional table + index)
+make test       # run ysql/*.sql (sharding, tablet leaders/replicas, transaction, index) and ycql/ (see below)
 make failover   # stop yb-3: YSQL + YCQL keep working after leader re-election; restart it
 make benchmark  # ysql_bench TPC-B-like + select-only at 1/8/16 clients over yb-1..3 (SMOKE=1: 10 s runs)
+make benchmark-ycql # yb-sample-apps key-value writes, reads, 50/50 at 1/8/32 threads over YCQL (SMOKE=1: 10 s runs)
 make status     # yugabyted status, yb-admin list_all_masters / list_all_tablet_servers
 make cli        # interactive ysqlsh on yb-1
 make cli-ycql   # interactive ycqlsh on yb-1
@@ -42,6 +43,32 @@ over a few minutes. For alerting see
 [YugabyteDB Anywhere](https://docs.yugabyte.com/stable/yugabyte-platform/) or the
 [Prometheus integration docs](https://docs.yugabyte.com/stable/explore/observability/prometheus-integration/).
 
+## YCQL in `make test`
+
+YCQL is YugabyteDB's Cassandra-compatible API on the same DocDB storage as YSQL, so unlike
+Cassandra it is strongly consistent: every write goes through the tablet's Raft group (RF=3 here)
+and reads go to the tablet leader. A keyspace takes its replication from the universe (no
+`replication` map needed), and the extensions below have no Cassandra equivalent:
+
+| file | shows |
+|---|---|
+| [`ycql/test.cql`](ycql/test.cql) | JSONB column, per-row TTL, a transactional table with a secondary index, `BEGIN TRANSACTION`, `partition_hash` |
+| [`ycql/schema/indexes.cql`](ycql/schema/indexes.cql) | the tables and indexes for the next two files, created first (see below) |
+| [`ycql/indexes.cql`](ycql/indexes.cql) | a covering index (`INCLUDE`): `EXPLAIN` shows *Index Only Scan* for covered columns and *Index Scan* otherwise; a `UNIQUE` index (*Index Only Key Lookup*) |
+| [`ycql/errors/unique-violation.cql`](ycql/errors/unique-violation.cql) | a duplicate email, rejected by the unique index (`make test` expects the error named in its `-- expect:` line) |
+| [`ycql/transactions.cql`](ycql/transactions.cql) | one distributed transaction over two tables; `writetime()` shows the single commit time on both rows |
+| [`ycql/jsonb.cql`](ycql/jsonb.cql) | `->` / `->>` on nested documents and arrays, an index on a JSONB attribute, filters with `CAST`, partial `UPDATE`s of single attributes |
+| [`ycql/ttl/`](ycql/ttl) | table default TTL, `USING TTL` per row and per column; `make test` reads again 6 s later: the row with the table default is gone, the column TTL cleared one column |
+| [`ycql/partitioning.cql`](ycql/partitioning.cql) | `partition_hash()` (0–65535) and `token()` per row, a table `WITH tablets = 4` and its hash ranges in `system.partitions`, a parallel scan split by hash and by token range |
+
+Secondary indexes need `transactions = {'enabled': true}` on the table (the index is updated in
+the same distributed transaction as the row), and a table with a secondary index cannot take
+row-level TTLs, which is why the TTL demo uses its own table. `make test` creates the indexed
+tables in `ycql/schema/` and waits 3 s before using them: a CQL proxy (here yb-1's) that touches a
+table while its new index is still backfilling caches the index as not yet readable and keeps
+planning `Seq Scan` for it (writes still maintain the index; other nodes' proxies use it).
+JSONB updates must end the path in `->` (`SET doc->'name' = '"desk lamp"'`); the value is JSON.
+
 ## Benchmark
 
 `make benchmark` runs `ysql_bench`, YugabyteDB's fork of `pgbench` that ships in the
@@ -68,8 +95,7 @@ records, then applying them). YSQL runs at `read committed` here, so concurrent 
 same branch row (there are only `SCALE` of them) wait for each other: with few rows, more
 clients mostly add lock waits and latency, not TPS; raise `SCALE` to spread them.
 
-YCQL is not benchmarked: the image ships neither `cassandra-stress` nor YugabyteDB's
-`yb-sample-apps` jar (nor a JRE to run it).
+YCQL has its own target, `make benchmark-ycql` (below).
 
 ```bash
 make benchmark                          # scale 10 (1M accounts), 60 s per run, 1/8/16 clients
@@ -87,12 +113,12 @@ standard-library Python run with `uv run --frozen` in the `ghcr.io/astral-sh/uv`
 The three nodes and the clients share one Docker VM, so the numbers compare workloads with each
 other rather than measure the hardware.
 
-**Resource budget.** For the run [`bench/limits.sh`](bench/limits.sh) gives the three
+**Resource budget.** For each run (`make benchmark` and `make benchmark-ycql`) [`bench/limits.sh`](bench/limits.sh) gives the three
 `yugabyted` nodes `BENCH_CPUS=6` / `BENCH_MEM=12g` in total, i.e. 2 CPUs / 4 GB each (no swap),
 with `docker update`, and restores the old limits afterwards. Docker cannot remove a memory
 limit from a running container, so "unlimited" comes back as the Docker VM's total memory;
 `make down && make up` starts clean. Prometheus and Grafana are left unlimited. The
-`ysql_bench` client has `cpus: 2` in compose (`BENCH_CLIENT_CPUS`). The JSON records the
+`ysql_bench` and yb-sample-apps clients have `cpus: 2` in compose (`BENCH_CLIENT_CPUS`). The JSON records the
 applied limits under `limits`. yb-master and yb-tserver size their memory trackers and thread
 pools from the RAM and cores they see at startup, which is the whole VM, since the cap is applied
 to running containers. The cgroup caps what they actually get: all three nodes sat at their
@@ -117,3 +143,72 @@ No transaction failed or needed a retry. Single-row reads are served by the tabl
 scale to ~20k TPS. A TPC-B transaction writes 4 rows across tablets and commits through Raft
 on 3 nodes. That makes it ~13x slower than a read with 1 client (3.6 ms vs 0.27 ms), and with
 the nodes CPU-bound it stops scaling at ~730 TPS.
+
+## YCQL benchmark
+
+`make benchmark-ycql` runs [yb-sample-apps](https://github.com/yugabyte/yb-sample-apps)
+v1.4.3 — the workload generator YugabyteDB's own
+[YCQL key-value benchmark](https://docs.yugabyte.com/stable/benchmark/key-value-workload-ycql/)
+uses — with its `CassandraKeyValue` workload ([`bench/run-ycql.sh`](bench/run-ycql.sh)). The jar
+is not in any image: the Makefile downloads it once into the gitignored
+`bench/yb-sample-apps.jar` and checks its sha256; it runs on the multi-arch
+`eclipse-temurin:17.0.20_8-jre-noble` image (arm64-native on Apple silicon). It drops
+`ybdemo_keyspace.cassandrakeyvalue` (`k varchar PRIMARY KEY, v blob`) first, then:
+
+| workload | yb-sample-apps | what it measures |
+|---|---|---|
+| `load` | `--num_writes KEYS`, `LOAD_THREADS` writers (not timed) | inserts `KEYS` keys with `VALUE_SIZE`-byte values |
+| `write` | `--num_threads_write N --num_threads_read 0` | single-row upserts of random existing keys: one Raft round to 2 of 3 replicas each |
+| `read` | `--read_only --num_threads_read N` | single-row reads of random keys from the tablet leader; every value is verified |
+| `mixed` | `N/2` writers + `N/2` readers (1 → 1 + 1) | both at once |
+
+Each timed run lasts `DURATION` seconds, once per `THREADS` count (`1 8 32`). The workload uses
+YugabyteDB's fork of the Cassandra Java driver, whose partition-aware policy sends every statement
+straight to the node that leads the key's tablet. YCQL always reads and writes at the tablet
+leader (the tool's default `QUORUM` is not a tunable here: there is no eventual consistency to
+choose), so unlike the ScyllaDB example's cassandra-stress runs there is no `ONE` vs `QUORUM` vs
+`ALL` trade-off to measure; `--local_reads` (follower reads at `ONE`) is not used.
+
+yb-sample-apps prints ops/s and the mean latency per 5 s interval and, with
+`--output_json_metrics`, cumulative latency statistics of every operation. The jar's own
+`log4j.properties` logs every driver request at TRACE, which caps throughput at a few thousand
+ops/s, so [`bench/log4j.properties`](bench/log4j.properties) replaces it. The report
+([`bench/report_ycql.py`](bench/report_ycql.py)) takes ops/s and the mean from the second status
+line to the last (leaving out connection setup and the `count(*)` the tool runs first) and p99 and
+max from the JSON; the tool computes no other percentiles.
+
+```bash
+make benchmark-ycql                     # 1M keys x 100 B, 60 s per run, 1/8/32 threads
+make benchmark-ycql SMOKE=1             # 100k keys, 10 s per run
+make benchmark-ycql DURATION=120 THREADS="4 64" KEYS=5000000 VALUE_SIZE=1024
+```
+
+It prints a summary table (ops/s, mean, p99 and max latency, exceptions per run and operation)
+and keeps the raw output and a parsed JSON (versions, live tservers, RF, parameters, limits,
+Docker VM) in the gitignored `results/yugabyte-ycql-<UTC time>.{txt,json}`, with the same
+resource budget as `make benchmark`.
+
+### Sample results
+
+2026-09-28, `make benchmark-ycql` (defaults: 1M keys x 100 B, 60 s per run), Docker Desktop
+29.5.3 on an Apple M4 Pro (Docker VM: 11 CPUs, 24.4 GB, aarch64, native arm64 images),
+YugabyteDB 2026.1.2.0, 3 nodes RF=3, 2 CPUs / 4 GB per node, client 2 CPUs (Temurin 17).
+
+| workload | threads | op | ops/s | mean ms | p99 ms |
+|---|---|---|---|---|---|
+| load | 32 | write (insert) | 22,255 | 1.31 | 7.58 |
+| write | 1 | write | 1,796 | 0.56 | 0.96 |
+| write | 8 | write | 10,387 | 0.77 | 2.23 |
+| write | 32 | write | 24,059 | 1.32 | 11.42 |
+| read | 1 | read | 4,637 | 0.21 | 0.31 |
+| read | 8 | read | 25,876 | 0.31 | 0.49 |
+| read | 32 | read | 55,721 | 0.57 | 4.50 |
+| mixed | 1 | read / write | 3,549 / 1,734 | 0.28 / 0.57 | 0.38 / 0.71 |
+| mixed | 8 | read / write | 12,092 / 5,558 | 0.33 / 0.72 | 0.61 / 2.18 |
+| mixed | 32 | read / write | 25,047 / 10,412 | 0.63 / 1.53 | 7.93 / 16.92 |
+
+No errors. The driver sends every statement straight to the key's tablet leader. A read is
+answered there (0.21 ms with 1 thread). A write costs ~2.7x as much: one Raft round to a second
+replica, and no distributed transaction, unlike TPC-B. Reads reach ~56k ops/s with 32 threads
+and writes ~24k. Past 8 threads, p99 grows faster than
+throughput: the three nodes and the client share 8 capped CPUs.

@@ -93,7 +93,7 @@ def main():
         "machine": machine(),
         "limits": json.loads(os.environ.get("BENCH_LIMITS") or "null"),  # bench/limits.sh
         "ysql": runs,
-        "ycql": "skipped: the image ships neither cassandra-stress nor yb-sample-apps (and no JRE)",
+        "ycql": "separate: make benchmark-ycql (yb-sample-apps on a JRE image)",
         "raw": os.path.basename(RAW),
     }
     with open(f"/results/{NAME}.json", "w") as f:

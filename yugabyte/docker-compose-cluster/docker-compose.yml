@@ -104,5 +104,44 @@ services:
       - ./results:/results
       - uv-cache:/uv
 
+  # `make benchmark-ycql`: yb-sample-apps' CassandraKeyValue workload (bench/run-ycql.sh) on a JRE,
+  # raw output to results/. The jar is downloaded (and checksummed) by the Makefile; the image is
+  # multi-arch like the yugabyte one.
+  bench-ycql:
+    image: eclipse-temurin:${JRE_VERSION:-17.0.20_8-jre-noble}
+    profiles: [bench]
+    cpus: ${BENCH_CLIENT_CPUS:-2}
+    entrypoint: ["bash", "/bench/run-ycql.sh"]
+    environment:
+      NAME: ${NAME:-}
+      DURATION: ${DURATION:-60}
+      THREADS: ${THREADS:-1 8 32}
+      KEYS: ${KEYS:-1000000}
+      VALUE_SIZE: ${VALUE_SIZE:-100}
+      LOAD_THREADS: ${LOAD_THREADS:-32}
+      SAMPLE_APPS_VERSION: ${SAMPLE_APPS_VERSION:-}
+    volumes:
+      - ./bench:/bench:ro
+      - ./results:/results
+
+  # `make benchmark-ycql`: parses the raw output (bench/report_ycql.py) into a table and results/*.json
+  bench-ycql-report:
+    image: ghcr.io/astral-sh/uv:0.12.19-python3.13-trixie-slim
+    profiles: [bench]
+    working_dir: /bench
+    command: ["uv", "run", "--frozen", "report_ycql.py"]
+    environment:
+      UV_CACHE_DIR: /uv/cache
+      UV_PROJECT_ENVIRONMENT: /uv/venv
+      UV_PYTHON_DOWNLOADS: never
+      NAME: ${NAME:-}
+      HOST_INFO: ${HOST_INFO:-}
+      DOCKER_INFO: ${DOCKER_INFO:-}
+      BENCH_LIMITS: ${BENCH_LIMITS:-}
+    volumes:
+      - ./bench:/bench:ro
+      - ./results:/results
+      - uv-cache:/uv
+
 volumes:
   uv-cache:
