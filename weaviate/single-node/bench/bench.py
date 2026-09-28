@@ -226,6 +226,7 @@ def main():
                    "metric": "cosine", "filter": f"tag == 0 (~{100 // TAGS}%)",
                    "hnsw": HNSW, "db_settings": db.settings},
         "machine": machine(),
+        "limits": json.loads(os.environ.get("BENCH_LIMITS") or "null"),  # bench/limits.sh
         "results": {
             "insert_s": round(insert_s, 2),
             "insert_vps": round(N / insert_s, 1),

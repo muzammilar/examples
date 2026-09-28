@@ -50,15 +50,32 @@ with `N`, `DIM`, `K` (e.g. `make benchmark N=1000000`). Results print as a table
 written to `results/weaviate-<timestamp>.json` (git-ignored) with the Weaviate version,
 parameters, and the CPU count and memory of the Docker VM.
 
+**Resource budget.** For the run [`bench/limits.sh`](bench/limits.sh) caps the `weaviate`
+container at `BENCH_CPUS=4` / `BENCH_MEM=6g` (no swap) with `docker update`, and restores the
+old limits afterwards. Docker cannot remove a memory limit from a running container, so
+"unlimited" comes back as the Docker VM's total memory; `make down && make up` starts clean.
+The bench client has `cpus: 2` in compose (`BENCH_CLIENT_CPUS`). The JSON records the applied
+limits under `limits`. Weaviate is built with Go 1.26, whose runtime re-reads the cgroup CPU
+limit, so `GOMAXPROCS` follows the cap. `GOMEMLIMIT` / `LIMIT_RESOURCES` are not set, so the Go
+GC does not know about the 6 GB cap. That is harmless at this size (~0.4 GB used).
+
 ### Sample results
 
-TODO: fill from a run on a quiet machine (`make benchmark`, N=100000, dim 128).
+2026-09-28, `make benchmark` (N=100000, dim 128), Docker Desktop 29.5.3 on an Apple M4 Pro
+(Docker VM: 11 CPUs, 24.4 GB, aarch64, native image), Weaviate 1.39.7 capped at 4 CPUs / 6 GB,
+client 2 CPUs.
 
 | metric | value |
 | --- | --- |
-| insert (vec/s) | TODO |
-| time to queryable (s) | TODO |
-| search, 1 client: QPS / p50 / p99 (ms) | TODO |
-| search, 8 clients: QPS / p50 / p99 (ms) | TODO |
-| filtered (~10%), 1 client: QPS / p50 / p99 (ms) | TODO |
-| recall@10 / filtered recall@10 | TODO |
+| insert (vec/s) | 28,332 (3.5 s) |
+| time to queryable (s) | 14.0 (async index queue drained) |
+| search, 1 client: QPS / p50 / p99 (ms) | 1,658 / 0.58 / 1.01 |
+| search, 8 clients: QPS / p50 / p99 (ms) | 5,796 / 1.27 / 2.84 |
+| filtered (~10%), 1 client: QPS / p50 / p99 (ms) | 988 / 0.96 / 1.96 |
+| recall@10 / filtered recall@10 | 0.221 / 1.000 |
+
+Weaviate has the best concurrent search throughput of the three vector examples, with a tight
+p99 under 8 clients. Recall is low, though: unfiltered recall@10 on uniform random 128-d vectors
+at `ef=64` falls to 0.22, compared with Qdrant's 0.59 on the same data. The filtered query is
+exact because the ~10k matching vectors fall under the flat-search cutoff, and that is also why
+it is slower.
