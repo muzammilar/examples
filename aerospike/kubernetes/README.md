@@ -26,3 +26,12 @@ deletes pod `aerospike-2` and waits for `cluster-stable:size=2`: with RF=2 every
 a copy on `aerospike-0` or `aerospike-1`, so all 10 records read back. The StatefulSet then recreates
 `aerospike-2` under the same name; the target waits for the rollout and for
 `cluster-stable:size=3;ignore-migrations=false` (migrations finished) and reads again.
+
+## Why not the Aerospike Kubernetes Operator
+
+AKO's [documentation](https://aerospike.com/docs/kubernetes/install/limitations/) says *"Community Edition is not supported. AKO only supports Enterprise and Federal editions"*,
+and its validating webhook enforces it: [`validateImage`](https://github.com/aerospike/aerospike-kubernetes-operator/blob/v4.5.0/internal/webhook/v1/aerospikecluster_validating_webhook.go#L1721-L1732)
+(v4.5.0) rejects any `AerospikeCluster` whose image name contains neither `enterprise` nor `federal`, so `aerospike/aerospike-server` never gets created.
+Even with the check sidestepped, AKO quiesces a node before every rolling restart, upgrade or scale-down ([`aero_info_calls.go`](https://github.com/aerospike/aerospike-kubernetes-operator/blob/v4.5.0/internal/controller/cluster/aero_info_calls.go#L94)),
+and CE answers `quiesce:` with `ERROR:25:enterprise only`, as it does for racks, access control, TLS and strong consistency.
+Config or resource changes could therefore never complete, so this example keeps to a plain StatefulSet.
