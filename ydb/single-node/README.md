@@ -15,4 +15,7 @@ make down     # remove the container
 - gRPC: `grpc://localhost:2136/local`
 - Embedded UI: http://localhost:8765
 
+local-ydb runs without authentication. It also serves gRPC over TLS (`grpcs://`, port
+2135 inside the container, not published), but `make test` uses plain gRPC on 2136.
+
 The image is amd64-only and runs under emulation on Apple silicon.
