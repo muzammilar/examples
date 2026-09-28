@@ -3,6 +3,7 @@
 Website: https://neo4j.com/
 
 - [`single-node/`](single-node) — Neo4j Community with Docker Compose: constraints, MERGE, variable-length paths, shortestPath and aggregation in Cypher.
+- [`docker-compose-cluster/`](docker-compose-cluster) — three-primary Neo4j cluster with Docker Compose (Enterprise Edition, evaluation license — you must accept it via `NEO4J_ACCEPT_LICENSE_AGREEMENT`; `make up` refuses otherwise): `SHOW SERVERS`/`SHOW DATABASES`, `neo4j://` routing to the leader, `CREATE DATABASE ... TOPOLOGY 3 PRIMARIES`, and a leader failover demo.
 
 ## Benchmark
 

@@ -1,0 +1,59 @@
+name: neo4j-cluster
+
+# Neo4j Enterprise Edition, three primary servers; user neo4j, password "demo-password".
+# All three start together and find each other through the static dbms.cluster.endpoints list
+# (discovery on :6000, Raft on :7000, server-side routing on :7688, all inside the compose network).
+x-neo4j: &neo4j
+  image: neo4j:${NEO4J_VERSION:-2026.09.0-enterprise}
+  mem_limit: 1g
+  stop_grace_period: 60s # clean shutdown (Raft + checkpoint) takes longer than Docker's default 10 s
+  healthcheck:
+    test: ["CMD", "cypher-shell", "-u", "neo4j", "-p", "demo-password", "RETURN 1"]
+    interval: 5s
+    timeout: 10s
+    retries: 40
+    start_period: 20s
+
+x-env: &env
+  # Enterprise license acceptance is passed through from your shell, never set here: `make up` refuses unless you export it (eval or yes).
+  NEO4J_ACCEPT_LICENSE_AGREEMENT: ${NEO4J_ACCEPT_LICENSE_AGREEMENT:-}
+  NEO4J_AUTH: neo4j/demo-password
+  NEO4J_server_memory_heap_initial__size: 384m
+  NEO4J_server_memory_heap_max__size: 384m
+  NEO4J_server_memory_pagecache_size: 128m
+  NEO4J_dbms_cluster_endpoints: neo4j-1:6000,neo4j-2:6000,neo4j-3:6000
+  NEO4J_initial_dbms_default__primaries__count: "3"
+
+services:
+  neo4j-1:
+    <<: *neo4j
+    container_name: neo4j-1
+    hostname: neo4j-1
+    environment:
+      <<: *env
+      NEO4J_server_default__advertised__address: neo4j-1
+    ports:
+      - "127.0.0.1:17474:7474" # HTTP + Browser
+      - "127.0.0.1:17687:7687" # Bolt
+    volumes: [neo4j-1:/data, ./cypher:/cypher:ro]
+  neo4j-2:
+    <<: *neo4j
+    container_name: neo4j-2
+    hostname: neo4j-2
+    environment:
+      <<: *env
+      NEO4J_server_default__advertised__address: neo4j-2
+    volumes: [neo4j-2:/data, ./cypher:/cypher:ro]
+  neo4j-3:
+    <<: *neo4j
+    container_name: neo4j-3
+    hostname: neo4j-3
+    environment:
+      <<: *env
+      NEO4J_server_default__advertised__address: neo4j-3
+    volumes: [neo4j-3:/data, ./cypher:/cypher:ro]
+
+volumes:
+  neo4j-1:
+  neo4j-2:
+  neo4j-3:
