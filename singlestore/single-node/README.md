@@ -118,3 +118,10 @@ Point selects on the in-memory rowstore are fast even under emulation (28k/s, p9
 range and aggregate statements in `oltp_read_only` / `read_write` hit a ~54 ms p99 tail, and the
 columnstore scans cost 50-190 ms warm. A range query that the sort key prunes (`range_one_week`)
 takes 3.8 ms. Expect much better numbers on native x86-64.
+
+### Future work
+
+Run one common sysbench workload set (same scripts, table count/size, thread counts and duration)
+across every sysbench-capable example — TiDB, OceanBase (single node and cluster), SingleStore and
+RonDB over the MySQL protocol, YugabyteDB YSQL and CedarDB with sysbench's `pgsql` driver — so their
+numbers compare directly. Today each example uses its own parameters.
