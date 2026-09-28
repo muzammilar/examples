@@ -1,0 +1,35 @@
+# YDB configuration V2, insecure mode (no TLS, no auth) for local testing.
+# Three storage hosts, each its own "data center" with three sparse file-backed
+# disks: the smallest layout that satisfies mirror-3-dc.
+metadata:
+  kind: MainConfig
+  cluster: ""
+  version: 0
+config:
+  erasure: mirror-3-dc
+  fail_domain_type: disk
+  self_management_config:
+    enabled: true
+  default_disk_type: SSD
+  host_configs:
+    - host_config_id: 1
+      drive:
+        - path: /ydb_data/disk1.data
+          type: SSD
+        - path: /ydb_data/disk2.data
+          type: SSD
+        - path: /ydb_data/disk3.data
+          type: SSD
+  hosts:
+    - host: ydb-storage-1
+      host_config_id: 1
+      location: { body: 1, data_center: zone-a, rack: "1" }
+    - host: ydb-storage-2
+      host_config_id: 1
+      location: { body: 2, data_center: zone-b, rack: "2" }
+    - host: ydb-storage-3
+      host_config_id: 1
+      location: { body: 3, data_center: zone-c, rack: "3" }
+  actor_system_config:
+    use_auto_config: true
+    cpu_count: 2
