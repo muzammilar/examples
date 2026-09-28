@@ -50,15 +50,30 @@ search `ef=64`. Defaults: `N=100000`; `SMOKE=1` uses `N=10000`; override with `N
 `results/qdrant-<timestamp>.json` (git-ignored) with the Qdrant version, parameters, and the
 CPU count and memory of the Docker VM.
 
+**Resource budget.** For the run [`bench/limits.sh`](bench/limits.sh) caps the `qdrant`
+container at `BENCH_CPUS=4` / `BENCH_MEM=6g` (no swap) with `docker update`, and restores the
+old limits afterwards. Docker cannot remove a memory limit from a running container, so
+"unlimited" comes back as the Docker VM's total memory; `make down && make up` starts clean.
+The bench client has `cpus: 2` in compose (`BENCH_CLIENT_CPUS`), so the 8-client search is partly
+bound by the client. The JSON records the applied limits under `limits`. The limit is set on a
+running server: Qdrant sized its search and optimizer thread pools at startup from the VM's CPUs,
+so it runs more threads than it has CPU quota. The cgroup still caps the CPU time it gets.
+
 ### Sample results
 
-TODO: fill from a run on a quiet machine (`make benchmark`, N=100000, dim 128).
+2026-09-28, `make benchmark` (N=100000, dim 128), Docker Desktop 29.5.3 on an Apple M4 Pro
+(Docker VM: 11 CPUs, 24.4 GB, aarch64, native image), Qdrant 1.19.1 capped at 4 CPUs / 6 GB,
+client 2 CPUs.
 
 | metric | value |
 | --- | --- |
-| insert (vec/s) | TODO |
-| time to queryable (s) | TODO |
-| search, 1 client: QPS / p50 / p99 (ms) | TODO |
-| search, 8 clients: QPS / p50 / p99 (ms) | TODO |
-| filtered (~10%), 1 client: QPS / p50 / p99 (ms) | TODO |
-| recall@10 / filtered recall@10 | TODO |
+| insert (vec/s) | 53,369 (1.9 s) |
+| time to queryable (s) | 10.6 (HNSW build) |
+| search, 1 client: QPS / p50 / p99 (ms) | 1,419 / 0.69 / 0.90 |
+| search, 8 clients: QPS / p50 / p99 (ms) | 3,209 / 1.75 / 24.3 |
+| filtered (~10%), 1 client: QPS / p50 / p99 (ms) | 1,979 / 0.50 / 0.66 |
+| recall@10 / filtered recall@10 | 0.591 / 0.945 |
+
+Ingest is fast and filtered search is cheap: the payload index shrinks the candidate set, so
+it is faster and more accurate than unfiltered search. Uniform random 128-d vectors are a worst
+case for HNSW, so recall@10 at `ef=64` is only 0.59. Raise `ef` for real use.
