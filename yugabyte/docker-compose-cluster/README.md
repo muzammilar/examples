@@ -219,3 +219,10 @@ Add sysbench (`--db-driver=pgsql`) with one common workload set (same scripts, t
 thread counts and duration) shared by every sysbench-capable example — TiDB, OceanBase (single node
 and cluster), SingleStore, RonDB, YugabyteDB YSQL and CedarDB — so their numbers compare directly.
 This example currently uses its own tool and parameters.
+
+Also run one standardized benchmark everywhere: TPC-C (e.g. with [go-tpc](https://github.com/pingcap/go-tpc),
+which speaks MySQL and PostgreSQL, or [BenchBase](https://github.com/cmu-db/benchbase)) with the same number
+of warehouses, threads, duration and think-time setting for every system. The warehouse count sets the data
+size and the contention: with the spec's keying/think times, throughput is capped at about 12.86 tpmC per
+warehouse (the YDB example's 10-warehouse run reached 127 tpmC, i.e. that cap, not its limit), so a comparison
+needs either enough warehouses or think time disabled, applied the same way to each database.
