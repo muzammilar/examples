@@ -62,11 +62,27 @@ with time-based ids, so they never collide with `client/demo.py` (ledger 1, ids 
 `make test` still passes afterwards. All three replicas and the client share one Docker VM (and
 its disk), so this measures the example, not TigerBeetle on dedicated machines.
 
+**Resource budget.** For the run [`bench/limits.sh`](bench/limits.sh) gives the three
+replicas `BENCH_CPUS=6` / `BENCH_MEM=12g` in total, 2 CPUs / 4 GB each (no swap)
+with `docker update` and restores the old limits afterwards. Docker cannot remove a memory limit from a running
+container, so "unlimited" goes back as the Docker VM's total memory; `make down && make up`
+starts clean. The bench client has `cpus: 2` in compose (`BENCH_CLIENT_CPUS`). The JSON records
+the applied limits under `limits`. A replica allocates its ~2.3 GiB up front and runs its state
+machine on a single core, so the memory cap is well above that floor and the extra CPUs mostly go
+to I/O.
+
 ### Sample results
 
-TODO: numbers from a quiet machine.
+2026-09-28, `make benchmark` (defaults), Docker Desktop 29.5.3 on an Apple M4 Pro (Docker VM:
+11 CPUs, 24.4 GB, aarch64, native image), TigerBeetle 0.17.9, 6 CPUs / 12 GB in total, 2 CPUs / 4 GB per replica,
+client 2 CPUs.
 
-| setup | transfers | transfers/s | batch p50 ms | batch p99 ms |
-|-------|----------:|------------:|-------------:|-------------:|
-| 3 replicas (this example) | 1,000,000 | TODO | TODO | TODO |
-| 1 replica ([single-node](../single-node)) | 1,000,000 | TODO | TODO | TODO |
+| setup | transfers | transfers/s | batch p50 ms | batch p99 ms | lookup p99 ms |
+|-------|----------:|------------:|-------------:|-------------:|--------------:|
+| 3 replicas (this example) | 1,000,000 | 380,543 | 14 | 50 | 58 |
+| 1 replica ([single-node](../single-node)) | 1,000,000 | 689,128 | 6 | 26 | 25 |
+
+`lookup` is `get_account_transfers`. A 3-replica cluster commits each batch on a quorum before
+it acks. That costs ~45% of the single replica's throughput and roughly doubles batch latency.
+Each run takes only 1.5 to 2.6 s, so repeat it, or raise `TRANSFERS`, before comparing small
+differences.

@@ -53,13 +53,23 @@ ACCOUNTS ?= 10000
 CLIENTS ?= 1
 BATCH ?= 8189
 
+# resource budget for `make benchmark` (bench/limits.sh): BENCH_CPUS / BENCH_MEM in total for the
+# database containers in BENCH_SPEC (equal shares; service=CPUS:MEM is a fixed amount), set with
+# `docker update` for the run and restored afterwards; the bench client has BENCH_CLIENT_CPUS
+BENCH_CPUS ?= 6
+BENCH_MEM ?= 12g
+BENCH_SPEC ?= tigerbeetle-0 tigerbeetle-1 tigerbeetle-2
+export BENCH_CLIENT_CPUS ?= 2
+
 benchmark:
 	@docker compose ps --status running --services | grep -qx tigerbeetle-0 || { echo 'run `make up` first'; exit 1; }
 	@mkdir -p results
-	@export NAME=tigerbeetle-cluster-$$(date -u +%Y%m%dT%H%M%SZ) TRANSFERS=$(TRANSFERS) ACCOUNTS=$(ACCOUNTS) \
+	@BENCH_LIMITS=$$(sh bench/limits.sh apply $(BENCH_CPUS) $(BENCH_MEM) $(BENCH_SPEC)) || { sh bench/limits.sh restore; exit 1; }; \
+	export BENCH_LIMITS NAME=tigerbeetle-cluster-$$(date -u +%Y%m%dT%H%M%SZ) TRANSFERS=$(TRANSFERS) ACCOUNTS=$(ACCOUNTS) \
 		CLIENTS=$(CLIENTS) BATCH=$(BATCH) HOST_INFO="$$(uname -sm)" \
 		DOCKER_INFO="$$(docker info --format 'Docker {{.ServerVersion}}, {{.NCPU}} CPUs, {{.MemTotal}} bytes')"; \
-	docker compose run --rm -T bench && docker compose run --rm -T bench-report
+	docker compose run --rm -T bench && docker compose run --rm -T bench-report; \
+	rc=$$?; sh bench/limits.sh restore; exit $$rc
 
 status:
 	docker compose ps --format 'table {{.Name}}\t{{.Status}}\t{{.Ports}}'
