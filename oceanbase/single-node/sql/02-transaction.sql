@@ -1,7 +1,8 @@
 USE demo;
 -- A transaction that writes to two HASH partitions of accounts and one RANGE partition
 -- of orders. OceanBase commits it atomically across every tablet it touched; when those
--- tablets' leaders live in different log streams / servers, commit is two-phase.
+-- tablets' leaders live in different log streams / servers, commit is two-phase. Here
+-- every tablet is in log stream 1001 on the one observer (sql/04), so it commits one-phase.
 BEGIN;
 UPDATE accounts SET balance = balance - 250 WHERE id = 1;
 UPDATE accounts SET balance = balance + 250 WHERE id = 2;

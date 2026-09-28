@@ -27,3 +27,10 @@ services:
       timeout: 10s
       retries: 60
       start_period: 5m
+
+  # sysbench for `make benchmark` (bench/run.sh); built from bench/Dockerfile, only
+  # started with `docker compose run`.
+  sysbench:
+    profiles: [bench]
+    build: ./bench
+    image: oceanbase-single-sysbench:1.0.20
