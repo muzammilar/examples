@@ -1,0 +1,75 @@
+name: oceanbase-cluster
+
+# Three observers, one per zone, from the official oceanbase-ce image. The image's own
+# entrypoint (obd, one server) is replaced by scripts/observer.sh, which starts the observer
+# binary directly; `make up` then runs scripts/bootstrap.sh once to bootstrap the cluster
+# over the three zones and create the MySQL-mode user tenant `test` with a full replica
+# in every zone (locality F@zone1,F@zone2,F@zone3).
+# The image is multi-arch (amd64 + arm64), so it runs natively on Apple silicon.
+
+x-observer: &observer
+  image: oceanbase/oceanbase-ce:${OB_VERSION:-4.4.2.1-101000022026050611}
+  entrypoint: ["/scripts/observer.sh"]
+  # Observers address each other by IP (rootservice list, BOOTSTRAP ... SERVER), so the
+  # addresses are fixed on a dedicated network.
+  environment: &observer-env
+    OB_CLUSTER_NAME: obcluster
+    OB_SYSLOG_LEVEL: ${OB_SYSLOG_LEVEL:-WARN}
+    OB_RS_LIST: 172.28.10.11:2882:2881;172.28.10.12:2882:2881;172.28.10.13:2882:2881
+    # memory_limit 6G is the smallest the single-node example could bootstrap with.
+    # cpu_count: CPUs the observer schedules with (sys tenant 1 + test 2 + headroom).
+    # __min_full_resource_pool_memory 1G (default 5G, which gives the sys unit 5G: bootstrap
+    # fails with 4624 "machine resource is not enough"); obd sets the same for small hosts.
+    # Logs: WARN level (OB_SYSLOG_LEVEL), 2 rotated 256 MB files per log.
+    OB_OPTS: >-
+      memory_limit=${OB_MEMORY_LIMIT:-6G},system_memory=${OB_SYSTEM_MEMORY:-1G},datafile_size=${OB_DATAFILE_SIZE:-2G},log_disk_size=${OB_LOG_DISK_SIZE:-4G},cpu_count=${OB_CPU_COUNT:-4},enable_syslog_recycle=True,max_syslog_file_count=2,enable_syslog_wf=False,enable_record_trace_log=False,__min_full_resource_pool_memory=1073741824
+  volumes:
+    - ./scripts:/scripts:ro
+    - ./sql:/sql:ro
+  healthcheck:
+    # Listening on the MySQL port (before bootstrap, root@sys can already log in).
+    test: ["CMD-SHELL", "obclient -h127.1 -P2881 -uroot@sys -A -e 'SELECT 1' >/dev/null 2>&1"]
+    interval: 5s
+    timeout: 5s
+    retries: 60
+    start_period: 2m
+  # Data lives under /root/ob in the container layer: it survives `docker stop/start`
+  # (make failover) and is discarded by `make down`.
+
+services:
+  ob1:
+    <<: *observer
+    container_name: ob1
+    hostname: ob1
+    environment: {<<: *observer-env, OB_ZONE: zone1}
+    networks: {ob: {ipv4_address: 172.28.10.11}}
+    ports: ["${OB1_PORT:-2881}:2881"]
+  ob2:
+    <<: *observer
+    container_name: ob2
+    hostname: ob2
+    environment: {<<: *observer-env, OB_ZONE: zone2}
+    networks: {ob: {ipv4_address: 172.28.10.12}}
+    ports: ["${OB2_PORT:-2891}:2881"]
+  ob3:
+    <<: *observer
+    container_name: ob3
+    hostname: ob3
+    environment: {<<: *observer-env, OB_ZONE: zone3}
+    networks: {ob: {ipv4_address: 172.28.10.13}}
+    ports: ["${OB3_PORT:-2901}:2881"]
+
+  # sysbench for `make benchmark` (bench/run.sh); built from bench/Dockerfile, only
+  # started with `docker compose run`.
+  sysbench:
+    profiles: [bench]
+    cpus: ${BENCH_CLIENT_CPUS:-2}
+    build: ./bench
+    image: oceanbase-cluster-sysbench:1.0.20
+    networks: [ob]
+
+networks:
+  ob:
+    ipam:
+      config:
+        - subnet: 172.28.10.0/24

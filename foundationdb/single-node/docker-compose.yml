@@ -1,0 +1,16 @@
+name: foundationdb-single
+
+services:
+  fdb:
+    # 7.3.79 is the newest 7.3 patch (GitHub marks it pre-release; 7.3.77 is the latest
+    # non-pre-release). The 7.4.x line also exists; 7.3 stays here as the stable line.
+    image: foundationdb/foundationdb:${FDB_VERSION:-7.3.79}
+    container_name: fdb
+    hostname: fdb
+    environment:
+      FDB_NETWORKING_MODE: container
+      FDB_PORT: 4500
+    volumes:
+      - fdb-data:/var/fdb/data
+volumes:
+  fdb-data:

@@ -1,0 +1,6 @@
+USE demo;
+INSERT VERTEX person (name, age) VALUES "alice":("Alice", 31), "bob":("Bob", 27), "carol":("Carol", 45), "dave":("Dave", 22);
+INSERT EDGE follows (degree) VALUES "alice"->"bob":(90), "alice"->"carol":(60), "bob"->"dave":(75), "carol"->"dave":(40);
+# Indexes only cover data written after they exist; rebuild picks up the rest.
+REBUILD TAG INDEX person_by_age;
+:sleep 3

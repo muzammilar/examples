@@ -1,0 +1,12 @@
+[project]
+name = "weaviate-bench"
+version = "0.1.0"
+description = "Vector search benchmark for the Weaviate example (make benchmark)"
+requires-python = ">=3.13"
+dependencies = [
+    "weaviate-client==4.23.1",
+    "numpy==2.5.3",
+]
+
+[tool.uv]
+package = false

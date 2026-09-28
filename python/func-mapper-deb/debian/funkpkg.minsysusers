@@ -1,0 +1,3 @@
+# sysusers.d(5) format (dh-sysuser minsysusers), installed as /usr/lib/sysusers.d/funkpkg.conf
+# (no GECOS: minsysusers keeps the quotes of a quoted one and ignores home/shell after an unquoted one)
+u funkuser - - /nonexistent /usr/sbin/nologin

@@ -1,0 +1,11 @@
+[project]
+name = "nebula-graph-bench"
+version = "0.1.0"
+description = "Graph benchmark for the NebulaGraph example (make benchmark)"
+requires-python = ">=3.13"
+dependencies = [
+    "nebula3-python==3.8.3",
+]
+
+[tool.uv]
+package = false

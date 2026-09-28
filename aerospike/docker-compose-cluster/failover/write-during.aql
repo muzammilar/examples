@@ -1,0 +1,6 @@
+-- written while aerospike-3 is down
+INSERT INTO test.failover (PK, v) VALUES ('r11', 'during')
+INSERT INTO test.failover (PK, v) VALUES ('r12', 'during')
+INSERT INTO test.failover (PK, v) VALUES ('r13', 'during')
+INSERT INTO test.failover (PK, v) VALUES ('r14', 'during')
+INSERT INTO test.failover (PK, v) VALUES ('r15', 'during')

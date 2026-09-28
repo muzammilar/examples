@@ -1,0 +1,7 @@
+writemode on
+set hello world
+set foo bar
+get hello
+getrange "" \xff
+clear foo
+getrange "" \xff

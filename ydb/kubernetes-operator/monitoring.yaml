@@ -1,0 +1,21 @@
+# ServiceMonitors for every storage and database node; `release: prom` matches
+# the default selector of the kube-prometheus-stack release installed by `make up`.
+apiVersion: ydb.tech/v1alpha1
+kind: StorageMonitoring
+metadata:
+  name: storage
+  labels:
+    release: prom
+spec:
+  storageRef:
+    name: storage
+---
+apiVersion: ydb.tech/v1alpha1
+kind: DatabaseMonitoring
+metadata:
+  name: database
+  labels:
+    release: prom
+spec:
+  databaseRef:
+    name: database

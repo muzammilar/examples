@@ -1,0 +1,9 @@
+// Insert schemaless documents; _key doubles as the primary key.
+FOR p IN [
+  { _key: "alice", name: "Alice", age: 34, city: "Berlin", tags: ["dev", "rust"] },
+  { _key: "bob",   name: "Bob",   age: 28, city: "Paris" },
+  { _key: "carol", name: "Carol", age: 41, city: "Berlin", tags: ["ops"] },
+  { _key: "dave",  name: "Dave",  age: 25, city: "Lisbon" }
+]
+  INSERT p INTO people OPTIONS { overwriteMode: "replace" }
+  RETURN NEW._key

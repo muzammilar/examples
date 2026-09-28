@@ -1,0 +1,4 @@
+// Graph traversal: who does Alice reach in 1..3 hops through the named graph?
+FOR v, e, path IN 1..3 OUTBOUND "people/alice" GRAPH "social"
+  OPTIONS { uniqueVertices: "global", order: "bfs" }
+  RETURN { name: v.name, hops: LENGTH(path.edges), via: path.vertices[*].name }
