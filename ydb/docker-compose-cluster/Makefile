@@ -1,4 +1,13 @@
-.PHONY: up dashboards init test failover status cli down
+.PHONY: up dashboards init test benchmark failover status cli down
+
+# `make benchmark`: YDB CLI kv + stock workloads; SMOKE=1 for a quick run
+SMOKE ?=
+BENCH_TIME ?= $(if $(SMOKE),10,60)
+BENCH_THREADS ?= $(if $(SMOKE),8,4 16 64)
+BENCH_KV_ROWS ?= $(if $(SMOKE),1000,10000)
+BENCH_PRODUCTS ?= 100
+BENCH_ORDERS ?= $(if $(SMOKE),1000,10000)
+BENCH_PARTITIONS ?= 4
 
 # upstream dashboards from YDB's ydb-prometheus Helm chart, at the release tag of our image
 YDB_REF := 26.2.1.14
@@ -31,6 +40,13 @@ init:
 # YDB runs DDL and DML as separate queries, hence one file each
 test:
 	for f in sql/*.sql; do echo "-- $$f"; cat $$f; $(YDB) $(DB) sql -f - < $$f || exit 1; done
+
+# init the kv and stock workload tables, run each workload x thread count for
+# BENCH_TIME seconds, print txs/s + latency percentiles, clean up; raw + JSON in results/
+benchmark:
+	BENCH_TIME='$(BENCH_TIME)' BENCH_THREADS='$(BENCH_THREADS)' BENCH_KV_ROWS='$(BENCH_KV_ROWS)' \
+		BENCH_PRODUCTS='$(BENCH_PRODUCTS)' BENCH_ORDERS='$(BENCH_ORDERS)' \
+		BENCH_PARTITIONS='$(BENCH_PARTITIONS)' bench/run.sh
 
 # stop one storage node (zone-c) and one dynamic node: mirror-3-dc keeps /Root/testdb
 # serving through ydb-dynamic-1 while the viewer reports DEGRADED; then bring both back
