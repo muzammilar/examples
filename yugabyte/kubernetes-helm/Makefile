@@ -1,3 +1,5 @@
+.PHONY: up kind-cluster chart test status cli cli-ycql ui down
+
 CLUSTER_NAME := yugabyte
 NAMESPACE := yb-demo
 RELEASE := yb-demo
@@ -9,8 +11,6 @@ TSERVER := $(KUBECTL) -n $(NAMESPACE) exec -i yb-tserver-0 -c yb-tserver --
 HOST := yb-tserver-0.yb-tservers.$(NAMESPACE)
 MASTERS := yb-master-0.yb-masters.$(NAMESPACE):7100,yb-master-1.yb-masters.$(NAMESPACE):7100,yb-master-2.yb-masters.$(NAMESPACE):7100
 
-.PHONY: up test status cli cli-ycql ui down kind-cluster chart
-
 up: kind-cluster chart
 
 # Side-loads the image when it is already in the local Docker (saves a ~850 MB pull).
@@ -21,12 +21,14 @@ kind-cluster:
 		docker save --platform linux/$$(docker version --format '{{.Server.Arch}}') $(IMAGE) | \
 		docker exec -i $(CLUSTER_NAME)-control-plane ctr -n k8s.io images import --digests -; fi
 
+# once the pods are ready, YSQL gets 60 x 5 s to answer; the final check fails the target
 chart:
 	helm repo add yugabytedb https://charts.yugabyte.com >/dev/null 2>&1 || true
 	helm repo update yugabytedb
 	$(HELM) upgrade --install $(RELEASE) yugabytedb/yugabyte --version $(CHART_VERSION) \
 		--namespace $(NAMESPACE) --create-namespace -f values.yaml --wait --timeout 15m
-	until $(TSERVER) ysqlsh -h $(HOST) -c 'SELECT 1' >/dev/null 2>&1; do sleep 5; done
+	for i in $$(seq 60); do $(TSERVER) ysqlsh -h $(HOST) -c 'SELECT 1' >/dev/null 2>&1 && break; sleep 5; done
+	$(TSERVER) ysqlsh -h $(HOST) -c 'SELECT 1' >/dev/null
 	$(KUBECTL) -n $(NAMESPACE) get pods -o wide
 
 # ysql/*.sql through ysqlsh, ycql/*.cql through ycqlsh
