@@ -1,0 +1,112 @@
+name: arangodb-cluster
+
+# ArangoDB cluster, one arangod per container and role: 3 agents (the agency, Raft),
+# 3 DB-servers (hold the shards), 2 coordinators (stateless API + AQL front ends).
+# Members authenticate to each other with a shared JWT secret; root password is "demo".
+
+x-arangod: &arangod
+  image: arangodb:${ARANGODB_VERSION:-3.12.12}
+  environment:
+    # skip the image's single-server init (it would start this arangod standalone once);
+    # authentication stays on (the entrypoint passes --server.authentication=true)
+    SKIP_DATABASE_INIT: "1"
+    # root password set when the coordinators bootstrap the cluster's _system database
+    ARANGODB_DEFAULT_ROOT_PASSWORD: demo
+    # size caches for 1 GiB per process instead of the whole Docker VM
+    ARANGODB_OVERRIDE_DETECTED_TOTAL_MEMORY: 1G
+  volumes:
+    - ./secrets/jwt-secret:/secrets/jwt-secret:ro
+  healthcheck:
+    # superuser JWT from the shared secret, so this works on every role
+    test: ["CMD", "arangosh", "--server.jwt-secret-keyfile", "/secrets/jwt-secret", "--quiet",
+           "--javascript.execute-string", "var r = arango.GET('/_admin/server/availability'); if (r.error) throw r;"]
+    interval: 3s
+    timeout: 10s
+    retries: 60
+    start_period: 5s
+
+x-agent: &agent
+  <<: *arangod
+  entrypoint: ["/entrypoint.sh", "arangod",
+    "--server.jwt-secret-keyfile", "/secrets/jwt-secret",
+    "--agency.activate", "true",
+    "--agency.size", "3",
+    "--agency.supervision", "true",
+    "--agency.endpoint", "tcp://agent-1:8529",
+    "--agency.endpoint", "tcp://agent-2:8529",
+    "--agency.endpoint", "tcp://agent-3:8529"]
+
+x-member: &member
+  <<: *arangod
+  entrypoint: ["/entrypoint.sh", "arangod",
+    "--server.jwt-secret-keyfile", "/secrets/jwt-secret",
+    "--cluster.agency-endpoint", "tcp://agent-1:8529",
+    "--cluster.agency-endpoint", "tcp://agent-2:8529",
+    "--cluster.agency-endpoint", "tcp://agent-3:8529"]
+  depends_on: [agent-1, agent-2, agent-3]
+
+services:
+  agent-1:
+    <<: *agent
+    container_name: arangodb-agent-1
+    hostname: agent-1
+    command: ["--agency.my-address", "tcp://agent-1:8529"]
+    volumes: [agent-1-data:/var/lib/arangodb3, ./secrets/jwt-secret:/secrets/jwt-secret:ro]
+  agent-2:
+    <<: *agent
+    container_name: arangodb-agent-2
+    hostname: agent-2
+    command: ["--agency.my-address", "tcp://agent-2:8529"]
+    volumes: [agent-2-data:/var/lib/arangodb3, ./secrets/jwt-secret:/secrets/jwt-secret:ro]
+  agent-3:
+    <<: *agent
+    container_name: arangodb-agent-3
+    hostname: agent-3
+    command: ["--agency.my-address", "tcp://agent-3:8529"]
+    volumes: [agent-3-data:/var/lib/arangodb3, ./secrets/jwt-secret:/secrets/jwt-secret:ro]
+
+  dbserver-1:
+    <<: *member
+    container_name: arangodb-dbserver-1
+    hostname: dbserver-1
+    command: ["--cluster.my-role", "DBSERVER", "--cluster.my-address", "tcp://dbserver-1:8529"]
+    volumes: [dbserver-1-data:/var/lib/arangodb3, ./secrets/jwt-secret:/secrets/jwt-secret:ro]
+  dbserver-2:
+    <<: *member
+    container_name: arangodb-dbserver-2
+    hostname: dbserver-2
+    command: ["--cluster.my-role", "DBSERVER", "--cluster.my-address", "tcp://dbserver-2:8529"]
+    volumes: [dbserver-2-data:/var/lib/arangodb3, ./secrets/jwt-secret:/secrets/jwt-secret:ro]
+  dbserver-3:
+    <<: *member
+    container_name: arangodb-dbserver-3
+    hostname: dbserver-3
+    command: ["--cluster.my-role", "DBSERVER", "--cluster.my-address", "tcp://dbserver-3:8529"]
+    volumes: [dbserver-3-data:/var/lib/arangodb3, ./secrets/jwt-secret:/secrets/jwt-secret:ro]
+
+  coordinator-1:
+    <<: *member
+    container_name: arangodb-coordinator-1
+    hostname: coordinator-1
+    command: ["--cluster.my-role", "COORDINATOR", "--cluster.my-address", "tcp://coordinator-1:8529"]
+    ports:
+      - "127.0.0.1:8539:8529" # HTTP API + web UI
+    volumes: [coordinator-1-data:/var/lib/arangodb3, ./secrets/jwt-secret:/secrets/jwt-secret:ro, ./js:/js:ro, ./failover:/failover:ro]
+  coordinator-2:
+    <<: *member
+    container_name: arangodb-coordinator-2
+    hostname: coordinator-2
+    command: ["--cluster.my-role", "COORDINATOR", "--cluster.my-address", "tcp://coordinator-2:8529"]
+    ports:
+      - "127.0.0.1:8540:8529"
+    volumes: [coordinator-2-data:/var/lib/arangodb3, ./secrets/jwt-secret:/secrets/jwt-secret:ro]
+
+volumes:
+  agent-1-data:
+  agent-2-data:
+  agent-3-data:
+  dbserver-1-data:
+  dbserver-2-data:
+  dbserver-3-data:
+  coordinator-1-data:
+  coordinator-2-data:
