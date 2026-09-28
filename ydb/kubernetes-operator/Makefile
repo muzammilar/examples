@@ -2,11 +2,17 @@ CLUSTER_NAME := ydb-operator
 NAMESPACE := ydb
 OPERATOR_VERSION := 0.8.0
 PROM_STACK_VERSION := 91.8.0
-YDB_IMAGE := cr.yandex/crptqonuodf51kdj7a7d/ydb:24.2.7
+YDB_IMAGE := cr.yandex/crptqonuodf51kdj7a7d/ydb:26.2.1.14
 YDB_IMAGE_TAR ?= ydb.tar
+# the operator image is on cr.yandex too (37 MB, but its pull alone took ~10 min in a test)
+OPERATOR_IMAGE := cr.yandex/yc/ydb-kubernetes-operator:$(OPERATOR_VERSION)
 KUBECTL := kubectl --context kind-$(CLUSTER_NAME)
 HELM := helm --kube-context kind-$(CLUSTER_NAME)
-YDB = $(KUBECTL) -n $(NAMESPACE) exec -i database-0 -c ydb-dynamic -- /opt/ydb/bin/ydb -e grpc://localhost:2135 -d /Root/database
+YDB_EXEC = $(KUBECTL) -n $(NAMESPACE) exec -i database-0 -c ydb-dynamic -- /opt/ydb/bin/ydb
+YDB = $(YDB_EXEC) -e grpc://localhost:2135 -d /Root/database
+# the CLI checks for a newer release on every call (and warns: the image has no curl);
+# `version --disable-checks` turns that off for the pod's ydb user
+NO_VERSION_CHECK = $(YDB_EXEC) version --disable-checks >/dev/null
 
 .PHONY: up test status cli grafana down kind-cluster prometheus operator cluster monitoring
 
@@ -15,13 +21,16 @@ up: kind-cluster prometheus operator cluster monitoring
 # cr.yandex can be slow from outside Russia; if the image is already in local
 # Docker (`docker pull $(YDB_IMAGE)`), or saved to $(YDB_IMAGE_TAR)
 # (`docker save --platform linux/amd64 -o ydb.tar $(YDB_IMAGE)`), copy it onto
-# every kind worker instead (--digests also registers it under its digest).
+# every kind worker instead (--digests also registers it under its digest). The same
+# for $(OPERATOR_IMAGE) if it is in local Docker (`docker pull --platform linux/amd64`).
 kind-cluster:
 	kind get clusters | grep -qx $(CLUSTER_NAME) || kind create cluster --config kind-config.yaml
 	for n in $$(kind get nodes --name $(CLUSTER_NAME) | grep worker); do \
 		if [ -f "$(YDB_IMAGE_TAR)" ]; then docker exec -i $$n ctr -n k8s.io images import --digests - < $(YDB_IMAGE_TAR); \
 		elif docker image inspect $(YDB_IMAGE) >/dev/null 2>&1; then \
-			docker save --platform linux/amd64 $(YDB_IMAGE) | docker exec -i $$n ctr -n k8s.io images import --digests -; fi; done
+			docker save --platform linux/amd64 $(YDB_IMAGE) | docker exec -i $$n ctr -n k8s.io images import --digests -; fi; \
+		if docker image inspect $(OPERATOR_IMAGE) >/dev/null 2>&1; then \
+			docker save --platform linux/amd64 $(OPERATOR_IMAGE) | docker exec -i $$n ctr -n k8s.io images import --digests -; fi; done
 	$(KUBECTL) create namespace $(NAMESPACE) --dry-run=client -o yaml | $(KUBECTL) apply -f -
 
 # Prometheus, Grafana and the ServiceMonitor CRD the YDB monitoring objects need.
@@ -54,17 +63,20 @@ cluster:
 monitoring:
 	$(KUBECTL) -n $(NAMESPACE) apply -f monitoring.yaml
 
-# YDB runs DDL and DML as separate queries, hence one file each; the CLI in
-# 24.2 (2.8) has `yql` rather than `sql` and no `-f -`
+# YDB runs DDL and DML as separate queries (mixing them in one fails with "Queries
+# with mixed data and scheme operations are not supported"), hence one file each
 test:
-	for f in sql/*.sql; do echo; echo "==== $$f"; cat $$f; $(YDB) yql -f /dev/stdin < $$f || exit 1; done
+	@$(NO_VERSION_CHECK)
+	for f in sql/*.sql; do echo; echo "==== $$f"; cat $$f; $(YDB) sql -f - < $$f || exit 1; done
 
 status:
+	@$(NO_VERSION_CHECK)
 	$(YDB) discovery list
 	$(KUBECTL) -n $(NAMESPACE) get storage,database
 
 # no subcommand = interactive mode
 cli:
+	@$(NO_VERSION_CHECK)
 	$(KUBECTL) -n $(NAMESPACE) exec -it database-0 -c ydb-dynamic -- /opt/ydb/bin/ydb -e grpc://localhost:2135 -d /Root/database
 
 # http://localhost:3000; the chart generates the admin password. Grafana is
