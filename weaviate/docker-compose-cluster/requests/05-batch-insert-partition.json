@@ -1,0 +1,5 @@
+{
+  "objects": [
+    { "class": "Landmark", "id": "00000000-0000-0000-0000-000000000010", "vector": [0.62, 0.20, 0.05, 0.77], "properties": { "name": "Taj Mahal", "city": "Agra" } }
+  ]
+}

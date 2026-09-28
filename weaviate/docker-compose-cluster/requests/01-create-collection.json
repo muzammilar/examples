@@ -1,0 +1,12 @@
+{
+  "class": "Landmark",
+  "vectorizer": "none",
+  "vectorIndexType": "hnsw",
+  "vectorIndexConfig": { "distance": "cosine" },
+  "shardingConfig": { "desiredCount": 3 },
+  "replicationConfig": { "factor": 3 },
+  "properties": [
+    { "name": "name", "dataType": ["text"] },
+    { "name": "city", "dataType": ["text"], "tokenization": "field" }
+  ]
+}

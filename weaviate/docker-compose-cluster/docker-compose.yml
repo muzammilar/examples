@@ -1,0 +1,84 @@
+name: weaviate-cluster
+
+# Three Weaviate nodes. Membership and node addresses travel over memberlist gossip
+# (CLUSTER_GOSSIP_BIND_PORT, CLUSTER_DATA_BIND_PORT = gossip + 1); node2 and node3 join
+# node1's gossip port with CLUSTER_JOIN. The schema and shard placement are kept in Raft
+# (RAFT_JOIN lists the voters by CLUSTER_HOSTNAME; RAFT_BOOTSTRAP_EXPECT=3 waits for all
+# three before electing a leader), so the nodes start together, not one after another.
+x-weaviate: &weaviate
+  image: semitechnologies/weaviate:${WEAVIATE_VERSION:-1.39.7}
+  command: ["--host", "0.0.0.0", "--port", "8080", "--scheme", "http"]
+  healthcheck:
+    test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:8080/v1/.well-known/ready"]
+    interval: 5s
+    timeout: 3s
+    retries: 30
+
+x-env: &env
+  AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: "true"
+  DEFAULT_VECTORIZER_MODULE: none # vectors are supplied by the client
+  PERSISTENCE_DATA_PATH: /var/lib/weaviate
+  QUERY_DEFAULTS_LIMIT: 10
+  DISABLE_TELEMETRY: "true" # no usage reports to Weaviate
+  CLUSTER_GOSSIP_BIND_PORT: "7100"
+  CLUSTER_DATA_BIND_PORT: "7101"
+  RAFT_JOIN: node1,node2,node3
+  RAFT_BOOTSTRAP_EXPECT: "3"
+
+services:
+  weaviate-1:
+    <<: *weaviate
+    container_name: weaviate-1
+    hostname: weaviate-1
+    environment:
+      <<: *env
+      CLUSTER_HOSTNAME: node1
+    ports: # localhost only: anonymous access, no API key
+      - "127.0.0.1:18080:8080"   # REST + GraphQL
+      - "127.0.0.1:50151:50051" # gRPC (used by the v4 clients)
+    volumes:
+      - weaviate-1:/var/lib/weaviate
+
+  weaviate-2:
+    <<: *weaviate
+    container_name: weaviate-2
+    hostname: weaviate-2
+    environment:
+      <<: *env
+      CLUSTER_HOSTNAME: node2
+      CLUSTER_JOIN: weaviate-1:7100
+    ports: ["127.0.0.1:18081:8080"] # REST + GraphQL
+    volumes:
+      - weaviate-2:/var/lib/weaviate
+    depends_on: [weaviate-1]
+
+  weaviate-3:
+    <<: *weaviate
+    container_name: weaviate-3
+    hostname: weaviate-3
+    environment:
+      <<: *env
+      CLUSTER_HOSTNAME: node3
+      CLUSTER_JOIN: weaviate-1:7100
+    ports: ["127.0.0.1:18082:8080"] # REST + GraphQL
+    volumes:
+      - weaviate-3:/var/lib/weaviate
+    depends_on: [weaviate-1]
+
+  # curl + jq, used by `make test`, `make failover` and `make cli`; iptables for the
+  # partition step of `make failover` (run in weaviate-3's network namespace)
+  tools:
+    build:
+      dockerfile_inline: |
+        FROM alpine:3.22
+        RUN apk add --no-cache curl jq iptables
+    profiles: [tools]
+    working_dir: /work
+    volumes:
+      - ./requests:/work/requests:ro
+      - ./scripts:/work/scripts:ro
+
+volumes:
+  weaviate-1:
+  weaviate-2:
+  weaviate-3:

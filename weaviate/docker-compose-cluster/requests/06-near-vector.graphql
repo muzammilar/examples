@@ -1,0 +1,8 @@
+# consistencyLevel is substituted by scripts/lib.sh (ONE, QUORUM or ALL)
+{
+  Get {
+    Landmark(nearVector: { vector: [0.2, 0.1, 0.9, 0.7] }, limit: 3, consistencyLevel: CL) {
+      name city _additional { id distance }
+    }
+  }
+}
