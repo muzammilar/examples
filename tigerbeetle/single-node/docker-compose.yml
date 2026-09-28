@@ -1,0 +1,97 @@
+name: tigerbeetle-single
+
+# One replica (--replica-count=1), following docs.tigerbeetle.com/operating/deploying/docker:
+# `tigerbeetle format` creates the data file once, then `tigerbeetle start` serves it.
+# TigerBeetle needs io_uring, which Docker >= 25 blocks by default: seccomp=unconfined.
+x-tigerbeetle: &tigerbeetle
+  image: ghcr.io/tigerbeetle/tigerbeetle:${TIGERBEETLE_VERSION:-0.17.9}
+  security_opt: ["seccomp=unconfined"]
+  cap_add: [IPC_LOCK] # memory locking (docs: "On MacOS" / error: SystemResources)
+  volumes:
+    - tigerbeetle-data:/data
+
+services:
+  # One-shot: format the data file unless the volume already has one.
+  format:
+    <<: *tigerbeetle
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - >-
+        [ -f /data/0_0.tigerbeetle ] ||
+        /tigerbeetle format --cluster=0 --replica=0 --replica-count=1 /data/0_0.tigerbeetle
+
+  tigerbeetle:
+    <<: *tigerbeetle
+    container_name: tigerbeetle
+    # --cache-grid: the default 1 GiB grid cache is sized for a dedicated machine
+    command: start --addresses=0.0.0.0:3000 --cache-grid=256MiB /data/0_0.tigerbeetle
+    ports:
+      - "${TIGERBEETLE_PORT:-3033}:3000"
+    depends_on:
+      format: { condition: service_completed_successfully }
+    healthcheck:
+      test: ["CMD", "nc", "-z", "127.0.0.1", "3000"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+
+  # `make test`: the official Python client (pip install tigerbeetle) runs client/demo.py.
+  client:
+    build:
+      context: client
+      args:
+        TIGERBEETLE_VERSION: ${TIGERBEETLE_VERSION:-0.17.9}
+    profiles: [test]
+    security_opt: ["seccomp=unconfined"] # the client library uses io_uring too
+    # the client takes IP addresses only (no DNS), so share the replica's network namespace
+    network_mode: service:tigerbeetle
+    environment:
+      TB_ADDRESS: 127.0.0.1:3000
+    depends_on:
+      tigerbeetle: { condition: service_healthy }
+
+  # `make benchmark`: the built-in `tigerbeetle benchmark` load generator (bench/run.sh)
+  # against the replica; raw output to results/
+  bench:
+    image: ghcr.io/tigerbeetle/tigerbeetle:${TIGERBEETLE_VERSION:-0.17.9}
+    profiles: [bench]
+    cpus: ${BENCH_CLIENT_CPUS:-2}
+    security_opt: ["seccomp=unconfined"] # the client uses io_uring
+    network_mode: service:tigerbeetle    # IP addresses only, like the test client
+    entrypoint: ["sh", "/bench/run.sh"]
+    environment:
+      NAME: ${NAME:-}
+      ADDRESSES: 127.0.0.1:3000
+      TRANSFERS: ${TRANSFERS:-1000000}
+      ACCOUNTS: ${ACCOUNTS:-10000}
+      CLIENTS: ${CLIENTS:-1}
+      BATCH: ${BATCH:-8189}
+    volumes:
+      - ./bench:/bench:ro
+      - ./results:/results
+    depends_on:
+      tigerbeetle: { condition: service_healthy }
+
+  # `make benchmark`: parses the raw output (bench/report.py) into a table and results/*.json
+  bench-report:
+    image: ghcr.io/astral-sh/uv:0.12.19-python3.13-trixie-slim
+    profiles: [bench]
+    network_mode: none
+    working_dir: /bench
+    command: ["uv", "run", "--frozen", "report.py"]
+    environment:
+      UV_CACHE_DIR: /uv/cache          # the venv lives in the uv volume, so reruns skip creating it
+      UV_PROJECT_ENVIRONMENT: /uv/venv
+      UV_PYTHON_DOWNLOADS: never       # use the image's Python
+      NAME: ${NAME:-}
+      HOST_INFO: ${HOST_INFO:-}
+      DOCKER_INFO: ${DOCKER_INFO:-}
+      BENCH_LIMITS: ${BENCH_LIMITS:-}
+    volumes:
+      - ./bench:/bench:ro
+      - ./results:/results
+      - uv-cache:/uv
+
+volumes:
+  tigerbeetle-data:
+  uv-cache:
