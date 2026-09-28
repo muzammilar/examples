@@ -1,4 +1,4 @@
-"""Milvus as a vector DB: schema, insert, index build + load, k-NN, filtered k-NN, range search."""
+"""Milvus as a vector DB: schema, insert + flush, index build + load, k-NN, filtered k-NN, range search."""
 import os
 from pymilvus import DataType, MilvusClient
 
@@ -33,6 +33,8 @@ rows = [
     {"id": 6, "vec": [0.35, 0.08, 0.11, 0.44], "city": "London",   "year": 1859},
 ]
 print(f"==> insert {len(rows)} rows:", client.insert(C, rows)["insert_count"])
+client.flush(C)  # seal the growing segment: persisted to object storage, counted in stats
+print("==> flush: row_count =", client.get_collection_stats(C)["row_count"])
 
 print("==> create_index: vec HNSW (M=8, efConstruction=64, COSINE); city INVERTED")
 idx = client.prepare_index_params()
