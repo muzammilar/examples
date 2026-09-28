@@ -13,6 +13,12 @@ services:
       - "3000:3000" # client
     volumes:
       - aerospike-data:/opt/aerospike/data
+    healthcheck: # `make up` waits for this (up --wait)
+      test: ["CMD-SHELL", "asinfo -v status | grep -q ok"]
+      interval: 2s
+      timeout: 5s
+      retries: 60
+      start_period: 5s
 
   # `make test` runs aql from here (the server image no longer ships it)
   tools:

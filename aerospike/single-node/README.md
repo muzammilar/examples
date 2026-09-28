@@ -13,4 +13,6 @@ make cli      # interactive asadm
 make down     # remove containers and the volume
 ```
 
+Community Edition has no authentication (users/roles) and no TLS; anyone who reaches port 3000 has full access.
+
 `aql/demo.lua` holds the two Lua UDFs; aql registers it from the tools container.
