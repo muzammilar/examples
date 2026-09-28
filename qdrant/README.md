@@ -3,6 +3,7 @@
 Website: https://qdrant.tech/
 
 - [`single-node/`](single-node) — one Qdrant server with Docker Compose: collection, payload index, k-NN, filtered search and the recommend API over REST.
+- [`docker-compose-cluster/`](docker-compose-cluster) — three Qdrant peers in distributed mode (Raft): a 3-shard, 2-replica collection, shard placement, and a failover demo (stop a peer, search and upsert keep working, its replicas recover to Active).
 
 ## Benchmark
 
