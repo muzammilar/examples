@@ -1,0 +1,3 @@
+grafana/provisioning/dashboards/upstream/
+results/
+bench/yb-sample-apps.jar*

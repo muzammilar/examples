@@ -1,0 +1,9 @@
+[project]
+name = "tigerbeetle-bench-report"
+version = "0.1.0"
+description = "Parses `tigerbeetle benchmark` output for make benchmark"
+requires-python = ">=3.13"
+dependencies = []
+
+[tool.uv]
+package = false
