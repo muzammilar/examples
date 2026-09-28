@@ -1,7 +1,13 @@
-.PHONY: up dashboards test failover status cli down
+.PHONY: up dashboards test failover benchmark status cli down
 
 # upstream dashboards from aerospike-monitoring (release tag)
 AEROSPIKE_MONITORING_REF := v3.20.0
+
+# make benchmark: seconds per timed workload, asbench threads, keys inserted (SMOKE=1: a short run)
+SMOKE ?=
+DURATION ?= $(if $(SMOKE),10,60)
+THREADS ?= 16
+KEYS ?= $(if $(SMOKE),100000,1000000)
 
 # aql exits 0 even on errors: print its output, fail on an "Error" line or when $(1) is missing
 AQL := docker compose run --rm -T tools aql -h aerospike-1 -f /dev/stdin
@@ -9,8 +15,10 @@ AQL_EXPECT = 2>&1 | awk -v need='$(1)' '{print} /^Error/{e=1} index($$0, need){o
 
 up: dashboards
 	docker compose up --detach
-	until docker exec aerospike-1 asinfo -v 'cluster-stable:size=3' 2>/dev/null | grep -qv ERROR; do sleep 1; done
-	@echo "cluster stable, size 3"
+	@for i in $$(seq 120); do \
+		docker exec aerospike-1 asinfo -v 'cluster-stable:size=3' 2>/dev/null | grep -qv ERROR && { echo "cluster stable, size 3"; exit 0; }; \
+		sleep 1; \
+	done; echo "cluster not stable at size 3 after 120 s (docker compose logs aerospike-1)"; exit 1
 
 # downloads into the gitignored grafana/provisioning/dashboards/upstream/ (skips existing files)
 dashboards:
@@ -24,6 +32,16 @@ test:
 
 # stop aerospike-3: replicas get promoted, every record stays readable and writable; then bring it back
 failover:
+	@echo "==> emptying set test.failover (left over from an earlier run)"
+	docker exec aerospike-1 asinfo -v 'truncate:namespace=test;set=failover'
+	@# truncate is applied cluster-wide in the background: wait until no node holds a record of the set
+	@for i in $$(seq 30); do \
+		n=0; for c in aerospike-1 aerospike-2 aerospike-3; do \
+			o=$$(docker exec $$c asinfo -v 'sets/test/failover' | tr ':;' '\n\n' | sed -n 's/^objects=//p'); \
+			n=$$((n + $${o:-0})); \
+		done; \
+		[ $$n = 0 ] && exit 0; sleep 1; \
+	done; echo "set test.failover still holds $$n records after 30 s"; exit 1
 	@echo "==> writing 10 records (all three nodes up)"
 	$(AQL) < failover/write-before.aql $(call AQL_EXPECT,record affected)
 	docker exec aerospike-1 asadm -e 'info namespace object'
@@ -46,6 +64,15 @@ failover:
 	docker exec aerospike-1 asadm -e 'info namespace object'
 	$(AQL) < failover/read.aql $(call AQL_EXPECT,15 rows in set)
 
+# asbench (aerospike-tools): insert KEYS records, then DURATION s read-only and 80/20 read/update;
+# prints a summary table, keeps results/aerospike-<UTC time>.{txt,json}
+benchmark:
+	@docker compose ps --status running --services | grep -qx aerospike-1 || { echo 'run `make up` first'; exit 1; }
+	@mkdir -p results
+	@export NAME=aerospike-$$(date -u +%Y%m%dT%H%M%SZ) DURATION=$(DURATION) THREADS=$(THREADS) KEYS=$(KEYS) \
+		HOST_INFO="$$(uname -sm)" DOCKER_INFO="$$(docker info --format 'Docker {{.ServerVersion}}, {{.NCPU}} CPUs, {{.MemTotal}} bytes')"; \
+	docker compose run --rm -T bench && docker compose run --rm -T bench-report
+
 status:
 	docker exec aerospike-1 asadm -e 'info'
 
@@ -53,4 +80,4 @@ cli:
 	docker exec -it aerospike-1 asadm
 
 down:
-	docker compose --profile tools down --volumes
+	docker compose --profile tools --profile bench down --volumes
