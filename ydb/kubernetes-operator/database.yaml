@@ -1,0 +1,25 @@
+# Database /Root/database served by three dynamic nodes, one per kind worker.
+apiVersion: ydb.tech/v1alpha1
+kind: Database
+metadata:
+  name: database
+spec:
+  image:
+    name: cr.yandex/crptqonuodf51kdj7a7d/ydb:24.2.7
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchExpressions:
+              - key: app.kubernetes.io/component
+                operator: In
+                values:
+                  - dynamic-node
+          topologyKey: "kubernetes.io/hostname"
+  nodes: 3
+  resources:
+    storageUnits:
+      - count: 1
+        unitKind: ssd
+  storageClusterRef:
+    name: storage
