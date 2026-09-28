@@ -201,6 +201,7 @@ def main(DB):
                    "max_in_degree": exp_top[0], "seed": SEED, "clients": CLIENTS,
                    "max_path_hops": MAX_HOPS, "db_settings": db.settings},
         "machine": machine(),
+        "limits": json.loads(os.environ.get("BENCH_LIMITS") or "null"),  # bench/limits.sh
         "results": {"load": load, "counts_after_load": counts, "queries": q},
     }
     m = res["machine"]

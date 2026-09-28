@@ -67,17 +67,35 @@ storaged to graphd; that design pays off when storaged is scaled out across mach
 which this single-node setup cannot show. For large imports the recommended tools are
 NebulaGraph Importer / Exchange; batched `INSERT` is the client-side path they use too.
 
+**Resource budget.** For the run [`bench/limits.sh`](bench/limits.sh) splits `BENCH_CPUS=4` /
+`BENCH_MEM=6g` (no swap) with `docker update`: `storaged` 2 CPUs / 3.5 GB (the data path),
+`graphd` 1.5 CPUs / 2 GB (query planning and execution), `metad` 0.5 CPU / 512 MB. The old
+limits come back afterwards. Docker cannot remove a memory limit from a running container, so
+"unlimited" returns as the Docker VM's total memory; `make down && make up` starts clean. The
+bench client has `cpus: 2` in compose (`BENCH_CLIENT_CPUS`). The JSON records the applied limits
+under `limits`. The daemons size their worker and IO thread pools from the host's cores at
+startup (the whole VM here), so they run more threads than they have CPU quota, and the cgroup
+caps the CPU time. `storaged` was the busy one, at its 2-CPU cap.
+
 ### Sample results
 
-TODO: fill in from a quiet machine (`make benchmark`, N=100k, ~950k edges).
+2026-09-28, `make benchmark` (N=100k, 952,309 edges), Docker Desktop 29.5.3 on an Apple M4 Pro
+(Docker VM: 11 CPUs, 24.4 GB, aarch64, native images), NebulaGraph 3.8.0, 4 CPUs / 6 GB split
+as above, client 2 CPUs.
 
 | metric | NebulaGraph |
 | --- | --- |
-| load persons (rows/s) | TODO |
-| load follows (rows/s) | TODO |
-| lookup by handle, 1 client: QPS / p99 ms | TODO |
-| lookup by handle, 8 clients: QPS / p99 ms | TODO |
-| 1-hop count p50 ms | TODO |
-| 2-hop count p50 ms | TODO |
-| shortest path p50 ms (% found) | TODO |
-| top-10 most-followed p50 ms | TODO |
+| load persons (rows/s) | 9,489 |
+| load follows (rows/s) | 173,136 |
+| lookup by handle, 1 client: QPS / p99 ms | 1,790 / 0.68 |
+| lookup by handle, 8 clients: QPS / p99 ms | 4,373 / 56.1 |
+| 1-hop count p50 ms | 0.51 |
+| 2-hop count p50 ms | 0.93 |
+| shortest path p50 ms (% found) | 2.50 (88%) |
+| top-10 most-followed p50 ms | 3,490 |
+
+Edges load fastest of the three graph examples (173k/s), and adjacency hops stay sub-millisecond.
+Vertex inserts that maintain the `handle` tag index are slow (9.5k/s), though. Global work is
+Nebula's weak spot: shortest path is 2-4x slower than the other two, and the top-10 aggregation
+over an edge-index scan takes 3.5 s, against ~0.1 s elsewhere. The 8-client p99 again reflects
+8 client processes on 2 CPUs.
