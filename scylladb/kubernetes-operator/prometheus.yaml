@@ -1,0 +1,21 @@
+# External Prometheus (managed by prometheus-operator) that picks up the
+# ServiceMonitors/PrometheusRules created by the ScyllaDBMonitoring below.
+apiVersion: monitoring.coreos.com/v1
+kind: Prometheus
+metadata:
+  name: prometheus
+  namespace: scylla
+spec:
+  serviceAccountName: prometheus
+  serviceName: prometheus
+  version: v3.15.0
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 65534
+    fsGroup: 65534
+  serviceMonitorSelector:
+    matchLabels:
+      scylla-operator.scylladb.com/scylladbmonitoring-name: scylla
+  ruleSelector:
+    matchLabels:
+      scylla-operator.scylladb.com/scylladbmonitoring-name: scylla
