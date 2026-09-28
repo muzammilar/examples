@@ -1,0 +1,9 @@
+[project]
+name = "scylladb-bench-report"
+version = "0.1.0"
+description = "Parses cassandra-stress output for the ScyllaDB cluster example (make benchmark)"
+requires-python = ">=3.13"
+dependencies = []
+
+[tool.uv]
+package = false

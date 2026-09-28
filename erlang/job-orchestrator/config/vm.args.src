@@ -1,0 +1,4 @@
+-sname ${NODE_NAME}
+## Limitation: anyone with the cookie who can reach the distribution port
+## can run code on this node, and there's no TLS between nodes.
+-setcookie ${ERLANG_COOKIE}

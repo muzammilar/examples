@@ -1,0 +1,12 @@
+[project]
+name = "foundationdb-bench"
+version = "0.1.0"
+description = "Transactional key-value benchmark for the FoundationDB cluster example (make benchmark)"
+requires-python = ">=3.13"
+dependencies = [
+    # Python bindings; they load libfdb_c.so, copied from the server image in bench/Dockerfile
+    "foundationdb==7.3.79",
+]
+
+[tool.uv]
+package = false

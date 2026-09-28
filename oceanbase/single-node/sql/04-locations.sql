@@ -1,0 +1,9 @@
+USE demo;
+-- Where each partition (tablet) lives: log stream, server, replica role.
+SELECT TABLE_NAME, PARTITION_NAME, TABLET_ID, LS_ID, SVR_IP, SVR_PORT, ZONE, ROLE, REPLICA_TYPE
+  FROM oceanbase.DBA_OB_TABLE_LOCATIONS
+ WHERE DATABASE_NAME = 'demo' AND TABLE_TYPE = 'USER TABLE'
+ ORDER BY TABLE_NAME, TABLET_ID;
+
+-- Log streams of this tenant.
+SELECT LS_ID, STATUS, PRIMARY_ZONE, UNIT_GROUP_ID FROM oceanbase.DBA_OB_LS ORDER BY LS_ID;

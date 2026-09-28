@@ -1,0 +1,9 @@
+[project]
+name = "aerospike-bench-report"
+version = "0.1.0"
+description = "Parses asbench output for the Aerospike cluster example (make benchmark)"
+requires-python = ">=3.13"
+dependencies = []
+
+[tool.uv]
+package = false

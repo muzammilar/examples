@@ -1,0 +1,10 @@
+# point writes and reads; every `set` outside `begin` auto-commits and prints its commit version
+writemode on
+set user/1 alice
+set user/2 bob
+set user/3 carol
+set user/4 dave
+set "note/1" "values with spaces are quoted"
+get user/2
+get "note/1"
+get user/9

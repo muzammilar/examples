@@ -1,0 +1,11 @@
+database:         # External database configuration
+  host: 'postgres'
+  port: 5432
+  name: 'conduktor'
+  username: 'conduktor'
+  password: 'conduktor'
+  connection_timeout: 30 # in seconds
+
+admin:            # Local admin credentials
+  email: "admin@test.com"
+  password: "admin"

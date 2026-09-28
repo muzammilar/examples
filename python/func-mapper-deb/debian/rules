@@ -1,0 +1,46 @@
+#!/usr/bin/make -f
+
+# We check distribution here because Makefile can contain linting and tests which don't need distro name
+DISTRO := $(shell lsb_release -cs)
+
+ifeq ($(DISTRO),)
+$(error DISTRO is not set, make sure you have `lsb-release` package installed)
+endif
+
+ifndef PKG_NAME
+$(error PKG_NAME is not set, should be exported by project Makefile)
+endif
+
+# use verbose logging to easily debug builds
+export DH_VERBOSE = 1
+
+# set the root path for dh-virtualenv
+export DH_VIRTUALENV_INSTALL_ROOT=/opt/venv
+
+# dh-sysuser for creating a user (when package is installed)
+# dh-virtualenv creates a debian package for python
+%:
+	dh $@ --with sysuser,python-virtualenv
+
+# the virtualenv ends up at ${DH_VIRTUALENV_INSTALL_ROOT}/${PY_INSTALL_SUFFIX} (i.e. /opt/venv/funcmapper)
+# tests are run with `make test` (dh-virtualenv no longer runs `setup.py test` by default)
+override_dh_virtualenv:
+	dh_virtualenv --python=/usr/bin/python3 --install-suffix=${PY_INSTALL_SUFFIX}
+
+# the virtualenv contains compiled python extensions/binaries that should not be stripped or shlib-scanned
+override_dh_strip:
+override_dh_shlibdeps:
+override_dh_dwz:
+
+# override the output directory of the binary to be `dist` instead of `..`
+override_dh_builddeb:
+	mkdir -p ${DEB_OUT_DIR}
+	dh_builddeb --destdir=${DEB_OUT_DIR}/
+
+# install systemd service file. Use a different name from the package itself
+override_dh_installsystemd:
+	dh_installsystemd --name=${PKG_SERVICE}
+
+# add logrotate support to the package
+override_dh_installlogrotate:
+	dh_installlogrotate --name=${PKG_SERVICE}

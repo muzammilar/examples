@@ -1,0 +1,57 @@
+services:
+  # The demo runs until stopped (-duration 0) with 20s bursts and 20s lulls, so
+  # the pool visibly grows and shrinks across several 5s scrapes. Metrics are
+  # served on :8080 inside the compose network only (scraped by prometheus).
+  dynamic-threadpool:
+    container_name: dynamic-threadpool
+    image: dynamic-threadpool
+    command:
+      - "-min=1"
+      - "-max=16"
+      - "-queue=64"
+      - "-duration=0"
+      - "-phase=20s"
+      - "-metrics-addr=:8080"
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      target: pool
+    expose:
+      - "8080"
+    restart: unless-stopped
+  dynamic-threadpool-help:
+    container_name: dynamic-threadpool-help
+    image: dynamic-threadpool
+    command: ["-h"]
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      target: pool
+  prometheus:
+    image: prom/prometheus:v3.15.0
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    ports:
+      - "19115:9090"
+    depends_on:
+      - dynamic-threadpool
+  grafana:
+    image: grafana/grafana:13.2.2
+    environment:
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Admin
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - grafana-data:/var/lib/grafana
+    ports:
+      - "13015:3000"
+    depends_on:
+      - prometheus
+
+volumes:
+  prometheus-data:
+  grafana-data:

@@ -1,0 +1,6 @@
+// UPSERT: update if the lookup matches, insert otherwise (atomic per document).
+FOR c IN ["Berlin", "Paris", "Berlin", "Lisbon"]
+  UPSERT { _key: c }
+    INSERT { _key: c, visits: 1 }
+    UPDATE { visits: OLD.visits + 1 } IN cities
+  RETURN { city: c, visits: NEW.visits }

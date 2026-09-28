@@ -1,0 +1,8 @@
+USE demo;
+# GO walks edges out from known vertex IDs: Alice's follows, 1 to 2 hops.
+GO 1 TO 2 STEPS FROM "alice" OVER follows YIELD src(edge) AS follower, dst(edge) AS followee, properties(edge).degree AS degree;
+# LOOKUP starts from an index instead of vertex IDs.
+LOOKUP ON person WHERE person.age > 25 YIELD id(vertex) AS vid, properties(vertex).name AS name, properties(vertex).age AS age | ORDER BY $-.age;
+# openCypher-style MATCH; with no start ID it also needs an index (person_by_age).
+MATCH (a:person)-[f:follows]->(b:person) WHERE a.person.age > 25 AND f.degree >= 60 RETURN a.person.name AS follower, b.person.name AS followee, f.degree AS degree ORDER BY degree DESC;
+FIND SHORTEST PATH FROM "alice" TO "dave" OVER follows YIELD path AS p;

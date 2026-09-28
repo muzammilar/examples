@@ -1,0 +1,14 @@
+# begin ... commit is one serializable transaction (reads see its own writes); rollback discards it
+writemode on
+begin
+set user/5 eve
+clear user/1
+get user/5
+commit
+begin
+set user/6 mallory
+rollback
+get user/1
+get user/6
+getrange user/ user0
+getversion
