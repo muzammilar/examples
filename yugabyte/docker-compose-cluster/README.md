@@ -212,3 +212,10 @@ answered there (0.21 ms with 1 thread). A write costs ~2.7x as much: one Raft ro
 replica, and no distributed transaction, unlike TPC-B. Reads reach ~56k ops/s with 32 threads
 and writes ~24k. Past 8 threads, p99 grows faster than
 throughput: the three nodes and the client share 8 capped CPUs.
+
+### Future work
+
+Add sysbench (`--db-driver=pgsql`) with one common workload set (same scripts, table count/size,
+thread counts and duration) shared by every sysbench-capable example — TiDB, OceanBase (single node
+and cluster), SingleStore, RonDB, YugabyteDB YSQL and CedarDB — so their numbers compare directly.
+This example currently uses its own tool and parameters.
