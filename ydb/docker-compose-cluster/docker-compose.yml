@@ -83,3 +83,30 @@ services:
     volumes:
       - ./grafana/provisioning:/etc/grafana/provisioning:ro
     depends_on: [prometheus]
+
+  # `make benchmark-range` (bench/extended.sh, part range): range-query load generator on the
+  # official ydb Python SDK (bench/range_bench.py), started with `docker compose run`
+  bench-range:
+    image: ghcr.io/astral-sh/uv:0.12.19-python3.13-trixie-slim
+    profiles: [bench]
+    cpus: ${RANGE_CLIENT_CPUS:-2}
+    working_dir: /bench
+    command: ["uv", "run", "--frozen", "range_bench.py"]
+    environment:
+      UV_CACHE_DIR: /uv/cache            # wheel cache and venv live in the uv volume,
+      UV_PROJECT_ENVIRONMENT: /uv/venv   # so reruns skip downloads and installs
+      UV_PYTHON_DOWNLOADS: never         # use the image's Python
+      SMOKE: ${SMOKE:-}
+      RANGE_ROWS: ${RANGE_ROWS:-}
+      RANGE_TIME: ${RANGE_TIME:-}
+      RANGE_THREADS: ${RANGE_THREADS:-}
+      RANGE_PROCS: ${RANGE_PROCS:-}
+      RANGE_WORKLOADS: ${RANGE_WORKLOADS:-}
+      RANGE_OUT: ${RANGE_OUT:-/results/.range.json}
+    volumes:
+      - ./bench:/bench:ro
+      - ./results:/results
+      - uv-cache:/uv
+
+volumes:
+  uv-cache:

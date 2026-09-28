@@ -1,4 +1,4 @@
-.PHONY: up dashboards init test benchmark benchmark-extended failover status cli down
+.PHONY: up dashboards init test benchmark benchmark-extended benchmark-range failover status cli down
 
 # `make benchmark`: YDB CLI kv + stock workloads; SMOKE=1 for a quick run
 SMOKE ?=
@@ -62,7 +62,7 @@ BENCH_CPUS ?= 6
 BENCH_MEM ?= 12g
 BENCH_SPEC ?= ydb-dynamic-1=1.5:2.25g ydb-dynamic-2=1.5:2.25g ydb-storage-1=1:2.5g ydb-storage-2=1:2.5g ydb-storage-3=1:2.5g
 export BENCH_CLIENT_CPUS ?= 0
-export BENCH_NOTE ?= no bench container: the ydb CLI load generator runs inside ydb-storage-1 (docker exec) and shares its limits
+export BENCH_NOTE ?= no bench container: the ydb CLI load generator runs inside ydb-storage-1 (docker exec) and shares its limits; the range part's Python client runs in its own bench-range container (RANGE_CLIENT_CPUS, default 2)
 
 # init the kv and stock workload tables, run each workload x thread count for
 # BENCH_TIME seconds, print txs/s + latency percentiles, clean up; raw + JSON in results/
@@ -73,12 +73,19 @@ benchmark:
 		BENCH_PARTITIONS='$(BENCH_PARTITIONS)' bench/run.sh; \
 	rc=$$?; sh bench/limits.sh restore; exit $$rc
 
-# longer look under the same budget (bench/extended.sh, ~45 min): thread scaling, kv load while a
-# storage and a dynamic node are stopped and started again, tpcc + tpch row vs column, per-node load
+# longer look under the same budget (bench/extended.sh, ~75 min): thread scaling, kv load while a
+# storage and a dynamic node are stopped and started again, tpcc + tpch row vs column, range
+# queries (bench/range_bench.py in the bench-range container), per-node load.
+# PARTS= picks parts (scaling failover breadth range); SMOKE=1 shortens the range part
+PARTS ?=
 benchmark-extended:
 	@BENCH_LIMITS=$$(sh bench/limits.sh apply $(BENCH_CPUS) $(BENCH_MEM) $(BENCH_SPEC)) || { sh bench/limits.sh restore; exit 1; }; \
-	export BENCH_LIMITS; bench/extended.sh; \
+	export BENCH_LIMITS; EXT_PARTS='$(or $(PARTS),$(EXT_PARTS))' SMOKE='$(SMOKE)' bench/extended.sh; \
 	rc=$$?; sh bench/limits.sh restore; exit $$rc
+
+# only the range-query part: PK / secondary-index range scans, a range aggregate, a full scan
+benchmark-range:
+	@$(MAKE) --no-print-directory benchmark-extended PARTS=range
 
 # stop one storage node (zone-c) and one dynamic node: mirror-3-dc keeps /Root/testdb
 # serving through ydb-dynamic-1 while the viewer reports DEGRADED; then bring both back
@@ -113,4 +120,4 @@ cli:
 	docker exec -it ydb-storage-1 /ydb $(DB) sql
 
 down:
-	docker compose down --volumes
+	docker compose --profile bench down --volumes

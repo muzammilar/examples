@@ -11,16 +11,26 @@
 #   breadth     `workload tpcc` (EXT_TPCC_WAREHOUSES warehouses, EXT_TPCC_TIME run) and TPC-H
 #               Q1/Q6 on row- vs column-store tables at scale EXT_TPCH_SCALE, each step capped at
 #               EXT_TIMEBOX seconds (skipped, and marked so, when it does not finish in time)
+#   range       range queries on a composite-key table (bench/range_bench.py, ydb Python SDK in the
+#               bench-range container with RANGE_CLIENT_CPUS): bulk load of RANGE_ROWS rows, GLOBAL
+#               index build, PK range scans of 10/100/1,000 rows, the same through the index, a
+#               COUNT/SUM over ~10k rows, each at RANGE_THREADS for RANGE_TIME seconds, and a
+#               full-table streaming scan; `make benchmark-range` runs only this part
 #   load        per-dynamic-node query share (Prometheus) and per-container CPU / memory from
-#               `docker stats` samples every 5 s, for the scaling and failover parts
-# Like `make benchmark`, the CLI runs inside ydb-storage-1 and shares its CPU/memory cap.
+#               `docker stats` samples every 5 s, for the scaling, failover and range parts
+# Like `make benchmark`, the CLI runs inside ydb-storage-1 and shares its CPU/memory cap; the
+# range client is its own container. SMOKE=1 shortens the range part (100k rows, 10 s per point).
 set -eu
 cd "$(dirname "$0")/.."
 
 : "${EXT_TIME:=30}" "${EXT_THREADS:=1 4 16 64}" "${EXT_KV_ROWS:=10000}" "${EXT_PRODUCTS:=100}"
 : "${EXT_ORDERS:=10000}" "${EXT_PARTITIONS:=4}" "${EXT_FO_TIME:=180}" "${EXT_FO_THREADS:=8}"
 : "${EXT_TPCC_WAREHOUSES:=20}" "${EXT_TPCC_TIME:=120}" "${EXT_TPCH_SCALE:=0.1}" "${EXT_TIMEBOX:=900}"
-: "${EXT_PARTS:=scaling failover breadth}"
+: "${EXT_PARTS:=scaling failover breadth range}"
+: "${RANGE_ROWS:=$([ -n "${SMOKE:-}" ] && echo 100000 || echo 1000000)}"
+: "${RANGE_TIME:=$([ -n "${SMOKE:-}" ] && echo 10 || echo 60)}"
+: "${RANGE_THREADS:=1 4 16 64}" "${RANGE_PROCS:=4}" "${RANGE_CLIENT_CPUS:=2}"
+export RANGE_ROWS RANGE_TIME RANGE_THREADS RANGE_PROCS RANGE_CLIENT_CPUS
 
 stamp=$(date -u +%Y%m%dT%H%M%SZ)
 mkdir -p results
@@ -52,7 +62,10 @@ node_delta() {
 sampler() {
 	while :; do
 		t=$(now)
-		docker stats --no-stream --format '{{.Name}} {{.CPUPerc}} {{.MemUsage}}' $NODES 2>/dev/null |
+		# plus the range client while it runs
+		# shellcheck disable=SC2046 # word splitting wanted: the container id, or nothing
+		docker stats --no-stream --format '{{.Name}} {{.CPUPerc}} {{.MemUsage}}' $NODES \
+			$(docker ps -q --filter name=^ydb-bench-range$) 2>/dev/null |
 			awk -v t="$t" -v p="$1" '{ cpu = $2; sub(/%/, "", cpu); m = $3; v = m + 0
 				if (m ~ /GiB/) v *= 1024; else if (m ~ /KiB/) v /= 1024
 				printf "%s %s %s %s %.0f\n", t, p, $1, cpu, v }' >>"$stats"
@@ -122,6 +135,8 @@ cleanup() {
 	ydb workload tpcc clean >>"$raw" 2>&1 || true
 	ydb workload tpch -p ext_tpch_row clean >>"$raw" 2>&1 || true
 	ydb workload tpch -p ext_tpch_column clean >>"$raw" 2>&1 || true
+	docker rm -f ydb-bench-range >/dev/null 2>&1 || true
+	ydb sql -s 'DROP TABLE IF EXISTS range_bench' >>"$raw" 2>&1 || true
 	rm -f "$tmp".*
 	echo "workload tables removed"
 }
@@ -132,6 +147,7 @@ trap cleanup EXIT
 scaling_json="null" scaling_nodes="{}" scaling_stats="{}"
 failover_json="null" failover_stats="{}" failover_nodes="{}"
 tpcc_json='{"skipped": "not run"}' tpch_json='{"skipped": "not run"}'
+range_json='{"skipped": "not run"}'
 
 part() { case " $EXT_PARTS " in *" $1 "*) return 0 ;; esac; return 1; }
 
@@ -295,6 +311,34 @@ if part breadth; then
 	tpch_json="{\"scale\": $EXT_TPCH_SCALE, \"queries\": \"Q1, Q6\", \"iterations\": 3, $tpch_rows}"
 fi
 
+# ---------------------------------------------------------------- range
+if part range; then
+	log "==> range: $RANGE_ROWS rows, $RANGE_THREADS threads, ${RANGE_TIME}s per point (client: bench-range, $RANGE_CLIENT_CPUS CPUs)"
+	# install the locked SDK into the uv volume first, so the timed part does not download
+	docker compose run --rm -T bench-range uv sync --frozen >>"$raw" 2>&1
+	q0=$(node_queries)
+	sampler range & spid=$!
+	docker compose run --rm -T --name ydb-bench-range -e RANGE_OUT="/results/.range-$stamp.json" bench-range \
+		</dev/null 2>&1 | tee -a "$raw"
+	kill $spid; spid=""
+	sleep 16
+	range_nodes="{$(node_delta "$q0" "$(node_queries)")}"
+	range_stats="{$(stats_json range)}"
+	client="{\"container\": \"ydb-bench-range\", \"image\": \"ghcr.io/astral-sh/uv:0.12.19-python3.13-trixie-slim\", \"cpus\": $RANGE_CLIENT_CPUS}"
+	if [ -s "results/.range-$stamp.json" ]; then
+		range_json="{\"client\": $client, \"run\": $(cat "results/.range-$stamp.json"),
+    \"queries_per_dynamic_node\": $range_nodes, \"docker_stats\": $range_stats}"
+	else
+		range_json="{\"client\": $client, \"skipped\": \"range_bench.py wrote no summary (see the raw log)\"}"
+	fi
+	rm -f "results/.range-$stamp.json"
+	{
+		echo "queries per dynamic node: $range_nodes"
+		echo "docker stats (every 5 s):"
+		stats_table range
+	} | tee -a "$raw"
+fi
+
 cli_version=$(docker exec ydb-storage-1 /ydb version 2>/dev/null | sed 's/^YDB CLI //')
 image=$(docker inspect --format '{{.Config.Image}}' ydb-storage-1)
 cat >"$json" <<JSON
@@ -310,11 +354,13 @@ cat >"$json" <<JSON
   "parameters": {"scaling_time_s": $EXT_TIME, "scaling_threads": "$EXT_THREADS", "kv_rows": $EXT_KV_ROWS,
                  "failover_time_s": $EXT_FO_TIME, "failover_threads_per_op": $EXT_FO_THREADS,
                  "tpcc_warehouses": $EXT_TPCC_WAREHOUSES, "tpcc_time_s": $EXT_TPCC_TIME, "tpch_scale": $EXT_TPCH_SCALE,
-                 "timebox_s": $EXT_TIMEBOX},
+                 "timebox_s": $EXT_TIMEBOX, "parts": "$EXT_PARTS", "range_rows": $RANGE_ROWS,
+                 "range_time_s": $RANGE_TIME, "range_threads": "$RANGE_THREADS", "range_client_cpus": $RANGE_CLIENT_CPUS},
   "scaling": {"results": $scaling_json, "queries_per_dynamic_node": $scaling_nodes, "docker_stats": $scaling_stats},
   "failover": {"run": $failover_json, "queries_per_dynamic_node": $failover_nodes, "docker_stats": $failover_stats},
   "tpcc": $tpcc_json,
-  "tpch": $tpch_json
+  "tpch": $tpch_json,
+  "range": $range_json
 }
 JSON
 echo

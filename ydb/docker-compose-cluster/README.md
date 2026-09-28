@@ -12,7 +12,8 @@ in insecure mode (no TLS, no auth):
 make up        # start, `ydb admin cluster bootstrap`, create /Root/testdb, wait for SQL and GOOD
 make test      # run sql/*.sql: (re)create table, upsert, select, delete
 make benchmark # YDB CLI kv + stock workloads via both dynamic nodes; SMOKE=1 = quick
-make benchmark-extended  # scaling, failure under load, tpcc, tpch row vs column (~35 min)
+make benchmark-extended  # scaling, failure under load, tpcc, tpch row vs column, range queries (~75 min)
+make benchmark-range     # only the range-query part (PARTS=range); SMOKE=1 = quick
 make failover  # stop ydb-storage-3 + ydb-dynamic-2: SQL still works, self-check DEGRADED; restart
 make status    # cluster health from the viewer API
 make cli       # interactive YQL shell against /Root/testdb
@@ -130,11 +131,12 @@ timeout.
 
 `make benchmark-extended` ([`bench/extended.sh`](bench/extended.sh), same budget, ~35 min under
 emulation) takes a longer look: thread scaling, a failure test under load, TPC-C and TPC-H
-row vs column, and per-node load. It waits for a GOOD self-check first. Results go to
-`results/ydb-extended-<time>.{log,json}`, with JSON keys `scaling`, `failover`, `tpcc`, `tpch`
-and `docker_stats` / `queries_per_dynamic_node` per part. Variables: `EXT_TIME` (per scaling
-point), `EXT_THREADS`, `EXT_FO_TIME`, `EXT_FO_THREADS`, `EXT_TPCC_WAREHOUSES`, `EXT_TPCC_TIME`,
-`EXT_TPCH_SCALE`, `EXT_TIMEBOX`, `EXT_PARTS`. Sample run 2026-09-28, same machine and budget:
+row vs column, range queries ([below](#range-queries)), and per-node load. It waits for a GOOD
+self-check first. Results go to `results/ydb-extended-<time>.{log,json}`, with JSON keys
+`scaling`, `failover`, `tpcc`, `tpch`, `range` and `docker_stats` / `queries_per_dynamic_node`
+per part. Variables: `EXT_TIME` (per scaling point), `EXT_THREADS`, `EXT_FO_TIME`,
+`EXT_FO_THREADS`, `EXT_TPCC_WAREHOUSES`, `EXT_TPCC_TIME`, `EXT_TPCH_SCALE`, `EXT_TIMEBOX`, and
+`PARTS` (or `EXT_PARTS`) to pick parts, e.g. `make benchmark-extended PARTS="scaling range"`. Sample run 2026-09-28, same machine and budget:
 `EXT_TIME=20`, 10 TPC-C warehouses, TPC-H scale 0.1. The TPC-C/TPC-H part was re-run on a fresh
 cluster after fixing a table-name clash with `workload stock`.
 
@@ -206,3 +208,72 @@ latency. Even a one-row upsert is ~2-3 ms p50 through a dynamic node and three-z
 where the single-node databases in this repo answer in well under a millisecond, and a
 multi-table order transaction is 5-20 ms. The engine runs under amd64 emulation on a 6-CPU
 budget, so treat the absolute numbers as a floor, and compare shapes, not magnitudes.
+
+### Range queries
+
+`make benchmark-range` (the `range` part of `make benchmark-extended`, same budget) measures
+ordered range reads, the access pattern YDB's sorted primary key and global indexes are built for.
+The CLI's `workload query` runs fixed query suites and cannot draw random parameters per call,
+so the load generator is [`bench/range_bench.py`](bench/range_bench.py) on the official `ydb`
+Python SDK (pinned in [`bench/pyproject.toml`](bench/pyproject.toml) / `uv.lock`, run with
+`uv run --frozen` in the `bench-range` service, `ghcr.io/astral-sh/uv:0.12.19-python3.13-trixie-slim`,
+capped at `RANGE_CLIENT_CPUS=2` like the bench clients of the other examples):
+
+- Table `range_bench (tenant Uint32, ts Uint64, id Uint64, category Uint32, amount Uint64,
+  payload String)`, primary key `(tenant, ts, id)`, pre-split into 4 partitions at tenant
+  boundaries. `RANGE_ROWS` rows (1M; `SMOKE=1`: 100k), 20,000 per tenant (so 50 tenants), loaded
+  with BulkUpsert (the API behind `ydb import`) from 4 processes, 2,000 rows per request; load
+  time and rows/s are reported.
+- Then `ALTER TABLE ... ADD INDEX idx_category GLOBAL SYNC ON (category, ts)`, timed until the
+  index answers. Built after the load, so the load measures the table alone.
+- Workloads, each at `RANGE_THREADS` (`1 4 16 64`) for `RANGE_TIME` seconds (60; `SMOKE=1`: 10)
+  after a 2 s warm-up, parameterized YQL with random parameters per call, one serializable
+  read-write transaction per query (the default), SDK retries (up to 5) counted:
+  - `pk range N`: `WHERE tenant = $t AND ts BETWEEN $a AND $b ORDER BY ts LIMIT N`, N = 10 / 100 / 1,000
+  - `index range N`: the same columns via `VIEW idx_category WHERE category = $c AND ts BETWEEN ...`,
+    which reads the index shard and then looks each row up in the table
+  - `pk agg 10000`: `COUNT(*), SUM(amount)` over a 10,000-row PK range (rows/s counts rows aggregated)
+  - full-table streaming scan: one query over all rows, with 1 and 4 parallel streams (rows/s)
+- Load: `min(threads, RANGE_PROCS=4)` processes, each with its own driver and
+  `QuerySessionPool` and worker threads; processes alternate the seed endpoint between
+  `ydb-dynamic-1` and `-2`, and SDK discovery spreads sessions over both (the per-node query
+  split from Prometheus is in the JSON). Reported: queries/s, rows/s, p50/p95/p99 ms, retries,
+  errors. The table is dropped at the end (and by the cleanup trap if interrupted).
+
+Sample results, 2026-09-28, `make benchmark-range` (defaults: 1M rows, 60 s per point), same
+machine and budget as above (`ydbd` amd64 under Rosetta emulation), self-check GOOD at start, no
+retries and no errors in any run. Queries/s, with p50 / p99 ms:
+
+| workload | 1 thr | 4 thr | 16 thr | 64 thr |
+|---|---|---|---|---|
+| pk range 10 | 867 (1.1 / 2.2) | 2,828 (1.3 / 8.6) | 4,124 (2.2 / 44) | 3,741 (8.4 / 68) |
+| pk range 100 | 673 (1.4 / 2.8) | 2,319 (1.7 / 2.8) | 2,519 (3.3 / 52) | 2,386 (13 / 79) |
+| pk range 1000 | 187 (5.2 / 6.7) | 617 (5.8 / 18) | 571 (15 / 75) | 560 (106 / 210) |
+| index range 10 | 445 (2.1 / 3.9) | 1,383 (2.8 / 4.9) | 2,382 (4.6 / 38) | 3,164 (13 / 56) |
+| index range 100 | 332 (3.0 / 4.5) | 1,168 (3.3 / 5.4) | 1,643 (6.7 / 41) | 1,725 (27 / 66) |
+| index range 1000 | 115 (8.7 / 10) | 347 (11 / 26) | 378 (35 / 71) | 375 (175 / 210) |
+| pk agg 10000 | 289 (3.4 / 4.5) | 857 (4.3 / 9.7) | 967 (14 / 49) | 1,030 (65 / 159) |
+
+Load: 1M rows in 5.1 s (197k rows/s over BulkUpsert). Index build: 1.3 s. Full scan: 357k rows/s
+with 1 stream, 598k rows/s with 4.
+
+In rows: a 100-row PK range peaks at ~250k rows/s, 1,000-row ranges at ~620k rows/s, and the
+aggregate covers 10.3M rows/s at 64 threads, because only one row goes back to the client. A PK
+range costs ~1 ms p50 at 10 rows and ~5 ms at 1,000. Going through the global index roughly
+doubles latency at low concurrency (index shard read, then a lookup into the table per row). It
+costs 40% of throughput at 1,000 rows and 15% at 10 rows / 64 threads. Throughput levels off from
+4-16 threads. Both dynamic nodes then average ~1.05-1.1 of their 1.5 CPUs, and the 2-CPU Python
+client averages 1.16 CPUs with peaks at its cap. So the 64-thread points and the full scan are
+partly client-bound (Python decodes every row), and they are floors. Queries split 47% / 53% over
+`ydb-dynamic-1` / `-2`, and the storage nodes stayed under 20% CPU: the data (~130 MB) sits in
+the DataShards' caches.
+
+### Future work
+
+- Run one workload set shared with the other examples: sysbench over YDB's PostgreSQL-compatible
+  endpoint (once it is enabled here), and one standardized benchmark everywhere, TPC-C
+  (`ydb workload tpcc`, go-tpc or BenchBase), with the same warehouses, threads, duration and
+  think-time setting as the other databases.
+- The 10-warehouse TPC-C result above (127 tpmC) is the spec's think-time cap of ~12.86 tpmC per
+  warehouse, not YDB's limit. A comparison needs more warehouses or think time disabled, applied
+  equally to every system.
