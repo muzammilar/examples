@@ -79,15 +79,34 @@ table and are written to `results/foundationdb-<timestamp>.json` and `.txt` (git
 server and client versions, redundancy mode, storage engine, parameters and the CPU count / memory
 of the Docker VM.
 
+**Resource budget.** For the run [`bench/limits.sh`](bench/limits.sh) gives the three
+`fdbserver` containers `BENCH_CPUS=6` / `BENCH_MEM=12g` in total, i.e. 2 CPUs / 4 GB each (no
+swap), with `docker update`, and restores the old limits afterwards. Docker cannot remove a
+memory limit from a running container, so "unlimited" comes back as the Docker VM's total
+memory; `make down && make up` starts clean. The exporter, Prometheus and Grafana are left
+unlimited. The bench client (8 processes) has `cpus: 2` in compose (`BENCH_CLIENT_CPUS`). The
+JSON records the applied limits under `limits`. Each `fdbserver` is one single-threaded process,
+so it can use one of its two CPUs at most. Here each used ~0.3 CPU and under 0.5 GB. The load is
+bound by commit latency, not by the budget.
+
 ### Sample results
 
-TODO: fill from a run on a quiet machine (`make benchmark`, defaults).
+2026-09-28, `make benchmark` (defaults: 8 clients, 100,000 rows × 100 B, 30 s per workload,
+hot set 100), Docker Desktop 29.5.3 on an Apple M4 Pro (Docker VM: 11 CPUs, 24.4 GB, aarch64;
+`fdbserver` and the bench native arm64, only the exporter image is amd64 under emulation),
+FoundationDB 7.3.79, `double`, `ssd-redwood-1`, 2 CPUs / 4 GB per process, client 2 CPUs.
 
 | workload | tx/s | keys/s | p50 (ms) | p99 (ms) | conflicts |
 | -------- | ---- | ------ | -------- | -------- | --------- |
-| load (100 keys/tx) | TODO | TODO | TODO | TODO | TODO |
-| point reads | TODO | TODO | TODO | TODO | TODO |
-| blind writes | TODO | TODO | TODO | TODO | TODO |
-| read-modify-write | TODO | TODO | TODO | TODO | TODO |
-| atomic adds | TODO | TODO | TODO | TODO | TODO |
-| range reads (100 keys) | TODO | TODO | TODO | TODO | TODO |
+| load (100 keys/tx) | 1,570 | 157,025 | 4.89 | 7.78 | 0 |
+| point reads | 3,412 | 3,412 | 2.10 | 4.95 | 0 |
+| blind writes | 1,894 | 1,894 | 4.03 | 8.20 | 0 |
+| read-modify-write | 1,241 | 2,482 | 4.96 | 30.85 | 5,386 (12.6%) |
+| atomic adds | 2,151 | 4,302 | 3.71 | 6.55 | 0 |
+| range reads (100 keys) | 2,486 | 248,644 | 3.12 | 5.77 | 0 |
+
+Both invariant checks passed: the balances summed to 100,000,000 and the atomic counter matched.
+Every transaction pays a GRV plus, for writes, a ~4 ms commit, so per-key throughput comes from
+batching (157k keys/s loading 100 per tx, 249k keys/s in range reads). On 100 hot keys,
+read-modify-write conflicts on 12.6% of attempts and its p99 grows to 31 ms, while atomic adds
+on the same keys never conflict.

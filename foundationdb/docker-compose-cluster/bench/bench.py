@@ -223,7 +223,9 @@ def main():
         "timestamp": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "params": {"clients": CLIENTS, "rows": ROWS, "value_bytes": VALUE, "duration_s": DURATION,
                    "hot_accounts": HOT, "range_limit": RANGE, "load_batch": BATCH, "smoke": SMOKE},
-        "machine": machine(), "results": results, "checks": checks,
+        "machine": machine(),
+        "limits": json.loads(os.environ.get("BENCH_LIMITS") or "null"),  # bench/limits.sh
+        "results": results, "checks": checks,
     }
 
     lines = [f"FoundationDB {info['server_version']}  {info['processes']} processes, "

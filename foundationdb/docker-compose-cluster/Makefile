@@ -62,11 +62,21 @@ status:
 cli:
 	docker exec -it fdb-0 fdbcli
 
+# resource budget for `make benchmark` (bench/limits.sh): BENCH_CPUS / BENCH_MEM in total for the
+# database containers in BENCH_SPEC (equal shares; service=CPUS:MEM is a fixed amount), set with
+# `docker update` for the run and restored afterwards; the bench client has BENCH_CLIENT_CPUS
+BENCH_CPUS ?= 6
+BENCH_MEM ?= 12g
+BENCH_SPEC ?= fdb-0 fdb-1 fdb-2
+export BENCH_CLIENT_CPUS ?= 2
+
 # needs `make up`; SMOKE=1 for a 5 s/workload run, or set DURATION / CLIENTS / ROWS / HOT
 benchmark:
 	@docker compose ps --status running --services | grep -qx fdb-0 || { echo 'run `make up` first'; exit 1; }
-	SMOKE=$(SMOKE) DURATION=$(DURATION) CLIENTS=$(CLIENTS) ROWS=$(ROWS) HOT=$(HOT) \
-		docker compose run --build --rm bench
+	@BENCH_LIMITS=$$(sh bench/limits.sh apply $(BENCH_CPUS) $(BENCH_MEM) $(BENCH_SPEC)) || { sh bench/limits.sh restore; exit 1; }; \
+	export BENCH_LIMITS; SMOKE=$(SMOKE) DURATION=$(DURATION) CLIENTS=$(CLIENTS) ROWS=$(ROWS) HOT=$(HOT) \
+		docker compose run --build --rm bench; \
+	rc=$$?; sh bench/limits.sh restore; exit $$rc
 
 # keeps the uv-cache volume (bench profile); removes the locally built bench image
 down:
