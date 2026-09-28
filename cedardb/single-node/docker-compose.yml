@@ -1,9 +1,5 @@
 name: cedardb-single
 
-x-credentials: &credentials
-  # fixed demo password; CedarDB requires 8+ chars mixing upper, lower, digit and symbol
-  CEDAR_PASSWORD: Cedar-Demo-1
-
 services:
   # CedarDB Community Edition, as in https://cedardb.com/docs/get_started/install_with_docker/
   # The image is multi-arch (amd64 + arm64), so it runs natively on Apple silicon.
@@ -11,7 +7,9 @@ services:
     image: cedardb/cedardb:${CEDARDB_VERSION:-v2026-09-16}
     container_name: cedardb
     environment:
-      <<: *credentials
+      # fixed demo password (also PGPASSWORD of the psql client below); CedarDB
+      # requires 8+ chars mixing upper, lower, digit and symbol
+      CEDAR_PASSWORD: Cedar-Demo-1
       CEDAR_USER: postgres
       CEDAR_DB: postgres
     ports:
@@ -43,5 +41,48 @@ services:
       cedardb:
         condition: service_healthy
 
+  # `make benchmark`: pgbench + analytic queries (bench/run.sh), raw output to results/
+  bench:
+    image: postgres:17-alpine
+    profiles: [bench]
+    entrypoint: ["bash", "/bench/run.sh"]
+    environment:
+      PGHOST: cedardb
+      PGUSER: postgres
+      PGDATABASE: postgres
+      PGPASSWORD: Cedar-Demo-1
+      NAME: ${NAME:-}
+      DURATION: ${DURATION:-60}
+      CLIENTS: ${CLIENTS:-1 8 16}
+      SCALE: ${SCALE:-10}
+      MAX_TRIES: ${MAX_TRIES:-10}
+      RUNS: ${RUNS:-5}
+    volumes:
+      - ./bench:/bench:ro
+      - ./sql:/sql:ro
+      - ./results:/results
+    depends_on:
+      cedardb:
+        condition: service_healthy
+
+  # `make benchmark`: parses the raw output (bench/report.py) into a table and results/*.json
+  bench-report:
+    image: ghcr.io/astral-sh/uv:0.12.19-python3.13-trixie-slim
+    profiles: [bench]
+    working_dir: /bench
+    command: ["uv", "run", "--frozen", "report.py"]
+    environment:
+      UV_CACHE_DIR: /uv/cache          # the venv lives in the uv volume, so reruns skip creating it
+      UV_PROJECT_ENVIRONMENT: /uv/venv
+      UV_PYTHON_DOWNLOADS: never       # use the image's Python
+      NAME: ${NAME:-}
+      HOST_INFO: ${HOST_INFO:-}
+      DOCKER_INFO: ${DOCKER_INFO:-}
+    volumes:
+      - ./bench:/bench:ro
+      - ./results:/results
+      - uv-cache:/uv
+
 volumes:
   cedardb-data:
+  uv-cache:
