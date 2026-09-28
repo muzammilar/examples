@@ -1,4 +1,8 @@
-.PHONY: up test status cli down
+.PHONY: up test status cli benchmark down
+
+SMOKE ?=
+# TPC-H scale factor: 1 (~1 GB of CSV-equivalent data), 0.1 with SMOKE=1
+SF ?= $(if $(filter-out 0,$(SMOKE)),0.1,1)
 
 export HOST_UID := $(shell id -u)
 export HOST_GID := $(shell id -g)
@@ -27,6 +31,14 @@ status:
 
 cli:
 	$(COMPOSE) run --rm duckdb demo.duckdb
+
+# TPC-H via the tpch extension in a separate database file (data/bench/tpch.duckdb, deleted
+# afterwards): dbgen, all 22 queries x3, EXPORT DATABASE to Parquet, a subset again on Parquet
+benchmark:
+	rm -rf data/bench && mkdir -p data/bench/prof results
+	sh bench/tpch.sh $(SF) $$(date -u +%Y%m%dT%H%M%SZ) $$(docker info --format '{{.NCPU}} {{.MemTotal}}') \
+		| docker compose --progress quiet --profile bench run --rm -T bench
+	rm -rf data/bench
 
 down:
 	$(COMPOSE) down --volumes --remove-orphans
