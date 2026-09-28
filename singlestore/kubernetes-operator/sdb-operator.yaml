@@ -1,0 +1,45 @@
+# Operator Deployment, from
+# https://docs.singlestore.com/db/v9.0/deploy/kubernetes/create-the-object-definition-files/sdb-operator-yaml/
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sdb-operator
+  labels:
+    app.kubernetes.io/component: operator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: sdb-operator
+  template:
+    metadata:
+      labels:
+        name: sdb-operator
+    spec:
+      serviceAccountName: sdb-operator
+      containers:
+        - name: sdb-operator
+          # singlestore/operator:4.176.0-140cf6a8 is an amd64-only image index; pinning the
+          # linux/amd64 manifest digest lets containerd on an arm64 kind node pull it
+          # (it then runs under Docker Desktop's Rosetta/QEMU emulation)
+          image: singlestore/operator@sha256:0691e6b5ce07c5e801f3e108340557b12bfa3eb61e1a1d66218dd6b0a99442ab
+          imagePullPolicy: IfNotPresent
+          args: [
+            # merge rather than replace annotations on services
+            "--merge-service-annotations",
+            # give the node processes read/write access to the /var/lib/memsql volume
+            "--fs-group-id", "5555",
+            # must match the MemsqlCluster name
+            "--cluster-id", "sdb-cluster"
+          ]
+          env:
+            - name: WATCH_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: OPERATOR_NAME
+              value: "sdb-operator"

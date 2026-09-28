@@ -1,0 +1,53 @@
+# 1 master aggregator + 1 child aggregator + 2 leaves, sized far below the documented
+# production shape (4-8 cores, 32-64 GiB per node) to fit a one-node kind cluster.
+# redundancyLevel 1: both leaves in one availability group. (redundancyLevel 2 puts each
+# leaf in its own availability group with required pod anti-affinity, i.e. needs 2+ k8s nodes.)
+apiVersion: memsql.com/v1alpha1
+kind: MemsqlCluster
+metadata:
+  name: sdb-cluster
+spec:
+  # Secret created by `make cluster` from $SINGLESTORE_LICENSE (key from https://portal.singlestore.com)
+  licenseSecret:
+    name: singlestore-license
+    key: license
+  # "*" + upper(hex(sha1(sha1(password)))) of the demo password SingleStore-Demo-1
+  adminHashedPassword: "*1055BAD08CB0397EA4B861A21771218F6BE7B93E"
+  nodeImage:
+    repository: singlestore/node
+    tag: alma-9.0.44-1322a9e639
+  redundancyLevel: 1
+
+  # ClusterIP instead of the default LoadBalancer (kind has no load balancer controller)
+  serviceSpec:
+    type: ClusterIP
+
+  globalVariables:
+    default_partitions_per_leaf: "4"
+
+  masterAggregatorSpec:
+    count: 1
+    cores: 1
+    coresLimit: 2
+    memoryMB: 2048
+    memoryMBLimit: 2048
+    storageGB: 5
+    storageClass: standard
+
+  childAggregatorSpec:
+    count: 1
+    cores: 1
+    coresLimit: 2
+    memoryMB: 2048
+    memoryMBLimit: 2048
+    storageGB: 5
+    storageClass: standard
+
+  leafSpec:
+    count: 2
+    cores: 1
+    coresLimit: 2
+    memoryMB: 3072
+    memoryLimitMB: 3072
+    storageGB: 10
+    storageClass: standard
