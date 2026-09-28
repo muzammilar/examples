@@ -21,6 +21,7 @@ Candidate databases and systems to add as examples. Branch names follow the exis
 - [ ] Temporal
 - [ ] Restate
 - [ ] Redpanda
+- [ ] SeaweedFS
 
 ## Time-series
 
@@ -75,7 +76,9 @@ Candidate databases and systems to add as examples. Branch names follow the exis
 
 - [ ] `iceberg-trino-minio`: Iceberg REST catalog (Polaris or Nessie) + MinIO + Trino; also read from DuckDB and ClickHouse.
 - [ ] `delta-lake-duckdb`: Delta tables read from DuckDB and Spark.
-- [ ] `garage-docker-compose-cluster` / `seaweedfs-docker-compose-cluster`: self-hosted S3-compatible storage.
+- [ ] `garage-docker-compose-cluster`: self-hosted S3-compatible storage.
+- [ ] `seaweedfs-docker-compose-cluster`: master/volume/filer with `xyz` replication (`001`/`010`/`100`), S3 gateway, erasure coding for warm volumes, `filer.sync` cross-cluster replication.
+- [ ] Comparison example: 1-4 MB blob put/update/delete latency in SeaweedFS vs Aerospike (`write-block-size 8M`) vs ScyllaDB (large-cell threshold, 16 MB mutation cap); plus metadata-in-Scylla + blob-in-SeaweedFS pattern.
 
 ## Document
 
