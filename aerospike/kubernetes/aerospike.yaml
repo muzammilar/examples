@@ -1,0 +1,109 @@
+# Aerospike CE as a plain StatefulSet. The Aerospike Kubernetes Operator targets
+# Enterprise Edition, so this keeps to core Kubernetes objects: a headless
+# Service gives each pod a stable DNS name used as a mesh heartbeat seed.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: aerospike-conf
+data:
+  aerospike.conf: |
+    service {
+    	cluster-name demo
+    	proto-fd-max 15000
+    }
+
+    logging {
+    	console {
+    		context any info
+    	}
+    }
+
+    network {
+    	service {
+    		address any
+    		port 3000
+    	}
+
+    	heartbeat {
+    		mode mesh
+    		address any
+    		port 3002
+    		mesh-seed-address-port aerospike-0.aerospike 3002
+    		mesh-seed-address-port aerospike-1.aerospike 3002
+    		mesh-seed-address-port aerospike-2.aerospike 3002
+    		interval 150
+    		timeout 10
+    	}
+
+    	fabric {
+    		address any
+    		port 3001
+    	}
+    }
+
+    namespace test {
+    	replication-factor 2
+    	storage-engine memory {
+    		data-size 512M
+    	}
+    }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: aerospike
+spec:
+  clusterIP: None
+  publishNotReadyAddresses: true # seeds must resolve before pods are ready
+  selector:
+    app: aerospike
+  ports:
+    - { name: service, port: 3000 }
+    - { name: fabric, port: 3001 }
+    - { name: heartbeat, port: 3002 }
+    - { name: metrics, port: 9145 }
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: aerospike
+spec:
+  serviceName: aerospike
+  replicas: 3
+  podManagementPolicy: Parallel
+  selector:
+    matchLabels:
+      app: aerospike
+  template:
+    metadata:
+      labels:
+        app: aerospike
+    spec:
+      containers:
+        - name: aerospike
+          image: aerospike/aerospike-server:8.1.2.5
+          command: ["asd", "--foreground", "--config-file", "/opt/aerospike/etc/aerospike.conf"]
+          ports:
+            - { name: service, containerPort: 3000 }
+            - { name: fabric, containerPort: 3001 }
+            - { name: heartbeat, containerPort: 3002 }
+          readinessProbe:
+            exec:
+              command: ["sh", "-c", "asinfo -v status | grep -q ok"]
+            periodSeconds: 5
+          resources:
+            requests: { cpu: 100m, memory: 768Mi }
+            limits: { memory: 1Gi }
+          volumeMounts:
+            - name: conf
+              mountPath: /opt/aerospike/etc
+        - name: exporter
+          image: aerospike/aerospike-prometheus-exporter:1.35.0
+          env:
+            - { name: AS_HOST, value: localhost }
+          ports:
+            - { name: metrics, containerPort: 9145 }
+      volumes:
+        - name: conf
+          configMap:
+            name: aerospike-conf
