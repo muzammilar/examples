@@ -34,5 +34,43 @@ services:
     environment:
       NATS_URL: nats://nats:4222
 
+  # `make benchmark`: `nats bench` workloads (bench/run.sh), raw output to results/
+  bench:
+    image: natsio/nats-box:${NATS_BOX_VERSION:-0.20.0}
+    profiles: [bench]
+    command: ["sh", "/bench/run.sh"]
+    environment:
+      NATS_URL: nats://nats:4222
+      NAME: ${NAME:-}
+      MSGS: ${MSGS:-1000000}
+      CLIENTS: ${CLIENTS:-4}
+      REQ_MSGS: ${REQ_MSGS:-20000}
+      JS_MSGS: ${JS_MSGS:-500000}
+      JS_SYNC_MSGS: ${JS_SYNC_MSGS:-20000}
+    volumes:
+      - ./bench:/bench:ro
+      - ./results:/results
+
+  # `make benchmark`: parses the raw output (bench/report.py) into a table and results/*.json
+  bench-report:
+    image: ghcr.io/astral-sh/uv:0.12.19-python3.13-trixie-slim
+    profiles: [bench]
+    network_mode: none
+    working_dir: /bench
+    command: ["uv", "run", "--frozen", "report.py"]
+    environment:
+      UV_CACHE_DIR: /uv/cache          # the venv lives in the uv volume, so reruns skip creating it
+      UV_PROJECT_ENVIRONMENT: /uv/venv
+      UV_PYTHON_DOWNLOADS: never       # use the image's Python
+      NAME: ${NAME:-}
+      NATS_BOX_VERSION: ${NATS_BOX_VERSION:-0.20.0}
+      HOST_INFO: ${HOST_INFO:-}
+      DOCKER_INFO: ${DOCKER_INFO:-}
+    volumes:
+      - ./bench:/bench:ro
+      - ./results:/results
+      - uv-cache:/uv
+
 volumes:
   nats-data:
+  uv-cache:

@@ -1,4 +1,4 @@
-.PHONY: up test app status cli down
+.PHONY: up test app benchmark status cli down
 
 up:
 	docker compose up --detach --wait
@@ -12,6 +12,26 @@ app:
 	docker compose --progress quiet --profile tools build app
 	for f in app/*.py; do echo "-- $$f"; docker compose --progress quiet run --rm -T app python $$(basename $$f) 2>&1 || exit 1; done
 
+# `nats bench`: core pub/sub 1x1 and CLIENTSxCLIENTS at 128 B and 1 KiB (MSGS messages each),
+# request/reply (REQ_MSGS), JetStream file/R1 publish sync (JS_SYNC_MSGS) and async + pull fetch
+# (JS_MSGS); SMOKE=1 runs a tenth of the messages. Prints a summary table, keeps
+# results/nats-<UTC time>.{txt,json}; the bench stream is removed afterwards.
+SMOKE ?=
+S := $(if $(filter 1,$(SMOKE)),10,1)
+MSGS ?= $(shell echo $$((1000000 / $(S))))
+CLIENTS ?= 4
+REQ_MSGS ?= $(shell echo $$((20000 / $(S))))
+JS_MSGS ?= $(shell echo $$((500000 / $(S))))
+JS_SYNC_MSGS ?= $(shell echo $$((20000 / $(S))))
+
+benchmark:
+	@docker compose ps --status running --services | grep -qx nats || { echo 'run `make up` first'; exit 1; }
+	@mkdir -p results
+	@export NAME=nats-$$(date -u +%Y%m%dT%H%M%SZ) MSGS=$(MSGS) CLIENTS=$(CLIENTS) REQ_MSGS=$(REQ_MSGS) \
+		JS_MSGS=$(JS_MSGS) JS_SYNC_MSGS=$(JS_SYNC_MSGS) HOST_INFO="$$(uname -sm)" \
+		DOCKER_INFO="$$(docker info --format 'Docker {{.ServerVersion}}, {{.NCPU}} CPUs, {{.MemTotal}} bytes')"; \
+	docker compose --progress quiet run --rm -T bench && docker compose --progress quiet run --rm -T bench-report
+
 status:
 	docker compose --progress quiet run --rm -T tools nats server check jetstream
 
@@ -19,4 +39,4 @@ cli:
 	docker compose --progress quiet run --rm tools
 
 down:
-	docker compose --profile tools down --volumes --rmi local
+	docker compose --profile tools --profile bench down --volumes --rmi local
