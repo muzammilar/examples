@@ -1,0 +1,9 @@
+[project]
+name = "yugabyte-cluster-bench-report"
+version = "0.1.0"
+description = "Parses ysql_bench (make benchmark) and yb-sample-apps (make benchmark-ycql) output for the YugabyteDB cluster example"
+requires-python = ">=3.13"
+dependencies = []
+
+[tool.uv]
+package = false
