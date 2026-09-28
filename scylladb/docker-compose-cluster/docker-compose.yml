@@ -1,0 +1,107 @@
+name: scylladb-cluster
+
+# Three ScyllaDB nodes in one datacenter. scylla-1 is the seed; the others
+# join one at a time (depends_on + healthcheck) so bootstrap never overlaps.
+x-scylla: &scylla
+  image: scylladb/scylla:${SCYLLA_VERSION:-2026.1.13}
+  command: --seeds scylla-1 --smp 1 --memory 750M --overprovisioned 1 --developer-mode 1
+  healthcheck:
+    test: ["CMD", "cqlsh", "-e", "SELECT now() FROM system.local"]
+    interval: 10s
+    timeout: 5s
+    retries: 30
+    start_period: 30s
+
+services:
+  # Each ScyllaDB shard reserves ~11k Linux AIO contexts; Docker Desktop's VM
+  # defaults to fs.aio-max-nr=65536. This one-shot raises it for the whole
+  # Docker VM (not namespaced; resets when Docker restarts).
+  sysctl:
+    image: busybox:1.37
+    privileged: true
+    command: sysctl -w fs.aio-max-nr=1048576
+
+  scylla-1:
+    <<: *scylla
+    container_name: scylla-1
+    hostname: scylla-1
+    ports: ["127.0.0.1:9042:9042"] # no auth (AllowAllAuthenticator): localhost only
+    volumes: [scylla-1:/var/lib/scylla, ./cql:/cql:ro]
+    depends_on:
+      sysctl: { condition: service_completed_successfully }
+  scylla-2:
+    <<: *scylla
+    container_name: scylla-2
+    hostname: scylla-2
+    volumes: [scylla-2:/var/lib/scylla]
+    depends_on:
+      scylla-1: { condition: service_healthy }
+  scylla-3:
+    <<: *scylla
+    container_name: scylla-3
+    hostname: scylla-3
+    volumes: [scylla-3:/var/lib/scylla]
+    depends_on:
+      scylla-2: { condition: service_healthy }
+
+  # ScyllaDB serves Prometheus metrics natively on :9180.
+  prometheus:
+    image: prom/prometheus:v3.15.0
+    container_name: scylla-prometheus
+    ports: ["9090:9090"]
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./prometheus/upstream:/etc/prometheus/upstream:ro # recording rules, fetched by `make dashboards`
+
+  grafana:
+    image: grafana/grafana:13.2.2
+    container_name: scylla-grafana
+    ports: ["3000:3000"]
+    environment:
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Admin
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+    depends_on: [prometheus]
+
+  # `make benchmark`: cassandra-stress workloads (bench/run.sh), raw output to results/
+  bench:
+    image: scylladb/cassandra-stress:${STRESS_VERSION:-3.21.1}
+    profiles: [bench]
+    cpus: ${BENCH_CLIENT_CPUS:-2}
+    entrypoint: ["bash", "/bench/run.sh"]
+    environment:
+      NAME: ${NAME:-}
+      DURATION: ${DURATION:-60}
+      THREADS: ${THREADS:-32}
+      KEYS: ${KEYS:-1000000}
+      LWT_KEYS: ${LWT_KEYS:-10000}
+    volumes:
+      - ./bench:/bench:ro
+      - ./results:/results
+
+  # `make benchmark`: parses the raw output (bench/report.py) into a table and results/*.json
+  bench-report:
+    image: ghcr.io/astral-sh/uv:0.12.19-python3.13-trixie-slim
+    profiles: [bench]
+    working_dir: /bench
+    command: ["uv", "run", "--frozen", "report.py"]
+    environment:
+      UV_CACHE_DIR: /uv/cache          # the venv lives in the uv volume, so reruns skip creating it
+      UV_PROJECT_ENVIRONMENT: /uv/venv
+      UV_PYTHON_DOWNLOADS: never       # use the image's Python
+      NAME: ${NAME:-}
+      STRESS_VERSION: ${STRESS_VERSION:-3.21.1}
+      HOST_INFO: ${HOST_INFO:-}
+      DOCKER_INFO: ${DOCKER_INFO:-}
+      BENCH_LIMITS: ${BENCH_LIMITS:-}
+    volumes:
+      - ./bench:/bench:ro
+      - ./results:/results
+      - uv-cache:/uv
+
+volumes:
+  scylla-1:
+  scylla-2:
+  scylla-3:
+  uv-cache:
