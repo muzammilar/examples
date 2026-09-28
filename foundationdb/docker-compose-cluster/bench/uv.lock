@@ -1,0 +1,20 @@
+version = 1
+revision = 3
+requires-python = ">=3.13"
+
+[[package]]
+name = "foundationdb"
+version = "7.3.79"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/11/d6/b1047749efe98b710a74f98063f6c1409890b28891bb3bc633a4d41638a3/foundationdb-7.3.79.tar.gz", hash = "sha256:c6122623cef35fb6d80c554338d9f44bf8d97b76ee18283e4fed1c20e6747f34", size = 51145, upload-time = "2026-07-16T10:20:41.193Z" }
+
+[[package]]
+name = "foundationdb-bench"
+version = "0.1.0"
+source = { virtual = "." }
+dependencies = [
+    { name = "foundationdb" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "foundationdb", specifier = "==7.3.79" }]

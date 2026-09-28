@@ -1,0 +1,28 @@
+name: yugabyte-single
+
+services:
+  # One yb-master + one yb-tserver (RF=1) managed by yugabyted, as in
+  # https://docs.yugabyte.com/stable/quick-start/docker/
+  # The image is multi-arch (amd64 + arm64), so it runs natively on Apple silicon.
+  yugabyte:
+    image: yugabytedb/yugabyte:${YB_VERSION:-2026.1.2.0-b137}
+    container_name: yugabyte
+    hostname: yugabyte # static: yugabyted records it in its data dir
+    # Data lives under $HOME/var in the container layer: the image runs as uid
+    # 10001 and a fresh named volume would be root-owned. `make down` discards it.
+    command: bin/yugabyted start --background=false
+    ports:
+      - "5433:5433"   # YSQL
+      - "9042:9042"   # YCQL
+      - "15433:15433" # yugabyted UI
+      - "7000:7000"   # yb-master UI
+      - "9000:9000"   # yb-tserver UI
+    volumes:
+      - ./ysql:/ysql:ro
+      - ./ycql:/ycql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "ysqlsh -h yugabyte -c 'SELECT 1' && ycqlsh yugabyte -e 'SELECT now() FROM system.local'"]
+      interval: 10s
+      timeout: 10s
+      retries: 30
+      start_period: 30s

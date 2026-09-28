@@ -1,0 +1,5 @@
+// Edges are documents too, with _from/_to pointing at vertices.
+FOR e IN [["alice", "bob", 2015], ["bob", "carol", 2019], ["carol", "dave", 2021], ["alice", "carol", 2020]]
+  INSERT { _key: CONCAT(e[0], "-", e[1]), _from: CONCAT("people/", e[0]), _to: CONCAT("people/", e[1]), since: e[2] }
+    INTO knows OPTIONS { overwriteMode: "replace" }
+  RETURN NEW._key

@@ -1,0 +1,17 @@
+name: ydb-single
+
+# local-ydb: one ydbd process with storage and database /local in one container.
+# amd64-only; runs under emulation on Apple silicon.
+services:
+  ydb:
+    image: ydbplatform/local-ydb:${YDB_VERSION:-26.2.1.14}
+    platform: linux/amd64
+    container_name: ydb
+    hostname: localhost # advertised in discovery, so host clients can reach it
+    environment:
+      YDB_USE_IN_MEMORY_PDISKS: "true"
+      GRPC_PORT: 2136
+      MON_PORT: 8765
+    ports:
+      - "2136:2136" # gRPC
+      - "8765:8765" # embedded UI

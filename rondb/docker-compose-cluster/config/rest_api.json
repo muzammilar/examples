@@ -1,0 +1,13 @@
+{
+  "REST": { "Enable": true, "ServerIP": "0.0.0.0", "ServerPort": 4406, "NumThreads": 4 },
+  "GRPC": { "Enable": false },
+  "Rondis": { "Enable": false },
+  "RonDB": { "Mgmds": [{ "IP": "mgmd", "Port": 1186 }], "ConnectionPoolSize": 1, "NodeIDs": [195] },
+  "Security": {
+    "#InsecureAllowAll": "no API keys, no TLS: local testing only",
+    "InsecureAllowAll": true,
+    "TLS": { "EnableTLS": false, "RequireAndVerifyClientCert": false },
+    "APIKey": { "UseHopsworksAPIKeys": false }
+  },
+  "Log": { "Level": "info" }
+}

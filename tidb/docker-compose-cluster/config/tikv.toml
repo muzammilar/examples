@@ -1,0 +1,19 @@
+# Laptop-sized TiKV. Without these, each store sizes its block cache from the whole
+# Docker VM's memory (45% of RAM), keeps 5 GB of disk in reserve, and reports the
+# VM's full disk as its capacity: on a nearly full Docker disk PD then marks every
+# store "low space" (used > 80%) and stops placing replicas.
+[storage]
+reserve-space = "0MB"
+
+[storage.block-cache]
+capacity = "256MB"
+
+[raftstore]
+# capacity PD sees per store (available = min(capacity - used, free disk))
+capacity = "2GB"
+
+[rocksdb]
+max-open-files = 4096
+
+[raftdb]
+max-open-files = 4096

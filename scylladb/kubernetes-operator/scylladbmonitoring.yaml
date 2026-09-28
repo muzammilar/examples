@@ -1,0 +1,22 @@
+# Grafana with the scylla-monitoring dashboards, wired to the Prometheus above.
+apiVersion: scylla.scylladb.com/v1alpha1
+kind: ScyllaDBMonitoring
+metadata:
+  name: scylla
+  namespace: scylla
+spec:
+  type: Platform
+  endpointsSelector:
+    matchLabels:
+      app.kubernetes.io/name: scylla
+      scylla-operator.scylladb.com/scylla-service-type: member
+      scylla/cluster: scylla
+  components:
+    prometheus:
+      mode: External
+    grafana:
+      datasources:
+        - name: prometheus
+          type: Prometheus
+          url: http://prometheus.scylla.svc.cluster.local:9090
+          prometheusOptions: {}

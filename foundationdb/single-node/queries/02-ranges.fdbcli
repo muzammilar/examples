@@ -1,0 +1,6 @@
+# keys are kept sorted, so a prefix is a range: getrange/getrangekeys with a LIMIT, then clearrange [begin, end)
+writemode on
+getrange user/ user0 2
+getrangekeys user/ user0
+clearrange user/2 user/4
+getrange user/ user0

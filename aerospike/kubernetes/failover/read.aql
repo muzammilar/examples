@@ -1,0 +1,3 @@
+-- every record, by scan and by key
+SELECT * FROM test.failover
+SELECT * FROM test.failover WHERE PK = 'r1'

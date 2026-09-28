@@ -1,0 +1,64 @@
+global:
+  scrape_interval: 15s
+
+# One job per ydbd counter group (/counters/counters=<group>/prometheus); static
+# nodes on :8765, dynamic nodes on :8766. The upstream dashboards expect the
+# naming of YDB's ydb-prometheus Helm chart: metric names prefixed with their
+# group ("utils_", "kqp_", ...), the ydb group served with name_label=name, and
+# container="ydb-static" or "ydb-dynamic". Every series also gets counter=<group>.
+scrape_configs:
+  - job_name: ydb-utils
+    metrics_path: /counters/counters=utils/prometheus
+    static_configs: &targets
+      - targets: ["ydb-storage-1:8765", "ydb-storage-2:8765", "ydb-storage-3:8765"]
+        labels: { role: storage, container: ydb-static }
+      - targets: ["ydb-dynamic-1:8766", "ydb-dynamic-2:8766"]
+        labels: { role: dynamic, container: ydb-dynamic }
+    relabel_configs: &counter
+      - source_labels: [__metrics_path__]
+        regex: /counters/counters=(\w+)/.*
+        target_label: counter
+    metric_relabel_configs: &prefix
+      - source_labels: [counter, __name__]
+        separator: _
+        target_label: __name__
+  - job_name: ydb-kqp
+    metrics_path: /counters/counters=kqp/prometheus
+    static_configs: *targets
+    relabel_configs: *counter
+    metric_relabel_configs: *prefix
+  - job_name: ydb-grpc
+    metrics_path: /counters/counters=grpc/prometheus
+    static_configs: *targets
+    relabel_configs: *counter
+    metric_relabel_configs: *prefix
+  - job_name: ydb-ydb
+    metrics_path: /counters/counters=ydb/name_label=name/prometheus
+    static_configs: *targets
+    relabel_configs: *counter
+    metric_relabel_configs: *prefix
+  - job_name: ydb-tablets
+    metrics_path: /counters/counters=tablets/prometheus
+    static_configs: *targets
+    relabel_configs: *counter
+    metric_relabel_configs: *prefix
+  - job_name: ydb-followers
+    metrics_path: /counters/counters=followers/prometheus
+    static_configs: *targets
+    relabel_configs: *counter
+    metric_relabel_configs: *prefix
+  - job_name: ydb-proxy
+    metrics_path: /counters/counters=proxy/prometheus
+    static_configs: *targets
+    relabel_configs: *counter
+    metric_relabel_configs: *prefix
+  - job_name: ydb-dsproxynode
+    metrics_path: /counters/counters=dsproxynode/prometheus
+    static_configs: *targets
+    relabel_configs: *counter
+    metric_relabel_configs: *prefix
+  - job_name: ydb-interconnect
+    metrics_path: /counters/counters=interconnect/prometheus
+    static_configs: *targets
+    relabel_configs: *counter
+    metric_relabel_configs: *prefix

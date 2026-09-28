@@ -1,0 +1,26 @@
+{application, orchestrator, [
+    {description, "Job orchestrator: a TCP front end over a supervised worker pool"},
+    {vsn, "0.1.0"},
+    {registered, [
+        orchestrator_sup,
+        orchestrator_job_server,
+        orchestrator_worker_sup,
+        orchestrator_conn_sup,
+        orchestrator_listener,
+        orchestrator_cluster
+    ]},
+    {mod, {orchestrator_app, []}},
+    {applications, [kernel, stdlib]},
+    {env, [
+        {port, 5555},
+        {acceptors, 4},
+        {workers, 4},
+        {max_queue, 100},
+        {max_attempts, 3},
+        {job_timeout, 5000},
+        {idle_timeout, 300000},
+        {result_ttl, 300000},
+        {peers, ""}
+    ]},
+    {licenses, ["MIT"]}
+]}.

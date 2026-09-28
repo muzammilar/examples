@@ -1,0 +1,4 @@
+// Shortest path Alice -> Dave, then aggregate the people by city.
+LET route = (FOR v IN OUTBOUND SHORTEST_PATH "people/alice" TO "people/dave" GRAPH "social" RETURN v.name)
+LET by_city = (FOR p IN people COLLECT city = p.city WITH COUNT INTO n SORT n DESC, city RETURN { city, n })
+RETURN { route, by_city }
