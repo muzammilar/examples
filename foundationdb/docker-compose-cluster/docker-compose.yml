@@ -3,7 +3,7 @@ name: foundationdb-cluster
 # Three fdbserver processes form one cluster; all three are coordinators.
 # The cluster file names coordinators by hostname (FDB 7.1+), so every process
 # and the exporter share the same static connection string.
-# `make init` configures the database in `double` redundancy.
+# `make init` configures the database in `double` redundancy on Redwood (ssd-redwood-1).
 x-fdb: &fdb
   image: foundationdb/foundationdb:${FDB_VERSION:-7.3.79}
   environment:
@@ -57,7 +57,33 @@ services:
       - ./grafana/provisioning:/etc/grafana/provisioning:ro
     depends_on: [prometheus]
 
+  # `make benchmark`: bench/bench.py under uv (deps pinned in bench/uv.lock), with
+  # libfdb_c.so from the server image (bench/Dockerfile).
+  bench:
+    build:
+      context: bench
+      args: { FDB_VERSION: "${FDB_VERSION:-7.3.79}" }
+    profiles: [bench]
+    working_dir: /bench
+    command: ["uv", "run", "--frozen", "bench.py"]
+    environment:
+      UV_CACHE_DIR: /uv/cache              # wheel cache and venv live in the uv volume,
+      UV_PROJECT_ENVIRONMENT: /uv/venv     # so reruns skip downloads and installs
+      UV_PYTHON_DOWNLOADS: never           # use the image's Python
+      FDB_CLUSTER_FILE: /etc/foundationdb/fdb.cluster
+      SMOKE: ${SMOKE:-}
+      DURATION: ${DURATION:-}
+      CLIENTS: ${CLIENTS:-}
+      ROWS: ${ROWS:-}
+      HOT: ${HOT:-}
+    volumes:
+      - ./bench:/bench:ro
+      - ./results:/results
+      - ./fdb.cluster:/etc/foundationdb/fdb.cluster:ro
+      - uv-cache:/uv
+
 volumes:
+  uv-cache:
   fdb-0:
   fdb-1:
   fdb-2:
