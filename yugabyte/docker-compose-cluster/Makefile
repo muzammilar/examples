@@ -1,9 +1,17 @@
-.PHONY: up dashboards test failover status cli cli-ycql down
+.PHONY: up dashboards test failover benchmark status cli cli-ycql down
 
 YUGABYTED := docker exec yb-1 yugabyted
 YB_ADMIN := docker exec yb-1 yb-admin --master_addresses yb-1:7100,yb-2:7100,yb-3:7100
 YSQLSH := docker exec -i yb-1 ysqlsh -h yb-1 -v ON_ERROR_STOP=1
 YCQLSH := docker exec -i yb-1 ycqlsh yb-1
+
+# make benchmark: seconds per ysql_bench run, client counts, scale (x 100k accounts),
+# tries per transaction on serialization/conflict errors (SMOKE=1: a short run)
+SMOKE ?=
+DURATION ?= $(if $(SMOKE),10,60)
+CLIENTS ?= 1 8 16
+SCALE ?= $(if $(SMOKE),2,10)
+MAX_TRIES ?= 10
 
 # upstream dashboard (cloud/grafana) from the yugabyte-db release tag matching the image
 YUGABYTE_DB_REF := v2026.1.2.0
@@ -53,6 +61,18 @@ failover:
 	$(YSQLSH) -c 'SELECT * FROM failover ORDER BY phase'
 	$(YCQLSH) -e 'SELECT * FROM demo.failover'
 
+# ysql_bench TPC-B-like and select-only at each CLIENTS count (split over yb-1..3) for DURATION s
+benchmark:
+	@for n in yb-1 yb-2 yb-3; do docker compose ps --status running --services | grep -qx $$n || { echo 'run `make up` first'; exit 1; }; done
+	@mkdir -p results
+	@export NAME=yugabyte-$$(date -u +%Y%m%dT%H%M%SZ) DURATION=$(DURATION) CLIENTS="$(CLIENTS)" SCALE=$(SCALE) \
+		MAX_TRIES=$(MAX_TRIES) HOST_INFO="$$(uname -sm)" \
+		DOCKER_INFO="$$(docker info --format 'Docker {{.ServerVersion}}, {{.NCPU}} CPUs, {{.MemTotal}} bytes')"; \
+	{ echo "meta: server_version=$$($(YSQLSH) -Atc 'SELECT version()')"; \
+	  echo "meta: tservers_alive=$$($(YB_ADMIN) list_all_tablet_servers | grep -c ALIVE)"; \
+	  echo "meta: replication_factor=$$($(YB_ADMIN) get_universe_config | jq '.replicationInfo.liveReplicas.numReplicas')"; } > results/$$NAME.txt; \
+	docker compose --progress quiet run --rm -T bench && docker compose --progress quiet run --rm -T bench-report
+
 status:
 	$(YUGABYTED) status
 	$(YB_ADMIN) list_all_masters
@@ -65,4 +85,4 @@ cli-ycql:
 	docker exec -it yb-1 ycqlsh yb-1
 
 down:
-	docker compose down --volumes
+	docker compose --profile bench down --volumes
