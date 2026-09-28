@@ -111,3 +111,10 @@ tens of milliseconds, and exact percentiles (~1.3 s) are the one expensive case.
 clients, but TPC-B writes do not. At scale 10 every transaction updates one of 10 branch rows, so
 under repeatable read 40-60% of transactions hit a serialization conflict and retry, and TPS
 flattens at ~1.45k.
+
+### Future work
+
+Add sysbench (`--db-driver=pgsql`) with one common workload set (same scripts, table count/size,
+thread counts and duration) shared by every sysbench-capable example — TiDB, OceanBase (single node
+and cluster), SingleStore, RonDB, YugabyteDB YSQL and CedarDB — so their numbers compare directly.
+This example currently uses its own tool and parameters.
