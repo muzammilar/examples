@@ -19,6 +19,12 @@ gql() { # FILE  (GraphQL: comments stripped, wrapped as {"query": ...})
 curl -sS -X DELETE "$URL/v1/schema/Landmark" >/dev/null   # start clean, so the test is repeatable
 rest POST /v1/schema        requests/01-create-collection.json '{class, vectorizer, distance: .vectorIndexConfig.distance}'
 rest POST /v1/batch/objects requests/02-batch-insert.json     '.[] | {id, status: .result.errors // "SUCCESS"}'
+# ASYNC_INDEXING is on: vectors are searchable once the background queue has indexed them
+echo "==> wait for async indexing (GET /v1/nodes/Landmark?output=verbose)"
+until curl -sS "$URL/v1/nodes/Landmark?output=verbose" \
+  | jq -e '[.nodes[].shards[]? | .vectorQueueLength == 0 and .vectorIndexingStatus == "READY"] | length > 0 and all' >/dev/null
+do sleep 0.2; done
+echo
 gql requests/03-near-vector.graphql
 gql requests/04-near-vector-where.graphql
 gql requests/05-bm25.graphql

@@ -12,9 +12,11 @@ services:
       PERSISTENCE_DATA_PATH: /var/lib/weaviate
       CLUSTER_HOSTNAME: node1
       QUERY_DEFAULTS_LIMIT: 10
-    ports:
-      - "8080:8080"   # REST + GraphQL
-      - "50051:50051" # gRPC (used by the v4 clients)
+      DISABLE_TELEMETRY: "true" # no usage reports to Weaviate
+      ASYNC_INDEXING: "true"    # build HNSW from a background queue (see `make benchmark`)
+    ports: # localhost only: anonymous access, no API key
+      - "127.0.0.1:8080:8080"   # REST + GraphQL
+      - "127.0.0.1:50051:50051" # gRPC (used by the v4 clients)
     volumes:
       - weaviate-data:/var/lib/weaviate
     healthcheck:
@@ -35,5 +37,25 @@ services:
       - ./requests:/work/requests:ro
       - ./scripts:/work/scripts:ro
 
+  # uv + Python 3.13, used by `make benchmark` (bench/bench.py, deps pinned in bench/uv.lock)
+  bench:
+    image: ghcr.io/astral-sh/uv:0.12.19-python3.13-trixie-slim
+    profiles: [bench]
+    working_dir: /bench
+    command: ["uv", "run", "--frozen", "bench.py"]
+    environment:
+      UV_CACHE_DIR: /uv/cache              # wheel cache and venv live in the uv volume,
+      UV_PROJECT_ENVIRONMENT: /uv/venv     # so reruns skip downloads and installs
+      UV_PYTHON_DOWNLOADS: never           # use the image's Python
+      SMOKE: ${SMOKE:-}
+      N: ${N:-}
+      DIM: ${DIM:-}
+      K: ${K:-}
+    volumes:
+      - ./bench:/bench:ro
+      - ./results:/results
+      - uv-cache:/uv
+
 volumes:
   weaviate-data:
+  uv-cache:
