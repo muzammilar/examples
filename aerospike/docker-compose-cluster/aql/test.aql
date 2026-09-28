@@ -1,0 +1,7 @@
+INSERT INTO test.demo (PK, v) VALUES ('hello', 'world')
+INSERT INTO test.demo (PK, v) VALUES ('foo', 'bar')
+SELECT * FROM test.demo WHERE PK = 'hello'
+SELECT * FROM test.demo
+DELETE FROM test.demo WHERE PK = 'foo'
+SELECT * FROM test.demo
+SHOW SETS
