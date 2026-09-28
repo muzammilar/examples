@@ -3,6 +3,7 @@
 Website: https://arangodb.com/
 
 - [`single-node/`](single-node) — one ArangoDB server with Docker Compose: documents, edges, UPSERT, a persistent index, graph traversal and shortest path in AQL.
+- [`docker-compose-cluster/`](docker-compose-cluster) — a cluster with Docker Compose (3 agents, 3 DB-servers, 2 coordinators): sharded, replicated collections, AQL and a graph traversal across shards, and DB-server failover.
 
 ## Benchmark
 
