@@ -1,0 +1,55 @@
+name: tigerbeetle-single
+
+# One replica (--replica-count=1), following docs.tigerbeetle.com/operating/deploying/docker:
+# `tigerbeetle format` creates the data file once, then `tigerbeetle start` serves it.
+# TigerBeetle needs io_uring, which Docker >= 25 blocks by default: seccomp=unconfined.
+x-tigerbeetle: &tigerbeetle
+  image: ghcr.io/tigerbeetle/tigerbeetle:${TIGERBEETLE_VERSION:-0.17.9}
+  security_opt: ["seccomp=unconfined"]
+  cap_add: [IPC_LOCK] # memory locking (docs: "On MacOS" / error: SystemResources)
+  volumes:
+    - tigerbeetle-data:/data
+
+services:
+  # One-shot: format the data file unless the volume already has one.
+  format:
+    <<: *tigerbeetle
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - >-
+        [ -f /data/0_0.tigerbeetle ] ||
+        /tigerbeetle format --cluster=0 --replica=0 --replica-count=1 /data/0_0.tigerbeetle
+
+  tigerbeetle:
+    <<: *tigerbeetle
+    container_name: tigerbeetle
+    # --cache-grid: the default 1 GiB grid cache is sized for a dedicated machine
+    command: start --addresses=0.0.0.0:3000 --cache-grid=256MiB /data/0_0.tigerbeetle
+    ports:
+      - "${TIGERBEETLE_PORT:-3033}:3000"
+    depends_on:
+      format: { condition: service_completed_successfully }
+    healthcheck:
+      test: ["CMD", "nc", "-z", "127.0.0.1", "3000"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+
+  # `make test`: the official Python client (pip install tigerbeetle) runs client/demo.py.
+  client:
+    build:
+      context: client
+      args:
+        TIGERBEETLE_VERSION: ${TIGERBEETLE_VERSION:-0.17.9}
+    image: tigerbeetle-single-client
+    profiles: [test]
+    security_opt: ["seccomp=unconfined"] # the client library uses io_uring too
+    # the client takes IP addresses only (no DNS), so share the replica's network namespace
+    network_mode: service:tigerbeetle
+    environment:
+      TB_ADDRESS: 127.0.0.1:3000
+    depends_on:
+      tigerbeetle: { condition: service_healthy }
+
+volumes:
+  tigerbeetle-data:
