@@ -1,0 +1,29 @@
+name: oceanbase-single
+
+services:
+  # One observer (sys tenant + MySQL-mode user tenant `test`) bootstrapped by obd inside
+  # the container, as in https://github.com/oceanbase/docker-images/tree/main/oceanbase-ce
+  # The image is multi-arch (amd64 + arm64), so it runs natively on Apple silicon.
+  oceanbase:
+    image: oceanbase/oceanbase-ce:${OB_VERSION:-4.4.2.1-101000022026050611}
+    container_name: oceanbase
+    hostname: oceanbase
+    environment:
+      MODE: ${OB_MODE:-mini}                       # mini = smallest resources; slim = prebuilt fastboot
+      OB_MEMORY_LIMIT: ${OB_MEMORY_LIMIT:-6G}      # observer memory_limit: mini default; 4G/5G fail to bootstrap
+      OB_SYSTEM_MEMORY: ${OB_SYSTEM_MEMORY:-1G}
+      OB_DATAFILE_SIZE: ${OB_DATAFILE_SIZE:-2G}     # preallocated data file (image default 5G)
+      OB_LOG_DISK_SIZE: ${OB_LOG_DISK_SIZE:-4G}     # preallocated log disk: sys 2G + test 2G
+      OB_TENANT_NAME: test
+    # Data lives under /root/ob in the container layer; `make down` discards it.
+    ports:
+      - "${OB_PORT:-2881}:2881" # MySQL protocol (root@sys, root@test)
+    volumes:
+      - ./sql:/sql:ro
+    healthcheck:
+      # Healthy once the user tenant accepts connections (the entrypoint then prints "boot success!").
+      test: ["CMD-SHELL", "obclient -h127.1 -P2881 -uroot@test -A -e 'SELECT 1' >/dev/null"]
+      interval: 10s
+      timeout: 10s
+      retries: 60
+      start_period: 5m
