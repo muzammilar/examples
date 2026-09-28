@@ -1,9 +1,16 @@
-.PHONY: up dashboards test failover status cli down
+.PHONY: up dashboards test failover benchmark status cli down
 
 # upstream dashboards (prebuilt for ScyllaDB $(SCYLLA_DASH_VERSION)) and the recording rules they rely on
 SCYLLA_MONITORING_REF := 4.16.1
 SCYLLA_DASH_VERSION := 2026.1
 SCYLLA_MONITORING := https://raw.githubusercontent.com/scylladb/scylla-monitoring/$(SCYLLA_MONITORING_REF)
+
+# make benchmark: seconds per workload, cassandra-stress threads, partitions written (SMOKE=1: a short run)
+SMOKE ?=
+DURATION ?= $(if $(SMOKE),10,60)
+THREADS ?= 32
+KEYS ?= $(if $(SMOKE),100000,1000000)
+LWT_KEYS ?= 10000
 
 up: dashboards
 	docker compose up --detach --wait
@@ -12,7 +19,7 @@ up: dashboards
 # downloads into the gitignored grafana/provisioning/dashboards/upstream/ and prometheus/upstream/
 dashboards:
 	grafana/fetch-dashboards.sh grafana/provisioning/dashboards/upstream $(SCYLLA_MONITORING)/grafana/build/ver_$(SCYLLA_DASH_VERSION) \
-		$(foreach d,overview detailed cql os,scylla-$(d).$(SCYLLA_DASH_VERSION).json)
+		$(foreach d,overview detailed cql,scylla-$(d).$(SCYLLA_DASH_VERSION).json)
 	grafana/fetch-dashboards.sh prometheus/upstream $(SCYLLA_MONITORING)/prometheus/prom_rules prometheus.latency.rules.yml
 
 # RF=3 keyspace, a few writes/reads at QUORUM
@@ -30,7 +37,11 @@ failover:
 	@echo "==> QUORUM write + read (2 of 3 replicas)"
 	docker exec -i scylla-1 cqlsh < failover/quorum.cql
 	@echo "==> CONSISTENCY ALL (3 of 3 replicas)"
-	docker exec -i scylla-1 cqlsh < failover/all.cql || echo "expected: Unavailable, only 2 of 3 replicas alive"
+	@if docker exec -i scylla-1 cqlsh < failover/all.cql; then \
+		echo "unexpected: ALL succeeded with a node down"; exit 1; \
+	else \
+		echo "expected: Unavailable, only 2 of 3 replicas alive"; \
+	fi
 	@echo "==> lightweight transactions (Paxos quorum)"
 	docker exec -i scylla-1 cqlsh < failover/lwt.cql
 	@echo "==> starting scylla-3"
@@ -39,8 +50,22 @@ failover:
 	for i in $$(seq 90); do [ "$$(docker exec scylla-1 nodetool status | grep -c '^UN')" = 3 ] && break; sleep 2; done
 	docker exec scylla-1 nodetool status | grep -E '^(UN|DN)'
 	[ "$$(docker exec scylla-1 nodetool status | grep -c '^UN')" = 3 ]
-	@echo "==> CONSISTENCY ALL works again (scylla-3 got the missed write via hints / read repair)"
+	@echo "==> CONSISTENCY ALL works again: all 3 replicas answer again (an ALL read also read-repairs)"
 	docker exec -i scylla-1 cqlsh < failover/all.cql
+
+# cassandra-stress at QUORUM: write, read, 50/50 mixed, plain vs LWT update, DURATION s each;
+# prints a summary table, keeps results/scylladb-<UTC time>.{txt,json}
+benchmark:
+	@docker compose ps --status running --services | grep -qx scylla-3 || { echo 'run `make up` first'; exit 1; }
+	@mkdir -p results
+	@echo "==> dropping the benchmark keyspaces of an earlier run"
+	@docker exec scylla-1 cqlsh -e 'DROP KEYSPACE IF EXISTS keyspace1; DROP KEYSPACE IF EXISTS bench_lwt'
+	@export NAME=scylladb-$$(date -u +%Y%m%dT%H%M%SZ) DURATION=$(DURATION) THREADS=$(THREADS) KEYS=$(KEYS) LWT_KEYS=$(LWT_KEYS) \
+		HOST_INFO="$$(uname -sm)" DOCKER_INFO="$$(docker info --format 'Docker {{.ServerVersion}}, {{.NCPU}} CPUs, {{.MemTotal}} bytes')"; \
+	{ echo "meta: server_version=$$(docker exec scylla-1 scylla --version)"; \
+	  echo "meta: nodes_up=$$(docker exec scylla-1 nodetool status | grep -c '^UN')"; \
+	  echo "meta: node_args=$$(docker inspect scylla-1 --format '{{join .Config.Cmd " "}}')"; } > results/$$NAME.txt; \
+	docker compose run --rm -T bench && docker compose run --rm -T bench-report
 
 status:
 	docker exec scylla-1 nodetool status
@@ -49,4 +74,4 @@ cli:
 	docker exec -it scylla-1 cqlsh
 
 down:
-	docker compose down --volumes
+	docker compose --profile bench down --volumes
