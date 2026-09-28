@@ -3,6 +3,7 @@
 Website: https://weaviate.io/
 
 - [`single-node/`](single-node) — one Weaviate server with Docker Compose and self-supplied vectors: nearVector, filtered search, BM25 and hybrid search over GraphQL.
+- [`docker-compose-cluster/`](docker-compose-cluster) — three Weaviate nodes (memberlist + Raft): a 3-shard collection with replication factor 3, reads and writes at ONE/QUORUM/ALL, and a failover demo (stop a node: QUORUM works; partition it: ALL fails; recovery to 3 healthy nodes).
 
 ## Benchmark
 

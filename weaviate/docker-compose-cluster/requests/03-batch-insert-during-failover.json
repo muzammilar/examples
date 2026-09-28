@@ -1,0 +1,6 @@
+{
+  "objects": [
+    { "class": "Landmark", "id": "00000000-0000-0000-0000-000000000007", "vector": [0.91, 0.12, 0.30, 0.25], "properties": { "name": "Eiffel Tower", "city": "Paris" } },
+    { "class": "Landmark", "id": "00000000-0000-0000-0000-000000000008", "vector": [0.15, 0.72, 0.40, 0.55], "properties": { "name": "Colosseum",    "city": "Rome" } }
+  ]
+}

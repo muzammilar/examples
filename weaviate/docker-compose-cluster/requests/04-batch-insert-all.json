@@ -1,0 +1,5 @@
+{
+  "objects": [
+    { "class": "Landmark", "id": "00000000-0000-0000-0000-000000000009", "vector": [0.44, 0.33, 0.81, 0.10], "properties": { "name": "Opera House", "city": "Sydney" } }
+  ]
+}
