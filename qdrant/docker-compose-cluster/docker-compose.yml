@@ -1,0 +1,69 @@
+name: qdrant-cluster
+
+# Three Qdrant peers in distributed mode (Raft consensus on the p2p port 6335).
+# qdrant-1 bootstraps the cluster; qdrant-2 and qdrant-3 join it through
+# --bootstrap once qdrant-1 is ready. Every peer passes its own --uri, so the
+# address stored in the cluster state is the hostname, not a container IP that
+# can change on restart.
+x-qdrant: &qdrant
+  image: qdrant/qdrant:${QDRANT_VERSION:-v1.19.1}
+  environment:
+    QDRANT__CLUSTER__ENABLED: "true"
+    QDRANT__TELEMETRY_DISABLED: "true" # no anonymous usage reports to telemetry.qdrant.io
+  # the image has no curl/wget; probe /readyz over bash's /dev/tcp
+  healthcheck:
+    test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/127.0.0.1/6333 && printf 'GET /readyz HTTP/1.0\\r\\n\\r\\n' >&3 && grep -q ' 200 ' <&3"]
+    interval: 5s
+    timeout: 3s
+    retries: 30
+
+services:
+  qdrant-1:
+    <<: *qdrant
+    container_name: qdrant-1
+    hostname: qdrant-1
+    command: ["./entrypoint.sh", "--uri", "http://qdrant-1:6335"]
+    ports: # localhost only: no API key is set
+      - "127.0.0.1:16333:6333" # REST + web UI (/dashboard)
+      - "127.0.0.1:16334:6334" # gRPC
+    volumes:
+      - qdrant-1:/qdrant/storage
+
+  qdrant-2:
+    <<: *qdrant
+    container_name: qdrant-2
+    hostname: qdrant-2
+    command: ["./entrypoint.sh", "--bootstrap", "http://qdrant-1:6335", "--uri", "http://qdrant-2:6335"]
+    ports: ["127.0.0.1:16343:6333"] # REST
+    volumes:
+      - qdrant-2:/qdrant/storage
+    depends_on:
+      qdrant-1: { condition: service_healthy }
+
+  qdrant-3:
+    <<: *qdrant
+    container_name: qdrant-3
+    hostname: qdrant-3
+    command: ["./entrypoint.sh", "--bootstrap", "http://qdrant-1:6335", "--uri", "http://qdrant-3:6335"]
+    ports: ["127.0.0.1:16353:6333"] # REST
+    volumes:
+      - qdrant-3:/qdrant/storage
+    depends_on:
+      qdrant-2: { condition: service_healthy }
+
+  # curl + jq, used by `make test`, `make failover` and `make cli`
+  tools:
+    build:
+      dockerfile_inline: |
+        FROM alpine:3.22
+        RUN apk add --no-cache curl jq
+    profiles: [tools]
+    working_dir: /work
+    volumes:
+      - ./requests:/work/requests:ro
+      - ./scripts:/work/scripts:ro
+
+volumes:
+  qdrant-1:
+  qdrant-2:
+  qdrant-3:
