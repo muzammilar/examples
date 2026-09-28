@@ -1,0 +1,9 @@
+[project]
+name = "cedardb-bench-report"
+version = "0.1.0"
+description = "Parses pgbench and psql output for the CedarDB single-node example (make benchmark)"
+requires-python = ">=3.13"
+dependencies = []
+
+[tool.uv]
+package = false
