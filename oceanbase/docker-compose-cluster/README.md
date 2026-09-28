@@ -216,3 +216,10 @@ Not set up here, compared with an obd deployment: obproxy (clients connect to an
 directly), named time zones (obd imports the time zone tables into each tenant; here
 `CONVERT_TZ(..., 'Asia/Shanghai')` returns NULL, offsets such as `'+00:00'` work), and passwords
 (root has none in both tenants).
+
+### Future work
+
+Run one common sysbench workload set (same scripts, table count/size, thread counts and duration)
+across every sysbench-capable example — TiDB, OceanBase (single node and cluster), SingleStore and
+RonDB over the MySQL protocol, YugabyteDB YSQL and CedarDB with sysbench's `pgsql` driver — so their
+numbers compare directly. Today each example uses its own parameters.
