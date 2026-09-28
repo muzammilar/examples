@@ -1,4 +1,6 @@
-.PHONY: up test status cli down
+.PHONY: up test status cli benchmark down
+
+SMOKE ?=
 
 ARANGOSH := docker exec -i arangodb arangosh --server.password demo --quiet
 
@@ -18,6 +20,11 @@ status:
 
 cli:
 	docker exec -it arangodb arangosh --server.password demo --server.database demo
+
+# needs `make up`; SMOKE=1 for 10k persons (default 100k), or set N
+benchmark:
+	@docker compose ps --status running --services | grep -qx arangodb || { echo 'run `make up` first'; exit 1; }
+	SMOKE=$(SMOKE) HOST_UID=$$(id -u) HOST_GID=$$(id -g) docker compose run --rm bench
 
 down:
 	docker compose down --volumes
