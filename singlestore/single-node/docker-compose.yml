@@ -27,5 +27,47 @@ services:
       retries: 60
       start_period: 90s
 
+  # `make benchmark`: sysbench OLTP + columnstore query timings over the MySQL protocol
+  # (bench/run.sh, image built from bench/Dockerfile, native arch), raw output to results/
+  bench:
+    build: ./bench
+    profiles: [bench]
+    command: ["sh", "/bench/run.sh"]
+    environment:
+      NAME: ${NAME:-}
+      SINGLESTORE_PASSWORD: ${SINGLESTORE_PASSWORD:-SingleStore-Demo-1}
+      DURATION: ${DURATION:-60}
+      THREADS: ${THREADS:-8}
+      TABLES: ${TABLES:-4}
+      TABLE_SIZE: ${TABLE_SIZE:-50000}
+      TABLE_TYPE: ${TABLE_TYPE:-rowstore}
+      RAND_TYPE: ${RAND_TYPE:-uniform}
+      RUNS: ${RUNS:-5}
+    volumes:
+      - ./bench:/bench:ro
+      - ./results:/results
+
+  # `make benchmark`: parses the raw output (bench/report.py) into a table and results/*.json
+  bench-report:
+    image: ghcr.io/astral-sh/uv:0.12.19-python3.13-trixie-slim
+    profiles: [bench]
+    network_mode: none
+    working_dir: /bench
+    command: ["uv", "run", "--frozen", "report.py"]
+    environment:
+      UV_CACHE_DIR: /uv/cache          # the venv lives in the uv volume, so reruns skip creating it
+      UV_PROJECT_ENVIRONMENT: /uv/venv
+      UV_PYTHON_DOWNLOADS: never       # use the image's Python
+      NAME: ${NAME:-}
+      HOST_INFO: ${HOST_INFO:-}
+      DOCKER_INFO: ${DOCKER_INFO:-}
+      DEV_IMAGE: ${SINGLESTORE_DEV_IMAGE_VERSION:-0.2.85}
+      SERVER_PLATFORM: ${SERVER_PLATFORM:-}
+    volumes:
+      - ./bench:/bench:ro
+      - ./results:/results
+      - uv-cache:/uv
+
 volumes:
   singlestore-data:
+  uv-cache:
