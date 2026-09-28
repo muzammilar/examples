@@ -26,11 +26,16 @@ make down      # remove containers (data lives inside them)
 - yb-master UI: http://localhost:7000, yb-tserver UI: http://localhost:9000 (yb-1)
 - Prometheus: http://localhost:9090
 - Grafana: http://localhost:3000 (anonymous admin) → **YugabyteDB** dashboard
+- `make up` also fetches the official YugabyteDB dashboard from
+  [yugabyte-db@v2026.1.2.0/cloud/grafana](https://github.com/yugabyte/yugabyte-db/tree/v2026.1.2.0/cloud/grafana)
+  into the gitignored `grafana/provisioning/dashboards/upstream/` → Grafana folder **upstream**.
+  `prometheus/prometheus.yml` adds the `node_prefix`/`export_type` labels and the
+  `handler_latency_*` → `rpc_latency{saved_name=...}` relabeling it expects. Its YEDIS panels stay empty.
 
 The image is multi-arch and runs natively on Apple silicon. It runs as uid 10001, so data
 stays in each container's writable layer (a fresh named volume would be root-owned).
 On macOS, AirPlay Receiver listens on port 7000; turn it off or remap to `7001:7000` if
 the port is taken. Tablet leaders start unevenly spread and the load balancer evens them out
-over a few minutes. For the full dashboards and alerting see
+over a few minutes. For alerting see
 [YugabyteDB Anywhere](https://docs.yugabyte.com/stable/yugabyte-platform/) or the
 [Prometheus integration docs](https://docs.yugabyte.com/stable/explore/observability/prometheus-integration/).

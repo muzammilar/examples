@@ -1,15 +1,23 @@
-.PHONY: up test failover status cli cli-ycql down
+.PHONY: up dashboards test failover status cli cli-ycql down
 
 YUGABYTED := docker exec yb-1 yugabyted
 YB_ADMIN := docker exec yb-1 yb-admin --master_addresses yb-1:7100,yb-2:7100,yb-3:7100
 YSQLSH := docker exec -i yb-1 ysqlsh -h yb-1 -v ON_ERROR_STOP=1
 YCQLSH := docker exec -i yb-1 ycqlsh yb-1
 
+# upstream dashboard (cloud/grafana) from the yugabyte-db release tag matching the image
+YUGABYTE_DB_REF := v2026.1.2.0
+
 # After all three nodes joined: place one replica of every tablet in each zone.
-up:
+up: dashboards
 	docker compose up --detach --wait
 	$(YUGABYTED) configure data_placement --fault_tolerance=zone
 	$(YUGABYTED) status
+
+# downloads into the gitignored grafana/provisioning/dashboards/upstream/ (skips existing files)
+dashboards:
+	grafana/fetch-dashboards.sh grafana/provisioning/dashboards/upstream \
+		https://raw.githubusercontent.com/yugabyte/yugabyte-db/$(YUGABYTE_DB_REF)/cloud/grafana YugabyteDB.json
 
 # ysql/*.sql through ysqlsh, ycql/*.cql through ycqlsh
 test:

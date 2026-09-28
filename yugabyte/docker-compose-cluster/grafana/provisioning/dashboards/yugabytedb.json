@@ -31,22 +31,22 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "sum(rate(handler_latency_yb_ysqlserver_SQLProcessor_SelectStmt_count{job=\"ysql\"}[1m]))",
+          "expr": "sum(rate(rpc_latency_count{saved_name=\"handler_latency_yb_ysqlserver_SQLProcessor_SelectStmt_count\",job=\"ysql\"}[1m]))",
           "legendFormat": "SELECT"
         },
         {
           "refId": "B",
-          "expr": "sum(rate(handler_latency_yb_ysqlserver_SQLProcessor_InsertStmt_count{job=\"ysql\"}[1m]))",
+          "expr": "sum(rate(rpc_latency_count{saved_name=\"handler_latency_yb_ysqlserver_SQLProcessor_InsertStmt_count\",job=\"ysql\"}[1m]))",
           "legendFormat": "INSERT"
         },
         {
           "refId": "C",
-          "expr": "sum(rate(handler_latency_yb_ysqlserver_SQLProcessor_UpdateStmt_count{job=\"ysql\"}[1m]))",
+          "expr": "sum(rate(rpc_latency_count{saved_name=\"handler_latency_yb_ysqlserver_SQLProcessor_UpdateStmt_count\",job=\"ysql\"}[1m]))",
           "legendFormat": "UPDATE"
         },
         {
           "refId": "D",
-          "expr": "sum(rate(handler_latency_yb_ysqlserver_SQLProcessor_DeleteStmt_count{job=\"ysql\"}[1m]))",
+          "expr": "sum(rate(rpc_latency_count{saved_name=\"handler_latency_yb_ysqlserver_SQLProcessor_DeleteStmt_count\",job=\"ysql\"}[1m]))",
           "legendFormat": "DELETE"
         }
       ]
@@ -74,22 +74,22 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "sum(rate(handler_latency_yb_cqlserver_SQLProcessor_SelectStmt_count{job=\"ycql\"}[1m]))",
+          "expr": "sum(rate(rpc_latency_count{saved_name=\"handler_latency_yb_cqlserver_SQLProcessor_SelectStmt_count\",job=\"ycql\"}[1m]))",
           "legendFormat": "SELECT"
         },
         {
           "refId": "B",
-          "expr": "sum(rate(handler_latency_yb_cqlserver_SQLProcessor_InsertStmt_count{job=\"ycql\"}[1m]))",
+          "expr": "sum(rate(rpc_latency_count{saved_name=\"handler_latency_yb_cqlserver_SQLProcessor_InsertStmt_count\",job=\"ycql\"}[1m]))",
           "legendFormat": "INSERT"
         },
         {
           "refId": "C",
-          "expr": "sum(rate(handler_latency_yb_cqlserver_SQLProcessor_UpdateStmt_count{job=\"ycql\"}[1m]))",
+          "expr": "sum(rate(rpc_latency_count{saved_name=\"handler_latency_yb_cqlserver_SQLProcessor_UpdateStmt_count\",job=\"ycql\"}[1m]))",
           "legendFormat": "UPDATE"
         },
         {
           "refId": "D",
-          "expr": "sum(rate(handler_latency_yb_cqlserver_SQLProcessor_DeleteStmt_count{job=\"ycql\"}[1m]))",
+          "expr": "sum(rate(rpc_latency_count{saved_name=\"handler_latency_yb_cqlserver_SQLProcessor_DeleteStmt_count\",job=\"ycql\"}[1m]))",
           "legendFormat": "DELETE"
         }
       ]
@@ -117,12 +117,12 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "sum by (instance) (rate(handler_latency_yb_tserver_TabletServerService_Read_count{job=\"yb-tserver\"}[1m]))",
+          "expr": "sum by (instance) (rate(rpc_latency_count{saved_name=\"handler_latency_yb_tserver_TabletServerService_Read_count\",job=\"yb-tserver\"}[1m]))",
           "legendFormat": "{{instance}} read"
         },
         {
           "refId": "B",
-          "expr": "sum by (instance) (rate(handler_latency_yb_tserver_TabletServerService_Write_count{job=\"yb-tserver\"}[1m]))",
+          "expr": "sum by (instance) (rate(rpc_latency_count{saved_name=\"handler_latency_yb_tserver_TabletServerService_Write_count\",job=\"yb-tserver\"}[1m]))",
           "legendFormat": "{{instance}} write"
         }
       ]
