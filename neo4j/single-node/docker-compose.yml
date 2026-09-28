@@ -15,7 +15,6 @@ services:
       - "7687:7687" # Bolt
     volumes:
       - neo4j-data:/data
-      - ./cypher:/cypher:ro
     healthcheck:
       test: ["CMD", "cypher-shell", "-u", "neo4j", "-p", "demo-password", "RETURN 1"]
       interval: 5s
@@ -23,5 +22,26 @@ services:
       retries: 30
       start_period: 15s
 
+  # uv + Python 3.13, used by `make benchmark` (bench/bench.py, deps pinned in bench/uv.lock)
+  bench:
+    image: ghcr.io/astral-sh/uv:0.12.19-python3.13-trixie-slim
+    profiles: [bench]
+    working_dir: /bench
+    command: ["uv", "run", "--frozen", "bench.py"]
+    environment:
+      UV_CACHE_DIR: /uv/cache              # wheel cache and venv live in the uv volume,
+      UV_PROJECT_ENVIRONMENT: /uv/venv     # so reruns skip downloads and installs
+      UV_PYTHON_DOWNLOADS: never           # use the image's Python
+      PYTHONDONTWRITEBYTECODE: "1"
+      SMOKE: ${SMOKE:-}
+      N: ${N:-}
+      HOST_UID: ${HOST_UID:-}
+      HOST_GID: ${HOST_GID:-}
+    volumes:
+      - ./bench:/bench:ro
+      - ./results:/results
+      - uv-cache:/uv
+
 volumes:
   neo4j-data:
+  uv-cache:
