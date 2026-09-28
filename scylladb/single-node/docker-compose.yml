@@ -10,12 +10,14 @@ services:
     command: sysctl -w fs.aio-max-nr=1048576
 
   scylla:
+    # 2026.1.x on purpose: it is ScyllaDB's current LTS line (newer feature
+    # releases exist); bump within 2026.1 for patch fixes.
     image: scylladb/scylla:${SCYLLA_VERSION:-2026.1.13}
     container_name: scylla
     hostname: scylla
     command: --smp 1 --memory 1G --overprovisioned 1 --developer-mode 1
     ports:
-      - "9042:9042" # CQL
+      - "127.0.0.1:9042:9042" # CQL, localhost only: no auth (AllowAllAuthenticator)
     depends_on:
       sysctl: { condition: service_completed_successfully }
     volumes:
