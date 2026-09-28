@@ -1,0 +1,76 @@
+name: tigerbeetle-cluster
+
+# Three replicas of one cluster (--replica-count=3), the Docker Compose recipe from
+# docs.tigerbeetle.com/operating/deploying/docker. Production clusters use 6 replicas on
+# separate machines (docs.tigerbeetle.com/operating/cluster); 3 tolerate one failed replica.
+#
+# `--addresses` takes IPs only (no DNS names) and must list every replica in replica
+# order, identically on every replica and client. The docs use `network_mode: host`
+# for that; here each replica gets a static IP on its own bridge network instead, which
+# also works on Docker Desktop. Each replica formats its own data file on first start.
+x-tigerbeetle: &tigerbeetle
+  image: ghcr.io/tigerbeetle/tigerbeetle:${TIGERBEETLE_VERSION:-0.17.9}
+  security_opt: ["seccomp=unconfined"] # io_uring (blocked by Docker >= 25's default seccomp)
+  cap_add: [IPC_LOCK]                  # memory locking (docs: "On MacOS" / error: SystemResources)
+  entrypoint: ["tini", "--", "/bin/sh", "-c"]
+  command:
+    - >-
+      [ -f /data/0_$$REPLICA.tigerbeetle ] ||
+      /tigerbeetle format --cluster=0 --replica=$$REPLICA --replica-count=3 /data/0_$$REPLICA.tigerbeetle;
+      exec /tigerbeetle start --addresses=$$ADDRESSES --cache-grid=256MiB /data/0_$$REPLICA.tigerbeetle
+  healthcheck:
+    test: ["CMD-SHELL", "nc -z $$(hostname -i) 3000"]
+    interval: 2s
+    timeout: 2s
+    retries: 30
+
+x-addresses: &addresses 10.203.53.10:3000,10.203.53.11:3000,10.203.53.12:3000
+
+services:
+  tigerbeetle-0:
+    <<: *tigerbeetle
+    container_name: tigerbeetle-0
+    environment: { REPLICA: 0, ADDRESSES: *addresses }
+    networks: { tigerbeetle: { ipv4_address: 10.203.53.10 } }
+    ports: ["${TIGERBEETLE_PORT_0:-3033}:3000"]
+    volumes: [tigerbeetle-0:/data]
+  tigerbeetle-1:
+    <<: *tigerbeetle
+    container_name: tigerbeetle-1
+    environment: { REPLICA: 1, ADDRESSES: *addresses }
+    networks: { tigerbeetle: { ipv4_address: 10.203.53.11 } }
+    ports: ["${TIGERBEETLE_PORT_1:-3034}:3000"]
+    volumes: [tigerbeetle-1:/data]
+  tigerbeetle-2:
+    <<: *tigerbeetle
+    container_name: tigerbeetle-2
+    environment: { REPLICA: 2, ADDRESSES: *addresses }
+    networks: { tigerbeetle: { ipv4_address: 10.203.53.12 } }
+    ports: ["${TIGERBEETLE_PORT_2:-3035}:3000"]
+    volumes: [tigerbeetle-2:/data]
+
+  # `make test`: the official Python client (pip install tigerbeetle) runs client/demo.py.
+  client:
+    build:
+      context: client
+      args:
+        TIGERBEETLE_VERSION: ${TIGERBEETLE_VERSION:-0.17.9}
+    image: tigerbeetle-cluster-client
+    profiles: [test]
+    security_opt: ["seccomp=unconfined"] # the client library uses io_uring too
+    networks: [tigerbeetle]
+    environment:
+      TB_ADDRESS: *addresses
+
+networks:
+  tigerbeetle:
+    ipam:
+      config:
+        # static replica IPs sit below ip_range, other containers get .128 and up
+        - subnet: 10.203.53.0/24
+          ip_range: 10.203.53.128/25
+
+volumes:
+  tigerbeetle-0:
+  tigerbeetle-1:
+  tigerbeetle-2:
