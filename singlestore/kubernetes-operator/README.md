@@ -28,15 +28,38 @@ busy network; `make cluster` waits up to 60 minutes and can simply be re-run.
 
 The operator rejects a `MemsqlCluster` without one (`either spec.license or
 spec.licenseSecret must be specified`). `make cluster` stores `$SINGLESTORE_LICENSE` in the
-Secret `singlestore-license`, referenced by `spec.licenseSecret`. Get a free or trial key
-from the [Cloud Portal](https://portal.singlestore.com) (self-managed license; see
-[Setting or Replacing a License](https://docs.singlestore.com/db/v9.0/user-and-cluster-administration/maintain-your-cluster/setting-or-replacing-a-license/)).
+Secret `singlestore-license`, referenced by `spec.licenseSecret`. Get a key (e.g. the
+30-day Enterprise Trial) from the [Cloud Portal](https://portal.singlestore.com).
 
-The free license built into the SingleStore Dev Image is accepted but is the "Developer
-Image Edition": adding a child aggregator or a second leaf fails with
-`Error 2633: Feature 'child aggregators' / 'more than 1 leaf' is not supported in
-SingleStore Developer Image Edition`. With such a key, shrink the cluster to a master
-aggregator + one leaf:
+[Setting or Replacing a License](https://docs.singlestore.com/db/v9.0/user-and-cluster-administration/maintain-your-cluster/setting-or-replacing-a-license/)
+says "SingleStore no longer requires a license for development, prototyping, and functional
+testing when using SingleStore Free Edition or the SingleStore Dev Image", but that does not
+cover a multi-node cluster:
+
+- The "Free Edition" is the Dev Image. [SingleStore Editions](https://docs.singlestore.com/db/v9.0/introduction/singlestore-editions/)
+  lists Standard, Enterprise and a free Dev Image ("maximum capacity of 8 vCPUs and 64GB of
+  RAM ... deployed anywhere as an integrated container image"), and the
+  [Self-Managed pricing FAQ](https://www.singlestore.com/pricing/?product=Self-Managed) says
+  "SingleStore offers a free Developer Image which can be used for testing or local
+  development". No other license-free self-managed download exists.
+- The Dev Image is "one Master Aggregator and one leaf node ... without the need for a
+  license" ([README](https://github.com/singlestore-labs/singlestoredb-dev-image#how-to-run-the-docker-image)).
+  It does not skip the license. It bakes one in at build time (`BOOTSTRAP_LICENSE` in its
+  Dockerfile), and that license is the "Developer Image Edition".
+- The engine still needs a key. On a bare `singlestore/node` container (the image the
+  operator runs) with no license, `BOOTSTRAP AGGREGATOR` fails with `Error 2446: A valid
+  license is required to run BOOTSTRAP AGGREGATOR`, and `SET LICENSE = ''` fails with
+  `Error 1888: The provided license is invalid`. The operator, `sdb-deploy`/Toolbox and plain
+  containers all hit the same check. `sdb-deploy cluster-in-a-box` is deprecated in favour of
+  the Dev Image.
+- The Dev Image key is accepted but has its own limits. Adding a child aggregator or a second
+  leaf fails with `Error 2633: Feature 'child aggregators' / 'more than 1 leaf' is not
+  supported in SingleStore Developer Image Edition`. The master aggregator raises this when
+  the operator runs `ADD AGGREGATOR`/`ADD LEAF`, so any other deployment tool hits it too.
+  Two leaves (and a child aggregator) therefore need a Standard,
+  Enterprise or Enterprise Trial key.
+
+With the Dev Image key, shrink the cluster to a master aggregator + one leaf:
 
 ```bash
 SINGLESTORE_CHILD_AGGREGATORS=0 SINGLESTORE_LEAVES=1 make up

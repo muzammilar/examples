@@ -25,7 +25,8 @@ operator:
 	$(KUBECTL_NS) apply -f sdb-rbac.yaml -f sdb-operator.yaml
 	$(KUBECTL_NS) rollout status deployment/sdb-operator --timeout=15m
 
-# the operator refuses a MemsqlCluster without a license: SINGLESTORE_LICENSE goes into a Secret
+# the operator refuses a MemsqlCluster without a license (and the engine cannot bootstrap without one):
+# SINGLESTORE_LICENSE goes into a Secret
 cluster:
 	@test -n "$$SINGLESTORE_LICENSE" || { echo "SINGLESTORE_LICENSE is not set (get a key at https://portal.singlestore.com)"; exit 1; }
 	@$(KUBECTL_NS) create secret generic singlestore-license --from-literal=license="$$SINGLESTORE_LICENSE" \
