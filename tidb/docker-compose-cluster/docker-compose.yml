@@ -128,7 +128,6 @@ services:
   # mysql CLI for `make test` / `make cli` (sql/ and conflict/ mounted read-only)
   mysql:
     build: ./client
-    image: tidb-cluster-mysql-client:local
     container_name: tidb-mysql
     command: ["sleep", "infinity"]
     init: true
@@ -140,3 +139,45 @@ services:
       retries: 40
     depends_on:
       tidb: { condition: service_healthy }
+
+  # `make benchmark`: go-tpc TPC-C + sysbench OLTP through TiDB (bench/run.sh, image built
+  # from bench/Dockerfile), raw output to results/
+  bench:
+    build:
+      context: ./bench
+      args:
+        GOPROXY: ${GOPROXY:-https://proxy.golang.org,direct}
+    profiles: [bench]
+    command: ["sh", "/bench/run.sh"]
+    environment:
+      NAME: ${NAME:-}
+      DURATION: ${DURATION:-60}
+      THREADS: ${THREADS:-8}
+      WAREHOUSES: ${WAREHOUSES:-4}
+      TABLES: ${TABLES:-4}
+      TABLE_SIZE: ${TABLE_SIZE:-50000}
+    volumes:
+      - ./bench:/bench:ro
+      - ./results:/results
+
+  # `make benchmark`: parses the raw output (bench/report.py) into a table and results/*.json
+  bench-report:
+    image: ghcr.io/astral-sh/uv:0.12.19-python3.13-trixie-slim
+    profiles: [bench]
+    network_mode: none
+    working_dir: /bench
+    command: ["uv", "run", "--frozen", "report.py"]
+    environment:
+      UV_CACHE_DIR: /uv/cache          # the venv lives in the uv volume, so reruns skip creating it
+      UV_PROJECT_ENVIRONMENT: /uv/venv
+      UV_PYTHON_DOWNLOADS: never       # use the image's Python
+      NAME: ${NAME:-}
+      HOST_INFO: ${HOST_INFO:-}
+      DOCKER_INFO: ${DOCKER_INFO:-}
+    volumes:
+      - ./bench:/bench:ro
+      - ./results:/results
+      - uv-cache:/uv
+
+volumes:
+  uv-cache:

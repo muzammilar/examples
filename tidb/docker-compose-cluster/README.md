@@ -11,10 +11,13 @@ three replicas.
 make up        # start PD -> TiKV -> TiDB (~30 s), wait for 3 stores Up and full replication
 make test      # run sql/*.sql (cluster_info, AUTO_RANDOM, SPLIT TABLE / SHOW TABLE REGIONS, EXPLAIN ANALYZE cop tasks, transactions), then conflict/
 make conflict  # two concurrent sessions: optimistic write conflict at COMMIT, pessimistic lock wait timeout
+make benchmark # go-tpc TPC-C (tpmC) + sysbench oltp_point_select / oltp_read_write through TiDB
 make status    # cluster_info, tikv_store_status, pd-ctl member leader / store
 make cli       # interactive mysql client on TiDB
-make down      # remove containers and volumes
+make down      # remove containers, volumes and the locally built client/bench images
 ```
+
+The cluster needs ~8 GB of Docker memory (each TiKV settles at ~2.3 GB RSS).
 
 - TiDB (MySQL protocol): `localhost:14000`, user `root`, no password (`TIDB_PORT` overrides)
 - PD API: http://localhost:12379/pd/api/v1/stores (`PD_PORT` overrides)
@@ -50,3 +53,56 @@ Notes:
   Prometheus/Grafana are left out too: every component serves Prometheus metrics
   (`pd:2379/metrics`, `tikv:20180/metrics`, `tidb:10080/metrics`) on the compose network
   if you want to add them.
+
+## Benchmark
+
+`make benchmark` ([`bench/run.sh`](bench/run.sh)) runs from an image built from
+[`bench/Dockerfile`](bench/Dockerfile): PingCAP's [go-tpc](https://github.com/pingcap/go-tpc)
+v1.0.12, built from source in `golang:1.26-alpine` (there is no arm64 image), and Debian's
+`sysbench` 1.0.20 on `debian:trixie-slim`. Both connect to TiDB's MySQL port (`tidb:4000`) on the
+compose network:
+
+1. **TPC-C (go-tpc).** `prepare` loads `WAREHOUSES` warehouses (default 4, ~100 MB each before
+   replication) into database `tpcc`, then `run` drives the TPC-C mix (45% new-order, 43% payment,
+   4% each order-status, delivery, stock-level; no keying/think time) for `DURATION` s (60) with
+   `THREADS` connections (8). The headline is **tpmC**: new-order transactions per minute. Without
+   think time it is far above the TPC-C limit of 12.86 tpmC per warehouse, so it is a throughput
+   test, not a compliant TPC-C result.
+2. **sysbench OLTP.** `TABLES` tables (4) of `TABLE_SIZE` rows (50,000) in database `sbtest`, then
+   `oltp_point_select` (one pk lookup per transaction) and `oltp_read_write` (10 pk lookups, 4 range
+   queries, 2 updates, a delete and an insert), each for `DURATION` s with `THREADS` threads.
+
+What it shows: distributed SQL over three TiKV stores. Every statement is planned by the stateless
+TiDB node and executed as coprocessor/KV requests against the region leaders spread over the three
+stores; every commit is a Percolator two-phase commit (a timestamp from PD, prewrite + commit
+through Raft to 3 replicas), which is what dominates the write-heavy TPC-C transactions.
+
+```bash
+make benchmark                        # 4 warehouses, 4 x 50,000 rows, 60 s per workload, 8 threads (~8 min)
+make benchmark SMOKE=1                # 1 warehouse, 2 x 10,000 rows, 10 s per workload
+make benchmark WAREHOUSES=10 THREADS=32 DURATION=300
+```
+
+It prints the tpmC and a per-transaction-type table (count, tpm, avg/p50/p95/p99 latency, failed
+transactions), a sysbench table (transactions/s, queries/s, avg/p50/p99 latency, errors sysbench
+ignored and retried: TiDB write conflicts 8002/8022/9007, deadlocks 1213 and lock wait timeouts
+1205) and keeps the raw output plus parsed JSON with the versions, parameters, cluster layout and
+Docker VM CPUs/memory in `results/tidb-<UTC time>.{txt,json}` (gitignored), written by
+[`bench/report.py`](bench/report.py) (standard library, `uv run --frozen` in
+`ghcr.io/astral-sh/uv:0.12.19-python3.13-trixie-slim`). `DROP DATABASE tpcc, sbtest` runs at the
+end, also when a workload fails. Set `GOPROXY` to build go-tpc through a Go module proxy of your
+own. Everything (3 PD, 3 TiKV, TiDB and the clients) shares one Docker VM, so this measures the
+example, not TiDB on dedicated machines.
+
+### Sample results
+
+TODO: numbers from a quiet machine.
+
+| TPC-C | tpmC | tpmTotal | new-order p99 ms |
+|-------|-----:|---------:|-----------------:|
+| 4 warehouses, 8 threads | TODO | TODO | TODO |
+
+| workload | tps | qps | avg ms | p50 ms | p99 ms |
+|----------|----:|----:|-------:|-------:|-------:|
+| oltp_point_select | TODO | TODO | TODO | TODO | TODO |
+| oltp_read_write | TODO | TODO | TODO | TODO | TODO |
