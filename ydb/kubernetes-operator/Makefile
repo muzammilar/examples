@@ -1,7 +1,7 @@
 CLUSTER_NAME := ydb-operator
 NAMESPACE := ydb
 OPERATOR_VERSION := 0.8.0
-PROM_STACK_VERSION := 91.7.1
+PROM_STACK_VERSION := 91.8.0
 YDB_IMAGE := cr.yandex/crptqonuodf51kdj7a7d/ydb:24.2.7
 YDB_IMAGE_TAR ?= ydb.tar
 KUBECTL := kubectl --context kind-$(CLUSTER_NAME)
@@ -14,13 +14,14 @@ up: kind-cluster prometheus operator cluster monitoring
 
 # cr.yandex can be slow from outside Russia; if the image is already in local
 # Docker (`docker pull $(YDB_IMAGE)`), or saved to $(YDB_IMAGE_TAR)
-# (`docker save -o ydb.tar $(YDB_IMAGE)`), copy it onto every kind worker instead.
+# (`docker save --platform linux/amd64 -o ydb.tar $(YDB_IMAGE)`), copy it onto
+# every kind worker instead (--digests also registers it under its digest).
 kind-cluster:
 	kind get clusters | grep -qx $(CLUSTER_NAME) || kind create cluster --config kind-config.yaml
 	for n in $$(kind get nodes --name $(CLUSTER_NAME) | grep worker); do \
-		if [ -f "$(YDB_IMAGE_TAR)" ]; then docker exec -i $$n ctr -n k8s.io images import - < $(YDB_IMAGE_TAR); \
+		if [ -f "$(YDB_IMAGE_TAR)" ]; then docker exec -i $$n ctr -n k8s.io images import --digests - < $(YDB_IMAGE_TAR); \
 		elif docker image inspect $(YDB_IMAGE) >/dev/null 2>&1; then \
-			docker save $(YDB_IMAGE) | docker exec -i $$n ctr -n k8s.io images import -; fi; done
+			docker save --platform linux/amd64 $(YDB_IMAGE) | docker exec -i $$n ctr -n k8s.io images import --digests -; fi; done
 	$(KUBECTL) create namespace $(NAMESPACE) --dry-run=client -o yaml | $(KUBECTL) apply -f -
 
 # Prometheus, Grafana and the ServiceMonitor CRD the YDB monitoring objects need.
@@ -66,8 +67,10 @@ status:
 cli:
 	$(KUBECTL) -n $(NAMESPACE) exec -it database-0 -c ydb-dynamic -- /opt/ydb/bin/ydb -e grpc://localhost:2135 -d /Root/database
 
-# http://localhost:3000; the chart generates the admin password
+# http://localhost:3000; the chart generates the admin password. Grafana is
+# installed without --wait, so wait for it here before port-forwarding.
 grafana:
+	$(KUBECTL) -n monitoring rollout status deploy/prom-grafana --timeout=15m
 	@echo "user: admin  password: $$($(KUBECTL) -n monitoring get secret prom-grafana -o jsonpath='{.data.admin-password}' | base64 -d)"
 	$(KUBECTL) -n monitoring port-forward svc/prom-grafana 3000:80
 
