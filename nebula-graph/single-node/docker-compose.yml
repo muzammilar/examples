@@ -69,10 +69,31 @@ services:
 
   # `make test` / `make cli` run nebula-console from here
   console:
-    image: vesoft/nebula-console:v3.8.0
+    image: vesoft/nebula-console:${NEBULA_VERSION:-v3.8.0}
     profiles: [tools]
     entrypoint: ["nebula-console", "-addr", "graphd", "-port", "9669", "-u", "root", "-p", "nebula"]
+
+  # uv + Python 3.13, used by `make benchmark` (bench/bench.py, deps pinned in bench/uv.lock)
+  bench:
+    image: ghcr.io/astral-sh/uv:0.12.19-python3.13-trixie-slim
+    profiles: [bench]
+    working_dir: /bench
+    command: ["uv", "run", "--frozen", "bench.py"]
+    environment:
+      UV_CACHE_DIR: /uv/cache              # wheel cache and venv live in the uv volume,
+      UV_PROJECT_ENVIRONMENT: /uv/venv     # so reruns skip downloads and installs
+      UV_PYTHON_DOWNLOADS: never           # use the image's Python
+      PYTHONDONTWRITEBYTECODE: "1"
+      SMOKE: ${SMOKE:-}
+      N: ${N:-}
+      HOST_UID: ${HOST_UID:-}
+      HOST_GID: ${HOST_GID:-}
+    volumes:
+      - ./bench:/bench:ro
+      - ./results:/results
+      - uv-cache:/uv
 
 volumes:
   meta-data:
   storage-data:
+  uv-cache:

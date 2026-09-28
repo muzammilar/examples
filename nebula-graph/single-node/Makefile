@@ -1,4 +1,6 @@
-.PHONY: up test status cli down
+.PHONY: up test status cli benchmark down
+
+SMOKE ?=
 
 COMPOSE := docker compose --progress quiet
 NGQL := $(COMPOSE) run --rm -T console
@@ -23,5 +25,10 @@ status:
 cli:
 	$(COMPOSE) run --rm console
 
+# needs `make up`; SMOKE=1 for 10k persons (default 100k), or set N
+benchmark:
+	@$(COMPOSE) ps --status running --services | grep -qx graphd || { echo 'run `make up` first'; exit 1; }
+	SMOKE=$(SMOKE) HOST_UID=$$(id -u) HOST_GID=$$(id -g) $(COMPOSE) run --rm bench
+
 down:
-	docker compose --profile tools down --volumes
+	$(COMPOSE) --profile tools down --volumes
