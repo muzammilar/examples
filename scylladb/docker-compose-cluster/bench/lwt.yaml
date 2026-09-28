@@ -1,0 +1,26 @@
+# cassandra-stress user profile for the LWT comparison: the same single-row update,
+# once as a plain write and once as a lightweight transaction (Paxos, IF EXISTS).
+keyspace: bench_lwt
+keyspace_definition: |
+  CREATE KEYSPACE bench_lwt WITH replication = {'class': 'NetworkTopologyStrategy', 'replication_factor': 3};
+
+table: kv
+table_definition: |
+  CREATE TABLE kv (k bigint PRIMARY KEY, v blob);
+
+columnspec:
+  - name: k
+    population: uniform(1..100000)
+  - name: v
+    size: fixed(100)
+
+insert:
+  partitions: fixed(1)
+
+queries:
+  plain:
+    cql: UPDATE kv SET v = ? WHERE k = ?
+    fields: samerow
+  lwt:
+    cql: UPDATE kv SET v = ? WHERE k = ? IF EXISTS
+    fields: samerow

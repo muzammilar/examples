@@ -1,0 +1,103 @@
+# include docker files (kafka cluster: 3 controllers and 3 brokers in KRaft mode)
+include:
+  - docker-kafka.yml
+
+services:
+  ####################
+  # Kafka Admin (franz-go/kadm) - creates the topics and exits
+  ####################
+  admin:
+    image: franz-tree-admin
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+      target: admin
+    command: ["/treeadmin", "-topics", "trees,test", "-partitions", "13", "-replication", "3"]
+    networks:
+      - kafka-network
+    depends_on:
+      kafka-broker-1:
+        condition: service_healthy
+      kafka-broker-2:
+        condition: service_healthy
+      kafka-broker-3:
+        condition: service_healthy
+
+  ####################
+  # Kafka Producers
+  ####################
+  producertree:
+    image: franz-tree-producer
+    hostname: producertree
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+      target: producer
+    command: ["/treeproducer", "-topic", "trees", "-workers", "2"]
+    networks:
+      - kafka-network
+    depends_on:
+      admin:
+        condition: service_completed_successfully
+
+  producertest:
+    image: franz-tree-producer
+    hostname: producertest
+    command: ["/treeproducer", "-topic", "test", "-workers", "3", "-partitioner", "roundrobin"]
+    networks:
+      - kafka-network
+    depends_on:
+      admin:
+        condition: service_completed_successfully
+
+  ####################
+  # Kafka Consumers (a consumer group, scale with `--scale consumer=N`)
+  ####################
+  consumer:
+    image: franz-tree-consumer
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+      target: consumer
+    command: ["/treeconsumer", "-topics", "test,trees"]
+    networks:
+      - kafka-network
+    depends_on:
+      admin:
+        condition: service_completed_successfully
+    deploy:
+      mode: replicated
+      replicas: 1
+
+  ####################
+  # Prometheus
+  ####################
+  prometheus:
+    image: prom/prometheus:v3.15.0
+    hostname: prometheus.svc
+    volumes:
+      - ./prometheus/config/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      - 19114:9090 # http port (host 19114, 9090 is commonly taken by other stacks)
+    networks:
+      - kafka-network
+
+  ####################
+  # Grafana (pre-provisioned prometheus datasource and the kafka-franz dashboard)
+  ####################
+  grafana:
+    image: grafana/grafana:13.2.2
+    hostname: grafana.svc
+    environment:
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Admin
+      GF_AUTH_DISABLE_LOGIN_FORM: "true"
+      GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /etc/grafana/provisioning/dashboards/kafka-franz.json
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+    ports:
+      - 13014:3000 # http port
+    networks:
+      - kafka-network
+    depends_on:
+      - prometheus

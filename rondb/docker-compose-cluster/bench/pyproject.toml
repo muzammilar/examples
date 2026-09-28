@@ -1,0 +1,9 @@
+[project]
+name = "rondb-bench-report"
+version = "0.1.0"
+description = "Parses sysbench and wrk output for make benchmark"
+requires-python = ">=3.13"
+dependencies = []
+
+[tool.uv]
+package = false

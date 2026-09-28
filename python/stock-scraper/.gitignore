@@ -1,0 +1,27 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Ruff
+**.ruff_cache/
+
+# Virtual environments
+.venv
+
+# Vagrant
+.vagrant
+
+# user data directory
+_userdatadir/
+_userdatachrome/
+_userdatafirefox/
+
+# scraped output
+data/
+
+# Pytest
+.pytest_cache/

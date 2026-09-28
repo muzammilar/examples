@@ -1,0 +1,45 @@
+services:
+  # Generic ClickHouse Service
+  clickhouse:
+    image: "clickhouse/clickhouse-server:${CLICKHOUSE_VERSION:-26.8}"
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    environment:
+      # Keep the passwordless `default` user reachable over the network (Distributed queries between nodes).
+      # Local demo only.
+      CLICKHOUSE_SKIP_USER_SETUP: 1
+    healthcheck:
+      test: ["CMD", "clickhouse-client", "--query", "SELECT 1"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+    volumes:
+      - ./configs/clickhouse/config_overrides.xml:/etc/clickhouse-server/config.d/config_overrides.xml # config overrides on default
+      - ./configs/clickhouse/keeper.xml:/etc/clickhouse-server/config.d/keeper.xml # zookeeper/keeper client configs
+      - ./configs/clickhouse/macros.xml:/etc/clickhouse-server/config.d/macros.xml # macros configs
+      - ./sql:/ch-replica-sql # sql files
+
+  # Data node: registers itself in cluster_hits as a replica of shard ${SHARD}
+  clickhouse-data:
+    extends:
+      service: clickhouse
+    volumes:
+      - ./configs/clickhouse/clusters.xml:/etc/clickhouse-server/config.d/clusters.xml
+
+  # Keeper node: runs the embedded clickhouse-keeper and observes cluster_hits without joining it
+  clickhouse-keeper:
+    extends:
+      service: clickhouse
+    volumes:
+      - ./configs/clickhouse/keeper_server.xml:/etc/clickhouse-server/config.d/keeper_server.xml # clickhouse-keeper configs
+      - ./configs/clickhouse/clusters_observer.xml:/etc/clickhouse-server/config.d/clusters.xml
+
+  # Keeper + data node: runs clickhouse-keeper and is also a replica in cluster_hits
+  clickhouse-keeper-data:
+    extends:
+      service: clickhouse
+    volumes:
+      - ./configs/clickhouse/keeper_server.xml:/etc/clickhouse-server/config.d/keeper_server.xml
+      - ./configs/clickhouse/clusters.xml:/etc/clickhouse-server/config.d/clusters.xml

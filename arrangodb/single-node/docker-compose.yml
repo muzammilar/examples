@@ -1,0 +1,47 @@
+name: arangodb-single
+
+# One ArangoDB server (single-server mode, RocksDB engine); root password is "demo".
+services:
+  arangodb:
+    image: arangodb:${ARANGODB_VERSION:-3.12.12}
+    container_name: arangodb
+    hostname: arangodb
+    environment:
+      ARANGO_ROOT_PASSWORD: demo
+    ports:
+      - "8529:8529" # HTTP API + web UI
+    volumes:
+      - arangodb-data:/var/lib/arangodb3
+      - ./aql:/aql:ro
+    healthcheck:
+      test: ["CMD", "arangosh", "--server.password", "demo", "--javascript.execute-string", "db._version()"]
+      interval: 5s
+      timeout: 10s
+      retries: 30
+      start_period: 10s
+
+  # uv + Python 3.13, used by `make benchmark` (bench/bench.py, deps pinned in bench/uv.lock)
+  bench:
+    image: ghcr.io/astral-sh/uv:0.12.19-python3.13-trixie-slim
+    profiles: [bench]
+    cpus: ${BENCH_CLIENT_CPUS:-2}
+    working_dir: /bench
+    command: ["uv", "run", "--frozen", "bench.py"]
+    environment:
+      BENCH_LIMITS: ${BENCH_LIMITS:-}      # bench/limits.sh, copied into the JSON
+      UV_CACHE_DIR: /uv/cache              # wheel cache and venv live in the uv volume,
+      UV_PROJECT_ENVIRONMENT: /uv/venv     # so reruns skip downloads and installs
+      UV_PYTHON_DOWNLOADS: never           # use the image's Python
+      PYTHONDONTWRITEBYTECODE: "1"
+      SMOKE: ${SMOKE:-}
+      N: ${N:-}
+      HOST_UID: ${HOST_UID:-}
+      HOST_GID: ${HOST_GID:-}
+    volumes:
+      - ./bench:/bench:ro
+      - ./results:/results
+      - uv-cache:/uv
+
+volumes:
+  arangodb-data:
+  uv-cache:

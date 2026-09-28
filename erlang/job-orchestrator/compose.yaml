@@ -1,0 +1,80 @@
+# A cluster of three to five nodes behind a load balancer. `make up` starts
+# it; `make up NODES=5` adds node4 and node5.
+
+# Only node1 builds the image; the others reuse it.
+x-node: &node
+  image: job-orchestrator
+  pull_policy: never
+  restart: unless-stopped
+  environment: &node-env
+    NODE_NAME: orchestrator
+    ERLANG_COOKIE: ${ERLANG_COOKIE:?run make up, which creates .env}
+    PEERS: orchestrator@node1,orchestrator@node2,orchestrator@node3,orchestrator@node4,orchestrator@node5
+    WORKERS: ${WORKERS:-4}
+    MAX_QUEUE: ${MAX_QUEUE:-100}
+    JOB_TIMEOUT_MS: ${JOB_TIMEOUT_MS:-5000}
+
+services:
+  node1:
+    <<: *node
+    build: .
+    hostname: node1
+
+  node2:
+    <<: *node
+    hostname: node2
+
+  node3:
+    <<: *node
+    hostname: node3
+
+  node4:
+    <<: *node
+    hostname: node4
+    profiles: [node4]
+
+  node5:
+    <<: *node
+    hostname: node5
+    profiles: [node5]
+
+  lb:
+    image: haproxy:3.2-alpine
+    volumes: ["./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro"]
+    ports: ["5555:5555"]
+    depends_on:
+      node1: {condition: service_healthy}
+      node2: {condition: service_healthy}
+      node3: {condition: service_healthy}
+    restart: unless-stopped
+
+  # Sends stdin through the load balancer and prints the replies: `make send`.
+  # Run with --no-deps, or compose restarts any node that was stopped.
+  client:
+    image: busybox:1.37
+    entrypoint: ["nc", "lb", "5555"]
+    depends_on: [lb]
+    profiles: [client]
+
+  # Load test through the load balancer: `make bench`.
+  bench:
+    image: erlang:27-slim
+    volumes: ["./scripts:/scripts:ro"]
+    entrypoint: ["escript", "/scripts/bench.escript", "--host", "lb"]
+    depends_on: [lb]
+    profiles: [client]
+
+  # Linters, run by `make quality`.
+  hadolint:
+    image: hadolint/hadolint:latest
+    volumes: [".:/src:ro"]
+    working_dir: /src
+    command: ["hadolint", "Dockerfile"]
+    profiles: [quality]
+
+  shellcheck:
+    image: koalaman/shellcheck:stable
+    volumes: [".:/src:ro"]
+    working_dir: /src
+    command: ["demo.sh"]
+    profiles: [quality]

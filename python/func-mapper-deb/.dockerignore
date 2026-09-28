@@ -1,0 +1,9 @@
+.venv/
+dist/
+build/
+*.egg-info/
+.pytest_cache/
+.benchmarks/
+**/__pycache__/
+debian/funkpkg/
+debian/.debhelper/

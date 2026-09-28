@@ -1,0 +1,13 @@
+%% Filled in from the environment when the release boots.
+[
+    {orchestrator, [
+        {port, ${PORT}},
+        {workers, ${WORKERS}},
+        {max_queue, ${MAX_QUEUE}},
+        {job_timeout, ${JOB_TIMEOUT_MS}},
+        {peers, "${PEERS}"}
+    ]},
+    {kernel, [
+        {logger_level, notice}
+    ]}
+].

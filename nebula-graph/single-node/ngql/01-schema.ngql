@@ -1,0 +1,13 @@
+# A space is a graph with its own schema; one storaged => replica_factor 1.
+CREATE SPACE IF NOT EXISTS demo (partition_num = 3, replica_factor = 1, vid_type = FIXED_STRING(16));
+# graphd and storaged learn about new spaces and schema via metad heartbeats
+# (2s in docker-compose.yml, 10s by default), so give them a few beats.
+:sleep 15
+USE demo;
+CREATE TAG IF NOT EXISTS person (name string, age int);
+CREATE EDGE IF NOT EXISTS follows (degree int);
+CREATE TAG INDEX IF NOT EXISTS person_by_age ON person (age);
+:sleep 10
+SHOW TAGS;
+SHOW EDGES;
+SHOW TAG INDEXES;

@@ -1,0 +1,7 @@
+{
+  Get {
+    Landmark(bm25: { query: "palace", properties: ["description"] }, limit: 3) {
+      name description _additional { score }
+    }
+  }
+}

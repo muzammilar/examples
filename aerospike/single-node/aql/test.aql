@@ -1,0 +1,34 @@
+-- echo each statement before its result (aql splits statements on semicolons, so none in comments)
+SET ECHO true
+
+-- a record is a set of typed bins (int, float, string, list, map), with no schema per set
+INSERT INTO test.users (PK, name, age, score, tags, address) VALUES ('u1', 'alice', 34, 9.5, LIST('["admin", "beta"]'), MAP('{"city": "Paris", "zip": "75001"}'))
+INSERT INTO test.users (PK, name, age, score) VALUES ('u2', 'bob', 27, 7.25)
+INSERT INTO test.users (PK, name, age) VALUES ('u3', 'carol', 41)
+
+-- per-record TTL: u4 expires in 300 s, the others never expire ({ttl} -1)
+SET RECORD_TTL 300
+INSERT INTO test.users (PK, name, age) VALUES ('u4', 'dave', 19)
+RESET RECORD_TTL
+SET RECORD_PRINT_METADATA true
+SELECT * FROM test.users WHERE PK = 'u1'
+SELECT * FROM test.users WHERE PK = 'u4'
+SET RECORD_PRINT_METADATA false
+
+-- the numeric secondary index on bin age (created by `make test`) serves equality and range queries
+SHOW INDEXES
+SELECT name, age FROM test.users WHERE age = 27
+SELECT name, age FROM test.users WHERE age BETWEEN 20 AND 40
+
+-- Lua UDFs: a record UDF runs on the server next to the record (bumping its {gen})
+-- and a stream UDF aggregates a secondary-index query (aql -u /aql finds demo.lua locally)
+REGISTER MODULE '/aql/demo.lua'
+SHOW MODULES
+EXECUTE demo.add('age', 1) ON test.users WHERE PK = 'u2'
+SET RECORD_PRINT_METADATA true
+SELECT name, age FROM test.users WHERE PK = 'u2'
+SET RECORD_PRINT_METADATA false
+AGGREGATE demo.sum('age') ON test.users WHERE age BETWEEN 0 AND 200
+
+DELETE FROM test.users WHERE PK = 'u3'
+SELECT name, age FROM test.users

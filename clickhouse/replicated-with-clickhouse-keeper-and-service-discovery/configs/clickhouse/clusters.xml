@@ -1,0 +1,30 @@
+<clickhouse>
+    <!-- Cluster discovery is still experimental: https://clickhouse.com/docs/operations/cluster-discovery -->
+    <allow_experimental_cluster_discovery>1</allow_experimental_cluster_discovery>
+
+    <remote_servers replace="replace"> <!-- `replace` attribute ensures that configs are replaced and not merged with the base config.xml -->
+
+        <!-- No static host lists: every data node registers itself under <path> in ClickHouse Keeper -->
+        <!-- and reads the other members from there. The cluster name is the last segment of <path>. -->
+
+        <!-- Sharded + replicated cluster for ingest: nodes with the same shard number are replicas of each other -->
+        <cluster_hits>
+            <discovery>
+                <path>/clickhouse/discovery/cluster_hits</path>
+                <shard from_env="SHARD" />
+                <!-- Nodes authenticate distributed queries with a shared secret instead of a user/password -->
+                <secret>cluster_hits_secret</secret>
+            </discovery>
+        </cluster_hits>
+
+        <!-- The same nodes with no <shard>: discovery puts them all in one shard, as replicas of each other. -->
+        <!-- `ON CLUSTER cluster_all_nodes` therefore runs on every data node, whatever its shard in cluster_hits. -->
+        <cluster_all_nodes>
+            <discovery>
+                <path>/clickhouse/discovery/cluster_all_nodes</path>
+                <secret>cluster_hits_secret</secret>
+            </discovery>
+        </cluster_all_nodes>
+
+    </remote_servers>
+</clickhouse>
