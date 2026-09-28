@@ -63,15 +63,32 @@ store differs. Object storage sits on the write path at `flush` and index build 
 and index files are uploaded) and on the read path at `load`; searches run from memory, so
 differences between RustFS and MinIO should show up in the flush / index / load phases.
 
+**Resource budget.** For the run [`bench/limits.sh`](bench/limits.sh) splits `BENCH_CPUS=4` /
+`BENCH_MEM=6g` (no swap) with `docker update`: `etcd` 0.25 CPU / 256 MB, `rustfs` 0.25 CPU /
+512 MB, and the rest (3.5 CPUs / 5.25 GB) to `standalone`, which does all the indexing and
+search. This is the same split as [`../single-node`](../single-node), with RustFS in MinIO's place.
+The old limits come back afterwards. Docker cannot remove a memory limit from a running container,
+so "unlimited" returns as the Docker VM's total memory; `make down && make up` starts clean. The
+bench client has `cpus: 2` in compose (`BENCH_CLIENT_CPUS`). The JSON records the applied limits
+under `limits`. The limits are set on running containers. Milvus sized its thread pools and memory
+quota from the VM (11 CPUs, 24 GB) at startup, and the cgroup still caps the CPU time it gets.
+
 ### Sample results
 
-TODO: fill from a run on a quiet machine (`make benchmark`, N=100000, dim 128).
+2026-09-28, `make benchmark` (N=100000, dim 128), Docker Desktop 29.5.3 on an Apple M4 Pro
+(Docker VM: 11 CPUs, 24.4 GB, aarch64, native images), Milvus 3.0.2 + RustFS 1.0.0, 4 CPUs /
+6 GB split as above, client 2 CPUs. The MinIO column is the same benchmark in
+[`../single-node`](../single-node#sample-results), run the same day.
 
-| metric | value |
-| --- | --- |
-| insert (vec/s) | TODO |
-| time to queryable (s): flush / index / load | TODO |
-| search, 1 client: QPS / p50 / p99 (ms) | TODO |
-| search, 8 clients: QPS / p50 / p99 (ms) | TODO |
-| filtered (~10%), 1 client: QPS / p50 / p99 (ms) | TODO |
-| recall@10 / filtered recall@10 | TODO |
+| metric | RustFS | MinIO |
+| --- | --- | --- |
+| insert (vec/s) | 107,442 (0.9 s) | 114,702 (0.9 s) |
+| time to queryable (s): flush / index / load | 19.7: 3.5 / 14.1 / 2.0 | 19.9: 2.5 / 15.2 / 2.2 |
+| search, 1 client: QPS / p50 / p99 (ms) | 924 / 1.01 / 2.06 | 925 / 1.02 / 1.97 |
+| search, 8 clients: QPS / p50 / p99 (ms) | 3,244 / 2.13 / 5.53 | 3,343 / 2.16 / 5.17 |
+| filtered (~10%), 1 client: QPS / p50 / p99 (ms) | 623 / 1.54 / 2.58 | 645 / 1.48 / 2.30 |
+| recall@10 / filtered recall@10 | 0.263 / 0.615 | 0.267 / 0.620 |
+
+The object store only matters at flush and load. Searches run on segments already loaded into the
+querynode, so RustFS and MinIO land within run-to-run noise (flush ~1 s slower on RustFS here).
+RustFS used ~340 MB of its 512 MB cap, against ~70 MB for MinIO.
