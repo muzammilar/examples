@@ -1,0 +1,24 @@
+# ScyllaDB needs more async-IO contexts than a kind node allows by default.
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: sysctl-aio
+  namespace: kube-system
+spec:
+  selector:
+    matchLabels:
+      app: sysctl-aio
+  template:
+    metadata:
+      labels:
+        app: sysctl-aio
+    spec:
+      initContainers:
+        - name: sysctl
+          image: busybox:1.37
+          securityContext:
+            privileged: true
+          command: ["sysctl", "-w", "fs.aio-max-nr=1048576"]
+      containers:
+        - name: pause
+          image: registry.k8s.io/pause:3.10
