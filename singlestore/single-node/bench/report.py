@@ -118,6 +118,7 @@ def main():
         },
         "prepare_s": meta.get("prepare_s"),
         "machine": machine(),
+        "limits": json.loads(os.environ.get("BENCH_LIMITS") or "null"),  # bench/limits.sh
         "workloads": workloads,
         "analytics": queries,
         "raw": os.path.basename(RAW),
@@ -133,6 +134,9 @@ def main():
     )
     print(f"Docker VM: {m['docker_vm_cpus']} CPUs, {m['docker_vm_memory_gib']} GiB ({m['arch']}); "
           f"server image {m['server_platform']}")
+    if lim := result["limits"]:
+        caps = ", ".join(f"{n} {c['cpus']} CPUs / {c['memory_mib']} MiB" for n, c in lim["containers"].items())
+        print(f"limits: {caps}; bench client {lim['bench_client_cpus']} CPUs")
     if m["arch"] in ("aarch64", "arm64"):
         print("NOTE: the amd64 server runs under emulation on this arm64 machine; the numbers are not "
               "representative of SingleStore on x86-64")

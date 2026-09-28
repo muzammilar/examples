@@ -28,17 +28,27 @@ TABLE_TYPE ?= rowstore
 RAND_TYPE ?= uniform
 RUNS ?= $(if $(filter 1,$(SMOKE)),3,5)
 
+# resource budget for `make benchmark` (bench/limits.sh): BENCH_CPUS / BENCH_MEM in total for the
+# database containers in BENCH_SPEC (equal shares; service=CPUS:MEM is a fixed amount), set with
+# `docker update` for the run and restored afterwards; the bench client has BENCH_CLIENT_CPUS
+BENCH_CPUS ?= 4
+BENCH_MEM ?= 6g
+BENCH_SPEC ?= singlestore
+export BENCH_CLIENT_CPUS ?= 2
+
 benchmark:
 	@docker compose ps --status running --services | grep -qx singlestore || { echo 'run `make up` first'; exit 1; }
 	@$(SQL) -N -e 'SELECT COUNT(*) FROM demo.orders' >/dev/null 2>&1 || { echo "==> loading demo.orders (sql/01-schema.sql, sql/02-generate.sql)"; \
 		for f in sql/01-schema.sql sql/02-generate.sql; do $(SQL) < $$f >/dev/null || exit 1; done; }
 	@mkdir -p results
 	@docker compose --progress quiet --profile bench build bench
-	@export NAME=singlestore-$$(date -u +%Y%m%dT%H%M%SZ) DURATION=$(DURATION) THREADS=$(THREADS) TABLES=$(TABLES) \
+	@BENCH_LIMITS=$$(sh bench/limits.sh apply $(BENCH_CPUS) $(BENCH_MEM) $(BENCH_SPEC)) || { sh bench/limits.sh restore; exit 1; }; \
+	export BENCH_LIMITS NAME=singlestore-$$(date -u +%Y%m%dT%H%M%SZ) DURATION=$(DURATION) THREADS=$(THREADS) TABLES=$(TABLES) \
 		TABLE_SIZE=$(TABLE_SIZE) TABLE_TYPE=$(TABLE_TYPE) RAND_TYPE=$(RAND_TYPE) RUNS=$(RUNS) SINGLESTORE_PASSWORD=$(SINGLESTORE_PASSWORD) \
 		HOST_INFO="$$(uname -sm)" SERVER_PLATFORM="$$(docker image inspect --format '{{.Os}}/{{.Architecture}}' $$(docker inspect --format '{{.Image}}' singlestore))" \
 		DOCKER_INFO="$$(docker info --format 'Docker {{.ServerVersion}}, {{.NCPU}} CPUs, {{.MemTotal}} bytes')"; \
-	docker compose run --rm -T bench && docker compose run --rm -T bench-report
+	docker compose run --rm -T bench && docker compose run --rm -T bench-report; \
+	rc=$$?; sh bench/limits.sh restore; exit $$rc
 
 status:
 	docker compose ps

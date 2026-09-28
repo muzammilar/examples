@@ -82,21 +82,39 @@ runs under Rosetta emulation (the report prints the server image's platform and 
 same Docker VM as the client, with the free license's limits (8 cores, 2 partitions per database).
 The numbers show the example working, not SingleStore's performance.
 
+**Resource budget.** For the run [`bench/limits.sh`](bench/limits.sh) caps the `singlestore`
+container at `BENCH_CPUS=4` / `BENCH_MEM=6g` (no swap) with `docker update`. Afterwards it
+restores the compose limits, i.e. `cpus: 8` (the free mode's core limit) and "unlimited" memory,
+which comes back as the Docker VM's total because Docker cannot remove a memory limit;
+`make down && make up` starts clean. The sysbench client has `cpus: 2` in compose
+(`BENCH_CLIENT_CPUS`). The JSON records the applied limits under `limits`. SingleStore sets its
+`maximum_memory` and thread counts when the node starts, from what it sees then: 8 CPUs and the
+VM's memory. So the 6 GB cap is only enforced by the cgroup, not by SingleStore's own memory
+accounting. It used ~1.4 GB here.
+
 ### Sample results
 
-TODO: numbers from a quiet x86-64 machine.
+2026-09-28, `make benchmark` (defaults), Docker Desktop 29.5.3 on an Apple M4 Pro (Docker VM:
+11 CPUs, 24.4 GB, aarch64). **The server is the amd64 image under Rosetta emulation**, so these
+numbers understate SingleStore on real x86-64. SingleStore 9.1.1 (Dev Image 0.2.85) capped at
+4 CPUs / 6 GB, client 2 CPUs (native arm64 sysbench), 8 threads, 60 s per workload.
 
 | workload | tps | qps | avg ms | p50 ms | p99 ms |
 |----------|----:|----:|-------:|-------:|-------:|
-| oltp_point_select | TODO | TODO | TODO | TODO | TODO |
-| oltp_read_only | TODO | TODO | TODO | TODO | TODO |
-| oltp_read_write | TODO | TODO | TODO | TODO | TODO |
+| oltp_point_select | 28,280 | 28,280 | 0.28 | 0.17 | 0.35 |
+| oltp_read_only | 1,156 | 18,498 | 6.92 | 3.62 | 53.85 |
+| oltp_read_write | 940 | 18,806 | 8.51 | 4.57 | 54.83 |
 
-| query | first ms | warm median ms |
+| query (600k-row columnstore) | first ms | warm median ms |
 |-------|---------:|---------------:|
-| scan_aggregate | TODO | TODO |
-| group_by_month | TODO | TODO |
-| count_distinct | TODO | TODO |
-| json_group_by | TODO | TODO |
-| range_one_week | TODO | TODO |
-| colocated_join | TODO | TODO |
+| scan_aggregate | 104.0 | 115.5 |
+| group_by_month | 376.6 | 191.0 |
+| count_distinct | 66.8 | 91.8 |
+| json_group_by | 203.9 | 149.4 |
+| range_one_week | 21.8 | 3.8 |
+| colocated_join | 114.0 | 50.9 |
+
+Point selects on the in-memory rowstore are fast even under emulation (28k/s, p99 0.35 ms). The
+range and aggregate statements in `oltp_read_only` / `read_write` hit a ~54 ms p99 tail, and the
+columnstore scans cost 50-190 ms warm. A range query that the sort key prunes (`range_one_week`)
+takes 3.8 ms. Expect much better numbers on native x86-64.
