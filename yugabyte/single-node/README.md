@@ -10,7 +10,7 @@ make test      # run ysql/*.sql (hash/range sharding, transaction, index, EXPLAI
 make status    # yugabyted status
 make cli       # interactive ysqlsh
 make cli-ycql  # interactive ycqlsh
-make down      # remove the container and its volume
+make down      # remove the container (data lives in it)
 ```
 
 - YSQL: `localhost:5433` (user `yugabyte`, db `yugabyte`, no password)
