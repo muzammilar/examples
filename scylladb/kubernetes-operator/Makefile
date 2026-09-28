@@ -5,8 +5,11 @@ EXAMPLES_URL := https://raw.githubusercontent.com/scylladb/scylla-operator/$(OPE
 KUBECTL := kubectl --context kind-$(CLUSTER_NAME)
 HELM := helm --kube-context kind-$(CLUSTER_NAME)
 SCYLLA_POD := scylla-dc1-rack1-0
+FAILOVER_POD := scylla-dc1-rack1-2
+NODETOOL := $(KUBECTL) -n $(NAMESPACE) exec $(SCYLLA_POD) -c scylla -- nodetool
+CQLSH := $(KUBECTL) -n $(NAMESPACE) exec -i $(SCYLLA_POD) -c scylla -- cqlsh
 
-.PHONY: up test status cli grafana down kind-cluster operator cluster monitoring
+.PHONY: up test failover status cli grafana down kind-cluster operator cluster monitoring
 
 up: kind-cluster operator cluster monitoring
 
@@ -24,7 +27,8 @@ operator:
 	helm repo add scylla https://scylla-operator-charts.storage.googleapis.com/stable >/dev/null 2>&1 || true
 	helm repo update scylla
 	$(HELM) upgrade --install scylla-operator scylla/scylla-operator \
-		--version $(OPERATOR_VERSION) --namespace scylla-operator --create-namespace --wait
+		--version $(OPERATOR_VERSION) --namespace scylla-operator --create-namespace \
+		--set replicas=1 --set webhookServerReplicas=1 --wait --timeout 15m
 
 cluster:
 	$(KUBECTL) create namespace $(NAMESPACE) --dry-run=client -o yaml | $(KUBECTL) apply -f -
@@ -39,11 +43,41 @@ monitoring:
 		-f $(EXAMPLES_URL)/monitoring/v1alpha1/prometheus.clusterrolebinding.yaml \
 		-f $(EXAMPLES_URL)/monitoring/v1alpha1/prometheus.service.yaml
 	$(KUBECTL) apply -f prometheus.yaml -f scylladbmonitoring.yaml
-	$(KUBECTL) -n $(NAMESPACE) wait scylladbmonitoring/scylla --for=condition=Available --timeout=10m
+	$(KUBECTL) -n $(NAMESPACE) wait scylladbmonitoring/scylla --for=condition=Available --timeout=15m
 
 # RF=3 keyspace, a few writes/reads at QUORUM
 test:
 	$(KUBECTL) -n $(NAMESPACE) exec -i $(SCYLLA_POD) -c scylla -- cqlsh < cql/test.cql
+
+# delete one member pod: QUORUM reads/writes and LWT keep working with 2 of 3 replicas,
+# ALL fails; the StatefulSet recreates the pod (same PVC) and it rejoins as UN
+failover:
+	@echo "==> deleting pod $(FAILOVER_POD)"
+	$(KUBECTL) -n $(NAMESPACE) delete pod $(FAILOVER_POD) --wait=false
+	@echo "==> waiting until $(SCYLLA_POD) sees it down (DN)"
+	@for i in $$(seq 60); do $(NODETOOL) status 2>/dev/null | grep -q '^DN' && break; sleep 2; done
+	$(NODETOOL) status | grep -E '^(UN|DN)'
+	@$(NODETOOL) status | grep -q '^DN'
+	@echo "==> QUORUM write + read (2 of 3 replicas)"
+	$(CQLSH) < failover/quorum.cql
+	@echo "==> CONSISTENCY ALL (3 of 3 replicas)"
+	@if $(CQLSH) < failover/all.cql; then \
+		if $(NODETOOL) status | grep -q '^DN'; then echo "unexpected: ALL succeeded with a node down"; exit 1; fi; \
+		echo "note: $(FAILOVER_POD) was already back up"; \
+	else \
+		echo "expected: Unavailable, only 2 of 3 replicas alive"; \
+	fi
+	@echo "==> lightweight transactions (Paxos quorum)"
+	$(CQLSH) < failover/lwt.cql
+	@echo "==> waiting for $(FAILOVER_POD) to be Ready and all three nodes UN (up to 180 x 5 s)"
+	@for i in $$(seq 180); do \
+		[ "$$($(NODETOOL) status 2>/dev/null | grep -c '^UN')" = 3 ] && \
+		[ "$$($(KUBECTL) -n $(NAMESPACE) get pod $(FAILOVER_POD) -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}' 2>/dev/null)" = True ] && break; \
+		[ $$i -lt 180 ] || { echo 'not back after 900 s'; exit 1; }; sleep 5; done
+	$(NODETOOL) status | grep -E '^(UN|DN)'
+	@echo "==> CONSISTENCY ALL works again (all 3 replicas answer)"
+	$(CQLSH) < failover/all.cql
+	$(KUBECTL) -n $(NAMESPACE) wait scyllacluster/scylla --for=condition=Available --timeout=15m
 
 status:
 	$(KUBECTL) -n $(NAMESPACE) exec $(SCYLLA_POD) -c scylla -- nodetool status
