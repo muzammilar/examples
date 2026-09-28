@@ -132,3 +132,10 @@ Point selects are cheap (17k/s, p99 0.9 ms), since TiDB goes straight to the reg
 Each `oltp_read_write` transaction pays a Percolator two-phase commit over Raft on 3 TiKVs, so it
 runs ~70x slower than a point select. TPC-C finished with no errors at ~10k tpmC on 3.75 CPUs of
 TiKV.
+
+### Future work
+
+Run one common sysbench workload set (same scripts, table count/size, thread counts and duration)
+across every sysbench-capable example — TiDB, OceanBase (single node and cluster), SingleStore and
+RonDB over the MySQL protocol, YugabyteDB YSQL and CedarDB with sysbench's `pgsql` driver — so their
+numbers compare directly. Today each example uses its own parameters.
