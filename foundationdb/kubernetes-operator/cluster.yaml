@@ -7,7 +7,7 @@
 # Process classes (processCounts, one pod each) and the roles FDB recruits on them:
 #   cluster_controller  1  cluster controller: elects/monitors every other role
 #   stateless           3  master (sequencer), commit proxy, GRV proxy, resolver,
-#                          ratekeeper, data distributor
+#                          ratekeeper, data distributor, consistency scan
 #   log                 3  transaction logs (tlog): durable commit log; 2 in use
 #                          (databaseConfiguration.logs) + 1 spare
 #   storage             3  storage servers: hold the key/value data (2 replicas)

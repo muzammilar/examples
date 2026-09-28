@@ -5,14 +5,31 @@ OPERATOR_URL := https://raw.githubusercontent.com/FoundationDB/fdb-kubernetes-op
 KUBECTL := kubectl --context kind-$(CLUSTER_NAME) -n $(NAMESPACE)
 FDB_POD = $$($(KUBECTL) get pod -l foundationdb.org/fdb-process-class=log -o name | head -1)
 
-.PHONY: up test roles status cli metrics down kind-cluster operator cluster exporter
+# images the operator sample and cluster.yaml pull (the 7.3/7.4 init images and the
+# per-pod 7.3.79 image are the slow part inside kind)
+PRELOAD_IMAGES := foundationdb/fdb-kubernetes-operator:$(OPERATOR_VERSION) \
+	foundationdb/fdb-kubernetes-monitor:7.3.69 foundationdb/fdb-kubernetes-monitor:7.4.5 \
+	foundationdb/fdb-kubernetes-monitor:7.3.79 aikoven/foundationdb-exporter:3.1.0
 
-up: kind-cluster operator cluster exporter
+.PHONY: up test roles failover status cli metrics down kind-cluster preload operator cluster exporter
+
+up: kind-cluster preload operator cluster exporter
 
 kind-cluster:
 	kind get clusters | grep -qx $(CLUSTER_NAME) || kind create cluster --config kind-config.yaml
 	kubectl --context kind-$(CLUSTER_NAME) create namespace $(NAMESPACE) --dry-run=client -o yaml \
 		| kubectl --context kind-$(CLUSTER_NAME) apply -f -
+
+# copies PRELOAD_IMAGES that already exist in the host's Docker into the kind node, so
+# kind does not pull them again; images not present locally are skipped (pulled in-cluster)
+preload:
+	@for img in $(PRELOAD_IMAGES); do \
+		plat=$$(docker image inspect --format '{{.Os}}/{{.Architecture}}' $$img 2>/dev/null) \
+			|| { echo "preload: $$img not in local Docker, kind will pull it"; continue; }; \
+		echo "preload: $$img ($$plat)"; \
+		docker save --platform $$plat $$img | docker exec -i $(CLUSTER_NAME)-control-plane \
+			ctr -n k8s.io images import --digests - >/dev/null || exit 1; \
+	done
 
 # CRDs + the namespace-scoped operator from the operator repo. The sample
 # ClusterRoleBinding carries a placeholder namespace; point it at ours.
@@ -29,6 +46,8 @@ operator:
 cluster:
 	$(KUBECTL) apply -f cluster.yaml
 	$(KUBECTL) wait foundationdbcluster/test-cluster --for=jsonpath='{.status.health.available}'=true --timeout=30m
+	@# the operator has finished reconciling the current spec
+	$(KUBECTL) wait foundationdbcluster/test-cluster --timeout=30m --for=jsonpath='{.status.generations.reconciled}'=$$($(KUBECTL) get foundationdbcluster/test-cluster -o jsonpath='{.metadata.generation}')
 	$(KUBECTL) get foundationdbcluster,pods
 
 exporter:
@@ -46,6 +65,34 @@ roles:
 	$(KUBECTL) exec $(FDB_POD) -c foundationdb -- fdbcli --exec 'status json' \
 		| jq -r '["ADDRESS","CLASS","ROLES"], ([.cluster.processes[]] | sort_by(.class_type, .address)[] | [.address, .class_type, ([.roles[].role] | join(","))]) | @tsv' \
 		| column -t
+
+# delete one storage pod: the operator recreates it (same name, same PVC) and its storage
+# server rejoins. Polls `status json` every 2 s (bounded, 300 x 2 s) and prints each change of
+# data state / fault tolerance / storage servers until the pod is back, healthy, fault
+# tolerance >= 1 and every storage pod runs a storage role again.
+FAILOVER_JQ := [.cluster.data.state.name, .cluster.data.state.healthy, \
+	.cluster.fault_tolerance.max_zone_failures_without_losing_data, \
+	([.cluster.processes[] | select(any(.roles[]?; .role == "storage"))] | length)] | @tsv
+
+failover:
+	@pod=$$($(KUBECTL) get pod -l foundationdb.org/fdb-process-class=storage -o name | head -1); \
+	want=$$($(KUBECTL) get pod -l foundationdb.org/fdb-process-class=storage -o name | wc -l | tr -d ' '); \
+	echo "-- deleting $$pod ($$want storage pods)"; $(KUBECTL) delete $$pod --wait=false; \
+	printf '%s\t%s\t%s\t%s\t%s\n' SECONDS DATA_STATE HEALTHY FAULT_TOLERANCE STORAGE_SERVERS; \
+	last=; start=$$(date +%s); \
+	for i in $$(seq 300); do \
+		cur=$$($(KUBECTL) exec $(FDB_POD) -c foundationdb -- fdbcli --exec 'status json' --timeout 5 2>/dev/null \
+			| jq -r '$(FAILOVER_JQ)' 2>/dev/null); \
+		[ -n "$$cur" ] && [ "$$cur" != "$$last" ] && { printf '%s\t%s\n' $$(( $$(date +%s) - start )) "$$cur"; last=$$cur; }; \
+		ready=$$($(KUBECTL) get $$pod -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}' 2>/dev/null); \
+		[ $$i -gt 5 ] && [ "$$ready" = True ] && echo "$$cur" | awk -v w=$$want '$$2 == "true" && $$3 >= 1 && $$4 == w {ok=1} END {exit !ok}' && break; \
+		[ $$i -lt 300 ] || { echo 'not recovered after 600 s'; exit 1; }; sleep 2; done
+	$(KUBECTL) wait foundationdbcluster/test-cluster --timeout=10m \
+		--for=jsonpath='{.status.health.available}'=true
+	$(KUBECTL) wait foundationdbcluster/test-cluster --timeout=10m \
+		--for=jsonpath='{.status.health.fullReplication}'=true
+	$(KUBECTL) exec $(FDB_POD) -c foundationdb -- fdbcli --exec 'status' | grep -E 'Fault Tolerance|Replication health'
+	@$(MAKE) --no-print-directory roles
 
 status:
 	$(KUBECTL) get foundationdbcluster
