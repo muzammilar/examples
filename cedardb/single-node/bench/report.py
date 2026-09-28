@@ -108,6 +108,7 @@ def main():
             "analytic_rows": {"customers": 100000, "orders": 3000000},
         },
         "machine": machine(),
+        "limits": json.loads(os.environ.get("BENCH_LIMITS") or "null"),  # bench/limits.sh
         "oltp": runs,
         "load": load,
         "analytics": analytics,
@@ -121,7 +122,12 @@ def main():
         f"\n{result['versions']['server']} | {result['tool']} | scale {p['scale']} "
         f"({p['scale'] * 100_000:,} accounts), {p['duration_s']} s per run, isolation {result['server']['isolation']}"
     )
-    print(f"Docker VM: {m['docker_vm_cpus']} CPUs, {m['docker_vm_memory_gib']} GiB ({m['arch']})\n")
+    print(f"Docker VM: {m['docker_vm_cpus']} CPUs, {m['docker_vm_memory_gib']} GiB ({m['arch']})")
+    if lim := result["limits"]:
+        caps = ", ".join(f"{n} {c['cpus']} CPUs / {c['memory_mib']} MiB" for n, c in lim["containers"].items())
+        print(f"limits: {caps}; bench client {lim['bench_client_cpus']} CPUs\n")
+    else:
+        print()
     hdr = f"{'workload':<12} {'clients':>7} {'tps':>10} {'avg ms':>8} {'p95 ms':>8} {'p99 ms':>8} {'failed':>7} {'retried':>8}"
     print(hdr)
     print("-" * len(hdr))

@@ -71,25 +71,43 @@ tables of `make test`.
 Client and server share one Docker VM, so the numbers compare workloads with each other rather
 than measure the hardware.
 
+**Resource budget.** For the run [`bench/limits.sh`](bench/limits.sh) caps the `cedardb`
+container at `BENCH_CPUS=4` / `BENCH_MEM=6g` (no swap) with `docker update`, and restores the
+old limits afterwards. Docker cannot remove a memory limit from a running container, so
+"unlimited" comes back as the Docker VM's total memory; `make down && make up` starts clean.
+The pgbench/psql client has `cpus: 2` in compose (`BENCH_CLIENT_CPUS`). The JSON records the
+applied limits under `limits`. CedarDB picks its worker count and buffer size at startup from
+the cores and memory it sees, which is the whole VM, since the cap comes later. The cgroup still
+caps its CPU time (it peaked at ~4.5 CPUs in `docker stats` samples) and memory (it used
+~0.7 GB).
+
 ### Sample results
 
-TODO: numbers from a run on a quiet machine (`make benchmark`, defaults).
+2026-09-28, `make benchmark` (defaults: scale 10, 60 s per run), Docker Desktop 29.5.3 on an
+Apple M4 Pro (Docker VM: 11 CPUs, 24.4 GB, aarch64, native arm64 build), CedarDB v2026-09-16
+capped at 4 CPUs / 6 GB, client 2 CPUs.
 
-| workload | clients | TPS | avg ms | p95 ms |
-|---|---|---|---|---|
-| tpcb | 1 | TODO | TODO | TODO |
-| tpcb | 8 | TODO | TODO | TODO |
-| tpcb | 16 | TODO | TODO | TODO |
-| select-only | 1 | TODO | TODO | TODO |
-| select-only | 8 | TODO | TODO | TODO |
-| select-only | 16 | TODO | TODO | TODO |
+| workload | clients | TPS | avg ms | p95 ms | p99 ms | retried / failed |
+|---|---|---|---|---|---|---|
+| tpcb | 1 | 1,025 | 0.97 | 1.08 | 1.24 | 0 / 0 |
+| tpcb | 8 | 1,449 | 5.47 | 20.23 | 31.37 | 35,212 / 170 |
+| tpcb | 16 | 1,474 | 10.04 | 47.54 | 58.73 | 52,058 / 1,895 |
+| select-only | 1 | 5,874 | 0.17 | 0.22 | 0.29 | 0 / 0 |
+| select-only | 8 | 14,187 | 0.56 | 1.09 | 1.71 | 0 / 0 |
+| select-only | 16 | 21,687 | 0.74 | 1.07 | 1.77 | 0 / 0 |
 
 | analytic query (3M orders) | min ms | median ms |
 |---|---|---|
-| join-group-by | TODO | TODO |
-| q1-like-summary | TODO | TODO |
-| q6-like-filter-sum | TODO | TODO |
-| percentiles | TODO | TODO |
-| count-distinct | TODO | TODO |
-| window-running-total | TODO | TODO |
-| top-n-per-group | TODO | TODO |
+| join-group-by | 27.0 | 66.3 |
+| q1-like-summary | 17.6 | 18.1 |
+| q6-like-filter-sum | 1.1 | 1.1 |
+| percentiles | 1,274.0 | 1,278.3 |
+| count-distinct | 12.3 | 13.0 |
+| window-running-total | 10.0 | 10.7 |
+| top-n-per-group | 100.1 | 103.2 |
+
+Load: 3M orders in 4.9 s. CedarDB is an analytics engine first: most queries over 3M rows take
+tens of milliseconds, and exact percentiles (~1.3 s) are the one expensive case. Reads scale with
+clients, but TPC-B writes do not. At scale 10 every transaction updates one of 10 branch rows, so
+under repeatable read 40-60% of transactions hit a serialization conflict and retry, and TPS
+flattens at ~1.45k.

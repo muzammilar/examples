@@ -45,6 +45,7 @@ services:
   bench:
     image: postgres:17-alpine
     profiles: [bench]
+    cpus: ${BENCH_CLIENT_CPUS:-2}
     entrypoint: ["bash", "/bench/run.sh"]
     environment:
       PGHOST: cedardb
@@ -78,6 +79,7 @@ services:
       NAME: ${NAME:-}
       HOST_INFO: ${HOST_INFO:-}
       DOCKER_INFO: ${DOCKER_INFO:-}
+      BENCH_LIMITS: ${BENCH_LIMITS:-}
     volumes:
       - ./bench:/bench:ro
       - ./results:/results
