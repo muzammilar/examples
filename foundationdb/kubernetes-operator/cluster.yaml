@@ -1,0 +1,104 @@
+# Small FoundationDB cluster for a single-node kind cluster, adapted from
+# config/samples/cluster.yaml in the operator repo. `double` redundancy on the
+# Redwood B+tree engine (ssd-redwood-1, FDB >= 7.3), with one pod per process and
+# explicit process classes so every role is visible. faultDomain `none` lets all
+# pods share the one kind node.
+#
+# Process classes (processCounts, one pod each) and the roles FDB recruits on them:
+#   cluster_controller  1  cluster controller: elects/monitors every other role
+#   stateless           3  master (sequencer), commit proxy, GRV proxy, resolver,
+#                          ratekeeper, data distributor, consistency scan
+#   log                 3  transaction logs (tlog): durable commit log; 2 in use
+#                          (databaseConfiguration.logs) + 1 spare
+#   storage             3  storage servers: hold the key/value data (2 replicas)
+# Coordinators are picked by the operator from the log/storage pods.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: fdb-kubernetes
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: fdb-kubernetes
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "watch", "update", "patch", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: fdb-kubernetes
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: fdb-kubernetes
+subjects:
+  - kind: ServiceAccount
+    name: fdb-kubernetes
+---
+apiVersion: apps.foundationdb.org/v1beta2
+kind: FoundationDBCluster
+metadata:
+  name: test-cluster
+spec:
+  version: 7.3.79
+  databaseConfiguration:
+    redundancy_mode: double
+    storage_engine: ssd-redwood-1
+    logs: 2
+    commit_proxies: 1
+    grv_proxies: 1
+    resolvers: 1
+  faultDomain:
+    key: foundationdb.org/none
+  processCounts:
+    storage: 3
+    log: 3
+    stateless: 3
+    cluster_controller: 1
+  automationOptions:
+    replacements:
+      enabled: true
+  minimumUptimeSecondsForBounce: 60
+  processes:
+    general:
+      # The kind node's disk is the (shared) Docker VM disk; FDB throttles writes
+      # once it has < 5% free, so lower that floor to 1% / 256 MiB for local use.
+      customParameters:
+        - knob_disable_posix_kernel_aio=1
+        - knob_min_available_space_ratio=0.01
+        - knob_min_available_space=268435456
+      podTemplate:
+        spec:
+          serviceAccountName: fdb-kubernetes
+          containers:
+            - name: foundationdb
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 128Mi
+              securityContext:
+                runAsUser: 0
+            - name: foundationdb-kubernetes-sidecar
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 128Mi
+                limits:
+                  cpu: 100m
+                  memory: 128Mi
+              securityContext:
+                runAsUser: 0
+      volumeClaimTemplate:
+        spec:
+          resources:
+            requests:
+              storage: 1Gi
+  routing:
+    defineDNSLocalityFields: true
+  sidecarContainer:
+    enableLivenessProbe: true
+    enableReadinessProbe: false
+  useExplicitListenAddress: true

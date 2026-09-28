@@ -1,0 +1,46 @@
+# Prometheus metrics from `status json`, reading the cluster file the operator
+# publishes in the <cluster>-config ConfigMap. amd64-only image.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fdb-exporter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fdb-exporter
+  template:
+    metadata:
+      labels:
+        app: fdb-exporter
+    spec:
+      containers:
+        - name: exporter
+          image: aikoven/foundationdb-exporter:3.1.0
+          env:
+            - name: FDB_CLUSTER_FILE
+              value: /etc/foundationdb/fdb.cluster
+          ports:
+            - name: metrics
+              containerPort: 9444
+          volumeMounts:
+            - name: cluster-file
+              mountPath: /etc/foundationdb
+      volumes:
+        - name: cluster-file
+          configMap:
+            name: test-cluster-config
+            items:
+              - key: cluster-file
+                path: fdb.cluster
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fdb-exporter
+spec:
+  selector:
+    app: fdb-exporter
+  ports:
+    - name: metrics
+      port: 9444
