@@ -1,0 +1,31 @@
+name: singlestore-single
+
+services:
+  singlestore:
+    # amd64-only image; on Apple silicon it runs under Rosetta (needs x86-64-v3, i.e. macOS 26+)
+    image: ghcr.io/singlestore-labs/singlestoredb-dev:${SINGLESTORE_DEV_IMAGE_VERSION:-0.2.85}
+    platform: linux/amd64
+    container_name: singlestore
+    hostname: singlestore
+    # the free (no license key) mode is limited to 8 cores
+    cpus: 8
+    environment:
+      ROOT_PASSWORD: ${SINGLESTORE_PASSWORD:-SingleStore-Demo-1}
+      # optional: empty = the image's built-in free license
+      SINGLESTORE_LICENSE: ${SINGLESTORE_LICENSE:-}
+    ports:
+      - "${SINGLESTORE_PORT:-3336}:3306"         # MySQL protocol
+      - "${SINGLESTORE_STUDIO_PORT:-18080}:8080" # SingleStore Studio (web UI)
+      - "${SINGLESTORE_HTTP_PORT:-19000}:9000"   # Data API (SQL over HTTP)
+    volumes:
+      - singlestore-data:/data
+      - ./sql:/sql:ro
+    healthcheck:
+      test: ["CMD", "/scripts/healthcheck.sh"]
+      interval: 5s
+      timeout: 5s
+      retries: 60
+      start_period: 90s
+
+volumes:
+  singlestore-data:
