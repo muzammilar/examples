@@ -1,0 +1,9 @@
+[project]
+name = "tidb-bench-report"
+version = "0.1.0"
+description = "Parses go-tpc and sysbench output for make benchmark"
+requires-python = ">=3.13"
+dependencies = []
+
+[tool.uv]
+package = false
