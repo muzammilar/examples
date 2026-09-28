@@ -55,12 +55,49 @@ services:
       context: client
       args:
         TIGERBEETLE_VERSION: ${TIGERBEETLE_VERSION:-0.17.9}
-    image: tigerbeetle-cluster-client
     profiles: [test]
     security_opt: ["seccomp=unconfined"] # the client library uses io_uring too
     networks: [tigerbeetle]
     environment:
       TB_ADDRESS: *addresses
+
+  # `make benchmark`: the built-in `tigerbeetle benchmark` load generator (bench/run.sh)
+  # against all three replicas; raw output to results/
+  bench:
+    image: ghcr.io/tigerbeetle/tigerbeetle:${TIGERBEETLE_VERSION:-0.17.9}
+    profiles: [bench]
+    security_opt: ["seccomp=unconfined"] # the client uses io_uring
+    networks: [tigerbeetle]
+    entrypoint: ["sh", "/bench/run.sh"]
+    environment:
+      NAME: ${NAME:-}
+      ADDRESSES: *addresses
+      TRANSFERS: ${TRANSFERS:-1000000}
+      ACCOUNTS: ${ACCOUNTS:-10000}
+      CLIENTS: ${CLIENTS:-1}
+      BATCH: ${BATCH:-8189}
+    volumes:
+      - ./bench:/bench:ro
+      - ./results:/results
+
+  # `make benchmark`: parses the raw output (bench/report.py) into a table and results/*.json
+  bench-report:
+    image: ghcr.io/astral-sh/uv:0.12.19-python3.13-trixie-slim
+    profiles: [bench]
+    network_mode: none
+    working_dir: /bench
+    command: ["uv", "run", "--frozen", "report.py"]
+    environment:
+      UV_CACHE_DIR: /uv/cache          # the venv lives in the uv volume, so reruns skip creating it
+      UV_PROJECT_ENVIRONMENT: /uv/venv
+      UV_PYTHON_DOWNLOADS: never       # use the image's Python
+      NAME: ${NAME:-}
+      HOST_INFO: ${HOST_INFO:-}
+      DOCKER_INFO: ${DOCKER_INFO:-}
+    volumes:
+      - ./bench:/bench:ro
+      - ./results:/results
+      - uv-cache:/uv
 
 networks:
   tigerbeetle:
@@ -74,3 +111,4 @@ volumes:
   tigerbeetle-0:
   tigerbeetle-1:
   tigerbeetle-2:
+  uv-cache:

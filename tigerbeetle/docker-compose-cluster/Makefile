@@ -1,4 +1,4 @@
-.PHONY: up test failover status cli down
+.PHONY: up test failover benchmark status cli down
 
 SHELL := bash
 .SHELLFLAGS := -o pipefail -c
@@ -37,12 +37,29 @@ failover:
 	echo "==> starting tigerbeetle-$$p, then stopping tigerbeetle-$$s"; \
 	docker compose up --detach --wait tigerbeetle-$$p; \
 	docker compose stop tigerbeetle-$$s; \
-	echo "==> transfer 502 via tigerbeetle-$$p: it rejoined, tigerbeetle-$$p + tigerbeetle-$$q are the quorum"; \
-	$(call REPL,$$p,create_transfers id=502 debit_account_id=1 credit_account_id=2 amount=1 ledger=1 code=10;); \
+	echo "==> transfer 502 (reverses 501) via tigerbeetle-$$p: it rejoined, tigerbeetle-$$p + tigerbeetle-$$q are the quorum"; \
+	$(call REPL,$$p,create_transfers id=502 debit_account_id=2 credit_account_id=1 amount=1 ledger=1 code=10;); \
 	$(call BALANCES,$$p); \
 	echo "==> starting tigerbeetle-$$s"; \
 	docker compose up --detach --wait tigerbeetle-$$s
 	$(MAKE) --no-print-directory status
+
+# `tigerbeetle benchmark` against the running cluster: TRANSFERS transfers (SMOKE=1: 100k)
+# between ACCOUNTS accounts from CLIENTS clients, in batches of up to BATCH (8189 = the most one
+# request holds); prints a summary table, keeps results/tigerbeetle-cluster-<UTC time>.{txt,json}
+SMOKE ?=
+TRANSFERS ?= $(if $(filter 1,$(SMOKE)),100000,1000000)
+ACCOUNTS ?= 10000
+CLIENTS ?= 1
+BATCH ?= 8189
+
+benchmark:
+	@docker compose ps --status running --services | grep -qx tigerbeetle-0 || { echo 'run `make up` first'; exit 1; }
+	@mkdir -p results
+	@export NAME=tigerbeetle-cluster-$$(date -u +%Y%m%dT%H%M%SZ) TRANSFERS=$(TRANSFERS) ACCOUNTS=$(ACCOUNTS) \
+		CLIENTS=$(CLIENTS) BATCH=$(BATCH) HOST_INFO="$$(uname -sm)" \
+		DOCKER_INFO="$$(docker info --format 'Docker {{.ServerVersion}}, {{.NCPU}} CPUs, {{.MemTotal}} bytes')"; \
+	docker compose run --rm -T bench && docker compose run --rm -T bench-report
 
 status:
 	docker compose ps --format 'table {{.Name}}\t{{.Status}}\t{{.Ports}}'
@@ -53,4 +70,4 @@ cli:
 	docker exec -it tigerbeetle-0 /tigerbeetle repl --cluster=0 --addresses=$(ADDRESSES)
 
 down:
-	docker compose --profile test down --volumes
+	docker compose --profile test --profile bench down --volumes --rmi local

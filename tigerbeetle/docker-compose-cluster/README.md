@@ -10,10 +10,12 @@ quorum of 2 and survive one failed replica; the docs recommend
 make up        # start the replicas (they format on first start and elect a primary)
 make test      # client/demo.py via the Python client against all three addresses, then the REPL
 make failover  # stop the primary: view change, transfer 501 commits on the other two; restart it,
-               # stop another replica, transfer 502 commits via the old primary; restart everything
+               # stop another replica, transfer 502 (reverses 501) commits via the old primary;
+               # restart everything
+make benchmark # tigerbeetle benchmark against the 3 replicas: 1M transfers (SMOKE=1: 100k)
 make status    # container state, current primary, each replica's last view/role
 make cli       # interactive tigerbeetle repl
-make down      # remove containers and the three data volumes
+make down      # remove containers, the data volumes and the built test client image
 ```
 
 - Replica `i` is `tigerbeetle-i` at `10.203.53.1i:3000` on the `tigerbeetle` network; host ports
@@ -28,3 +30,43 @@ make down      # remove containers and the three data volumes
   `python:3.13-slim` + `pip install tigerbeetle==0.17.9`. Server and client need io_uring
   (`security_opt: seccomp=unconfined`); `cap_add: IPC_LOCK` allows memory locking.
 - `--cache-grid=256MiB` per replica; each replica still allocates ~2.3 GiB (~7 GiB in total).
+
+## Benchmark
+
+`make benchmark` runs TigerBeetle's own load generator, `tigerbeetle benchmark`
+([`bench/run.sh`](bench/run.sh)), in a container on the cluster network against all three
+replicas. It creates `ACCOUNTS` accounts (default 10,000) and commits `TRANSFERS` transfers
+between random pairs of them (default 1,000,000; `SMOKE=1`: 100,000) from `CLIENTS` clients
+(1), each request a batch of up to `BATCH` transfers (8,189, the most one request holds), then
+runs 100 `get_account_transfers` queries.
+
+What it shows: TigerBeetle's throughput comes from batching. Every request is one consensus
+round (prepare to the backups, a quorum of 2 of 3 acks, commit) and one pass of the double-entry
+state machine for the whole batch, so thousands of transfers share the cost of one network round
+trip and one disk write; the latency it reports is per batch, not per transfer. The single-node
+example ([`../single-node`](../single-node)) has the same `make benchmark`, showing what
+replication to a quorum costs.
+
+```bash
+make benchmark                          # 1M transfers
+make benchmark SMOKE=1                  # 100k transfers
+make benchmark TRANSFERS=5000000 CLIENTS=4 BATCH=1000
+```
+
+It prints a summary table (transfers/s = the tool's "load accepted", batch latency p50/p99/p100,
+query latency) and keeps the raw output plus parsed JSON with the version, parameters and Docker
+VM CPUs/memory in `results/tigerbeetle-cluster-<UTC time>.{txt,json}` (gitignored), written by
+[`bench/report.py`](bench/report.py) (standard library, `uv run --frozen` in
+`ghcr.io/astral-sh/uv:0.12.19-python3.13-trixie-slim`). The benchmark's accounts live on ledger 2
+with time-based ids, so they never collide with `client/demo.py` (ledger 1, ids 1-3) and
+`make test` still passes afterwards. All three replicas and the client share one Docker VM (and
+its disk), so this measures the example, not TigerBeetle on dedicated machines.
+
+### Sample results
+
+TODO: numbers from a quiet machine.
+
+| setup | transfers | transfers/s | batch p50 ms | batch p99 ms |
+|-------|----------:|------------:|-------------:|-------------:|
+| 3 replicas (this example) | 1,000,000 | TODO | TODO | TODO |
+| 1 replica ([single-node](../single-node)) | 1,000,000 | TODO | TODO | TODO |
