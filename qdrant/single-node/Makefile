@@ -1,4 +1,6 @@
-.PHONY: up test status cli down
+.PHONY: up test status cli benchmark down
+
+SMOKE ?=
 
 up:
 	docker compose up --detach --wait
@@ -15,5 +17,10 @@ status:
 cli:
 	docker compose run --rm tools sh
 
+# needs `make up`; SMOKE=1 for a 10k-vector run, or set N / DIM / K
+benchmark:
+	@docker compose ps --status running --services | grep -qx qdrant || { echo 'run `make up` first'; exit 1; }
+	SMOKE=$(SMOKE) docker compose run --rm bench
+
 down:
-	docker compose --profile tools down --volumes
+	docker compose --profile tools down --volumes --rmi local

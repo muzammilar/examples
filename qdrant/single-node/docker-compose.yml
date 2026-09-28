@@ -5,9 +5,11 @@ services:
     image: qdrant/qdrant:${QDRANT_VERSION:-v1.19.1}
     container_name: qdrant
     hostname: qdrant
-    ports:
-      - "6333:6333" # REST + web UI (/dashboard)
-      - "6334:6334" # gRPC
+    environment:
+      QDRANT__TELEMETRY_DISABLED: "true" # no anonymous usage reports to telemetry.qdrant.io
+    ports: # localhost only: no API key is set
+      - "127.0.0.1:6333:6333" # REST + web UI (/dashboard)
+      - "127.0.0.1:6334:6334" # gRPC
     volumes:
       - qdrant-data:/qdrant/storage
     # the image has no curl/wget; probe /readyz over bash's /dev/tcp
@@ -29,5 +31,25 @@ services:
       - ./requests:/work/requests:ro
       - ./scripts:/work/scripts:ro
 
+  # uv + Python 3.13, used by `make benchmark` (bench/bench.py, deps pinned in bench/uv.lock)
+  bench:
+    image: ghcr.io/astral-sh/uv:0.12.19-python3.13-trixie-slim
+    profiles: [bench]
+    working_dir: /bench
+    command: ["uv", "run", "--frozen", "bench.py"]
+    environment:
+      UV_CACHE_DIR: /uv/cache              # wheel cache and venv live in the uv volume,
+      UV_PROJECT_ENVIRONMENT: /uv/venv     # so reruns skip downloads and installs
+      UV_PYTHON_DOWNLOADS: never           # use the image's Python
+      SMOKE: ${SMOKE:-}
+      N: ${N:-}
+      DIM: ${DIM:-}
+      K: ${K:-}
+    volumes:
+      - ./bench:/bench:ro
+      - ./results:/results
+      - uv-cache:/uv
+
 volumes:
   qdrant-data:
+  uv-cache:
