@@ -20,7 +20,8 @@ make down     # remove containers and network, delete ./data
 - The generator is seeded: `make down && make up` recreates byte-identical files.
   `python scripts/generate.py DIR N` changes the output dir and event count.
 - `sql/01-read-files.sql` creates the views in `data/demo.duckdb` that the later
-  files and `make cli` use; relative paths resolve against `/data` in the container.
+  files and `make cli` use; `make up` also runs its `CREATE VIEW` lines, so `make cli`
+  works straight after `make up`. Relative paths resolve against `/data` in the container.
 - `.timer on` times are wall-clock inside the container. The CSV is re-parsed on
   every query; compare the same aggregate on CSV and Parquet in `04-parquet.sql`.
 - DuckDB allows one writing process per database file: close `make cli` before

@@ -14,10 +14,13 @@ export HOST_GID := $(shell id -g)
 COMPOSE := docker compose --progress quiet --profile tools
 DUCKDB := $(COMPOSE) run --rm -T duckdb
 
+# also runs the CREATE VIEW lines of sql/01 (single source), so `make cli` has the
+# views in data/demo.duckdb right after `make up`, before `make test` has run
 up:
 	$(COMPOSE) pull
 	mkdir -p data
 	test -f data/events.csv || $(COMPOSE) run --rm gen
+	grep '^CREATE OR REPLACE VIEW' sql/01-read-files.sql | $(DUCKDB) demo.duckdb
 
 # the duckdb CLI does not echo statements, so each sql/*.sql file is printed before
 # its output; all files share data/demo.duckdb (01 creates the views the rest use)
