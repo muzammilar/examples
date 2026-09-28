@@ -68,6 +68,7 @@ services:
   bench:
     image: scylladb/cassandra-stress:${STRESS_VERSION:-3.21.1}
     profiles: [bench]
+    cpus: ${BENCH_CLIENT_CPUS:-2}
     entrypoint: ["bash", "/bench/run.sh"]
     environment:
       NAME: ${NAME:-}
@@ -93,6 +94,7 @@ services:
       STRESS_VERSION: ${STRESS_VERSION:-3.21.1}
       HOST_INFO: ${HOST_INFO:-}
       DOCKER_INFO: ${DOCKER_INFO:-}
+      BENCH_LIMITS: ${BENCH_LIMITS:-}
     volumes:
       - ./bench:/bench:ro
       - ./results:/results

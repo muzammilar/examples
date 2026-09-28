@@ -53,6 +53,14 @@ failover:
 	@echo "==> CONSISTENCY ALL works again: all 3 replicas answer again (an ALL read also read-repairs)"
 	docker exec -i scylla-1 cqlsh < failover/all.cql
 
+# resource budget for `make benchmark` (bench/limits.sh): BENCH_CPUS / BENCH_MEM in total for the
+# database containers in BENCH_SPEC (equal shares; service=CPUS:MEM is a fixed amount), set with
+# `docker update` for the run and restored afterwards; the bench client has BENCH_CLIENT_CPUS
+BENCH_CPUS ?= 6
+BENCH_MEM ?= 12g
+BENCH_SPEC ?= scylla-1 scylla-2 scylla-3
+export BENCH_CLIENT_CPUS ?= 2
+
 # cassandra-stress at QUORUM: write, read, 50/50 mixed, plain vs LWT update, DURATION s each;
 # prints a summary table, keeps results/scylladb-<UTC time>.{txt,json}
 benchmark:
@@ -60,12 +68,14 @@ benchmark:
 	@mkdir -p results
 	@echo "==> dropping the benchmark keyspaces of an earlier run"
 	@docker exec scylla-1 cqlsh -e 'DROP KEYSPACE IF EXISTS keyspace1; DROP KEYSPACE IF EXISTS bench_lwt'
-	@export NAME=scylladb-$$(date -u +%Y%m%dT%H%M%SZ) DURATION=$(DURATION) THREADS=$(THREADS) KEYS=$(KEYS) LWT_KEYS=$(LWT_KEYS) \
+	@BENCH_LIMITS=$$(sh bench/limits.sh apply $(BENCH_CPUS) $(BENCH_MEM) $(BENCH_SPEC)) || { sh bench/limits.sh restore; exit 1; }; \
+	export BENCH_LIMITS NAME=scylladb-$$(date -u +%Y%m%dT%H%M%SZ) DURATION=$(DURATION) THREADS=$(THREADS) KEYS=$(KEYS) LWT_KEYS=$(LWT_KEYS) \
 		HOST_INFO="$$(uname -sm)" DOCKER_INFO="$$(docker info --format 'Docker {{.ServerVersion}}, {{.NCPU}} CPUs, {{.MemTotal}} bytes')"; \
 	{ echo "meta: server_version=$$(docker exec scylla-1 scylla --version)"; \
 	  echo "meta: nodes_up=$$(docker exec scylla-1 nodetool status | grep -c '^UN')"; \
 	  echo "meta: node_args=$$(docker inspect scylla-1 --format '{{join .Config.Cmd " "}}')"; } > results/$$NAME.txt; \
-	docker compose run --rm -T bench && docker compose run --rm -T bench-report
+	docker compose run --rm -T bench && docker compose run --rm -T bench-report; \
+	rc=$$?; sh bench/limits.sh restore; exit $$rc
 
 status:
 	docker exec scylla-1 nodetool status

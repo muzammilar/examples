@@ -74,15 +74,33 @@ standard-library Python run with `uv run --frozen` in the `ghcr.io/astral-sh/uv`
 The three nodes and the client share one Docker VM, so the numbers compare workloads with each
 other rather than measure the hardware.
 
+**Resource budget.** For the run [`bench/limits.sh`](bench/limits.sh) gives the three Scylla
+nodes `BENCH_CPUS=6` / `BENCH_MEM=12g` in total, i.e. 2 CPUs / 4 GB each (no swap), with
+`docker update`, and restores the old limits afterwards. Docker cannot remove a memory limit
+from a running container, so "unlimited" comes back as the Docker VM's total memory;
+`make down && make up` starts clean. Prometheus and Grafana are left unlimited. The
+cassandra-stress client has `cpus: 2` in compose (`BENCH_CLIENT_CPUS`). The JSON records the
+applied limits under `limits`. Scylla's own flags bind first: `--smp 1 --memory 750M` pins each
+node to one shard (one reactor thread) and 750 MB, so a node uses ~1.2 CPUs and ~700 MB of its
+cap. The client was the busier side, at its 2-CPU limit.
+
 ### Sample results
 
-TODO: numbers from a run on a quiet machine (`make benchmark`, defaults).
+2026-09-28, `make benchmark` (defaults: 32 threads, 60 s per workload, 1M partitions, RF=3,
+CL=QUORUM), Docker Desktop 29.5.3 on an Apple M4 Pro (Docker VM: 11 CPUs, 24.4 GB, aarch64, all
+images native arm64), ScyllaDB 2026.1.13, 2 CPUs / 4 GB per node (1 shard, 750 MB used),
+client 2 CPUs.
 
 | workload | op | ops/s | p50 ms | p95 ms | p99 ms | p99.9 ms |
 |---|---|---|---|---|---|---|
-| write | write | TODO | TODO | TODO | TODO | TODO |
-| read | read | TODO | TODO | TODO | TODO | TODO |
-| mixed | read | TODO | TODO | TODO | TODO | TODO |
-| mixed | write | TODO | TODO | TODO | TODO | TODO |
-| plain-update | plain | TODO | TODO | TODO | TODO | TODO |
-| lwt-update | lwt | TODO | TODO | TODO | TODO | TODO |
+| write | write | 52,695 | 0.30 | 2.80 | 4.10 | 30.10 |
+| read | read | 40,347 | 0.60 | 1.30 | 2.20 | 23.20 |
+| mixed | read | 21,027 | 0.60 | 2.40 | 5.00 | 29.90 |
+| mixed | write | 21,083 | 0.30 | 1.50 | 4.00 | 28.00 |
+| plain-update | plain | 59,524 | 0.30 | 0.50 | 2.80 | 48.00 |
+| lwt-update | lwt | 15,471 | 1.90 | 3.00 | 4.60 | 13.80 |
+
+Writes are cheaper than reads. A write goes to the commitlog and memtable, while a QUORUM read
+has to reconcile two replicas. Lightweight transactions (Paxos: several replica round trips) cost ~6x a
+plain write at p50 and cut throughput to about a quarter. One shard per node and a
+client-bound load generator mean these are floor numbers for ScyllaDB.
