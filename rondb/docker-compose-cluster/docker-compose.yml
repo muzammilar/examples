@@ -78,7 +78,6 @@ services:
     volumes:
       - ./config/my.cnf:/srv/hops/mysql-cluster/my.cnf:ro
       - ./config/init.sql:/srv/hops/docker/rondb_standalone/sql_init_scripts/init.sql:ro
-      - ./sql:/sql:ro
     depends_on:
       ndbd-1: { condition: service_healthy }
       ndbd-2: { condition: service_healthy }
@@ -112,6 +111,42 @@ services:
       timeout: 5s
       retries: 30
 
+  # `make benchmark`: sysbench OLTP via the MySQL Server + wrk pk-reads via the REST API
+  # (bench/run.sh, image built from bench/Dockerfile), raw output to results/
+  bench:
+    build: ./bench
+    profiles: [bench]
+    command: ["sh", "/bench/run.sh"]
+    environment:
+      NAME: ${NAME:-}
+      DURATION: ${DURATION:-60}
+      THREADS: ${THREADS:-8}
+      TABLES: ${TABLES:-4}
+      TABLE_SIZE: ${TABLE_SIZE:-50000}
+    volumes:
+      - ./bench:/bench:ro
+      - ./results:/results
+
+  # `make benchmark`: parses the raw output (bench/report.py) into a table and results/*.json
+  bench-report:
+    image: ghcr.io/astral-sh/uv:0.12.19-python3.13-trixie-slim
+    profiles: [bench]
+    network_mode: none
+    working_dir: /bench
+    command: ["uv", "run", "--frozen", "report.py"]
+    environment:
+      UV_CACHE_DIR: /uv/cache          # the venv lives in the uv volume, so reruns skip creating it
+      UV_PROJECT_ENVIRONMENT: /uv/venv
+      UV_PYTHON_DOWNLOADS: never       # use the image's Python
+      NAME: ${NAME:-}
+      HOST_INFO: ${HOST_INFO:-}
+      DOCKER_INFO: ${DOCKER_INFO:-}
+    volumes:
+      - ./bench:/bench:ro
+      - ./results:/results
+      - uv-cache:/uv
+
 volumes:
   ndbd-1:
   ndbd-2:
+  uv-cache:

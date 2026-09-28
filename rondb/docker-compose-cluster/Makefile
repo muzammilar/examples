@@ -1,4 +1,4 @@
-.PHONY: up test failover status cli down
+.PHONY: up test failover benchmark status cli down
 
 RONDB_REST_PORT ?= 4406
 MGM := docker exec rondb-mgmd ndb_mgm --ndb-connectstring=mgmd:1186
@@ -41,6 +41,25 @@ failover:
 	$(MYSQL) -e "SELECT node_id, fragment_num, fixed_elem_count AS row_count FROM ndbinfo.memory_per_fragment \
 		WHERE fq_name = 'demo/def/accounts' ORDER BY fragment_num, node_id; SELECT * FROM demo.accounts WHERE id = 5;"
 
+# sysbench oltp_point_select / oltp_read_only / oltp_read_write on TABLES ENGINE=NDB tables of
+# TABLE_SIZE rows through the MySQL Server, then wrk pk-reads through the REST API; DURATION s each
+# with THREADS clients (SMOKE=1: 10 s, 2 x 10,000 rows). Prints a summary table, keeps
+# results/rondb-<UTC time>.{txt,json}; drops the sbtest database afterwards.
+SMOKE ?=
+DURATION ?= $(if $(filter 1,$(SMOKE)),10,60)
+THREADS ?= 8
+TABLES ?= $(if $(filter 1,$(SMOKE)),2,4)
+TABLE_SIZE ?= $(if $(filter 1,$(SMOKE)),10000,50000)
+
+benchmark:
+	@docker compose ps --status running --services | grep -qx rest || { echo 'run `make up` first'; exit 1; }
+	@mkdir -p results
+	@docker compose --progress quiet --profile bench build bench
+	@export NAME=rondb-$$(date -u +%Y%m%dT%H%M%SZ) DURATION=$(DURATION) THREADS=$(THREADS) TABLES=$(TABLES) \
+		TABLE_SIZE=$(TABLE_SIZE) HOST_INFO="$$(uname -sm)" \
+		DOCKER_INFO="$$(docker info --format 'Docker {{.ServerVersion}}, {{.NCPU}} CPUs, {{.MemTotal}} bytes')"; \
+	docker compose run --rm -T bench && docker compose run --rm -T bench-report
+
 status:
 	$(MGM) -e show
 	$(MGM) -e 'all report memory'
@@ -49,4 +68,4 @@ cli:
 	docker exec -it rondb-mysqld mysql -uroot
 
 down:
-	docker compose down --volumes
+	docker compose --profile bench down --volumes --rmi local
