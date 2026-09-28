@@ -1,0 +1,12 @@
+{
+  "class": "Landmark",
+  "vectorizer": "none",
+  "vectorIndexType": "hnsw",
+  "vectorIndexConfig": { "distance": "cosine" },
+  "properties": [
+    { "name": "name",        "dataType": ["text"] },
+    { "name": "description", "dataType": ["text"] },
+    { "name": "city",        "dataType": ["text"], "tokenization": "field" },
+    { "name": "year",        "dataType": ["int"] }
+  ]
+}
