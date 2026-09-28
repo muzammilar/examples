@@ -31,8 +31,7 @@ services:
     environment:
       RUSTFS_VOLUMES: /data              # single-disk mode
       RUSTFS_ADDRESS: 0.0.0.0:9000       # S3 API
-      RUSTFS_CONSOLE_ENABLE: "true"
-      RUSTFS_CONSOLE_ADDRESS: 0.0.0.0:9001 # web console (not published)
+      RUSTFS_CONSOLE_ENABLE: "false"     # web console off (on :9001 by default); `make status` uses the S3 API
       RUSTFS_ACCESS_KEY: rustfsadmin     # RustFS' default credentials, passed to Milvus below
       RUSTFS_SECRET_KEY: rustfsadmin
     volumes:
@@ -57,9 +56,10 @@ services:
       MINIO_REGION: us-east-1
       MINIO_ACCESS_KEY_ID: rustfsadmin
       MINIO_SECRET_ACCESS_KEY: rustfsadmin
-    ports:
-      - "19530:19530" # gRPC + REST (/v2/vectordb)
-      - "9091:9091"   # health, metrics, web UI (/webui)
+    ports: # localhost only: Milvus auth is off
+      - "127.0.0.1:19530:19530" # gRPC + REST (/v2/vectordb)
+      - "127.0.0.1:9091:9091"   # health, metrics, web UI (/webui)
+    # upstream's milvus-volume-init chown service is omitted: named volumes inherit the image's ownership (uid 999)
     volumes:
       - milvus-data:/var/lib/milvus
     healthcheck:
@@ -83,7 +83,27 @@ services:
     volumes:
       - ./scripts:/work/scripts:ro
 
+  # uv + Python 3.13, used by `make benchmark` (bench/bench.py, deps pinned in bench/uv.lock)
+  bench:
+    image: ghcr.io/astral-sh/uv:0.12.19-python3.13-trixie-slim
+    profiles: [bench]
+    working_dir: /bench
+    command: ["uv", "run", "--frozen", "bench.py"]
+    environment:
+      UV_CACHE_DIR: /uv/cache              # wheel cache and venv live in the uv volume,
+      UV_PROJECT_ENVIRONMENT: /uv/venv     # so reruns skip downloads and installs
+      UV_PYTHON_DOWNLOADS: never           # use the image's Python
+      SMOKE: ${SMOKE:-}
+      N: ${N:-}
+      DIM: ${DIM:-}
+      K: ${K:-}
+    volumes:
+      - ./bench:/bench:ro
+      - ./results:/results
+      - uv-cache:/uv
+
 volumes:
   etcd-data:
   rustfs-data:
   milvus-data:
+  uv-cache:
