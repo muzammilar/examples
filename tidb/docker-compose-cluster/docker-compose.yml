@@ -1,0 +1,142 @@
+name: tidb-cluster
+
+# A minimal real TiDB cluster: 3 PD (placement driver: metadata, TSO, scheduling),
+# 3 TiKV (storage, Raft-replicated regions, 3 replicas each), 1 TiDB (stateless
+# SQL layer). Every image is multi-arch (amd64 + arm64). PD starts as one Raft
+# group, the TiKV stores register with it, then TiDB bootstraps its system tables.
+# Only TiDB's SQL port and one PD client port are published to the host.
+x-pd: &pd
+  image: pingcap/pd:${TIDB_VERSION:-v8.5.8}
+  healthcheck:
+    # /pd/api/v1/leader answers only once the PD Raft group elected a leader
+    test: ["CMD", "wget", "-qO-", "http://127.0.0.1:2379/pd/api/v1/leader"]
+    interval: 3s
+    timeout: 3s
+    retries: 40
+
+x-tikv: &tikv
+  image: pingcap/tikv:${TIDB_VERSION:-v8.5.8}
+  ulimits:
+    nofile: { soft: 1000000, hard: 1000000 }
+  volumes: [./config/tikv.toml:/tikv.toml:ro]
+  healthcheck:
+    test: ["CMD", "wget", "-qO-", "http://127.0.0.1:20180/status"]
+    interval: 3s
+    timeout: 3s
+    retries: 40
+  depends_on:
+    pd0: { condition: service_healthy }
+    pd1: { condition: service_healthy }
+    pd2: { condition: service_healthy }
+
+services:
+  pd0:
+    <<: *pd
+    container_name: tidb-pd0
+    hostname: pd0
+    command:
+      - --name=pd0
+      - --client-urls=http://0.0.0.0:2379
+      - --peer-urls=http://0.0.0.0:2380
+      - --advertise-client-urls=http://pd0:2379
+      - --advertise-peer-urls=http://pd0:2380
+      - --initial-cluster=pd0=http://pd0:2380,pd1=http://pd1:2380,pd2=http://pd2:2380
+      - --data-dir=/data/pd
+    ports: ["${PD_PORT:-12379}:2379"]
+  pd1:
+    <<: *pd
+    container_name: tidb-pd1
+    hostname: pd1
+    command:
+      - --name=pd1
+      - --client-urls=http://0.0.0.0:2379
+      - --peer-urls=http://0.0.0.0:2380
+      - --advertise-client-urls=http://pd1:2379
+      - --advertise-peer-urls=http://pd1:2380
+      - --initial-cluster=pd0=http://pd0:2380,pd1=http://pd1:2380,pd2=http://pd2:2380
+      - --data-dir=/data/pd
+  pd2:
+    <<: *pd
+    container_name: tidb-pd2
+    hostname: pd2
+    command:
+      - --name=pd2
+      - --client-urls=http://0.0.0.0:2379
+      - --peer-urls=http://0.0.0.0:2380
+      - --advertise-client-urls=http://pd2:2379
+      - --advertise-peer-urls=http://pd2:2380
+      - --initial-cluster=pd0=http://pd0:2380,pd1=http://pd1:2380,pd2=http://pd2:2380
+      - --data-dir=/data/pd
+
+  tikv0:
+    <<: *tikv
+    container_name: tidb-tikv0
+    hostname: tikv0
+    command:
+      - --addr=0.0.0.0:20160
+      - --advertise-addr=tikv0:20160
+      - --status-addr=0.0.0.0:20180
+      - --advertise-status-addr=tikv0:20180
+      - --pd=pd0:2379,pd1:2379,pd2:2379
+      - --data-dir=/data/tikv
+      - --config=/tikv.toml
+  tikv1:
+    <<: *tikv
+    container_name: tidb-tikv1
+    hostname: tikv1
+    command:
+      - --addr=0.0.0.0:20160
+      - --advertise-addr=tikv1:20160
+      - --status-addr=0.0.0.0:20180
+      - --advertise-status-addr=tikv1:20180
+      - --pd=pd0:2379,pd1:2379,pd2:2379
+      - --data-dir=/data/tikv
+      - --config=/tikv.toml
+  tikv2:
+    <<: *tikv
+    container_name: tidb-tikv2
+    hostname: tikv2
+    command:
+      - --addr=0.0.0.0:20160
+      - --advertise-addr=tikv2:20160
+      - --status-addr=0.0.0.0:20180
+      - --advertise-status-addr=tikv2:20180
+      - --pd=pd0:2379,pd1:2379,pd2:2379
+      - --data-dir=/data/tikv
+      - --config=/tikv.toml
+
+  tidb:
+    image: pingcap/tidb:${TIDB_VERSION:-v8.5.8}
+    container_name: tidb-tidb
+    hostname: tidb
+    command:
+      - --store=tikv
+      - --path=pd0:2379,pd1:2379,pd2:2379
+      - --advertise-address=tidb
+    ports: ["${TIDB_PORT:-14000}:4000"]
+    healthcheck:
+      # the status server (:10080) answers once bootstrap finished
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:10080/status"]
+      interval: 3s
+      timeout: 3s
+      retries: 60
+    depends_on:
+      tikv0: { condition: service_healthy }
+      tikv1: { condition: service_healthy }
+      tikv2: { condition: service_healthy }
+
+  # mysql CLI for `make test` / `make cli` (sql/ and conflict/ mounted read-only)
+  mysql:
+    build: ./client
+    image: tidb-cluster-mysql-client:local
+    container_name: tidb-mysql
+    command: ["sleep", "infinity"]
+    init: true
+    volumes: [./sql:/sql:ro, ./conflict:/conflict:ro]
+    healthcheck:
+      test: ["CMD", "mariadb", "-h", "tidb", "-P", "4000", "-u", "root", "-e", "SELECT 1"]
+      interval: 3s
+      timeout: 3s
+      retries: 40
+    depends_on:
+      tidb: { condition: service_healthy }
