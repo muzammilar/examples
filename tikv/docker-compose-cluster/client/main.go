@@ -34,6 +34,10 @@ func main() {
 
 	ctx := context.Background()
 	pd := strings.Split(getenv("PD_ADDRS", "pd0:2379"), ",")
+	if len(os.Args) == 2 && os.Args[1] == "cleanup-bench" {
+		cleanupBench(ctx, pd)
+		return
+	}
 	rawKV(ctx, pd)
 	txnKV(ctx, pd)
 	fmt.Println("\nOK")
@@ -151,6 +155,40 @@ func txnKV(ctx context.Context, pd []string) {
 		fmt.Printf("  %s = %s\n", k, v.Value)
 	}
 	must(t.Rollback())
+}
+
+// cleanupBench removes the rows `make benchmark` (go-ycsb) wrote: table ycsb_raw through
+// RawKV (keys "ycsb_raw:<key>"), table ycsb_txn through TxnKV, 1000 deletes per transaction.
+func cleanupBench(ctx context.Context, pd []string) {
+	r, err := rawkv.NewClient(ctx, pd, config.DefaultConfig().Security)
+	must(err)
+	defer r.Close()
+	must(r.DeleteRange(ctx, []byte("ycsb_raw:"), []byte("ycsb_raw;")))
+	fmt.Println("cleanup: deleted RawKV range ycsb_raw:")
+
+	c, err := txnkv.NewClient(pd)
+	must(err)
+	defer c.Close()
+	total := 0
+	for {
+		t, err := c.Begin()
+		must(err)
+		it, err := t.Iter([]byte("ycsb_txn:"), []byte("ycsb_txn;"))
+		must(err)
+		n := 0
+		for ; it.Valid() && n < 1000; n++ {
+			must(t.Delete(it.Key()))
+			must(it.Next())
+		}
+		it.Close()
+		if n == 0 {
+			must(t.Rollback())
+			break
+		}
+		must(t.Commit(ctx))
+		total += n
+	}
+	fmt.Printf("cleanup: deleted %d TxnKV keys ycsb_txn:\n", total)
 }
 
 func pessimistic(c *txnkv.Client) *transaction.KVTxn {

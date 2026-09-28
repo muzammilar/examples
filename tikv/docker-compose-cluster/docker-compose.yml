@@ -105,11 +105,48 @@ services:
       - --data-dir=/data/tikv
       - --config=/tikv.toml
 
-
   # demo client: `make test` runs it once with `docker compose run --rm client`
   client:
     build: ./client
-    image: tikv-cluster-demo-client:local
     profiles: [client]
     environment:
       PD_ADDRS: pd0:2379,pd1:2379,pd2:2379
+
+  # `make benchmark`: go-ycsb (bench/Dockerfile) with its TiKV driver, raw output to results/
+  bench:
+    build:
+      context: ./bench
+      args:
+        GOPROXY: ${GOPROXY:-https://proxy.golang.org,direct}
+    profiles: [bench]
+    command: ["sh", "/bench/run.sh"]
+    environment:
+      NAME: ${NAME:-}
+      THREADS: ${THREADS:-16}
+      RECORDS: ${RECORDS:-100000}
+      OPERATIONS: ${OPERATIONS:-100000}
+    volumes:
+      - ./bench:/bench:ro
+      - ./results:/results
+
+  # `make benchmark`: parses the raw output (bench/report.py) into a table and results/*.json
+  bench-report:
+    image: ghcr.io/astral-sh/uv:0.12.19-python3.13-trixie-slim
+    profiles: [bench]
+    network_mode: none
+    working_dir: /bench
+    command: ["uv", "run", "--frozen", "report.py"]
+    environment:
+      UV_CACHE_DIR: /uv/cache          # the venv lives in the uv volume, so reruns skip creating it
+      UV_PROJECT_ENVIRONMENT: /uv/venv
+      UV_PYTHON_DOWNLOADS: never       # use the image's Python
+      NAME: ${NAME:-}
+      HOST_INFO: ${HOST_INFO:-}
+      DOCKER_INFO: ${DOCKER_INFO:-}
+    volumes:
+      - ./bench:/bench:ro
+      - ./results:/results
+      - uv-cache:/uv
+
+volumes:
+  uv-cache:
