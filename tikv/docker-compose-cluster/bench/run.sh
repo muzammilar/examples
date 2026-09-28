@@ -37,7 +37,10 @@ meta threads "$THREADS"
 meta records "$RECORDS"
 meta operations "$OPERATIONS"
 
-for api in raw txn; do
+# TxnKV first: once the RawKV load has split regions at raw (unencoded) keys, the TxnKV client
+# fails to decode those region boundaries ("failed to decode region range key") and every txn
+# operation errors (at the default 100k records; 10k records stay in one region)
+for api in txn raw; do
 	props="-p tikv.type=$api --table ycsb_$api"
 	echo "==> $api: load $RECORDS records"
 	start=$(date +%s.%N)

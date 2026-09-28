@@ -27,16 +27,27 @@ THREADS ?= 16
 RECORDS ?= $(if $(filter 1,$(SMOKE)),10000,100000)
 OPERATIONS ?= $(RECORDS)
 
+# resource budget for `make benchmark` (bench/limits.sh): BENCH_CPUS / BENCH_MEM in total for the
+# database containers in BENCH_SPEC (equal shares; service=CPUS:MEM is a fixed amount), set with
+# `docker update` for the run and restored afterwards; the bench client has BENCH_CLIENT_CPUS
+BENCH_CPUS ?= 6
+BENCH_MEM ?= 14g
+BENCH_SPEC ?= tikv0 tikv1 tikv2 pd0=0.5:512m pd1=0.5:512m pd2=0.5:512m
+export BENCH_CLIENT_CPUS ?= 2
+export BENCH_NOTE ?= memory raised from 12g to 14g: TiKV sizes its memory usage limit from the VM at startup and was OOM-killed at 2.8g in the TiDB example, so each TiKV gets ~4.2g
+
 benchmark:
 	@docker compose ps --status running --services | grep -qx pd0 || { echo 'run `make up` first'; exit 1; }
 	@mkdir -p results
 	@docker compose --progress quiet --profile bench --profile client build bench client
-	@export NAME=tikv-$$(date -u +%Y%m%dT%H%M%SZ) THREADS=$(THREADS) RECORDS=$(RECORDS) OPERATIONS=$(OPERATIONS) \
+	@BENCH_LIMITS=$$(sh bench/limits.sh apply $(BENCH_CPUS) $(BENCH_MEM) $(BENCH_SPEC)) || { sh bench/limits.sh restore; exit 1; }; \
+	export BENCH_LIMITS NAME=tikv-$$(date -u +%Y%m%dT%H%M%SZ) THREADS=$(THREADS) RECORDS=$(RECORDS) OPERATIONS=$(OPERATIONS) \
 		HOST_INFO="$$(uname -sm)" \
 		DOCKER_INFO="$$(docker info --format 'Docker {{.ServerVersion}}, {{.NCPU}} CPUs, {{.MemTotal}} bytes')"; \
 	docker compose run --rm -T bench; rc=$$?; \
 	docker compose run --rm -T client cleanup-bench || rc=1; \
-	[ $$rc = 0 ] && docker compose run --rm -T bench-report
+	[ $$rc = 0 ] && docker compose run --rm -T bench-report; \
+	rc=$$?; sh bench/limits.sh restore; exit $$rc
 
 status:
 	$(PD_CTL) member | $(PD_JQ) '"PD leader: \(.leader.name)", (.members[] | "member \(.name) \(.client_urls[0])")'

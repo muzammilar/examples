@@ -166,29 +166,26 @@ func cleanupBench(ctx context.Context, pd []string) {
 	must(r.DeleteRange(ctx, []byte("ycsb_raw:"), []byte("ycsb_raw;")))
 	fmt.Println("cleanup: deleted RawKV range ycsb_raw:")
 
-	c, err := txnkv.NewClient(pd)
-	must(err)
-	defer c.Close()
-	total := 0
-	for {
-		t, err := c.Begin()
-		must(err)
-		it, err := t.Iter([]byte("ycsb_txn:"), []byte("ycsb_txn;"))
-		must(err)
-		n := 0
-		for ; it.Valid() && n < 1000; n++ {
-			must(t.Delete(it.Key()))
-			must(it.Next())
-		}
-		it.Close()
-		if n == 0 {
-			must(t.Rollback())
-			break
-		}
-		must(t.Commit(ctx))
-		total += n
+	// Once the RawKV load has split regions at raw (unencoded) keys, the TxnKV client can no
+	// longer iterate ycsb_txn: ("failed to decode region range key"), so drop the txn keys'
+	// MVCC records directly: the memcomparable-encoded range in each column family.
+	from, to := encodeBytes([]byte("ycsb_txn:")), encodeBytes([]byte("ycsb_txn;"))
+	for _, cf := range []string{"default", "lock", "write"} {
+		must(r.DeleteRange(ctx, from, to, rawkv.SetColumnFamily(cf)))
 	}
-	fmt.Printf("cleanup: deleted %d TxnKV keys ycsb_txn:\n", total)
+	fmt.Println("cleanup: deleted TxnKV range ycsb_txn: (default, lock and write column families)")
+}
+
+// encodeBytes is TiKV's memcomparable key encoding (what TxnKV stores keys as): 8-byte
+// groups, zero-padded, each followed by 0xFF minus the number of padding bytes.
+func encodeBytes(b []byte) []byte {
+	out := make([]byte, 0, (len(b)/8+1)*9)
+	for i := 0; i <= len(b); i += 8 {
+		g := make([]byte, 8)
+		n := copy(g, b[i:])
+		out = append(append(out, g...), byte(0xFF-(8-n)))
+	}
+	return out
 }
 
 func pessimistic(c *txnkv.Client) *transaction.KVTxn {
