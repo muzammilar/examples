@@ -1,0 +1,159 @@
+{
+  "title": "YugabyteDB",
+  "uid": "yugabytedb",
+  "schemaVersion": 39,
+  "time": {
+    "from": "now-15m",
+    "to": "now"
+  },
+  "refresh": "10s",
+  "panels": [
+    {
+      "id": 1,
+      "type": "timeseries",
+      "title": "YSQL statements/s (all nodes)",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops"
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(rate(rpc_latency_count{saved_name=\"handler_latency_yb_ysqlserver_SQLProcessor_SelectStmt_count\",job=\"ysql\"}[1m]))",
+          "legendFormat": "SELECT"
+        },
+        {
+          "refId": "B",
+          "expr": "sum(rate(rpc_latency_count{saved_name=\"handler_latency_yb_ysqlserver_SQLProcessor_InsertStmt_count\",job=\"ysql\"}[1m]))",
+          "legendFormat": "INSERT"
+        },
+        {
+          "refId": "C",
+          "expr": "sum(rate(rpc_latency_count{saved_name=\"handler_latency_yb_ysqlserver_SQLProcessor_UpdateStmt_count\",job=\"ysql\"}[1m]))",
+          "legendFormat": "UPDATE"
+        },
+        {
+          "refId": "D",
+          "expr": "sum(rate(rpc_latency_count{saved_name=\"handler_latency_yb_ysqlserver_SQLProcessor_DeleteStmt_count\",job=\"ysql\"}[1m]))",
+          "legendFormat": "DELETE"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "YCQL statements/s (all nodes)",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops"
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(rate(rpc_latency_count{saved_name=\"handler_latency_yb_cqlserver_SQLProcessor_SelectStmt_count\",job=\"ycql\"}[1m]))",
+          "legendFormat": "SELECT"
+        },
+        {
+          "refId": "B",
+          "expr": "sum(rate(rpc_latency_count{saved_name=\"handler_latency_yb_cqlserver_SQLProcessor_InsertStmt_count\",job=\"ycql\"}[1m]))",
+          "legendFormat": "INSERT"
+        },
+        {
+          "refId": "C",
+          "expr": "sum(rate(rpc_latency_count{saved_name=\"handler_latency_yb_cqlserver_SQLProcessor_UpdateStmt_count\",job=\"ycql\"}[1m]))",
+          "legendFormat": "UPDATE"
+        },
+        {
+          "refId": "D",
+          "expr": "sum(rate(rpc_latency_count{saved_name=\"handler_latency_yb_cqlserver_SQLProcessor_DeleteStmt_count\",job=\"ycql\"}[1m]))",
+          "legendFormat": "DELETE"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "type": "timeseries",
+      "title": "DocDB RPCs/s per tserver",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops"
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (instance) (rate(rpc_latency_count{saved_name=\"handler_latency_yb_tserver_TabletServerService_Read_count\",job=\"yb-tserver\"}[1m]))",
+          "legendFormat": "{{instance}} read"
+        },
+        {
+          "refId": "B",
+          "expr": "sum by (instance) (rate(rpc_latency_count{saved_name=\"handler_latency_yb_tserver_TabletServerService_Write_count\",job=\"yb-tserver\"}[1m]))",
+          "legendFormat": "{{instance}} write"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "type": "timeseries",
+      "title": "Tablet leaders per tserver",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (instance) (is_raft_leader{job=\"yb-tserver\"})",
+          "legendFormat": "{{instance}}"
+        }
+      ]
+    }
+  ]
+}
