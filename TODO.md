@@ -30,6 +30,7 @@ Candidate databases and systems to add as examples. Branch names follow the exis
 - [ ] `victoriametrics-docker-compose-cluster`: vminsert/vmselect/vmstorage as Prometheus long-term storage.
 - [ ] `influxdb3-core-single-node`: Arrow/Parquet engine with SQL.
 - [ ] `greptimedb-single-node`: unified metrics, logs and traces.
+- [ ] `arcticdb-local`: Man Group's DataFrame time-series DB (C++ engine, Python API) on local LMDB and MinIO/S3 backends; versioned symbols, append/update.
 
 ## Streaming databases and CDC
 
@@ -45,6 +46,7 @@ Candidate databases and systems to add as examples. Branch names follow the exis
 - [ ] `fluvio-single-node`: Rust streaming with WASM SmartModules.
 - [ ] `pulsar-single-node`: broker/BookKeeper split, tiered storage.
 - [ ] `rabbitmq-streams`: classic queues vs streams.
+- [ ] `aeron-cluster`: Java/C++ microsecond messaging over UDP/IPC with Raft-replicated Aeron Cluster.
 
 ## Durable execution and workflow engines
 
@@ -71,6 +73,7 @@ Candidate databases and systems to add as examples. Branch names follow the exis
 - [ ] `pinot-docker-compose-cluster`: real-time ingest from Kafka, star-tree index.
 - [ ] `druid-docker-compose-cluster`: segments, ingestion specs.
 - [ ] `databend-single-node`: Rust cloud warehouse on object storage.
+- [ ] `firebolt-core-single-node`: free self-hosted Firebolt engine; compare with ClickHouse and StarRocks.
 
 ## Lakehouse and object storage
 
@@ -85,6 +88,8 @@ Candidate databases and systems to add as examples. Branch names follow the exis
 - [ ] `daos-single-node`: DAOS (`daos-stack/daos`) over `ofi+tcp` in MD-on-SSD mode (no RDMA/PMem); `daos_server` + `daos_engine` + `daos_agent`, `dmg` pool setup, containers, `pydaos` KV API, `dfuse` POSIX mount, replication vs EC object classes.
 - [ ] `tidehunter-embedded`: Mysten Labs' WAL-as-storage KV engine (Rust, used by Sui validators); compare write amplification and point reads with RocksDB.
 - [ ] `cockroachdb-value-separation`: Pebble blob separation (v25.4+) on vs off for large values.
+- [ ] `hazelcast-docker-compose-cluster`: Java in-memory data grid; IMap, near cache, CP subsystem; latency vs Valkey/Dragonfly.
+- [ ] `chronicle-map-embedded`: Java off-heap persisted map, microsecond latency; compare with LMDB.
 
 ## Document
 
@@ -109,8 +114,10 @@ Candidate databases and systems to add as examples. Branch names follow the exis
 - [ ] `garnet-docker-compose-cluster`: Microsoft Garnet (.NET) standalone and cluster mode; Tsavorite storage with tiering to disk, checkpoints and AOF.
 - [ ] `keydb-active-replica`: multithreaded Redis fork (Snap) with active-active replicas; note slowed development.
 - [ ] `pika-single-node`: Redis protocol on RocksDB (OpenAtom); compare with Kvrocks for larger-than-memory data.
-- [ ] `redict-single-node`: LGPL fork of Redis 7.2.4; licensing comparison with Valkey and Redis 8.
-- [ ] Comparison example: same workload (GET/SET, pipelines, large values, persistence on) across Valkey, Redis 8, Dragonfly, Garnet, KeyDB, Kvrocks and Pika.
+- [ ] `ocache-docker-compose-cluster`: Tigris Data's Go cache (in-memory + RocksDB) single node and 3-node cluster; gRPC/HTTP APIs, versioned CAS ops, `ocachecli bench`.
+- [ ] `tarantool-single-node` / `tarantool-replicaset`: in-memory DB with WAL and Lua stored procedures; memtx vs vinyl engines, synchronous replication.
+- [ ] `memcached-extstore`: pure-cache latency baseline; extstore for large values on flash.
+- [ ] Comparison example: same workload (GET/SET, pipelines, large values, persistence on) across Valkey, Redis 8, Dragonfly, Garnet, KeyDB, Kvrocks, Pika, Tarantool, ocache and Memcached.
 - [ ] `etcd-docker-compose-cluster`: Raft, watches, leases.
 
 ## Graph and multi-model
@@ -128,13 +135,23 @@ Candidate databases and systems to add as examples. Branch names follow the exis
 - [ ] `rqlite-docker-compose-cluster`: SQLite replicated over Raft.
 - [ ] `litefs-litestream`: SQLite replication and backup to S3.
 - [ ] `lancedb-embedded`: embedded vector DB on Lance format.
+- [ ] `go-embedded-kv-comparison`: LMDB/libmdbx vs Badger vs Pebble vs bbolt; point reads, writes, range scans, write amplification.
 
 ## Wide-column and sharding
 
 - [ ] `cassandra-docker-compose-cluster`: baseline to compare with ScyllaDB.
 - [ ] `vitess-docker-compose-cluster`: sharded MySQL with VSchema and resharding.
 
+## Identity and access
+
+- [ ] `keycloak-oidc`: Keycloak realm with OIDC/SAML login; Go and Python apps validating tokens (compare Zitadel/Authentik).
+- [ ] `spicedb-vs-openfga`: Zanzibar-style relationship authorization; same schema and checks in SpiceDB and OpenFGA backed by Postgres.
+- [ ] `opa-vs-cedar`: policy-as-code authorization; same rules in OPA (Rego) and Cedar, called from a Go service.
+- [ ] `teleport-single-node`: short-lived certs for SSH, Postgres and k8s access with session recording.
+
 ## Observability pipeline
 
 - [ ] `otel-collector-clickhouse`: OpenTelemetry Collector into ClickHouse, visualised in Grafana.
 - [ ] `vector-pipeline`: Vector (Rust) log shipping into ClickHouse/Quickwit.
+- [ ] `clickstack-otel`: ClickStack (HyperDX) or SigNoz; logs, traces and metrics in ClickHouse via OpenTelemetry.
+- [ ] `akvorado-flows`: NetFlow/sFlow/IPFIX collection into ClickHouse through Kafka.
