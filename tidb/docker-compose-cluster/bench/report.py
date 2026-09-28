@@ -121,6 +121,7 @@ def main():
         },
         "prepare_s": prepare,
         "machine": machine(),
+        "limits": json.loads(os.environ.get("BENCH_LIMITS") or "null"),  # bench/limits.sh
         "workloads": workloads,
         "raw": os.path.basename(RAW),
     }
@@ -132,7 +133,12 @@ def main():
         f"\nTiDB {v['tidb']}: {c['pd']} PD, {c['tikv_stores_up']} TiKV (max-replicas {c['max_replicas']}), 1 TiDB | "
         f"{result['tool']} | {p['threads']} threads, {p['duration_s']} s per workload"
     )
-    print(f"Docker VM: {m['docker_vm_cpus']} CPUs, {m['docker_vm_memory_gib']} GiB ({m['arch']})\n")
+    print(f"Docker VM: {m['docker_vm_cpus']} CPUs, {m['docker_vm_memory_gib']} GiB ({m['arch']})")
+    if lim := result["limits"]:
+        caps = ", ".join(f"{n} {c['cpus']} CPUs / {c['memory_mib']} MiB" for n, c in lim["containers"].items())
+        print(f"limits: {caps}; bench client {lim['bench_client_cpus']} CPUs\n")
+    else:
+        print()
 
     print(f"TPC-C, {p['warehouses']} warehouse(s) (load: {prepare.get('tpcc')} s): "
           f"tpmC {tpcc['tpmC']:,.0f} (new-order/min), tpmTotal {tpcc['tpm_total']:,.0f}")

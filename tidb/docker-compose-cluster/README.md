@@ -94,15 +94,41 @@ end, also when a workload fails. Set `GOPROXY` to build go-tpc through a Go modu
 own. Everything (3 PD, 3 TiKV, TiDB and the clients) shares one Docker VM, so this measures the
 example, not TiDB on dedicated machines.
 
+**Resource budget.** For the run [`bench/limits.sh`](bench/limits.sh) caps the cluster with
+`docker update` (memory without swap), at `BENCH_CPUS=6` / **`BENCH_MEM=16g`**:
+
+| container | CPUs | memory |
+|---|---:|---:|
+| `tikv0`-`tikv2` | 1.25 each | 4.17 GB each |
+| `tidb` | 1.5 | 2 GB |
+| `pd0`-`pd2` | 0.25 each | 512 MB each |
+
+**Memory is 16 GB, not the 12 GB used for the other clusters.** TiKV sizes its
+`memory-usage-limit` and write buffers from the machine at startup (the Docker VM here, since
+the cap is applied later), and at 2.8 GB per TiKV two of the three stores were OOM-killed during the
+TPC-C load. At ~4.2 GB each they peaked at 2.8-3.5 GB. The JSON records this, with the applied
+limits, under `limits`. The old limits come back afterwards. Docker cannot remove a memory limit
+from a running container, so "unlimited" returns as the Docker VM's total memory;
+`make down && make up` starts clean. The bench client has `cpus: 2` in compose
+(`BENCH_CLIENT_CPUS`). TiKV and TiDB also size their thread pools from the VM's 11 cores at
+startup, and the cgroup caps what they get.
+
 ### Sample results
 
-TODO: numbers from a quiet machine.
+2026-09-28, `make benchmark` (defaults: TPC-C 4 warehouses, 8 threads, 60 s; sysbench
+4 × 50,000 rows), Docker Desktop 29.5.3 on an Apple M4 Pro (Docker VM: 11 CPUs, 24.4 GB, aarch64,
+native arm64 images), TiDB/TiKV/PD v8.5.8, split as above, client 2 CPUs.
 
 | TPC-C | tpmC | tpmTotal | new-order p99 ms |
 |-------|-----:|---------:|-----------------:|
-| 4 warehouses, 8 threads | TODO | TODO | TODO |
+| 4 warehouses, 8 threads | 10,092 | 22,686 | 71.3 |
 
 | workload | tps | qps | avg ms | p50 ms | p99 ms |
 |----------|----:|----:|-------:|-------:|-------:|
-| oltp_point_select | TODO | TODO | TODO | TODO | TODO |
-| oltp_read_write | TODO | TODO | TODO | TODO | TODO |
+| oltp_point_select | 17,375 | 17,375 | 0.46 | 0.31 | 0.89 |
+| oltp_read_write | 241 | 4,825 | 33.16 | 14.99 | 80.03 |
+
+Point selects are cheap (17k/s, p99 0.9 ms), since TiDB goes straight to the region leader.
+Each `oltp_read_write` transaction pays a Percolator two-phase commit over Raft on 3 TiKVs, so it
+runs ~70x slower than a point select. TPC-C finished with no errors at ~10k tpmC on 3.75 CPUs of
+TiKV.
