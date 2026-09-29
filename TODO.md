@@ -38,6 +38,14 @@ Candidate databases and systems to add as examples. Branch names follow the exis
 - [ ] `materialize-emulator`: strict-serializable incremental views.
 - [ ] `feldera-single-node`: incremental SQL computation (DBSP).
 - [ ] `debezium-postgres-kafka`: CDC from Postgres into Kafka, then ClickHouse.
+- [ ] `debezium-mysql-kafka-flink-clickhouse`: end-to-end e-commerce CDC pipeline, MySQL → Debezium → Kafka → Flink → ClickHouse, orchestrated by Airflow.
+  - **Source:** MySQL 8 with `binlog_format=ROW`, `binlog_row_image=FULL`, GTIDs on; `demo` schema with `products`, `orders` (`pending`/`completed`/`canceled`), `order_items` (price and cost price for margin); `debezium` user with `REPLICATION SLAVE`/`REPLICATION CLIENT`/`RELOAD`/`SHOW DATABASES`; seed data plus a load generator for inserts/updates/deletes.
+  - **Capture:** Debezium MySQL connector (`io.debezium.connector.mysql.MySqlConnector`) with an initial snapshot and then binlog streaming; `table.include.list`, schema-history topic, `ExtractNewRecordState` unwrap SMT, Avro via Schema Registry (Confluent or Apicurio).
+  - **Kafka, two variants:** Docker Compose (KRaft Kafka + Kafka Connect + Schema Registry, connector registered by `curl` to `:8083/connectors`) and Kubernetes with Strimzi (`Kafka` with KRaft node pools, `KafkaConnect` with a Debezium plugin image built via `spec.build`, `KafkaConnector` CR for the MySQL source, `KafkaTopic` CRs for per-table topics).
+  - **Processing:** Flink SQL with the Kafka connector and `debezium-avro-confluent` format; joins `order_items` with `products` and `orders` into per-order revenue/margin, tumbling-window aggregates, exactly-once via checkpoints.
+  - **Sink:** ClickHouse, either through the Flink ClickHouse connector or the ClickHouse Kafka Connect sink (Strimzi `KafkaConnector`); `ReplacingMergeTree(version)` keyed on primary key with `is_deleted` for Debezium deletes, plus a `SummingMergeTree` materialized view for daily revenue. Compare with ClickHouse's native `Kafka` table engine + MV as the no-Flink baseline.
+  - **Airflow:** DAGs that apply MySQL migrations (`migration_history` table), register/pause/restart connectors through the Connect REST API (or apply Strimzi CRs), trigger Debezium incremental snapshots via a signal table for backfills, and run nightly row-count/sum reconciliation between MySQL and ClickHouse.
+  - **Ops:** Kafka UI (Conduktor, Redpanda Console or AKHQ) to browse topics and schemas; show a schema change (add column) flowing through the schema-history topic and Schema Registry compatibility rules; failure demos: restart Connect mid-stream, drop and recreate a Flink job from a savepoint.
 
 ## Message streaming and queues
 
