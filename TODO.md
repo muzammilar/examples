@@ -38,6 +38,7 @@ Candidate databases and systems to add as examples. Branch names follow the exis
 - [ ] `materialize-emulator`: strict-serializable incremental views.
 - [ ] `feldera-single-node`: incremental SQL computation (DBSP).
 - [ ] `debezium-postgres-kafka`: CDC from Postgres into Kafka, then ClickHouse.
+- [ ] `debezium-mysql-kafka-flink-clickhouse`: MySQL (binlog) → Debezium MySQL connector → Kafka with Schema Registry (Avro), Conduktor UI; Flink joins/enriches the `products`/`orders`/`order_items` change streams, then sinks into ClickHouse (`ReplacingMergeTree` for upserts).
 
 ## Message streaming and queues
 
