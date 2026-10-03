@@ -1,13 +1,6 @@
 # examples
 Example Codes in different languages and technologies, for fun.
 
-## Dev Shell
-
-`flake.nix` at the root provides the tools the examples' Makefiles use: `go` (with `gopls`, `golangci-lint`,
-`gotools`), `kind`, `kubectl`, `helm`, `k9s`, `valkey-cli`, `jq`, `yq`, `envsubst`, `ansi2txt`. With [direnv](https://direnv.net/),
-run `direnv allow` once in the repo root; or run `nix develop`. The shell adds `~/go/bin` to `PATH` and loads a
-root `.env` (gitignored) if present. Docker is not included: use Docker Desktop, or Docker Engine on Linux.
-
 ## Language Examples
 
 These directories were merged from standalone repos (now archived) using `git subtree`, with full history preserved.
