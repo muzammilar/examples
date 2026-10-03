@@ -1,7 +1,7 @@
 # TigerBeetle — standbys, replica replacement and rolling restarts
 
-Standbys, replica replacement and rolling restarts on a running 3-replica TigerBeetle cluster
-(Docker Compose), each step under load.
+What TigerBeetle 0.17.9 lets you change on a running 3-replica cluster (Docker Compose), each step
+under load.
 
 ## Quick start
 
@@ -19,53 +19,36 @@ make cli              # tigerbeetle repl
 make down             # remove containers, volumes and the client image
 ```
 
-What TigerBeetle 0.17.9 lets you change on a running cluster, run on Docker Compose: three active
-replicas (`--replica-count=3`), two optional standbys, and a load client
-([`client/load.py`](client/load.py)) during every step. The load client sends batches of 100
-transfers back to back. At the end it checks that the sink account's balance equals the number
-of acked transfers.
+Steps live in [`ops.sh`](ops.sh). The load client ([`client/load.py`](client/load.py)) sends
+batches of 100 transfers back to back for `DURATION` (default 40 s), then checks that the sink
+account's balance equals the number of acked transfers. Output goes to `results/` (gitignored).
 
-**What cannot be done:** the number of active replicas is fixed when the data files are
-formatted. You cannot go from 3 to 5 voting replicas, or from 6 to 3, without formatting a new
-cluster and moving the data over. The protocol has a `reconfigure` operation, but in 0.17.9 it
-rejects any change to the replica or standby count (`different_replica_count`,
-`different_standby_count` in `src/vsr.zig`), and no client or CLI command sends it. A standby
-cannot be promoted to an active replica. "Scaling" here means adding and removing standbys,
-which never vote, and changing per-replica resources with a rolling restart.
+`rolling-restart` picks up environment changes: `CACHE_GRID=2GiB MEM_LIMIT=6g make rolling-restart`
+resizes the grid cache. A new `TIGERBEETLE_VERSION` would upgrade the cluster the same way, as in
+the [upgrade docs](https://docs.tigerbeetle.com/operating/upgrading/#upgrading-docker-based-installations)
+(not run here).
 
-The steps live in [`ops.sh`](ops.sh). `DURATION` (default 40 s) sets how long the load runs;
-its output goes to `results/` (gitignored). `rolling-restart` picks up whatever changed in the
-environment: `CACHE_GRID=2GiB MEM_LIMIT=6g make rolling-restart` resizes the grid cache. A new
-`TIGERBEETLE_VERSION` upgrades the cluster the same way, which the
-[upgrade docs](https://docs.tigerbeetle.com/operating/upgrading/#upgrading-docker-based-installations)
-describe; that was not run here.
+## What can and cannot change
 
-- **Standbys** ([experimental](https://github.com/tigerbeetle/tigerbeetle/blob/0.17.9/src/tigerbeetle/cli.zig#L42):
-  "standbys don't have a concrete practical use-case yet") are formatted with
-  `--standby=<index>` (index ≥ replica count, at most 6 standbys). They are listed in every
-  replica's `--addresses` after the actives. They receive and commit the log, but they do not
-  count toward any quorum. Clients list only the actives. Adding or removing a standby changes
-  the address list, so every active needs a rolling restart. `ops.sh` passes the 3- or
-  5-address list as `ADDRESSES`. A plain `make up` after `scale-out` would recreate the actives
-  with 3 addresses.
-- **Replacing a replica** whose data file is lost:
-  [`tigerbeetle recover`](https://docs.tigerbeetle.com/operating/recovering/), never `format`.
-  A re-formatted replica could forget promises it made and lose committed data. `recover`
-  writes a data file that must state-sync from the others before it takes part in consensus.
-  It needs a healthy cluster. The service runs it when `RECOVER=1` and `/data` is empty.
-- **Resources:** `--cache-grid` and the memory limit are start-time flags, not part of the data
-  file, so a rolling restart changes them. All replicas should use the same batch size; mixing
-  in `--development` would break that. Each replica allocates ~2.3 GiB with
-  `--cache-grid=256MiB` (4.1 GiB with 2 GiB) and has `cpus: 2`, `mem_limit: ${MEM_LIMIT:-4g}`.
-- Network `10.203.54.0/24`; actives `.10–.12`, standbys `.13–.14` (`--addresses` takes IPs only).
-  Image `ghcr.io/tigerbeetle/tigerbeetle:0.17.9`, client `tigerbeetle==0.17.9`.
+| change | how |
+|--------|-----|
+| add/remove standbys | [Experimental](https://github.com/tigerbeetle/tigerbeetle/blob/0.17.9/src/tigerbeetle/cli.zig#L42) ("standbys don't have a concrete practical use-case yet"). Formatted with `--standby=<index>` (index ≥ replica count, at most 6 standbys), listed in every replica's `--addresses` after the actives. They receive and commit the log but count toward no quorum. Clients list only the actives. Changing the address list needs a rolling restart of every active; `ops.sh` passes the 3- or 5-address list as `ADDRESSES`. A plain `make up` after `scale-out` would recreate the actives with 3 addresses. |
+| replace a replica with a lost data file | [`tigerbeetle recover`](https://docs.tigerbeetle.com/operating/recovering/), never `format`: a re-formatted replica could forget promises it made and lose committed data. `recover` writes a data file that must state-sync from the others before joining consensus, and needs a healthy cluster. The service runs it when `RECOVER=1` and `/data` is empty. |
+| resources | `--cache-grid` and the memory limit are start-time flags, not in the data file: a rolling restart changes them. All replicas should use the same batch size (mixing in `--development` would break that). ~2.3 GiB per replica with `--cache-grid=256MiB`, 4.1 GiB with 2 GiB; `cpus: 2`, `mem_limit: ${MEM_LIMIT:-4g}`. |
+| active replica count | Not possible. Fixed at format time; 3 → 5 or 6 → 3 needs a new cluster and a data move. `reconfigure` rejects any replica or standby count change in 0.17.9 (`different_replica_count`, `different_standby_count` in `src/vsr.zig`), and no client or CLI sends it. A standby cannot be promoted. |
+
+| item | value |
+|------|-------|
+| network | `10.203.54.0/24`; actives `.10–.12`, standbys `.13–.14` (`--addresses` takes IPs only) |
+| image | `ghcr.io/tigerbeetle/tigerbeetle:0.17.9` |
+| client | `tigerbeetle==0.17.9` |
 
 ## Results
 
-2026-10-03, Docker Desktop 29.5.3 on an Apple M4 Pro (Docker VM: 11 CPUs, 24.4 GB, aarch64),
-TigerBeetle 0.17.9, one run of each step in this order. Steady load from one client was
-~46k transfers/s. No step lost or duplicated an acked transfer, and no request returned an
-error. The clients retry on their own while a replica restarts or the view changes.
+2026-10-03, Docker Desktop 29.5.3, Apple M4 Pro (Docker VM: 11 CPUs, 24.4 GB, aarch64),
+TigerBeetle 0.17.9, one run of each step in this order. Steady load from one client: ~46k
+transfers/s. No step lost or duplicated an acked transfer, and no request returned an error
+(clients retry on their own during restarts and view changes).
 
 | step | nodes | acked transfers/s | longest request | notes |
 |------|-------|------------------:|----------------:|-------|
@@ -82,8 +65,7 @@ error. The clients retry on their own while a replica restarts or the view chang
 | 256 MiB | 343,416 | 15 | 68 | 55 |
 | 2 GiB | 221,131 | 18 | 151 | 223 |
 
-A bigger grid cache did not make this benchmark faster. Its 10k accounts and recent
-transfers fit in 256 MiB, and the 2 GiB run was slower. That was a single run on a Docker VM
-shared with other workloads, so the drop is more likely noise than the cache. The grid cache
-pays off when the working set outgrows it, on a dedicated machine ("as large as possible":
-RAM − 3 GiB − 1 GiB, `tigerbeetle --help`).
+The 10k accounts and recent transfers already fit in 256 MiB. The 2 GiB run was a single run on a
+shared Docker VM, so the drop is more likely noise than the cache. The grid cache pays off when
+the working set outgrows it, on a dedicated machine ("as large as possible": RAM − 3 GiB − 1 GiB,
+`tigerbeetle --help`).

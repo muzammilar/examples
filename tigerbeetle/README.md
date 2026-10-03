@@ -2,71 +2,57 @@
 
 Website: https://tigerbeetle.com/
 
+| folder | what |
+|--------|------|
+| [`single-node/`](single-node) | One replica (`--replica-count=1`) on Docker Compose. |
+| [`docker-compose-cluster/`](docker-compose-cluster) | Three replicas of one cluster; `make failover` stops the primary. |
+| [`payments-ledger/`](payments-ledger) | Wallet/payments ledger in Rust (official client, built from source): 1M linked payment + fee transfers with overdraft protection, card holds (post/void/expire), linked currency exchange, idempotent retries, audit that debits equal credits. |
+| [`cluster-operations/`](cluster-operations) | Changes to a running cluster, each under load: add/remove standbys (3 → 3 + 2 standbys → 3), standbys never form a quorum, replace a lost data file with `tigerbeetle recover`, resize the grid cache with a rolling restart. |
+| [`kubernetes-statefulset/`](kubernetes-statefulset) | Three replicas as a plain StatefulSet on kind (one per zone): init container formats (or recovers) from the pod ordinal, fixed ClusterIP per replica, Jobs for demo/load/benchmark, `make failover` kills the primary's pod. |
+
 `single-node` and `docker-compose-cluster` run `client/demo.py` with the official Python client
 (accounts, transfers, two-phase pending → post/void, a linked chain that fails atomically, a
-transfer rejected by `debits_must_not_exceed_credits`) and use the built-in `tigerbeetle repl`.
-
-- [`single-node/`](single-node) — one replica (`--replica-count=1`) on Docker Compose.
-- [`docker-compose-cluster/`](docker-compose-cluster) — three replicas of one cluster, with a `make failover` that stops the primary.
-- [`payments-ledger/`](payments-ledger) — a wallet/payments ledger in Rust (official client, built from source): 1M linked payment + fee transfers with overdraft protection, card holds (post/void/expire), linked currency exchange, idempotent retries, and an audit that debits equal credits.
-- [`cluster-operations/`](cluster-operations) — what changes on a running cluster, each step under load: adding and removing standby replicas (3 → 3 + 2 standbys → 3), showing that standbys never form a quorum, replacing a replica's lost data file with `tigerbeetle recover`, and resizing the grid cache with a rolling restart.
-- [`kubernetes-statefulset/`](kubernetes-statefulset) — three replicas as a plain StatefulSet on kind (one per zone), with an init container that formats (or recovers) the data file from the pod ordinal, a fixed ClusterIP per replica, Jobs for the demo, load and benchmark, and a `make failover` that kills the primary's pod. TigerBeetle has no Kubernetes operator or Helm chart of its own.
+transfer rejected by `debits_must_not_exceed_credits`) and the built-in `tigerbeetle repl`.
 
 ## Benchmark
 
-`tigerbeetle benchmark`, 1M transfers (Apple M4 Pro, Docker VM aarch64, 2026-09-28): one replica
-(4 CPUs / 6 GB) does 689k transfers/s at 26 ms batch p99; three replicas (2 CPUs / 4 GB each) do
-381k/s at 50 ms p99 — quorum commit costs ~45% of throughput. Full tables and method:
-[`docker-compose-cluster/README.md`](docker-compose-cluster/README.md#benchmark) and
-[`single-node/README.md`](single-node/README.md#benchmark).
+Apple M4 Pro, Docker VM aarch64, TigerBeetle 0.17.9. Each run lasts ~2 s, so treat these as rough.
 
-Payments ledger (Rust client, one replica, no CPU limits, 2026-10-02): 1M payment + fee
-transfers in linked pairs, every fee to one hot account, ran at 481k transfers/s from 1 client
-(batch p50 11.7 / p99 44 ms), 533–858k/s from 2 and 465k/s from 4, with overdrafts rejected by the
-database and an audit that found 0 mismatches. Rough numbers: each run lasts ~2 s. Details:
-[`payments-ledger/README.md`](payments-ledger/README.md#sample-output).
-
-Cluster operations under load (`cluster-operations/`, 2026-10-03, one client at ~46k transfers/s):
-adding two standbys, removing them, replacing a lost replica (`recover` + 4.6 s state sync) and a
-rolling restart all completed without a failed request or a lost transfer. The worst single-request
-stall was 1.9 s, during the rolling restart. Raising `--cache-grid` from 256 MiB to 2 GiB did not
-speed up the 1M-transfer benchmark (343k → 221k transfers/s in single runs on a shared VM): its
-working set already fits.
-
-On kind (`kubernetes-statefulset/`, 2026-10-03) the same 1M-transfer benchmark does 347k transfers/s
-at 55 ms batch p99. Killing the primary's pod under load stalled the client for at most 314 ms;
-every acked transfer was in the balance afterwards.
+| example | date | workload | result |
+|---------|------|----------|--------|
+| [single-node](single-node/README.md#benchmark) | 2026-09-28 | `tigerbeetle benchmark`, 1M transfers, 1 replica (4 CPUs / 6 GB) | 689k transfers/s, batch p99 26 ms |
+| [docker-compose-cluster](docker-compose-cluster/README.md#benchmark) | 2026-09-28 | same, 3 replicas (2 CPUs / 4 GB each) | 381k transfers/s, batch p99 50 ms (quorum commit costs ~45%) |
+| [kubernetes-statefulset](kubernetes-statefulset) | 2026-10-03 | same, 3 replicas on kind | 347k transfers/s, batch p99 55 ms; primary pod kill under load stalled the client ≤ 314 ms, every acked transfer kept |
+| [payments-ledger](payments-ledger/README.md#sample-output) | 2026-10-02 | Rust client, 1 replica, no CPU limits, 1M payment + fee transfers in linked pairs, all fees to one hot account | 481k/s from 1 client (batch p50 11.7 / p99 44 ms), 533–858k/s from 2, 465k/s from 4; overdrafts rejected by the database, audit 0 mismatches |
+| [cluster-operations](cluster-operations) | 2026-10-03 | 1 client at ~46k transfers/s during add/remove standbys, replace replica (`recover` + 4.6 s state sync), rolling restart | no failed request, no lost transfer; worst stall 1.9 s (rolling restart). `--cache-grid` 256 MiB → 2 GiB did not speed up the 1M benchmark (343k → 221k/s, single runs on a shared VM): the working set already fits. |
 
 ## Known issues
 
-Seen while building these examples (TigerBeetle 0.17.9, 2026-10-02):
+Seen with TigerBeetle 0.17.9, 2026-10-02.
 
-- The official Rust client is not on crates.io: the `tigerbeetle` crate there is a 0.0.1
-  placeholder from 2023. The real client lives in the main repo (`src/clients/rust`) and links a
-  native `tb_client` library that must be built with Zig from a release tag, with
-  `-Dconfig-release` / `-Dconfig-release-client-min` matching the server, or the server rejects
-  the client. `payments-ledger/app/Dockerfile` does this.
-- Re-running `payments-ledger` against the same data file gets slower: ~675k/s and ~545k/s on the
-  2nd and 3rd runs, ~200k/s and ~174k/s on the 4th and 5th. A fresh cluster (`make down up`)
-  restores the first-run numbers.
-- The number of active replicas is fixed at format time (`--replica-count`, at most 6). There is
-  no way to go from 3 to 5 (or 6 to 3) voting replicas in place. The `reconfigure` operation in
-  the protocol rejects a different replica or standby count in 0.17.9 (`src/vsr.zig`), and no
-  client or CLI exposes it. Changing the replica count means a new cluster.
-- Standby replicas (`format --standby=<i>`) are experimental: "standbys don't have a concrete
-  practical use-case yet" (`src/tigerbeetle/cli.zig`). They cannot be promoted, and they do not
-  count toward a quorum. Adding or removing one changes `--addresses`, so every replica needs a
-  restart.
-- A replica that lost its data file must come back with `tigerbeetle recover`, never `format`
-  ([recovering](https://docs.tigerbeetle.com/operating/recovering/)).
-- No official Kubernetes operator or Helm chart. The docs cover systemd, Docker and the managed
-  service ([deploying](https://docs.tigerbeetle.com/operating/deploying/)). The
-  `tigerbeetle.github.io/helm-charts` repo that Rafiki's docs point at returns 404. The community
-  operators on GitHub (e.g. `Code-Growers/tigerbeetle-operator`, "experimental") have no users
-  (0 stars, checked 2026-10-03).
-- `--addresses` takes IP addresses only, no DNS names, and is read once at start. On
-  Kubernetes that rules out the usual headless-Service pod DNS names, so
-  `kubernetes-statefulset/` gives each replica a ClusterIP Service with a fixed IP.
-- The replica count is fixed when the data files are formatted (`--replica-count`). Changing
-  it means a new cluster. Scaling the StatefulSet to 4 would start `tigerbeetle-3`, whose
+- **Rust client not on crates.io.** The `tigerbeetle` crate there is a 0.0.1 placeholder from
+  2023. The real client is in the main repo (`src/clients/rust`) and links a native `tb_client`
+  library built with Zig from a release tag, with `-Dconfig-release` /
+  `-Dconfig-release-client-min` matching the server, or the server rejects the client.
+  `payments-ledger/app/Dockerfile` does this.
+- **`payments-ledger` slows down on re-runs** against the same data file: ~675k/s and ~545k/s on
+  the 2nd and 3rd runs, ~200k/s and ~174k/s on the 4th and 5th. `make down up` restores
+  first-run numbers.
+- **Replica count is fixed at format time** (`--replica-count`, at most 6). No in-place change
+  from 3 to 5 (or 6 to 3) voting replicas: `reconfigure` rejects a different replica or standby
+  count in 0.17.9 (`src/vsr.zig`), and no client or CLI exposes it. Changing it means a new
+  cluster. On Kubernetes, scaling the StatefulSet to 4 would start `tigerbeetle-3`, whose
   `format --replica=3 --replica-count=3` is rejected (`src/tigerbeetle/cli.zig`; not run here).
+- **Standbys are experimental** (`format --standby=<i>`): "standbys don't have a concrete
+  practical use-case yet" (`src/tigerbeetle/cli.zig`). They cannot be promoted and do not count
+  toward a quorum. Adding or removing one changes `--addresses`, so every replica needs a restart.
+- **Lost data file:** bring the replica back with `tigerbeetle recover`, never `format`
+  ([recovering](https://docs.tigerbeetle.com/operating/recovering/)).
+- **No official Kubernetes operator or Helm chart.** The docs cover systemd, Docker and the
+  managed service ([deploying](https://docs.tigerbeetle.com/operating/deploying/)). The
+  `tigerbeetle.github.io/helm-charts` repo that Rafiki's docs point at returns 404. Community
+  operators (e.g. `Code-Growers/tigerbeetle-operator`, "experimental") have 0 stars (checked
+  2026-10-03).
+- **`--addresses` takes IPs only**, no DNS names, and is read once at start. On Kubernetes that
+  rules out headless-Service pod DNS names, so `kubernetes-statefulset/` gives each replica a
+  ClusterIP Service with a fixed IP.
