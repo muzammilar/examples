@@ -1,0 +1,160 @@
+name: rondb-scale
+
+# RonDB online scaling walkthrough (see README.md / `make help`). Starts as the minimal
+# cluster (1 management server, node group 0 = data nodes 1 + 2, 1 MySQL Server); the
+# `scale` profile holds what joins later: data nodes 3 + 4 (node group 1), a second MySQL
+# Server and the REST API server. All of them are in config/config.ini from the start.
+x-rondb: &rondb
+  image: hopsworks/rondb:${RONDB_VERSION:-26.02.11}
+  # mysqld refuses to run as root; the image's directories are world-writable
+  user: "1000:1000"
+
+services:
+  # ndb_mgmd copies config/config.ini into its container on the first start and starts with
+  # --initial. `make scale-up` copies config/config-scale-up.ini over it and restarts the
+  # container, which then starts with --reload: a new configuration generation that the data
+  # nodes pick up when they restart (rolling restart). Its config cache lives in the container
+  # layer, so `docker compose up` must not recreate it (the Makefile only names other services).
+  mgmd:
+    <<: *rondb
+    container_name: rondb-scale-mgmd
+    hostname: mgmd
+    command:
+      - bash
+      - -c
+      - |
+        cfg=/srv/hops/mysql-cluster/config.ini
+        if [ -f "$$cfg" ]; then mode=--reload; else cp /config/config.ini "$$cfg"; mode=--initial; fi
+        set -x
+        exec ndb_mgmd --nodaemon --ndb-nodeid=65 -f "$$cfg" --configdir=/srv/hops/mysql-cluster/log $$mode
+    mem_limit: 256m
+    volumes:
+      - ./config:/config:ro
+    healthcheck:
+      test: ["CMD", "ndb_mgm", "--ndb-connectstring=mgmd:1186", "-e", "show"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  # --initial wipes a data node's file system: only when its volume is empty (first start of
+  # nodes 1 + 2, or nodes 3 + 4 joining), so every later start is a node restart.
+  ndbd-1: &ndbd
+    <<: *rondb
+    container_name: rondb-scale-ndbd-1
+    hostname: ndbd-1
+    environment: { NODE_ID: 1 }
+    command:
+      - bash
+      - -c
+      - >-
+        exec ndbmtd --nodaemon --ndb-nodeid=$$NODE_ID --ndb-connectstring=mgmd:1186
+        $$([ -d /srv/hops/mysql-cluster/ndb_data/ndb_$${NODE_ID}_fs ] || echo --initial)
+    cap_add: [SYS_NICE] # NUMA memory binding (mbind)
+    cpus: 2
+    mem_limit: 2g
+    volumes:
+      - ndbd-1:/srv/hops/mysql-cluster/ndb_data
+    depends_on:
+      mgmd: { condition: service_healthy }
+    healthcheck:
+      # rondb-docker's check: `ndb_mgm -e "<id> status"` reports "started"
+      test: ["CMD-SHELL", "./docker/rondb_standalone/healthcheck.sh mgmd:1186 $$NODE_ID"]
+      interval: 5s
+      timeout: 10s
+      retries: 120
+      start_period: 20s
+  ndbd-2:
+    <<: *ndbd
+    container_name: rondb-scale-ndbd-2
+    hostname: ndbd-2
+    environment: { NODE_ID: 2 }
+    volumes:
+      - ndbd-2:/srv/hops/mysql-cluster/ndb_data
+  ndbd-3:
+    <<: *ndbd
+    container_name: rondb-scale-ndbd-3
+    hostname: ndbd-3
+    profiles: [scale]
+    environment: { NODE_ID: 3 }
+    volumes:
+      - ndbd-3:/srv/hops/mysql-cluster/ndb_data
+  ndbd-4:
+    <<: *ndbd
+    container_name: rondb-scale-ndbd-4
+    hostname: ndbd-4
+    profiles: [scale]
+    environment: { NODE_ID: 4 }
+    volumes:
+      - ndbd-4:/srv/hops/mysql-cluster/ndb_data
+
+  mysqld-1: &mysqld
+    <<: *rondb
+    container_name: rondb-scale-mysqld-1
+    hostname: mysqld-1
+    command: ["mysqld"]
+    cap_add: [SYS_NICE]
+    cpus: 2
+    mem_limit: 1400m
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "true" # root@localhost, no password
+      MYSQL_INITIALIZE_DB: "1"           # runs config/init.sql (user rondb/rondb @ '%')
+    ports:
+      - "127.0.0.1:${RONDB_MYSQL_PORT:-3310}:3306"
+    volumes:
+      - ./config/my.cnf:/srv/hops/mysql-cluster/my.cnf:ro
+      - ./config/init.sql:/srv/hops/docker/rondb_standalone/sql_init_scripts/init.sql:ro
+    depends_on:
+      mgmd: { condition: service_healthy }
+    healthcheck:
+      # healthy once mysqld listens on TCP and is connected to at least one started data node
+      test: ["CMD-SHELL", "mysql -h127.0.0.1 -urondb -prondb -Nse \"SHOW STATUS LIKE 'Ndb_number_of_ready_data_nodes'\" 2>/dev/null | awk '$$2 > 0 {ok=1} END {exit !ok}'"]
+      interval: 5s
+      timeout: 5s
+      retries: 60
+      start_period: 20s
+  # a second MySQL Server: same cluster, same tables, own connection slot (node id 68)
+  mysqld-2:
+    <<: *mysqld
+    container_name: rondb-scale-mysqld-2
+    hostname: mysqld-2
+    profiles: [scale]
+    ports:
+      - "127.0.0.1:${RONDB_MYSQL2_PORT:-3311}:3306"
+
+  # REST API server (node id 195): pk-read / batch / scan over HTTP via the NDB API
+  rest:
+    <<: *rondb
+    container_name: rondb-scale-rest
+    hostname: rest
+    profiles: [scale]
+    command: ["bash", "-c", "exec rdrs2 --config /srv/hops/mysql-cluster/rest_api.json"]
+    mem_limit: 512m
+    ports:
+      - "127.0.0.1:${RONDB_REST_PORT:-4407}:4406"
+    volumes:
+      - ./config/rest_api.json:/srv/hops/mysql-cluster/rest_api.json:ro
+    healthcheck:
+      test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/127.0.0.1/4406 && printf 'GET /0.1.0/health HTTP/1.0\\r\\n\\r\\n' >&3 && read -r status <&3 && [[ $$status == *' 200 '* ]]"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  # sysbench client for the load phases (bench/sb.sh, image from bench/Dockerfile)
+  bench:
+    build: ./bench
+    profiles: [bench]
+    cpus: ${BENCH_CLIENT_CPUS:-2}
+    entrypoint: ["sh", "/bench/sb.sh"]
+    environment:
+      THREADS: ${THREADS:-16}
+      TABLES: ${TABLES:-4}
+      TABLE_SIZE: ${TABLE_SIZE:-50000}
+    volumes:
+      - ./bench:/bench:ro
+      - ./results:/results
+
+volumes:
+  ndbd-1:
+  ndbd-2:
+  ndbd-3:
+  ndbd-4:
