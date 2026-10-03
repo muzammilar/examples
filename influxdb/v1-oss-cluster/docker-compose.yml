@@ -1,0 +1,112 @@
+name: influxdb1-cluster
+
+# InfluxDB 1.8 clustering from the third-party MIT fork chengshiwen/influxdb-cluster (the
+# InfluxDB Enterprise 1.x design): 3 meta nodes (Raft, cluster metadata) and 2 data nodes
+# (TSM shards, HTTP API on 8086). The `join` one-shot registers them with `influxd-ctl`.
+x-meta: &meta
+  image: chengshiwen/influxdb:${INFLUXDB_CLUSTER_VERSION:-1.8.11-c1.2.0}-meta
+  healthcheck:
+    test: ["CMD", "curl", "-sf", "-o", "/dev/null", "http://127.0.0.1:8091/ping"]
+    interval: 2s
+    timeout: 2s
+    retries: 30
+
+x-data: &data
+  image: chengshiwen/influxdb:${INFLUXDB_CLUSTER_VERSION:-1.8.11-c1.2.0}-data
+  environment:
+    INFLUXDB_HTTP_LOG_ENABLED: "false" # one log line per request otherwise
+  healthcheck:
+    test: ["CMD", "curl", "-sf", "-o", "/dev/null", "http://127.0.0.1:8086/ping"]
+    interval: 2s
+    timeout: 2s
+    retries: 30
+
+services:
+  meta-1:
+    <<: *meta
+    container_name: influxdb1-meta-1
+    hostname: meta-1
+    volumes: [meta-1:/var/lib/influxdb]
+  meta-2:
+    <<: *meta
+    container_name: influxdb1-meta-2
+    hostname: meta-2
+    volumes: [meta-2:/var/lib/influxdb]
+  meta-3:
+    <<: *meta
+    container_name: influxdb1-meta-3
+    hostname: meta-3
+    volumes: [meta-3:/var/lib/influxdb]
+
+  data-1:
+    <<: *data
+    container_name: influxdb1-data-1
+    hostname: data-1
+    ports: ["${DATA1_PORT:-8386}:8086"]
+    volumes: [data-1:/var/lib/influxdb]
+  data-2:
+    <<: *data
+    container_name: influxdb1-data-2
+    hostname: data-2
+    ports: ["${DATA2_PORT:-8387}:8086"]
+    volumes: [data-2:/var/lib/influxdb]
+
+  # One-shot: form the meta Raft group and add both data nodes (re-runs are no-ops)
+  join:
+    image: chengshiwen/influxdb:${INFLUXDB_CLUSTER_VERSION:-1.8.11-c1.2.0}-meta
+    entrypoint: ["/bin/bash", "-c"]
+    command:
+      - |
+        c="influxd-ctl -bind meta-1:8091"
+        for m in meta-1 meta-2 meta-3; do $$c add-meta $$m:8091; done
+        for d in data-1 data-2; do $$c add-data $$d:8088; done
+        $$c show
+    depends_on:
+      meta-1: { condition: service_healthy }
+      meta-2: { condition: service_healthy }
+      meta-3: { condition: service_healthy }
+      data-1: { condition: service_healthy }
+      data-2: { condition: service_healthy }
+
+  # `make test`: scripts/demo.sh (curl + influxd-ctl from the meta image)
+  client:
+    image: chengshiwen/influxdb:${INFLUXDB_CLUSTER_VERSION:-1.8.11-c1.2.0}-meta
+    profiles: [test]
+    entrypoint: ["bash", "/scripts/demo.sh"]
+    volumes:
+      - ./scripts:/scripts:ro
+
+  # `make benchmark`: bench/bench.py (standard library) in the uv image
+  bench:
+    image: ghcr.io/astral-sh/uv:0.12.19-python3.13-trixie-slim
+    profiles: [bench]
+    cpus: ${BENCH_CLIENT_CPUS:-2}
+    working_dir: /bench
+    command: ["uv", "run", "--frozen", "bench.py"]
+    environment:
+      UV_CACHE_DIR: /uv/cache
+      UV_PROJECT_ENVIRONMENT: /uv/venv
+      UV_PYTHON_DOWNLOADS: never
+      WRITE_HOSTS: data-1:8086,data-2:8086
+      NAME: ${NAME:-}
+      ROWS: ${ROWS:-2000000}
+      SERIES: ${SERIES:-10000}
+      BATCH: ${BATCH:-10000}
+      WRITERS: ${WRITERS:-16}
+      CONSISTENCY: ${CONSISTENCY:-one}
+      ITER: ${ITER:-30}
+      HOST_INFO: ${HOST_INFO:-}
+      DOCKER_INFO: ${DOCKER_INFO:-}
+      BENCH_LIMITS: ${BENCH_LIMITS:-}
+    volumes:
+      - ./bench:/bench:ro
+      - ./results:/results
+      - uv-cache:/uv
+
+volumes:
+  meta-1:
+  meta-2:
+  meta-3:
+  data-1:
+  data-2:
+  uv-cache:
