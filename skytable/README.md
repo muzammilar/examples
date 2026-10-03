@@ -20,6 +20,15 @@ per second at ~0.13 ms p50 and ~0.6–1.1 ms p99. Each query is its own round tr
 under 2 CPUs, and 8 CPUs did not go faster. Full table and method:
 [`single-node/README.md`](single-node/README.md#benchmark).
 
+Session-store showcase (Rust driver, same machine, no caps, shared VM, min–max over three runs,
+2026-10-02): pipelining raised point reads to ~590k queries/s (64 connections x depth 16) from
+~230k with one query per round trip, made inserts 3–25x faster and the 4-query request path
+1.1–4.4x faster. Server-side `n += 1` stayed exact at 32,000 increments, where client-side
+read-modify-write lost 94%. With the driver's default Nagle setting, small pipelines stall ~41 ms
+each (~390 queries/s on one connection). Details:
+[`session-store-showcase/README.md`](session-store-showcase/README.md#sample-output).
+
+
 ## Known issues
 
 Skytable is not stable enough to depend on yet: 0.8.4 (August 2024) is still the latest release,
