@@ -1,4 +1,4 @@
-// Capital-markets showcase: a C++ client of one KDB-X q process, using KX's C API (k.h + c.o).
+// Capital-markets showcase: a C++ client of one kdb+ q process, using KX's C API (k.h + c.o).
 //
 // 1. simulates one trading day (09:30-16:00) for SYMS symbols in C++: a stream of quotes (random
 //    walk mid, 1-5 cent spread) and trades that hit the current bid or ask or print at the mid,
@@ -10,7 +10,7 @@
 //    count, volume, notional, and how many trades were buys (at the ask), sells (at the bid) and
 //    at the mid, which the aj must reproduce exactly. Exits 1 on a mismatch.
 //
-// env: KDBX_HOST (kdbx), KDBX_PORT (5000), TRADES (20000000), QUOTES_PER_TRADE (2), SYMS (100),
+// env: KDB_HOST (kdb), KDB_PORT (5000), TRADES (20000000), QUOTES_PER_TRADE (2), SYMS (100),
 //      BATCH (1000000), SEED (42)
 #include <algorithm>
 #include <chrono>
@@ -166,8 +166,8 @@ struct Truth {
 } // namespace
 
 int main() {
-	const std::string host = env("KDBX_HOST", "kdbx");
-	const int port = (int)envll("KDBX_PORT", 5000);
+	const std::string host = env("KDB_HOST", "kdb");
+	const int port = (int)envll("KDB_PORT", 5000);
 	const long long ntrades = envll("TRADES", 20000000);
 	const long long qpt = envll("QUOTES_PER_TRADE", 2);
 	const int nsyms = (int)envll("SYMS", 100);

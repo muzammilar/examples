@@ -1,10 +1,10 @@
-# KDB-X — capital markets showcase (C++ client)
+# kdb+ — capital markets showcase (C++ client)
 
 Tick data analytics, the workload kdb+ was built for, on one q process driven by
 [`showcase/main.cpp`](showcase/main.cpp): a C++ program using KX's official C API (`k.h` + `c.o`).
-The server is the shared [`../image`](../image) (`q -p 5000 -s 4`, host port `5102`, override
-with `KDBX_PORT`) and needs the KDB-X license, see [`../README.md#license`](../README.md#license);
-the client does not.
+The server is the shared [`../image`](../image) (kdb+ 4.1, `q -p 5000 -s 4`, host port `5102`,
+override with `KDB_PORT`) and needs a kdb+ license key (free: KDB-X Community Edition), see
+[`../README.md#license`](../README.md#license); the client does not.
 
 ```bash
 make up      # build the image and start q
@@ -38,8 +38,8 @@ What `make run` does:
    holds if every trade got the right quote. Exits 1 with `VERIFY FAILED` otherwise.
 
 Each run drops and recreates the tables. Memory: the default (~20M trades, ~40M quotes) needs
-about 4-5 GB in q including the `aj` result; Community Edition caps q at 16 GB, which allows about
-`TRADES=50000000` (~150M rows).
+about 4-5 GB in q including the `aj` result; the KDB-X Community Edition key caps q at 16 GB,
+which allows about `TRADES=50000000` (~150M rows).
 
 ## The C++ client
 
@@ -54,9 +54,9 @@ the include. C++ over the C API was chosen over Rust: KX maintains `c.o` for lin
 
 ## Sample output
 
-Not run: no license key was available when this example was written (2026-10-02, Apple M4 Pro,
-Docker VM aarch64). The client compiles and links against `c.o` on arm64 without warnings and
-exits with `cannot connect` when no server answers; the server stops at the license check.
+Not run: no license key was available (2026-10-02, Apple M4 Pro, Docker VM aarch64). The client
+compiles and links against `c.o` on arm64 without warnings and exits with `cannot connect` when
+no server answers; the kdb+ 4.1 server stops at the license check (`license error: k4.lic`).
 
 ## Why kdb+ fits this
 

@@ -1,11 +1,11 @@
-/ bench.q: KDB-X single-node benchmark. Runs in a client q process; the work runs on the server
+/ bench.q: kdb+ single-node benchmark. Runs in a client q process; the work runs on the server
 / (functions are sent over IPC and timed there with .z.n), except the IPC round trip and ingest,
 / which are timed here. N trades (default 10M, SMOKE=1: 1M) and 2N quotes over 100 symbols.
-/ Prints a table and writes /results/kdbx-single-<UTC time>.json.
+/ Prints a table and writes /results/kdb-single-<UTC time>.json.
 system "c 40 200";
 env:{$[count v:getenv x;v;y]};
 n:"J"$env[`N;$["1"~getenv`SMOKE;"1000000";"10000000"]];
-h:hopen `$":",env[`KDBX_HOST;"localhost"],":5000";
+h:hopen `$":",env[`KDB_HOST;"localhost"],":5000";
 srv:{[name;val] h(set;name;val)};
 res:([] metric:`symbol$(); ms:`float$(); rows:`long$(); rows_per_s:`long$());
 rec:{[m;ms;r] res::res,([] metric:enlist m; ms:enlist ms; rows:enlist r; rows_per_s:enlist $[ms>0;`long$r%ms%1000;0N]);
@@ -14,7 +14,7 @@ rec:{[m;ms;r] res::res,([] metric:enlist m; ms:enlist ms; rows:enlist r; rows_pe
 srv[`tm; {[k;e] t0:.z.n; do[k; value e]; 1e-6*(`long$.z.n-t0)%k}];
 tm:{[k;e] h(`tm;k;e)};
 
--1 "KDB-X ",(string h".z.K")," ",(string h".z.k"),", ",(string h"system\"s\"")," secondary threads; N=",string n;
+-1 "kdb+ ",(string h".z.K")," ",(string h".z.k"),", ",(string h"system\"s\"")," secondary threads; N=",string n;
 
 / ---- data: N trades, 2N quotes, sorted by time, 100 symbols with their own price levels
 srv[`syms; `$"S",'string til 100];
@@ -84,7 +84,7 @@ ts:ssr[;":";""] 19#string .z.p;
 out:`timestamp`server`n`partition_mb`server_mem`ipc_p50_ms`ipc_p99_ms`limits`docker`results!(
   ts; h"(`version`release`os`threads!(.z.K;.z.k;.z.o;system\"s\"))"; n; mb; mem; p[lat;.5]; p[lat;.99];
   @[.j.k;getenv`BENCH_LIMITS;{()}]; getenv`DOCKER_INFO; res);
-f:`$":/results/kdbx-single-",ts,".json";
+f:`$":/results/kdb-single-",ts,".json";
 f 0: enlist .j.j out;
 -1 "results: ",1_string f;
 exit 0

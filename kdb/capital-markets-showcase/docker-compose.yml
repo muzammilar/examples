@@ -1,22 +1,24 @@
-name: kdbx-markets
+name: kdb-markets
 
-# One KDB-X q process (as in ../single-node) and the C++ showcase client (showcase/, KX C API).
-# The server needs the KDB-X license (KDB_LICENSE_B64 / ../license), see ../README.md; the client
-# does not. Host port KDBX_PORT (default 5102).
+# One kdb+ q process (as in ../single-node) and the C++ showcase client (showcase/, KX C API).
+# The server needs the kdb+ license (KDB_LICENSE_B64 / ../license), see ../README.md; the client
+# does not. Host port KDB_PORT (default 5102).
 services:
-  kdbx:
+  kdb:
     build:
       context: ../image
       args:
+        KDB_DIST: ${KDB_DIST:-kdb+}
+        KDB_VERSION: ${KDB_VERSION:-4.1/2026.10.02}
         KDB_X_VERSION: ${KDB_X_VERSION:-5.0.20261002}
-    container_name: kdbx-markets
-    # -s 4: secondary threads (Community Edition maximum)
+    container_name: kdb-markets
+    # -s 4: secondary threads (KDB-X Community Edition maximum)
     command: ["q", "-p", "5000", "-s", "4"]
     environment:
       KDB_LICENSE_B64: ${KDB_LICENSE_B64:-}
       KDB_LICENSE_K4B64: ${KDB_LICENSE_K4B64:-}
     ports:
-      - "${KDBX_PORT:-5102}:5000"
+      - "${KDB_PORT:-5102}:5000"
     volumes:
       - ../license:/license:ro
     # q has no health endpoint; a TCP connect means the listener is up (after the license check)
@@ -31,11 +33,11 @@ services:
     build: showcase
     profiles: [run]
     environment:
-      KDBX_HOST: kdbx
-      KDBX_PORT: "5000"
+      KDB_HOST: kdb
+      KDB_PORT: "5000"
       TRADES: ${TRADES:-20000000}
       QUOTES_PER_TRADE: ${QUOTES_PER_TRADE:-2}
       SYMS: ${SYMS:-100}
       BATCH: ${BATCH:-1000000}
     depends_on:
-      kdbx: { condition: service_healthy }
+      kdb: { condition: service_healthy }
