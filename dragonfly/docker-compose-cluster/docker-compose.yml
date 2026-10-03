@@ -1,0 +1,52 @@
+name: dragonfly-cluster
+
+# cluster_mode=yes: each node only serves the slots of the config pushed to it (DFLYCLUSTER CONFIG);
+# until then it has no config and refuses keyed commands
+x-dragonfly: &dragonfly
+  image: docker.dragonflydb.io/dragonflydb/dragonfly:${DRAGONFLY_VERSION:-v2.0.0}
+  command: >-
+    dragonfly --logtostderr --cluster_mode=yes
+    --proactor_threads=1 --maxmemory=512mb
+  # same per-node limits as the Valkey cluster in valkey/helm-chart
+  cpus: 1
+  mem_limit: 512m
+  ulimits:
+    memlock: -1
+  healthcheck:
+    test: ["CMD", "redis-cli", "ping"]
+    interval: 2s
+    retries: 30
+
+services:
+  dragonfly-1: {<<: *dragonfly, hostname: dragonfly-1, ports: ["127.0.0.1:7201:6379"], volumes: [dragonfly-1:/data]}
+  dragonfly-2: {<<: *dragonfly, hostname: dragonfly-2, ports: ["127.0.0.1:7202:6379"], volumes: [dragonfly-2:/data]}
+  dragonfly-3: {<<: *dragonfly, hostname: dragonfly-3, ports: ["127.0.0.1:7203:6379"], volumes: [dragonfly-3:/data]}
+  dragonfly-4: {<<: *dragonfly, hostname: dragonfly-4, ports: ["127.0.0.1:7204:6379"], volumes: [dragonfly-4:/data]}
+  dragonfly-5: {<<: *dragonfly, hostname: dragonfly-5, ports: ["127.0.0.1:7205:6379"], volumes: [dragonfly-5:/data]}
+  dragonfly-6: {<<: *dragonfly, hostname: dragonfly-6, ports: ["127.0.0.1:7206:6379"], volumes: [dragonfly-6:/data]}
+
+  # one node that answers CLUSTER commands as if it owned all 16384 slots, for cluster clients
+  dragonfly-emulated:
+    <<: *dragonfly
+    profiles: [emulated]
+    hostname: dragonfly-emulated
+    command: dragonfly --logtostderr --cluster_mode=emulated --proactor_threads=1 --maxmemory=512mb
+
+  # cluster-aware client in the same network: MOVED replies name dragonfly-N, which resolve here
+  tools:
+    image: valkey/valkey:${VALKEY_VERSION:-9.1.2-alpine}
+    profiles: [tools]
+    entrypoint: []
+
+  # make bench-lua: go/rueidis-lua-bench (linked as bench), rueidis in cluster mode
+  lua:
+    build: bench
+    profiles: [bench]
+
+volumes:
+  dragonfly-1:
+  dragonfly-2:
+  dragonfly-3:
+  dragonfly-4:
+  dragonfly-5:
+  dragonfly-6:
