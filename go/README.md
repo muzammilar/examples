@@ -39,6 +39,8 @@ The `ext` directory project that are imported as git submodules.
 
 `multi-error`: An example of using error wrapping to return multiple errors in a single error.
 
+`rueidis-lua-bench`: SET, GET and add/update/delete Lua scripts through `rueidis` against a single node, a primary or a cluster; the Valkey and Dragonfly examples link it as `bench`.
+
 `struct-embedding`: A basic struct embedding example in Golang.
 
 `sqlc-students`: A basic example of using sqlc to convert sql queries into golang structs.

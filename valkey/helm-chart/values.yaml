@@ -1,0 +1,17 @@
+# primary/replica: valkey-0 is the primary, valkey-1 and valkey-2 replicate from it
+replica:
+  enabled: true
+  replicas: 2
+  persistence:
+    size: 1Gi
+  # let valkey-0 take writes even with no replica connected
+  minReplicasToWrite: 0
+
+# AOF, so valkey-0 comes back from its PVC with its data
+valkeyConfig: |
+  appendonly yes
+  appendfsync everysec
+
+readinessProbe:
+  enabled: true
+  periodSeconds: 2

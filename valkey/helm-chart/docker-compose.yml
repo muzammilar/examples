@@ -1,0 +1,62 @@
+name: valkey-helm-compose
+
+# nodes announce their hostname so MOVED redirects point at valkey-1..6, which resolve in this network
+x-valkey: &valkey
+  image: valkey/valkey:${VALKEY_VERSION:-9.1.2}
+  command: >-
+    sh -c 'exec valkey-server --cluster-enabled yes --cluster-node-timeout 5000
+    --cluster-announce-hostname $$HOSTNAME --cluster-preferred-endpoint-type hostname
+    --appendonly yes --dir /data'
+  # same per-node limits as dragonfly/docker-compose-cluster
+  cpus: 1
+  mem_limit: 512m
+  healthcheck:
+    test: ["CMD", "valkey-cli", "ping"]
+    interval: 2s
+    retries: 30
+
+services:
+  valkey-1: {<<: *valkey, hostname: valkey-1, ports: ["127.0.0.1:7101:6379"], volumes: [valkey-1:/data]}
+  valkey-2: {<<: *valkey, hostname: valkey-2, ports: ["127.0.0.1:7102:6379"], volumes: [valkey-2:/data]}
+  valkey-3: {<<: *valkey, hostname: valkey-3, ports: ["127.0.0.1:7103:6379"], volumes: [valkey-3:/data]}
+  valkey-4: {<<: *valkey, hostname: valkey-4, ports: ["127.0.0.1:7104:6379"], volumes: [valkey-4:/data]}
+  valkey-5: {<<: *valkey, hostname: valkey-5, ports: ["127.0.0.1:7105:6379"], volumes: [valkey-5:/data]}
+  valkey-6: {<<: *valkey, hostname: valkey-6, ports: ["127.0.0.1:7106:6379"], volumes: [valkey-6:/data]}
+
+  # 3 primaries + 3 replicas, then wait until every node sees cluster_state:ok
+  cluster-init:
+    image: valkey/valkey:${VALKEY_VERSION:-9.1.2}
+    profiles: [init]
+    command:
+      - sh
+      - -ec
+      - |
+        valkey-cli -h valkey-1 cluster info | grep -q cluster_slots_assigned:16384 ||
+          valkey-cli --cluster create valkey-1:6379 valkey-2:6379 valkey-3:6379 \
+            valkey-4:6379 valkey-5:6379 valkey-6:6379 --cluster-replicas 1 --cluster-yes
+        for n in 1 2 3 4 5 6; do
+          i=0
+          until valkey-cli -h valkey-$$n cluster info | grep -q cluster_state:ok; do
+            i=$$((i + 1)); [ $$i -lt 60 ] || exit 1; sleep 1
+          done
+        done
+        echo "cluster_state:ok on all six nodes"
+
+  # make compose-bench-resp: valkey-benchmark --cluster
+  resp:
+    image: valkey/valkey:${VALKEY_VERSION:-9.1.2}-alpine
+    profiles: [bench]
+    entrypoint: []
+
+  # make compose-bench-lua: go/rueidis-lua-bench (linked as bench), rueidis in cluster mode
+  lua:
+    build: bench
+    profiles: [bench]
+
+volumes:
+  valkey-1:
+  valkey-2:
+  valkey-3:
+  valkey-4:
+  valkey-5:
+  valkey-6:
