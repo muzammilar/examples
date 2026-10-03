@@ -1,9 +1,10 @@
-# KDB-X — single node
+# kdb+ — single node
 
 One q process (`q -p 5000 -s 4`) from the shared [`../image`](../image) (Debian slim + the
-public KDB-X `q` 5.0.20261002 binary, arm64 or amd64), IPC on `localhost:5101` (override with
-`KDBX_PORT`), data in the `kdbx-data` volume at `/data`. Needs a KDB-X license, see
-[`../README.md#license`](../README.md#license); `make up` refuses to start without one.
+public kdb+ 4.1 `q` binary, build 2026.10.02, arm64 or amd64; `KDB_DIST=kdb-x` for KDB-X q 5.0),
+IPC on `localhost:5101` (override with `KDB_PORT`), data in the `kdb-data` volume at `/data`.
+Needs a license key (free: KDB-X Community Edition), see [`../README.md#license`](../README.md#license);
+`make up` refuses to start without one.
 
 ```bash
 make up         # build the image, start q, wait for the port
@@ -60,19 +61,19 @@ N=...`) and `2N` quotes over 100 symbols:
 | `write_partition_dpft` | `.Q.dpft` of the N trades as one date partition under `/data/bench` |
 | `hdb_vwap_by_sym_one_date` / `hdb_one_sym_one_date_p_attr` | the same queries on the mapped partition |
 
-Results print as a table and go to `results/kdbx-single-<UTC time>.json` (git-ignored) with the
+Results print as a table and go to `results/kdb-single-<UTC time>.json` (git-ignored) with the
 server version, thread count, memory used and the limits below. Afterwards the server drops the
 benchmark tables from memory but keeps `/data/bench` loaded (its working directory) until the
 next `\l`, so `make test` after a benchmark re-loads `/data/db`.
 
-**Resource budget.** For the run [`bench/limits.sh`](bench/limits.sh) caps the `kdbx` container
+**Resource budget.** For the run [`bench/limits.sh`](bench/limits.sh) caps the `kdb` container
 at `BENCH_CPUS=4` / `BENCH_MEM=6g` (no swap) with `docker update`, and restores the old limits
 afterwards (an unlimited memory limit comes back as the Docker VM's total; `make down && make up`
-starts clean). q runs with `-s 4` secondary threads, the Community Edition maximum. The JSON
+starts clean). q runs with `-s 4` secondary threads, the KDB-X Community Edition maximum. The JSON
 records the applied limits under `limits`.
 
 ### Sample results
 
-Not run: no license key was available when this example was written (2026-10-02, Apple M4 Pro,
-Docker VM aarch64). The image builds and the container starts and exits at the license check;
-the walkthrough and the benchmark have not been executed yet.
+Not run: no license key was available (2026-10-02, Apple M4 Pro, Docker VM aarch64). The image
+builds with the pinned kdb+ 4.1 2026.10.02 `l64arm` zip, and q starts and exits at the license
+check (`license error: k4.lic`); the walkthrough and the benchmark have not been executed yet.
