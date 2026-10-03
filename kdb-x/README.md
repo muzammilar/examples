@@ -9,6 +9,10 @@ run (`q` 5.0 from the KDB-X download); the q code is plain kdb+ q.
 - [`single-node/`](single-node) — one q process on Docker Compose: in-memory tables, q-sql
   (`select`/`exec`/`update`/`by`, `xbar` OHLC bars, `lj`), as-of join `aj`, window join `wj`,
   the `s#` `g#` `p#` attributes with timings, and splayed and date-partitioned tables on disk.
+- [`capital-markets-showcase/`](capital-markets-showcase) — tick analytics from a C++ client
+  (KX C API, `k.h` + `c.o`): ~60M simulated trades and quotes streamed over IPC as column batches,
+  then VWAP, OHLCV bars, `aj` of every trade to its quote, trade classification, effective spread,
+  realized volatility and `wj` on the server, checked against the client's own counts.
 
 ## License
 
@@ -36,4 +40,5 @@ Not run yet: these examples were written without a license key, so the q code ha
 executed. The image builds and starts (Apple M4 Pro, Docker VM aarch64, 2026-10-02) and stops at
 the license check. With a license, `make benchmark` in [`single-node/`](single-node#benchmark)
 measures generation, IPC ingest, q-sql aggregations, `aj`, `wj` and partition writes over 10M
-trades and 20M quotes.
+trades and 20M quotes; [`capital-markets-showcase/`](capital-markets-showcase) prints its own
+timings.
