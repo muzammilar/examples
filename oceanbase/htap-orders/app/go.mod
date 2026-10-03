@@ -1,4 +1,4 @@
-module htap-showcase
+module htap-orders
 
 go 1.26.0
 

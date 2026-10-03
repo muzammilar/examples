@@ -1,4 +1,4 @@
-// htap-showcase: OLTP writes and real-time analytics on one OceanBase table.
+// htap-orders: OLTP writes and real-time analytics on one OceanBase table.
 //
 // One hybrid row/column table (`WITH COLUMN GROUP(all columns, each column)`) takes
 // transactional writes; the same table answers analytical aggregations either through

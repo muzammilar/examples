@@ -4,8 +4,8 @@ WORKDIR /src
 COPY go.mod go.sum ./
 RUN go mod download
 COPY main.go ./
-RUN CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o /htap-showcase .
+RUN CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o /htap-orders .
 
 FROM alpine:3.24
-COPY --from=build /htap-showcase /usr/local/bin/htap-showcase
-ENTRYPOINT ["htap-showcase"]
+COPY --from=build /htap-orders /usr/local/bin/htap-orders
+ENTRYPOINT ["htap-orders"]

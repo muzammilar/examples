@@ -1,4 +1,4 @@
-# OceanBase — HTAP showcase (Go)
+# OceanBase — HTAP orders (Go)
 
 One OceanBase CE observer (`MODE=mini`, as in [`../single-node`](../single-node), tenant
 parameters from obd's `htap` scenario) and a Go program ([`app/main.go`](app/main.go),
