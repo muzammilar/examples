@@ -12,6 +12,12 @@ call clustering and replication "on track" for "early Q1'25". The README says th
 `cluster` module stubs (last commit January 2025), and 0.9 has not been released. A second `skyd`
 would be an unrelated database.
 
+There is no free or preview build with clustering either (checked 2026-10-03): no 0.9 release,
+pre-release or nightly exists. The last update on the roadmap issue
+([#203](https://github.com/skytable/skytable/issues/203), 2025-07-14) says clustering is
+"complete… awaiting final integration" in a private fork; a release announced for July 2025 has not
+shipped.
+
 ## Benchmark
 
 `sky-bench` `uniform_std_v1`, 1M rows (4M queries), one server capped at 4 CPUs / 4 GB, 32
