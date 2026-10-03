@@ -1,0 +1,29 @@
+# `make benchmark`: the built-in `tigerbeetle benchmark` load generator against all three
+# replicas (`kubectl set env` overrides TRANSFERS, ACCOUNTS, CLIENTS, BATCH)
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: bench
+spec:
+  backoffLimit: 0
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: bench
+          image: ghcr.io/tigerbeetle/tigerbeetle:0.17.9
+          command: ["/bin/sh", "-c"]
+          args:
+            - exec /tigerbeetle benchmark --addresses=$ADDRESSES --transfer-count=$TRANSFERS
+              --account-count=$ACCOUNTS --clients=$CLIENTS --transfer-batch-count=$BATCH
+          env:
+            - name: ADDRESSES
+              valueFrom: { configMapKeyRef: { name: tigerbeetle, key: ADDRESSES } }
+            - { name: TRANSFERS, value: "1000000" }
+            - { name: ACCOUNTS, value: "10000" }
+            - { name: CLIENTS, value: "1" }
+            - { name: BATCH, value: "8189" }
+          resources:
+            limits: { cpu: "2" }
+          securityContext:
+            seccompProfile: { type: Unconfined }

@@ -1,0 +1,20 @@
+# `make test`: client/demo.py through the official Python client against all three replicas
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: demo
+spec:
+  backoffLimit: 0
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: demo
+          image: tigerbeetle-client:0.17.9 # built from client/ and loaded into kind by `make up`
+          imagePullPolicy: Never
+          command: ["python", "-u", "/demo.py"]
+          env:
+            - name: TB_ADDRESS
+              valueFrom: { configMapKeyRef: { name: tigerbeetle, key: ADDRESSES } }
+          securityContext:
+            seccompProfile: { type: Unconfined } # the client library uses io_uring

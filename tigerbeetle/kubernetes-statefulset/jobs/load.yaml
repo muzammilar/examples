@@ -1,0 +1,23 @@
+# `make failover`: client/load.py, one client sending batches of BATCH
+# transfers back to back for DURATION seconds (`kubectl set env` overrides them)
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: load
+spec:
+  backoffLimit: 0
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: load
+          image: tigerbeetle-client:0.17.9
+          imagePullPolicy: Never
+          command: ["python", "-u", "/load.py"]
+          env:
+            - name: TB_ADDRESS
+              valueFrom: { configMapKeyRef: { name: tigerbeetle, key: ADDRESSES } }
+            - { name: DURATION, value: "40" }
+            - { name: BATCH, value: "100" }
+          securityContext:
+            seccompProfile: { type: Unconfined }

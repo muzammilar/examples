@@ -1,0 +1,160 @@
+# A 3-replica TigerBeetle cluster as a plain StatefulSet (there is no official operator).
+#
+# `--addresses` takes IPs only (no DNS names), is read once at start, and must list every
+# replica in replica order. Pod IPs change whenever a pod is recreated, so each replica gets
+# its own ClusterIP Service with a fixed IP (10.96.53.1i, in kind's default service range)
+# that follows the pod `tigerbeetle-i`. Every replica and client uses those three IPs; a
+# replica only puts its own pod IP in its own slot, because it binds (listens on) that address.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tigerbeetle
+data:
+  CLUSTER: "0"
+  REPLICA_COUNT: "3"
+  ADDRESSES: 10.96.53.10:3000,10.96.53.11:3000,10.96.53.12:3000
+  # `make up` sets this to "true" once all replicas have formatted. From then on a replica
+  # that starts without a data file (lost PVC) runs `tigerbeetle recover`, never `format`:
+  # a freshly formatted replica could forget promises it made and lose committed data.
+  BOOTSTRAPPED: "false"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tigerbeetle-scripts
+data:
+  # format the data file on first start, or recover it once the cluster exists
+  init.sh: |
+    set -eu
+    i=${HOSTNAME##*-}
+    f=/data/${CLUSTER}_$i.tigerbeetle
+    if [ -f "$f" ]; then echo "data file $f exists"; exit 0; fi
+    if [ "$BOOTSTRAPPED" = true ]; then
+      echo "data file $f missing in a running cluster: tigerbeetle recover"
+      exec /tigerbeetle recover --cluster=$CLUSTER --replica=$i --replica-count=$REPLICA_COUNT \
+        --addresses=$ADDRESSES "$f"
+    fi
+    exec /tigerbeetle format --cluster=$CLUSTER --replica=$i --replica-count=$REPLICA_COUNT "$f"
+  # the Service IPs, with this replica's own slot replaced by its pod IP
+  start.sh: |
+    set -eu
+    i=${HOSTNAME##*-}
+    addresses=$(echo "$ADDRESSES" | awk -F, -v OFS=, -v i=$i -v me=$POD_IP:3000 '{ $(i + 1) = me; print }')
+    echo "replica $i: --addresses=$addresses"
+    exec /tigerbeetle start --addresses=$addresses --cache-grid=$CACHE_GRID /data/${CLUSTER}_$i.tigerbeetle
+---
+# governs the StatefulSet's pod DNS names (tigerbeetle-0.tigerbeetle...); TigerBeetle itself
+# cannot use them
+apiVersion: v1
+kind: Service
+metadata:
+  name: tigerbeetle
+spec:
+  clusterIP: None
+  publishNotReadyAddresses: true
+  selector: { app: tigerbeetle }
+  ports: [{ name: tigerbeetle, port: 3000 }]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tigerbeetle-0
+spec:
+  clusterIP: 10.96.53.10
+  publishNotReadyAddresses: true
+  selector: { statefulset.kubernetes.io/pod-name: tigerbeetle-0 }
+  ports: [{ name: tigerbeetle, port: 3000 }]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tigerbeetle-1
+spec:
+  clusterIP: 10.96.53.11
+  publishNotReadyAddresses: true
+  selector: { statefulset.kubernetes.io/pod-name: tigerbeetle-1 }
+  ports: [{ name: tigerbeetle, port: 3000 }]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tigerbeetle-2
+spec:
+  clusterIP: 10.96.53.12
+  publishNotReadyAddresses: true
+  selector: { statefulset.kubernetes.io/pod-name: tigerbeetle-2 }
+  ports: [{ name: tigerbeetle, port: 3000 }]
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: tigerbeetle
+spec:
+  maxUnavailable: 1 # 2 of 3 replicas are a quorum
+  selector:
+    matchLabels: { app: tigerbeetle }
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: tigerbeetle
+spec:
+  serviceName: tigerbeetle
+  replicas: 3 # fixed: must equal REPLICA_COUNT, which is written into the data files
+  # start all replicas together: one replica alone never becomes ready for clients
+  podManagementPolicy: Parallel
+  selector:
+    matchLabels: { app: tigerbeetle }
+  template:
+    metadata:
+      labels: { app: tigerbeetle }
+    spec:
+      terminationGracePeriodSeconds: 10
+      # one replica per zone (kind worker)
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: topology.kubernetes.io/zone
+          whenUnsatisfiable: DoNotSchedule
+          labelSelector:
+            matchLabels: { app: tigerbeetle }
+      initContainers:
+        - name: format
+          image: ghcr.io/tigerbeetle/tigerbeetle:0.17.9
+          command: ["/bin/sh", "/scripts/init.sh"]
+          envFrom: [{ configMapRef: { name: tigerbeetle } }]
+          securityContext: &security
+            seccompProfile: { type: Unconfined } # io_uring
+            capabilities: { add: [IPC_LOCK] }    # memory locking
+          volumeMounts: &mounts
+            - { name: data, mountPath: /data }
+            - { name: scripts, mountPath: /scripts }
+      containers:
+        - name: tigerbeetle
+          image: ghcr.io/tigerbeetle/tigerbeetle:0.17.9
+          command: ["tini", "--", "/bin/sh", "/scripts/start.sh"]
+          envFrom: [{ configMapRef: { name: tigerbeetle } }]
+          env:
+            - name: POD_IP
+              valueFrom: { fieldRef: { fieldPath: status.podIP } }
+            - name: CACHE_GRID
+              value: 256MiB
+          ports: [{ name: tigerbeetle, containerPort: 3000 }]
+          readinessProbe:
+            tcpSocket: { port: 3000 }
+            periodSeconds: 2
+          securityContext: *security
+          # a replica allocates ~2.3 GiB up front with --cache-grid=256MiB
+          resources:
+            requests: { cpu: 500m, memory: 3Gi }
+            limits: { cpu: "2", memory: 4Gi }
+          volumeMounts: *mounts
+      volumes:
+        - name: scripts
+          configMap: { name: tigerbeetle-scripts }
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: [ReadWriteOnce]
+        resources:
+          requests: { storage: 2Gi }

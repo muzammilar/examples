@@ -10,6 +10,7 @@ transfer rejected by `debits_must_not_exceed_credits`) and use the built-in `tig
 - [`docker-compose-cluster/`](docker-compose-cluster) — three replicas of one cluster, with a `make failover` that stops the primary.
 - [`payments-ledger/`](payments-ledger) — a wallet/payments ledger in Rust (official client, built from source): 1M linked payment + fee transfers with overdraft protection, card holds (post/void/expire), linked currency exchange, idempotent retries, and an audit that debits equal credits.
 - [`cluster-operations/`](cluster-operations) — what changes on a running cluster, each step under load: adding and removing standby replicas (3 → 3 + 2 standbys → 3), showing that standbys never form a quorum, replacing a replica's lost data file with `tigerbeetle recover`, and resizing the grid cache with a rolling restart.
+- [`kubernetes-statefulset/`](kubernetes-statefulset) — three replicas as a plain StatefulSet on kind (one per zone), with an init container that formats (or recovers) the data file from the pod ordinal, a fixed ClusterIP per replica, Jobs for the demo, load and benchmark, and a `make failover` that kills the primary's pod. TigerBeetle has no Kubernetes operator or Helm chart of its own.
 
 ## Benchmark
 
@@ -31,6 +32,10 @@ rolling restart all completed without a failed request or a lost transfer. The w
 stall was 1.9 s, during the rolling restart. Raising `--cache-grid` from 256 MiB to 2 GiB did not
 speed up the 1M-transfer benchmark (343k → 221k transfers/s in single runs on a shared VM): its
 working set already fits.
+
+On kind (`kubernetes-statefulset/`, 2026-10-03) the same 1M-transfer benchmark does 347k transfers/s
+at 55 ms batch p99. Killing the primary's pod under load stalled the client for at most 314 ms;
+every acked transfer was in the balance afterwards.
 
 ## Known issues
 
@@ -54,3 +59,14 @@ Seen while building these examples (TigerBeetle 0.17.9, 2026-10-02):
   restart.
 - A replica that lost its data file must come back with `tigerbeetle recover`, never `format`
   ([recovering](https://docs.tigerbeetle.com/operating/recovering/)).
+- No official Kubernetes operator or Helm chart. The docs cover systemd, Docker and the managed
+  service ([deploying](https://docs.tigerbeetle.com/operating/deploying/)). The
+  `tigerbeetle.github.io/helm-charts` repo that Rafiki's docs point at returns 404. The community
+  operators on GitHub (e.g. `Code-Growers/tigerbeetle-operator`, "experimental") have no users
+  (0 stars, checked 2026-10-03).
+- `--addresses` takes IP addresses only, no DNS names, and is read once at start. On
+  Kubernetes that rules out the usual headless-Service pod DNS names, so
+  `kubernetes-statefulset/` gives each replica a ClusterIP Service with a fixed IP.
+- The replica count is fixed when the data files are formatted (`--replica-count`). Changing
+  it means a new cluster. Scaling the StatefulSet to 4 would start `tigerbeetle-3`, whose
+  `format --replica=3 --replica-count=3` is rejected (`src/tigerbeetle/cli.zig`; not run here).
