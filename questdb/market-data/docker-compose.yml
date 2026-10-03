@@ -1,0 +1,39 @@
+name: questdb-market
+
+# One QuestDB server, as in ../single-node, plus the Rust client (ILP over HTTP to
+# :9000, PostgreSQL wire to :8812, both inside the compose network).
+services:
+  questdb:
+    image: questdb/questdb:${QUESTDB_VERSION:-10.0.1}
+    container_name: questdb-market
+    environment:
+      QDB_TELEMETRY_ENABLED: "false"
+    ports:
+      - "${QUESTDB_HTTP_PORT:-9001}:9000" # web console, REST, ILP over HTTP
+      - "${QUESTDB_PG_PORT:-8813}:8812"   # PostgreSQL wire (admin / quest)
+    volumes:
+      - questdb-data:/var/lib/questdb
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:9003/"]
+      interval: 2s
+      timeout: 2s
+      retries: 60
+
+  # `make run`: app/ (Rust: questdb-rs ILP/HTTP feeds + tokio-postgres queries)
+  app:
+    build: app
+    profiles: [run]
+    environment:
+      QDB_HOST: questdb
+      FEEDS: ${FEEDS:-1,4}
+      DURATION: ${DURATION:-20}
+      SYMBOLS: ${SYMBOLS:-50}
+      BATCH: ${BATCH:-10000}
+      RATE: ${RATE:-500000}
+      QUERY_CLIENTS: ${QUERY_CLIENTS:-4}
+      KEEP: ${KEEP:-0}
+    depends_on:
+      questdb: { condition: service_healthy }
+
+volumes:
+  questdb-data:

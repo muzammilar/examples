@@ -1,0 +1,15 @@
+[package]
+name = "market-data"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[dependencies]
+# official QuestDB client; only the ILP-over-HTTP sender is needed here (the crate requires a
+# TLS root store and crypto provider feature even when TLS is not used)
+questdb-rs = { version = "7.0.0", default-features = false, features = ["sync-sender-http", "ring-crypto", "tls-webpki-certs"] }
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "time"] }
+tokio-postgres = "0.7.18"
+
+[profile.release]
+codegen-units = 4
