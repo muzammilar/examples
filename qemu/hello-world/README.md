@@ -7,6 +7,7 @@ needs only Docker.
 ## Quick start
 
 ```bash
+make build               # build the image only (ARCH=x86_64 default)
 make run                 # build the image, boot an x86_64 VM, print Hello World, exit
 make run ARCH=aarch64    # same with an arm64 guest (QEMU virt machine): ~2x faster on Apple silicon
 make run KERNEL_ARGS=    # full kernel boot log instead of `quiet`
@@ -37,20 +38,26 @@ qemu-system-x86_64 -M q35 -accel tcg -m 256M -smp 1 \
 # ARCH=aarch64: qemu-system-aarch64 -M virt -cpu max ... console=ttyAMA0
 ```
 
-- No disk image: the kernel unpacks the initramfs into a RAM filesystem and runs `rdinit=/init`
-  as PID 1. That needs no `qemu-img`, `mkfs`, `guestmount`/libguestfs or sudo.
-- `/init` prints Hello World, then the kernel version and how long the kernel took to get there
-  (`CLOCK_BOOTTIME`). PID 1 must never exit (the kernel panics if it does), so it calls
-  `sync()` and `reboot(RB_POWER_OFF)`. QEMU exits and the container goes away.
-- `-display none -serial stdio` puts the guest's serial console on stdout. `-nographic` would too,
-  but then SeaBIOS writes its banner and terminal escape codes there as well.
-- `panic=-1` plus `-no-reboot`: if the kernel panics anyway, QEMU exits instead of hanging.
-- `-accel tcg` is pure emulation, so the same command runs on any host. QEMU 5.2 removed
-  `-no-kvm`; use `-accel tcg`. On a Linux host of the guest's architecture,
-  `docker run --rm --device /dev/kvm -e ACCEL=kvm qemu-hello-world:x86_64` should use hardware
-  virtualization (not tested here: no `/dev/kvm` on macOS).
+| Choice | Reason |
+|---|---|
+| No disk image | the kernel unpacks the initramfs into a RAM filesystem and runs `rdinit=/init` as PID 1; no `qemu-img`, `mkfs`, `guestmount`/libguestfs or sudo |
+| `/init` powers off | prints Hello World, the kernel version and time since kernel start (`CLOCK_BOOTTIME`). PID 1 must never exit (the kernel panics), so it calls `sync()` and `reboot(RB_POWER_OFF)`; QEMU exits and the container goes away |
+| `-display none -serial stdio` | guest serial console on stdout. `-nographic` would too, but SeaBIOS then also writes its banner and terminal escape codes there |
+| `panic=-1` + `-no-reboot` | if the kernel panics anyway, QEMU exits instead of hanging |
+| `-accel tcg` | pure emulation, runs on any host. QEMU 5.2 removed `-no-kvm`; use `-accel tcg` |
 
-`hello.sh` takes `ARCH`, `ACCEL`, `MEM`, `SMP` and `KERNEL_ARGS` from the environment.
+KVM: on a Linux host of the guest's architecture, `docker run --rm --device /dev/kvm -e ACCEL=kvm qemu-hello-world:x86_64`
+should use hardware virtualization (not tested here: no `/dev/kvm` on macOS).
+
+[`hello.sh`](hello.sh) environment:
+
+| Variable | Default |
+|---|---|
+| `ARCH` | `x86_64` (or `aarch64`) |
+| `ACCEL` | `tcg` (`kvm` needs `/dev/kvm` and guest arch = host arch) |
+| `MEM` | `256M` |
+| `SMP` | `1` |
+| `KERNEL_ARGS` | `quiet` (empty: full boot log) |
 
 ## Sample output
 
@@ -95,7 +102,7 @@ snapshot.debian.org. After that the image is cached.
 - The VM has no `/proc`, `/sys`, `/dev` mounts or devices beyond `/dev/console`, which comes from
   the kernel's built-in initramfs. A real init would mount them first.
 
-## Useful resources
+## Links
 
 - [Kernel docs: ramfs, rootfs and initramfs](https://docs.kernel.org/filesystems/ramfs-rootfs-initramfs.html)
 - [QEMU removed features](https://www.qemu.org/docs/master/about/removed-features.html) (`-no-kvm`)
