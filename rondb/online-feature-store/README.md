@@ -1,4 +1,4 @@
-# RonDB — online feature store showcase (Go)
+# RonDB — online feature store (Go)
 
 RonDB is the online feature store behind [Hopsworks](https://www.hopsworks.ai/): a model
 asks for the feature vector of a few entities, and the store answers with primary-key reads
