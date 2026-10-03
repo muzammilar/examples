@@ -32,3 +32,7 @@ Seen while building these examples (2026-10-02):
   it. Details: [`single-node/README.md`](single-node/README.md).
 - After `ALTER MODEL ... ADD` on a model with rows, `SELECT *` on an old row returns error `101`
   and `SELECT ALL` panics a server task (`sel.rs:108`). skyd keeps running.
+- The official Rust driver (`skytable` 0.8.12) leaves Nagle's algorithm on and writes a pipeline
+  in two pieces, so every small pipeline stalls ~41 ms. The driver doesn't expose its socket; the
+  showcase sets `TCP_NODELAY` itself. Details:
+  [`session-store-showcase/README.md`](session-store-showcase/README.md).
