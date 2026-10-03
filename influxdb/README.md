@@ -56,9 +56,17 @@ with `influxdb:3.12.0-core` (2026-10-02):
   the examples always filter.
 - `no_sync=true` writes are acked before they are queryable. A `count(*)` right after the last
   ack saw part of 2M rows, and all of them 1.7–5 s later.
-- When the Docker VM disk filled up (shared with other examples), MinIO answered
-  `507 Insufficient Storage`. InfluxDB then failed `create database` with `object store error:
-  ... RetryError ... retries: 10 ... inner: Status { status: 507 ...` and exited (code 1) at
-  startup. It recovered once space was freed and needed no repair. Keep a few GB free.
+- When the shared Docker VM disk filled up, MinIO answered `507 Insufficient Storage`.
+  InfluxDB failed `create database` with `object store error: ... retries: 10 ... inner:
+  Status { status: 507 ...`. At startup it exited with code 1. During writes it logged `ERROR
+  influxdb3_wal::object_store: error writing wal file to object store ... 507 Insufficient
+  Storage` and kept retrying, and write requests stalled for up to 128 s, then completed once
+  space was back, with no rows lost. Keep a few GB free.
+- A last value cache query without a key predicate is slow. Reading all 10k cached hosts took
+  177–426 ms, against 17–194 ms for the SQL `GROUP BY`. The caches pay off for keyed lookups.
+- Core does not compact Parquet files. A query that would open more than `--query-file-limit`
+  files (432, i.e. 72 h of one table) fails with `Query would scan 432 Parquet files, exceeding
+  the file limit. InfluxDB 3 Core caps file access ...`, followed by an upsell paragraph for
+  Enterprise.
 - MinIO no longer publishes community images, so the examples use Chainguard's `latest` build
   pinned by digest.
