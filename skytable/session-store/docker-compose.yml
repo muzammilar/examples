@@ -1,6 +1,6 @@
 name: skytable-session-store
 
-# One Skytable server, configured as in ../single-node, plus the Rust showcase client.
+# One Skytable server, configured as in ../single-node, plus the Rust client.
 # Both get fixed CPU/memory caps so the numbers are comparable with ../single-node's benchmark.
 services:
   skytable:
@@ -25,11 +25,11 @@ services:
       timeout: 2s
       retries: 30
 
-  # `make run`: showcase/ (Rust, official `skytable` driver from crates.io)
-  showcase:
-    build: showcase
+  # `make run`: app/ (Rust, official `skytable` driver from crates.io)
+  app:
+    build: app
     profiles: [run]
-    cpus: ${SHOWCASE_CPUS:-4}
+    cpus: ${APP_CPUS:-4}
     environment:
       SKYTABLE_HOST: skytable
       SKYTABLE_PORT: 2003

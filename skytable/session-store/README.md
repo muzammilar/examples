@@ -1,7 +1,7 @@
-# Skytable — session store showcase (Rust client)
+# Skytable — session store (Rust client)
 
 An API gateway's session store and per-API-key rate limiter on one Skytable node, driven by
-[`showcase/`](showcase): a Rust program using the official async driver
+[`app/`](app): a Rust program using the official async driver
 ([`skytable`](https://crates.io/crates/skytable) 0.8.12 from crates.io). Sessions are typed rows
 looked up by primary key. Counters and token buckets are updated in place by the server
 (`hits += 1`, `tokens -= 1`). Pipelines carry many queries per round trip. Client port:
@@ -9,7 +9,7 @@ looked up by primary key. Counters and token buckets are updated in place by the
 
 ```bash
 make up      # start skyd (4 CPUs / 4 GB)
-make run     # build the showcase image (first time: about a minute) and run it
+make run     # build the app image (first time: about a minute) and run it
 make status  # container state, server version, INSPECT MODEL gateway.sessions
 make cli     # interactive skysh as root
 make down    # remove the containers, the data volume and the built image
@@ -51,18 +51,18 @@ short header, then the queries. The server can't answer before the queries arriv
 its ACK of the header. Nagle holds the queries back until that ACK comes. Every small pipeline
 takes ~41 ms (Linux's minimum delayed ACK): 1 connection, depth 16 does **~390 queries/s with
 p50 41 ms**, against 80–130k queries/s with p50 ~0.08 ms once `TCP_NODELAY` is set. The driver
-doesn't expose its socket, so after each connect the showcase sets `TCP_NODELAY` on every
+doesn't expose its socket, so after each connect the app sets `TCP_NODELAY` on every
 socket the process has open (all of them are Skytable connections; `set_nodelay_on_all_sockets`
-in [`main.rs`](showcase/src/main.rs)). `NODELAY=0` turns that off. Single queries are one write,
+in [`main.rs`](app/src/main.rs)). `NODELAY=0` turns that off. Single queries are one write,
 so Nagle doesn't affect them. `sky-bench` never pipelines.
 
-- [`showcase/Dockerfile`](showcase/Dockerfile) builds with `rust:1.90-slim-bookworm` plus
+- [`app/Dockerfile`](app/Dockerfile) builds with `rust:1.90-slim-bookworm` plus
   `libssl-dev` (the driver always links native-tls/OpenSSL, even for plain TCP), and the final
   image is `debian:bookworm-slim` + `libssl3` + the binary. No host Rust needed.
 - Server: the same image and env-var configuration as [`../single-node`](../single-node)
   (`skytable/skytable:146d8664…`, skyd 0.8.4), with compose caps of 4 CPUs / 4 GB
   (`SKYTABLE_CPUS`, `SKYTABLE_MEM`), the same budget as single-node's `make benchmark`. The
-  showcase client gets 4 CPUs (`SHOWCASE_CPUS`) and reaches the server over the compose network.
+  app client gets 4 CPUs (`APP_CPUS`) and reaches the server over the compose network.
 - Compose project `skytable-session-store`, container `skytable-session-store`, so it runs next to
   `../single-node`.
 

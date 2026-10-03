@@ -1,4 +1,4 @@
-//! Skytable session-store showcase (see ../README.md): an API gateway's session store and
+//! Skytable session-store example (see ../README.md): an API gateway's session store and
 //! per-API-key rate limiter on one Skytable node, through the official async Rust driver.
 //!
 //! 1. schema        space `gateway`: sessions, quotas (sint64 tokens), counters

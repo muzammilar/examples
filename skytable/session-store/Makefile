@@ -5,13 +5,13 @@ up:
 	docker compose logs --no-log-prefix skytable | grep -E 'Skytable v|listening on'
 
 build:
-	docker compose --profile run build showcase
+	docker compose --profile run build app
 
-# the showcase against the running server; it drops and recreates space `gateway`, so it can be
+# runs the app against the running server; it drops and recreates space `gateway`, so it can be
 # repeated (override SESSIONS, LOAD_SINGLE, LOAD_CONNS, PIPE, SCALE_SECS, SCALE_CONNS,
 # SCALE_DEPTHS, CLIENTS, REQUESTS, KEYS, LIMIT, INCREMENTS, NODELAY)
 run:
-	docker compose --progress quiet run --rm --build --no-deps showcase
+	docker compose --progress quiet run --rm --build --no-deps app
 
 status:
 	docker compose ps --format 'table {{.Name}}\t{{.Status}}\t{{.Ports}}'
