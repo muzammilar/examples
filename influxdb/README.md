@@ -23,13 +23,24 @@ under Enterprise, and in the
 Core 3.12 has no compactor, so its Parquet files stay at the 10-minute gen1 size, and one query
 may read at most `--query-file-limit` files (432 by default, 72 h of one table).
 
-- **InfluxDB 3 Enterprise cluster**: `v3-enterprise-docker-compose-cluster/` (branch
-  `influxdb3-enterprise-docker-compose-cluster`). **Not run: blocked on a license.** Enterprise
-  will not start without a license. The free trial (30 days, multi-node, non-commercial) and
-  at-home (2 cores, single node only) licenses both need an email address and a click on a
-  verification link, which nobody did for these examples. What ran: the images pull, MinIO and
-  the token come up, and every node reaches the bucket and exits with `License management
-  error: No interactive TTY detected. Cannot prompt for email.`
+- **InfluxDB 3 Enterprise cluster**: not included, because Enterprise does not start without a
+  license and the free ones need a person to verify an email address. The `home` license
+  (2 cores, no expiry, non-commercial) is single node only. A cluster needs `trial` (30 days,
+  256 cores, non-commercial) or a commercial license
+  ([license docs](https://docs.influxdata.com/influxdb3/enterprise/admin/license/)). To set one up
+  yourself with Docker Compose:
+  1. Run MinIO and create a bucket, as [`v3-core-single-node/`](v3-core-single-node) does.
+  2. Start one node from the `influxdb:<version>-enterprise` image (pin the version) with
+     `influxdb3 serve --node-id ingest-1 --cluster-id cluster0 --mode ingest --object-store s3`
+     and the bucket settings, plus `INFLUXDB3_LICENSE_EMAIL=<you>` and
+     `INFLUXDB3_LICENSE_TYPE=trial`. Click the link in the email from InfluxData. The license is
+     then stored in the bucket at `cluster0/trial_or_home_license`, so later starts skip the
+     email as long as the bucket is kept.
+  3. Add more nodes with the same `--cluster-id` and bucket and their own `--node-id`: a second
+     `--mode ingest`, one or more `--mode query` read replicas, and exactly one `--mode compact`.
+     Give every node the same admin token (`--admin-token-file`).
+  4. Write to any ingest node and query any query node.
+  Layout and flags: the [Enterprise multi-server guide](https://docs.influxdata.com/influxdb3/enterprise/get-started/multi-server/).
 - **Open-source cluster**: only for InfluxDB 1.x, through the third-party fork
   `chengshiwen/influxdb-cluster`, in `v1-oss-cluster/` (branch `influxdb1-oss-cluster`). It ran
   end to end.
