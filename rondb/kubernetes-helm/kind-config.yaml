@@ -1,0 +1,7 @@
+# One node: every RonDB pod (management server, 2 data nodes, MySQL Server, REST API
+# server) runs on it, so the chart is installed with isMultiNodeCluster=false.
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: rondb-helm
+nodes:
+  - role: control-plane

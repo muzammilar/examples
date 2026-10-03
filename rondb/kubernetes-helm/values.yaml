@@ -1,0 +1,78 @@
+# Values for the rondb/rondb chart (https://github.com/logicalclocks/rondb-helm, 26.2.20) on a
+# one-node kind cluster: the chart's values/minikube/mini.yaml sizes, with one node group of
+# two data nodes, one MySQL Server and one REST API server.
+
+imagePullPolicy: IfNotPresent # images are loaded into kind by `make images`
+# no pod anti-affinity: every pod runs on the one kind node
+isMultiNodeCluster: false
+
+clusterSize:
+  # replicas per node group: data nodes node-group-0-0 and -1. The chart writes NoOfReplicas=3
+  # and a third, inactive (NodeActive=0) slot, so this can go up to 3 with `helm upgrade`
+  # (not run here).
+  activeDataReplicas: 2
+  # immutable after install: the chart refuses to change it (see README, Scaling)
+  numNodeGroups: 1
+  minNumMySQLServers: 1
+  maxNumMySQLServers: 2 # config.ini slots for up to 2 MySQL Servers (HPA bound)
+  minNumRdrs: 1
+  maxNumRdrs: 1
+
+resources:
+  limits:
+    cpus:
+      mgmds: 0.2
+      mysqlds: 2
+      ndbmtds: 2 # NumCPUs = 0.9 x this, rounded = 2
+      rdrs: 1
+    memory:
+      # <= 5000 MiB: the chart sets TotalMemoryConfig to 75% of this (2250M; RonDB's minimum is 2G)
+      ndbmtdsMiB: 3000
+      mysqldMiB: 1400
+      rdrsMiB: 500
+  requests:
+    cpus:
+      mgmds: 0.1
+      mysqlds: 0.5
+      rdrs: 0.25
+    memory:
+      mysqldMiB: 650
+      rdrsMiB: 100
+    storage:
+      # per data node: redo log, undo log and the disk-column tablespace, all preallocated
+      # on kind's local-path volumes; the PVC must be >= 2.25 x memory GiB + redo + 2 x undo + log + diskColumn
+      redoLogGiB: 2 # chart minimum
+      undoLogsGiB: 1
+      diskColumnGiB: 1
+      logGiB: 1
+      ndbmtdGiB: 10
+      mgmdGiB: 1
+
+rondbConfig:
+  EmptyApiSlots: 2
+  MaxNoOfAttributes: 4000
+  MaxNoOfConcurrentOperations: 100000
+  MaxNoOfTables: 128
+  MaxNoOfTriggers: 1000
+  MySQLdSlotsPerNode: 2
+  ReplicationMemory: 50M
+  ReservedConcurrentOperations: 20000
+  SchemaMemory: 200M
+  SharedGlobalMemory: 150M
+  TransactionMemory: 150M
+
+terminationGracePeriodSeconds:
+  ndbmtds: 30
+
+# plain TCP inside the cluster (no cert-manager)
+meta:
+  mysqld:
+    statefulSet:
+      endToEndTls:
+        enabled: false
+  rdrs:
+    ingress:
+      enabled: false
+    statefulSet:
+      endToEndTls:
+        enabled: false

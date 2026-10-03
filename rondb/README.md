@@ -6,6 +6,7 @@ Website: https://www.rondb.com/
 - [`docker-compose-cluster/`](docker-compose-cluster) — the minimal cluster from `rondb-docker`: 1 management server, 2 data nodes (1 node group, 2 replicas), 1 MySQL Server and the REST API server, with a `make failover` that stops a data node.
 - [`online-feature-store/`](online-feature-store) — online feature serving (Hopsworks-style feature groups, 1M users x 2 tables) from a Go client: single-row SQL vs `IN` lists vs a pushed join vs REST `pk-read` / `batch`, with p50/p99 and throughput, and serving through a data-node stop/restart.
 - [`online-scaling/`](online-scaling) — what RonDB scales online: 2 → 4 data nodes (activate prepared nodes, `CREATE NODEGROUP`, `REORGANIZE PARTITION` under load), more MySQL / REST API servers, `DataMemory` and threads via rolling restart. Scaling in a node group that holds data is not supported.
+- [`kubernetes-helm/`](kubernetes-helm) — the official RonDB Helm chart (26.2.20) on a one-node kind cluster: 1 management server, 2 data nodes, 1 MySQL Server, 1 REST API server; sysbench load while a data node pod is force-deleted.
 
 RonDB always runs as separate processes (management server, data nodes, MySQL Server), so
 `single-node/` is still three containers: one of each, with one replica. It is the smallest
@@ -22,6 +23,8 @@ Online feature serving, 16 clients each asking for 16 users x 2 feature groups o
 
 Online scaling, sysbench `oltp_read_write`, 16 threads, 4 × 50,000 rows, data nodes and MySQL Servers at 2 CPUs each (2026-10-03): 1,077 tps with 2 data nodes and 1 MySQL Server, 845 tps after growing to 4 data nodes (the single MySQL Server stays the bottleneck), 1,651 tps with a second MySQL Server. The four `REORGANIZE PARTITION`s (~8 s each) stalled writes to 0–22 tps with p99 ~7.9 s, and throughput recovered right after. A rolling restart to `DataMemory` 1G / 3 threads per node kept 1,540–1,662 tps in every 5 s interval. Details: [`online-scaling/README.md`](online-scaling/README.md#benchmark).
 
+Kubernetes (Helm chart on kind), sysbench `oltp_read_write` through the chart's `mysqld` Service, 8 threads, 4 × 50,000 rows, 120 s, data node pod `node-group-0-1` force-deleted 30 s in (2026-10-03): 752 tps / 15.0k qps, p99 51 ms. Every 5 s interval stayed at 730–767 tps, 8 transactions failed, and the data node was `started` again 32 s after the kill (node restart, 18 s). Details: [`kubernetes-helm/README.md`](kubernetes-helm/README.md#failover).
+
 ## Known issues
 
 - `single-node/`: `TotalMemoryConfig` has a 2 GB floor (`Illegal value 1G for parameter TotalMemoryConfig. Legal values are between 2147483648 and 70368744177664`), so the smallest data node sets its memory pools by hand (`AutomaticMemoryConfig=false`). Details: [`single-node/README.md`](single-node/README.md#known-issues).
@@ -31,3 +34,5 @@ Online scaling, sysbench `oltp_read_write`, 16 threads, 4 × 50,000 rows, data n
 - `online-feature-store/` (RonDB 26.02.10): the REST server's `feature_store` and `batch_feature_store` endpoints need the Hopsworks metadata database. On plain RonDB they answer `Database/Table does not exist. Database: hopsworks. Table: feature_store`.
 - `online-feature-store/` (RonDB 26.02.10): the REST server (`rdrs2`) is CPU-bound on JSON. With `NumThreads` 4 it was the bottleneck for batch reads, so the example uses 8.
 - `online-scaling/`: `DROP NODEGROUP` only works on an empty node group, and with data it answers `1006: Illegal reply from server` / `error: -2`. RonDB cannot remove a node group that holds data ([docs](https://docs.rondb.com/rondb_mgm_client/), [Helm chart](https://github.com/logicalclocks/rondb-helm/blob/v26.2.20/templates/topology-immutability.yaml)). `REORGANIZE PARTITION` stalls writes while it runs, and a 4 × 16 MB redo log overloads during `sysbench prepare` (`Got temporary error 410 'REDO log files overloaded ...'`). Details: [`online-scaling/README.md`](online-scaling/README.md#known-issues).
+
+- `kubernetes-helm/`: the chart refuses to change `clusterSize.numNodeGroups` after install (`ERROR: clusterSize.numNodeGroups is immutable (deployed=1, requested=2)`), and `kind load docker-image` fails on Docker Desktop (`ctr: content digest sha256:...: not found`). Details: [`kubernetes-helm/README.md`](kubernetes-helm/README.md#known-issues).
