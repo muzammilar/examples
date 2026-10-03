@@ -1,0 +1,46 @@
+name: dragonfly-single-node
+
+services:
+  dragonfly:
+    image: docker.dragonflydb.io/dragonflydb/dragonfly:${DRAGONFLY_VERSION:-v2.0.0}
+    # same limits as valkey/minimal-lua so the bench numbers compare
+    cpus: 2
+    mem_limit: 1g
+    command: ["--proactor_threads=2", "--maxmemory=1gb"]
+    ulimits:
+      memlock: -1
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 2s
+      retries: 30
+    ports:
+      - "127.0.0.1:${DRAGONFLY_PORT:-6391}:6379"
+
+  app:
+    build:
+      context: .
+      args:
+        GO_VERSION: ${GO_VERSION:-1.26}
+    profiles: [app]
+    environment:
+      DRAGONFLY_ADDR: dragonfly:6379
+    depends_on:
+      dragonfly:
+        condition: service_healthy
+
+  # valkey-benchmark for make bench-resp
+  resp:
+    image: valkey/valkey:9.1.2-alpine
+    profiles: [bench]
+    entrypoint: []
+    depends_on:
+      dragonfly:
+        condition: service_healthy
+
+  # make bench-lua: go/rueidis-lua-bench (linked as bench), rueidis in standalone mode
+  lua:
+    build: bench
+    profiles: [bench]
+    depends_on:
+      dragonfly:
+        condition: service_healthy
