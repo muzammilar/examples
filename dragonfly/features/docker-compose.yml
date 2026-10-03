@@ -1,0 +1,36 @@
+name: dragonfly-features
+
+services:
+  dragonfly:
+    image: docker.dragonflydb.io/dragonflydb/dragonfly:${DRAGONFLY_VERSION:-v2.0.0}
+    container_name: dragonfly-features
+    command:
+      - --proactor_threads=2
+      - --maxmemory=1gb
+      - --memcached_port=11211
+      - --cluster_mode=emulated
+      - --dir=/data
+      - --dbfilename=dump
+    # the image's own healthcheck runs every 30s; poll faster so `up --wait` returns quickly
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+    ports:
+      - "127.0.0.1:6392:6379" # Redis API
+      - "127.0.0.1:11212:11211" # memcached text protocol
+    volumes:
+      - data:/data
+
+  # valkey-cli for the Redis API, busybox nc (part of the alpine image) for memcached
+  tools:
+    image: valkey/valkey:${VALKEY_VERSION:-9.1.2-alpine}
+    profiles: [tools]
+    entrypoint: []
+    volumes:
+      - ./scripts:/scripts:ro
+      - data:/data:ro # to list the snapshot files
+
+volumes:
+  data:
