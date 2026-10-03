@@ -1,0 +1,118 @@
+name: timescaledb-multinode
+
+# Distributed (sharded) TimescaleDB with the LAST release that has multi-node: 2.13.1 on
+# PostgreSQL 15. Multi-node was removed in 2.14.0 (2024-02-08); this image is end-of-life and
+# unpatched. For learning only.
+#   an1        access node: holds the metadata, plans queries, pushes work to the data nodes
+#   dn1..dn3   data nodes: hold the chunks of distributed hypertables
+x-tsdb: &tsdb
+  image: timescale/timescaledb:${TIMESCALEDB_TAG:-2.13.1-pg15}
+  healthcheck:
+    test: ["CMD", "pg_isready", "-h", "localhost", "-U", "postgres"]
+    interval: 2s
+    timeout: 5s
+    retries: 60
+    start_period: 5s
+
+x-datanode: &datanode
+  <<: *tsdb
+  environment:
+    POSTGRES_PASSWORD: tsdb-demo
+    TIMESCALEDB_TELEMETRY: "off"
+    TS_TUNE_MEMORY: 2GB
+    TS_TUNE_NUM_CPUS: "2"
+    # the access node connects as postgres; trust inside the compose network only
+    POSTGRES_HOST_AUTH_METHOD: trust
+  # max_prepared_transactions: two-phase commit, the access node commits a write on several data
+  # nodes atomically; wal_level=logical: timescaledb_experimental.copy_chunk (re-replication)
+  command: ["postgres", "-c", "max_prepared_transactions=150", "-c", "wal_level=logical"]
+
+services:
+  an1:
+    <<: *tsdb
+    container_name: tsdb-an1
+    environment:
+      POSTGRES_PASSWORD: tsdb-demo
+      POSTGRES_DB: tsdb # add_data_node creates this database on each data node
+      TIMESCALEDB_TELEMETRY: "off"
+      TS_TUNE_MEMORY: 2GB
+      TS_TUNE_NUM_CPUS: "2"
+    command: ["postgres", "-c", "max_prepared_transactions=150", "-c", "enable_partitionwise_aggregate=on"]
+    ports:
+      - "${TIMESCALEDB_PORT:-5470}:5432"
+    volumes:
+      - an1-data:/var/lib/postgresql/data
+    depends_on:
+      dn1: { condition: service_healthy }
+      dn2: { condition: service_healthy }
+      dn3: { condition: service_healthy }
+  dn1:
+    <<: *datanode
+    container_name: tsdb-dn1
+    volumes:
+      - dn1-data:/var/lib/postgresql/data
+  dn2:
+    <<: *datanode
+    container_name: tsdb-dn2
+    volumes:
+      - dn2-data:/var/lib/postgresql/data
+  dn3:
+    <<: *datanode
+    container_name: tsdb-dn3
+    volumes:
+      - dn3-data:/var/lib/postgresql/data
+
+  psql:
+    image: timescale/timescaledb:${TIMESCALEDB_TAG:-2.13.1-pg15}
+    profiles: [tools]
+    environment: &pgenv
+      PGHOST: an1
+      PGUSER: postgres
+      PGPASSWORD: tsdb-demo
+      PGDATABASE: tsdb
+    volumes:
+      - ./sql:/sql:ro
+    entrypoint: ["psql", "-v", "ON_ERROR_STOP=1"]
+
+  bench:
+    image: timescale/timescaledb:${TIMESCALEDB_TAG:-2.13.1-pg15}
+    profiles: [bench]
+    cpus: ${BENCH_CLIENT_CPUS:-2}
+    entrypoint: ["bash", "/bench/run.sh"]
+    environment:
+      <<: *pgenv
+      NAME: ${NAME:-}
+      DEVICES: ${DEVICES:-1000}
+      DAYS: ${DAYS:-2}
+      WORKERS: ${WORKERS:-4}
+      BATCH: ${BATCH:-5000}
+      RUNS: ${RUNS:-5}
+    volumes:
+      - ./bench:/bench:ro
+      - ./results:/results
+
+  bench-report:
+    image: ghcr.io/astral-sh/uv:0.12.19-python3.13-trixie-slim
+    profiles: [bench]
+    network_mode: none
+    working_dir: /bench
+    command: ["uv", "run", "--frozen", "report.py"]
+    environment:
+      UV_CACHE_DIR: /uv/cache
+      UV_PROJECT_ENVIRONMENT: /uv/venv
+      UV_PYTHON_DOWNLOADS: never
+      NAME: ${NAME:-}
+      HOST_INFO: ${HOST_INFO:-}
+      DOCKER_INFO: ${DOCKER_INFO:-}
+      BENCH_LIMITS: ${BENCH_LIMITS:-}
+    volumes:
+      - ./bench:/bench:ro
+      - ./results:/results
+      - uv-cache:/uv
+
+volumes:
+  an1-data:
+  dn1-data:
+  dn2-data:
+  dn3-data:
+  uv-cache:

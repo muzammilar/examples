@@ -7,17 +7,20 @@ chunks, a columnstore for older chunks, continuous aggregates, and retention and
 columnstore policies. It is plain SQL on Postgres, so joins with relational tables work.
 
 - [`single-node/`](single-node) — one PostgreSQL 18 + TimescaleDB 2.30 server (`timescale/timescaledb-ha`) on Docker Compose, with a SQL walkthrough: hypertables and chunks, columnstore compression, continuous aggregates with real-time aggregation, `time_bucket_gapfill`, toolkit hyperfunctions, and retention.
+- [`multinode-2.13/`](multinode-2.13) — **legacy, end-of-life**: a real sharded TimescaleDB on the last release that had multi-node (`timescale/timescaledb:2.13.1-pg15`). It has an access node and 3 data nodes, a distributed hypertable with `replication_factor => 2`, chunk placement, aggregate pushdown, and a `make failover` that stops a data node and re-replicates the chunks it missed by hand. For learning only.
 
-There is no sharded (distributed) cluster example. TimescaleDB's multi-node mode (distributed
-hypertables) was deprecated in 2.13 and removed in 2.14
-([CHANGELOG](https://github.com/timescale/timescaledb/blob/main/CHANGELOG.md),
+TimescaleDB's multi-node mode (distributed hypertables) was deprecated in 2.13 and removed in
+[2.14.0](https://github.com/timescale/timescaledb/releases/tag/2.14.0) (2024-02-08; see
 [MultiNodeDeprecation.md](https://github.com/timescale/timescaledb/blob/main/docs/MultiNodeDeprecation.md)).
-A self-hosted TimescaleDB cluster is now Postgres streaming replication: one primary and
-replicas that each hold all the data, for HA and read scaling, not sharding.
+`multinode-2.13/` runs that last release, which is unpatched and stuck on PostgreSQL 13-15. On
+a supported TimescaleDB, a self-hosted cluster is Postgres streaming replication: one primary
+and replicas that each hold all the data, for HA and read scaling, not sharding.
 
 ## Benchmark
 
 `timescaledb-parallel-copy` ingest of 10.08M sensor readings, then dashboard queries, on 4 CPUs / 6 GB (Apple M4 Pro, Docker VM aarch64, 2026-10-02). Writing straight into the columnstore reaches 2.98M rows/s with 8 workers, against 524k rows/s into the rowstore. The columnstore is 7.7x smaller (151 MiB vs 1,164 MiB), and full-scan aggregates run 3-5x faster on it (daily max per device: 1,302 -> 399 ms). A continuous aggregate answers the same query in 28 ms. Full tables and method: [`single-node/README.md`](single-node/README.md#benchmark).
+
+Multi-node 2.13 (end-of-life), 2.88M rows loaded with `timescaledb-parallel-copy` through the access node, each of the 4 containers capped at 2 CPUs / 2 GiB (same hardware, 2026-10-03): a distributed hypertable on 3 data nodes runs full-table aggregates about 2x faster than a local hypertable on one node (max per device 71 vs 124 ms). Ingest is about the same with replication factor 1 (1.20M vs 1.16M rows/s) and half as fast with replication factor 2 (582k rows/s, two-phase commit to two nodes). After stopping a data node, every query failed until `alter_data_node(..., available => false)`, and repairing the 6 under-replicated chunks took a manual `copy_chunk` of ~5 s per chunk. Details: [`multinode-2.13/README.md`](multinode-2.13/README.md#benchmark).
 
 ## Known issues
 
@@ -49,3 +52,15 @@ TimescaleDB 2.30.2, `timescale/timescaledb-ha:pg18.6-ts2.30.2`):
   `timescale/timescaledb` image (~500 MB) has no `timescaledb_toolkit`. On a shared, nearly full
   Docker VM, the 10M-row benchmark once failed with
   `ERROR: could not extend file "base/5/84390": No space left on device`. Keep ~5 GB free.
+- Multi-node 2.13 (`timescale/timescaledb:2.13.1-pg15`, end-of-life): every multi-node call warns
+  `WARNING: adding data node is deprecated` / `DETAIL: Multi-node is deprecated and will be removed in future releases.`
+  A stopped data node makes every query on a distributed hypertable fail
+  (`ERROR: could not connect to "dn2"`), even with `replication_factor => 2`, until
+  `alter_data_node('dn2', available => false)`. Writes made meanwhile leave chunks
+  under-replicated (`WARNING: insufficient number of data nodes`), and nothing repairs them
+  automatically.
+- `timescaledb_experimental.copy_chunk` fails with `ERROR: [dn1]: logical decoding requires wal_level >= logical`
+  unless the data nodes run with `wal_level=logical`. It then fails with
+  `ERROR: [dn2]: relation "_dist_hyper_1_3_chunk" already exists` if the returning node still has a
+  stale copy. The example drops the stale copy with `distributed_exec` first. Each copy took ~5 s,
+  even for small chunks.
