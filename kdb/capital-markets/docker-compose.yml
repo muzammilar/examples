@@ -1,6 +1,6 @@
 name: kdb-markets
 
-# One kdb+ q process (as in ../single-node) and the C++ showcase client (showcase/, KX C API).
+# One kdb+ q process and the C++ client (app/, KX C API).
 # The server needs the kdb+ license (KDB_LICENSE_B64 / ../license), see ../README.md; the client
 # does not. Host port KDB_PORT (default 5102).
 services:
@@ -28,9 +28,9 @@ services:
       timeout: 2s
       retries: 30
 
-  # `make run`: showcase/main.cpp, built against k.h + c.o
-  showcase:
-    build: showcase
+  # `make run`: app/main.cpp, built against k.h + c.o
+  app:
+    build: app
     profiles: [run]
     environment:
       KDB_HOST: kdb

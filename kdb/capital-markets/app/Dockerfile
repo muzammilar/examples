@@ -1,4 +1,4 @@
-# The showcase client: main.cpp linked against KX's C API (k.h + c.o for linux arm64 or amd64)
+# The client: main.cpp linked against KX's C API (k.h + c.o for linux arm64 or amd64)
 # from github.com/KxSystems/kdb at a pinned commit. The C API needs no license.
 FROM debian:trixie-slim AS build
 ARG TARGETARCH
@@ -16,8 +16,8 @@ RUN set -eu; \
 	curl -fsSL -o k.h "$base/c/c/k.h"; curl -fsSL -o c.o "$base/$d/c.o"; \
 	printf '%s  k.h\n%s  c.o\n' 7da364e03c053942ab35ea52da28c6fe75dda69aba6dc25fbd7503e42a72209a "$sum" | sha256sum -c -
 COPY main.cpp .
-RUN g++ -O2 -std=c++20 -Wall -Wextra -I. main.cpp c.o -lpthread -o showcase
+RUN g++ -O2 -std=c++20 -Wall -Wextra -I. main.cpp c.o -lpthread -o capital-markets
 
 FROM debian:trixie-slim
-COPY --from=build /build/showcase /usr/local/bin/showcase
-CMD ["showcase"]
+COPY --from=build /build/capital-markets /usr/local/bin/capital-markets
+CMD ["capital-markets"]

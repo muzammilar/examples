@@ -1,7 +1,7 @@
-# kdb+ — capital markets showcase (C++ client)
+# kdb+ — capital markets (C++ client)
 
 Tick data analytics, the workload kdb+ was built for, on one q process driven by
-[`showcase/main.cpp`](showcase/main.cpp): a C++ program using KX's official C API (`k.h` + `c.o`).
+[`app/main.cpp`](app/main.cpp): a C++ program using KX's official C API (`k.h` + `c.o`).
 The server is the shared [`../image`](../image) (kdb+ 4.1, `q -p 5000 -s 4`, host port `5102`,
 override with `KDB_PORT`) and needs a kdb+ license key (free: KDB-X Community Edition), see
 [`../README.md#license`](../README.md#license); the client does not.
@@ -9,7 +9,7 @@ override with `KDB_PORT`) and needs a kdb+ license key (free: KDB-X Community Ed
 ```bash
 make up      # build the image and start q
 make build   # build the C++ client image (k.h + c.o, g++)
-make run     # run the showcase (TRADES=20000000 QUOTES_PER_TRADE=2 SYMS=100 BATCH=1000000)
+make run     # run the analytics (TRADES=20000000 QUOTES_PER_TRADE=2 SYMS=100 BATCH=1000000)
 make status  # container state
 make down    # remove the containers and the built images
 ```
@@ -45,7 +45,7 @@ which allows about `TRADES=50000000` (~150M rows).
 
 The C API is two files from [github.com/KxSystems/kdb](https://github.com/KxSystems/kdb) (Apache
 2.0): `c/c/k.h` and the prebuilt object `l64arm/c.o` (or `l64/c.o` on amd64), pinned to commit
-`3af0d47` with sha256 checks in [`showcase/Dockerfile`](showcase/Dockerfile), which compiles
+`3af0d47` with sha256 checks in [`app/Dockerfile`](app/Dockerfile), which compiles
 `main.cpp` with Debian's g++ (`-std=c++20`, `-lpthread`, nothing else) and copies the 80 KB binary
 into `debian:trixie-slim`. It connects with `khpunc(..., capability 1)` so a message may exceed
 2 GB. `k.h` defines one-letter macros (`O`, `R`, `U`, `Z`, ...), which `main.cpp` undefines after

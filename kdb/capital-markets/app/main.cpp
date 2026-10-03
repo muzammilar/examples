@@ -1,4 +1,4 @@
-// Capital-markets showcase: a C++ client of one kdb+ q process, using KX's C API (k.h + c.o).
+// Capital markets: a C++ client of one kdb+ q process, using KX's C API (k.h + c.o).
 //
 // 1. simulates one trading day (09:30-16:00) for SYMS symbols in C++: a stream of quotes (random
 //    walk mid, 1-5 cent spread) and trades that hit the current bid or ask or print at the mid,
@@ -52,7 +52,7 @@ double ms_since(Clock::time_point t0) {
 
 int h = 0; // IPC handle
 
-// drop the showcase's globals on the server (functional delete from the root namespace)
+// drop this program's globals on the server (functional delete from the root namespace)
 const char* DROP = "![`.;();0b;(`trade`quote`taq`bars`es`rv`wjr) inter key `.]; .Q.gc[]";
 
 // run q code on the server and return the result; dies on a q error (type -128)

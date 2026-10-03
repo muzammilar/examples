@@ -11,12 +11,12 @@ up: license
 
 # the C++ client image (k.h + c.o from KxSystems/kdb); needs no license
 build:
-	docker compose --profile run build showcase
+	docker compose --profile run build app
 
-# the showcase against the running server (override TRADES, QUOTES_PER_TRADE, SYMS, BATCH);
+# the analytics run against the running server (override TRADES, QUOTES_PER_TRADE, SYMS, BATCH);
 # each run replaces the tables, so it can be repeated
 run:
-	docker compose --progress quiet run --rm --build showcase
+	docker compose --progress quiet run --rm --build app
 
 status:
 	docker compose ps --format 'table {{.Name}}\t{{.Status}}\t{{.Ports}}'
