@@ -1,0 +1,25 @@
+apiVersion: dragonflydb.io/v1alpha1
+kind: Dragonfly
+metadata:
+  name: dragonfly
+  namespace: dragonfly
+spec:
+  replicas: 3 # 1 primary + 2 replicas
+  image: docker.dragonflydb.io/dragonflydb/dragonfly:v2.0.0
+  args:
+    - --proactor_threads=1
+    - --maxmemory=512mb
+    - --dbfilename=dump # one file overwritten by each snapshot, not dump-<timestamp>
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      memory: 768Mi
+  snapshot:
+    cron: "* * * * *"
+    persistentVolumeClaimSpec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 1Gi
