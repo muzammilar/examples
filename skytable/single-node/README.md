@@ -115,5 +115,6 @@ limits how much CPU time they get.
   ~1.5, so neither is the limit. The cost is one network round trip per query, and more
   connections mostly trade latency for a little throughput.
 - Pipelining (many queries per round trip, from Skytable drivers) removes that cost. `sky-bench`
-  0.8.4 does not pipeline.
+  0.8.4 does not pipeline. [`../session-store`](../session-store) measures it
+  with the Rust driver.
 - Each phase takes about 5 s, so repeat a run before comparing small differences.
