@@ -1,0 +1,54 @@
+name: skytable-session-store
+
+# One Skytable server, configured as in ../single-node, plus the Rust showcase client.
+# Both get fixed CPU/memory caps so the numbers are comparable with ../single-node's benchmark.
+services:
+  skytable:
+    image: skytable/skytable:${SKYTABLE_IMAGE_TAG:-146d866452d937da8a987c92b3a12d42588ee86f}
+    container_name: skytable-session-store
+    entrypoint: ["skyd"]
+    cpus: ${SKYTABLE_CPUS:-4}
+    mem_limit: ${SKYTABLE_MEM:-4g}
+    environment:
+      SKYDB_RUN_MODE: prod
+      SKYDB_ENDPOINTS: tcp@0.0.0.0:2003
+      SKYDB_AUTH_PLUGIN: pwd
+      SKYDB_AUTH_ROOT_PASSWORD: ${SKYTABLE_PASSWORD:-skytable-root-password}
+      SKYDB_PASSWORD: ${SKYTABLE_PASSWORD:-skytable-root-password} # read by skysh
+    ports:
+      - "${SKYTABLE_PORT:-2013}:2003"
+    volumes:
+      - skytable-data:/var/lib/skytable
+    healthcheck:
+      test: ["CMD", "skysh", "-e", "sysctl report status"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+
+  # `make run`: showcase/ (Rust, official `skytable` driver from crates.io)
+  showcase:
+    build: showcase
+    profiles: [run]
+    cpus: ${SHOWCASE_CPUS:-4}
+    environment:
+      SKYTABLE_HOST: skytable
+      SKYTABLE_PORT: 2003
+      SKYDB_PASSWORD: ${SKYTABLE_PASSWORD:-skytable-root-password}
+      SESSIONS: ${SESSIONS:-200000}
+      LOAD_SINGLE: ${LOAD_SINGLE:-20000}
+      LOAD_CONNS: ${LOAD_CONNS:-8}
+      PIPE: ${PIPE:-500}
+      SCALE_SECS: ${SCALE_SECS:-2}
+      SCALE_CONNS: ${SCALE_CONNS:-1,4,16,64}
+      SCALE_DEPTHS: ${SCALE_DEPTHS:-1,16}
+      CLIENTS: ${CLIENTS:-32}
+      REQUESTS: ${REQUESTS:-2000}
+      KEYS: ${KEYS:-50}
+      LIMIT: ${LIMIT:-500}
+      INCREMENTS: ${INCREMENTS:-1000}
+      NODELAY: ${NODELAY:-1} # 0: leave Nagle on, as the driver does
+    depends_on:
+      skytable: { condition: service_healthy }
+
+volumes:
+  skytable-data:

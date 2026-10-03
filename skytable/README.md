@@ -3,6 +3,7 @@
 Website: https://skytable.io/
 
 - [`single-node/`](single-node) — one `skyd` 0.8.4 (official multi-arch image) on Docker Compose with a root password, BlueQL through `skysh` (spaces, models, all data types, point DML, a standard user), and `sky-bench`.
+- [`session-store-showcase/`](session-store-showcase) — an API gateway's session store and per-key rate limiter in Rust (official `skytable` driver): typed session rows; in-place `hits += 1` / `tokens -= 1` that stay exact under 32 concurrent clients, where read-modify-write loses 94%; pipelining against one query per round trip; and the driver's 41 ms Nagle stall on small pipelines.
 
 There is no cluster example: Skytable 0.8.4 (August 2024) is the latest release and runs as a
 single node only. It has no replication or clustering code, and no setting for either. The docs
