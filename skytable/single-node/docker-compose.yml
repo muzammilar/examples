@@ -1,0 +1,74 @@
+name: skytable-single
+
+# One Skytable server (skyd). The official image's entrypoint (start-server.sh) writes a random
+# root password into its config file; here skyd is started directly and configured through its
+# SKYDB_* environment variables instead, so the root password is known (min. 16 characters).
+x-image: &image skytable/skytable:${SKYTABLE_IMAGE_TAG:-146d866452d937da8a987c92b3a12d42588ee86f}
+
+services:
+  skytable:
+    image: *image
+    container_name: skytable
+    entrypoint: ["skyd"]
+    environment:
+      SKYDB_RUN_MODE: prod
+      SKYDB_ENDPOINTS: tcp@0.0.0.0:2003
+      SKYDB_AUTH_PLUGIN: pwd
+      SKYDB_AUTH_ROOT_PASSWORD: ${SKYTABLE_PASSWORD:-skytable-root-password}
+      # reliability service window: DML changes reach disk at most this many seconds later
+      SKYDB_SERVICE_WINDOW: ${SKYTABLE_SERVICE_WINDOW:-300}
+      SKYDB_PASSWORD: ${SKYTABLE_PASSWORD:-skytable-root-password} # read by skysh (make cli/test)
+    ports:
+      - "${SKYTABLE_PORT:-2003}:2003"
+    volumes:
+      - skytable-data:/var/lib/skytable # the image's working directory: gns.db-tlog, data/
+      - ./blueql:/blueql:ro
+    healthcheck:
+      test: ["CMD", "skysh", "-e", "sysctl report status"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+
+  # `make benchmark`: sky-bench from the v0.8.4 release bundle (bench/Dockerfile), sharing the
+  # server's network namespace; raw output to results/
+  bench:
+    build: bench
+    profiles: [bench]
+    cpus: ${BENCH_CLIENT_CPUS:-4}
+    network_mode: service:skytable
+    entrypoint: ["sh", "/bench/run.sh"]
+    environment:
+      NAME: ${NAME:-}
+      SKYDB_PASSWORD: ${SKYTABLE_PASSWORD:-skytable-root-password}
+      ROWS: ${ROWS:-1000000}
+      THREADS: ${THREADS:-4}
+      CONNECTIONS: ${CONNECTIONS:-32}
+    volumes:
+      - ./bench:/bench:ro
+      - ./results:/results
+    depends_on:
+      skytable: { condition: service_healthy }
+
+  # `make benchmark`: parses the raw output (bench/report.py) into a table and results/*.json
+  bench-report:
+    image: ghcr.io/astral-sh/uv:0.12.19-python3.13-trixie-slim
+    profiles: [bench]
+    network_mode: none
+    working_dir: /bench
+    command: ["uv", "run", "--frozen", "report.py"]
+    environment:
+      UV_CACHE_DIR: /uv/cache          # the venv lives in the uv volume, so reruns skip creating it
+      UV_PROJECT_ENVIRONMENT: /uv/venv
+      UV_PYTHON_DOWNLOADS: never       # use the image's Python
+      NAME: ${NAME:-}
+      HOST_INFO: ${HOST_INFO:-}
+      DOCKER_INFO: ${DOCKER_INFO:-}
+      BENCH_LIMITS: ${BENCH_LIMITS:-}
+    volumes:
+      - ./bench:/bench:ro
+      - ./results:/results
+      - uv-cache:/uv
+
+volumes:
+  skytable-data:
+  uv-cache:
