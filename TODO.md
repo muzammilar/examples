@@ -5,7 +5,7 @@ Candidate databases and systems to add as examples. Branch names follow the exis
 
 ## Already covered
 
-- **On `main`:** ClickHouse, CockroachDB, YugabyteDB, Elasticsearch, Kafka, NATS, Neo4j, NebulaGraph, ArangoDB, Dragonfly, Garnet/Valkey (Go comparison), Postgres (k8s/vagrant), MySQL and SQLite clients, Airflow.
+- **On `main`:** ClickHouse, CockroachDB, YugabyteDB, Elasticsearch, Kafka, NATS, Neo4j, NebulaGraph, ArangoDB, Garnet/Valkey (Go comparison), Postgres (k8s/vagrant), MySQL and SQLite clients, Airflow.
 - **On branches:** Aerospike, FoundationDB, TiDB, TiKV, YDB, OceanBase, RonDB, SingleStore, ScyllaDB, TigerBeetle, CedarDB, DuckDB, Milvus, Qdrant, Weaviate.
 
 ## Priority
@@ -17,7 +17,6 @@ Candidate databases and systems to add as examples. Branch names follow the exis
 - [ ] StarRocks
 - [ ] Iceberg + Trino + MinIO
 - [ ] MongoDB replica set
-- [ ] Valkey cluster
 - [ ] Temporal
 - [ ] Restate
 - [ ] Redpanda
@@ -116,7 +115,6 @@ Candidate databases and systems to add as examples. Branch names follow the exis
 
 ## Key-value and cache
 
-- [ ] `valkey-cluster`: Valkey 9 cluster with atomic slot migration.
 - [ ] `redis8-single-node`: Redis 8 (AGPL option) with built-in JSON, search and vector sets.
 - [ ] `kvrocks-single-node`: Redis protocol on RocksDB.
 - [ ] `garnet-docker-compose-cluster`: Microsoft Garnet (.NET) standalone and cluster mode; Tsavorite storage with tiering to disk, checkpoints and AOF.
