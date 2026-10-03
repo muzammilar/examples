@@ -17,9 +17,19 @@ MIN_LOG ?= 2Gi
 # 11.x client requires TLS by default ("SSL is required, but the server does not support it")
 SQL = $(KUBECTL) -n $(NAMESPACE) exec -i sql-client -- mariadb --skip-ssl -h obcluster-standalone-svc -P 2881 --table
 
-.PHONY: up test status cli cli-sys down kind-cluster cert-manager operator cluster tenant client
+.PHONY: aio-max-nr up test status cli cli-sys down kind-cluster cert-manager operator cluster tenant client
 
-up: kind-cluster cert-manager operator cluster tenant client
+# obd refuses to start an observer when the kernel's async-I/O limit is nearly used up (ScyllaDB
+# and other OceanBase stacks on the same Docker VM use it too). Raise fs.aio-max-nr if it is lower
+# than AIO_MAX_NR. Not namespaced: on Docker Desktop this is the whole Docker VM until Docker
+# restarts; on a Linux host it changes the host kernel. `AIO_MAX_NR=0` leaves it unchanged.
+AIO_MAX_NR ?= 1048576
+aio-max-nr:
+	@docker run --rm --privileged busybox:1.37 sh -c 'cur=$$(cat /proc/sys/fs/aio-max-nr); \
+		if [ $(AIO_MAX_NR) -gt "$$cur" ]; then sysctl -w fs.aio-max-nr=$(AIO_MAX_NR); \
+		else echo "fs.aio-max-nr = $$cur (fs.aio-nr = $$(cat /proc/sys/fs/aio-nr))"; fi'
+
+up: aio-max-nr kind-cluster cert-manager operator cluster tenant client
 
 # The observer image (1.7 GB) is side-loaded from local Docker when it is there
 # (`docker pull $(OB_IMAGE)`), instead of letting the worker pull it.

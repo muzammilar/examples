@@ -1,11 +1,21 @@
-.PHONY: up run status cli logs down
+.PHONY: aio-max-nr up run status cli logs down
 
 SYS := docker exec -i oceanbase-htap obclient -h127.1 -P2881 -uroot@sys -A --table
 TEST := docker exec -i oceanbase-htap obclient -h127.1 -P2881 -uroot@test -A --table
 
 # Bootstrap (obd deploy + start + tenant `test`) takes 1-5 minutes; the healthcheck passes once
 # root@test connects, the entrypoint prints "boot success!" after its last step. Then build the app.
-up:
+# obd refuses to start an observer when the kernel's async-I/O limit is nearly used up (ScyllaDB
+# and other OceanBase stacks on the same Docker VM use it too). Raise fs.aio-max-nr if it is lower
+# than AIO_MAX_NR. Not namespaced: on Docker Desktop this is the whole Docker VM until Docker
+# restarts; on a Linux host it changes the host kernel. `AIO_MAX_NR=0` leaves it unchanged.
+AIO_MAX_NR ?= 1048576
+aio-max-nr:
+	@docker run --rm --privileged busybox:1.37 sh -c 'cur=$$(cat /proc/sys/fs/aio-max-nr); \
+		if [ $(AIO_MAX_NR) -gt "$$cur" ]; then sysctl -w fs.aio-max-nr=$(AIO_MAX_NR); \
+		else echo "fs.aio-max-nr = $$cur (fs.aio-nr = $$(cat /proc/sys/fs/aio-nr))"; fi'
+
+up: aio-max-nr
 	docker compose up --detach --wait --wait-timeout 900
 	@for i in $$(seq 1 120); do \
 		log=$$(docker logs oceanbase-htap 2>&1); \

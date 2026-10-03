@@ -16,7 +16,7 @@ elif [ -f /license/k4.lic ]; then
 	cp /license/k4.lic "$QLIC/k4.lic"
 else
 	echo "kdb+: no license. Set KDB_LICENSE_B64 (base64 kc.lic) / KDB_LICENSE_K4B64 (base64 k4.lic)" >&2
-	echo "kdb+: or put kc.lic / k4.lic in kdb/license/; how to get a free key: kdb/README.md#license" >&2
+	echo "kdb+: or put kc.lic / k4.lic in kdb/license/; how to get a free key: kdb/README.md#license-required-before-running" >&2
 	exit 64
 fi
 exec "$@"

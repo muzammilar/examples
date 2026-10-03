@@ -64,10 +64,13 @@ not run: it would need about 40 GB of preallocated disk. Details:
 
 Seen while building these examples (oceanbase-ce 4.4.2.1, 2026-10-02):
 
-- obd refuses to start the observer when the Docker VM's `fs.aio-max-nr` is nearly used up,
-  for example by a ScyllaDB container on the same VM. Raise it with
-  `docker run --rm --privileged alpine sysctl -w fs.aio-max-nr=1048576`; it resets when Docker
-  restarts.
+- obd refuses to start the observer (`OBD-1011: Insufficient AIO`) when the kernel's
+  `fs.aio-max-nr` (65536 by default in Docker Desktop's VM) is nearly used up, for example by
+  ScyllaDB or a second OceanBase stack on the same VM. Every example's `make up` now runs
+  `make aio-max-nr` first: a privileged one-shot `busybox` container raises it to 1048576 (override
+  with `AIO_MAX_NR=...`, `AIO_MAX_NR=0` leaves it unchanged) and otherwise prints the current limit and usage.
+  The setting is not namespaced: on Docker Desktop it applies to the whole Docker VM until Docker
+  restarts, and on a Linux host it changes the host kernel.
 - obd's disk check needs ~10 GB free in the Docker VM, so `make up` fails on a nearly full disk.
 - In `MODE=mini`, a 2M-row load stalls at ~200k rows with the default memstore limit. The
   HTAP example sets `memstore_limit_percentage = 50`.
@@ -80,8 +83,8 @@ Seen while building these examples (oceanbase-ce 4.4.2.1, 2026-10-02):
   'homo', not 'hetero'`; use `ALTER RESOURCE TENANT <tenant> UNIT_NUM = n`. Scale in with
   `DELETE UNIT_GROUP (<id>)`: without it the root service dropped the original units and got stuck
   migrating the tenant's LS 1 (`ret:-4737, OB_LS_EXIST`) ([`scale-out-in/`](scale-out-in/README.md#scale-in)).
-- Six observers exhaust the Docker VM's default `fs.aio-max-nr` (65536; `fs.aio-nr` reached
-  55,152). Raise it with `docker run --rm --privileged alpine sysctl -w fs.aio-max-nr=1048576`.
+- Six observers alone nearly exhaust the default `fs.aio-max-nr` (65536; `fs.aio-nr` reached
+  55,152), which `make up` raises (see above).
 - Tenant CPU caps (`MAX_CPU`) need cgroups. In these containers the observer logs
   `check_cgroup_root_dir ... ret=-4027`, and 4.4.2.1 CE does not use cgroup v2 (`cgroup/cgroup.clone_children`
   not found), so `MAX_CPU` changes did not change throughput.

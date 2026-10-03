@@ -121,7 +121,6 @@ tenant with its own CPU/memory unit for analytics) does not fit in the `mini` ob
   default) is still ~78% full from the first run, and writes are throttled until checkpoints
   catch up.
 - obd checks host limits before deploying. On a Docker VM shared with ScyllaDB, `fs.aio-max-nr`
-  (65536) was nearly used up and obd refused to start (`OBD-1011: Insufficient AIO`). The fix is to
-  raise it in the Docker VM (`docker run --rm --privileged alpine sysctl -w fs.aio-max-nr=1048576`;
-  this resets when Docker restarts). obd also wants ~10G of free disk in the Docker VM, for the
+  (65536) was nearly used up and obd refused to start (`OBD-1011: Insufficient AIO`). `make up`
+  now raises it first (`make aio-max-nr`, see [`../README.md`](../README.md#known-issues)). obd also wants ~10G of free disk in the Docker VM, for the
   preallocated 2G data file and 4G log disk.

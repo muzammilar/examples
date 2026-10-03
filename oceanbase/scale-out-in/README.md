@@ -197,9 +197,8 @@ failed for over 2 minutes with
 Measured: about 2.6–3.1 GiB resident per observer after `make up`, 3.7 GiB on ob1 after the
 runs. obproxy uses about 240 MB. Six observers at 4G each fit in the 24.4 GB Docker VM. The 6G of the
 cluster example would not. The VM's `fs.aio-max-nr` (65536) runs out with six observers:
-`fs.aio-nr` reached 55,152 with ob1..ob6 started. Raise it once with
-`docker run --rm --privileged alpine sysctl -w fs.aio-max-nr=1048576` (it resets when Docker
-restarts). Disk: about 6.1 GB preallocated per observer, up to 37 GB with six, plus the 1.9 GB image.
+`fs.aio-nr` reached 55,152 with ob1..ob6 started. `make up` raises it to 1048576 first
+(`make aio-max-nr`, see [`../README.md`](../README.md#known-issues)). Disk: about 6.1 GB preallocated per observer, up to 37 GB with six, plus the 1.9 GB image.
 
 ## Known issues
 
