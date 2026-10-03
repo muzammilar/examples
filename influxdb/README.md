@@ -10,6 +10,7 @@ InfluxDB 1.x (TSM engine, InfluxQL) is the previous generation.
 
 - [`v3-core-single-node/`](v3-core-single-node) — InfluxDB 3 Core: `influxdb3 serve` on MinIO (S3) with an offline admin token: line protocol over the v3/v2/v1 write APIs, SQL and InfluxQL, last/distinct value caches, a WAL and a schedule plugin in the embedded Python processing engine, and the Parquet files it writes to the bucket.
 - [`iot-fleet/`](iot-fleet) — InfluxDB 3 Core, an IoT fleet in Rust (reqwest against the HTTP API): ingest at 1k–1M series, dashboard queries through the last/distinct value caches vs plain SQL, a week of history in Parquet, and the query file limit that bounds it in Core.
+- [`v1-oss-cluster/`](v1-oss-cluster) — InfluxDB **1.8** clustering from the third-party MIT fork `chengshiwen/influxdb-cluster` (dormant since 2024-09): 3 meta + 2 data nodes, replication factor 2, write consistency levels, `make failover` with hinted handoff.
 
 ## Clusters
 
@@ -66,6 +67,16 @@ whole cache took 1.2 s, 5–80x slower than SQL. 7 days × 1,000 devices (2M row
 Parquet files, 18 MB, 9 bytes/row. Queries over up to 2 days take 5–10 ms. The 7-day query fails
 on Core's 432-file limit; with `--query-file-limit=2500` it takes 22 ms.
 
+**1.8 OSS cluster fork** ([`v1-oss-cluster`](v1-oss-cluster/README.md#benchmark), `make
+benchmark`): Python HTTP writer, 2M rows / 10k series into a replication-factor-2 database, two
+data nodes with 1.5 CPUs / 2.25 GB each and three meta nodes with 0.33 CPU each (Apple M4 Pro,
+Docker VM aarch64, 2026-10-03). Throughput was 202k rows/s with 16 writers at `consistency=one`,
+201k/s at `consistency=all` and 252k/s with 4 writers. Every row is stored on both nodes. With
+`one`, the second replica trailed the acks by up to 60k rows and caught up 1.3–1.8 s after the
+last one. Through the TSM index, `last()` for one series takes 0.14 ms and 200 points of one
+series 0.44 ms. `count` over 2M points takes 310 ms and `last() GROUP BY host` over 10k series
+172 ms.
+
 ## Known issues
 
 InfluxDB 3 Core is actively developed: 3.12.0 is from 2026-10, with several minor releases since
@@ -104,3 +115,20 @@ InfluxDB 3 Core is actively developed: 3.12.0 is from 2026-10, with several mino
   was back, with no rows lost. Keep a few GB free.
 - MinIO no longer publishes community images, so the examples use Chainguard's `latest` build
   pinned by digest.
+
+InfluxDB 1.x cluster fork (`chengshiwen/influxdb:1.8.11-c1.2.0`, 2026-10-03):
+
+- **`chengshiwen/influxdb-cluster` is a dormant third-party project.** It is not from
+  InfluxData, and its last release, image and commit (`v1.8.11-c1.2.0`) are from 2024-09-08. It
+  is based on InfluxDB 1.8, which is itself in maintenance.
+- After `make failover` (restarting data nodes), `DROP DATABASE fleet` + `CREATE DATABASE fleet`
+  twice left the replicas **diverged**: data-1 counted 60 rows, data-2 122 (62/124 the first
+  time). The recreated database reused the dropped one's shard id, and the restarted node still
+  had the old data under it. A third try got a fresh shard id and matched. `make down && make
+  up` starts clean.
+- A `consistency=all` write with one replica down answers `500 {"error":"partial write"}` but is
+  not rolled back. The point is stored on the live node and queued for the other.
+- `/query` with `Accept: application/csv` prints the integer `replicaN` column of `SHOW
+  RETENTION POLICIES` as the literal text `replicaN`. JSON is correct.
+- Right after the join, `influxd-ctl show` lists some nodes with an empty version column. It
+  fills in after a few seconds.
