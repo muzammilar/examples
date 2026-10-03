@@ -2,15 +2,7 @@
 
 The minimal RonDB (MySQL NDB Cluster fork by Hopsworks) cluster that
 [rondb-docker](https://github.com/logicalclocks/rondb-docker) builds, written out as a plain
-compose file:
-
-| service  | process                            | node id | role                                                    |
-|----------|------------------------------------|---------|---------------------------------------------------------|
-| `mgmd`   | `ndb_mgmd`                         | 65      | management server: hands out [`config/config.ini`](config/config.ini), arbitrator |
-| `ndbd-1` | `ndbmtd`                           | 1       | data node, node group 0                                 |
-| `ndbd-2` | `ndbmtd`                           | 2       | data node, node group 0 (`NoOfReplicas=2`: a replica of every fragment) |
-| `mysqld` | `mysqld`                           | 67      | MySQL Server, SQL on top of the NDB tables              |
-| `rest`   | `rdrs2`                            | 195     | REST API server: pk-read / batch / scan over HTTP via the NDB API |
+compose file.
 
 ```bash
 make up        # start in order (mgmd -> data nodes -> mysqld -> rest), ~40 s
@@ -23,6 +15,16 @@ make status    # ndb_mgm -e show, all report memory
 make cli       # interactive mysql client (root) on the MySQL Server
 make down      # remove containers, the data nodes' volumes and the built bench image
 ```
+
+Services:
+
+| service  | process                            | node id | role                                                    |
+|----------|------------------------------------|---------|---------------------------------------------------------|
+| `mgmd`   | `ndb_mgmd`                         | 65      | management server: hands out [`config/config.ini`](config/config.ini), arbitrator |
+| `ndbd-1` | `ndbmtd`                           | 1       | data node, node group 0                                 |
+| `ndbd-2` | `ndbmtd`                           | 2       | data node, node group 0 (`NoOfReplicas=2`: a replica of every fragment) |
+| `mysqld` | `mysqld`                           | 67      | MySQL Server, SQL on top of the NDB tables              |
+| `rest`   | `rdrs2`                            | 195     | REST API server: pk-read / batch / scan over HTTP via the NDB API |
 
 - MySQL: `localhost:3307`, user `rondb` / `rondb` (override the port with `RONDB_MYSQL_PORT`);
   inside the container `mysql -uroot` has no password.
