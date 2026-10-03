@@ -7,10 +7,13 @@ chunks, a columnstore for older chunks, continuous aggregates, and retention and
 columnstore policies. It is plain SQL on Postgres, so joins with relational tables work.
 
 - [`single-node/`](single-node) — one PostgreSQL 18 + TimescaleDB 2.30 server (`timescale/timescaledb-ha`) on Docker Compose, with a SQL walkthrough: hypertables and chunks, columnstore compression, continuous aggregates with real-time aggregation, `time_bucket_gapfill`, toolkit hyperfunctions, and retention.
+- [`docker-compose-cluster/`](docker-compose-cluster) — three nodes under Patroni (one primary, two streaming replicas), a 3-member etcd cluster and HAProxy with read-write and read-only ports, plus `make failover`, `make switchover` and `make sync`. This is replication for HA and read scaling, not sharding: TimescaleDB multi-node was removed in 2.14.
 
 ## Benchmark
 
 `timescaledb-parallel-copy` ingest of 10.08M sensor readings, then dashboard queries, on 4 CPUs / 6 GB (Apple M4 Pro, Docker VM aarch64, 2026-10-02). Writing straight into the columnstore reaches 2.98M rows/s with 8 workers, against 524k rows/s into the rowstore. The columnstore is 7.7x smaller (151 MiB vs 1,164 MiB), and full-scan aggregates run 3-5x faster on it (daily max per device: 1,302 -> 399 ms). A continuous aggregate answers the same query in 28 ms. Full tables and method: [`single-node/README.md`](single-node/README.md#benchmark).
+
+Patroni cluster, 2 CPUs / 4 GiB per node (same hardware and date): a 2.88M-row load writes 566 MiB of WAL into the rowstore against 41 MiB straight into the columnstore (2.47M vs 580k rows/s), so the replicas also replay 14x less. Synchronous replication costs nothing measurable for 5,000-row `COPY` batches. Two replicas serve 16.1k read queries/s, against 8.0k/s on the primary alone. Stopping the primary interrupted writes for ~18 s and lost no acknowledged insert. Details: [`docker-compose-cluster/README.md`](docker-compose-cluster/README.md#benchmark).
 
 ## Known issues
 
@@ -42,3 +45,14 @@ TimescaleDB 2.30.2, `timescale/timescaledb-ha:pg18.6-ts2.30.2`):
   `timescale/timescaledb` image (~500 MB) has no `timescaledb_toolkit`. On a shared, nearly full
   Docker VM, the 10M-row benchmark once failed with
   `ERROR: could not extend file "base/5/84390": No space left on device`. Keep ~5 GB free.
+- Patroni cluster (Patroni 4.1.5, etcd v3.6.15): after `docker stop` of the primary, Postgres
+  shut down within a second, but the leader key stayed in etcd until its 20 s TTL expired
+  (`etcdctl get /service/tsdb/leader` still returned the stopped node, and the container exited
+  137). The replicas promoted only then, about 17 s later. Running Patroni under tini
+  (`init: true`) changed nothing, so the example keeps the image's entrypoint and documents the
+  TTL wait. `make switchover` does not have this problem (~6 s).
+- The leader key's TTL, not Postgres, sets the failover time: ~17 s with `ttl: 20`. Shorter TTLs
+  fail over faster but risk false failovers on a loaded laptop.
+- There is no Kubernetes variant (CloudNativePG + a TimescaleDB image). With the shared Docker
+  VM's disk nearly full (the 3 GB timescaledb-ha image plus a kind node), it was not cheap to
+  add.

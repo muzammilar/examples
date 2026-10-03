@@ -1,0 +1,177 @@
+name: timescaledb-cluster
+
+# Three TimescaleDB nodes managed by Patroni (bundled in timescale/timescaledb-ha): one primary,
+# two streaming replicas, leader election in a 3-member etcd cluster, HAProxy in front.
+# Every node holds the whole database; this is replication for availability and read scaling,
+# not sharding (TimescaleDB multi-node was removed in 2.14).
+x-etcd: &etcd
+  image: quay.io/coreos/etcd:${ETCD_VERSION:-v3.6.15}
+  environment: &etcdenv
+    ETCD_INITIAL_CLUSTER: etcd1=http://etcd1:2380,etcd2=http://etcd2:2380,etcd3=http://etcd3:2380
+    ETCD_INITIAL_CLUSTER_STATE: new
+    ETCD_INITIAL_CLUSTER_TOKEN: tsdb-etcd
+    ETCD_LISTEN_PEER_URLS: http://0.0.0.0:2380
+    ETCD_LISTEN_CLIENT_URLS: http://0.0.0.0:2379
+    ETCD_DATA_DIR: /etcd-data
+  healthcheck:
+    test: ["CMD", "etcdctl", "endpoint", "health"]
+    interval: 2s
+    timeout: 3s
+    retries: 30
+
+x-tsdb: &tsdb
+  image: timescale/timescaledb-ha:${TIMESCALEDB_TAG:-pg18.6-ts2.30.2}
+  command: ["patroni", "/config/patroni.yml"]
+  shm_size: 512m
+  depends_on:
+    etcd1: { condition: service_healthy }
+    etcd2: { condition: service_healthy }
+    etcd3: { condition: service_healthy }
+  healthcheck:
+    # Patroni's REST API: 200 once Postgres runs and follows the cluster (primary or replica)
+    test: ["CMD", "curl", "-fs", "http://localhost:8008/health"]
+    interval: 2s
+    timeout: 3s
+    retries: 90
+    start_period: 10s
+
+x-pgenv: &pgenv
+  PGUSER: postgres
+  PGDATABASE: postgres
+  PGPASSWORD: tsdb-demo
+
+services:
+  etcd1:
+    <<: *etcd
+    container_name: tsdb-etcd1
+    environment:
+      <<: *etcdenv
+      ETCD_NAME: etcd1
+      ETCD_INITIAL_ADVERTISE_PEER_URLS: http://etcd1:2380
+      ETCD_ADVERTISE_CLIENT_URLS: http://etcd1:2379
+  etcd2:
+    <<: *etcd
+    container_name: tsdb-etcd2
+    environment:
+      <<: *etcdenv
+      ETCD_NAME: etcd2
+      ETCD_INITIAL_ADVERTISE_PEER_URLS: http://etcd2:2380
+      ETCD_ADVERTISE_CLIENT_URLS: http://etcd2:2379
+  etcd3:
+    <<: *etcd
+    container_name: tsdb-etcd3
+    environment:
+      <<: *etcdenv
+      ETCD_NAME: etcd3
+      ETCD_INITIAL_ADVERTISE_PEER_URLS: http://etcd3:2380
+      ETCD_ADVERTISE_CLIENT_URLS: http://etcd3:2379
+
+  tsdb1:
+    <<: *tsdb
+    container_name: tsdb1
+    hostname: tsdb1
+    environment:
+      PATRONI_NAME: tsdb1
+      PATRONI_RESTAPI_CONNECT_ADDRESS: tsdb1:8008
+      PATRONI_POSTGRESQL_CONNECT_ADDRESS: tsdb1:5432
+    volumes:
+      - ./config:/config:ro
+      - tsdb1-data:/home/postgres/pgdata
+  tsdb2:
+    <<: *tsdb
+    container_name: tsdb2
+    hostname: tsdb2
+    environment:
+      PATRONI_NAME: tsdb2
+      PATRONI_RESTAPI_CONNECT_ADDRESS: tsdb2:8008
+      PATRONI_POSTGRESQL_CONNECT_ADDRESS: tsdb2:5432
+    volumes:
+      - ./config:/config:ro
+      - tsdb2-data:/home/postgres/pgdata
+  tsdb3:
+    <<: *tsdb
+    container_name: tsdb3
+    hostname: tsdb3
+    environment:
+      PATRONI_NAME: tsdb3
+      PATRONI_RESTAPI_CONNECT_ADDRESS: tsdb3:8008
+      PATRONI_POSTGRESQL_CONNECT_ADDRESS: tsdb3:5432
+    volumes:
+      - ./config:/config:ro
+      - tsdb3-data:/home/postgres/pgdata
+
+  haproxy:
+    image: haproxy:${HAPROXY_VERSION:-3.2-alpine}
+    container_name: tsdb-haproxy
+    volumes:
+      - ./config/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+    ports:
+      - "${TSDB_RW_PORT:-5460}:5000" # primary (read-write)
+      - "${TSDB_RO_PORT:-5461}:5001" # replicas (read-only)
+      - "${TSDB_STATS_PORT:-7460}:7000" # HAProxy stats page
+    depends_on:
+      tsdb1: { condition: service_healthy }
+      tsdb2: { condition: service_healthy }
+      tsdb3: { condition: service_healthy }
+
+  # psql for `make test` / `make cli` / `make failover`; PGHOST/PGPORT pick primary or replicas
+  psql:
+    image: timescale/timescaledb-ha:${TIMESCALEDB_TAG:-pg18.6-ts2.30.2}
+    profiles: [tools]
+    environment:
+      <<: *pgenv
+      PGHOST: haproxy
+      PGPORT: "5000"
+      PGCONNECT_TIMEOUT: "3"
+    volumes:
+      - ./sql:/sql:ro
+      - ./bench:/bench:ro
+    entrypoint: ["psql", "-v", "ON_ERROR_STOP=1"]
+
+  # `make benchmark`: timescaledb-parallel-copy through HAProxy (bench/run.sh), raw output to results/
+  bench:
+    image: timescale/timescaledb-ha:${TIMESCALEDB_TAG:-pg18.6-ts2.30.2}
+    profiles: [bench]
+    cpus: ${BENCH_CLIENT_CPUS:-2}
+    user: root
+    entrypoint: ["bash", "/bench/run.sh"]
+    environment:
+      <<: *pgenv
+      PGHOST: haproxy
+      PGPORT: "5000"
+      NAME: ${NAME:-}
+      DEVICES: ${DEVICES:-1000}
+      DAYS: ${DAYS:-2}
+      WORKERS: ${WORKERS:-4}
+      BATCH: ${BATCH:-5000}
+      MODES: ${MODES:-async sync}
+      CLIENTS: ${CLIENTS:-8}
+      DURATION: ${DURATION:-20}
+    volumes:
+      - ./bench:/bench:ro
+      - ./results:/results
+
+  bench-report:
+    image: ghcr.io/astral-sh/uv:0.12.19-python3.13-trixie-slim
+    profiles: [bench]
+    network_mode: none
+    working_dir: /bench
+    command: ["uv", "run", "--frozen", "report.py"]
+    environment:
+      UV_CACHE_DIR: /uv/cache
+      UV_PROJECT_ENVIRONMENT: /uv/venv
+      UV_PYTHON_DOWNLOADS: never
+      NAME: ${NAME:-}
+      HOST_INFO: ${HOST_INFO:-}
+      DOCKER_INFO: ${DOCKER_INFO:-}
+      BENCH_LIMITS: ${BENCH_LIMITS:-}
+    volumes:
+      - ./bench:/bench:ro
+      - ./results:/results
+      - uv-cache:/uv
+
+volumes:
+  tsdb1-data:
+  tsdb2-data:
+  tsdb3-data:
+  uv-cache:
