@@ -1,0 +1,101 @@
+name: influxdb3-iot
+
+# One InfluxDB 3 Core node on MinIO, as in ../v3-core-single-node, plus the Rust client.
+x-minio: &minio
+  # MinIO no longer publishes community images; Chainguard's free build is `latest` only,
+  # so it is pinned by digest.
+  image: cgr.dev/chainguard/minio:latest@sha256:6a1d0b45c8669726bba580ced0bfa4cb9fdeed1ed636dfabd81d1577beb6937b
+  environment:
+    MINIO_ROOT_USER: minioadmin
+    MINIO_ROOT_PASSWORD: minioadmin
+
+services:
+  minio:
+    <<: *minio
+    container_name: influxdb3-iot-minio
+    command: server /data
+    volumes:
+      - minio-data:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+
+  bucket:
+    <<: *minio
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - mc alias set local http://minio:9000 minioadmin minioadmin >/dev/null && mc mb --ignore-existing local/influxdb3
+    depends_on:
+      minio: { condition: service_healthy }
+
+  # One-shot: an offline admin token (unless one exists) that the server loads at startup.
+  init:
+    image: influxdb:${INFLUXDB_VERSION:-3.12.0-core}
+    user: root
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - >-
+        [ -f /token/admin.json ] ||
+        { influxdb3 create token --admin --offline --name _admin --output-file /token/admin.json &&
+          chown 1500:1500 /token/admin.json; }
+    volumes:
+      - token:/token
+
+  influxdb3:
+    image: influxdb:${INFLUXDB_VERSION:-3.12.0-core}
+    container_name: influxdb3-iot
+    command:
+      - influxdb3
+      - serve
+      - --node-id=node0
+      - --object-store=s3
+      - --bucket=influxdb3
+      - --aws-endpoint=http://minio:9000
+      - --aws-allow-http
+      - --aws-access-key-id=minioadmin
+      - --aws-secret-access-key=minioadmin
+      - --admin-token-file=/token/admin.json
+      - --disable-authz=health,ping
+      # snapshot every ~10 WAL files (default 600) so history lands in Parquet within seconds
+      - --wal-files-per-snapshot=${WAL_FILES_PER_SNAPSHOT:-10}
+      # Core's cap on Parquet files per query (default 432 = 72 h of 10-minute files)
+      - --query-file-limit=${QUERY_FILE_LIMIT:-432}
+    ports:
+      - "${INFLUXDB_PORT:-8192}:8181"
+    volumes:
+      - token:/token:ro
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "-o", "/dev/null", "http://127.0.0.1:8181/ping"]
+      interval: 2s
+      timeout: 2s
+      retries: 60
+    depends_on:
+      init: { condition: service_completed_successfully }
+      bucket: { condition: service_completed_successfully }
+
+  # `make run`: app/ (Rust, reqwest against the HTTP API)
+  app:
+    build: app
+    profiles: [run]
+    environment:
+      INFLUX_URL: http://influxdb3:8181
+      CARDINALITIES: ${CARDINALITIES:-1000,10000,100000,1000000}
+      ROWS_PER_LEVEL: ${ROWS_PER_LEVEL:-1000000}
+      WRITERS: ${WRITERS:-16}
+      BATCH: ${BATCH:-10000}
+      FLEET_DEVICES: ${FLEET_DEVICES:-100000}
+      FLEET_POINTS: ${FLEET_POINTS:-10}
+      HISTORY_DEVICES: ${HISTORY_DEVICES:-1000}
+      HISTORY_DAYS: ${HISTORY_DAYS:-7}
+      HISTORY_STEP_S: ${HISTORY_STEP_S:-300}
+      ITER: ${ITER:-30}
+    volumes:
+      - token:/token:ro
+    depends_on:
+      influxdb3: { condition: service_healthy }
+
+volumes:
+  minio-data:
+  token:

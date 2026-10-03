@@ -9,6 +9,7 @@ open-source (MIT/Apache-2.0) edition, and Enterprise is the closed-source, licen
 InfluxDB 1.x (TSM engine, InfluxQL) is the previous generation.
 
 - [`v3-core-single-node/`](v3-core-single-node) — InfluxDB 3 Core: `influxdb3 serve` on MinIO (S3) with an offline admin token: line protocol over the v3/v2/v1 write APIs, SQL and InfluxQL, last/distinct value caches, a WAL and a schedule plugin in the embedded Python processing engine, and the Parquet files it writes to the bucket.
+- [`iot-fleet/`](iot-fleet) — InfluxDB 3 Core, an IoT fleet in Rust (reqwest against the HTTP API): ingest at 1k–1M series, dashboard queries through the last/distinct value caches vs plain SQL, a week of history in Parquet, and the query file limit that bounds it in Core.
 
 ## Clusters
 
@@ -54,6 +55,16 @@ from concurrency. With `no_sync=true` (ack before the flush) it reaches 1.17M ro
 latest values take 0.5–1 ms from the last value cache, against 2–12 ms in SQL. A 10k-row
 distinct list takes 3–6 ms from the distinct value cache, against 13–200 ms with `SELECT
 DISTINCT`.
+
+**v3 Core IoT fleet example** ([`iot-fleet`](iot-fleet/README.md#sample-output),
+`make run`): Rust HTTP client with 16 writers, no CPU or memory caps (same machine, 2026-10-02).
+Ingest does not slow down as cardinality grows. At 1k, 10k, 100k and 1M distinct devices, 1M
+rows per level ran at 144–158k rows/s durable and 2.7–3.0M rows/s with `no_sync`. Over 100k
+devices the last value cache answers one device's latest reading in 0.7 ms, against 4.4 ms in
+SQL, and the distinct value cache lists 1,000 sites in 0.9 ms. A fleet-wide predicate over the
+whole cache took 1.2 s, 5–80x slower than SQL. 7 days × 1,000 devices (2M rows) became 1,009
+Parquet files, 18 MB, 9 bytes/row. Queries over up to 2 days take 5–10 ms. The 7-day query fails
+on Core's 432-file limit; with `--query-file-limit=2500` it takes 22 ms.
 
 ## Known issues
 
