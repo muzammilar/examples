@@ -9,14 +9,18 @@ columnstore policies. It is plain SQL on Postgres, so joins with relational tabl
 - [`single-node/`](single-node) — one PostgreSQL 18 + TimescaleDB 2.30 server (`timescale/timescaledb-ha`) on Docker Compose, with a SQL walkthrough: hypertables and chunks, columnstore compression, continuous aggregates with real-time aggregation, `time_bucket_gapfill`, toolkit hyperfunctions, and retention.
 - [`docker-compose-cluster/`](docker-compose-cluster) — three nodes under Patroni (one primary, two streaming replicas), a 3-member etcd cluster and HAProxy with read-write and read-only ports, plus `make failover`, `make switchover` and `make sync`. This is replication for HA and read scaling, not sharding: TimescaleDB multi-node was removed in 2.14.
 - [`fleet-telemetry/`](fleet-telemetry) — a Rust client (`tokio-postgres`, binary `COPY`) that simulates 1000 electric delivery vehicles (14.4M readings). It times the ingest into the rowstore and straight into the columnstore, the compression ratio, and fleet dashboard queries joined with relational metadata, on the rowstore, the columnstore and a continuous aggregate.
+- [`multinode-2.13/`](multinode-2.13) — **legacy, end-of-life**: a real sharded TimescaleDB on the last release that had multi-node (`timescale/timescaledb:2.13.1-pg15`). It has an access node and 3 data nodes, a distributed hypertable with `replication_factor => 2`, chunk placement, aggregate pushdown, and a `make failover` that stops a data node and re-replicates the chunks it missed by hand. For learning only.
 
-There is no sharded (distributed) cluster example. TimescaleDB's multi-node mode (distributed
-hypertables) was deprecated in 2.13 and removed in 2.14
-([CHANGELOG](https://github.com/timescale/timescaledb/blob/main/CHANGELOG.md),
+TimescaleDB's multi-node mode (distributed hypertables) was deprecated in 2.13 and removed in
+[2.14.0](https://github.com/timescale/timescaledb/releases/tag/2.14.0) (2024-02-08; see
 [MultiNodeDeprecation.md](https://github.com/timescale/timescaledb/blob/main/docs/MultiNodeDeprecation.md)).
 A self-hosted TimescaleDB cluster is now Postgres streaming replication: one primary and
 replicas that each hold all the data, for HA and read scaling, not sharding. That is what
 `docker-compose-cluster/` runs.
+
+`multinode-2.13/` runs that last release, which is unpatched and stuck on PostgreSQL 13-15. On
+a supported TimescaleDB, a self-hosted cluster is Postgres streaming replication: one primary
+and replicas that each hold all the data, for HA and read scaling, not sharding.
 
 ## Benchmark
 
@@ -25,6 +29,8 @@ replicas that each hold all the data, for HA and read scaling, not sharding. Tha
 Patroni cluster, 2 CPUs / 4 GiB per node (same hardware and date): a 2.88M-row load writes 566 MiB of WAL into the rowstore against 41 MiB straight into the columnstore (2.47M vs 580k rows/s), so the replicas also replay 14x less. Synchronous replication costs nothing measurable for 5,000-row `COPY` batches. Two replicas serve 16.1k read queries/s, against 8.0k/s on the primary alone. Stopping the primary interrupted writes for ~18 s and lost no acknowledged insert. Details: [`docker-compose-cluster/README.md`](docker-compose-cluster/README.md#benchmark).
 
 Fleet telemetry example (Rust client, 4 binary `COPY` connections, server capped at 4 CPUs / 6 GB, same hardware, 2026-10-03): 14.4M readings from 1000 vehicles load at 5.8M rows/s straight into the columnstore, against 1.1M rows/s into the rowstore. The columnstore takes 213 MiB against 2,020 MiB (9.5x smaller). Dashboard tiles that join telemetry with `vehicles`/`fleets` take 27-41 ms on an hourly continuous aggregate, 0.63-0.66 s on the columnstore and 0.76-1.3 s on the rowstore. Details: [`fleet-telemetry/README.md`](fleet-telemetry/README.md#results).
+
+Multi-node 2.13 (end-of-life), 2.88M rows loaded with `timescaledb-parallel-copy` through the access node, each of the 4 containers capped at 2 CPUs / 2 GiB (same hardware, 2026-10-03): a distributed hypertable on 3 data nodes runs full-table aggregates about 2x faster than a local hypertable on one node (max per device 71 vs 124 ms). Ingest is about the same with replication factor 1 (1.20M vs 1.16M rows/s) and half as fast with replication factor 2 (582k rows/s, two-phase commit to two nodes). After stopping a data node, every query failed until `alter_data_node(..., available => false)`, and repairing the 6 under-replicated chunks took a manual `copy_chunk` of ~5 s per chunk. Details: [`multinode-2.13/README.md`](multinode-2.13/README.md#benchmark).
 
 ## Known issues
 
@@ -67,3 +73,16 @@ TimescaleDB 2.30.2, `timescale/timescaledb-ha:pg18.6-ts2.30.2`):
 - There is no Kubernetes variant (CloudNativePG + a TimescaleDB image). With the shared Docker
   VM's disk nearly full (the 3 GB timescaledb-ha image plus a kind node), it was not cheap to
   add.
+
+- Multi-node 2.13 (`timescale/timescaledb:2.13.1-pg15`, end-of-life): every multi-node call warns
+  `WARNING: adding data node is deprecated` / `DETAIL: Multi-node is deprecated and will be removed in future releases.`
+  A stopped data node makes every query on a distributed hypertable fail
+  (`ERROR: could not connect to "dn2"`), even with `replication_factor => 2`, until
+  `alter_data_node('dn2', available => false)`. Writes made meanwhile leave chunks
+  under-replicated (`WARNING: insufficient number of data nodes`), and nothing repairs them
+  automatically.
+- `timescaledb_experimental.copy_chunk` fails with `ERROR: [dn1]: logical decoding requires wal_level >= logical`
+  unless the data nodes run with `wal_level=logical`. It then fails with
+  `ERROR: [dn2]: relation "_dist_hyper_1_3_chunk" already exists` if the returning node still has a
+  stale copy. The example drops the stale copy with `distributed_exec` first. Each copy took ~5 s,
+  even for small chunks.
