@@ -1,78 +1,64 @@
-# InfluxDB 3 Core — IoT fleet (Rust client)
+# InfluxDB 3 Core: IoT fleet (Rust client)
 
-An IoT sensor fleet on one InfluxDB 3 Core node backed by MinIO, driven by
-[`app/`](app), a Rust program. It covers what InfluxDB 3 is built for:
+An IoT sensor fleet on one InfluxDB 3 Core node backed by MinIO, driven by [`app/`](app), a Rust
+program: high-cardinality ingest, "latest value" dashboards from the in-memory caches, history as
+Parquet in object storage, and Core's limit on how much of it one query may read. HTTP API:
+`localhost:8192` (`INFLUXDB_PORT`).
 
-- ingesting high-cardinality tags with no series limit;
-- serving "latest value" dashboards from in-memory caches;
-- keeping history cheaply as Parquet in object storage.
+## Quick start
 
-It also shows the Core limit on how much of that history one query may read. HTTP API:
-`localhost:8192` (override with `INFLUXDB_PORT`).
-
-```bash
-make up      # MinIO, the bucket, an offline admin token, influxdb3 serve
-make run     # build the app image (first time: ~1 min) and run it (~2 min)
-make files   # object store usage per prefix: WAL, Parquet (dbs/), snapshots, catalog
-make status  # containers, /ping, CPU and memory
-make down    # remove the containers, the volumes and the built image
-```
-
-What `make run` does (it recreates database `iot` each time, so it can be repeated):
-
-1. **Cardinality ladder.** For 1k, 10k, 100k and 1M distinct devices it writes 1M rows of
-   `<table>,site=site-NNNN,device_id=dev-NNNNNNN,model=mN temp=..,humidity=..,battery=..i,rssi=..i`
-   (1,000 points per device at 1k devices, 1 point each at 1M). Each level is written twice,
-   once durable (the ack waits for the WAL flush) and once with `no_sync=true` (the ack comes
-   first). The no_sync run then polls until `count(*)` returns every row. 16 writers, 10,000
-   lines per request. Afterwards
-   `count(*)` and `count(DISTINCT device_id)` must match exactly. It also reports the server's
-   heap (jemalloc `resident` from `/metrics`).
-2. **Dashboard.** Creates table `fleet` (tags `site`, `device_id`, `model`), a last value cache
-   keyed `(site, device_id)` and a distinct value cache on `site`, then writes 10 readings for
-   each of 100,000 devices in 1,000 sites. Then four dashboard questions, each asked in plain
-   SQL and through a cache, 30 times. Both must return the same rows:
-   - one device's latest reading;
-   - the latest reading of every device in one site;
-   - how many devices report battery < 20 right now;
-   - the list of sites.
-3. **History.** 1,000 devices × 7 days at 5-minute resolution = 2,016,000 rows with past
-   timestamps, written oldest first. It polls `system.parquet_files` until every row is in
-   Parquet, writing a heartbeat row each second to keep the WAL moving, then reports the
-   file count, the bytes and the compression against the line protocol. Then queries: one
-   device over the last 6 h and over a 6 h window 6 days ago, the fleet's hourly average over
-   24 h, and daily averages over 2 days and over all 7.
+| Command | What |
+|---------|------|
+| `make up` | MinIO, the bucket, an offline admin token, `influxdb3 serve` |
+| `make run` | build the app image (first time ~1 min) and run it (~2 min) |
+| `make build` | build the app image only |
+| `make files` | object store usage per prefix: WAL, Parquet (`dbs/`), snapshots, catalog |
+| `make status` | containers, `/ping`, CPU and memory |
+| `make down` | remove containers, volumes and the built image |
 
 Override sizes with `CARDINALITIES`, `ROWS_PER_LEVEL`, `WRITERS`, `BATCH`, `FLEET_DEVICES`,
 `FLEET_POINTS`, `HISTORY_DEVICES`, `HISTORY_DAYS`, `HISTORY_STEP_S`, `ITER`, e.g.
 `make run CARDINALITIES=1000,10000 ROWS_PER_LEVEL=100000` (make passes them to compose).
 
-## The Rust client
+## What `make run` does
 
-InfluxDB 3 has no official Rust client. InfluxData's documented v3 client libraries are Go,
-Python, Java, C#, and JavaScript. The community crate
-[`influxdb3_client`](https://github.com/InfluxCommunity/influxdb3-rust) (0.3, InfluxCommunity,
-not supported by InfluxData) wraps writes and Flight SQL queries. This example calls the HTTP
-API directly with `reqwest` + `serde_json` on tokio (see [`Cargo.toml`](app/Cargo.toml)):
+Recreates database `iot` each time, so it can be repeated.
 
-- `POST /api/v3/write_lp?db=iot&precision=nanosecond[&no_sync=true]` with a body of line protocol;
-- `POST /api/v3/query_sql` with `{"db", "q", "format": "json"}`;
-- `POST /api/v3/configure/{database,table,last_cache,distinct_cache}` and `DELETE
-  /api/v3/configure/database?hard_delete_at=now`.
+| Phase | What |
+|-------|------|
+| 1. Cardinality ladder | For 1k, 10k, 100k and 1M distinct devices: 1M rows of `<table>,site=site-NNNN,device_id=dev-NNNNNNN,model=mN temp=..,humidity=..,battery=..i,rssi=..i` (1,000 points per device at 1k, 1 point each at 1M). Each level written twice: durable (ack waits for the WAL flush) and `no_sync=true` (ack first; then polls until `count(*)` returns every row). 16 writers, 10,000 lines per request. `count(*)` and `count(DISTINCT device_id)` must match exactly. Reports server heap (jemalloc `resident` from `/metrics`). |
+| 2. Dashboard | Table `fleet` (tags `site`, `device_id`, `model`), last value cache keyed `(site, device_id)`, distinct value cache on `site`. Writes 10 readings for each of 100,000 devices in 1,000 sites. Four questions, each in plain SQL and via a cache, 30 times; both must return the same rows: one device's latest reading; latest reading of every device in one site; devices with battery < 20 now; list of sites. |
+| 3. History | 1,000 devices × 7 days at 5-minute resolution = 2,016,000 rows with past timestamps, oldest first. Polls `system.parquet_files` until every row is in Parquet (writing a heartbeat row each second to keep the WAL moving), reports file count, bytes and compression vs line protocol. Queries: one device over the last 6 h and over a 6 h window 6 days ago, fleet hourly average over 24 h, daily averages over 2 days and over all 7. |
 
-[`app/Dockerfile`](app/Dockerfile) builds it in `rust:1.90-slim-bookworm` and copies
-the binary into `debian:bookworm-slim` (no TLS, so no OpenSSL). No host Rust needed.
+## Setup
 
-- Server image `influxdb:3.12.0-core` (`INFLUXDB_VERSION`), Chainguard MinIO pinned by digest,
-  `--wal-files-per-snapshot=10` (snapshots every ~10 s of writes, default ~10 min),
-  `--query-file-limit=${QUERY_FILE_LIMIT:-432}` (the Core default, made explicit).
-- Compose project `influxdb3-iot`, containers `influxdb3-iot` and `influxdb3-iot-minio`, so it
-  runs next to [`../v3-core-single-node`](../v3-core-single-node).
+| Item | Value |
+|------|-------|
+| Server | `influxdb:3.12.0-core` (`INFLUXDB_VERSION`), Chainguard MinIO pinned by digest |
+| `--wal-files-per-snapshot=10` | snapshots every ~10 s of writes (default ~10 min) |
+| `--query-file-limit=${QUERY_FILE_LIMIT:-432}` | the Core default, made explicit |
+| Compose project | `influxdb3-iot`, containers `influxdb3-iot` and `influxdb3-iot-minio`, so it runs next to [`../v3-core-single-node`](../v3-core-single-node) |
+| App image | [`app/Dockerfile`](app/Dockerfile): built in `rust:1.90-slim-bookworm`, binary copied into `debian:bookworm-slim` (no TLS, so no OpenSSL). No host Rust needed. |
+
+### Rust client
+
+InfluxDB 3 has no official Rust client; InfluxData's documented v3 client libraries are Go,
+Python, Java, C# and JavaScript. The community crate
+[`influxdb3_client`](https://github.com/InfluxCommunity/influxdb3-rust) (0.3, InfluxCommunity, not
+supported by InfluxData) wraps writes and Flight SQL queries. This app calls the HTTP API
+directly with `reqwest` + `serde_json` on tokio ([`Cargo.toml`](app/Cargo.toml)):
+
+| Endpoint | Use |
+|----------|-----|
+| `POST /api/v3/write_lp?db=iot&precision=nanosecond[&no_sync=true]` | line protocol body |
+| `POST /api/v3/query_sql` | `{"db", "q", "format": "json"}` |
+| `POST /api/v3/configure/{database,table,last_cache,distinct_cache}` | schema and caches |
+| `DELETE /api/v3/configure/database?hard_delete_at=now` | drop database |
 
 ## Sample output
 
-2026-10-02, a fresh `make up` then `make run` (defaults), Docker Desktop on an Apple M4 Pro
-(Docker VM: 11 CPUs, 24.4 GiB, aarch64), InfluxDB 3 Core 3.12.0, no CPU or memory caps:
+2026-10-02, fresh `make up` then `make run` (defaults), Docker Desktop on Apple M4 Pro (VM: 11
+CPUs, 24.4 GiB, aarch64), InfluxDB 3 Core 3.12.0, no CPU or memory caps:
 
 ```text
 1. ingest vs series cardinality: 1,000,000 rows per level, 16 writers, 10,000 lines per request
@@ -105,42 +91,30 @@ the binary into `debian:bookworm-slim` (no TLS, so no OpenSSL). No host Rust nee
    Parquet in the object store (files / size): ladder_1k 3 / 4.1 MB, ladder_1k_ns 3 / 4.1 MB, ladder_10k 1 / 4.0 MB, ladder_10k_ns 1 / 4.0 MB, ladder_100k 1 / 4.2 MB, ladder_100k_ns 1 / 4.2 MB, ladder_1m 1 / 5.7 MB, ladder_1m_ns 1 / 5.7 MB, fleet 2 / 4.6 MB, history 1009 / 18.2 MB
 ```
 
-With `QUERY_FILE_LIMIT=2500 make up` (the server restarts with the higher limit, and the
-bucket is kept), the 7-day daily average reads all 1,009 files: 8 rows, 20.8 ms first run,
-22.1 ms p50. The other history queries were unchanged (4.5–10 ms).
+- `QUERY_FILE_LIMIT=2500 make up` (server restarts with the higher limit, bucket kept): the 7-day
+  daily average reads all 1,009 files, 8 rows, 20.8 ms first run, 22.1 ms p50. Other history
+  queries unchanged (4.5–10 ms).
+- Afterwards `make files` showed 651 MiB of WAL vs 56 MiB of Parquet in the bucket. The server
+  keeps the last 300 snapshotted WAL files (`--snapshotted-wal-files-to-keep`), so right after a
+  bulk load the WAL takes most of the space. Server container memory: 2.4 GiB.
+- Run to run: an earlier run on the same setup had faster plain-SQL dashboard queries (whole-fleet
+  battery 14–16 ms, list of sites 4–13 ms); the cache side was the same (0.7 ms, ~1.2–1.4 s,
+  ~1 ms). Other examples shared the Docker VM. One earlier run hit a full VM disk mid-load (MinIO
+  `507 Insufficient Storage`): the server retried the WAL PUT, pending writes stalled up to 128 s,
+  then all completed with nothing lost.
 
-Afterwards `make files` showed 651 MiB of WAL files, against 56 MiB of Parquet, in the bucket. The
-server keeps the last 300 snapshotted WAL files (`--snapshotted-wal-files-to-keep`), so right
-after a bulk load the WAL, not the Parquet, takes most of the space. The server container used
-2.4 GiB of memory.
+## Findings
 
-Run to run: in an earlier run on the same setup the plain-SQL dashboard queries were faster
-(whole-fleet battery 14–16 ms, list of sites 4–13 ms), while the cache side was the same
-(0.7 ms, ~1.2–1.4 s, ~1 ms). Other examples shared the Docker VM. One earlier run hit a full VM
-disk mid-load (MinIO `507 Insufficient Storage`). The server retried the WAL PUT, and the
-pending write requests stalled for up to 128 s, then all completed with nothing lost.
+| Topic | Result |
+|-------|--------|
+| Cardinality | No series index (InfluxDB 1.x has one; its `max-series-per-database` defaults to 1M). 1M distinct `device_id`s ingest at the same rate as 1k: ~150k rows/s durable with 16 writers, 2.7–3.0M rows/s `no_sync`. Heap grew 0.9 → 1.8 GiB while 8M rows accumulated over the four levels. |
+| Durability | A durable write is acked after the next WAL flush (1 s), so every request takes ~1 s and throughput comes from concurrency. `no_sync` acks before the flush; rows were queryable 1.2–1.6 s after the last ack, and a crash in between loses them. |
+| Caches | Last value cache: one device's latest 0.7 ms vs 3–4 ms SQL; one site (key prefix) 2 ms vs 7 ms. Distinct value cache: 1,000 sites under 1 ms where `SELECT DISTINCT` scans 1M rows. No key predicate ("battery < 20 anywhere") walks all 100k entries: over 1 s, 5–80x slower than SQL. Use for keyed lookups, not fleet-wide scans. |
+| History | 2M rows → 18 MB Parquet, 9 bytes/row, 13x smaller than line protocol. No separate cold tier: a 6 h window from 6 days ago (5 ms) was as fast as the last 6 h (MinIO on the same machine, small files). |
+| Core limit | No compaction: every 10-minute chunk stays its own file (1,009 files for 7 days of one table); a query may open at most 432 by default (72 h). Raising `--query-file-limit` works at this size (all 7 days in 22 ms); the error text warns it "may cause slower queries or instability". Compaction is an InfluxDB 3 Enterprise feature. |
 
-## Why InfluxDB 3 fits this (and where Core stops)
+## Known issues
 
-- **Cardinality is not a cost.** There is no series index (InfluxDB 1.x has one, and its
-  `max-series-per-database` defaults to 1M). A million distinct `device_id`s ingest at the same
-  rate as a thousand: ~150k rows/s durable with 16 writers, 2.7–3.0M rows/s with `no_sync`. The
-  heap grew from 0.9 to 1.8 GiB while 8M rows accumulated over the four levels.
-- **Durability costs latency, not throughput.** A durable write is acked after the next WAL
-  flush to the object store (1 s), so every request takes ~1 s, and throughput comes from
-  concurrent requests. `no_sync` acks before that flush, and the rows were queryable 1.2–1.6 s
-  after the last ack, but a crash in between loses them.
-- **Caches for dashboards.** The last value cache answers "latest reading of this device" in
-  0.7 ms against 3–4 ms in SQL. The latest readings for a whole site (a key prefix) take 2 ms
-  against 7 ms. The distinct value cache lists 1,000 sites in under 1 ms where `SELECT
-  DISTINCT` scans 1M rows. The last value cache is organized by its key columns, so a question
-  with no key predicate ("battery < 20 anywhere") walks all 100k entries and took over a second,
-  5–80x slower than SQL. Use them for keyed lookups, not fleet-wide scans.
-- **History is cheap.** 2M rows took 18 MB of Parquet, 9 bytes/row, 13x smaller than the line
-  protocol. Old data needs no separate cold tier: a 6-hour window from 6 days ago (5 ms) was as
-  fast as the last 6 hours here, with MinIO on the same machine and small files.
-- **But Core does not compact.** Every 10-minute chunk stays its own Parquet file (1,009 files
-  for 7 days of one table), and a query may open at most 432 of them by default (72 h). Raising
-  `--query-file-limit` works at this size (all 7 days in 22 ms), and the error text warns it
-  "may cause slower queries or instability". Compaction into larger files is an InfluxDB 3
-  Enterprise feature.
+Shared with [`v3-core-single-node/`](../v3-core-single-node): see
+[InfluxDB 3 Core known issues](../README.md#known-issues) (432-file query limit, `no_sync`
+visibility lag, cache scans without a key, `507 Insufficient Storage` on a full disk).
