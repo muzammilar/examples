@@ -1,0 +1,69 @@
+# Patroni config shared by tsdb1..3; the per-node values come from the environment
+# (PATRONI_NAME, PATRONI_RESTAPI_CONNECT_ADDRESS, PATRONI_POSTGRESQL_CONNECT_ADDRESS).
+scope: tsdb
+namespace: /service/
+
+restapi:
+  listen: 0.0.0.0:8008
+
+etcd3:
+  hosts: etcd1:2379,etcd2:2379,etcd3:2379
+
+bootstrap:
+  # written to etcd once, by the node that initializes the cluster; change later with
+  # `patronictl edit-config` (make sync / make async)
+  dcs:
+    ttl: 20
+    loop_wait: 5
+    retry_timeout: 5
+    maximum_lag_on_failover: 1048576 # bytes: a replica further behind is not promoted
+    synchronous_mode: false
+    postgresql:
+      use_pg_rewind: true # the old primary rejoins as a replica after a failover
+      use_slots: true     # a replication slot per replica, so the primary keeps the WAL it needs
+      parameters:
+        shared_preload_libraries: timescaledb
+        timescaledb.telemetry_level: "off"
+        timescaledb.max_background_workers: 8
+        max_worker_processes: 16
+        wal_level: replica
+        hot_standby: "on"
+        wal_log_hints: "on"
+        max_wal_senders: 10
+        max_replication_slots: 10
+        max_wal_size: 2GB
+        shared_buffers: 512MB
+        effective_cache_size: 1536MB
+        work_mem: 16MB
+        maintenance_work_mem: 128MB
+  initdb:
+    - encoding: UTF8
+    - data-checksums
+  # runs once on the first primary: the extensions in the default database
+  post_bootstrap: /config/post-bootstrap.sh
+
+postgresql:
+  listen: 0.0.0.0:5432
+  data_dir: /home/postgres/pgdata/data
+  pgpass: /tmp/pgpass
+  pg_hba:
+    - local all all trust
+    - host replication replicator all scram-sha-256
+    - host all all all scram-sha-256
+  authentication:
+    superuser:
+      username: postgres
+      password: tsdb-demo
+    replication:
+      username: replicator
+      password: tsdb-repl
+    rewind:
+      username: rewinder
+      password: tsdb-rewind
+  parameters:
+    unix_socket_directories: /var/run/postgresql
+
+tags:
+  nofailover: false
+  noloadbalance: false
+  clonefrom: false
