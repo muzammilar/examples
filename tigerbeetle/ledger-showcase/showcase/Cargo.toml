@@ -1,0 +1,15 @@
+[package]
+name = "ledger-showcase"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+# The official Rust client (src/clients/rust) is not on crates.io yet, and its native tb_client
+# library is built by `zig build clients:rust`; the Dockerfile does both at the server's tag.
+tigerbeetle.path = "/tigerbeetle/src/clients/rust"
+futures = { version = "0.3", default-features = false, features = ["executor"] }
+
+[profile.release]
+# TigerBeetle recommends overflow checks for accounting code
+overflow-checks = true

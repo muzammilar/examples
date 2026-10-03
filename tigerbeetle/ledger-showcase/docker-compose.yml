@@ -1,0 +1,58 @@
+name: tigerbeetle-ledger
+
+# One replica (--replica-count=1), as in ../single-node, plus the Rust showcase client.
+# TigerBeetle needs io_uring, which Docker >= 25 blocks by default: seccomp=unconfined.
+x-tigerbeetle: &tigerbeetle
+  image: ghcr.io/tigerbeetle/tigerbeetle:${TIGERBEETLE_VERSION:-0.17.9}
+  security_opt: ["seccomp=unconfined"]
+  cap_add: [IPC_LOCK]
+  volumes:
+    - tigerbeetle-data:/data
+
+services:
+  # One-shot: format the data file unless the volume already has one.
+  format:
+    <<: *tigerbeetle
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - >-
+        [ -f /data/0_0.tigerbeetle ] ||
+        /tigerbeetle format --cluster=0 --replica=0 --replica-count=1 /data/0_0.tigerbeetle
+
+  tigerbeetle:
+    <<: *tigerbeetle
+    container_name: tigerbeetle-ledger
+    command: start --addresses=0.0.0.0:3000 --cache-grid=256MiB /data/0_0.tigerbeetle
+    ports:
+      - "${TIGERBEETLE_PORT:-3034}:3000"
+    depends_on:
+      format: { condition: service_completed_successfully }
+    healthcheck:
+      test: ["CMD", "nc", "-z", "127.0.0.1", "3000"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+
+  # `make run`: showcase/ (Rust, official client built from source at the same tag)
+  showcase:
+    build:
+      context: showcase
+      args:
+        TIGERBEETLE_VERSION: ${TIGERBEETLE_VERSION:-0.17.9}
+    profiles: [run]
+    security_opt: ["seccomp=unconfined"] # the client library uses io_uring too
+    # the client takes IP addresses only (no DNS), so share the replica's network namespace
+    network_mode: service:tigerbeetle
+    environment:
+      TB_ADDRESS: 127.0.0.1:3000
+      USERS: ${USERS:-10000}
+      MERCHANTS: ${MERCHANTS:-100}
+      PAYMENTS: ${PAYMENTS:-500000}
+      CLIENTS: ${CLIENTS:-2}
+      HOLDS: ${HOLDS:-30000}
+      EXCHANGES: ${EXCHANGES:-20000}
+    depends_on:
+      tigerbeetle: { condition: service_healthy }
+
+volumes:
+  tigerbeetle-data:
