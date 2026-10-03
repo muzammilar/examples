@@ -1,0 +1,113 @@
+name: rondb-feature-store
+
+# The cluster from ../docker-compose-cluster (1 management server, 2 data nodes in one node
+# group = NoOfReplicas 2, 1 MySQL Server, 1 REST API server) under its own project name,
+# container names and host ports, plus the Go feature-serving client in client/.
+x-rondb: &rondb
+  image: hopsworks/rondb:${RONDB_VERSION:-26.02.10}
+  user: "1000:1000" # mysqld refuses to run as root
+
+services:
+  mgmd:
+    <<: *rondb
+    container_name: rondb-fs-mgmd
+    hostname: mgmd
+    command: ["ndb_mgmd", "--ndb-nodeid=65", "--initial"]
+    mem_limit: 256m
+    volumes:
+      - ./config/config.ini:/srv/hops/mysql-cluster/config.ini:ro
+    healthcheck:
+      test: ["CMD", "ndb_mgm", "--ndb-connectstring=mgmd:1186", "-e", "show"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  # --initial only on the very first start, so a restarted node recovers from its own
+  # checkpoint + redo log and catches up from its peer (node restart)
+  ndbd-1: &ndbd
+    <<: *rondb
+    container_name: rondb-fs-ndbd-1
+    hostname: ndbd-1
+    environment: { NODE_ID: 1 }
+    command:
+      - bash
+      - -c
+      - >-
+        exec ndbmtd --nodaemon --ndb-nodeid=$$NODE_ID --ndb-connectstring=mgmd:1186
+        $$([ -d /srv/hops/mysql-cluster/ndb_data/ndb_$${NODE_ID}_fs ] || echo --initial)
+    cap_add: [SYS_NICE]
+    mem_limit: 2500m
+    volumes:
+      - ndbd-1:/srv/hops/mysql-cluster/ndb_data
+    depends_on:
+      mgmd: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD-SHELL", "./docker/rondb_standalone/healthcheck.sh mgmd:1186 $$NODE_ID"]
+      interval: 5s
+      timeout: 10s
+      retries: 60
+      start_period: 20s
+  ndbd-2:
+    <<: *ndbd
+    container_name: rondb-fs-ndbd-2
+    hostname: ndbd-2
+    environment: { NODE_ID: 2 }
+    volumes:
+      - ndbd-2:/srv/hops/mysql-cluster/ndb_data
+
+  mysqld:
+    <<: *rondb
+    container_name: rondb-fs-mysqld
+    hostname: mysqld
+    command: ["mysqld"]
+    cap_add: [SYS_NICE]
+    mem_limit: 1400m
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "true"
+      MYSQL_INITIALIZE_DB: "1" # runs config/init.sql (user rondb/rondb @ '%')
+    ports:
+      - "${RONDB_MYSQL_PORT:-3308}:3306"
+    volumes:
+      - ./config/my.cnf:/srv/hops/mysql-cluster/my.cnf:ro
+      - ./config/init.sql:/srv/hops/docker/rondb_standalone/sql_init_scripts/init.sql:ro
+    depends_on:
+      ndbd-1: { condition: service_healthy }
+      ndbd-2: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD-SHELL", "mysql -h127.0.0.1 -urondb -prondb -Nse \"SHOW STATUS LIKE 'Ndb_number_of_ready_data_nodes'\" 2>/dev/null | awk '$$2 > 0 {ok=1} END {exit !ok}'"]
+      interval: 5s
+      timeout: 5s
+      retries: 60
+      start_period: 20s
+
+  # REST API server (rdrs2): pk-read / batch / feature_store over HTTP via the NDB API
+  rest:
+    <<: *rondb
+    container_name: rondb-fs-rest
+    hostname: rest
+    command: ["bash", "-c", "exec rdrs2 --config /srv/hops/mysql-cluster/rest_api.json"]
+    mem_limit: 512m
+    ports:
+      - "${RONDB_REST_PORT:-4407}:4406"
+    volumes:
+      - ./config/rest_api.json:/srv/hops/mysql-cluster/rest_api.json:ro
+    depends_on:
+      mysqld: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/127.0.0.1/4406 && printf 'GET /0.1.0/health HTTP/1.0\\r\\n\\r\\n' >&3 && read -r status <&3 && [[ $$status == *' 200 '* ]]"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  # Go feature-serving client (client/): `make load`, `make run`, `make failover`
+  client:
+    build: ./client
+    profiles: [client]
+    cpus: ${CLIENT_CPUS:-4}
+    environment:
+      MYSQL_DSN: rondb:rondb@tcp(mysqld:3306)/
+      REST_URL: http://rest:4406
+
+volumes:
+  ndbd-1:
+  ndbd-2:
