@@ -1,0 +1,113 @@
+name: tigerbeetle-ops
+
+# Three active replicas (--replica-count=3), each with its own data file on its own volume,
+# and two optional standbys (--standby=3, --standby=4; profile `standby`). A standby is listed
+# in every replica's --addresses after the actives (ADDRESSES, set by `make scale-out` /
+# `make scale-in`) and receives the replicated log, but never votes and cannot be promoted.
+# Clients only list the three actives.
+#
+# Start-up: format on first start (or `tigerbeetle recover` when RECOVER=1 and the data file
+# is missing, see `make replace`), then `tigerbeetle start --cache-grid=$CACHE_GRID`.
+# CACHE_GRID and the image tag are runtime settings: change them and recreate one replica at a
+# time (`make rolling-restart`).
+x-tigerbeetle: &tigerbeetle
+  image: ghcr.io/tigerbeetle/tigerbeetle:${TIGERBEETLE_VERSION:-0.17.9}
+  security_opt: ["seccomp=unconfined"] # io_uring
+  cap_add: [IPC_LOCK]
+  cpus: 2
+  mem_limit: ${MEM_LIMIT:-4g}
+  entrypoint: ["tini", "--", "/bin/sh", "-c"]
+  command:
+    - >-
+      f=/data/0_$$INDEX.tigerbeetle;
+      if [ ! -f $$f ] && [ "$$RECOVER" = 1 ]; then
+      echo "data file missing: tigerbeetle recover --replica=$$INDEX";
+      /tigerbeetle recover --cluster=0 --replica=$$INDEX --replica-count=3 --addresses=$$ADDRESSES $$f || exit 1;
+      elif [ ! -f $$f ]; then
+      /tigerbeetle format --cluster=0 $$ROLE --replica-count=3 $$f || exit 1;
+      fi;
+      exec /tigerbeetle start --addresses=$$ADDRESSES --cache-grid=$$CACHE_GRID $$f
+  healthcheck:
+    test: ["CMD-SHELL", "nc -z $$(hostname -i) 3000"]
+    interval: 2s
+    timeout: 2s
+    retries: 30
+
+x-env: &env
+  ADDRESSES: ${ADDRESSES:-10.203.54.10:3000,10.203.54.11:3000,10.203.54.12:3000}
+  CACHE_GRID: ${CACHE_GRID:-256MiB}
+  RECOVER: ${RECOVER:-0}
+
+x-client-addresses: &client-addresses 10.203.54.10:3000,10.203.54.11:3000,10.203.54.12:3000
+
+services:
+  replica-0:
+    <<: *tigerbeetle
+    environment: { <<: *env, INDEX: 0, ROLE: --replica=0 }
+    networks: { tigerbeetle: { ipv4_address: 10.203.54.10 } }
+    volumes: [replica-0:/data]
+  replica-1:
+    <<: *tigerbeetle
+    environment: { <<: *env, INDEX: 1, ROLE: --replica=1 }
+    networks: { tigerbeetle: { ipv4_address: 10.203.54.11 } }
+    volumes: [replica-1:/data]
+  replica-2:
+    <<: *tigerbeetle
+    environment: { <<: *env, INDEX: 2, ROLE: --replica=2 }
+    networks: { tigerbeetle: { ipv4_address: 10.203.54.12 } }
+    volumes: [replica-2:/data]
+  # experimental: "standbys don't have a concrete practical use-case yet" (src/tigerbeetle/cli.zig)
+  standby-3:
+    <<: *tigerbeetle
+    profiles: [standby]
+    environment: { <<: *env, INDEX: 3, ROLE: --standby=3 }
+    networks: { tigerbeetle: { ipv4_address: 10.203.54.13 } }
+    volumes: [standby-3:/data]
+  standby-4:
+    <<: *tigerbeetle
+    profiles: [standby]
+    environment: { <<: *env, INDEX: 4, ROLE: --standby=4 }
+    networks: { tigerbeetle: { ipv4_address: 10.203.54.14 } }
+    volumes: [standby-4:/data]
+
+  # `make test`: client/demo.py; client/load.py runs during the other targets
+  client:
+    build:
+      context: client
+      args: # a client must not be newer than the cluster: keep it at the old version while upgrading
+        TIGERBEETLE_VERSION: ${CLIENT_VERSION:-0.17.9}
+    profiles: [test]
+    security_opt: ["seccomp=unconfined"]
+    networks: [tigerbeetle]
+    environment:
+      TB_ADDRESS: *client-addresses
+      DURATION: ${DURATION:-60}
+      BATCH: ${BATCH:-100}
+
+  # `make benchmark`: tigerbeetle benchmark against the three actives
+  bench:
+    image: ghcr.io/tigerbeetle/tigerbeetle:${TIGERBEETLE_VERSION:-0.17.9}
+    profiles: [bench]
+    cpus: 2
+    security_opt: ["seccomp=unconfined"]
+    networks: [tigerbeetle]
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - exec /tigerbeetle benchmark --addresses=$$ADDRESSES $$ARGS
+    environment:
+      ADDRESSES: *client-addresses
+      ARGS: ${BENCH_ARGS:-}
+
+networks:
+  tigerbeetle:
+    ipam:
+      config:
+        - subnet: 10.203.54.0/24
+          ip_range: 10.203.54.128/25
+
+volumes:
+  replica-0:
+  replica-1:
+  replica-2:
+  standby-3:
+  standby-4:
