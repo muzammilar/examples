@@ -1,0 +1,11 @@
+# As the standard user `app` (created by 1-root.blueql).
+# DML on existing models works.
+insert into demo.users("dave", null, 22, 5, 2.5, false, ``, ["trial"])
+update demo.users set followers += 1 where username = "dave"
+select username, followers, tags from demo.users where username = "dave"
+# DDL is root only: error 5 (permission denied).
+create model demo.sneaky(k: string)
+drop space allow not empty demo
+# INSPECT GLOBAL hides the user list from standard users.
+inspect global
+sysctl report status

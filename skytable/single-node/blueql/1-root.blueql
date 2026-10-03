@@ -1,0 +1,35 @@
+# As root. One query per line (BlueQL has no comments or semicolons; run.sh prints these lines).
+# A space is like a database: start from a clean one, so the file can be re-run.
+drop space if exists allow not empty demo
+create space demo
+# A model is like a table. The first field is the primary key; fields are NOT NULL unless marked `null`.
+create model demo.users(username: string, null email: string, age: uint8, followers: uint64, rating: float64, verified: bool, avatar: binary, tags: [string])
+inspect model demo.users
+# INSERT in declaration order, or by field name.
+insert into demo.users("alice", "alice@example.com", 31, 1200, 4.75, true, `PNG`, ["admin", "beta"])
+insert into demo.users { username: "bob", email: null, age: 27, followers: 0, rating: 3.5, verified: false, avatar: ``, tags: [] }
+insert into demo.users("carol", "carol@example.com", 45, 87, 4.1, true, `JPG`, ["beta"])
+# A duplicate primary key is refused: error 108.
+insert into demo.users("alice", null, 1, 0, 0.5, false, ``, [])
+# SELECT is a point query on the primary key (binary comes back as a byte list).
+select * from demo.users where username = "alice"
+select username, email, tags from demo.users where username = "bob"
+# UPDATE: `=`, arithmetic `+=` `*=` `/=` on numbers, `+=` appends to a string or a list.
+update demo.users set rating = 4.9, followers += 100 where username = "alice"
+update demo.users set followers *= 3, followers /= 2 where username = "carol"
+update demo.users set tags += "new", verified = true, email = "bob@example.com" where username = "bob"
+select username, followers, rating, verified, email, tags from demo.users where username = "alice"
+select username, followers, rating, verified, email, tags from demo.users where username = "bob"
+select username, followers from demo.users where username = "carol"
+# More than one row needs SELECT ALL with a LIMIT (a scan; the docs discourage it on large models).
+select all username, age, followers from demo.users limit 10
+# DELETE is a point query too; the row is gone afterwards: error 111.
+delete from demo.users where username = "carol"
+select * from demo.users where username = "carol"
+# Types are strict: an unsigned literal into a sint64 column fails validation: error 109.
+create model demo.ledger(id: uint64, delta: sint64, null memo: string)
+insert into demo.ledger(1, 5, null)
+inspect space demo
+# A standard user (2-app-user.blueql runs as it): rows yes, DDL no.
+sysctl create user app with { password: "app-password-1234" }
+inspect global
