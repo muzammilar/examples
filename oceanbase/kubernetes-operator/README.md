@@ -13,19 +13,20 @@ make cli      # mariadb shell as root@test (make cli-sys: root@sys)
 make down     # delete the kind cluster
 ```
 
-[ob-operator](https://github.com/oceanbase/ob-operator) `2.3.4` (Helm chart `ob-operator/ob-operator`;
-2.3.4 is still the latest release, from January 2026) on a two-node kind cluster. It runs an
-[`OBCluster`](obcluster.yaml) with **one zone and one observer** in standalone mode
-(`oceanbase/oceanbase-cloud-native:4.4.2.1-101000022026050611`, the same OceanBase CE as the
-Docker Compose examples, native arm64) and an [`OBTenant`](obtenant.yaml) `test` (MySQL mode,
-1 CPU / 1.5Gi). cert-manager `v1.21.2` issues the webhook certificate. The observer is smaller than
-ob-operator normally accepts. See [Resource floors](#resource-floors).
+## Setup
 
-`up` is split into `kind-cluster`, `cert-manager`, `operator`, `cluster`, `tenant`, `client`.
-Passwords are in [`secrets.yaml`](secrets.yaml) (example values). Clients connect to the
-Service `obcluster-standalone-svc:2881`, which ob-operator creates in standalone mode.
+| Component | Version / spec |
+|---|---|
+| [ob-operator](https://github.com/oceanbase/ob-operator) | `2.3.4` (Helm chart `ob-operator/ob-operator`; still the latest release, from January 2026) |
+| cert-manager | `v1.21.2` (issues the webhook certificate) |
+| [`OBCluster`](obcluster.yaml) | **one zone, one observer**, standalone mode, `oceanbase/oceanbase-cloud-native:4.4.2.1-101000022026050611` (same OceanBase CE as the Docker Compose examples, native arm64); smaller than ob-operator normally accepts, see [Resource floors](#resource-floors) |
+| [`OBTenant`](obtenant.yaml) | `test`, MySQL mode, 1 CPU / 1.5Gi |
 
-## Run
+- `make up` = `kind-cluster`, `cert-manager`, `operator`, `cluster`, `tenant`, `client`.
+- Passwords: [`secrets.yaml`](secrets.yaml) (example values).
+- Clients connect to Service `obcluster-standalone-svc:2881`, created by ob-operator in standalone mode.
+
+## Results
 
 2026-10-03, Docker Desktop 29.5.3 on an Apple M4 Pro (Docker VM 11 CPUs, 24.4 GB), kind 0.32.0,
 Helm 4.3.0, with the observer image pulled into local Docker beforehand:
@@ -56,10 +57,13 @@ Helm 4.3.0, with the observer image pulled into local Docker beforehand:
 memory_limit 4G, system_memory 1G, cpu_count 16, datafile_size 2G, datafile_maxsize 11G, log_disk_size 11G
 ```
 
-Observed usage: the kind worker (observer, operator, cert-manager, client) used 3.7 GiB and the
-control plane 1.0 GiB. On disk the redo-log PVC took 12 GB (`log_disk_size` 11G, preallocated),
-the data PVC 2.1 GB and the log PVC 387 MB. The observer pod requests and limits `cpu: 2,
-memory: 5Gi`. `CPU_CAPACITY` is 16 anyway, because ob-operator passes `cpu_count = max(cpu, 16)`.
+| Observed | Value |
+|---|---|
+| kind worker (observer, operator, cert-manager, client) | 3.7 GiB |
+| control plane | 1.0 GiB |
+| redo-log PVC | 12 GB (`log_disk_size` 11G, preallocated) |
+| data PVC / log PVC | 2.1 GB / 387 MB |
+| observer pod requests = limits | `cpu: 2, memory: 5Gi`; `CPU_CAPACITY` is still 16 because ob-operator passes `cpu_count = max(cpu, 16)` |
 
 ## Resource floors
 
@@ -74,7 +78,7 @@ The OBCluster "obcluster" is invalid:
 * spec.observer.resource.memory: Invalid value: "5Gi": The minimum memory size of OBCluster is 8Gi
 ```
 
-These are only defaults. The operator reads them from its viper config
+These are defaults. The operator reads them from its viper config
 (`resource.minMemorySize`, `minDataDiskSize`, `minRedoLogDiskSize`, `minLogDiskSize` in
 [`internal/config/operator/default.go`](https://github.com/oceanbase/ob-operator/blob/2.3.4/internal/config/operator/default.go)),
 and the environment overrides them as `OB_OPERATOR_RESOURCE_MIN*`. The Helm chart has no value for
@@ -86,8 +90,7 @@ kubectl -n oceanbase-system set env deploy/oceanbase-controller-manager \
   OB_OPERATOR_RESOURCE_MINREDOLOGDISKSIZE=12Gi OB_OPERATOR_RESOURCE_MINLOGDISKSIZE=2Gi
 ```
 
-The rejection message always prints the built-in floors, even when they are lowered. Some limits
-still apply after that:
+The rejection message always prints the built-in floors, even when lowered. Limits that still apply:
 
 - **Data and redo log storage must each be at least 3 × `memory_limit`.** If `memory_limit` is not
   set in `spec.parameters`, the mutating webhook sets it to 90% of `resource.memory`. Here
@@ -101,7 +104,9 @@ still apply after that:
   (default 5G, which does not fit) is the same setting the Docker Compose scale-out example runs its
   observers with. ob-operator's own quickstart uses 10Gi memory and 50Gi data and redo storage.
 
-**3 zones × 1 observer: not run.** Memory would fit (3 × 5Gi requests on a 24 GB VM, about
+### 3 zones × 1 observer: not run
+
+Memory would fit (3 × 5Gi requests on a 24 GB VM, about
 3–3.7 GiB resident each). Disk would not: each observer needs at least 11 GB of preallocated log disk
 plus 2 GB of data file, about 40 GB for three. The Docker VM had 34 GB free at the time. The
 topology change is `topology: [{zone: zone1, replica: 1}, {zone: zone2, ...}, {zone: zone3, ...}]`

@@ -17,26 +17,29 @@ make cli        # obclient as root@test (on ob1); make cli-sys for root@sys
 make down       # remove everything
 ```
 
+## Setup
+
 The [`docker-compose-cluster`](../docker-compose-cluster) setup (OceanBase CE `4.4.2.1`, observers
 started without obd by [`scripts/observer.sh`](scripts/observer.sh), bootstrapped by
-[`scripts/bootstrap.sh`](scripts/bootstrap.sh)), extended with:
+[`scripts/bootstrap.sh`](scripts/bootstrap.sh)), plus:
 
-- **ob4..ob6**, a second observer for each of zone1..zone3 (compose profile `scale`), which
-  `make scale-out` adds to the running cluster and `make scale-in` removes again: 3 → 6 → 3
-  observers.
-- **obproxy** (`oceanbase/obproxy-ce:4.3.5.0-3`, port 2883), which sends every statement to
-  the observer that leads the partition it touches. Without it a client is pinned to one observer.
-- smaller observers so six of them fit in a 24 GB Docker VM: `memory_limit` 4G (the cluster
-  example uses 6G), 3 CPUs and 5 GB per container, and a `test` unit of 1 CPU / 1.5G.
+| Addition | Detail |
+|---|---|
+| **ob4..ob6** | a second observer for each of zone1..zone3 (compose profile `scale`); `make scale-out` adds them, `make scale-in` removes them: 3 → 6 → 3 observers |
+| **obproxy** | `oceanbase/obproxy-ce:4.3.5.0-3`, port 2883; sends each statement to the observer leading the partition it touches. Without it a client is pinned to one observer |
+| smaller observers | so six fit in a 24 GB Docker VM: `memory_limit` 4G (cluster example: 6G), 3 CPUs and 5 GB per container, `test` unit 1 CPU / 1.5G |
 
-- `mysql -h127.1 -P2883 -uroot@test#obcluster` goes through obproxy; `-P2881 -uroot@test`
-  goes to ob1 directly. No passwords. The sys-tenant user `proxyro` (password `proxyro`,
-  `OB_PROXYRO_PASSWORD`) is what obproxy reads the partition locations with.
+| Connection | Command |
+|---|---|
+| via obproxy | `mysql -h127.1 -P2883 -uroot@test#obcluster` |
+| ob1 direct | `mysql -h127.1 -P2881 -uroot@test` |
+
+- No passwords. obproxy reads partition locations as sys-tenant user `proxyro` (password `proxyro`, `OB_PROXYRO_PASSWORD`).
 - Fixed addresses on `172.28.12.0/24`: ob1..ob3 `.11-.13`, ob4..ob6 `.14-.16`, obproxy `.20`.
 
 ## Scale out
 
-[`scripts/scale.sh out`](scripts/scale.sh) does what an operator does by hand:
+[`scripts/scale.sh out`](scripts/scale.sh) runs the manual steps:
 
 ```sql
 -- after `docker compose --profile scale up ob4 ob5 ob6` (they start with the same rootservice list)
@@ -44,12 +47,12 @@ ALTER SYSTEM ADD SERVER '172.28.12.14:2882' ZONE 'zone1';   -- and .15 / zone2, 
 ALTER RESOURCE TENANT test UNIT_NUM = 2;                     -- one more unit of `test` per zone
 ```
 
-Adding servers alone moves nothing: a tenant only uses the servers its units sit on. Raising
-`UNIT_NUM` puts a second unit in each zone on the new servers, and the tenant's balancer then
-runs an `LS_BALANCE` job. It splits the user log stream LS 1001, moves half of the partitions into
-the new LS 1002 with a transfer, and moves LS 1002's replicas onto the new units. In OceanBase 4.4
-the statement is `ALTER RESOURCE TENANT`. The older form fails here with
-`ERROR 4179: Tenant 1002 zone_deploy_mode is 'homo', not 'hetero', alter resource pool unit_num not allowed`.
+- Adding servers alone moves nothing: a tenant uses only the servers its units sit on.
+- Raising `UNIT_NUM` puts a second unit per zone on the new servers; the tenant's balancer then
+  runs an `LS_BALANCE` job. It splits the user log stream LS 1001, moves half of the partitions into
+  the new LS 1002 with a transfer, and moves LS 1002's replicas onto the new units.
+- In OceanBase 4.4 the statement is `ALTER RESOURCE TENANT`. The older form fails with
+  `ERROR 4179: Tenant 1002 zone_deploy_mode is 'homo', not 'hetero', alter resource pool unit_num not allowed`.
 
 From the `make demo` run (times in seconds since the load started, sysbench running):
 
@@ -103,7 +106,7 @@ leader on ob1) to ob4, and it hung: the migration retried every ~10 s and failed
 `ret:-4737, OB_LS_EXIST; comment:[storage] fail to send execution rpc` (`CDB_OB_LS_REPLICA_TASK_HISTORY`,
 `migrate replica due to unit deleting`, for tenants 1002 and 1001). The units stayed `DELETING`
 for over 5 minutes. `ALTER RESOURCE TENANT test UNIT_NUM = 2` rolled it back within about 15 s.
-Name the unit group.
+Always name the unit group.
 
 ## Load during scaling (`make demo`)
 
@@ -118,7 +121,7 @@ running on the same Mac:
 | `oltp_point_select`, obproxy | 54.0k qps | 30.5k (min 1.0k) | **57.1k** | 43.7k (min 1.4k) | 52.9k |
 | `oltp_point_select`, ob1 direct | 49.0k qps | 28.1k (min 0.9k) | **26.0k** | 43.0k (min 2.8k) | 55.5k |
 
-No statement failed in any run (err/s 0.00). What the numbers show:
+No statement failed in any run (err/s 0.00).
 
 - **Both scale-out and scale-in are online.** Each one costs one 5–10 s dip: about 1k qps, or
   ~100 tps for read-write. It comes when the transfer switches partitions between log streams
