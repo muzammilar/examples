@@ -1,0 +1,130 @@
+name: influxdb3-single
+
+# InfluxDB 3 Core (one node) with MinIO as its object store: the WAL, snapshots, the catalog
+# and the Parquet files all live in the S3 bucket `influxdb3`; the container keeps no state.
+x-minio: &minio
+  # MinIO no longer publishes community images; Chainguard's free build is `latest` only,
+  # so it is pinned by digest (same image as ../../milvus/single-node).
+  image: cgr.dev/chainguard/minio:latest@sha256:6a1d0b45c8669726bba580ced0bfa4cb9fdeed1ed636dfabd81d1577beb6937b
+  environment:
+    MINIO_ROOT_USER: minioadmin
+    MINIO_ROOT_PASSWORD: minioadmin
+
+services:
+  minio:
+    <<: *minio
+    container_name: influxdb3-single-minio
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio-data:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+
+  # One-shot: create the bucket and, unless one exists, an offline admin token
+  # (`influxdb3 create token --admin --offline`) that the server loads at startup.
+  init:
+    image: influxdb:${INFLUXDB_VERSION:-3.12.0-core}
+    user: root
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - >-
+        [ -f /token/admin.json ] ||
+        { influxdb3 create token --admin --offline --name _admin --output-file /token/admin.json &&
+          chown 1500:1500 /token/admin.json; }
+    volumes:
+      - token:/token
+
+  bucket:
+    <<: *minio
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - mc alias set local http://minio:9000 minioadmin minioadmin >/dev/null && mc mb --ignore-existing local/influxdb3
+    depends_on:
+      minio: { condition: service_healthy }
+
+  influxdb3:
+    image: influxdb:${INFLUXDB_VERSION:-3.12.0-core}
+    container_name: influxdb3-single
+    command:
+      - influxdb3
+      - serve
+      - --node-id=node0
+      - --object-store=s3
+      - --bucket=influxdb3
+      - --aws-endpoint=http://minio:9000
+      - --aws-allow-http
+      - --aws-access-key-id=minioadmin
+      - --aws-secret-access-key=minioadmin
+      - --admin-token-file=/token/admin.json
+      - --plugin-dir=/plugins
+      - --virtual-env-location=/home/influxdb3/.venv # keep the plugin venv out of ./plugins
+      - --disable-authz=health,ping # unauthenticated /health and /ping for the healthcheck
+      # persist small, frequent snapshots so Parquet files show up within seconds
+      # (defaults: a snapshot every 600 one-second WAL files, i.e. ~10 min)
+      - --wal-files-per-snapshot=${WAL_FILES_PER_SNAPSHOT:-10}
+      - --gen1-duration=${GEN1_DURATION:-10m}
+    environment:
+      INFLUXDB3_LOG_FILTER: info
+    ports:
+      - "${INFLUXDB_PORT:-8191}:8181"
+    volumes:
+      - token:/token:ro
+      - ./plugins:/plugins:ro
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "-o", "/dev/null", "http://127.0.0.1:8181/ping"]
+      interval: 2s
+      timeout: 2s
+      retries: 60
+    depends_on:
+      init: { condition: service_completed_successfully }
+      bucket: { condition: service_completed_successfully }
+
+  # `make test`: scripts/demo.sh with the influxdb3 CLI and curl from the same image
+  client:
+    image: influxdb:${INFLUXDB_VERSION:-3.12.0-core}
+    profiles: [test]
+    entrypoint: ["bash", "/scripts/demo.sh"]
+    environment:
+      INFLUXDB3_HOST_URL: http://influxdb3:8181
+    volumes:
+      - token:/token:ro
+      - ./scripts:/scripts:ro
+    depends_on:
+      influxdb3: { condition: service_healthy }
+
+  # `make benchmark`: bench/bench.py (standard library) in the uv image
+  bench:
+    image: ghcr.io/astral-sh/uv:0.12.19-python3.13-trixie-slim
+    profiles: [bench]
+    cpus: ${BENCH_CLIENT_CPUS:-2}
+    working_dir: /bench
+    command: ["uv", "run", "--frozen", "bench.py"]
+    environment:
+      UV_CACHE_DIR: /uv/cache          # the venv lives in the uv volume, so reruns skip creating it
+      UV_PROJECT_ENVIRONMENT: /uv/venv
+      UV_PYTHON_DOWNLOADS: never       # use the image's Python
+      NAME: ${NAME:-}
+      ROWS: ${ROWS:-2000000}
+      SERIES: ${SERIES:-10000}
+      BATCH: ${BATCH:-10000}
+      WRITERS: ${WRITERS:-16}
+      NO_SYNC: ${NO_SYNC:-}
+      ITER: ${ITER:-30}
+      HOST_INFO: ${HOST_INFO:-}
+      DOCKER_INFO: ${DOCKER_INFO:-}
+      BENCH_LIMITS: ${BENCH_LIMITS:-}
+    volumes:
+      - token:/token:ro
+      - ./bench:/bench:ro
+      - ./results:/results
+      - uv-cache:/uv
+    depends_on:
+      influxdb3: { condition: service_healthy }
+
+volumes:
+  minio-data:
+  token:
+  uv-cache:

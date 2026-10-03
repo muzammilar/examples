@@ -1,0 +1,9 @@
+[project]
+name = "influxdb3-bench"
+version = "0.1.0"
+description = "Line protocol ingest and query latency against InfluxDB 3 Core for make benchmark"
+requires-python = ">=3.13"
+dependencies = []
+
+[tool.uv]
+package = false
