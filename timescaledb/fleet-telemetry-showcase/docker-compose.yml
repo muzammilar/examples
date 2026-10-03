@@ -1,0 +1,61 @@
+name: timescaledb-fleet
+
+# One TimescaleDB server (same image and tuning as ../single-node, capped at 4 CPUs / 6 GB)
+# and the Rust client (client/), which generates fleet telemetry and times ingest and queries.
+services:
+  timescaledb:
+    image: timescale/timescaledb-ha:${TIMESCALEDB_TAG:-pg18.6-ts2.30.2}
+    container_name: tsdb-fleet
+    environment:
+      POSTGRES_PASSWORD: tsdb-demo # fixed demo password
+      TIMESCALEDB_TELEMETRY: "off"
+      TS_TUNE_MEMORY: 6GB # timescaledb-tune on first start, sized for the caps below
+      TS_TUNE_NUM_CPUS: "4"
+    cpus: 4
+    mem_limit: 6g
+    memswap_limit: 6g
+    shm_size: 1g
+    ports:
+      - "${TIMESCALEDB_PORT:-5455}:5432"
+    volumes:
+      - fleet-data:/home/postgres/pgdata
+    healthcheck:
+      test: ["CMD", "pg_isready", "-h", "localhost", "-U", "postgres"]
+      interval: 2s
+      timeout: 5s
+      retries: 60
+      start_period: 5s
+
+  # `make run`: the Rust client (tokio-postgres, binary COPY)
+  fleet:
+    build: client
+    image: timescaledb-fleet-client
+    profiles: [run]
+    cpus: ${CLIENT_CPUS:-4}
+    environment:
+      PGHOST: timescaledb
+      PGUSER: postgres
+      PGPASSWORD: tsdb-demo
+      PGDATABASE: postgres
+      VEHICLES: ${VEHICLES:-1000}
+      FLEETS: ${FLEETS:-20}
+      DAYS: ${DAYS:-5}
+      INTERVAL_S: ${INTERVAL_S:-30}
+      WORKERS: ${WORKERS:-4}
+      BATCH: ${BATCH:-100000}
+      RUNS: ${RUNS:-5}
+    depends_on:
+      timescaledb: { condition: service_healthy }
+
+  psql:
+    image: timescale/timescaledb-ha:${TIMESCALEDB_TAG:-pg18.6-ts2.30.2}
+    profiles: [tools]
+    environment:
+      PGHOST: timescaledb
+      PGUSER: postgres
+      PGPASSWORD: tsdb-demo
+      PGDATABASE: postgres
+    entrypoint: ["psql"]
+
+volumes:
+  fleet-data:

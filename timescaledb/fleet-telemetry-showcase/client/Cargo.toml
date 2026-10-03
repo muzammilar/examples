@@ -1,0 +1,16 @@
+[package]
+name = "fleet"
+version = "0.1.0"
+edition = "2024"
+description = "TimescaleDB fleet telemetry showcase: binary COPY ingest, columnstore, continuous aggregates"
+publish = false
+
+[dependencies]
+anyhow = "1"
+futures-util = "0.3"
+rand = { version = "0.8", features = ["small_rng"] }
+tokio = { version = "1", features = ["rt-multi-thread", "macros"] }
+tokio-postgres = "0.7"
+
+[profile.release]
+opt-level = 3
