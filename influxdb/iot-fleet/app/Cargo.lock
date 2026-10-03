@@ -279,7 +279,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "iot-fleet-showcase"
+name = "iot-fleet"
 version = "0.1.0"
 dependencies = [
  "reqwest",

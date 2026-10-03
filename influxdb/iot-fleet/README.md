@@ -1,7 +1,7 @@
-# InfluxDB 3 Core — IoT fleet showcase (Rust client)
+# InfluxDB 3 Core — IoT fleet (Rust client)
 
 An IoT sensor fleet on one InfluxDB 3 Core node backed by MinIO, driven by
-[`showcase/`](showcase), a Rust program. It covers what InfluxDB 3 is built for:
+[`app/`](app), a Rust program. It covers what InfluxDB 3 is built for:
 
 - ingesting high-cardinality tags with no series limit;
 - serving "latest value" dashboards from in-memory caches;
@@ -12,7 +12,7 @@ It also shows the Core limit on how much of that history one query may read. HTT
 
 ```bash
 make up      # MinIO, the bucket, an offline admin token, influxdb3 serve
-make run     # build the showcase image (first time: ~1 min) and run it (~2 min)
+make run     # build the app image (first time: ~1 min) and run it (~2 min)
 make files   # object store usage per prefix: WAL, Parquet (dbs/), snapshots, catalog
 make status  # containers, /ping, CPU and memory
 make down    # remove the containers, the volumes and the built image
@@ -52,15 +52,15 @@ Override sizes with `CARDINALITIES`, `ROWS_PER_LEVEL`, `WRITERS`, `BATCH`, `FLEE
 InfluxDB 3 has no official Rust client. InfluxData's documented v3 client libraries are Go,
 Python, Java, C#, and JavaScript. The community crate
 [`influxdb3_client`](https://github.com/InfluxCommunity/influxdb3-rust) (0.3, InfluxCommunity,
-not supported by InfluxData) wraps writes and Flight SQL queries. This showcase calls the HTTP
-API directly with `reqwest` + `serde_json` on tokio (see [`Cargo.toml`](showcase/Cargo.toml)):
+not supported by InfluxData) wraps writes and Flight SQL queries. This example calls the HTTP
+API directly with `reqwest` + `serde_json` on tokio (see [`Cargo.toml`](app/Cargo.toml)):
 
 - `POST /api/v3/write_lp?db=iot&precision=nanosecond[&no_sync=true]` with a body of line protocol;
 - `POST /api/v3/query_sql` with `{"db", "q", "format": "json"}`;
 - `POST /api/v3/configure/{database,table,last_cache,distinct_cache}` and `DELETE
   /api/v3/configure/database?hard_delete_at=now`.
 
-[`showcase/Dockerfile`](showcase/Dockerfile) builds it in `rust:1.90-slim-bookworm` and copies
+[`app/Dockerfile`](app/Dockerfile) builds it in `rust:1.90-slim-bookworm` and copies
 the binary into `debian:bookworm-slim` (no TLS, so no OpenSSL). No host Rust needed.
 
 - Server image `influxdb:3.12.0-core` (`INFLUXDB_VERSION`), Chainguard MinIO pinned by digest,

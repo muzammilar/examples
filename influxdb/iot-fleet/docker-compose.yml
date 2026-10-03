@@ -1,6 +1,6 @@
 name: influxdb3-iot
 
-# One InfluxDB 3 Core node on MinIO, as in ../v3-core-single-node, plus the Rust showcase client.
+# One InfluxDB 3 Core node on MinIO, as in ../v3-core-single-node, plus the Rust client.
 x-minio: &minio
   # MinIO no longer publishes community images; Chainguard's free build is `latest` only,
   # so it is pinned by digest.
@@ -75,9 +75,9 @@ services:
       init: { condition: service_completed_successfully }
       bucket: { condition: service_completed_successfully }
 
-  # `make run`: showcase/ (Rust, reqwest against the HTTP API)
-  showcase:
-    build: showcase
+  # `make run`: app/ (Rust, reqwest against the HTTP API)
+  app:
+    build: app
     profiles: [run]
     environment:
       INFLUX_URL: http://influxdb3:8181

@@ -1,4 +1,4 @@
-//! IoT fleet showcase for InfluxDB 3 Core over plain HTTP (no official Rust client):
+//! IoT fleet example for InfluxDB 3 Core over plain HTTP (no official Rust client):
 //! 1. ingest at rising series cardinality (no series index, so no cardinality limit),
 //! 2. dashboard queries: last value / distinct value caches against the same answer in SQL,
 //! 3. a week of history persisted as Parquet in the object store, recent vs old data, and the
@@ -341,7 +341,7 @@ async fn main() -> R<()> {
             break;
         }
         // keep the WAL moving like a live fleet would: one heartbeat row a second
-        db.write(format!("heartbeat,source=showcase alive=1i {}\n", now_ns()), false).await?;
+        db.write(format!("heartbeat,source=iot-fleet alive=1i {}\n", now_ns()), false).await?;
         tokio::time::sleep(Duration::from_secs(1)).await;
     }
     println!(

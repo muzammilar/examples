@@ -5,13 +5,13 @@ up:
 	docker compose logs --no-log-prefix influxdb3 | grep -E 'server starting|startup time'
 
 build:
-	docker compose --profile run build showcase
+	docker compose --profile run build app
 
-# the showcase against the running server; it recreates database `iot` each run
+# runs the app against the running server; it recreates database `iot` each run
 # (override CARDINALITIES, ROWS_PER_LEVEL, WRITERS, BATCH, FLEET_DEVICES, FLEET_POINTS,
 # HISTORY_DEVICES, HISTORY_DAYS, HISTORY_STEP_S, ITER)
 run:
-	docker compose --progress quiet run --rm --build --no-deps showcase
+	docker compose --progress quiet run --rm --build --no-deps app
 
 # what the object store holds per prefix (WAL, Parquet under dbs/, snapshots, catalog)
 files:
