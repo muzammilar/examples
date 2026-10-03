@@ -1,0 +1,91 @@
+name: timescaledb-single
+
+# One TimescaleDB server: timescale/timescaledb-ha, the image Timescale builds for its own
+# cloud (Postgres + timescaledb + timescaledb_toolkit + pgvector/pgvectorscale + Patroni),
+# all under the Timescale License (community features: columnstore, continuous aggregates,
+# policies, hyperfunctions). Multi-arch, native on Apple silicon.
+x-env: &pgenv
+  PGHOST: timescaledb
+  PGUSER: postgres
+  PGDATABASE: postgres
+  PGPASSWORD: tsdb-demo
+
+services:
+  timescaledb:
+    image: timescale/timescaledb-ha:${TIMESCALEDB_TAG:-pg18.6-ts2.30.2}
+    container_name: timescaledb
+    environment:
+      POSTGRES_PASSWORD: tsdb-demo # fixed demo password
+      TIMESCALEDB_TELEMETRY: "off"
+      # the image runs timescaledb-tune on first start; size it for the make benchmark budget
+      # (4 CPUs / 6 GB) rather than the whole Docker VM
+      TS_TUNE_MEMORY: 6GB
+      TS_TUNE_NUM_CPUS: "4"
+    ports:
+      # host 5450, not 5432, to stay clear of a local PostgreSQL
+      - "${TIMESCALEDB_PORT:-5450}:5432"
+    volumes:
+      - timescaledb-data:/home/postgres/pgdata
+    shm_size: 1g
+    healthcheck:
+      test: ["CMD", "pg_isready", "-h", "localhost", "-U", "postgres"]
+      interval: 2s
+      timeout: 5s
+      retries: 60
+      start_period: 5s
+
+  # psql for `make test` / `make cli` (same image, so no extra pull); only via `docker compose run`
+  psql:
+    image: timescale/timescaledb-ha:${TIMESCALEDB_TAG:-pg18.6-ts2.30.2}
+    profiles: [tools]
+    environment: *pgenv
+    volumes:
+      - ./sql:/sql:ro
+    entrypoint: ["psql", "-v", "ON_ERROR_STOP=1"]
+    depends_on:
+      timescaledb: { condition: service_healthy }
+
+  # `make benchmark`: timescaledb-parallel-copy ingest + queries (bench/run.sh), raw output to results/
+  bench:
+    image: timescale/timescaledb-ha:${TIMESCALEDB_TAG:-pg18.6-ts2.30.2}
+    profiles: [bench]
+    cpus: ${BENCH_CLIENT_CPUS:-2}
+    user: root # writes results/ owned by the host user's bind mount
+    entrypoint: ["bash", "/bench/run.sh"]
+    environment:
+      <<: *pgenv
+      NAME: ${NAME:-}
+      DEVICES: ${DEVICES:-1000}
+      DAYS: ${DAYS:-7}
+      WORKERS: ${WORKERS:-1 4 8}
+      BATCH: ${BATCH:-5000}
+      RUNS: ${RUNS:-5}
+    volumes:
+      - ./bench:/bench:ro
+      - ./results:/results
+    depends_on:
+      timescaledb: { condition: service_healthy }
+
+  # `make benchmark`: parses the raw output (bench/report.py) into a table and results/*.json
+  bench-report:
+    image: ghcr.io/astral-sh/uv:0.12.19-python3.13-trixie-slim
+    profiles: [bench]
+    network_mode: none
+    working_dir: /bench
+    command: ["uv", "run", "--frozen", "report.py"]
+    environment:
+      UV_CACHE_DIR: /uv/cache          # the venv lives in the uv volume, so reruns skip creating it
+      UV_PROJECT_ENVIRONMENT: /uv/venv
+      UV_PYTHON_DOWNLOADS: never       # use the image's Python
+      NAME: ${NAME:-}
+      HOST_INFO: ${HOST_INFO:-}
+      DOCKER_INFO: ${DOCKER_INFO:-}
+      BENCH_LIMITS: ${BENCH_LIMITS:-}
+    volumes:
+      - ./bench:/bench:ro
+      - ./results:/results
+      - uv-cache:/uv
+
+volumes:
+  timescaledb-data:
+  uv-cache:
