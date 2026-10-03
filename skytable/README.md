@@ -18,3 +18,16 @@ connections (Apple M4 Pro, Docker VM aarch64, 2026-10-02): ~185–210k INSERT/UP
 per second at ~0.13 ms p50 and ~0.6–1.1 ms p99. Each query is its own round trip. skyd used
 under 2 CPUs, and 8 CPUs did not go faster. Full table and method:
 [`single-node/README.md`](single-node/README.md#benchmark).
+
+## Known issues
+
+Skytable is not stable enough to depend on yet: 0.8.4 (August 2024) is still the latest release,
+clustering promised for early 2025 has not shipped, and 0.9 is developed in a private repository.
+Seen while building these examples (2026-10-02):
+
+- The `skytable/skytable:v0.8.4` release image is amd64 only, so on Apple silicon it runs under
+  emulation. These examples pin a multi-arch build of the `next` branch (still reports 0.8.4).
+- skysh cannot send signed integers (`-5`, `-=`) and only parses a float when punctuation follows
+  it. Details: [`single-node/README.md`](single-node/README.md).
+- After `ALTER MODEL ... ADD` on a model with rows, `SELECT *` on an old row returns error `101`
+  and `SELECT ALL` panics a server task (`sel.rs:108`). skyd keeps running.
