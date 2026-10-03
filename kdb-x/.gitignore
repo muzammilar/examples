@@ -1,0 +1,4 @@
+# license files and the env file holding KDB_LICENSE_B64: never commit them
+license/*
+!license/README.md
+.env
