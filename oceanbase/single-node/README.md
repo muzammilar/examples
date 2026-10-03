@@ -1,13 +1,9 @@
 # OceanBase — single node
 
-One OceanBase Community Edition observer from the official
-[`oceanbase/oceanbase-ce`](https://github.com/oceanbase/docker-images/tree/main/oceanbase-ce)
-image, as in the
-[Docker quick start](https://en.oceanbase.com/docs/common-oceanbase-database-10000000001970931).
-`MODE=mini` (the image default) runs `obd` inside the container to deploy one observer
-with the smallest resource settings, then creates the MySQL-mode user tenant `test`.
-Image `4.4.2.1-101000022026050611` (tag `4.4.2-lts`), multi-arch, so it runs natively on
-Apple silicon.
+One OceanBase CE observer (`MODE=mini`, MySQL-mode tenant `test`) on Docker Compose, with SQL
+tests and a sysbench benchmark.
+
+## Quick start
 
 ```bash
 make up        # start and wait for "boot success!" (about 1 minute here, up to 5)
@@ -19,6 +15,15 @@ make cli-sys   # interactive obclient as root@sys (cluster-wide views)
 make logs      # last 50 lines of the entrypoint (obd) output
 make down      # remove the container and its data
 ```
+
+One OceanBase Community Edition observer from the official
+[`oceanbase/oceanbase-ce`](https://github.com/oceanbase/docker-images/tree/main/oceanbase-ce)
+image, as in the
+[Docker quick start](https://en.oceanbase.com/docs/common-oceanbase-database-10000000001970931).
+`MODE=mini` (the image default) runs `obd` inside the container to deploy one observer
+with the smallest resource settings, then creates the MySQL-mode user tenant `test`.
+Image `4.4.2.1-101000022026050611` (tag `4.4.2-lts`), multi-arch, so it runs natively on
+Apple silicon.
 
 - MySQL protocol: `localhost:2881` (`OB_PORT=... make up` to change the host port)
   - `mysql -h127.0.0.1 -P2881 -uroot@test` — user tenant `test`, no password

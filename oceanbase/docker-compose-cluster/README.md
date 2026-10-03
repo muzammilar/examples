@@ -1,5 +1,22 @@
 # OceanBase — 3-zone cluster with Docker Compose
 
+Three OceanBase CE observers in three zones, bootstrapped by hand without obd, with a MySQL-mode
+tenant `test` replicated to every zone and a leader-failover demo.
+
+## Quick start
+
+```bash
+make up        # start ob1..ob3, bootstrap the cluster, create tenant `test` (about 40 s)
+make test      # sql/*.sql: partitions, transaction, EXPLAIN, replicas/leaders per zone, cluster views
+make failover  # kill the observer with the leaders, write through the others, restart it, wait for catch-up
+make benchmark # sysbench OLTP against tenant `test` at 2 CPUs / 7 GB per observer; SMOKE=1 = quick
+make status    # servers, tenants, `test` log stream leaders
+make cli       # interactive obclient as root@test (on ob1)
+make cli-sys   # interactive obclient as root@sys (cluster-wide views)
+make logs      # container output + recent errors from each observer.log
+make down      # remove the containers and their data
+```
+
 Three OceanBase Community Edition observers, one per zone, from the official
 [`oceanbase/oceanbase-ce`](https://github.com/oceanbase/docker-images/tree/main/oceanbase-ce)
 image (`4.4.2.1-101000022026050611`, tag `4.4.2-lts`, multi-arch, so native on Apple silicon).
@@ -21,18 +38,6 @@ CREATE RESOURCE UNIT test_unit MAX_CPU = 2, MIN_CPU = 2, MEMORY_SIZE = '4G', LOG
 CREATE RESOURCE POOL test_pool UNIT = 'test_unit', UNIT_NUM = 1, ZONE_LIST = ('zone1', 'zone2', 'zone3');
 CREATE TENANT test RESOURCE_POOL_LIST = ('test_pool'), LOCALITY = 'F@zone1, F@zone2, F@zone3',
   PRIMARY_ZONE = 'zone1;zone2;zone3' SET ob_compatibility_mode = 'mysql', ob_tcp_invited_nodes = '%';
-```
-
-```bash
-make up        # start ob1..ob3, bootstrap the cluster, create tenant `test` (about 40 s)
-make test      # sql/*.sql: partitions, transaction, EXPLAIN, replicas/leaders per zone, cluster views
-make failover  # kill the observer with the leaders, write through the others, restart it, wait for catch-up
-make benchmark # sysbench OLTP against tenant `test` at 2 CPUs / 7 GB per observer; SMOKE=1 = quick
-make status    # servers, tenants, `test` log stream leaders
-make cli       # interactive obclient as root@test (on ob1)
-make cli-sys   # interactive obclient as root@sys (cluster-wide views)
-make logs      # container output + recent errors from each observer.log
-make down      # remove the containers and their data
 ```
 
 - MySQL protocol, one port per observer: `localhost:2881` (ob1), `:2891` (ob2), `:2901` (ob3)
