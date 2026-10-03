@@ -1,0 +1,45 @@
+name: valkey-minimal-lua
+
+services:
+  valkey:
+    image: valkey/valkey:${VALKEY_VERSION:-9.1.2}
+    # same limits as dragonfly/single-node so the bench numbers compare
+    cpus: 2
+    mem_limit: 1g
+    # two I/O threads, like dragonfly's --proactor_threads=2
+    command: ["valkey-server", "--io-threads", "2"]
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 2s
+      retries: 30
+    ports:
+      - "127.0.0.1:${VALKEY_PORT:-6390}:6379"
+
+  app:
+    build:
+      context: .
+      args:
+        GO_VERSION: ${GO_VERSION:-1.26}
+    profiles: [app]
+    environment:
+      VALKEY_ADDR: valkey:6379
+    depends_on:
+      valkey:
+        condition: service_healthy
+
+  # valkey-benchmark for make bench-resp
+  resp:
+    image: valkey/valkey:${VALKEY_VERSION:-9.1.2}-alpine
+    profiles: [bench]
+    entrypoint: []
+    depends_on:
+      valkey:
+        condition: service_healthy
+
+  # make bench-lua: go/rueidis-lua-bench (linked as bench), rueidis in standalone mode
+  lua:
+    build: bench
+    profiles: [bench]
+    depends_on:
+      valkey:
+        condition: service_healthy
