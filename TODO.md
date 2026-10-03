@@ -25,7 +25,7 @@ Candidate databases and systems to add as examples. Branch names follow the exis
 ## Time-series
 
 - [ ] `timescaledb-single-node`: hypertables and continuous aggregates on Postgres.
-- [ ] `questdb-single-node`: ILP ingest and `SAMPLE BY` queries.
+- [x] `questdb-single-node`: ILP ingest and `SAMPLE BY` queries.
 - [ ] `victoriametrics-docker-compose-cluster`: vminsert/vmselect/vmstorage as Prometheus long-term storage.
 - [x] `influxdb3-core-single-node`: Arrow/Parquet engine with SQL.
 - [ ] `greptimedb-single-node`: unified metrics, logs and traces.

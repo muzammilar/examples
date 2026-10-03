@@ -1,0 +1,68 @@
+name: questdb-single
+
+# One QuestDB server (official image). Config is set with QDB_* environment variables, which
+# override server.conf keys (cairo.wal.enabled.default -> QDB_CAIRO_WAL_ENABLED_DEFAULT).
+services:
+  questdb:
+    image: questdb/questdb:${QUESTDB_VERSION:-10.0.1}
+    container_name: questdb
+    environment:
+      QDB_TELEMETRY_ENABLED: "false"
+    ports:
+      - "${QUESTDB_HTTP_PORT:-9000}:9000"  # web console, REST (/exec, /imp, /exp), ILP over HTTP
+      - "${QUESTDB_PG_PORT:-8812}:8812"    # PostgreSQL wire protocol (admin / quest)
+      - "${QUESTDB_ILP_PORT:-9009}:9009"   # ILP over TCP
+      - "${QUESTDB_HEALTH_PORT:-9003}:9003" # health check and /metrics (Prometheus)
+    volumes:
+      - questdb-data:/var/lib/questdb
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:9003/"]
+      interval: 2s
+      timeout: 2s
+      retries: 60
+
+  # `make test` / `make cli`: psql over the PostgreSQL wire protocol (user admin, password quest)
+  psql:
+    image: postgres:17-alpine
+    profiles: [tools]
+    entrypoint: ["psql", "-h", "questdb", "-p", "8812", "-U", "admin", "-d", "qdb"]
+    environment:
+      PGPASSWORD: quest
+    volumes:
+      - ./sql:/sql:ro
+    depends_on:
+      questdb: { condition: service_healthy }
+
+  # `make benchmark`: bench/bench.py, ILP ingest with the official Python client, then timed
+  # queries over HTTP; results to results/
+  bench:
+    image: ghcr.io/astral-sh/uv:0.12.19-python3.13-trixie-slim
+    profiles: [bench]
+    cpus: ${BENCH_CLIENT_CPUS:-6}
+    working_dir: /bench
+    command: ["uv", "run", "--frozen", "bench.py"]
+    environment:
+      UV_CACHE_DIR: /uv/cache          # the venv lives in the uv volume, so reruns skip creating it
+      UV_PROJECT_ENVIRONMENT: /uv/venv
+      UV_PYTHON_DOWNLOADS: never       # use the image's Python
+      NAME: ${NAME:-}
+      SMOKE: ${SMOKE:-}
+      ROWS: ${ROWS:-}
+      PROCS: ${PROCS:-}
+      CHUNK: ${CHUNK:-}
+      SYMBOLS: ${SYMBOLS:-}
+      REPEAT: ${REPEAT:-}
+      KEEP: ${KEEP:-}
+      HOST_INFO: ${HOST_INFO:-}
+      DOCKER_INFO: ${DOCKER_INFO:-}
+      BENCH_LIMITS: ${BENCH_LIMITS:-}
+    volumes:
+      - ./bench:/bench:ro
+      - ./results:/results
+      - uv-cache:/uv
+    depends_on:
+      questdb: { condition: service_healthy }
+
+volumes:
+  questdb-data:
+  uv-cache:
