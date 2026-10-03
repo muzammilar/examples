@@ -1,9 +1,8 @@
 # TigerBeetle — single replica
 
-One TigerBeetle replica following the [Docker recipe](https://docs.tigerbeetle.com/operating/deploying/docker/):
-a one-shot `format` service runs `tigerbeetle format --cluster=0 --replica=0 --replica-count=1`
-into a named volume, then `tigerbeetle start --addresses=0.0.0.0:3000` serves it.
-Client port: `localhost:3033` (override with `TIGERBEETLE_PORT`).
+One TigerBeetle replica on Docker Compose, exercised with the official Python client.
+
+## Quick start
 
 ```bash
 make up        # format the data file (first run only) and start the replica
@@ -15,6 +14,11 @@ make status    # container state, version, balances through the REPL
 make cli       # interactive tigerbeetle repl
 make down      # remove the containers, the data volume and the built test client image
 ```
+
+One TigerBeetle replica following the [Docker recipe](https://docs.tigerbeetle.com/operating/deploying/docker/):
+a one-shot `format` service runs `tigerbeetle format --cluster=0 --replica=0 --replica-count=1`
+into a named volume, then `tigerbeetle start --addresses=0.0.0.0:3000` serves it.
+Client port: `localhost:3033` (override with `TIGERBEETLE_PORT`).
 
 - Image `ghcr.io/tigerbeetle/tigerbeetle:0.17.9` (override with `TIGERBEETLE_VERSION`); the
   test client is `python:3.13-slim` + `pip install tigerbeetle==0.17.9`, built by `make test`.

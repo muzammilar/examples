@@ -1,10 +1,8 @@
 # TigerBeetle — 3-replica cluster with Docker Compose
 
-Three replicas of cluster `0`, as in the [Docker Compose recipe](https://docs.tigerbeetle.com/operating/deploying/docker/#run-a-multi-node-cluster-using-docker-compose):
-each formats its own data file (`--replica=N --replica-count=3`) on first start, then runs
-`tigerbeetle start --addresses=<all three replicas>`. Three replicas replicate every commit to a
-quorum of 2 and survive one failed replica; the docs recommend
-[6 replicas on separate machines](https://docs.tigerbeetle.com/operating/cluster/) for production.
+Three TigerBeetle replicas of one cluster on Docker Compose, with a primary failover test.
+
+## Quick start
 
 ```bash
 make up        # start the replicas (they format on first start and elect a primary)
@@ -17,6 +15,12 @@ make status    # container state, current primary, each replica's last view/role
 make cli       # interactive tigerbeetle repl
 make down      # remove containers, the data volumes and the built test client image
 ```
+
+Three replicas of cluster `0`, as in the [Docker Compose recipe](https://docs.tigerbeetle.com/operating/deploying/docker/#run-a-multi-node-cluster-using-docker-compose):
+each formats its own data file (`--replica=N --replica-count=3`) on first start, then runs
+`tigerbeetle start --addresses=<all three replicas>`. Three replicas replicate every commit to a
+quorum of 2 and survive one failed replica; the docs recommend
+[6 replicas on separate machines](https://docs.tigerbeetle.com/operating/cluster/) for production.
 
 - Replica `i` is `tigerbeetle-i` at `10.203.53.1i:3000` on the `tigerbeetle` network; host ports
   `3033`, `3034`, `3035` (override with `TIGERBEETLE_PORT_0..2`). A host client passes
