@@ -1,6 +1,6 @@
 name: questdb-market
 
-# One QuestDB server, as in ../single-node, plus the Rust showcase client (ILP over HTTP to
+# One QuestDB server, as in ../single-node, plus the Rust client (ILP over HTTP to
 # :9000, PostgreSQL wire to :8812, both inside the compose network).
 services:
   questdb:
@@ -19,9 +19,9 @@ services:
       timeout: 2s
       retries: 60
 
-  # `make run`: showcase/ (Rust: questdb-rs ILP/HTTP feeds + tokio-postgres queries)
-  showcase:
-    build: showcase
+  # `make run`: app/ (Rust: questdb-rs ILP/HTTP feeds + tokio-postgres queries)
+  app:
+    build: app
     profiles: [run]
     environment:
       QDB_HOST: questdb

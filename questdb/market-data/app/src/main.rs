@@ -1,4 +1,4 @@
-//! Market-data showcase: live tick ingestion over ILP while time-series SQL runs on the
+//! Market-data example: live tick ingestion over ILP while time-series SQL runs on the
 //! freshest data.
 //!
 //! * Feed threads, each with its own ILP-over-HTTP `Sender` (official `questdb-rs` client),
@@ -511,6 +511,6 @@ async fn main() -> Res<()> {
     if !all_ok {
         return Err("row counts do not match what was sent".into());
     }
-    println!("\nSHOWCASE PASSED");
+    println!("\nALL CHECKS PASSED");
     Ok(())
 }

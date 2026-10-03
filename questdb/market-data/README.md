@@ -1,7 +1,7 @@
-# QuestDB — market-data showcase (Rust client)
+# QuestDB — market data (Rust client)
 
 Live market-data ingestion on one QuestDB server while dashboard-style time-series SQL runs on
-the newest seconds of data. [`showcase/`](showcase) is a Rust program: feed threads write quotes
+the newest seconds of data. [`app/`](app) is a Rust program: feed threads write quotes
 and trades over ILP/HTTP with the official [`questdb-rs`](https://crates.io/crates/questdb-rs)
 client, and PostgreSQL-wire connections ([`tokio-postgres`](https://crates.io/crates/tokio-postgres))
 query at the same time. Host ports: web console `localhost:9001` (`QUESTDB_HTTP_PORT`), PG wire
@@ -9,7 +9,7 @@ query at the same time. Host ports: web console `localhost:9001` (`QUESTDB_HTTP_
 
 ```bash
 make up      # start QuestDB (questdb/questdb:10.0.1)
-make run     # build the showcase image (first time: about a minute) and run it
+make run     # build the app image (first time: about a minute) and run it
 make status  # container state and server version
 make down    # remove the containers, the data volume and the built image
 ```
@@ -45,12 +45,12 @@ Override with `FEEDS` (feed counts to run one after the other, default `1,4`), `
 (rows/s in total, `0` = as fast as possible), `DURATION`, `SYMBOLS`, `BATCH`, `QUERY_CLIENTS`,
 `KEEP`, for example `make run RATE=0 FEEDS=1,4,8`.
 
-- The [`showcase/Dockerfile`](showcase/Dockerfile) builds with `rust:1.98.1-trixie`
+- The [`app/Dockerfile`](app/Dockerfile) builds with `rust:1.98.1-trixie`
   (`questdb-rs` 7.0.0 needs Rust 1.91.1 or newer) and ships the binary on `debian:trixie-slim`.
   No host Rust needed. Only the crate's `sync-sender-http` feature is used, plus
   `ring-crypto` and `tls-webpki-certs`, which it requires even without TLS.
 - `questdb-rs` 7.0 can also query, and send over QWP (QuestDB's binary protocol over WebSocket,
-  server 10.0+). This showcase uses ILP/HTTP and PG wire, the interfaces most clients have.
+  server 10.0+). This example uses ILP/HTTP and PG wire, the interfaces most clients have.
 - Compose project `questdb-market`, container `questdb-market`, so it runs next to
   [`../single-node`](../single-node).
 
@@ -102,7 +102,7 @@ shared with other running containers.
       1       500,660         369          25          60          21.2          82.2
       4       501,422         163          65         233          21.3        2590.0
 
-SHOWCASE PASSED
+ALL CHECKS PASSED
 ```
 
 (Per-second progress lines and the VWAP / top-of-book tables trimmed.)
