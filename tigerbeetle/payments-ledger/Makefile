@@ -6,12 +6,12 @@ up:
 
 # builds the official Rust client from source at the server's tag (first run: a few minutes)
 build:
-	docker compose --profile run build showcase
+	docker compose --profile run build app
 
-# the showcase against the running replica; every run uses fresh accounts, so it can be repeated
+# runs the app against the running replica; every run uses fresh accounts, so it can be repeated
 # (override USERS, MERCHANTS, PAYMENTS, CLIENTS, HOLDS, EXCHANGES)
 run:
-	docker compose --progress quiet run --rm --build --no-deps showcase
+	docker compose --progress quiet run --rm --build --no-deps app
 
 status:
 	docker compose ps --format 'table {{.Name}}\t{{.Status}}\t{{.Ports}}'

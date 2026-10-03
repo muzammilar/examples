@@ -1,5 +1,5 @@
 [package]
-name = "ledger-showcase"
+name = "payments-ledger"
 version = "0.1.0"
 edition = "2021"
 publish = false

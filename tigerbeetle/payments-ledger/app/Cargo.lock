@@ -79,7 +79,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "ledger-showcase"
+name = "payments-ledger"
 version = "0.1.0"
 dependencies = [
  "futures",

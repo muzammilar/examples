@@ -199,7 +199,7 @@ fn main() {
     let mut model = vec![Bal::default(); l.count()];
     let mut rng = Rng(0x5EED);
 
-    println!("TigerBeetle ledger showcase (Rust client), cluster 0 at {address}");
+    println!("TigerBeetle payments ledger (Rust client), cluster 0 at {address}");
     println!(
         "{users} users (USD + EUR wallet each), {merchants} merchants, {payments} payments from \
          {clients} clients, {holds} card holds, {exchanges} currency exchanges\n"

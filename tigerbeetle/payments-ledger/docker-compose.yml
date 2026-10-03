@@ -1,6 +1,6 @@
 name: tigerbeetle-ledger
 
-# One replica (--replica-count=1), as in ../single-node, plus the Rust showcase client.
+# One replica (--replica-count=1), as in ../single-node, plus the Rust client.
 # TigerBeetle needs io_uring, which Docker >= 25 blocks by default: seccomp=unconfined.
 x-tigerbeetle: &tigerbeetle
   image: ghcr.io/tigerbeetle/tigerbeetle:${TIGERBEETLE_VERSION:-0.17.9}
@@ -33,10 +33,10 @@ services:
       timeout: 2s
       retries: 30
 
-  # `make run`: showcase/ (Rust, official client built from source at the same tag)
-  showcase:
+  # `make run`: app/ (Rust, official client built from source at the same tag)
+  app:
     build:
-      context: showcase
+      context: app
       args:
         TIGERBEETLE_VERSION: ${TIGERBEETLE_VERSION:-0.17.9}
     profiles: [run]

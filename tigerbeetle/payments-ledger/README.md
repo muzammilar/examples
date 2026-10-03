@@ -1,13 +1,13 @@
-# TigerBeetle — ledger showcase (Rust client)
+# TigerBeetle — payments ledger (Rust client)
 
-A wallet/payments ledger on one TigerBeetle replica, driven by [`showcase/`](showcase), a Rust
+A wallet/payments ledger on one TigerBeetle replica, driven by [`app/`](app), a Rust
 program using the official Rust client. Every money movement is a double-entry transfer and every
 rule (no overdraft, holds, atomic multi-leg moves, idempotency) is enforced by the database, not
 the application. Client port: `localhost:3034` (override with `TIGERBEETLE_PORT`).
 
 ```bash
 make up      # format the data file (first run only) and start the replica
-make run     # build the showcase image (first time: a few minutes) and run it
+make run     # build the app image (first time: a few minutes) and run it
 make status  # container state and server version
 make down    # remove the containers, the data volume and the built image
 ```
@@ -46,10 +46,10 @@ Override the sizes with `USERS`, `MERCHANTS`, `PAYMENTS`, `CLIENTS`, `HOLDS`, `E
 TigerBeetle's Rust client lives in the main repo ([`src/clients/rust`](https://github.com/tigerbeetle/tigerbeetle/tree/0.17.9/src/clients/rust))
 but is not on crates.io yet (the `tigerbeetle` crate there is a 0.0.1 placeholder), and it links
 the native `tb_client` library that `zig build clients:rust` produces. So
-[`showcase/Dockerfile`](showcase/Dockerfile) clones tag `0.17.9`, builds the library with the
+[`app/Dockerfile`](app/Dockerfile) clones tag `0.17.9`, builds the library with the
 repo's pinned Zig, stamped with `-Dconfig-release=0.17.9 -Dconfig-release-client-min=0.16.4` (a
 plain source build reports a dev release that the server would reject), then `cargo build`s the
-showcase against the crate by path (`/tigerbeetle/src/clients/rust` in [`Cargo.toml`](showcase/Cargo.toml)).
+the app against the crate by path (`/tigerbeetle/src/clients/rust` in [`Cargo.toml`](app/Cargo.toml)).
 The final image is `debian:bookworm-slim` plus the binary. No host Rust or Zig needed.
 
 - Server image `ghcr.io/tigerbeetle/tigerbeetle:0.17.9` (override with `TIGERBEETLE_VERSION`, and

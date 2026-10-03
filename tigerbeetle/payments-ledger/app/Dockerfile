@@ -18,11 +18,11 @@ RUN ./zig/download.sh && ./zig/zig build clients:rust -Drelease \
 
 FROM rust:1.90-slim-bookworm AS build
 COPY --from=tb-client /tigerbeetle/src/clients/rust /tigerbeetle/src/clients/rust
-WORKDIR /showcase
+WORKDIR /app
 COPY Cargo.toml Cargo.lock ./
 COPY src src
 RUN cargo build --release --locked
 
 FROM debian:bookworm-slim
-COPY --from=build /showcase/target/release/ledger-showcase /usr/local/bin/ledger-showcase
-CMD ["ledger-showcase"]
+COPY --from=build /app/target/release/payments-ledger /usr/local/bin/payments-ledger
+CMD ["payments-ledger"]
