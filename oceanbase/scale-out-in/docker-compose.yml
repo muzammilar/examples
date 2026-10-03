@@ -1,0 +1,112 @@
+name: oceanbase-scale
+
+# Scale out / scale in: three observers (ob1..ob3, one per zone) form the cluster at
+# `make up`; ob4..ob6 (one more per zone, compose profile `scale`) are started by
+# `make scale-out` and added with ALTER SYSTEM ADD SERVER, then removed again by
+# `make scale-in` (ALTER SYSTEM DELETE SERVER). Same image and startup as the
+# docker-compose-cluster example: scripts/observer.sh runs the observer binary from the
+# official oceanbase-ce image without obd. The image is multi-arch (native on Apple silicon).
+#
+# Memory: six observers have to fit in a ~24 GB Docker VM, so each one runs with
+# memory_limit 4G (system_memory 1G, sys unit 1G, `test` unit 1.5G + 0.5G headroom) and a 5g container cap.
+
+x-observer: &observer
+  image: oceanbase/oceanbase-ce:${OB_VERSION:-4.4.2.1-101000022026050611}
+  entrypoint: ["/scripts/observer.sh"]
+  # CPU cap per observer (cgroup); cpu_count below is what the observer schedules with.
+  cpus: ${OB_CPUS:-3}
+  mem_limit: ${OB_CONTAINER_MEM:-5g}
+  memswap_limit: ${OB_CONTAINER_MEM:-5g}
+  environment: &observer-env
+    OB_CLUSTER_NAME: obcluster
+    OB_SYSLOG_LEVEL: ${OB_SYSLOG_LEVEL:-WARN}
+    # The rootservice list only names the three bootstrap servers; ob4..ob6 use it to find
+    # the cluster and join once the root service has run ADD SERVER for them.
+    OB_RS_LIST: 172.28.12.11:2882:2881;172.28.12.12:2882:2881;172.28.12.13:2882:2881
+    # memory_limit 4G: 1G system memory + sys unit 1G + `test` unit 1.5G (0.5G free to grow into).
+    # __min_full_resource_pool_memory 1G (default 5G: bootstrap fails with 4624).
+    OB_OPTS: >-
+      memory_limit=${OB_MEMORY_LIMIT:-4G},system_memory=${OB_SYSTEM_MEMORY:-1G},datafile_size=${OB_DATAFILE_SIZE:-2G},log_disk_size=${OB_LOG_DISK_SIZE:-4G},cpu_count=${OB_CPU_COUNT:-4},enable_syslog_recycle=True,max_syslog_file_count=2,enable_syslog_wf=False,enable_record_trace_log=False,__min_full_resource_pool_memory=1073741824
+  volumes:
+    - ./scripts:/scripts:ro
+    - ./sql:/sql:ro
+  healthcheck:
+    test: ["CMD-SHELL", "obclient -h127.1 -P2881 -uroot@sys -A -e 'SELECT 1' >/dev/null 2>&1"]
+    interval: 5s
+    timeout: 5s
+    retries: 60
+    start_period: 2m
+
+services:
+  ob1:
+    <<: *observer
+    container_name: ob1
+    hostname: ob1
+    environment: {<<: *observer-env, OB_ZONE: zone1}
+    networks: {ob: {ipv4_address: 172.28.12.11}}
+    ports: ["${OB1_PORT:-2881}:2881"]
+  ob2:
+    <<: *observer
+    container_name: ob2
+    hostname: ob2
+    environment: {<<: *observer-env, OB_ZONE: zone2}
+    networks: {ob: {ipv4_address: 172.28.12.12}}
+  ob3:
+    <<: *observer
+    container_name: ob3
+    hostname: ob3
+    environment: {<<: *observer-env, OB_ZONE: zone3}
+    networks: {ob: {ipv4_address: 172.28.12.13}}
+
+  # The second observer of each zone, only started by `make scale-out`.
+  ob4:
+    <<: *observer
+    profiles: [scale]
+    container_name: ob4
+    hostname: ob4
+    environment: {<<: *observer-env, OB_ZONE: zone1}
+    networks: {ob: {ipv4_address: 172.28.12.14}}
+  ob5:
+    <<: *observer
+    profiles: [scale]
+    container_name: ob5
+    hostname: ob5
+    environment: {<<: *observer-env, OB_ZONE: zone2}
+    networks: {ob: {ipv4_address: 172.28.12.15}}
+  ob6:
+    <<: *observer
+    profiles: [scale]
+    container_name: ob6
+    hostname: ob6
+    environment: {<<: *observer-env, OB_ZONE: zone3}
+    networks: {ob: {ipv4_address: 172.28.12.16}}
+
+  # obproxy: routes each statement to the observer that leads the partition it touches
+  # (it reads the partition locations from the cluster with the sys-tenant user proxyro,
+  # created by scripts/bootstrap.sh). Clients use root@test#obcluster on port 2883.
+  # `make up` starts it after the bootstrap.
+  obproxy:
+    image: oceanbase/obproxy-ce:${OBPROXY_VERSION:-4.3.5.0-3}
+    container_name: obproxy
+    hostname: obproxy
+    environment:
+      APP_NAME: scale
+      OB_CLUSTER: obcluster
+      RS_LIST: 172.28.12.11:2881;172.28.12.12:2881;172.28.12.13:2881
+      PROXYRO_PASSWORD: ${OB_PROXYRO_PASSWORD:-proxyro}
+    networks: {ob: {ipv4_address: 172.28.12.20}}
+    ports: ["${OBPROXY_PORT:-2883}:2883"]
+
+  # sysbench (bench/Dockerfile), only started with `docker compose run`.
+  sysbench:
+    profiles: [bench]
+    cpus: ${BENCH_CLIENT_CPUS:-2}
+    build: ./bench
+    image: oceanbase-cluster-sysbench:1.0.20
+    networks: [ob]
+
+networks:
+  ob:
+    ipam:
+      config:
+        - subnet: 172.28.12.0/24
