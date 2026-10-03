@@ -1,11 +1,8 @@
 # Valkey: official Helm chart on kind, cluster on Docker Compose
 
-The official [`valkey/valkey`](https://github.com/valkey-io/valkey-helm) chart `0.12.0` (Valkey `9.1.2`)
-on kind as one primary and two replicas, and a 6-node Valkey cluster (3 primaries + 3 replicas) on
-Docker Compose.
+The official [`valkey/valkey`](https://github.com/valkey-io/valkey-helm) chart `0.12.0` (Valkey `9.1.2`) on kind as one primary + two replicas, and a 6-node Valkey cluster (3 primaries + 3 replicas) on Docker Compose.
 
-The chart only does standalone or primary/replica, with no cluster mode and no Sentinel. That's why
-the cluster runs on Compose, and why nothing promotes a replica on kind.
+## Quick start
 
 ```bash
 make kind-up           # kind cluster valkey-helm, helm install valkey/valkey into namespace valkey
@@ -28,10 +25,7 @@ make up test failover status bench down   # each runs the kind-* target, then th
 make bench-resp bench-lua                  # same, for one of the two benchmarks
 ```
 
-## Tools
-
-`direnv allow` (or `nix develop`) at the repo root gives you kind, kubectl, helm and valkey-cli; Docker
-comes from the host. On Linux without Nix:
+Tools: `direnv allow` (or `nix develop`) at the repo root gives kind, kubectl, helm and valkey-cli; Docker comes from the host. On Linux without Nix:
 
 ```bash
 curl -fsSL https://get.docker.com | sh && sudo usermod -aG docker "$USER"
@@ -41,65 +35,47 @@ curl -fsSL https://get.helm.sh/helm-v4.3.0-linux-amd64.tar.gz | tar xz --strip-c
 sudo install -m 0755 kind kubectl helm /usr/local/bin/ && rm kind kubectl helm
 ```
 
-## kind
+## kind: primary + 2 replicas
 
-[`values.yaml`](values.yaml) turns on 2 replicas with 1Gi PVCs and AOF. Service `valkey` points at
-`valkey-0` only (writes), `valkey-read` at all three pods.
+[`values.yaml`](values.yaml): 2 replicas, 1Gi PVCs, AOF.
 
-`make kind-test` checks that `valkey-0` is primary with 2 connected replicas and both replicas follow
-it, that the Services point at the right pods, writes 1000 keys through `valkey` followed by
-`WAIT 2` (both replicas must ack), reads them back on every pod and through `valkey-read`, and checks
-that the replicas answer `READONLY` to writes.
+| Service | Points at |
+|---|---|
+| `valkey` | `valkey-0` only (writes) |
+| `valkey-read` | all three pods |
 
-`make kind-failover` deletes `valkey-0`. While it's gone the replicas still serve all 1000 keys and
-writes through `valkey` fail. The StatefulSet recreates `valkey-0` on the same PVC, it loads its AOF
-and is primary again, the replicas reconnect, and 100 new writes reach both. Without the PVC + AOF,
-`valkey-0` would come back empty and the replicas would resync to that, dropping their data.
+- `make kind-test`: `valkey-0` is primary with 2 connected replicas and both follow it; Services point at the right pods; 1000 keys written through `valkey` followed by `WAIT 2` (both replicas must ack); read back on every pod and through `valkey-read`; replicas answer `READONLY` to writes.
+- `make kind-failover`: deletes `valkey-0`. While it is gone the replicas serve all 1000 keys and writes through `valkey` fail. The StatefulSet recreates `valkey-0` on the same PVC; it loads its AOF and is primary again, the replicas reconnect, and 100 new writes reach both. Without PVC + AOF, `valkey-0` would come back empty and the replicas would resync to that, dropping their data.
 
-## Docker Compose
+## Docker Compose: 3 primaries + 3 replicas
 
-Six nodes `valkey-1..6` with cluster mode and AOF, one volume each, on `127.0.0.1:7101..7106`. Nodes
-announce their hostname, so redirects name `valkey-N`, which only resolves inside the compose
-network: use `make compose-cli` for `-c`.
+Six nodes `valkey-1..6`, cluster mode, AOF, one volume each, on `127.0.0.1:7101..7106`. Nodes announce their hostname, so redirects name `valkey-N`, which only resolves inside the compose network: use `make compose-cli` for `-c`.
 
-`make compose-test` checks `CLUSTER INFO` on all six (state ok, 16384 slots, 6 nodes, 3 shards),
-that there are 3 primaries with slots and one replica each, writes and reads 1000 keys through
-`valkey-cli -c`, and waits until each replica has as many keys as its primary.
-
-`make compose-failover` stops the primary of slot 0. Its replica is promoted within a few seconds
-(node timeout is 5s), all keys are still readable and new writes work. The old primary is started
-again and rejoins as a replica of the promoted node; it doesn't take the primary role back, so the
-next run stops the other node of that pair.
+- `make compose-test`: `CLUSTER INFO` on all six (state ok, 16384 slots, 6 nodes, 3 shards); 3 primaries with slots and one replica each; 1000 keys written and read through `valkey-cli -c`; waits until each replica has as many keys as its primary.
+- `make compose-failover`: stops the primary of slot 0. Its replica is promoted within a few seconds (node timeout 5s); all keys stay readable and new writes work. The old primary restarts and rejoins as a replica of the promoted node; it does not take the primary role back, so the next run stops the other node of that pair.
 
 ## Benchmark
 
-`make bench` runs two benchmarks on kind and then on Compose, with the same settings as every other
-Valkey and Dragonfly example here: `BENCH_N=200000` operations, `BENCH_C=50` clients,
-`BENCH_KEYS=100000` keys.
+Same settings as every other Valkey and Dragonfly example here: `BENCH_N=200000` operations, `BENCH_C=50` clients, `BENCH_KEYS=100000` keys. `make bench` runs both benchmarks on kind, then on Compose.
 
-`bench-resp` is `valkey-benchmark -t set,get,incr,lpush,hset` from a `valkey/valkey:9.1.2-alpine`
-container, at `-P 1` and `-P 16`. `bench-lua` is
-[`go/rueidis-lua-bench`](../../go/rueidis-lua-bench), linked as `bench`: SET, GET and three Lua
-scripts through rueidis.
+| Benchmark | What |
+|---|---|
+| `bench-resp` | `valkey-benchmark -t set,get,incr,lpush,hset` from a `valkey/valkey:9.1.2-alpine` container, at `-P 1` and `-P 16` |
+| `bench-lua` | [`go/rueidis-lua-bench`](../../go/rueidis-lua-bench) (linked as `bench`): SET, GET and three Lua scripts through rueidis |
 
-On kind both run as a pod (`kubectl run --rm`) against Service `valkey`, so only `valkey-0` takes
-the load. The Go image is built locally and loaded with `kind load docker-image`. The chart sets no
-resource limits; the pods share the kind node with everything else.
+| Setup | How it runs | Resources |
+|---|---|---|
+| kind | pod (`kubectl run --rm`) against Service `valkey`, so only `valkey-0` takes load; Go image built locally and loaded with `kind load docker-image` | chart sets no limits; pods share the kind node with everything else |
+| Compose | in the compose network: `valkey-benchmark --cluster`; rueidis sees a cluster node and sends each key to its primary | 1 CPU + 512 MiB per node, same as [`dragonfly/docker-compose-cluster`](../../dragonfly/docker-compose-cluster); Valkey runs commands on one thread; AOF on (`appendfsync everysec`) |
 
-On Compose both run in the compose network against the cluster: `valkey-benchmark --cluster`, and
-rueidis, which sees a cluster node and sends each key to its primary. Every node is limited to 1 CPU
-and 512 MiB, the same as [`dragonfly/docker-compose-cluster`](../../dragonfly/docker-compose-cluster),
-and Valkey runs commands on one thread. AOF stays on (`appendfsync everysec`).
+Comparison:
 
-In `--cluster` mode `valkey-benchmark` only notices that a test is done on a 250 ms timer, so ops/s
-is `BENCH_N` divided by a multiple of 0.25 s (800000, 400000, 266667, ...). Latencies are not
-affected. Raise `BENCH_N` if you want finer steps.
+- Compose cluster vs [`dragonfly/docker-compose-cluster`](../../dragonfly/docker-compose-cluster) at 1 CPU per node: Valkey wins every test except the Lua bench's GET (about even). 1.5-4x on most, up to 5.5x on pipelined SET; RESP p99 under 1 ms vs 5-18 ms.
+- kind: the Valkey primary runs `add.lua` at 364k ops/s vs 149k for [`dragonfly/helm-chart`](../../dragonfly/helm-chart), though pod resources differ.
 
-The Compose cluster beats [`dragonfly/docker-compose-cluster`](../../dragonfly/docker-compose-cluster) at 1 CPU per node on every test but the Lua bench's GET, which is about even: 1.5-4x on most, up to 5.5x on pipelined SET, and RESP p99 under 1 ms vs 5-18 ms. On kind the Valkey primary runs `add.lua` at 364k ops/s against 149k for [`dragonfly/helm-chart`](../../dragonfly/helm-chart), though pod resources differ.
+`BENCH_N=1000000 make kind-bench` / `make compose-bench`, Apple M4 Pro (Docker Desktop VM, 11 CPUs), 2026-10-03, one setup at a time.
 
-Results from `BENCH_N=1000000 make kind-bench` / `make compose-bench` on an Apple M4 Pro (Docker Desktop VM, 11 CPUs), 2026-10-03, one setup at a time:
-
-kind (primary + 2 replicas, writes to Service `valkey`):
+### kind (primary + 2 replicas, writes to Service `valkey`)
 
 `valkey-benchmark` (RESP), 50 clients, 100k keys:
 
@@ -121,7 +97,7 @@ kind (primary + 2 replicas, writes to Service `valkey`):
 | update.lua | 220,430 | 0.23 | 0.39 |
 | delete.lua | 381,382 | 0.13 | 0.26 |
 
-Compose cluster (3 primaries + 3 replicas, 1 CPU per node):
+### Compose cluster (3 primaries + 3 replicas, 1 CPU per node)
 
 `valkey-benchmark` (RESP), 50 clients, 100k keys:
 
@@ -142,3 +118,8 @@ Compose cluster (3 primaries + 3 replicas, 1 CPU per node):
 | add.lua | 446,089 | 0.10 | 0.26 |
 | update.lua | 315,508 | 0.13 | 0.33 |
 | delete.lua | 461,261 | 0.10 | 0.25 |
+
+## Known issues
+
+- **No cluster mode in the chart.** It only does standalone or primary/replica, with no Sentinel. That is why the cluster runs on Compose, and why nothing promotes a replica on kind.
+- **`valkey-benchmark --cluster` ops/s is quantized.** It notices a test is done only on a 250 ms timer, so ops/s is `BENCH_N` divided by a multiple of 0.25 s (800000, 400000, 266667, ...). Latencies are not affected. Raise `BENCH_N` for finer steps.

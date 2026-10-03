@@ -1,8 +1,8 @@
 # Valkey: Lua scripts from Go
 
-One Valkey 9.1.2 container and a Go program ([`main.go`](main.go)) that uses
-[rueidis](https://github.com/redis/rueidis) to add, update and delete hashes through the Lua
-scripts in [`lua/`](lua). Each hash has a `version` field that the scripts bump.
+One Valkey 9.1.2 container and a Go program ([`main.go`](main.go)) using [rueidis](https://github.com/redis/rueidis) to add, update and delete hashes through the Lua scripts in [`lua/`](lua). Each hash has a `version` field the scripts bump.
+
+## Quick start
 
 ```bash
 make up           # start valkey on 127.0.0.1:6390
@@ -17,39 +17,33 @@ make cli          # valkey-cli
 make down         # remove the container, volume and built images
 ```
 
+Tools: `direnv allow` (or `nix develop`) at the repo root. Without Nix: Docker, plus Go for `make run-local` and `make bench-local`.
+
+## Scripts
+
 | Script | KEYS | ARGV | Returns |
 |---|---|---|---|
 | [`add.lua`](lua/add.lua) | key | `field value ...` | `1` created at version 1, `0` already exists |
 | [`update.lua`](lua/update.lua) | key | expected version (`''` for any), `field value ...` | new version, `0` missing, `-1` version mismatch |
 | [`delete.lua`](lua/delete.lua) | keys | expected version (`''` for any) | number deleted |
 
-The scripts are embedded with `//go:embed` and wrapped in `rueidis.NewLuaScript`. `Exec` sends
-`EVALSHA`, and if the server replies `NOSCRIPT` (after a restart or `SCRIPT FLUSH`) it resends
-the script with `EVAL`, which caches it again. So nothing has to be loaded up front; `SCRIPT LOAD`
-(as in `make scripts`) just fills the cache ahead of time. The program flushes the cache first to
-show the fallback, then runs a few updates at a stale version and a small CAS race.
+- Scripts are embedded with `//go:embed` and wrapped in `rueidis.NewLuaScript`.
+- `Exec` sends `EVALSHA`; on `NOSCRIPT` (after a restart or `SCRIPT FLUSH`) it resends with `EVAL`, which caches the script again. Nothing has to be loaded up front; `SCRIPT LOAD` (`make scripts`) only fills the cache ahead of time.
+- The program flushes the script cache first to show the fallback, then runs a few updates at a stale version and a small CAS race.
 
 ## Benchmark
 
-`make bench` runs two benchmarks with the same settings: `BENCH_N=200000` operations,
-`BENCH_C=50` clients, `BENCH_KEYS=100000` keys.
+`BENCH_N=200000` operations, `BENCH_C=50` clients, `BENCH_KEYS=100000` keys.
 
-`make bench-resp` runs `valkey-benchmark -t set,get,incr,lpush,hset` from a
-`valkey/valkey:9.1.2-alpine` container in the compose network, once without pipelining (`-P 1`)
-and once with 16 commands per round trip (`-P 16`).
+| Target | What |
+|---|---|
+| `make bench-resp` | `valkey-benchmark -t set,get,incr,lpush,hset` from a `valkey/valkey:9.1.2-alpine` container in the compose network, at `-P 1` and `-P 16` |
+| `make bench-lua` | [`go/rueidis-lua-bench`](../../go/rueidis-lua-bench) (linked as `bench`): SET, GET and the three scripts from 50 goroutines. Each goroutine owns its slice of keys, so `update.lua` is a real CAS at the expected version. rueidis auto-pipelines concurrent calls over one connection. |
+| `make bench-local` | same as `bench-lua`, through Docker's port forwarding; much slower |
 
-`make bench-lua` runs [`go/rueidis-lua-bench`](../../go/rueidis-lua-bench), linked as `bench`:
-SET, GET and the same three scripts, from 50 goroutines. Each goroutine owns its slice of the keys,
-so `update.lua` is a real CAS at the version it expects. rueidis auto-pipelines the concurrent
-calls over one connection.
+Server: 2 CPUs, 1 GiB, `--io-threads 2`; same as [`dragonfly/single-node`](../../dragonfly/single-node) with `--proactor_threads=2`, which runs the same two benchmarks. Against it, Valkey is about 15% faster on plain RESP and 2.7-3x faster on the Lua scripts.
 
-The server is limited to 2 CPUs and 1 GiB and runs with `--io-threads 2`, the same as
-[`dragonfly/single-node`](../../dragonfly/single-node) with `--proactor_threads=2`, which runs the
-same two benchmarks. `make bench-local` goes through Docker's port forwarding and is much slower.
-
-Next to [`dragonfly/single-node`](../../dragonfly/single-node) on the same 2 CPUs, Valkey is about 15% faster on plain RESP and 2.7-3x faster on the Lua scripts.
-
-Results from `BENCH_N=1000000 make bench` on an Apple M4 Pro (Docker Desktop VM, 11 CPUs), 2026-10-03, one setup at a time:
+`BENCH_N=1000000 make bench`, Apple M4 Pro (Docker Desktop VM, 11 CPUs), 2026-10-03, one setup at a time.
 
 `valkey-benchmark` (RESP), 50 clients, 100k keys:
 
@@ -70,6 +64,3 @@ Results from `BENCH_N=1000000 make bench` on an Apple M4 Pro (Docker Desktop VM,
 | add.lua | 489,724 | 0.10 | 0.21 |
 | update.lua | 406,756 | 0.12 | 0.23 |
 | delete.lua | 508,709 | 0.09 | 0.20 |
-
-Tools: run `direnv allow` (or `nix develop`) at the repo root. Without Nix you need Docker, and
-Go for `make run-local` and `make bench-local`.

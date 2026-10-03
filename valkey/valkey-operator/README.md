@@ -1,21 +1,13 @@
-# Valkey — 3-shard cluster on kind with Valkey Operator
+# Valkey: 3-shard cluster on kind with Valkey Operator
 
-[Valkey Operator](https://github.com/valkey-io/valkey-operator) `v0.7.1` (Helm chart `0.7.0`)
-managing a `ValkeyCluster` ([`valkeycluster.yaml`](valkeycluster.yaml)): 3 shards x 1 replica,
-Valkey `9.1.2`, AOF on a 1Gi PVC per node.
+[Valkey Operator](https://github.com/valkey-io/valkey-operator) managing a `ValkeyCluster` ([`valkeycluster.yaml`](valkeycluster.yaml)): 3 shards x 1 replica, AOF on a 1Gi PVC per node.
 
-The official operator is early: its own README says it is not ready for production. Its API is
-`v1alpha1`.
+| Component | Version |
+|---|---|
+| Operator | `v0.7.1` (Helm chart `0.7.0`), API `v1alpha1` |
+| Valkey | `9.1.2` |
 
-Requires `kind`, `kubectl`, `helm`. With Nix, run `direnv allow` (or `nix develop`) at the repo root.
-On Linux (amd64):
-
-```bash
-curl -fsSLo kind https://kind.sigs.k8s.io/dl/v0.32.0/kind-linux-amd64
-curl -fsSLo kubectl https://dl.k8s.io/release/v1.37.1/bin/linux/amd64/kubectl
-curl -fsSL https://get.helm.sh/helm-v4.3.0-linux-amd64.tar.gz | tar -xz --strip-components=1 linux-amd64/helm
-sudo install -m 0755 kind kubectl helm /usr/local/bin/ && rm kind kubectl helm
-```
+## Quick start
 
 ```bash
 make kind-up      # create the kind cluster only
@@ -32,58 +24,36 @@ make cli          # interactive valkey-cli -c
 make down         # delete the kind cluster
 ```
 
-[`wait-healthy.sh`](wait-healthy.sh) asks Valkey itself whether the cluster matches the spec
-(`cluster_state:ok`, all slots, the right number of connected primaries and replicas). The
-`ValkeyCluster` status is not enough: it stays `Ready` while every pod is being recreated.
+Tools: `kind`, `kubectl`, `helm`; with Nix, `direnv allow` (or `nix develop`) at the repo root. On Linux (amd64):
 
-The `server` container sets `VALKEYCLI_AUTH` to the operator user's password, so the targets run
-`env -u VALKEYCLI_AUTH valkey-cli` to connect as the `default` user.
+```bash
+curl -fsSLo kind https://kind.sigs.k8s.io/dl/v0.32.0/kind-linux-amd64
+curl -fsSLo kubectl https://dl.k8s.io/release/v1.37.1/bin/linux/amd64/kubectl
+curl -fsSL https://get.helm.sh/helm-v4.3.0-linux-amd64.tar.gz | tar -xz --strip-components=1 linux-amd64/helm
+sudo install -m 0755 kind kubectl helm /usr/local/bin/ && rm kind kubectl helm
+```
 
-## Persistence
+## What it does
 
-Each node keeps its AOF and `nodes.conf` on its PVC. `make persistence` deletes all six pods at
-once; they come back with new IPs but the same node IDs and every key is still there, about 40 s
-later. Some shards come back with primary and replica swapped, since a primary hands its slots to
-its replica on `SIGTERM`.
-
-Persistence can't be toggled after the cluster is created: the CRD rejects adding, removing or
-shrinking `spec.persistence` (`make persistence` checks the removal). To change it, edit
-`valkeycluster.yaml` and `make down up`.
-
-## Scaling
-
-`make scale-up` / `scale-down` patch `spec.shards` and wait until the cluster matches. The operator
-moves slots with atomic slot migration (Valkey 9.0+), so keys stay readable throughout; 3 -> 4 -> 3
-shards takes about 45 s each way. Don't change `spec.shards` again while slots are still moving.
-
-## Failover
-
-`make failover` deletes the shard 0 primary. Its replica is primary within a couple of seconds,
-the keys read back from it, and the deleted pod returns on its PVC as a replica.
-`cluster-node-timeout` is 5000 ms so an unclean primary loss fails over sooner.
+- **Health:** [`wait-healthy.sh`](wait-healthy.sh) asks Valkey whether the cluster matches the spec (`cluster_state:ok`, all slots, right number of connected primaries and replicas).
+- **Persistence:** each node keeps its AOF and `nodes.conf` on its PVC. `make persistence` deletes all six pods at once; about 40 s later they are back with new IPs, the same node IDs, and every key. Some shards come back with primary and replica swapped, since a primary hands its slots to its replica on `SIGTERM`.
+- **Scaling:** `make scale-up` / `scale-down` patch `spec.shards` and wait until the cluster matches. The operator moves slots with atomic slot migration (Valkey 9.0+), so keys stay readable throughout; 3 -> 4 -> 3 shards takes about 45 s each way.
+- **Failover:** `make failover` deletes the shard 0 primary. Its replica is primary within a couple of seconds, keys read back from it, and the deleted pod returns on its PVC as a replica. `cluster-node-timeout` is 5000 ms so an unclean primary loss fails over sooner.
 
 ## Benchmark
 
-`make bench` runs the same two benchmarks as the other Valkey and Dragonfly examples, with the same
-settings: `BENCH_N=200000` operations, `BENCH_C=50` clients, `BENCH_KEYS=100000` keys. Each runs in
-its own pod (`kubectl run --rm`) and starts from the headless Service `valkey-valkey`.
+Same two benchmarks and settings as the other Valkey and Dragonfly examples: `BENCH_N=200000` operations, `BENCH_C=50` clients, `BENCH_KEYS=100000` keys. Each runs in its own pod (`kubectl run --rm`) and starts from the headless Service `valkey-valkey`.
 
-`make bench-resp` is `valkey-benchmark --cluster -t set,get,incr,lpush,hset` from a
-`valkey/valkey:9.1.2-alpine` pod, at `-P 1` and `-P 16`. In cluster mode it only notices that a
-test is done on a 250 ms timer, so ops/s is `BENCH_N` divided by a multiple of 0.25 s (800000,
-400000, 266667, ...); latencies are not affected.
+| Target | What |
+|---|---|
+| `make bench-resp` | `valkey-benchmark --cluster -t set,get,incr,lpush,hset` from a `valkey/valkey:9.1.2-alpine` pod, at `-P 1` and `-P 16` |
+| `make bench-lua` | [`go/rueidis-lua-bench`](../../go/rueidis-lua-bench) (linked as `bench`): SET, GET and three Lua scripts through rueidis, which sees a cluster and sends each key to its primary. Image built locally and loaded with `kind load docker-image`. |
 
-`make bench-lua` runs [`go/rueidis-lua-bench`](../../go/rueidis-lua-bench), linked as `bench`:
-SET, GET and three Lua scripts through rueidis, which sees a cluster and sends each key to its
-primary. The image is built locally and loaded with `kind load docker-image`.
+Resources as in [`valkeycluster.yaml`](valkeycluster.yaml): 500m CPU and 256Mi per node, `maxmemory 100mb` with `allkeys-lru`, AOF on. All six pods and the bench pod share one kind node.
 
-Resources are left as in [`valkeycluster.yaml`](valkeycluster.yaml): each node gets 500m CPU and
-256Mi, `maxmemory 100mb` with `allkeys-lru`, AOF on. All six pods and the bench pod share one kind
-node.
+Within about 25% of [`ot-redis-operator`](../ot-redis-operator) on the same kind node. There is no sharded Dragonfly on kind to compare with: the Dragonfly operator runs one primary with replicas.
 
-Close to [`ot-redis-operator`](../ot-redis-operator) on the same kind node (within about 25%). There is no sharded Dragonfly on kind to compare with: the Dragonfly operator runs one primary with replicas.
-
-Results from `BENCH_N=1000000 make bench` on an Apple M4 Pro (Docker Desktop VM, 11 CPUs), 2026-10-03, one setup at a time:
+`BENCH_N=1000000 make bench`, Apple M4 Pro (Docker Desktop VM, 11 CPUs), 2026-10-03, one setup at a time.
 
 `valkey-benchmark` (RESP), 50 clients, 100k keys:
 
@@ -104,3 +74,12 @@ Results from `BENCH_N=1000000 make bench` on an Apple M4 Pro (Docker Desktop VM,
 | add.lua | 268,417 | 0.10 | 0.44 |
 | update.lua | 177,434 | 0.13 | 0.36 |
 | delete.lua | 342,547 | 0.10 | 0.26 |
+
+## Known issues
+
+- **Early operator.** Its own README says it is not ready for production; API is `v1alpha1`.
+- **`ValkeyCluster` status is not a health signal.** It stays `Ready` while every pod is being recreated. Workaround: [`wait-healthy.sh`](wait-healthy.sh) checks Valkey directly.
+- **`VALKEYCLI_AUTH` is preset.** The `server` container sets it to the operator user's password, so the targets run `env -u VALKEYCLI_AUTH valkey-cli` to connect as the `default` user.
+- **Persistence can't be toggled after creation.** The CRD rejects adding, removing or shrinking `spec.persistence` (`make persistence` checks the removal). Workaround: edit `valkeycluster.yaml` and `make down up`.
+- **Don't change `spec.shards` while slots are still moving.**
+- **`valkey-benchmark --cluster` ops/s is quantized.** It notices a test is done only on a 250 ms timer, so ops/s is `BENCH_N` divided by a multiple of 0.25 s (800000, 400000, 266667, ...). Latencies are not affected.
