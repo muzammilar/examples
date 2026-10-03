@@ -1,4 +1,4 @@
-# TimescaleDB — fleet telemetry showcase (Rust)
+# TimescaleDB — fleet telemetry (Rust)
 
 Electric delivery vehicles report position, speed, battery and motor temperature every 30 s.
 Fleet dashboards need two things: today's numbers for each fleet and region, and history that

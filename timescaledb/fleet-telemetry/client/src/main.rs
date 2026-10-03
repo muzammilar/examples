@@ -1,4 +1,4 @@
-//! TimescaleDB fleet telemetry showcase.
+//! TimescaleDB fleet telemetry example.
 //!
 //! 1. Relational metadata (fleets, vehicles) in plain Postgres tables.
 //! 2. Telemetry from VEHICLES vehicles, one reading every INTERVAL_S seconds for DAYS days,

@@ -2,7 +2,7 @@
 name = "fleet"
 version = "0.1.0"
 edition = "2024"
-description = "TimescaleDB fleet telemetry showcase: binary COPY ingest, columnstore, continuous aggregates"
+description = "TimescaleDB fleet telemetry example: binary COPY ingest, columnstore, continuous aggregates"
 publish = false
 
 [dependencies]
