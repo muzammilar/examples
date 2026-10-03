@@ -42,3 +42,13 @@ the license check. With a license, `make benchmark` in [`single-node/`](single-n
 measures generation, IPC ingest, q-sql aggregations, `aj`, `wj` and partition writes over 10M
 trades and 20M quotes; [`capital-markets-showcase/`](capital-markets-showcase) prints its own
 timings.
+
+## Known issues
+
+- Nothing here has run yet. The q code (walkthrough, benchmarks, tick gateway and feed, the
+  C++ showcase's queries) was written without a license, so expect fixes on the first licensed
+  run.
+- q needs a license even for the free Community Edition, and the key only comes by signing up.
+  The old free 32-bit kdb+ builds are withdrawn, and PyKX without a license cannot run q.
+- The Rust `kdbplus` crate's last release was 0.3.9 in 2024, so the showcase uses KX's C API
+  (`k.h` + `c.o`) from C++ instead.
