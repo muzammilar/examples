@@ -1,0 +1,60 @@
+# storage turns the Deployment into a StatefulSet with one PVC per pod
+replicaCount: 3
+storage:
+  enabled: true
+  requests: 1Gi
+
+# The chart has no replication setting and passes the same args to every pod, so the
+# replica-of flag is added here for every pod except dragonfly-0. Args land in "$@".
+command:
+  - /bin/sh
+  - -c
+  - |
+    [ "$HOSTNAME" = dragonfly-0 ] || set -- "$@" --replicaof=dragonfly-0.dragonfly:6379
+    exec /usr/bin/tini -- entrypoint.sh dragonfly "$@"
+  - sh
+
+extraArgs:
+  - --proactor_threads=2
+  - --maxmemory=512mb
+  - --dir=/data
+  - --dbfilename=dump
+  - --snapshot_cron=* * * * *
+
+# headless, so dragonfly-0.dragonfly resolves for the replicas
+service:
+  clusterIP: None
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    memory: 768Mi
+
+probes:
+  readinessProbe:
+    exec:
+      command: [/bin/sh, /usr/local/bin/healthcheck.sh]
+    initialDelaySeconds: 2
+    periodSeconds: 2
+  livenessProbe:
+    exec:
+      command: [/bin/sh, /usr/local/bin/healthcheck.sh]
+    initialDelaySeconds: 10
+    periodSeconds: 10
+
+# writes go to dragonfly-0 only
+extraObjects:
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      name: dragonfly-primary
+      namespace: "{{ .Release.Namespace }}"
+    spec:
+      selector:
+        statefulset.kubernetes.io/pod-name: dragonfly-0
+      ports:
+        - name: dragonfly
+          port: 6379
+          targetPort: dragonfly
