@@ -1,0 +1,15 @@
+[package]
+name = "iot-fleet-showcase"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+# InfluxDB 3 has no official Rust client: plain HTTP (/api/v3/write_lp, /api/v3/query_sql,
+# /api/v3/configure/*) with reqwest, no TLS.
+[dependencies]
+reqwest = { version = "0.13", default-features = false, features = ["json"] }
+serde_json = "1"
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "sync", "time"] }
+
+[profile.release]
+codegen-units = 4
