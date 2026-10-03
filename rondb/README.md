@@ -4,6 +4,7 @@ Website: https://www.rondb.com/
 
 - [`single-node/`](single-node) — the minimal footprint: 1 management server, 1 data node (`NoOfReplicas=1`, `NumCPUs=1`, `DataMemory=256M`) and 1 MySQL Server, ~1.5 GB in total, no redundancy.
 - [`docker-compose-cluster/`](docker-compose-cluster) — the minimal cluster from `rondb-docker`: 1 management server, 2 data nodes (1 node group, 2 replicas), 1 MySQL Server and the REST API server, with a `make failover` that stops a data node.
+- [`online-feature-store/`](online-feature-store) — online feature serving (Hopsworks-style feature groups, 1M users x 2 tables) from a Go client: single-row SQL vs `IN` lists vs a pushed join vs REST `pk-read` / `batch`, with p50/p99 and throughput, and serving through a data-node stop/restart.
 
 RonDB always runs as separate processes (management server, data nodes, MySQL Server), so
 `single-node/` is still three containers: one of each, with one replica. It is the smallest
@@ -16,6 +17,13 @@ sysbench through `mysqld` and wrk against the REST API, 6 CPUs / 12 GB split acr
 
 Single node, sysbench through `mysqld` with 1 data node (`NumCPUs=1`, `DataMemory=256M`), no CPU caps, 2 × 50,000 rows, 8 threads, 30 s per workload (Apple M4 Pro, Docker VM aarch64, 2026-10-03): point selects 28.9k/s (p99 0.86 ms), `oltp_read_only` 1,809 tps and `oltp_read_write` 1,358 tps (p99 7.7 / 10.5 ms). `mysqld` used ~380% CPU and the data node's one thread ~84%. With no CPU caps and no second replica, these are not comparable with the cluster numbers above. Full table: [`single-node/README.md`](single-node/README.md#benchmark).
 
+Online feature serving, 16 clients each asking for 16 users x 2 feature groups out of 1M users per group (same hardware, no CPU limits, shared Docker VM, 2026-10-02): `WHERE user_id IN (...)` 8.9k vectors/s at p50 1.4 / p99 6.7 ms and one REST `batch` call 7.1k/s at p50 1.7 / p99 9.7 ms, against ~1k/s at 11-18 ms p50 for one round trip per row. For a single user, REST `batch` is fastest: 0.43 ms p50, 28k vectors/s. Stopping a data node mid-run failed no requests (8 SQL reads were retried). Details: [`online-feature-store/README.md`](online-feature-store/README.md#results).
+
 ## Known issues
 
 - `single-node/`: `TotalMemoryConfig` has a 2 GB floor (`Illegal value 1G for parameter TotalMemoryConfig. Legal values are between 2147483648 and 70368744177664`), so the smallest data node sets its memory pools by hand (`AutomaticMemoryConfig=false`). Details: [`single-node/README.md`](single-node/README.md#known-issues).
+- `online-feature-store/` (RonDB 26.02.10): with the default redo log, bulk inserts fail with NDB error 410 ("REDO log files overloaded"), which reaches the client as MySQL error 1297 (temporary). The example's loader retries. A larger redo log avoids it but makes each data-node volume ~1.2 GB.
+- `online-feature-store/` (RonDB 26.02.10): a data node that restarts while the Docker disk is full dies with error 2810 ("file system full") and does not rejoin.
+- `online-feature-store/` (RonDB 26.02.10): stopping a data node aborts the transactions in flight on it. SQL reads get error 1205 ("Lock wait timeout exceeded") and must be retried by the client. REST `batch` reads saw no errors, only a ~1.3 s stall.
+- `online-feature-store/` (RonDB 26.02.10): the REST server's `feature_store` and `batch_feature_store` endpoints need the Hopsworks metadata database. On plain RonDB they answer `Database/Table does not exist. Database: hopsworks. Table: feature_store`.
+- `online-feature-store/` (RonDB 26.02.10): the REST server (`rdrs2`) is CPU-bound on JSON. With `NumThreads` 4 it was the bottleneck for batch reads, so the example uses 8.
