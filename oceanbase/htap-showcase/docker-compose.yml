@@ -1,0 +1,43 @@
+name: oceanbase-htap
+
+services:
+  # One observer (sys tenant + MySQL-mode user tenant `test`) bootstrapped by obd inside the
+  # container with MODE=mini, as in ../single-node; tenant parameters from obd's `htap` scenario.
+  oceanbase:
+    image: oceanbase/oceanbase-ce:${OB_VERSION:-4.4.2.1-101000022026050611}
+    container_name: oceanbase-htap
+    hostname: oceanbase-htap
+    cpus: ${OB_CPUS:-6}
+    environment:
+      MODE: mini
+      OB_SCENARIO: htap                          # tenant parameter template (mini default: express_oltp)
+      OB_MEMORY_LIMIT: ${OB_MEMORY_LIMIT:-6G}    # sys 2G + test 2G + its meta tenant 1G + 1G system memory
+      OB_SYSTEM_MEMORY: 1G
+      OB_DATAFILE_SIZE: ${OB_DATAFILE_SIZE:-2G}  # orders (row copy + column groups) takes ~150 MB
+      OB_LOG_DISK_SIZE: ${OB_LOG_DISK_SIZE:-4G}  # sys 2G + test 1.5G + its meta tenant 0.5G
+      OB_TENANT_NAME: test
+    # Data lives under /root/ob in the container layer; `make down` discards it.
+    ports:
+      - "${OB_PORT:-2891}:2881" # MySQL protocol (root@sys, root@test)
+    healthcheck:
+      test: ["CMD-SHELL", "obclient -h127.1 -P2881 -uroot@test -A -e 'SELECT 1' >/dev/null"]
+      interval: 10s
+      timeout: 10s
+      retries: 60
+      start_period: 5m
+
+  # The Go program (app/), started with `docker compose run` by `make run`.
+  app:
+    profiles: [app]
+    build: ./app
+    image: oceanbase-htap-app:latest
+    cpus: ${APP_CPUS:-2}
+    environment:
+      OB_HOST: oceanbase:2881
+      OB_USER: root@test
+      ROWS: ${ROWS:-2000000}
+      DURATION: ${DURATION:-30}
+      OLTP_WORKERS: ${OLTP_WORKERS:-16}
+      OLAP_WORKERS: ${OLAP_WORKERS:-2}
+      DOP: ${DOP:-4}
+      REPEATS: ${REPEATS:-3}

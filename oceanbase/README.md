@@ -11,6 +11,12 @@ read from the `sys` tenant.
   bootstrapped by hand without obd; tenant `test` has locality `F@zone1, F@zone2, F@zone3`, with a
   `make failover` that kills the leader's observer.
 
+- [`htap-showcase/`](htap-showcase) — a Go program on one `mini` observer (port 2891): OLTP
+  transactions and analytics at the same time on one hybrid row/column table (`WITH COLUMN
+  GROUP(all columns, each column)`). It compares row-store and column-store scans, alone and
+  next to concurrent writes, and shows that a column-store aggregate sees orders committed a
+  moment earlier.
+
 The cluster needs about 20 GB of Docker memory (3 × 6G `memory_limit` plus overhead) and ~20 GB of
 disk. OceanBase's own recommendations for clusters are `obd` or
 [ob-operator](https://github.com/oceanbase/ob-operator); ob-operator 2.3.4 refuses observers below
@@ -23,3 +29,5 @@ sysbench on one `mini` observer, 4 CPUs / 8 GB (memory raised from the usual 6 G
 Cluster (3 observers, 2 CPUs / 7 GB each, all leaders in zone1, sysbench at 32 threads): point selects
 40k/s, `oltp_read_write` ~900 tps. Killing the leader's observer moved leadership to zone2 and the
 next write committed ~4.6 s after the kill. Full tables: [`docker-compose-cluster/README.md`](docker-compose-cluster/README.md#benchmark).
+
+HTAP showcase (one `mini` observer, 6 CPUs, 2M orders in a hybrid row/column table, 2026-10-02): aggregations ran 5–170x faster through the column store than through the row copy of the same table. With 16 OLTP workers writing, 2 column-store analytics workers finished 3.6x more queries than row-store ones, and OLTP kept 74% of its solo ~1.5k tps (65% with row-store scans). Details: [`htap-showcase/README.md`](htap-showcase/README.md#sample-output).
