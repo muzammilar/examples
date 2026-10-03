@@ -17,3 +17,16 @@ transfer rejected by `debits_must_not_exceed_credits`) and use the built-in `tig
 381k/s at 50 ms p99 — quorum commit costs ~45% of throughput. Full tables and method:
 [`docker-compose-cluster/README.md`](docker-compose-cluster/README.md#benchmark) and
 [`single-node/README.md`](single-node/README.md#benchmark).
+
+## Known issues
+
+Seen while building these examples (TigerBeetle 0.17.9, 2026-10-02):
+
+- The official Rust client is not on crates.io: the `tigerbeetle` crate there is a 0.0.1
+  placeholder from 2023. The real client lives in the main repo (`src/clients/rust`) and links a
+  native `tb_client` library that must be built with Zig from a release tag, with
+  `-Dconfig-release` / `-Dconfig-release-client-min` matching the server, or the server rejects
+  the client. `ledger-showcase/showcase/Dockerfile` does this.
+- Re-running `ledger-showcase` against the same data file gets slower: ~675k/s and ~545k/s on the
+  2nd and 3rd runs, ~200k/s and ~174k/s on the 4th and 5th. A fresh cluster (`make down up`)
+  restores the first-run numbers.
