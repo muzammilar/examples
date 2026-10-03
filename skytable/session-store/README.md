@@ -1,79 +1,72 @@
 # Skytable — session store (Rust client)
 
 An API gateway's session store and per-API-key rate limiter on one Skytable node, driven by
-[`app/`](app): a Rust program using the official async driver
+[`app/`](app), a Rust program using the official async driver
 ([`skytable`](https://crates.io/crates/skytable) 0.8.12 from crates.io). Sessions are typed rows
-looked up by primary key. Counters and token buckets are updated in place by the server
-(`hits += 1`, `tokens -= 1`). Pipelines carry many queries per round trip.
+looked up by primary key; counters and token buckets are updated in place by the server
+(`hits += 1`, `tokens -= 1`); pipelines carry many queries per round trip.
 
 ## Quick start
 
 ```bash
 make up      # start skyd (4 CPUs / 4 GB)
 make run     # build the app image (first time: about a minute) and run it
+make build   # build the app image only
 make status  # container state, server version, INSPECT MODEL gateway.sessions
 make cli     # interactive skysh as root
 make down    # remove the containers, the data volume and the built image
 ```
 
-Client port: `localhost:2013` (override with `SKYTABLE_PORT`).
+Client port `localhost:2013` (`SKYTABLE_PORT`). Sizes: `SESSIONS`, `LOAD_SINGLE`, `LOAD_CONNS`,
+`PIPE`, `SCALE_SECS`, `SCALE_CONNS`, `SCALE_DEPTHS`, `CLIENTS`, `REQUESTS`, `KEYS`, `LIMIT`,
+`INCREMENTS`, e.g. `make run CLIENTS=8 SCALE_CONNS=1,8 SCALE_DEPTHS=1,64`.
 
-What `make run` does (it drops and recreates space `gateway`, so it can be re-run):
+## What `make run` does
 
-1. **schema**: `sessions(token: string, user_id, created_at, last_seen, hits: uint64,
-   roles: [string], null ip: string)`, `quotas(api_key: string, tokens: sint64)` and
-   `counters(name: string, n: uint64)`. The token buckets use `sint64`, which skysh can't
-   write (see [`../single-node`](../single-node/README.md#blueql)) but the driver can.
-2. **load**: 200,000 sessions (some with two roles, a third with a `null` ip). The first 20,000
-   go one `INSERT` per round trip. Of the rest, half go in pipelines of 500 on one connection,
-   and half in pipelines on 8 connections at once.
-3. **scaling**: point `SELECT user_id, hits ... WHERE token = ?` on random sessions for 2 s per
-   setting, at 1/4/16/64 connections, either one query per round trip (depth 1) or pipelines of
-   16. A last row repeats 1 connection × depth 16 with the driver's default socket settings (see
-   below).
-4. **request path**: 32 clients × 2,000 API requests. Each request selects the session (auth),
-   sets `last_seen` and `hits += 1`, does `tokens -= 1` on one of 50 API keys (500 tokens each)
-   and reads the balance back. A request is admitted if the balance is ≥ 0. Run once as 4 round
-   trips and once as a single 4-query pipeline, refilling the buckets in between. The checks:
-   every key's balance must equal exactly `500 - attempts` (no decrement lost), and no key may
-   admit more than 500.
-5. **counters**: 32 clients × 1,000 increments of one row, as `n += 1` in the server and as
-   `select n` then `set n = n + 1` in the client.
-6. **audit**: `INSPECT MODEL` must report 200,000 rows. `sum(hits)` over every session, read
-   with pipelined point SELECTs, must equal the 128,000 requests served. Exits non-zero
-   otherwise, and also when the atomic counter is off.
+Drops and recreates space `gateway`, so it can be re-run.
 
-Override the sizes with `SESSIONS`, `LOAD_SINGLE`, `LOAD_CONNS`, `PIPE`, `SCALE_SECS`,
-`SCALE_CONNS`, `SCALE_DEPTHS`, `CLIENTS`, `REQUESTS`, `KEYS`, `LIMIT`, `INCREMENTS`, e.g.
-`make run CLIENTS=8 SCALE_CONNS=1,8 SCALE_DEPTHS=1,64`.
+| step | what |
+|------|------|
+| 1. schema | `sessions(token: string, user_id, created_at, last_seen, hits: uint64, roles: [string], null ip: string)`, `quotas(api_key: string, tokens: sint64)`, `counters(name: string, n: uint64)`. Token buckets use `sint64`, which skysh can't write ([`../single-node`](../single-node/README.md#known-issues)) but the driver can. |
+| 2. load | 200,000 sessions (some with two roles, a third with a `null` ip). First 20,000: one `INSERT` per round trip. Of the rest, half in pipelines of 500 on one connection, half in pipelines on 8 connections at once. |
+| 3. scaling | Point `SELECT user_id, hits ... WHERE token = ?` on random sessions, 2 s per setting, at 1/4/16/64 connections, depth 1 (one query per round trip) or 16. A last row repeats 1 connection × depth 16 with the driver's default socket settings. |
+| 4. request path | 32 clients × 2,000 API requests. Each: select the session (auth), set `last_seen` and `hits += 1`, `tokens -= 1` on one of 50 API keys (500 tokens each), read the balance back; admitted if ≥ 0. Run as 4 round trips, then as one 4-query pipeline, refilling buckets in between. Checks: every key's balance equals exactly `500 - attempts` (no lost decrement); no key admits more than 500. |
+| 5. counters | 32 clients × 1,000 increments of one row, as `n += 1` in the server and as `select n` then `set n = n + 1` in the client. |
+| 6. audit | `INSPECT MODEL` must report 200,000 rows; `sum(hits)` over every session (pipelined point SELECTs) must equal the 128,000 requests served. Exits non-zero otherwise, or when the atomic counter is off. |
 
 ## The driver and TCP_NODELAY
 
 The driver leaves Nagle's algorithm on, and `execute_pipeline` sends a pipeline as two writes: a
 short header, then the queries. The server can't answer before the queries arrive, so it delays
-its ACK of the header. Nagle holds the queries back until that ACK comes. Every small pipeline
-takes ~41 ms (Linux's minimum delayed ACK): 1 connection, depth 16 does **~390 queries/s with
-p50 41 ms**, against 235–255k queries/s with p50 0.05–0.07 ms once `TCP_NODELAY` is set. The driver
-doesn't expose its socket, so after each connect the app sets `TCP_NODELAY` on every
-socket the process has open (all of them are Skytable connections; `set_nodelay_on_all_sockets`
-in [`main.rs`](app/src/main.rs)). `NODELAY=0` turns that off. Single queries are one write,
-so Nagle doesn't affect them. `sky-bench` never pipelines.
+its ACK of the header; Nagle holds the queries back until that ACK comes. Every small pipeline
+takes ~41 ms (Linux's minimum delayed ACK).
 
-- [`app/Dockerfile`](app/Dockerfile) builds with `rust:1.90-slim-bookworm` plus
-  `libssl-dev` (the driver always links native-tls/OpenSSL, even for plain TCP), and the final
-  image is `debian:bookworm-slim` + `libssl3` + the binary. No host Rust needed.
-- Server: the same image and env-var configuration as [`../single-node`](../single-node)
-  (`skytable/skytable:146d8664…`, skyd 0.8.4), with compose caps of 4 CPUs / 4 GB
-  (`SKYTABLE_CPUS`, `SKYTABLE_MEM`), the same budget as single-node's `make benchmark`. The
-  app client gets 4 CPUs (`APP_CPUS`) and reaches the server over the compose network.
-- Compose project `skytable-session-store`, container `skytable-session-store`, so it runs next to
-  `../single-node`.
+| 1 connection, depth 16 | queries/s | p50 |
+|------------------------|----------:|----:|
+| driver default (Nagle on) | ~390 | 41 ms |
+| `TCP_NODELAY` set | 235–255k | 0.05–0.07 ms |
+
+- The driver doesn't expose its socket, so after each connect the app sets `TCP_NODELAY` on every
+  socket the process has open (all are Skytable connections; `set_nodelay_on_all_sockets` in
+  [`main.rs`](app/src/main.rs)). `NODELAY=0` turns that off.
+- Single queries are one write, so Nagle doesn't affect them. `sky-bench` never pipelines.
+
+## Build and server
+
+- [`app/Dockerfile`](app/Dockerfile): `rust:1.90-slim-bookworm` plus `libssl-dev` (the driver
+  always links native-tls/OpenSSL, even for plain TCP); final image `debian:bookworm-slim` +
+  `libssl3` + the binary. No host Rust needed.
+- Server: same image and env-var configuration as [`../single-node`](../single-node)
+  (`skytable/skytable:146d8664…`, skyd 0.8.4), capped at 4 CPUs / 4 GB (`SKYTABLE_CPUS`,
+  `SKYTABLE_MEM`), the same budget as single-node's `make benchmark`. The app gets 4 CPUs
+  (`APP_CPUS`) and reaches the server over the compose network.
+- Compose project and container `skytable-session-store`, so it runs next to `../single-node`.
 
 ## Sample output
 
-2026-10-03, `make run` (defaults) on a running server, Docker Desktop 29.5.3 on an Apple M4 Pro
-(Docker VM: 11 CPUs, 24.4 GB, aarch64), Skytable 0.8.4, server 4 CPUs / 4 GB, client 4 CPUs.
-Nothing else was running in the Docker VM. The table below gives the range over three runs.
+2026-10-03, `make run` (defaults) on a running server, Docker Desktop 29.5.3, Apple M4 Pro
+(Docker VM: 11 CPUs, 24.4 GB, aarch64), Skytable 0.8.4, server 4 CPUs / 4 GB, client 4 CPUs,
+nothing else running in the Docker VM.
 
 ```text
 1. schema        space gateway: sessions(token -> user_id, timestamps, hits, roles: [string], null ip),
@@ -118,36 +111,34 @@ Three consecutive runs (min – max):
 | request path, 32 clients (requests/s) | 79,439 – 99,921 | 204,611 – 264,640 |
 | pipeline, driver default (Nagle on) | – | 396 – 398 queries/s, p50 41.0 ms |
 
-In all three runs: no decrement lost on any key, no key over its limit, `sum(hits)` = 128,000,
-and the atomic counter exactly 32,000. Read-modify-write ended at 1,916–1,947, so 94% of the
-increments were lost.
+- All three runs: no lost decrement, no key over its limit, `sum(hits)` = 128,000, atomic
+  counter exactly 32,000. Read-modify-write ended at 1,916–1,947 (94% of increments lost).
+- An earlier set of three runs (2026-10-02), with other projects' containers using 2–3 CPUs of the
+  same VM, was 2–4x slower across the board (best pipelined 586,263 queries/s, best unpipelined
+  230,162) with p99s in milliseconds; the ratios between settings held.
 
-An earlier set of three runs (2026-10-02), with other projects' containers using 2–3 CPUs of the
-same VM, was 2–4x slower across the board (best pipelined setting 586,263 queries/s, best
-unpipelined 230,162) and had p99s in the milliseconds; the ratios between the settings held.
+## Design notes
 
-## Where Skytable fits
+- **Point reads and writes on a primary key.** Skytable allows nothing else (no secondary
+  indexes, ranges or joins), which is all a session or token lookup needs. p50: 24–41 µs per
+  round trip, 51–67 µs per 16-query pipeline.
+- **Typed rows.** A session has typed fields, a `null`able column and a list of roles. The server
+  rejects a wrong type (error 109); `SELECT` returns only the columns asked for.
+- **Atomic in-place updates.** `hits += 1` and `tokens -= 1` run in the server, so 32 clients on
+  one row lose nothing; client-side read-then-write lost 94%. The rate limiter needs no locks or
+  transactions.
+- **Pipelining.** Inserts 33–41x faster on one connection, per-connection reads 8.5–12x.
+  Pipelines give no atomicity or isolation (per the docs): the balance read can include other
+  clients' decrements, so a few requests (up to 12 per run) were refused while tokens were left,
+  but none over the limit was admitted.
+- **Multithreaded server.** Throughput grows with connections: ~1.9–2.1M point reads/s at 64
+  connections × depth 16 on 4 CPUs, ~330–470k unpipelined. 16 → 64 connections added only 10–15%
+  (pipelined), so on 4 CPUs it levels off between them.
 
-- **Point reads and writes on a primary key.** Skytable allows nothing else (no secondary indexes,
-  no ranges, no joins), and that is all a session or token lookup needs. A single round trip took
-  24–41 µs at p50 here, and a 16-query pipeline 51–67 µs.
-- **Typed rows, not just bytes.** Unlike a plain KV store, a session is a row with typed fields,
-  a `null`able column and a list of roles. The server rejects a wrong type (error 109), and a
-  `SELECT` returns only the columns asked for.
-- **Updates in place, atomic per row.** `hits += 1` and `tokens -= 1` run inside the server, so
-  32 clients hammering one row lose nothing. Doing the same from the client (read, then write)
-  lost 94% of the increments. The rate limiter needs no locks or transactions, and its balances
-  were exact.
-- **Pipelining.** Batches of independent queries share one round trip. Insert throughput went up
-  33–41x on one connection, and per-connection reads 8.5–12x. Pipelines give no atomicity or isolation (the docs
-  say so): the rate limiter's balance read can include other clients' decrements, so a few
-  requests (up to 12 per run) were refused while tokens were left, but none over the limit was ever
-  admitted.
-- **Multithreaded server.** Each connection is served concurrently, so throughput grows with
-  connections. It reached ~1.9–2.1M point reads/s at 64 connections × depth 16 on 4 CPUs, and
-  ~330–470k without pipelining. Going from 16 to 64 connections added only 10–15% (pipelined),
-  so on 4 CPUs it levels off between them.
+## Known issues
 
-Not shown, because 0.8.4 doesn't have it: replication or clustering (see [`../README.md`](../README.md)),
-TTLs (expiry has to be done by the application), or durable-on-ack writes. DML reaches disk within
-the reliability service window (300 s by default).
+- Driver Nagle stall (~41 ms per small pipeline): see
+  [The driver and TCP_NODELAY](#the-driver-and-tcp_nodelay).
+- Not in 0.8.4, so not shown: replication or clustering (see [`../README.md`](../README.md)),
+  TTLs (expiry is up to the application), durable-on-ack writes (DML reaches disk within the
+  reliability service window, 300 s by default).

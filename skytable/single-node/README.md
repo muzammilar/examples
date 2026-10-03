@@ -1,7 +1,7 @@
 # Skytable — single node
 
-One Skytable server (`skyd`) on Docker Compose, with a password-protected `root` account, BlueQL
-through the bundled shell `skysh`, and Skytable's own load generator `sky-bench`.
+One Skytable server (`skyd`) on Docker Compose with a password-protected `root` account, BlueQL
+through the bundled shell `skysh`, and Skytable's load generator `sky-bench`.
 
 ## Quick start
 
@@ -15,66 +15,63 @@ make cli       # interactive skysh as root
 make down      # remove the container, the data volume and the built bench image
 ```
 
-Client port: `localhost:2003` (Skyhash protocol over TCP; override with `SKYTABLE_PORT`).
+## Setup
 
-- Image `skytable/skytable:146d866452d937da8a987c92b3a12d42588ee86f` (override the tag with
-  `SKYTABLE_IMAGE_TAG`): skyd and skysh **v0.8.4**, the latest release, built by Skytable's CI from
-  the `next` branch on 2026-09-30. It is multi-arch and runs natively on arm64. The release tag
-  `skytable/skytable:v0.8.4` is amd64 only, and on an Apple Silicon Mac it would run under
-  emulation. The newer build has only CI changes, compile fixes and skysh fixes (the unreleased
-  0.8.5 changelog) since v0.8.4.
-- The image's entrypoint writes a random root password into its config file and prints it once.
-  Compose runs `skyd` directly and configures it through environment variables instead:
-  `SKYDB_RUN_MODE=prod`, `SKYDB_ENDPOINTS=tcp@0.0.0.0:2003`, `SKYDB_AUTH_PLUGIN=pwd` and
-  `SKYDB_AUTH_ROOT_PASSWORD` (`SKYTABLE_PASSWORD`, default `skytable-root-password`; skyd
-  refuses fewer than 16 characters). `SKYDB_PASSWORD` in the container lets `skysh` log in as root
-  without `--password`.
-- There is one `root` account (DDL and user management). Standard users from
+| item | value |
+|------|-------|
+| client port | `localhost:2003`, Skyhash over TCP (`SKYTABLE_PORT`) |
+| image | `skytable/skytable:146d866452d937da8a987c92b3a12d42588ee86f` (`SKYTABLE_IMAGE_TAG`) |
+| version | skyd and skysh **v0.8.4** (latest release) |
+| data | `/var/lib/skytable`: `gns.db-tlog` (spaces/models/users), `data/` (rows) |
+| healthcheck | `skysh -e 'sysctl report status'` |
+
+- **Image.** Built by Skytable's CI from the `next` branch on 2026-09-30; multi-arch, native on
+  arm64. The release tag `skytable/skytable:v0.8.4` is amd64 only (emulated on Apple Silicon).
+  Since v0.8.4 the newer build has only CI changes, compile fixes and skysh fixes (the unreleased
+  0.8.5 changelog).
+- **Config.** The image's entrypoint writes a random root password into its config file and
+  prints it once. Compose instead runs `skyd` directly with env vars: `SKYDB_RUN_MODE=prod`,
+  `SKYDB_ENDPOINTS=tcp@0.0.0.0:2003`, `SKYDB_AUTH_PLUGIN=pwd`, `SKYDB_AUTH_ROOT_PASSWORD`
+  (`SKYTABLE_PASSWORD`, default `skytable-root-password`; skyd refuses fewer than 16 characters).
+  `SKYDB_PASSWORD` in the container lets `skysh` log in as root without `--password`.
+- **Users.** One `root` account (DDL and user management). Standard users from
   `sysctl create user app with { password: "..." }` can only run DML, `INSPECT` and
   `sysctl report status`.
-- Data lives in `/var/lib/skytable` (`gns.db-tlog` for spaces/models/users, `data/` for rows).
-  DDL and DCL are durable when they return. DML is *eventually* durable: changed rows reach disk
-  within the reliability service window (`SKYTABLE_SERVICE_WINDOW`, default 300 s), and on a
-  clean shutdown (SIGTERM). `make test` restarts the container and reads `alice` back.
-- Healthcheck: `skysh -e 'sysctl report status'`.
+- **Durability.** DDL and DCL are durable when they return. DML is *eventually* durable: changed
+  rows reach disk within the reliability service window (`SKYTABLE_SERVICE_WINDOW`, default
+  300 s) and on a clean shutdown (SIGTERM). `make test` restarts the container and reads `alice`
+  back.
 
 ## BlueQL
 
-BlueQL looks like SQL, but works differently, and [`blueql/`](blueql) shows each of these:
+Looks like SQL, works differently. [`blueql/`](blueql) shows each point:
 
 - A **space** holds **models**. The first field is the primary key unless another is marked
   `primary`. Fields are not nullable unless declared `null`. Types: `bool`, `uint8..64`,
   `sint8..64`, `float32/64`, `string`, `binary`, lists (`[string]`).
-- `SELECT`, `UPDATE` and `DELETE` are **point queries on the primary key** (`WHERE pk = ?`). There
-  are no secondary indexes, no range queries, no joins. Several rows need `SELECT ALL ... LIMIT n`,
-  a scan.
+- `SELECT`, `UPDATE`, `DELETE` are **point queries on the primary key** (`WHERE pk = ?`). No
+  secondary indexes, range queries or joins. Several rows need `SELECT ALL ... LIMIT n`, a scan.
 - `UPDATE` supports `=`, `+=`, `-=`, `*=`, `/=` on numbers, and `+=` to append to a string or list.
-- Literals are always sent as parameters (`?`). Drivers bind them, and skysh turns typed literals
-  into parameters for you. There are no comments, no semicolons and one statement per query.
-- Errors come back as codes. The ones the demo hits: `108` duplicate primary key, `109` data
-  validation, `111` row not found, `5` permission denied.
+- Literals are always sent as parameters (`?`); drivers bind them, skysh turns typed literals into
+  parameters. No comments, no semicolons, one statement per query.
 
-Quirks in skysh/skyd 0.8.4 found while writing the demo:
-
-- skysh cannot send a signed integer. `-5` fails in its literal parser, an unsigned literal into a
-  `sint64` column is error `109`, and so is `-=`. Use a driver for `sint*` columns.
-- skysh reads a float up to the next punctuation, so `SET rating = 4.9 WHERE ...` fails to parse.
-  Put a float before a comma or `)` (`SET rating = 4.9, followers += 1 WHERE ...`).
-- After `ALTER MODEL ... ADD` on a model that already has rows, `SELECT *` on an old row returns
-  `101`, and `SELECT ALL` panics the server task (`sel.rs:108`). The connection is reset, and skyd
-  keeps running.
-- `sysctl create user` takes an unquoted name (`app`, not `"app"`: error `29`).
+| error code | meaning |
+|-----------:|---------|
+| `108` | duplicate primary key |
+| `109` | data validation |
+| `111` | row not found |
+| `5` | permission denied |
 
 ## Benchmark
 
-`make benchmark` runs `sky-bench`, Skytable's own load generator, from the official v0.8.4 release
-bundle ([`bench/Dockerfile`](bench/Dockerfile), native arm64/x86_64; the server image doesn't
-ship it). It runs in a container sharing the server's network namespace
-([`bench/run.sh`](bench/run.sh)). Workload `uniform_std_v1`: it creates model
-`db.db(k: binary, v: uint64)`, then runs four phases over `ROWS` unique keys (default 1,000,000):
-`INSERT`, `UPDATE v += 1`, `SELECT v`, `DELETE`. Each key gets one query per phase, sent from
-`CONNECTIONS` connections (32) on `THREADS` client threads (4). Every query is its own round trip
-(no pipelining), and latency is per query. The model is dropped at the end.
+`make benchmark` runs `sky-bench` from the official v0.8.4 release bundle
+([`bench/Dockerfile`](bench/Dockerfile), native arm64/x86_64; the server image doesn't ship it) in
+a container sharing the server's network namespace ([`bench/run.sh`](bench/run.sh)).
+
+Workload `uniform_std_v1`: creates model `db.db(k: binary, v: uint64)`, then four phases over
+`ROWS` unique keys (default 1,000,000): `INSERT`, `UPDATE v += 1`, `SELECT v`, `DELETE`, one query
+per key per phase, from `CONNECTIONS` connections (32) on `THREADS` client threads (4). Every
+query is its own round trip (no pipelining); latency is per query. The model is dropped at the end.
 
 ```bash
 make benchmark                    # 1M rows = 4M queries
@@ -82,25 +79,23 @@ make benchmark SMOKE=1            # 100k rows
 make benchmark CONNECTIONS=128 ROWS=2000000
 ```
 
-It prints a summary table (queries/s = sky-bench's "full" throughput, latency mean/p50/p95/p99/max)
-and keeps the raw output, its log and parsed JSON with the version, parameters and Docker VM
-CPUs/memory in `results/skytable-single-<UTC time>.{txt,log,json}` (gitignored), written by
-[`bench/report.py`](bench/report.py) (standard library, `uv run --frozen` in
-`ghcr.io/astral-sh/uv:0.12.19-python3.13-trixie-slim`).
-
-**Resource budget.** [`bench/limits.sh`](bench/limits.sh) caps the `skytable` container at
-`BENCH_CPUS=4` / `BENCH_MEM=4g` (no swap) with `docker update` for the run and restores the old
-limits afterwards. Docker cannot remove a memory limit from a running container, so "unlimited"
-goes back as the Docker VM's total memory; `make down && make up` starts clean. The bench client
-has `cpus: 4` (`BENCH_CLIENT_CPUS`). The JSON records the applied limits under `limits`. skyd
-starts at least one worker thread per logical CPU it sees (11 in this VM), and the CPU cap only
-limits how much CPU time they get.
+- Output: summary table (queries/s = sky-bench's "full" throughput, latency
+  mean/p50/p95/p99/max); raw output, log and JSON (version, parameters, Docker VM CPUs/memory,
+  applied `limits`) in `results/skytable-single-<UTC time>.{txt,log,json}` (gitignored), written
+  by [`bench/report.py`](bench/report.py) (standard library, `uv run --frozen` in
+  `ghcr.io/astral-sh/uv:0.12.19-python3.13-trixie-slim`).
+- Resource caps: [`bench/limits.sh`](bench/limits.sh) caps the `skytable` container at
+  `BENCH_CPUS=4` / `BENCH_MEM=4g` (no swap) with `docker update` and restores the old limits
+  afterwards. Docker cannot remove a memory limit from a running container, so "unlimited" goes
+  back as the Docker VM's total memory; `make down && make up` starts clean. The bench client has
+  `cpus: 4` (`BENCH_CLIENT_CPUS`). skyd starts at least one worker thread per logical CPU it sees
+  (11 in this VM); the CPU cap only limits their CPU time.
 
 ### Sample results
 
-2026-10-02, `make benchmark` (defaults unless noted), Docker Desktop 29.5.3 on an Apple M4 Pro
-(Docker VM: 11 CPUs, 24.4 GB, aarch64, native image), Skytable 0.8.4, the server capped at
-4 CPUs / 4 GB, client 4 CPUs, 1,000,000 rows per phase.
+2026-10-02, defaults unless noted, Docker Desktop 29.5.3, Apple M4 Pro (Docker VM: 11 CPUs,
+24.4 GB, aarch64, native image), Skytable 0.8.4, server 4 CPUs / 4 GB, client 4 CPUs, 1,000,000
+rows per phase.
 
 | connections | INSERT /s | UPDATE /s | SELECT /s | DELETE /s | SELECT p50 ms | SELECT p99 ms |
 |------------:|----------:|----------:|----------:|----------:|--------------:|--------------:|
@@ -109,12 +104,21 @@ limits how much CPU time they get.
 | 128 | 177,286 | 177,041 | 254,876 | 213,273 | 0.404 | 2.571 |
 | 32, server 8 CPUs | 165,364 | 198,491 | 221,738 | 194,392 | 0.122 | 0.588 |
 
-- About 200k point queries/s at a p50 around 0.13 ms (and 0.05 ms at 8 connections), every
-  query its own round trip.
-- Doubling the server's CPUs changes nothing. During a run skyd uses ~1.8 CPUs and the client
-  ~1.5, so neither is the limit. The cost is one network round trip per query, and more
-  connections mostly trade latency for a little throughput.
-- Pipelining (many queries per round trip, from Skytable drivers) removes that cost. `sky-bench`
-  0.8.4 does not pipeline. [`../session-store`](../session-store) measures it
-  with the Rust driver.
-- Each phase takes about 5 s, so repeat a run before comparing small differences.
+- ~200k point queries/s at p50 ~0.13 ms (0.05 ms at 8 connections), one round trip per query.
+- Doubling server CPUs changes nothing: skyd uses ~1.8 CPUs and the client ~1.5. The cost is
+  the round trip per query; more connections mostly trade latency for a little throughput.
+- `sky-bench` 0.8.4 does not pipeline. [`../session-store`](../session-store) measures
+  pipelining with the Rust driver.
+- Each phase takes ~5 s; repeat a run before comparing small differences.
+
+## Known issues
+
+skysh/skyd 0.8.4:
+
+- skysh cannot send a signed integer: `-5` fails in its literal parser; an unsigned literal into a
+  `sint64` column is error `109`, and so is `-=`. Use a driver for `sint*` columns.
+- skysh reads a float up to the next punctuation, so `SET rating = 4.9 WHERE ...` fails to parse.
+  Put a float before a comma or `)` (`SET rating = 4.9, followers += 1 WHERE ...`).
+- After `ALTER MODEL ... ADD` on a model with rows, `SELECT *` on an old row returns `101` and
+  `SELECT ALL` panics the server task (`sel.rs:108`). The connection is reset; skyd keeps running.
+- `sysctl create user` takes an unquoted name (`app`, not `"app"`: error `29`).
