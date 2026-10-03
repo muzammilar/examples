@@ -1,0 +1,15 @@
+# One worker per zone; the StatefulSet spreads its three replicas across them.
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: tigerbeetle
+nodes:
+  - role: control-plane
+  - role: worker
+    labels:
+      topology.kubernetes.io/zone: az-1
+  - role: worker
+    labels:
+      topology.kubernetes.io/zone: az-2
+  - role: worker
+    labels:
+      topology.kubernetes.io/zone: az-3
