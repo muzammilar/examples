@@ -1,0 +1,26 @@
+# MySQL-mode user tenant `test`: one unit (1 CPU, 1.5Gi, 2Gi log disk) in zone1.
+apiVersion: oceanbase.oceanbase.com/v1alpha1
+kind: OBTenant
+metadata:
+  name: test
+spec:
+  obcluster: obcluster
+  tenantName: test
+  unitNum: 1
+  charset: utf8mb4
+  connectWhiteList: '%'
+  forceDelete: true
+  credentials:
+    root: test-root-password
+    standbyRo: test-standby-ro-password
+  pools:
+    - zone: zone1
+      type:
+        name: Full
+        replica: 1
+        isActive: true
+      resource:
+        maxCPU: 1
+        minCPU: 1
+        memorySize: 1536Mi
+        logDiskSize: 2Gi

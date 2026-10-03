@@ -1,0 +1,48 @@
+# One zone, one observer, standalone mode. Sizes are below ob-operator's built-in floors
+# (8Gi memory, 30Gi data, 30Gi redo log, 10Gi log storage), which `make operator` lowers
+# through the operator's OB_OPERATOR_RESOURCE_MIN* environment variables.
+apiVersion: oceanbase.oceanbase.com/v1alpha1
+kind: OBCluster
+metadata:
+  name: obcluster
+  annotations:
+    # standalone (OceanBase >= 4.2.0): the observer listens on 127.0.0.1 inside the pod,
+    # so a recreated pod with a new pod IP keeps working (only for a single observer)
+    oceanbase.oceanbase.com/mode: standalone
+spec:
+  clusterName: obcluster
+  clusterId: 1
+  serviceAccount: default
+  userSecrets:
+    root: root-password
+  topology:
+    - zone: zone1
+      replica: 1
+  observer:
+    image: oceanbase/oceanbase-cloud-native:4.4.2.1-101000022026050611
+    resource:
+      cpu: 2
+      memory: 5Gi
+    storage:
+      # kind's default StorageClass (rancher local-path): a host directory on the worker,
+      # the size is not enforced. The observer preallocates DATAFILE_SIZE = 20% of the
+      # data size and LOG_DISK_SIZE = 95% of the redo log size (ob-operator 2.3.4).
+      dataStorage:
+        storageClass: standard
+        size: 12Gi
+      redoLogStorage:
+        storageClass: standard
+        size: 12Gi
+      logStorage:
+        storageClass: standard
+        size: 2Gi
+  parameters:
+    # without it the webhook defaults memory_limit to 90% of resource.memory; the webhook
+    # also requires data and redo log storage >= 3 x memory_limit
+    - name: memory_limit
+      value: 4G
+    - name: system_memory
+      value: 1G
+    # sys unit memory; the default (5G) does not fit a 4G memory_limit
+    - name: __min_full_resource_pool_memory
+      value: "1073741824"
