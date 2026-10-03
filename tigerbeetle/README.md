@@ -18,6 +18,13 @@ transfer rejected by `debits_must_not_exceed_credits`) and use the built-in `tig
 [`docker-compose-cluster/README.md`](docker-compose-cluster/README.md#benchmark) and
 [`single-node/README.md`](single-node/README.md#benchmark).
 
+Ledger showcase (Rust client, one replica, no CPU limits, 2026-10-02): 1M payment + fee
+transfers in linked pairs, every fee to one hot account, ran at 481k transfers/s from 1 client
+(batch p50 11.7 / p99 44 ms), 533–593k/s from 2 and 465k/s from 4, with overdrafts rejected by the
+database and an audit that found 0 mismatches. Rough numbers: each run lasts ~2 s. Details:
+[`ledger-showcase/README.md`](ledger-showcase/README.md#sample-output).
+
+
 ## Known issues
 
 Seen while building these examples (TigerBeetle 0.17.9, 2026-10-02):
