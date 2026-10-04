@@ -15,6 +15,7 @@ Silicon. 3.x tags have shipped arm64 since 3.1 (Docker Hub, checked 2026-10-04).
 | [`docker-compose-cluster/`](docker-compose-cluster) | One replicaset of 3 instances (Tarantool 3 YAML config), Raft-based leader election, synchronous space; `make failover` kills the leader under write load and checks no acknowledged write is lost. |
 | [`vshard-cluster/`](vshard-cluster) | Sharded cluster (vshard through the Tarantool 3 `sharding` config): 2-instance storage replicasets + router; `make scale-out` / `make scale-in` grow 2 → 3 → 2 replicasets under load with bucket rebalancing. |
 | [`kubernetes-statefulset/`](kubernetes-statefulset) | 3-instance replicaset (Raft leader election) as a plain StatefulSet on kind; `make failover` force-deletes the leader pod under write load. No maintained CE operator or Helm chart for Tarantool 3. |
+| [`wallet-transfers/`](wallet-transfers) | Wallet transfers in Go (go-tarantool v3): one `transfer()` stored-procedure call vs the same logic as an 8-round-trip interactive transaction vs a Valkey Lua script, 200k transfers with hot accounts, audit of sums, negative balances and idempotent replays. |
 
 Image: `tarantool/tarantool:3.8.1` is multi-arch (amd64 + arm64) and runs natively on Apple
 Silicon (Docker Hub, checked 2026-10-04).
@@ -29,6 +30,7 @@ Silicon (Docker Hub, checked 2026-10-04).
 | [docker-compose-cluster failover](docker-compose-cluster/README.md#failover) | 2026-10-04 | 16 writers on a sync space, leader SIGKILLed | new leader after 3.2 s, longest writer stall 3.29 s, 16 retried `Peer closed`, 0 of 1,170,927 acknowledged writes lost |
 | [vshard-cluster](vshard-cluster/README.md#scaling) | 2026-10-04 | 2 → 3 → 2 storage replicasets (2 instances each) + router, 16 client fibers, ~18.7k puts/s + as many gets | scale-out: 1,000 buckets moved in 51.8 s; scale-in drain: 103.5 s; 0 failed requests, 0 of 2,256,693 acknowledged puts lost, throughput unchanged |
 | [kubernetes-statefulset](kubernetes-statefulset/README.md#failover) | 2026-10-04 | 3 pods on kind, 4 writers on a sync space, leader pod force-deleted | new leader after 1.2 s, longest writer stall 0.42 s, 4 retried writes, 0 of 348,504 acknowledged writes lost |
+| [wallet-transfers](wallet-transfers/README.md#results) | 2026-10-04 | 2 CPUs / 4 GB per server, 64 workers, 200k transfers, 20% on 100 hot accounts | stored procedure 65.5k tx/s (p99 2.7 ms), client-side transaction 37.2k tx/s (p99 4.0 ms, 3,592 conflict retries), Valkey Lua 149.9k tx/s (p99 1.7 ms); all audits ok |
 
 ## Known issues
 
@@ -42,5 +44,8 @@ Silicon (Docker Hub, checked 2026-10-04).
   the vshard module.
 - `tarantool/tarantool-operator` (CE) manages Cartridge clusters only; last release
   `v1.0.0-rc3` (2023-08-04). The Enterprise operator is commercial.
+- With `database.use_mvcc_engine: true`, read-then-write procedures need
+  `box.atomic({ txn_isolation = 'read-committed' }, …)`; the default `best-effort` aborts some
+  with `Transaction has been aborted by conflict`.
 - The image sets `TT_INSTANCE_NAME`; running a client script with the image needs
   `env -u TT_INSTANCE_NAME tarantool script.lua`.

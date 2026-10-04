@@ -1,0 +1,61 @@
+name: tarantool-wallet
+
+# Wallet transfers: Tarantool (stored procedure vs client-side interactive transaction) and
+# Valkey (Lua script) on the same request stream. client/ is the Go program (go-tarantool v3,
+# rueidis). Both servers get the same caps (cpus/mem_limit) so the comparison is like for like.
+services:
+  tarantool:
+    image: tarantool/tarantool:${TARANTOOL_VERSION:-3.8.1}
+    container_name: tarantool-wallet
+    working_dir: /opt/tarantool/wallet   # app.file is relative to it
+    environment: { TT_APP_NAME: wallet, TT_INSTANCE_NAME: instance-001 }
+    cpus: ${SERVER_CPUS:-2}
+    mem_limit: ${SERVER_MEM:-4g}
+    volumes:
+      - ./app:/opt/tarantool/wallet:ro
+      - tarantool-data:/var/lib/tarantool
+    ports: ["127.0.0.1:${TARANTOOL_PORT:-3331}:3301"]
+    healthcheck:
+      test: ["CMD", "status"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+
+  # same version as ../../valkey/minimal-lua; AOF with fsync once a second, close to
+  # Tarantool's wal.mode=write (write() per commit, no fsync)
+  valkey:
+    image: valkey/valkey:${VALKEY_VERSION:-9.1.2-alpine}
+    container_name: tarantool-wallet-valkey
+    command: ["valkey-server", "--appendonly", "yes", "--appendfsync", "everysec", "--io-threads", "2"]
+    cpus: ${SERVER_CPUS:-2}
+    mem_limit: ${SERVER_MEM:-4g}
+    volumes: [valkey-data:/data]
+    ports: ["127.0.0.1:${VALKEY_PORT:-6391}:6379"]
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+
+  # `make run`
+  client:
+    build: client
+    image: tarantool-wallet-client:local
+    profiles: [run]
+    cpus: ${CLIENT_CPUS:-4}
+    environment:
+      TARANTOOL_ADDR: tarantool:3301
+      VALKEY_ADDR: valkey:6379
+      ACCOUNTS: ${ACCOUNTS:-100000}
+      HOT_ACCOUNTS: ${HOT_ACCOUNTS:-100}
+      HOT_PCT: ${HOT_PCT:-20}
+      TRANSFERS: ${TRANSFERS:-200000}
+      WORKERS: ${WORKERS:-64}
+      PHASES: ${PHASES:-tarantool-procedure,tarantool-client-txn,valkey-lua}
+    depends_on:
+      tarantool: { condition: service_healthy }
+      valkey: { condition: service_healthy }
+
+volumes:
+  tarantool-data:
+  valkey-data:

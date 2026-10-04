@@ -1,0 +1,23 @@
+# One Tarantool 3 instance for the wallet workload (see ../README.md).
+credentials:
+  users:
+    app:
+      password: secret
+      roles: [super]
+iproto:
+  listen:
+    - uri: 0.0.0.0:3301
+app:
+  file: init.lua              # relative to the working dir (compose working_dir)
+memtx:
+  memory: 2147483648          # 2 GiB
+database:
+  use_mvcc_engine: true       # interactive transactions over streams (the client-side phase)
+wal:
+  mode: write                 # write() per commit, no fsync (Valkey runs appendfsync everysec)
+groups:
+  group-001:
+    replicasets:
+      replicaset-001:
+        instances:
+          instance-001: {}
