@@ -148,6 +148,10 @@ separate folders and stay as they are.)
 - Every result line states: date, `Apple M4 Pro, Docker VM aarch64`, caps, data size, threads/clients.
 - Images run under emulation (amd64 on arm64) must be marked as such.
 - Raw output goes to `results/` (gitignored); the README gets the table.
+- Number-centric: report measured values with units (ops/s, rows/s, MiB/s, p50/p99/p99.9 ms, s to
+  recover, records lost), in a table. A claim without a number behind it ("fast", "scales well",
+  "low latency") does not go in. Comparisons state both numbers and the ratio (e.g. "p99 8.1 vs
+  39.5 ms, 4.9x").
 
 ## Licensed systems
 
@@ -186,6 +190,9 @@ make up / make test / make failover / make benchmark / make down   (real targets
 - Precise and short. Tables for ports, targets, settings and results; bullets over paragraphs.
 - No marketing ("blazing", "powerful", "seamless"), no "why X wins" pitches, no restating conclusions.
 - Keep exact error strings, versions and numbers. Do not round or guess; if something was not run, say so.
+- Do 2-3 editing passes before committing: (1) check every number, command, port and link against
+  what actually ran and the real files; (2) cut filler, repetition, hedging and marketing; (3) turn
+  remaining prose into tables or short bullets where it reads better.
 
 ## Checklist for a new system
 
