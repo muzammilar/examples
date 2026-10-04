@@ -1,0 +1,57 @@
+name: manticore-single
+
+# One Manticore Search server (official image). The image ships the columnar, secondary-index
+# and KNN libraries (Manticore Columnar Library) and Manticore Buddy (sidecar inside the same
+# container that handles SHOW SHARDING, fuzzy search, autocomplete, the Elasticsearch-like
+# _bulk endpoint and more). searchd_* environment variables override searchd settings.
+services:
+  manticore:
+    image: manticoresearch/manticore:${MANTICORE_VERSION:-29.9.0}
+    container_name: manticore-single
+    environment:
+      QUERY_LOG_TO_STDOUT: "false"
+    ports:
+      # no authentication configured: bind to localhost only
+      - "127.0.0.1:${MANTICORE_MYSQL_PORT:-9306}:9306" # SQL over the MySQL protocol
+      - "127.0.0.1:${MANTICORE_HTTP_PORT:-9308}:9308"  # HTTP: /sql, /search (JSON), /insert, /bulk, /cli
+    ulimits:
+      nofile: { soft: 65536, hard: 65536 }
+      memlock: { soft: -1, hard: -1 }
+    volumes:
+      - manticore-data:/var/lib/manticore
+      - ./sql:/sql:ro
+      - ./scripts:/scripts:ro
+    healthcheck:
+      # healthy once searchd answers and Buddy has registered (it starts a few seconds later)
+      test: ["CMD-SHELL", "mysql -h127.0.0.1 -P9306 -e 'SHOW VERSION' | grep -q Buddy"]
+      interval: 2s
+      timeout: 3s
+      retries: 60
+
+  # `make benchmark`: bench/run.sh with manticore-load (from the same image) in its own container
+  bench:
+    image: manticoresearch/manticore:${MANTICORE_VERSION:-29.9.0}
+    profiles: [bench]
+    cpus: ${BENCH_CLIENT_CPUS:-4}
+    entrypoint: ["sh", "/bench/run.sh"]
+    # tmpfs: the image declares a VOLUME at /var/lib/manticore (keeps the client from creating one);
+    # manticore-load pre-generates every batch into /tmp before the clock starts (~0.9 GB per 1M docs)
+    tmpfs: [/var/lib/manticore, /tmp]
+    environment:
+      NAME: ${NAME:-}
+      DOCS: ${DOCS:-}
+      THREADS: ${THREADS:-}
+      QUERIES: ${QUERIES:-}
+      KNN_QUERIES: ${KNN_QUERIES:-}
+      KEEP: ${KEEP:-}
+      HOST_INFO: ${HOST_INFO:-}
+      DOCKER_INFO: ${DOCKER_INFO:-}
+      BENCH_LIMITS: ${BENCH_LIMITS:-}
+    volumes:
+      - ./bench:/bench:ro
+      - ./results:/results
+    depends_on:
+      manticore: { condition: service_healthy }
+
+volumes:
+  manticore-data:
