@@ -23,7 +23,7 @@ existing examples do (`ydb/`, `scylladb/`, `tigerbeetle/`, `oceanbase/`, `rondb/
 | `kubernetes-helm/` | official Helm chart, no operator | `<system>-kubernetes-helm` |
 | `kubernetes-statefulset/` | neither exists | `<system>-kubernetes` |
 | scaling folder | the system can change node count online | `<system>-scale-out` |
-| workload folder | one per "where it is fastest" program | `<system>-<workload>-showcase` |
+| workload folder | always: the workload the system was built for (see below) | `<system>-<workload>-showcase` |
 
 - Folder and file names describe the workload. Never put `showcase` in a path (it is fine in a branch name).
 - If an example is impossible (no OSS clustering, no single-process mode), do not fake it. Say
@@ -103,6 +103,22 @@ kind-cluster:
 - Lowered resource floors (operator minimums, PVC sizes) go in the manifests with a comment saying
   what the default is and why it was lowered.
 - `kind`, `kubectl`, `helm` come from the repo's dev shell (`nix develop` / direnv, `flake.nix`).
+
+## Workload example (what the system is built for)
+
+Every system gets at least one example of the workload it was purpose-built for and is fastest at
+(TigerBeetle: payments ledger; QuestDB: market-data ticks; RonDB: online feature store; OceanBase:
+HTAP orders). This is the example that shows why someone would pick the system.
+
+- Folder named after the workload (`payments-ledger/`, `market-data/`), program in `app/` or `client/`
+  (Go, Rust or C++; official client library where one exists), built by a Dockerfile so the host needs
+  only Docker. `make up`, `make run`, `make down`.
+- Model a realistic workload, not a microbenchmark: real schema, mixed operations, concurrency.
+- Compare against the naive approach or a system already in the repo on the same data (one query per
+  round trip vs batched; row store vs column store; Kafka vs Redpanda).
+- Check correctness at the end (counts, sums, invariants) and exit non-zero if it fails.
+- Print throughput and p50/p99 per phase; the README gets the table and a short "Design notes" list of
+  the technical reasons (no sales pitch).
 
 ## Scaling example
 
