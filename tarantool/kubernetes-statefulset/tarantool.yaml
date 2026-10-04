@@ -1,0 +1,58 @@
+# Headless Service: stable DNS names tarantool-N.tarantool for the peers. publishNotReadyAddresses
+# lets instances find each other while they bootstrap (before any of them is Ready).
+apiVersion: v1
+kind: Service
+metadata:
+  name: tarantool
+spec:
+  clusterIP: None
+  publishNotReadyAddresses: true
+  selector: { app: tarantool }
+  ports:
+    - { name: iproto, port: 3301 }
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: tarantool
+spec:
+  serviceName: tarantool
+  replicas: 3                       # must match the instances listed in app/config.yaml
+  podManagementPolicy: Parallel     # all three start together and bootstrap the replicaset
+  selector:
+    matchLabels: { app: tarantool }
+  template:
+    metadata:
+      labels: { app: tarantool }
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+        - name: tarantool
+          image: tarantool/tarantool:3.8.1
+          workingDir: /opt/tarantool/k8s          # app.file is relative to it
+          env:
+            - { name: TT_APP_NAME, value: k8s }
+            - name: TT_INSTANCE_NAME
+              valueFrom: { fieldRef: { fieldPath: metadata.name } }
+          ports:
+            - { name: iproto, containerPort: 3301 }
+          readinessProbe:
+            exec: { command: ["status"] }         # the image's script: console socket answers
+            periodSeconds: 2
+            failureThreshold: 3
+          resources:
+            requests: { cpu: 250m, memory: 512Mi }
+            limits: { memory: 1Gi }
+          volumeMounts:
+            - { name: config, mountPath: /opt/tarantool/k8s, readOnly: true }
+            - { name: data, mountPath: /var/lib/tarantool }
+      volumes:
+        - name: config
+          configMap: { name: tarantool-config }
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: [ReadWriteOnce]
+        resources:
+          requests: { storage: 1Gi }

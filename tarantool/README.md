@@ -14,6 +14,7 @@ Silicon. 3.x tags have shipped arm64 since 3.1 (Docker Hub, checked 2026-10-04).
 
 | [`docker-compose-cluster/`](docker-compose-cluster) | One replicaset of 3 instances (Tarantool 3 YAML config), Raft-based leader election, synchronous space; `make failover` kills the leader under write load and checks no acknowledged write is lost. |
 | [`vshard-cluster/`](vshard-cluster) | Sharded cluster (vshard through the Tarantool 3 `sharding` config): 2-instance storage replicasets + router; `make scale-out` / `make scale-in` grow 2 → 3 → 2 replicasets under load with bucket rebalancing. |
+| [`kubernetes-statefulset/`](kubernetes-statefulset) | 3-instance replicaset (Raft leader election) as a plain StatefulSet on kind; `make failover` force-deletes the leader pod under write load. No maintained CE operator or Helm chart for Tarantool 3. |
 
 Image: `tarantool/tarantool:3.8.1` is multi-arch (amd64 + arm64) and runs natively on Apple
 Silicon (Docker Hub, checked 2026-10-04).
@@ -27,6 +28,7 @@ Silicon (Docker Hub, checked 2026-10-04).
 | [docker-compose-cluster](docker-compose-cluster/README.md#benchmark) | 2026-10-04 | 3 instances, 2 CPUs / 1 GiB each, 64 fibers over 4 net.box connections to the leader, 10 s per op | async replace 118k/s (p99 3.0 ms), sync replace (2 of 3 WALs) 90k/s (p99 1.7 ms), get 338k/s |
 | [docker-compose-cluster failover](docker-compose-cluster/README.md#failover) | 2026-10-04 | 16 writers on a sync space, leader SIGKILLed | new leader after 3.2 s, longest writer stall 3.29 s, 16 retried `Peer closed`, 0 of 1,170,927 acknowledged writes lost |
 | [vshard-cluster](vshard-cluster/README.md#scaling) | 2026-10-04 | 2 → 3 → 2 storage replicasets (2 instances each) + router, 16 client fibers, ~18.7k puts/s + as many gets | scale-out: 1,000 buckets moved in 51.8 s; scale-in drain: 103.5 s; 0 failed requests, 0 of 2,256,693 acknowledged puts lost, throughput unchanged |
+| [kubernetes-statefulset](kubernetes-statefulset/README.md#failover) | 2026-10-04 | 3 pods on kind, 4 writers on a sync space, leader pod force-deleted | new leader after 1.2 s, longest writer stall 0.42 s, 4 retried writes, 0 of 348,504 acknowledged writes lost |
 
 ## Known issues
 
@@ -38,5 +40,7 @@ Silicon (Docker Hub, checked 2026-10-04).
 - A replicaset scales reads and redundancy, not writes: only the leader accepts writes. Writes
   scale out with vshard ([`vshard-cluster/`](vshard-cluster)); the official image does not ship
   the vshard module.
+- `tarantool/tarantool-operator` (CE) manages Cartridge clusters only; last release
+  `v1.0.0-rc3` (2023-08-04). The Enterprise operator is commercial.
 - The image sets `TT_INSTANCE_NAME`; running a client script with the image needs
   `env -u TT_INSTANCE_NAME tarantool script.lua`.

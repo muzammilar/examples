@@ -1,0 +1,45 @@
+# Tarantool 3 config for the StatefulSet: three instances named after the pods (tarantool-0..2,
+# TT_INSTANCE_NAME from metadata.name), one replicaset, Raft-based leader election. Each
+# instance listens on 0.0.0.0 and advertises its stable headless-Service DNS name to the peers.
+credentials:
+  users:
+    replicator:
+      password: secret
+      roles: [replication]
+    app:
+      password: secret
+      roles: [super]
+
+iproto:
+  listen:
+    - uri: 0.0.0.0:3301
+  advertise:
+    peer:
+      login: replicator
+
+replication:
+  failover: election
+  timeout: 1
+  election_timeout: 2
+  synchro_timeout: 30
+
+app:
+  file: init.lua
+
+memtx:
+  memory: 268435456
+
+database:
+  use_mvcc_engine: true
+
+groups:
+  group-001:
+    replicasets:
+      replicaset-001:
+        instances:
+          tarantool-0:
+            iproto: { advertise: { peer: { uri: 'tarantool-0.tarantool:3301' } } }
+          tarantool-1:
+            iproto: { advertise: { peer: { uri: 'tarantool-1.tarantool:3301' } } }
+          tarantool-2:
+            iproto: { advertise: { peer: { uri: 'tarantool-2.tarantool:3301' } } }

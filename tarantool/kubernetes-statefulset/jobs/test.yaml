@@ -1,0 +1,26 @@
+# `make test`: Lua client from the tarantool image against the three instances.
+# The image sets TT_INSTANCE_NAME, which makes a plain `tarantool` look for a cluster config.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: tarantool-test
+spec:
+  backoffLimit: 0
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: client
+          image: tarantool/tarantool:3.8.1
+          workingDir: /work
+          command: ["env", "-u", "TT_INSTANCE_NAME", "tarantool", "scripts/run.lua", "scripts/01-replication.lua", "scripts/02-sync-writes.lua", "scripts/03-every-instance.all.lua"]
+          env:
+            - name: TARANTOOL_URIS
+              value: app:secret@tarantool-0.tarantool:3301,app:secret@tarantool-1.tarantool:3301,app:secret@tarantool-2.tarantool:3301
+            - { name: WRITERS, value: "4" }   # fewer than the compose example: less WAL on the shared disk
+            - { name: DURATION, value: "40" }
+          volumeMounts:
+            - { name: scripts, mountPath: /work/scripts, readOnly: true }
+      volumes:
+        - name: scripts
+          configMap: { name: tarantool-scripts }
