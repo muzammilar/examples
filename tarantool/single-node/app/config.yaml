@@ -1,0 +1,41 @@
+# Tarantool 3 declarative config (https://www.tarantool.io/en/doc/latest/reference/configuration/configuration_reference/).
+# The image's entrypoint loads /opt/tarantool/$TT_APP_NAME/config.yaml and starts the instance
+# named $TT_INSTANCE_NAME; snapshot, WAL and vinyl dirs default to /var/lib/tarantool/sys_env/...
+credentials:
+  users:
+    # app/secret: used by `make test`, `make benchmark` and `make cli`
+    app:
+      password: secret
+      roles: [super]
+
+iproto:
+  listen:
+    - uri: 0.0.0.0:3301
+
+app:
+  file: init.lua            # schema + stored procedures; relative to the working dir (compose working_dir)
+
+memtx:
+  memory: 1073741824        # 1 GiB arena for memtx tuples and indexes (default 256 MiB)
+
+vinyl:
+  memory: 134217728         # 128 MiB L0 (in-memory level) before a dump to disk
+  cache: 134217728          # 128 MiB page cache for reads
+
+database:
+  use_mvcc_engine: true     # memtx MVCC: needed for interactive transactions over streams
+
+wal:
+  mode: write               # write() each commit; `fsync` waits for the disk as well
+
+snapshot:
+  count: 2                  # keep the last 2 snapshots (and the WALs needed after them)
+  by:
+    interval: 3600          # automatic checkpoint every hour; `box.snapshot()` forces one
+
+groups:
+  group-001:
+    replicasets:
+      replicaset-001:
+        instances:
+          instance-001: {}

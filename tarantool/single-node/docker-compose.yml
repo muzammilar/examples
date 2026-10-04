@@ -1,0 +1,62 @@
+name: tarantool-single
+
+# One Tarantool 3 instance configured by app/config.yaml (YAML, Tarantool 3's declarative
+# config). The official image's entrypoint reads /opt/tarantool/$TT_APP_NAME/config.yaml and
+# starts instance $TT_INSTANCE_NAME; app/init.lua (app.file) creates the schema and defines the
+# stored procedures. Snapshots, WALs and vinyl files go to the tarantool-data volume.
+x-image: &image tarantool/tarantool:${TARANTOOL_VERSION:-3.8.1}
+
+services:
+  tarantool:
+    image: *image
+    container_name: tarantool
+    environment:
+      TT_APP_NAME: single
+      TT_INSTANCE_NAME: instance-001
+    working_dir: /opt/tarantool/single  # app.file is relative to it
+    volumes:
+      - ./app:/opt/tarantool/single:ro
+      - tarantool-data:/var/lib/tarantool
+    ports:
+      - "127.0.0.1:${TARANTOOL_PORT:-3301}:3301"
+    healthcheck:
+      # the image's `status` script: connects to the instance's console socket
+      test: ["CMD", "status"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+
+  # `make test`: scripts/run.lua evals scripts/NN-*.lua on the server via net.box
+  client:
+    image: *image
+    profiles: [test]
+    # the image sets TT_INSTANCE_NAME, which makes tarantool look for a cluster config
+    entrypoint: ["env", "-u", "TT_INSTANCE_NAME", "tarantool"]
+    working_dir: /work
+    environment:
+      TARANTOOL_URI: app:secret@tarantool:3301
+    volumes:
+      - ./scripts:/work/scripts:ro
+
+  # `make benchmark`: bench/bench.lua, a net.box load generator, results in results/
+  bench:
+    image: *image
+    profiles: [bench]
+    cpus: ${BENCH_CLIENT_CPUS:-2}
+    entrypoint: ["env", "-u", "TT_INSTANCE_NAME", "tarantool", "/bench/bench.lua"]
+    user: root  # writes to the bind-mounted results/
+    environment:
+      TARANTOOL_URI: app:secret@tarantool:3301
+      NAME: ${NAME:-bench}
+      FIBERS: ${FIBERS:-64}
+      CONNS: ${CONNS:-4}
+      DURATION: ${DURATION:-10}
+      KEYS: ${KEYS:-100000}
+      OPS: ${OPS:-memtx_replace,memtx_get,vinyl_replace,vinyl_get,call_transfer}
+      BENCH_LIMITS: ${BENCH_LIMITS:-}
+    volumes:
+      - ./bench:/bench:ro
+      - ./results:/results
+
+volumes:
+  tarantool-data:
