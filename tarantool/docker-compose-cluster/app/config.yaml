@@ -1,0 +1,48 @@
+# Three instances, one replicaset, Raft-based leader election (replication.failover: election).
+# Every instance is a candidate; the elected leader is the only writable one. Spaces created with
+# is_sync = true commit only after synchro_quorum (default N/2+1 = 2) instances have the
+# transaction. Same file on all three; each container picks its part by $TT_INSTANCE_NAME.
+credentials:
+  users:
+    replicator:                 # instances connect to each other as this user
+      password: secret
+      roles: [replication]
+    app:                        # clients: make test / failover / benchmark / cli
+      password: secret
+      roles: [super]
+
+iproto:
+  advertise:
+    peer:
+      login: replicator         # peers use these credentials with each instance's listen URI
+
+replication:
+  failover: election            # Raft: election_mode = candidate on every instance
+  timeout: 1                    # heartbeat interval; a peer is dead after 4 x timeout without data
+  election_timeout: 2           # seconds between election rounds (default 5)
+  election_fencing_mode: soft   # (default) a leader without a quorum of connections resigns
+  synchro_timeout: 30           # how long a sync transaction waits for the quorum (default 5)
+
+app:
+  file: init.lua                # relative to the working dir (compose working_dir)
+
+memtx:
+  memory: 268435456             # 256 MiB per instance
+
+database:
+  use_mvcc_engine: true
+
+groups:
+  group-001:
+    replicasets:
+      replicaset-001:
+        instances:
+          instance-001:
+            iproto:
+              listen: [{ uri: 'tarantool-1:3301' }]
+          instance-002:
+            iproto:
+              listen: [{ uri: 'tarantool-2:3301' }]
+          instance-003:
+            iproto:
+              listen: [{ uri: 'tarantool-3:3301' }]

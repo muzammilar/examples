@@ -1,0 +1,93 @@
+name: tarantool-cluster
+
+# One replicaset of three Tarantool 3 instances with Raft-based leader election
+# (app/config.yaml: replication.failover = election). The same config file is mounted into
+# every container; TT_INSTANCE_NAME picks the instance. Hostnames tarantool-1..3 are the
+# listen/advertise URIs the instances use to replicate from each other.
+x-tarantool: &tarantool
+  image: tarantool/tarantool:${TARANTOOL_VERSION:-3.8.1}
+  working_dir: /opt/tarantool/cluster   # app.file is relative to it
+  volumes:
+    - ./app:/opt/tarantool/cluster:ro
+  healthcheck:
+    test: ["CMD", "status"]             # the image's script: connects to the console socket
+    interval: 2s
+    timeout: 5s
+    retries: 30
+
+x-client: &client
+  image: tarantool/tarantool:${TARANTOOL_VERSION:-3.8.1}
+  working_dir: /work
+  environment: &client-env
+    TARANTOOL_URIS: app:secret@tarantool-1:3301,app:secret@tarantool-2:3301,app:secret@tarantool-3:3301
+  depends_on:
+    tarantool-1: { condition: service_healthy }
+    tarantool-2: { condition: service_healthy }
+    tarantool-3: { condition: service_healthy }
+
+services:
+  tarantool-1:
+    <<: *tarantool
+    container_name: tarantool-1
+    hostname: tarantool-1
+    environment: { TT_APP_NAME: cluster, TT_INSTANCE_NAME: instance-001 }
+    ports: ["127.0.0.1:${TARANTOOL_PORT_1:-3311}:3301"]
+    volumes: [./app:/opt/tarantool/cluster:ro, tarantool-1:/var/lib/tarantool]
+  tarantool-2:
+    <<: *tarantool
+    container_name: tarantool-2
+    hostname: tarantool-2
+    environment: { TT_APP_NAME: cluster, TT_INSTANCE_NAME: instance-002 }
+    ports: ["127.0.0.1:${TARANTOOL_PORT_2:-3312}:3301"]
+    volumes: [./app:/opt/tarantool/cluster:ro, tarantool-2:/var/lib/tarantool]
+  tarantool-3:
+    <<: *tarantool
+    container_name: tarantool-3
+    hostname: tarantool-3
+    environment: { TT_APP_NAME: cluster, TT_INSTANCE_NAME: instance-003 }
+    ports: ["127.0.0.1:${TARANTOOL_PORT_3:-3313}:3301"]
+    volumes: [./app:/opt/tarantool/cluster:ro, tarantool-3:/var/lib/tarantool]
+
+  # `make test`: scripts/run.lua evals scripts/NN-*.lua on the leader (*.all.lua: every instance).
+  # The image sets TT_INSTANCE_NAME, which makes a plain `tarantool` look for a cluster config.
+  client:
+    <<: *client
+    profiles: [test]
+    entrypoint: ["env", "-u", "TT_INSTANCE_NAME", "tarantool"]
+    volumes: [./scripts:/work/scripts:ro]
+
+  # `make failover`: scripts/load.lua writes to the leader while the Makefile kills it
+  load:
+    <<: *client
+    profiles: [test]
+    container_name: tarantool-load
+    entrypoint: ["env", "-u", "TT_INSTANCE_NAME", "tarantool", "scripts/load.lua"]
+    environment:
+      <<: *client-env
+      WRITERS: ${WRITERS:-16}
+      DURATION: ${LOAD_DURATION:-40}
+    volumes: [./scripts:/work/scripts:ro]
+    depends_on: []
+
+  # `make benchmark`: bench/bench.lua against the leader, results in results/
+  bench:
+    <<: *client
+    profiles: [bench]
+    cpus: ${BENCH_CLIENT_CPUS:-2}
+    user: root  # writes to the bind-mounted results/
+    entrypoint: ["env", "-u", "TT_INSTANCE_NAME", "tarantool", "/bench/bench.lua"]
+    environment:
+      <<: *client-env
+      NAME: ${NAME:-bench}
+      FIBERS: ${FIBERS:-64}
+      CONNS: ${CONNS:-4}
+      DURATION: ${DURATION:-10}
+      KEYS: ${KEYS:-100000}
+      OPS: ${OPS:-async_replace,sync_replace,get}
+      BENCH_LIMITS: ${BENCH_LIMITS:-}
+    volumes: [./bench:/bench:ro, ./results:/results]
+
+volumes:
+  tarantool-1:
+  tarantool-2:
+  tarantool-3:
