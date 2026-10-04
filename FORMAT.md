@@ -150,8 +150,8 @@ separate folders and stay as they are.)
 - Raw output goes to `results/` (gitignored); the README gets the table.
 - Number-centric: report measured values with units (ops/s, rows/s, MiB/s, p50/p99/p99.9 ms, s to
   recover, records lost), in a table. A claim without a number behind it ("fast", "scales well",
-  "low latency") does not go in. Comparisons state both numbers and the ratio (e.g. "p99 8.1 vs
-  39.5 ms, 4.9x").
+  "low latency") does not go in. Comparisons state both numbers and the ratio (e.g. "p99 8.1 ms
+  vs 39.5 ms, 4.9x"). Every number carries its unit, including the first one in a pair or range.
 
 ## Licensed systems
 
