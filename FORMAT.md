@@ -11,7 +11,6 @@ existing examples do (`ydb/`, `scylladb/`, `tigerbeetle/`, `oceanbase/`, `rondb/
   single-node/               # minimal setup
   docker-compose-cluster/    # replicated / sharded cluster on Docker Compose
   kubernetes-operator/       # official operator on kind (or kubernetes-helm/, kubernetes-statefulset/)
-  <scaling-folder>/          # scale out and back in under load (e.g. scale-out-in/, online-scaling/)
   <workload-name>/           # a program on the system's strongest workload (payments-ledger/, market-data/)
 ```
 
@@ -22,7 +21,6 @@ existing examples do (`ydb/`, `scylladb/`, `tigerbeetle/`, `oceanbase/`, `rondb/
 | `kubernetes-operator/` | an official operator exists | `<system>-kubernetes-operator` |
 | `kubernetes-helm/` | official Helm chart, no operator | `<system>-kubernetes-helm` |
 | `kubernetes-statefulset/` | neither exists | `<system>-kubernetes` |
-| scaling folder | the system can change node count online | `<system>-scale-out` |
 | workload folder | always: the workload the system was built for (see below) | `<system>-<workload>-showcase` |
 
 - Folder and file names describe the workload. Never put `showcase` in a path (it is fine in a branch name).
@@ -53,7 +51,7 @@ Each example folder:
 | `failover` | clusters | stop a node under load, show the cluster keeps serving, restart it, show it rejoins |
 | `benchmark` | when measured | `bench/run.sh` under `bench/limits.sh` caps; writes `results/` |
 | `run` / `build` | workload folders | build the app image, run it against the running system |
-| `scale-out` / `scale-in` | scaling folders | add nodes, then remove them, with load running |
+| `scale-out` / `scale-in` | cluster / Kubernetes examples | add nodes, then remove them, with load running |
 | `logs` | optional | follow logs |
 | `kind-cluster`, `operator`, `cluster` | kind examples | steps of `up`, each idempotent |
 | `aio-max-nr` etc. | when a kernel setting is needed | prerequisite of `up` (see `oceanbase/*/Makefile`) |
@@ -120,7 +118,11 @@ HTAP orders). This is the example that shows why someone would pick the system.
 - Print throughput and p50/p99 per phase; the README gets the table and a short "Design notes" list of
   the technical reasons (no sales pitch).
 
-## Scaling example
+## Scaling
+
+Not a separate example: `make scale-out` / `make scale-in` live in the cluster example
+(`docker-compose-cluster/`) and/or the Kubernetes example, whichever the system scales through.
+(`oceanbase/scale-out-in/`, `rondb/online-scaling/` and `tigerbeetle/cluster-operations/` predate this rule.)
 
 - Grow, then shrink, with load running: 3 → 5 → 3 or 3 → 7 → 5. Never more than 7 nodes.
 - Per step: the command, how long rebalancing took, throughput before/during/after, failed requests.
