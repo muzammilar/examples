@@ -70,6 +70,28 @@ services:
       replicas: 1
 
   ####################
+  # Benchmark (profile `bench`, not started by `up`): `make bench` in trees, or
+  #   docker compose --profile bench run --rm bench -rate 0 -duration 20s
+  ####################
+  bench:
+    image: franz-tree-bench
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+      target: bench
+    profiles: ["bench"]
+    command: ["-brokers", "kafka-broker-1:19092,kafka-broker-2:19092,kafka-broker-3:19092", "-label", "kafka"]
+    networks:
+      - kafka-network
+    depends_on:
+      kafka-broker-1:
+        condition: service_healthy
+      kafka-broker-2:
+        condition: service_healthy
+      kafka-broker-3:
+        condition: service_healthy
+
+  ####################
   # Prometheus
   ####################
   prometheus:

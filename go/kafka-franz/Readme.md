@@ -17,6 +17,9 @@ See the `trees` directory for code. In order to avoid multiple small modules for
 * `trees/producer` - each worker runs a sync producer (`ProduceSync`) and an async producer (`Produce` with a promise callback) sharing one `kgo.Client`.
 * `trees/consumer` - a consumer group member (`kgo.ConsumerGroup`) that marks processed records and auto-commits the marked offsets (at-least-once).
   The partition balancer can be selected with `-balancer` (`range`, `roundrobin`, `sticky`, `cooperative-sticky`).
+* `trees/bench` - a benchmark for any Kafka-API cluster (this Kafka, Redpanda, ...): fixed-rate or max-rate produce with acks=all and
+  the idempotent producer, end-to-end latency, and a read-back check that no acknowledged record is lost or duplicated.
+  See [Benchmark](#benchmark-kafka-and-redpanda). Not started by `docker compose up`.
 
 The Kafka cluster runs in KRaft mode (3 controllers and 3 brokers, no zookeeper). The `admin` service waits for the brokers to be healthy,
 creates the `trees` and `test` topics (13 partitions, replication factor 3), and the producers and consumers start once it has completed.
@@ -90,6 +93,7 @@ All binaries accept `-brokers` (default `kafka-broker-1:19092,kafka-broker-2:190
 | `admin`    | `-topics` (`trees`), `-partitions` (`13`, `-1` for broker default), `-replication` (`3`, `-1` for broker default), `-configs` (`key=value,...`), `-timeout` (`2m`) |
 | `producer` | `-topic` (`trees`), `-workers` (`2`), `-partitioner` (`hash`, `rand`, `roundrobin`; default `hash`), `-interval` (`100ms`), `-metrics.addr` (`:8080`)          |
 | `consumer` | `-topics` (`trees`), `-group` (`treeconsumer`), `-balancer` (default `cooperative-sticky`), `-oldest` (`true`), `-metrics.addr` (`:8080`)                          |
+| `bench`    | see [Benchmark](#benchmark-kafka-and-redpanda); `-brokers` defaults to `$KAFKA_BROKERS` if set                                                                  |
 
 ### Tests and Benchmarks
 
@@ -117,6 +121,56 @@ make logs         # follow the producer and consumer logs
 make down         # stop the stack, remove containers, networks, volumes, orphans and the franz-tree-* images
                          # (the apache/kafka, prom/prometheus and grafana/grafana images are kept)
 ```
+
+### Benchmark (Kafka and Redpanda)
+
+`trees/bench` (image `franz-tree-bench`, Dockerfile target `bench`, compose service `bench` in profile `bench`) is the shared
+Kafka-API benchmark client of this repo; [`redpanda/streaming-latency`](../../redpanda/streaming-latency) runs it against Redpanda and
+against this Kafka with the same caps.
+
+```sh
+cd trees
+make kafka-bench                                         # against the compose kafka (compose starts the brokers if needed), defaults below
+make kafka-bench BENCH_ARGS="-rate 0 -duration 5s"       # max rate
+make kafka-bench BENCH_ARGS="-rate 20000 -txns 100"      # plus the exactly-once check
+make run-bench KAFKA_BROKERS=localhost:19092 BENCH_ARGS="-label redpanda"   # from the host against any cluster
+docker run --rm --network <net> franz-tree-bench -brokers redpanda-0:9092,redpanda-1:9092 -label redpanda   # in docker
+```
+
+What one run does:
+
+1. deletes and re-creates the topic (`-topic bench`, `-partitions 12`, `-replication 3`, `-topic.configs min.insync.replicas=2`),
+   waits until every partition has a leader and writes one untimed warm-up record to each;
+2. starts a consumer on all partitions (no group) at the end of the topic;
+3. produces `-size 1024`-byte records for `-duration 30s` at `-rate 10000` records/s (paced by elapsed time), or as fast as one client can
+   with `-rate 0`. acks=all, idempotent producer (franz-go then keeps up to 5 requests in flight per broker), `-linger 0`,
+   `-compression none`, 10,000 distinct keys;
+4. reports ack latency (send to acknowledgement) and end-to-end latency (send to consume, same host clock) as p50/p99/p99.9/max,
+   ignoring records sent during `-warmup 2s`. The send time travels in the `send-ns` header (the record timestamp only has ms resolution);
+5. reads the topic back from offset 0 and checks that every acknowledged record is there exactly once: count, missing sequences,
+   duplicates, and the sum of the CRC32 of the values;
+6. with `-txns N`: N transactions of `-txn.records 1000` on `<topic>-txn`, every 5th aborted; a `read_committed` consumer must see exactly
+   the committed records (count and checksum), a `read_uncommitted` one all of them;
+7. deletes the topics (`-keep` keeps them), prints `RESULT {json}` on one line and `CHECK PASSED`, or `CHECK FAILED` with exit status 1.
+
+```text
+bench kafka-4.3.1: 5000 records/s, 1024 B records, 10s (warm-up 2s), topic bench (12 partitions, RF 3, min.insync.replicas=2), acks=all, idempotent, linger 0s, compression none; run 58ba9821843d9770
+  produced   49985 acked in 10.0 s = 4998 records/s = 4.9 MiB/s, 0 failed; consumed live 49985
+  ack        p50 0.58  p99 2.99  p99.9 7.58  max 9.66 ms (n=39990)
+  end-to-end p50 0.67  p99 3.13  p99.9 7.77  max 10.98 ms (n=39990)
+  read back  49985 records: missing 0, duplicates 0, checksum ok true
+RESULT {"label":"kafka-4.3.1","mode":"rate","target_rate":5000,"acked":49985,"failed":0,"ack_ms":{...},"e2e_ms":{...},"missing":0,"duplicates":0,"checksum_ok":true,"ok":true,...}
+CHECK PASSED
+```
+
+Smoke runs on 2026-10-04 (Apple M4 Pro, Docker VM aarch64, this compose's Kafka 4.3.1, no CPU caps, shared Docker VM, one run each):
+5,000 records/s for 10 s: end-to-end p50 0.67 / p99 3.13 / p99.9 7.77 ms; `-rate 0 -duration 5s`: 356,564 records/s (348.2 MiB/s),
+end-to-end p50 76 ms (queueing at saturation); `-txns 10`: 8,000 committed and 2,000 aborted records, `read_committed` returned exactly
+the 8,000. All read-backs: 0 missing, 0 duplicates.
+
+- The payload is one random string repeated in every record, so any `-compression` other than `none` inflates the numbers
+  (snappy, franz-go's default, gave ~840k records/s here).
+- A max-rate run writes `rate x size x RF` bytes to the brokers' disks (5 s at 350 MiB/s is ~5 GB with RF 3); keep it short on a laptop.
 
 ### Kafka Topic Creation (Kafka CLI)
 

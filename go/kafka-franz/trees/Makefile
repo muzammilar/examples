@@ -1,4 +1,4 @@
-.PHONY: help deps fmt vet build run-admin run-producer run-consumer test test-race bench bench-cpu test-all test-integration bench-integration clean docker-build up logs wait down
+.PHONY: help deps fmt vet build run-admin run-producer run-consumer run-bench kafka-bench test test-race bench bench-cpu test-all test-integration bench-integration clean docker-build up logs wait down
 
 # Variables
 BIN_DIR := bin
@@ -9,7 +9,7 @@ INTEGRATION_BENCH ?= Integration
 # The compose file lives in the parent directory (the go module is in `trees`)
 COMPOSE := docker compose --project-directory .. -f ../docker-compose.yml
 # Images built by the compose file (removed by `make down`)
-BUILT_IMAGES := franz-tree-admin franz-tree-producer franz-tree-consumer
+BUILT_IMAGES := franz-tree-admin franz-tree-producer franz-tree-consumer franz-tree-bench
 # Kafka brokers exposed on the host by the docker compose setup (override for another cluster)
 KAFKA_BROKERS ?= localhost:29092,localhost:39092,localhost:49092
 export KAFKA_BROKERS
@@ -34,8 +34,8 @@ vet: ## Run go vet (including the integration tests)
 	go vet ./...
 	go vet -tags integration ./...
 
-build: ## Build the admin, producer and consumer binaries into bin/
-	go build -o $(BIN_DIR)/ ./admin ./producer ./consumer
+build: ## Build the admin, producer, consumer and bench binaries into bin/
+	go build -o $(BIN_DIR)/ ./admin ./producer ./consumer ./bench
 
 run-admin: ## Create the topics on the compose kafka (from the host)
 	go run ./admin -brokers $(KAFKA_BROKERS) -topics trees,test
@@ -45,6 +45,15 @@ run-producer: ## Run a producer against the compose kafka (from the host, metric
 
 run-consumer: ## Run a consumer group member against the compose kafka (from the host, metrics on :8082)
 	go run ./consumer -brokers $(KAFKA_BROKERS) -topics trees,test -metrics.addr :8082 -log.level debug
+
+# Kafka-API benchmark (bench/): BENCH_ARGS are passed to it, e.g. BENCH_ARGS="-rate 0 -duration 20s -txns 50"
+BENCH_ARGS ?=
+
+run-bench: ## Run the Kafka-API benchmark from the host against $(KAFKA_BROKERS) (BENCH_ARGS="...")
+	go run ./bench -brokers $(KAFKA_BROKERS) $(BENCH_ARGS)
+
+kafka-bench: ## Run the benchmark in docker against the compose kafka (BENCH_ARGS="...", see ../Readme.md)
+	$(COMPOSE) --profile bench run --rm --build bench -label kafka $(BENCH_ARGS)
 
 test: ## Run unit tests only (no broker needed, benchmarks are skipped)
 	go test -v ./...
@@ -92,5 +101,5 @@ logs: ## Follow the producer and consumer logs
 	$(COMPOSE) logs --follow producertree producertest consumer
 
 down: ## Stop services and remove containers, networks, volumes, orphans and the built images (keeps the shared kafka/prometheus/grafana images)
-	$(COMPOSE) down --volumes --remove-orphans
+	$(COMPOSE) --profile bench down --volumes --remove-orphans
 	-docker image rm $(BUILT_IMAGES) 2>/dev/null

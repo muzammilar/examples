@@ -5,7 +5,7 @@ ARG ALPINE_VERSION=3.24
 # Builder stage
 ###############################################
 
-# a single builder for all the binaries (admin, producer, consumer)
+# a single builder for all the binaries (admin, producer, consumer, bench)
 FROM golang:${GO_VERSION}-alpine AS builder
 WORKDIR /go/src/app
 # download the dependencies first (cached layer)
@@ -13,7 +13,7 @@ COPY ./trees/go.mod ./trees/go.sum ./
 RUN go mod download
 COPY ./trees .
 # install the binaries
-RUN CGO_ENABLED=0 go install -v ./admin ./producer ./consumer
+RUN CGO_ENABLED=0 go install -v ./admin ./producer ./consumer ./bench
 
 ###############################################
 # Runner stage
@@ -36,3 +36,9 @@ FROM alpine:${ALPINE_VERSION} AS consumer
 RUN apk --no-cache add ca-certificates
 COPY --from=builder /go/bin/consumer /treeconsumer
 CMD ["/treeconsumer"]
+
+# bench (Kafka-API benchmark: rate/max-rate produce, end-to-end latency, loss/duplicate check)
+FROM alpine:${ALPINE_VERSION} AS bench
+RUN apk --no-cache add ca-certificates
+COPY --from=builder /go/bin/bench /treebench
+ENTRYPOINT ["/treebench"]
