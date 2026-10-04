@@ -1,0 +1,42 @@
+# Three instances, one replicaset, Raft leader election. tarantool-1 is the only candidate, so
+# it is always the leader (the bench writes to it); the other two vote. wal.mode comes from
+# TT_WAL_MODE. With BENCH_SYNC=1, init.lua creates the bench spaces as synchronous: a commit
+# returns after synchro_quorum (default N/2+1 = 2 of 3) instances have it in their WAL.
+credentials:
+  users:
+    replicator:
+      password: secret
+      roles: [replication]
+    app:
+      password: secret
+      roles: [super]
+
+iproto:
+  advertise:
+    peer:
+      login: replicator
+
+replication:
+  failover: election
+  timeout: 1
+  election_timeout: 2
+
+app:
+  file: init.lua
+
+memtx:
+  memory: 1073741824            # 1 GiB per instance
+
+groups:
+  group-001:
+    replicasets:
+      replicaset-001:
+        instances:
+          tarantool-1:
+            iproto: { listen: [{ uri: 'tarantool-1:3301' }] }
+          tarantool-2:
+            replication: { election_mode: voter }
+            iproto: { listen: [{ uri: 'tarantool-2:3301' }] }
+          tarantool-3:
+            replication: { election_mode: voter }
+            iproto: { listen: [{ uri: 'tarantool-3:3301' }] }

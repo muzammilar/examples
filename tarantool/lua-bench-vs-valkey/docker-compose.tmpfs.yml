@@ -1,0 +1,11 @@
+# Overlay for the rs-tarantool-tmpfs-* setups (bench/run.sh sets COMPOSE_FILE): the replicaset's
+# data dir (WAL and snapshots) on tmpfs instead of a volume, so a commit is in RAM on the
+# instances that confirm it and nothing reaches a disk. tmpfs pages count against the
+# container's 2 GiB memory limit.
+x-tmpfs: &tmpfs
+  tmpfs: ["/var/lib/tarantool:size=1g,uid=999,gid=999"]
+
+services:
+  tarantool-1: { <<: *tmpfs, volumes: !override [./tarantool/replicaset:/opt/tarantool/replicaset:ro] }
+  tarantool-2: { <<: *tmpfs, volumes: !override [./tarantool/replicaset:/opt/tarantool/replicaset:ro] }
+  tarantool-3: { <<: *tmpfs, volumes: !override [./tarantool/replicaset:/opt/tarantool/replicaset:ro] }

@@ -43,6 +43,7 @@ docker run --rm --network tarantool-single_default lua-bench-tarantool:local \
 | `-c` | 50 | concurrent workers |
 | `-keys` | 100000 | distinct keys |
 | `-user` / `-password` | `guest` / empty | credentials |
+| `-router` | false | `-addr` is a vshard router that defines `bench_reset`, `bench_put`, `bench_get`, `bench_add`, `bench_update`, `bench_delete` (see [`tarantool/lua-bench-vs-valkey/tarantool/vshard`](../../../tarantool/lua-bench-vs-valkey/tarantool/vshard)); no schema or function setup from the client |
 
 ## Results
 
@@ -70,7 +71,13 @@ For comparison, rueidis-lua-bench on Valkey 9.1.2 (2 CPUs, `--io-threads 2`) wit
 on 2026-10-03: SET 538,655, GET 550,445, `add.lua` 489,724, `update.lua` 406,756, `delete.lua`
 508,709 ops/s; Dragonfly about 170k for `add.lua` ([`go/rueidis-lua-bench`](../../rueidis-lua-bench#results)).
 
-- Different protocol (IPROTO/MessagePack vs RESP) and different durability: Tarantool writes
-  every commit to its WAL (`wal.mode: write`); the Valkey example ran without AOF.
+- Different protocol (IPROTO/MessagePack vs RESP) and different durability: Tarantool wrote
+  every commit to its WAL (`wal.mode: write`); the Valkey run had no AOF and Valkey's default
+  RDB snapshots (`save 3600 1 300 100 60 10000`, the image has no config file).
+- At matching durability, one setup at a time:
+  [`tarantool/lua-bench-vs-valkey`](../../../tarantool/lua-bench-vs-valkey#results). Without
+  fsync Valkey was 1.8x–2.7x Tarantool on every op (put 214,707 vs SET 520,961 ops/s at
+  `write` / `appendfsync no`); with fsync per commit Tarantool was ahead on put (67,365 vs
+  49,517 ops/s, 1.36x) and update (79,728 vs 45,890 ops/s, 1.74x).
 - `update` is the slowest op: it copies the tuple's field map in Lua, merges it and replaces
   the whole tuple.

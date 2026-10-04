@@ -33,6 +33,8 @@ func main() {
 	n := flag.Int("n", 200000, "operations per command")
 	workers := flag.Int("c", 50, "concurrent workers")
 	keys := flag.Int("keys", 100000, "number of distinct keys")
+	wait := flag.Int("wait", 0, "send WAIT <wait> 0 after every write and require that many replica acks "+
+		"(0: off; standalone primary only)")
 	flag.Parse()
 
 	c, err := rueidis.NewClient(rueidis.ClientOption{InitAddress: []string{*addr}, DisableCache: true})
@@ -42,5 +44,5 @@ func main() {
 	defer c.Close()
 
 	fmt.Printf("%s: %s mode, %d nodes\n", *addr, c.Mode(), len(c.Nodes()))
-	bench(context.Background(), c, *n, *workers, *keys)
+	bench(context.Background(), c, *n, *workers, *keys, *wait)
 }

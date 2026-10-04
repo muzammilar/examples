@@ -1,0 +1,65 @@
+# vshard: three storage replicasets of one instance each (no replicas, like the 3-primary Valkey
+# cluster) and one router. wal.mode comes from TT_WAL_MODE. The router's app file defines the
+# bench_* functions that go/lua-bench/tarantool calls with -router.
+credentials:
+  users:
+    replicator:
+      password: secret
+      roles: [replication]
+    storage:                    # vshard router -> storage
+      password: secret
+      roles: [sharding]
+      privileges:               # functions the router calls with vshard.router.callrw / map_callrw
+        - permissions: [execute]
+          lua_call: [bench_truncate, bench_put, bench_get, bench_add, bench_update, bench_delete]
+    app:
+      password: secret
+      roles: [super]
+
+iproto:
+  advertise:
+    peer:
+      login: replicator
+    sharding:
+      login: storage
+
+sharding:
+  bucket_count: 3000
+
+memtx:
+  memory: 1073741824            # 1 GiB per instance
+
+groups:
+  storages:
+    app:
+      file: storage.lua
+    sharding:
+      roles: [storage]
+    replication:
+      failover: manual
+    replicasets:
+      storage-a:
+        leader: storage-a
+        instances:
+          storage-a:
+            iproto: { listen: [{ uri: 'tarantool-storage-a:3301' }] }
+      storage-b:
+        leader: storage-b
+        instances:
+          storage-b:
+            iproto: { listen: [{ uri: 'tarantool-storage-b:3301' }] }
+      storage-c:
+        leader: storage-c
+        instances:
+          storage-c:
+            iproto: { listen: [{ uri: 'tarantool-storage-c:3301' }] }
+  routers:
+    app:
+      file: router.lua
+    sharding:
+      roles: [router]
+    replicasets:
+      router:
+        instances:
+          router:
+            iproto: { listen: [{ uri: 'tarantool-router:3301' }] }

@@ -47,6 +47,8 @@ func main() {
 	keys := flag.Int("keys", 100000, "number of distinct keys")
 	user := flag.String("user", "guest", "user (needs eval and space creation, e.g. role super)")
 	password := flag.String("password", "", "password")
+	router := flag.Bool("router", false, "-addr is a vshard router that defines bench_reset, bench_put, "+
+		"bench_get, bench_add, bench_update and bench_delete (no schema or function setup from here)")
 	flag.Parse()
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -57,6 +59,18 @@ func main() {
 		log.Fatalf("connect %s: %v", *addr, err)
 	}
 	defer conn.Close()
+
+	// A vshard router has the bench_* functions in its app file; each forwards the call to the
+	// storage that owns the key's bucket. bench_reset empties the spaces on every storage.
+	if *router {
+		res, err := conn.Do(tarantool.NewCallRequest("bench_reset")).Get()
+		if err != nil {
+			log.Fatalf("bench_reset: %v", err)
+		}
+		fmt.Printf("%s: Tarantool %v (vshard router)\n", *addr, res[0])
+		bench(conn, *n, *workers, *keys, true)
+		return
+	}
 
 	// EVAL the schema, then each lua/*.lua: they define the functions as Lua globals, which
 	// live in the instance's memory until it restarts
@@ -70,5 +84,5 @@ func main() {
 		}
 	}
 	fmt.Printf("%s: Tarantool %v\n", *addr, res[0])
-	bench(conn, *n, *workers, *keys)
+	bench(conn, *n, *workers, *keys, false)
 }

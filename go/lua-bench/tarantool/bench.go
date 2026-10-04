@@ -14,8 +14,9 @@ import (
 // bench runs n operations of each command from c workers, like go/rueidis-lua-bench: worker w
 // only touches its own slice of the key space, so it knows the version of every hash it owns
 // and bench_update does a real CAS without reading the version first. go-tarantool multiplexes
-// the concurrent requests over one connection (as rueidis auto-pipelines).
-func bench(conn *tarantool.Connection, n, workers, keys int) {
+// the concurrent requests over one connection (as rueidis auto-pipelines). With router set,
+// put and get are CALLs to bench_put / bench_get on a vshard router instead of REPLACE / SELECT.
+func bench(conn *tarantool.Connection, n, workers, keys int, router bool) {
 	keysPerWorker := keys / workers
 	if keysPerWorker == 0 {
 		log.Fatal("-keys must be at least -c")
@@ -64,10 +65,18 @@ func bench(conn *tarantool.Connection, n, workers, keys int) {
 	fields := map[string]any{"name": "item", "qty": "1"}
 	fmt.Printf("%-10s %9s %7s %7s\n", "op", "ops/s", "p50 ms", "p99 ms")
 	run("put", func(i, key int) error {
+		if router {
+			_, err := do(tarantool.NewCallRequest("bench_put").Args([]any{skey(key), "value-" + strconv.Itoa(i)}))
+			return err
+		}
 		_, err := do(tarantool.NewReplaceRequest("bench_s").Tuple([]any{skey(key), "value-" + strconv.Itoa(i)}))
 		return err
 	})
 	run("get", func(i, key int) error {
+		if router {
+			_, err := do(tarantool.NewCallRequest("bench_get").Args([]any{skey(key)}))
+			return err
+		}
 		_, err := do(tarantool.NewSelectRequest("bench_s").Key([]any{skey(key)}).Limit(1))
 		return err
 	})

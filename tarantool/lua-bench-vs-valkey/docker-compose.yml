@@ -1,0 +1,182 @@
+name: tarantool-lua-bench-vs-valkey
+
+# Tarantool 3.8.1 and Valkey 9.1.2 side by side for the go/rueidis-lua-bench workload, one
+# setup at a time (bench/run.sh starts one profile, runs the client, removes it):
+#
+#   profile          servers
+#   single-tarantool tarantool                                    (1 instance)
+#   single-valkey    valkey                                       (1 instance)
+#   rs-tarantool     tarantool-1..3                               (replicaset, leader tarantool-1)
+#   rs-valkey        valkey-primary, valkey-replica-1..2          (primary + 2 replicas)
+#   shard-tarantool  tarantool-storage-a..c, tarantool-router     (vshard, 3 x 1-instance replicasets)
+#   shard-valkey     valkey-shard-1..3                            (cluster, 3 primaries, no replicas;
+#                    valkey-shard-init, profile shard-valkey-init, creates it)
+#   docker-compose.tmpfs.yml: overlay putting the replicaset's WAL on tmpfs (rs-tarantool-tmpfs-*)
+#   tools            lua-bench-tarantool, lua-bench-valkey        (the two Go clients)
+#
+# Every server: 2 CPUs, 2 GiB. Durability comes from the environment:
+#   WAL_MODE        Tarantool wal.mode (none | write | fsync), as TT_WAL_MODE
+#   VALKEY_PERSIST  extra valkey-server flags (--appendonly no | --appendonly yes --appendfsync ...)
+# RDB snapshots are off on every Valkey (--save ""); Tarantool keeps its default checkpoint
+# interval (1 h), which never fires during a run.
+x-limits: &limits
+  cpus: 2
+  mem_limit: 2g
+
+# The image's entrypoint loads /opt/tarantool/$TT_APP_NAME/config.yaml (tarantool/<app>/) and
+# starts instance $TT_INSTANCE_NAME.
+x-tarantool: &tarantool
+  <<: *limits
+  image: tarantool/tarantool:${TARANTOOL_VERSION:-3.8.1}
+  environment: &tarantool-env
+    TT_WAL_MODE: ${WAL_MODE:-write}
+    BENCH_SYNC: ${BENCH_SYNC:-0}
+  healthcheck:
+    test: ["CMD", "status"]           # the image's script: connects to the console socket
+    interval: 2s
+    timeout: 5s
+    retries: 30
+
+x-valkey: &valkey
+  <<: *limits
+  image: valkey/valkey:${VALKEY_VERSION:-9.1.2}
+  environment:
+    VALKEY_PERSIST: ${VALKEY_PERSIST:---appendonly no}
+  # two I/O threads, as in valkey/minimal-lua
+  command: ["sh", "-c", "exec valkey-server --io-threads 2 --save '' --dir /data $$VALKEY_PERSIST"]
+  healthcheck:
+    test: ["CMD", "valkey-cli", "ping"]
+    interval: 2s
+    retries: 30
+
+x-tarantool-rs: &tarantool-rs
+  <<: *tarantool
+  profiles: [rs-tarantool]
+  working_dir: /opt/tarantool/replicaset   # app.file is relative to it
+
+x-valkey-replica: &valkey-replica
+  <<: *valkey
+  profiles: [rs-valkey]
+  command: ["sh", "-c", "exec valkey-server --io-threads 2 --save '' --dir /data --replicaof valkey-primary 6379 $$VALKEY_PERSIST"]
+  healthcheck:
+    test: ["CMD-SHELL", "valkey-cli info replication | grep -q master_link_status:up"]
+    interval: 2s
+    retries: 30
+  depends_on:
+    valkey-primary: { condition: service_healthy }
+
+x-tarantool-shard: &tarantool-shard
+  <<: *tarantool
+  profiles: [shard-tarantool]
+  build:
+    context: ../vshard-cluster        # its Dockerfile: tarantool image + the vshard module
+    args: { TARANTOOL_VERSION: "${TARANTOOL_VERSION:-3.8.1}" }
+  image: tarantool-lua-bench-vshard:local
+  working_dir: /opt/tarantool/vshard
+
+x-valkey-shard: &valkey-shard
+  <<: *valkey
+  profiles: [shard-valkey]
+  # nodes announce their hostname so MOVED redirects resolve on this network
+  command: ["sh", "-c", "exec valkey-server --io-threads 2 --save '' --dir /data --cluster-enabled yes --cluster-announce-hostname $$HOSTNAME --cluster-preferred-endpoint-type hostname $$VALKEY_PERSIST"]
+
+services:
+  tarantool:
+    <<: *tarantool
+    profiles: [single-tarantool]
+    environment: { <<: *tarantool-env, TT_APP_NAME: single, TT_INSTANCE_NAME: single }
+    working_dir: /opt/tarantool/single
+    volumes: [./tarantool/single:/opt/tarantool/single:ro, tarantool:/var/lib/tarantool]
+  valkey:
+    <<: *valkey
+    profiles: [single-valkey]
+    volumes: [valkey:/data]
+
+  tarantool-1:
+    <<: *tarantool-rs
+    environment: { <<: *tarantool-env, TT_APP_NAME: replicaset, TT_INSTANCE_NAME: tarantool-1 }
+    volumes: [./tarantool/replicaset:/opt/tarantool/replicaset:ro, tarantool-1:/var/lib/tarantool]
+  tarantool-2:
+    <<: *tarantool-rs
+    environment: { <<: *tarantool-env, TT_APP_NAME: replicaset, TT_INSTANCE_NAME: tarantool-2 }
+    volumes: [./tarantool/replicaset:/opt/tarantool/replicaset:ro, tarantool-2:/var/lib/tarantool]
+  tarantool-3:
+    <<: *tarantool-rs
+    environment: { <<: *tarantool-env, TT_APP_NAME: replicaset, TT_INSTANCE_NAME: tarantool-3 }
+    volumes: [./tarantool/replicaset:/opt/tarantool/replicaset:ro, tarantool-3:/var/lib/tarantool]
+  valkey-primary:
+    <<: *valkey
+    profiles: [rs-valkey]
+    volumes: [valkey-primary:/data]
+  valkey-replica-1: { <<: *valkey-replica, volumes: [valkey-replica-1:/data] }
+  valkey-replica-2: { <<: *valkey-replica, volumes: [valkey-replica-2:/data] }
+
+  tarantool-storage-a:
+    <<: *tarantool-shard
+    environment: { <<: *tarantool-env, TT_APP_NAME: vshard, TT_INSTANCE_NAME: storage-a }
+    volumes: [./tarantool/vshard:/opt/tarantool/vshard:ro, tarantool-storage-a:/var/lib/tarantool]
+  tarantool-storage-b:
+    <<: *tarantool-shard
+    environment: { <<: *tarantool-env, TT_APP_NAME: vshard, TT_INSTANCE_NAME: storage-b }
+    volumes: [./tarantool/vshard:/opt/tarantool/vshard:ro, tarantool-storage-b:/var/lib/tarantool]
+  tarantool-storage-c:
+    <<: *tarantool-shard
+    environment: { <<: *tarantool-env, TT_APP_NAME: vshard, TT_INSTANCE_NAME: storage-c }
+    volumes: [./tarantool/vshard:/opt/tarantool/vshard:ro, tarantool-storage-c:/var/lib/tarantool]
+  tarantool-router:
+    <<: *tarantool-shard
+    environment: { <<: *tarantool-env, TT_APP_NAME: vshard, TT_INSTANCE_NAME: router }
+    volumes: [./tarantool/vshard:/opt/tarantool/vshard:ro, tarantool-router:/var/lib/tarantool]
+    depends_on:
+      tarantool-storage-a: { condition: service_healthy }
+      tarantool-storage-b: { condition: service_healthy }
+      tarantool-storage-c: { condition: service_healthy }
+
+  valkey-shard-1: { <<: *valkey-shard, hostname: valkey-shard-1, volumes: [valkey-shard-1:/data] }
+  valkey-shard-2: { <<: *valkey-shard, hostname: valkey-shard-2, volumes: [valkey-shard-2:/data] }
+  valkey-shard-3: { <<: *valkey-shard, hostname: valkey-shard-3, volumes: [valkey-shard-3:/data] }
+  # 3 primaries, no replicas; waits until every node sees cluster_state:ok
+  valkey-shard-init:
+    image: valkey/valkey:${VALKEY_VERSION:-9.1.2}
+    profiles: [shard-valkey-init]
+    command:
+      - sh
+      - -ec
+      - |
+        valkey-cli -h valkey-shard-1 cluster info | grep -q cluster_slots_assigned:16384 ||
+          valkey-cli --cluster create valkey-shard-1:6379 valkey-shard-2:6379 valkey-shard-3:6379 \
+            --cluster-replicas 0 --cluster-yes
+        for n in 1 2 3; do
+          i=0
+          until valkey-cli -h valkey-shard-$$n cluster info | grep -q cluster_state:ok; do
+            i=$$((i + 1)); [ $$i -lt 60 ] || exit 1; sleep 1
+          done
+        done
+        echo "cluster_state:ok on all three nodes"
+
+  # the clients, not CPU-capped, on this network
+  lua-bench-tarantool:
+    build: ../../go/lua-bench/tarantool
+    image: tarantool-lua-bench-client:local
+    profiles: [tools]
+  lua-bench-valkey:
+    build: ../../go/rueidis-lua-bench
+    image: tarantool-lua-bench-valkey-client:local
+    profiles: [tools]
+
+volumes:
+  tarantool:
+  valkey:
+  tarantool-1:
+  tarantool-2:
+  tarantool-3:
+  valkey-primary:
+  valkey-replica-1:
+  valkey-replica-2:
+  tarantool-storage-a:
+  tarantool-storage-b:
+  tarantool-storage-c:
+  tarantool-router:
+  valkey-shard-1:
+  valkey-shard-2:
+  valkey-shard-3:

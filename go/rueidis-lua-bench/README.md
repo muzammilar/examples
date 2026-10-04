@@ -25,6 +25,7 @@ go run . -addr 127.0.0.1:6379 -n 200000 -c 50 -keys 100000
 | `-n` | 200000 | operations per command |
 | `-c` | 50 | concurrent workers |
 | `-keys` | 100000 | distinct keys |
+| `-wait` | 0 | if > 0, send `WAIT <n> 0` with every write (same round trip, on a dedicated connection per worker) and fail if fewer replicas acknowledged; standalone primary only |
 
 The [`Dockerfile`](Dockerfile) builds a static image.
 
@@ -47,6 +48,11 @@ VM), one setup at a time, 2026-10-03. Valkey was ahead in every setup, most on t
 | Single node, 2 CPUs each | Valkey 2.7-3x faster (`add.lua` 490k vs 170k ops/s) | Valkey 1.6x faster (539k vs 337k) |
 | Cluster, 3 primaries + 3 replicas, 1 CPU per node | Valkey 1.5-2.5x faster (`update.lua` 316k vs 125k ops/s) | GET about even |
 | kind, primary + replicas | `add.lua` on the primary: Valkey 364k, Dragonfly Helm chart 149k, Dragonfly operator 253k ops/s | — |
+
+Valkey vs Tarantool 3.8.1 (the [`go/lua-bench/tarantool`](../lua-bench/tarantool) port of this
+workload) at matching durability (no AOF / `wal.mode none`, `appendfsync no` / `everysec` vs
+`write`, `always` vs `fsync`), on a single node, 1 primary + 2 replicas (async, and `-wait 1` vs
+synchronous spaces) and 3 shards: [`tarantool/lua-bench-vs-valkey`](../../tarantool/lua-bench-vs-valkey#results).
 
 Notes:
 

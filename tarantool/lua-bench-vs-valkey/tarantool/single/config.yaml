@@ -1,0 +1,21 @@
+# One instance. wal.mode is not set here: it comes from TT_WAL_MODE (none | write | fsync),
+# which docker-compose.yml sets from WAL_MODE. The bench client creates its own spaces.
+credentials:
+  users:
+    app:                        # the bench client: EVALs the schema and its functions
+      password: secret
+      roles: [super]
+
+iproto:
+  listen:
+    - uri: 0.0.0.0:3301
+
+memtx:
+  memory: 1073741824            # 1 GiB (default 256 MiB)
+
+groups:
+  group-001:
+    replicasets:
+      replicaset-001:
+        instances:
+          single: {}

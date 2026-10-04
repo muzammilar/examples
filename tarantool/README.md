@@ -11,6 +11,7 @@ snapshots) or vinyl (LSM on disk), business logic in Lua stored procedures next 
 | [`docker-compose-cluster/`](docker-compose-cluster) | One replicaset of 3 instances (Tarantool 3 YAML config), Raft-based leader election, synchronous space; `make failover` kills the leader under write load and checks no acknowledged write is lost. |
 | [`vshard-cluster/`](vshard-cluster) | Sharded cluster (vshard through the Tarantool 3 `sharding` config): 2-instance storage replicasets + router; `make scale-out` / `make scale-in` grow 2 → 3 → 2 replicasets under load with bucket rebalancing. |
 | [`kubernetes-statefulset/`](kubernetes-statefulset) | 3-instance replicaset (Raft leader election) as a plain StatefulSet on kind; `make failover` force-deletes the leader pod under write load. No maintained CE operator or Helm chart for Tarantool 3. |
+| [`lua-bench-vs-valkey/`](lua-bench-vs-valkey) | The go/rueidis-lua-bench workload on Tarantool and Valkey 9.1.2 at matching durability (`wal.mode` none / write / fsync vs no AOF / `appendfsync` no / everysec / always), on 1 node, a 3-node replicaset vs primary + 2 replicas (async, sync spaces vs `WAIT 1 0`, WAL on tmpfs) and vshard vs Valkey cluster (3 shards). |
 | [`wallet-transfers/`](wallet-transfers) | Wallet transfers in Go (go-tarantool v3): one `transfer()` stored-procedure call vs the same logic as an 8-round-trip interactive transaction vs a Valkey Lua script, 200k transfers with hot accounts, audit of sums, negative balances and idempotent replays. |
 
 Image: `tarantool/tarantool:3.8.1` is multi-arch (amd64 + arm64) and runs natively on Apple
@@ -22,6 +23,7 @@ Silicon. 3.x tags have shipped arm64 since 3.1 (Docker Hub, checked 2026-10-04).
 |---|---|---|---|
 | [single-node](single-node/README.md#benchmark) | 2026-10-04 | 1 instance, 2 CPUs / 2 GB, 64 fibers over 4 net.box connections, 10 s per op | memtx get 362k/s (p99 0.52 ms), memtx replace 231k/s, vinyl replace 94k/s (p99.9 70 ms), `transfer()` stored procedure 62.6k tx/s (p99 3.6 ms) |
 | [go/lua-bench/tarantool](../go/lua-bench/tarantool) | 2026-10-04 | the go/rueidis-lua-bench workload over IPROTO (go-tarantool v3), `-n 1000000 -c 50 -keys 100000`, single node 2 CPUs / 2 GB | put 175k, get 293k, `add` 198k, `update` 111k, `delete` 187k ops/s; an earlier run on a busier VM: 61k–236k (Valkey 9.1.2 with the same flags, RESP: 407k–550k ops/s) |
+| [lua-bench-vs-valkey](lua-bench-vs-valkey/README.md#results) | 2026-10-04 | same workload, 2 CPUs / 2 GiB per server, one setup at a time | single node put: `write` 215k vs Valkey `everysec` 532k ops/s (0.40x); `fsync` 67k vs `always` 50k (1.36x). 3 nodes, sync spaces vs `WAIT 1 0`: put 83k vs 91k (0.92x). vshard via 1 router vs Valkey cluster: put 92k vs 438k (0.21x) |
 | [docker-compose-cluster](docker-compose-cluster/README.md#benchmark) | 2026-10-04 | 3 instances, 2 CPUs / 1 GiB each, 64 fibers over 4 net.box connections to the leader, 10 s per op | async replace 118k/s (p99 3.0 ms), sync replace (2 of 3 WALs) 90k/s (p99 1.7 ms), get 338k/s |
 | [docker-compose-cluster failover](docker-compose-cluster/README.md#failover) | 2026-10-04 | 16 writers on a sync space, leader SIGKILLed | new leader after 3.2 s, longest writer stall 3.29 s, 16 retried `Peer closed`, 0 of 1,170,927 acknowledged writes lost |
 | [vshard-cluster](vshard-cluster/README.md#scaling) | 2026-10-04 | 2 → 3 → 2 storage replicasets (2 instances each) + router, 16 client fibers, ~18.7k puts/s + as many gets | scale-out: 1,000 buckets moved in 51.8 s; scale-in drain: 103.5 s; 0 failed requests, 0 of 2,256,693 acknowledged puts lost, throughput unchanged |
@@ -43,5 +45,8 @@ Silicon. 3.x tags have shipped arm64 since 3.1 (Docker Hub, checked 2026-10-04).
 - With `database.use_mvcc_engine: true`, read-then-write procedures need
   `box.atomic({ txn_isolation = 'read-committed' }, …)`; the default `best-effort` aborts some
   with `Transaction has been aborted by conflict`.
+- Replication needs the WAL: with `wal.mode: none` replicas fail with `Replication does not
+  support wal_mode = 'none'` and the leader runs alone with synchro quorum 1, so `is_sync`
+  spaces commit without any replica ([lua-bench-vs-valkey](lua-bench-vs-valkey/README.md#replicated-3-nodes-writes-to-the-leader--primary)).
 - The image sets `TT_INSTANCE_NAME`; running a client script with the image needs
   `env -u TT_INSTANCE_NAME tarantool script.lua`.
