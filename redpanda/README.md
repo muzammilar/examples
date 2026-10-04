@@ -9,6 +9,8 @@ no ZooKeeper/KRaft; Schema Registry, HTTP Proxy and the Admin API are built into
 |---|---|
 | [`single-node/`](single-node) | One broker (`dev-container` mode) + Redpanda Console: `rpk` topics and groups, Schema Registry (Avro, compatibility check), HTTP Proxy, Console API; `rpk` produce/consume benchmark. |
 
+| [`docker-compose-cluster/`](docker-compose-cluster) | Three brokers + Console; RF=3 topics; `make failover` stops a partition leader under acks=all load (Go, franz-go) and reads every acknowledged record back; `make scale-demo`: 3 → 5 → 3 brokers (`rpk cluster brokers decommission`) under load. |
+
 ## License
 
 - The core is source-available under the
@@ -38,6 +40,9 @@ no ZooKeeper/KRaft; Schema Registry, HTTP Proxy and the Admin API are built into
 |---|---|---|---|
 | [single-node](single-node/README.md#benchmark) | 2026-10-04 | 1 broker capped 2 CPUs / 3 GB, one `rpk` producer then consumer, 1M x 1000 B, acks=all | produce 152,161 records/s (145.1 MiB/s); consume 881,057 records/s (840.2 MiB/s) |
 
+| [docker-compose-cluster](docker-compose-cluster/README.md#failover) | 2026-10-04 | 3 brokers (`--smp 1`), 5,000 x 512 B records/s for 60 s, acks=all, idempotent; leader of partition 0 stopped at 15 s, restarted at ~35 s | 299,950 acked, 0 failed, 0 lost, 0 duplicates; affected partitions stalled up to 10.0 s (franz-go `MetadataMinAge` 5 s) / 5.5 s (500 ms); rejoin 4.5-15.5 s |
+| [docker-compose-cluster](docker-compose-cluster/README.md#scaling-3--5--3-brokers) | 2026-10-04 | 3 → 5 → 3 brokers under 2,000 x 512 B records/s, acks=all, 24 partitions RF 3 | scale-out balanced in 81 s (29 of 72 replicas moved), decommission of 2 in 16 s; 405,300 acked, 0 failed, 0 lost; slowest ack 5.2 s |
+
 Apple M4 Pro, Docker VM aarch64, Redpanda v26.2.3 (native arm64 image). Single runs on a shared
 Docker VM.
 
@@ -48,6 +53,16 @@ Seen with Redpanda v26.2.3 / Console v3.12.0, 2026-10-04.
 - `rpk registry schema check-compatibility` requires `--schema-version` (`latest`).
 - `--mode dev-container` bypasses fsync and turns on write caching (`rpk redpanda start --mode help`);
   don't take durability or latency numbers from it.
+
+- A `docker stop`ped broker does not transfer leadership first: its partitions are leaderless for
+  ~3-5 s until a Raft election (`leadership transfer: false` in the logs). The docs drain a broker
+  with maintenance mode before a planned restart (not run here).
+- `rpk cluster health` exits 10 when the cluster is unhealthy.
+- The partition balancer does not place replicas on brokers whose disk is over 80% used
+  (`partition_autobalancing_max_disk_usage_percent`). On Docker Desktop all brokers share the VM
+  disk; when that is fuller than 80%, new brokers get nothing.
+- `--mode dev-container` bypasses fsync and turns on write caching; don't take durability or
+  latency numbers from it.
 - The trial license makes a fresh cluster behave differently from one 30 days old (continuous
   balancing on, then off). Pin the behaviour with `rpk cluster config set partition_autobalancing_mode node_add`
   if a test depends on it.
