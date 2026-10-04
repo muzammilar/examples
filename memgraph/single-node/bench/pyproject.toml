@@ -1,0 +1,11 @@
+[project]
+name = "memgraph-bench"
+version = "0.1.0"
+description = "Graph benchmark for the Memgraph example (make benchmark), same workload as neo4j/single-node"
+requires-python = ">=3.13"
+dependencies = [
+    "neo4j==6.3.1",
+]
+
+[tool.uv]
+package = false

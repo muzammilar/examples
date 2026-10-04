@@ -1,0 +1,83 @@
+name: memgraph-single
+
+# Memgraph Community (MAGE image: Memgraph + the MAGE algorithm library) and Memgraph Lab.
+# No auth (Community has no users until you create one), so ports bind to 127.0.0.1.
+services:
+  # Memgraph warns "vm.max_map_count 262144 is too low, increase to at least 524288".
+  # The setting is not namespaced: this raises it for the whole Docker VM (Docker Desktop;
+  # resets when Docker restarts) or the host (Linux). It never lowers a higher value.
+  sysctl:
+    image: busybox:1.37
+    privileged: true
+    command: ["sh", "-c", "[ $$(sysctl -n vm.max_map_count) -ge 524288 ] || sysctl -w vm.max_map_count=524288"]
+
+  memgraph:
+    image: memgraph/memgraph-mage:${MEMGRAPH_VERSION:-3.13.1}
+    container_name: memgraph-single
+    hostname: memgraph
+    # image defaults (/etc/memgraph/memgraph.conf) already enable WAL, snapshots every 300 s,
+    # a snapshot on exit and recovery on startup; they are repeated here so the README can
+    # point at them. Snapshot interval lowered to 60 s for the durability demo.
+    command:
+      - --telemetry-enabled=false
+      - --also-log-to-stderr
+      - --log-level=WARNING
+      - --storage-wal-enabled=true
+      - --storage-snapshot-interval-sec=60
+      - --storage-snapshot-on-exit=true
+      - --data-recovery-on-startup=true
+      - --memory-limit=${MEMGRAPH_MEMORY_LIMIT_MIB:-4096}
+    ports:
+      - "127.0.0.1:${MEMGRAPH_PORT:-7689}:7687" # Bolt
+    volumes:
+      - memgraph-data:/var/lib/memgraph
+    depends_on:
+      sysctl: { condition: service_completed_successfully }
+    healthcheck:
+      test: ["CMD-SHELL", "echo 'RETURN 1;' | mgconsole >/dev/null"]
+      interval: 3s
+      timeout: 5s
+      retries: 40
+      start_period: 10s
+
+  lab:
+    image: memgraph/lab:${LAB_VERSION:-3.13.2}
+    container_name: memgraph-single-lab
+    environment:
+      QUICK_CONNECT_MG_HOST: memgraph
+      QUICK_CONNECT_MG_PORT: "7687"
+    ports:
+      - "127.0.0.1:${LAB_PORT:-3010}:3000" # Memgraph Lab (web UI)
+    depends_on:
+      memgraph: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:3000/ || exit 1"]
+      interval: 3s
+      timeout: 5s
+      retries: 30
+
+  # uv + Python 3.13, used by `make benchmark` (bench/bench.py, deps pinned in bench/uv.lock)
+  bench:
+    image: ghcr.io/astral-sh/uv:0.12.19-python3.13-trixie-slim
+    profiles: [bench]
+    cpus: ${BENCH_CLIENT_CPUS:-2}
+    working_dir: /bench
+    command: ["uv", "run", "--frozen", "bench.py"]
+    environment:
+      BENCH_LIMITS: ${BENCH_LIMITS:-}      # bench/limits.sh, copied into the JSON
+      UV_CACHE_DIR: /uv/cache
+      UV_PROJECT_ENVIRONMENT: /uv/venv
+      UV_PYTHON_DOWNLOADS: never
+      PYTHONDONTWRITEBYTECODE: "1"
+      SMOKE: ${SMOKE:-}
+      N: ${N:-}
+      HOST_UID: ${HOST_UID:-}
+      HOST_GID: ${HOST_GID:-}
+    volumes:
+      - ./bench:/bench:ro
+      - ./results:/results
+      - uv-cache:/uv
+
+volumes:
+  memgraph-data:
+  uv-cache:
