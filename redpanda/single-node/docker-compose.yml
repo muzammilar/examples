@@ -1,0 +1,81 @@
+name: redpanda-single-node
+
+# One Redpanda broker in dev-container mode plus Redpanda Console.
+# dev-container mode (https://docs.redpanda.com/current/reference/rpk/rpk-redpanda/rpk-redpanda-mode/)
+# turns off fsync-per-batch tuning checks, sets --overprovisioned (no CPU pinning, no busy polling)
+# and lowers the memory reserve: fine on a laptop, not for production.
+services:
+  redpanda:
+    image: docker.redpanda.com/redpandadata/redpanda:${REDPANDA_VERSION:-v26.2.3}
+    container_name: redpanda-sn-0
+    command:
+      - redpanda
+      - start
+      - --mode=dev-container
+      - --smp=${REDPANDA_SMP:-2}
+      - --memory=${REDPANDA_MEMORY:-2G}
+      - --default-log-level=info
+      - --kafka-addr=internal://0.0.0.0:9092,external://0.0.0.0:19092
+      - --advertise-kafka-addr=internal://redpanda:9092,external://localhost:${REDPANDA_KAFKA_PORT:-19092}
+      - --pandaproxy-addr=internal://0.0.0.0:8082,external://0.0.0.0:18082
+      - --advertise-pandaproxy-addr=internal://redpanda:8082,external://localhost:${REDPANDA_PROXY_PORT:-18082}
+      - --schema-registry-addr=internal://0.0.0.0:8081,external://0.0.0.0:18081
+      - --rpc-addr=redpanda:33145
+      - --advertise-rpc-addr=redpanda:33145
+    ports:
+      - "127.0.0.1:${REDPANDA_KAFKA_PORT:-19092}:19092"   # Kafka API
+      - "127.0.0.1:${REDPANDA_SR_PORT:-18081}:18081"      # Schema Registry
+      - "127.0.0.1:${REDPANDA_PROXY_PORT:-18082}:18082"   # HTTP Proxy (pandaproxy)
+      - "127.0.0.1:${REDPANDA_ADMIN_PORT:-19644}:9644"    # Admin API
+    volumes:
+      - redpanda-data:/var/lib/redpanda/data
+      - ./scripts:/scripts:ro
+    healthcheck:
+      test: ["CMD-SHELL", "rpk cluster health | grep -Eq 'Healthy:.+true'"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+      start_period: 5s
+
+  console:
+    image: docker.redpanda.com/redpandadata/console:${CONSOLE_VERSION:-v3.12.0}
+    container_name: redpanda-sn-console
+    entrypoint: ["/bin/sh", "-c", 'echo "$$CONSOLE_CONFIG" > /tmp/config.yml && exec ./console']
+    environment:
+      CONFIG_FILEPATH: /tmp/config.yml
+      CONSOLE_CONFIG: |
+        kafka:
+          brokers: ["redpanda:9092"]
+        schemaRegistry:
+          enabled: true
+          urls: ["http://redpanda:8081"]
+        redpanda:
+          adminApi:
+            enabled: true
+            urls: ["http://redpanda:9644"]
+    ports:
+      - "127.0.0.1:${CONSOLE_PORT:-8080}:8080"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:8080/admin/health"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+    depends_on:
+      redpanda: { condition: service_healthy }
+
+  # `make benchmark`: rpk in its own container (bench/run.sh), results in ./results
+  bench:
+    image: docker.redpanda.com/redpandadata/redpanda:${REDPANDA_VERSION:-v26.2.3}
+    profiles: [bench]
+    entrypoint: ["bash", "/bench/run.sh"]
+    cpus: ${BENCH_CLIENT_CPUS:-2}
+    environment:
+      [NAME, RECORDS, RECORD_SIZE, PARTITIONS, BENCH_LIMITS, HOST_INFO, DOCKER_INFO]
+    volumes:
+      - ./bench:/bench:ro
+      - ./results:/results
+    depends_on:
+      redpanda: { condition: service_healthy }
+
+volumes:
+  redpanda-data:

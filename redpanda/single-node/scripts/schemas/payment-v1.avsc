@@ -1,0 +1,4 @@
+{"type":"record","name":"Payment","namespace":"example","fields":[
+  {"name":"id","type":"string"},
+  {"name":"amount_cents","type":"long"},
+  {"name":"currency","type":"string"}]}
