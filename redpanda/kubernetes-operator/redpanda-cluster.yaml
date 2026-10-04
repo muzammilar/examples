@@ -1,0 +1,38 @@
+# Redpanda custom resource (cluster.redpanda.com/v1alpha2). spec.clusterSpec takes the values of
+# the redpanda Helm chart, which the operator renders and reconciles.
+apiVersion: cluster.redpanda.com/v1alpha2
+kind: Redpanda
+metadata:
+  name: redpanda
+spec:
+  clusterSpec:
+    statefulset:
+      replicas: 3
+      initContainers:
+        setDataDirOwnership:
+          enabled: true          # kind's local-path volumes are root-owned
+    # lowered for a laptop: chart default is 1 core and 2.5Gi per broker, 20Gi volume
+    resources:
+      cpu:
+        cores: 1
+      memory:
+        container:
+          max: 2Gi
+    storage:
+      persistentVolume:
+        size: 2Gi
+    # Dev setup: no TLS (the chart default needs cert-manager), no external NodePorts,
+    # no Console (see ../single-node for Console)
+    tls:
+      enabled: false
+    external:
+      enabled: false
+    console:
+      enabled: false
+    config:
+      cluster:
+        # kind volumes sit on the Docker VM's disk, which is shared and often > 80% full;
+        # the balancer refuses to place replicas on brokers above this (default 80)
+        partition_autobalancing_max_disk_usage_percent: 99
+        # same reason: the production default refuses writes below 5 GiB free on the data disk
+        storage_min_free_bytes: 1073741824

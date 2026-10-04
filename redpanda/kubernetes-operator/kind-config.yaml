@@ -1,0 +1,10 @@
+# One control plane + 3 workers: the Redpanda chart's default pod anti-affinity puts one broker
+# per Kubernetes node, so 3 brokers need 3 schedulable nodes.
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: redpanda-operator
+nodes:
+  - role: control-plane
+  - role: worker
+  - role: worker
+  - role: worker
