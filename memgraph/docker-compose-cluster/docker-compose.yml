@@ -1,0 +1,112 @@
+name: memgraph-cluster
+
+# Memgraph Community replication: one MAIN and two REPLICAs (one SYNC, one ASYNC).
+# Roles and replica registrations are set by the `setup` one-shot (scripts/setup.sh) and kept
+# across restarts (--replication-restore-state-on-startup, default true).
+# No automatic failover: that needs the Enterprise coordinators (see README).
+# Every instance is capped at MEMGRAPH_CPUS (default 1) so read scaling over replicas is visible.
+x-memgraph: &memgraph
+  image: memgraph/memgraph:${MEMGRAPH_VERSION:-3.13.1}
+  cpus: ${MEMGRAPH_CPUS:-1}
+  command:
+    - --telemetry-enabled=false
+    - --also-log-to-stderr
+    - --log-level=WARNING
+    - --memory-limit=1024
+    - --storage-wal-enabled=true
+    - --data-recovery-on-startup=true
+    - --replication-restore-state-on-startup=true
+  healthcheck:
+    test: ["CMD-SHELL", "echo 'RETURN 1;' | mgconsole >/dev/null"]
+    interval: 2s
+    timeout: 5s
+    retries: 30
+    start_period: 5s
+  depends_on:
+    sysctl: { condition: service_completed_successfully }
+
+services:
+  # Memgraph wants vm.max_map_count >= 524288. Not namespaced: raises it for the whole Docker VM
+  # (Docker Desktop, until Docker restarts) or the host (Linux). Never lowers a higher value.
+  sysctl:
+    image: busybox:1.37
+    privileged: true
+    command: ["sh", "-c", "[ $$(sysctl -n vm.max_map_count) -ge 524288 ] || sysctl -w vm.max_map_count=524288"]
+
+  main:
+    <<: *memgraph
+    container_name: memgraph-main
+    hostname: memgraph-main
+    ports: ["127.0.0.1:${MEMGRAPH_MAIN_PORT:-7690}:7687"]
+    volumes: [main-data:/var/lib/memgraph]
+
+  replica1:
+    <<: *memgraph
+    container_name: memgraph-replica-1
+    hostname: memgraph-replica-1
+    ports: ["127.0.0.1:${MEMGRAPH_REPLICA1_PORT:-7691}:7687"]
+    volumes: [replica1-data:/var/lib/memgraph]
+
+  replica2:
+    <<: *memgraph
+    container_name: memgraph-replica-2
+    hostname: memgraph-replica-2
+    ports: ["127.0.0.1:${MEMGRAPH_REPLICA2_PORT:-7692}:7687"]
+    volumes: [replica2-data:/var/lib/memgraph]
+
+  # `make scale-out` / `make scale-in`: two more replicas (ASYNC), 3 -> 5 -> 3 instances
+  replica3:
+    <<: *memgraph
+    container_name: memgraph-replica-3
+    hostname: memgraph-replica-3
+    profiles: [scale]
+    volumes: [replica3-data:/var/lib/memgraph]
+
+  replica4:
+    <<: *memgraph
+    container_name: memgraph-replica-4
+    hostname: memgraph-replica-4
+    profiles: [scale]
+    volumes: [replica4-data:/var/lib/memgraph]
+
+  # one-shot: replicas listen for replication on 10000, MAIN registers them (idempotent)
+  setup:
+    image: memgraph/memgraph:${MEMGRAPH_VERSION:-3.13.1}
+    entrypoint: ["sh", "/scripts/setup.sh"]
+    volumes: ["./scripts:/scripts:ro"]
+    depends_on:
+      main: { condition: service_healthy }
+      replica1: { condition: service_healthy }
+      replica2: { condition: service_healthy }
+
+  # `make failover` / `make verify`: Go client (client/), neo4j-go-driver v6 over Bolt
+  client:
+    build: client
+    image: memgraph-cluster-client:local
+    profiles: [tools]
+    volumes: ["./results:/results"]
+
+  # `make enterprise-ha-check`: a coordinator without a license, to show the refusal
+  coordinator:
+    image: memgraph/memgraph:${MEMGRAPH_VERSION:-3.13.1}
+    container_name: memgraph-coordinator-1
+    hostname: memgraph-coordinator-1
+    profiles: [ha]
+    command:
+      - --telemetry-enabled=false
+      - --coordinator-id=1
+      - --coordinator-port=10111
+      - --management-port=10121
+      - --coordinator-hostname=memgraph-coordinator-1
+    healthcheck:
+      test: ["CMD-SHELL", "echo 'RETURN 1;' | mgconsole 2>&1 | grep -qv 'Connection failure'"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+
+volumes:
+  main-data:
+  replica1-data:
+  replica2-data:
+  replica3-data:
+  replica4-data:
