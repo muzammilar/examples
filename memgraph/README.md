@@ -52,6 +52,17 @@ library. Images used: `memgraph/memgraph:3.13.1`, `memgraph/memgraph-mage:3.13.1
   license a coordinator answers `Access to high availability requires an enterprise, ai_platform,
   or oem license.` (3.13.1, 2026-10-04). The example routes reads in the client.
 
+| [`kubernetes-helm/`](kubernetes-helm) | Official `memgraph/memgraph` chart 1.0.7 (standalone, 1 pod) on kind: walkthrough, pod force-deleted under write load (new pod Ready in 5.5 s, writes stopped 6.4 s, 0 of 569,739 acknowledged writes lost). No scaling: the standalone chart has no replication; the HA chart needs Enterprise. |
+
+## Clustering and scaling
+
+- **No sharding.** Every instance holds the whole graph in RAM; scaling out means read replicas.
+- **Replication** (MAIN + replicas, manual promotion) is Community; the standalone Helm chart does
+  not set it up.
+- **Automatic failover** (the `memgraph-high-availability` chart, Raft coordinators) is
+  Enterprise. Without a license a coordinator answers `Access to high availability requires an
+  enterprise, ai_platform, or oem license.` (3.13.1, 2026-10-04).
+
 ## Benchmark
 
 | example | date | setup | result |
@@ -59,6 +70,7 @@ library. Images used: `memgraph/memgraph:3.13.1`, `memgraph/memgraph-mage:3.13.1
 | [single-node](single-node/README.md#benchmark) | 2026-10-04 | social graph 100k persons / 952k edges (same harness as `neo4j/single-node`), 4 CPUs / 6 GB, Python driver, 1 run | load 79,227 persons/s and 141,226 edges/s (Neo4j 56,875 / 78,249, 1.39x / 1.80x); lookup 12,724 QPS with 8 clients, p99 1.56 ms (Neo4j 7,398 QPS, 1.72x); shortest path p50 0.29 ms (Neo4j 0.70 ms, 2.4x lower); top-10 in-degree p50 32.15 ms (Neo4j 107 ms, 3.3x lower) |
 | [docker-compose-cluster](docker-compose-cluster/README.md#results) | 2026-10-04 | 3 instances, 1 CPU each, Go client, 4 writers | MAIN killed under ~450 writes/s: manual promotion 2 s after the kill, longest write gap 1.9 s, 0 acknowledged writes lost on the SYNC replica, 7 missing on the ASYNC replica at the kill (caught up later), 1 duplicate from a retried in-flight write |
 | [docker-compose-cluster](docker-compose-cluster/README.md#read-replicas-make-scale-demo) | 2026-10-04 | 16 readers, 2-hop counts, 1 CPU per replica | 2 → 4 → 2 replicas: 5,048 → 11,934 → 5,710 reads/s (2.36x at 4 replicas), 0 failed reads; `REGISTER`/`DROP REPLICA` needed up to 77 retries under load |
+| [kubernetes-helm](kubernetes-helm/README.md#results) | 2026-10-04 | kind, 1 pod (2 CPU / 2Gi), Go client Job, 4 writers | 16,363–18,368 writes/s; pod kill: 6,386 ms without writes, new pod Ready in 5.5 s, 0 acknowledged writes lost |
 
 ## Known issues
 
@@ -84,3 +96,8 @@ Seen with Memgraph 3.13.1, 2026-10-04.
   writes; `behind` goes negative.
 - **Disk full kills the process** (`Assertion failed ... 'written > 0' ... No space left on device`, exit 133).
 - **`vm.max_map_count`**: Memgraph wants at least 524288 (Docker Desktop's VM has 262144).
+
+Seen with Memgraph 3.13.1 and chart 1.0.7, 2026-10-04.
+
+- **Chart `helm test` Job uses `memgraph/memgraph:3.5.1`**, not the chart's appVersion.
+- **Chart sysctl init container** is privileged and sets `vm.max_map_count` unconditionally.

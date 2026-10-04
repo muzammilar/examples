@@ -1,0 +1,30 @@
+# Values for the official chart memgraph/memgraph 1.0.7 (standalone Memgraph, one StatefulSet pod).
+image:
+  repository: docker.io/memgraph/memgraph
+  tag: "3.13.1" # chart appVersion; pinned here
+
+persistentVolumeClaim:
+  storageSize: 2Gi     # default 10Gi; lowered for kind (kind's local-path provisioner)
+  logStorageSize: 256Mi # default 1Gi
+
+memgraphConfig:
+  - "--data-directory=/var/lib/memgraph/mg_data"
+  - "--also-log-to-stderr=true"
+  - "--telemetry-enabled=false" # on by default
+  - "--memory-limit=1536"       # MiB, below the pod's 2Gi limit (see the chart's comment)
+  - "--storage-wal-enabled=true"
+  - "--storage-snapshot-interval-sec=60"
+
+resources:
+  requests: { cpu: "1", memory: 2Gi }
+  limits: { cpu: "2", memory: 2Gi }
+
+# the chart's init container sets vm.max_map_count (privileged) on the node; Memgraph asks for
+# at least 524288 (chart default 262144, image busybox:latest). On kind the node is a container
+# in the Docker VM, so this changes the Docker VM's setting.
+sysctlInitContainer:
+  enabled: true
+  maxMapCount: 524288
+  image:
+    repository: docker.io/library/busybox
+    tag: "1.37"

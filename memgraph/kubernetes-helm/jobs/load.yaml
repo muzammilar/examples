@@ -1,0 +1,21 @@
+# Write load + check: client write (DURATION s, WORKERS goroutines, one CREATE per query), then
+# client verify (every acknowledged write must be in Memgraph). Image side-loaded into kind.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: load
+spec:
+  backoffLimit: 0
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: client
+          image: memgraph-helm-client:local
+          imagePullPolicy: Never
+          command: ["sh", "-c", "client write && client verify"]
+          env:
+            - { name: HOSTS, value: "memgraph:7687" }
+            - { name: DURATION, value: "40" }
+            - { name: WORKERS, value: "4" }
+            - { name: ACKED_FILE, value: "/tmp/acked.txt" }
