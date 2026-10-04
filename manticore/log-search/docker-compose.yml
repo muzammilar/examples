@@ -1,0 +1,70 @@
+name: manticore-log-search
+
+# Manticore Search and Elasticsearch side by side, same CPU / memory caps, plus app/ (Go) that
+# loads the same generated log lines into both and runs the same queries.
+services:
+  manticore:
+    image: manticoresearch/manticore:${MANTICORE_VERSION:-29.9.0}
+    container_name: manticore-ls
+    cpus: ${ENGINE_CPUS:-4}
+    mem_limit: ${ENGINE_MEM:-4g}
+    environment:
+      searchd_auto_schema: "0" # a typo in a table name fails instead of creating a table
+    ports:
+      - "127.0.0.1:${MANTICORE_PORT:-9336}:9306" # SQL over the MySQL protocol, no auth
+    ulimits:
+      nofile: { soft: 65536, hard: 65536 }
+      memlock: { soft: -1, hard: -1 }
+    volumes:
+      - manticore-data:/var/lib/manticore
+    healthcheck:
+      test: ["CMD-SHELL", "mysql -h127.0.0.1 -P9306 -e 'SHOW VERSION' | grep -q Buddy"]
+      interval: 2s
+      timeout: 3s
+      retries: 60
+
+  elasticsearch:
+    image: elastic/elasticsearch:${ES_VERSION:-9.5.4}
+    container_name: manticore-ls-elasticsearch
+    cpus: ${ENGINE_CPUS:-4}
+    mem_limit: ${ENGINE_MEM:-4g}
+    environment:
+      discovery.type: single-node
+      xpack.security.enabled: "false" # local comparison only; ports bound to 127.0.0.1
+      ES_JAVA_OPTS: "-Xms${ES_HEAP:-2g} -Xmx${ES_HEAP:-2g}" # half of the container memory, as Elastic recommends
+      # a shared, nearly full Docker VM disk would otherwise hit the flood-stage watermark (95%)
+      # and make the index read-only mid-load
+      cluster.routing.allocation.disk.threshold_enabled: "false"
+    ports:
+      - "127.0.0.1:${ES_PORT:-9201}:9200"
+    ulimits:
+      nofile: { soft: 65536, hard: 65536 }
+      memlock: { soft: -1, hard: -1 }
+    volumes:
+      - es-data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf 'http://localhost:9200/_cluster/health?wait_for_status=yellow&timeout=1s' >/dev/null"]
+      interval: 3s
+      timeout: 5s
+      retries: 60
+
+  # `make run`: app/ (Go; go-sql-driver/mysql for Manticore, go-elasticsearch v9 for Elasticsearch)
+  app:
+    build: app
+    image: manticore-log-search-app:local
+    profiles: [run]
+    environment:
+      DOCS: ${DOCS:-}
+      DAYS: ${DAYS:-}
+      WRITERS: ${WRITERS:-}
+      BATCH: ${BATCH:-}
+      RUNS: ${RUNS:-}
+      CLIENTS: ${CLIENTS:-}
+      ENGINES: ${ENGINES:-}
+    depends_on:
+      manticore: { condition: service_healthy }
+      elasticsearch: { condition: service_healthy }
+
+volumes:
+  manticore-data:
+  es-data:

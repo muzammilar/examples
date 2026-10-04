@@ -52,6 +52,21 @@ Apple M4 Pro, Docker VM aarch64, kind, Manticore 29.9.0.1.
 | [kubernetes-helm failover](kubernetes-helm/README.md#failover) | 2026-10-04 | Go load, 4 writers (`REPLACE` x 200 rows) + 4 readers on 3 workers; worker-1 force-deleted at 15 s | 81,473–89,961 rows/s before; 2,900 rows/s at the low point; back to 72,026 rows/s 13 s after the delete; new pod ready in 11.0 s; 3,788,600 rows acknowledged, 0 lost |
 | [kubernetes-helm scaling](kubernetes-helm/README.md#scale-out-and-in-3--5--3) | 2026-10-04 | `kubectl scale` 3 → 5 → 3, writes paced at 1,000 rows/s | scale-out 148.4 s, scale-in 4.9 s; 0 failed writes; 0 of 160,200 / 46,000 rows lost |
 
+JSON API; built for full-text search with filters and aggregations (logs, e-commerce, site
+search). Open source (GPL-3.0; the columnar library is Apache-2.0).
+
+| folder | what |
+|---|---|
+| [`log-search/`](log-search) | Web/app log lines in Manticore and Elasticsearch 9.5.4 side by side (same caps, same data, same queries) from a Go program: ingest rate, disk and memory, full-text / phrase / filtered / aggregation latency, and a check that both return the generator's exact counts. |
+
+## Benchmark
+
+Apple M4 Pro, Docker VM aarch64, shared VM.
+
+| example | date | setup | result |
+|---|---|---|---|
+| [log-search](log-search/README.md#results) | 2026-10-04 | 1M log lines, 8 writers x 5,000 docs; 6 queries x 200 runs from 4 clients; Manticore 29.9.0 and Elasticsearch 9.5.4 each 4 CPUs / 4 GB | Manticore vs Elasticsearch: ingest 169,661 vs 120,180 docs/s (1.41x); disk 194 MB vs 142 MB (Elasticsearch 1.37x smaller); container memory 472.8 MiB vs 2.542 GiB (5.5x less); query q/s 2.0x–6.9x higher, p50 0.8–1.9 ms vs 2.3–4.9 ms (1.5x–3.8x), p99 1.5–5.2 ms (phrase 51.1 ms) vs 40.5–51.7 ms; counts identical on all 6 queries |
+
 ## Known issues
 
 Seen with Manticore 29.9.0 (Buddy 4.4.3), 2026-10-04. The project is active (29.9.0 on
@@ -85,3 +100,8 @@ Chart 29.9.1, 2026-10-04. Details in [kubernetes-helm](kubernetes-helm/README.md
 | Scale-in leaves removed pods in `cluster_…_nodes_set`; their PVCs stay |
 | Full disk: a joining worker cannot allocate its 128 MiB `galera.cache` and loops on `must reinit` |
 | First install takes 295–326 s (60 s wait on worker-0, workers start one at a time) |
+
+Seen 2026-10-04. Details in [log-search](log-search/README.md#known-issues):
+
+- Elasticsearch reads numbers in a `range` query on an `epoch_second` date field as milliseconds unless the query sets `"format": "epoch_second"`.
+- On a full disk Manticore rejects `INSERT` (`unable to write to binlog ... No space left on device`); Elasticsearch goes read-only at its 95% flood-stage watermark.
