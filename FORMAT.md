@@ -9,18 +9,18 @@ existing examples do (`ydb/`, `scylladb/`, `tigerbeetle/`, `oceanbase/`, `rondb/
 <system>/
   README.md                  # system index (see "Top-level README")
   single-node/               # minimal setup
-  docker-compose-cluster/    # replicated / sharded cluster on Docker Compose
-  kubernetes-operator/       # official operator on kind (or kubernetes-helm/, kubernetes-statefulset/)
+  docker-compose-cluster/    # replicated / sharded cluster on Docker Compose, with failover and scaling
+  kubernetes-operator/       # official operator on kind (or kubernetes-helm/, kubernetes-statefulset/), with scaling
   <workload-name>/           # a program on the system's strongest workload (payments-ledger/, market-data/)
 ```
 
 | Folder | When | Branch name |
 |---|---|---|
 | `single-node/` | always, if the system can run as one process or container | `<system>-single-node` |
-| `docker-compose-cluster/` | the system replicates or shards | `<system>-docker-compose-cluster` |
-| `kubernetes-operator/` | an official operator exists | `<system>-kubernetes-operator` |
-| `kubernetes-helm/` | official Helm chart, no operator | `<system>-kubernetes-helm` |
-| `kubernetes-statefulset/` | neither exists | `<system>-kubernetes` |
+| `docker-compose-cluster/` | the system replicates or shards; includes `failover`, `scale-out`, `scale-in` | `<system>-docker-compose-cluster` |
+| `kubernetes-operator/` | an official operator exists; includes `scale-out`/`scale-in` when the operator scales | `<system>-kubernetes-operator` |
+| `kubernetes-helm/` | official Helm chart, no operator; same scaling rule | `<system>-kubernetes-helm` |
+| `kubernetes-statefulset/` | neither exists; same scaling rule | `<system>-kubernetes` |
 | workload folder | always: the workload the system was built for (see below) | `<system>-<workload>-showcase` |
 
 - Folder and file names describe the workload. Never put `showcase` in a path (it is fine in a branch name).
@@ -120,9 +120,12 @@ HTAP orders). This is the example that shows why someone would pick the system.
 
 ## Scaling
 
-Not a separate example: `make scale-out` / `make scale-in` live in the cluster example
-(`docker-compose-cluster/`) and/or the Kubernetes example, whichever the system scales through.
-(`oceanbase/scale-out-in/`, `rondb/online-scaling/` and `tigerbeetle/cluster-operations/` predate this rule.)
+Not a separate example: scaling is part of the cluster example (`docker-compose-cluster/` with
+`make scale-out` / `make scale-in`) and/or the Kubernetes example (operator, Helm or StatefulSet with
+the same targets), whichever the system scales through. Say so in that example's README and in the
+examples table of `<system>/README.md` (e.g. "3 nodes, failover, scale 3 → 5 → 3").
+(`oceanbase/scale-out-in/`, `rondb/online-scaling/` and `tigerbeetle/cluster-operations/` are older
+separate folders and stay as they are.)
 
 - Grow, then shrink, with load running: 3 → 5 → 3 or 3 → 7 → 5. Never more than 7 nodes.
 - Per step: the command, how long rebalancing took, throughput before/during/after, failed requests.
