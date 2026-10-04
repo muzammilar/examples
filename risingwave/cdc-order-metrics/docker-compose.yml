@@ -1,0 +1,78 @@
+name: risingwave-cdc
+
+services:
+  # OLTP database. wal_level=logical for the postgres-cdc connector.
+  postgres:
+    image: postgres:17-alpine
+    container_name: risingwave-cdc-postgres
+    command: ["postgres", "-c", "wal_level=logical", "-c", "max_replication_slots=4", "-c", "max_wal_senders=4",
+              "-c", "shared_buffers=512MB", "-c", "max_connections=100"]
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: shop
+    cpus: ${PG_CPUS:-4}
+    mem_limit: ${PG_MEM:-2g}
+    ports:
+      - "127.0.0.1:${PG_PORT:-5433}:5432"
+    volumes:
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - pg-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d shop"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+
+  # RisingWave 3.1.0 in single_node mode (see ../single-node). 8 GB: at 6 GB the embedded
+  # compactor panics on start.
+  risingwave:
+    image: risingwavelabs/risingwave:${RW_VERSION:-v3.1.0}
+    container_name: risingwave-cdc-rw
+    command: ["single_node", "--store-directory", "/data"]
+    environment:
+      ENABLE_TELEMETRY: "false"
+    cpus: ${RW_CPUS:-4}
+    mem_limit: ${RW_MEM:-8g}
+    ports:
+      - "127.0.0.1:${RW_PORT:-4566}:4566"
+    volumes:
+      - rw-data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c '> /dev/tcp/127.0.0.1/4566'"]
+      interval: 2s
+      timeout: 5s
+      retries: 60
+    depends_on:
+      postgres: { condition: service_healthy }
+
+  # Go program (pgx): schema + CDC tables + MVs, OLTP load on Postgres, page-view events into
+  # RisingWave, freshness probes, Postgres re-query baseline, correctness check.
+  app:
+    profiles: [app]
+    build: ./app
+    image: risingwave-cdc-app:latest
+    container_name: risingwave-cdc-app
+    cpus: ${APP_CPUS:-2}
+    environment:
+      PG_URL: postgres://postgres:postgres@postgres:5432/shop?sslmode=disable
+      RW_URL: postgres://root@risingwave:4566/dev?sslmode=disable
+      SEED_ORDERS: ${SEED_ORDERS:-1000000}
+      DURATION: ${DURATION:-30}
+      OLTP_WORKERS: ${OLTP_WORKERS:-8}
+      EVENT_WORKERS: ${EVENT_WORKERS:-2}
+      POLL_INTERVAL: ${POLL_INTERVAL:-5}
+
+  psql:
+    profiles: [tools]
+    image: postgres:17-alpine
+    container_name: risingwave-cdc-psql
+    environment:
+      PGHOST: risingwave
+      PGPORT: "4566"
+      PGUSER: root
+      PGDATABASE: dev
+    entrypoint: ["psql"]
+
+volumes:
+  pg-data:
+  rw-data:

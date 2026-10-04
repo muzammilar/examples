@@ -10,6 +10,7 @@ maintained incrementally; state lives in Hummock, an LSM tree on object storage.
 | [`single-node/`](single-node) | `single_node` mode (all components in one process, local filesystem state store) on Docker Compose; psql walkthrough of tables, a datagen source, join/aggregate MVs, `EMIT ON WINDOW CLOSE`, sink into table and a native Postgres sink |
 | [`docker-compose-cluster/`](docker-compose-cluster) | meta + 2 compute + compactor + frontend, Postgres meta store, MinIO state store; `make failover` kills a compute node under load (acknowledged rows lost with and without `implicit_flush`); `make scale-out` / `scale-in` 2 → 4 → 2 compute nodes with adaptive parallelism |
 | [`kubernetes-operator/`](kubernetes-operator) | risingwave-operator v0.18.0 on kind: `RisingWave` resource with 1 meta, 2 compute, 1 compactor, 1 frontend, Postgres meta store, MinIO state store; one MV test |
+| [`cdc-order-metrics/`](cdc-order-metrics) | Go (pgx): Postgres OLTP tables replicated with the `postgres-cdc` connector plus page-view events, a 3-way join/aggregate MV and a funnel MV kept fresh under ~20k tx/s; freshness vs re-running the query on Postgres; MV checked against Postgres |
 
 ## Benchmark summary
 
@@ -20,6 +21,7 @@ Apple M4 Pro, Docker VM aarch64. Full numbers in each example.
 | [single-node](single-node/README.md#results) | 2026-10-04 | one container, 4 CPUs / 8 GB | healthy 5.3 s after `make up`; walkthrough (10 streaming jobs) 14.4 s; 318 MiB resident |
 | [docker-compose-cluster](docker-compose-cluster/README.md#results) | 2026-10-04 | compute nodes 2 CPUs / 4 GB, Go loader + datagen source | compute-node kill: writes failed 40 s (until the node returned), reads never failed; 5,400 of 1.68M acknowledged rows lost by default, 0 with `implicit_flush`. Aggregate throughput 0.86M → 1.90M rows/s from 2 to 4 compute nodes, rescheduled in 7 s; 4 → 2 in 4 s with `unregister-workers`; one failed write per change |
 | [kubernetes-operator](kubernetes-operator/README.md#results) | 2026-10-04 | one kind node, compute pods 2 CPU / 3Gi | empty kind → `Running` RisingWave in ~3 min (image side-load 105 s, cert-manager 12 s, operator 17 s, cluster 47 s); node 2.15 GiB idle |
+| [cdc-order-metrics](cdc-order-metrics/README.md#results) | 2026-10-04 | `single_node` 4 CPUs / 8 GB, Postgres 4 CPUs / 2 GB, 1M seeded orders, 8 OLTP workers | CDC snapshot 220k rows/s; MV freshness p50 1.01 s / p99 2.03 s at 20.6k Postgres tx/s; same query on Postgres 169 ms per run (freshness 4.0 s at a 5 s poll); MV equals Postgres, 0 differing groups |
 
 ## Known issues
 
