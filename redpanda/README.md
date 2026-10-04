@@ -13,6 +13,8 @@ no ZooKeeper/KRaft; Schema Registry, HTTP Proxy and the Admin API are built into
 
 | [`kubernetes-operator/`](kubernetes-operator) | Redpanda Operator 26.2.4 (Helm) on kind, a `Redpanda` resource with 3 brokers (one per worker); `make failover` force-deletes a broker pod under an acks=all rpk producer and checks every acked record. |
 
+| [`streaming-latency/`](streaming-latency) | The workload Redpanda is built for: acks=all streaming measured end to end. The shared franz-go benchmark ([`go/kafka-franz`](../go/kafka-franz)) against 3 Redpanda brokers (fsync and write caching) and against go/kafka-franz's Kafka 4.3.1, same caps: latency at 10k records/s, max rate, transactions, loss/duplicate check. |
+
 ## License
 
 - The core is source-available under the
@@ -36,6 +38,7 @@ no ZooKeeper/KRaft; Schema Registry, HTTP Proxy and the Admin API are built into
 
 - The Redpanda Operator is free to run; it gates Redpanda Connect pipelines and multi-cluster
   (stretch) deployments on a license.
+
 - Everything in these examples runs without a key. During the trial, `rpk cluster license info`
   lists `core_balancing_continuous` and `partition_auto_balancing_continuous` as in use: they are
   on by default until the trial expires, then the balancer falls back to `node_add`.
@@ -50,6 +53,8 @@ no ZooKeeper/KRaft; Schema Registry, HTTP Proxy and the Admin API are built into
 | [docker-compose-cluster](docker-compose-cluster/README.md#scaling-3--5--3-brokers) | 2026-10-04 | 3 → 5 → 3 brokers under 2,000 x 512 B records/s, acks=all, 24 partitions RF 3 | scale-out balanced in 81 s (29 of 72 replicas moved), decommission of 2 in 16 s; 405,300 acked, 0 failed, 0 lost; slowest ack 5.2 s |
 
 | [kubernetes-operator](kubernetes-operator/README.md#failover) | 2026-10-04 | 3 brokers on kind (1 core / 2Gi each), rpk producer 500 records/s, pod `redpanda-2` force-deleted | 30,000 of 30,000 acked records read back, 0 producer errors; pod back and cluster healthy in 23 s |
+
+| [streaming-latency](streaming-latency/README.md#results) | 2026-10-04 | 3 brokers x 2 CPUs / 3 GB each, 10,000 x 1 KiB records/s, acks=all, idempotent, 12 partitions RF 3 | end-to-end p99: Redpanda 8.07 ms (fsync) / 3.73 ms (write caching), Kafka 4.3.1 39.45 ms; max rate one client: Redpanda 196,463 records/s, Kafka 311,192; 0 lost, 0 duplicates, read_committed exact |
 
 Apple M4 Pro, Docker VM aarch64, Redpanda v26.2.3 (native arm64 image). Single runs on a shared
 Docker VM.
@@ -74,6 +79,12 @@ Seen with Redpanda v26.2.3 / Console v3.12.0, 2026-10-04.
 
 - The operator's `Redpanda` resource reports `Ready` before every broker pod is Ready; wait on
   the pods too.
+
+- Redpanda preallocates 32 MiB per partition replica (`segment_fallocation_step`) and creates
+  50 transaction coordinator partitions on first use; on a small shared Docker disk that filled
+  the disk (see streaming-latency).
+- Seastar needs 10,000 AIO events per shard; several brokers on one Docker VM can exceed the
+  default `fs.aio-max-nr` (65,536).
 - `--mode dev-container` bypasses fsync and turns on write caching (`rpk redpanda start --mode help`);
   don't take durability or latency numbers from it.
 - The trial license makes a fresh cluster behave differently from one 30 days old (continuous

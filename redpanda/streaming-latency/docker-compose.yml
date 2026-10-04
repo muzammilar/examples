@@ -1,0 +1,89 @@
+name: redpanda-streaming
+
+# Three Redpanda brokers for the Kafka-vs-Redpanda comparison. The Kafka side is the repo's
+# go/kafka-franz compose (Kafka 4.3.1, KRaft: 3 controllers + 3 brokers), started by the Makefile;
+# both run the same benchmark client, go/kafka-franz/trees/bench.
+#
+# Not dev-container mode: that adds --unsafe-bypass-fsync and write_caching_default=true. Here
+# acks=all waits until a Raft majority has fsynced the batch (Redpanda's default);
+# `make up WRITE_CACHING=true` acknowledges once a majority has it in memory, like Kafka's
+# default (no fsync per write, acks=all = all in-sync replicas have it in the page cache).
+# Caps per broker (both systems): BROKER_CPUS, BROKER_MEM.
+x-redpanda: &redpanda
+  image: docker.redpanda.com/redpandadata/redpanda:${REDPANDA_VERSION:-v26.2.3}
+  cpus: ${BROKER_CPUS:-2}
+  mem_limit: ${BROKER_MEM:-3g}
+  memswap_limit: ${BROKER_MEM:-3g}
+  healthcheck:
+    test: ["CMD-SHELL", "rpk cluster health -X brokers=localhost:9092 | grep -Eq 'Healthy:.+true'"]
+    interval: 2s
+    timeout: 5s
+    retries: 60
+    start_period: 5s
+
+services:
+  redpanda-0:
+    <<: *redpanda
+    container_name: redpanda-sl-0
+    command:
+      - redpanda
+      - start
+      - --kafka-addr=internal://0.0.0.0:9092
+      - --advertise-kafka-addr=internal://redpanda-0:9092
+      - --rpc-addr=redpanda-0:33145
+      - --advertise-rpc-addr=redpanda-0:33145
+      - --smp=${BROKER_CPUS:-2}
+      - --memory=${REDPANDA_MEMORY:-2G}
+      - --reserve-memory=0M
+      - --overprovisioned
+      - --check=false
+    volumes:
+      - redpanda-0:/var/lib/redpanda/data
+      - ./redpanda-bootstrap.yaml:/etc/redpanda/.bootstrap.yaml:ro
+
+  redpanda-1:
+    <<: *redpanda
+    container_name: redpanda-sl-1
+    command:
+      - redpanda
+      - start
+      - --kafka-addr=internal://0.0.0.0:9092
+      - --advertise-kafka-addr=internal://redpanda-1:9092
+      - --rpc-addr=redpanda-1:33145
+      - --advertise-rpc-addr=redpanda-1:33145
+      - --seeds=redpanda-0:33145
+      - --smp=${BROKER_CPUS:-2}
+      - --memory=${REDPANDA_MEMORY:-2G}
+      - --reserve-memory=0M
+      - --overprovisioned
+      - --check=false
+    volumes:
+      - redpanda-1:/var/lib/redpanda/data
+      - ./redpanda-bootstrap.yaml:/etc/redpanda/.bootstrap.yaml:ro
+    depends_on: { redpanda-0: { condition: service_healthy } }
+
+  redpanda-2:
+    <<: *redpanda
+    container_name: redpanda-sl-2
+    command:
+      - redpanda
+      - start
+      - --kafka-addr=internal://0.0.0.0:9092
+      - --advertise-kafka-addr=internal://redpanda-2:9092
+      - --rpc-addr=redpanda-2:33145
+      - --advertise-rpc-addr=redpanda-2:33145
+      - --seeds=redpanda-0:33145
+      - --smp=${BROKER_CPUS:-2}
+      - --memory=${REDPANDA_MEMORY:-2G}
+      - --reserve-memory=0M
+      - --overprovisioned
+      - --check=false
+    volumes:
+      - redpanda-2:/var/lib/redpanda/data
+      - ./redpanda-bootstrap.yaml:/etc/redpanda/.bootstrap.yaml:ro
+    depends_on: { redpanda-0: { condition: service_healthy } }
+
+volumes:
+  redpanda-0:
+  redpanda-1:
+  redpanda-2:

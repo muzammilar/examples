@@ -1,0 +1,10 @@
+# Cluster properties applied when the cluster is first created. All three brokers and the
+# Kafka cluster share the Docker VM's disk, which is small and shared on a laptop:
+# - storage_min_free_bytes: Redpanda refuses writes below this much free disk (default 5 GiB).
+storage_min_free_bytes: 1073741824
+# - segment_fallocation_step: every partition replica preallocates its active segment in steps
+#   of this size (default 32 MiB). The 50-partition transaction coordinator topic alone is
+#   150 replicas = 4.7 GiB of preallocated space with RF 3, which filled the disk here.
+segment_fallocation_step: 4096
+# - transaction_coordinator_partitions: partitions of kafka_internal/tx (default 50).
+transaction_coordinator_partitions: 4
