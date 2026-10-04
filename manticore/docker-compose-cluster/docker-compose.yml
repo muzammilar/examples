@@ -1,0 +1,93 @@
+name: manticore-cluster
+
+# Three Manticore Search nodes in one replication cluster (`c`, Galera-based synchronous
+# multi-master replication), plus manticore-4 / manticore-5 for `make scale-out` (profile
+# `scale`). scripts/bootstrap.sh creates the cluster and the tables after `up`.
+#
+# searchd_listen puts `$ip:9312` (the node's own address, filled in by the image's entrypoint)
+# first. Buddy's sharding code takes the first listen line that looks like host:port as the
+# node id; with the image's default order that is `9308:http` -> 127.0.0.1:9308 on every node,
+# and `CREATE TABLE c:t ... shards= rf=` times out (`Waiting timeout exceeded.`).
+x-manticore: &manticore
+  image: manticoresearch/manticore:${MANTICORE_VERSION:-29.9.0}
+  environment:
+    searchd_listen: "$$ip:9312|9306:mysql41|9308:http|$$ip:9315-9325:replication|/var/run/mysqld/mysqld.sock:mysql41"
+    # auto_schema off: an INSERT into a missing table must fail instead of creating a local RT
+    # table (during a shard rebalance the sharded table's wrapper is briefly missing; with
+    # auto_schema on, writes landed in a new local `events` on one node, see README)
+    searchd_auto_schema: "0"
+  ulimits:
+    nofile: { soft: 65536, hard: 65536 }
+    memlock: { soft: -1, hard: -1 }
+  healthcheck:
+    test: ["CMD-SHELL", "mysql -h127.0.0.1 -P9306 -e 'SHOW VERSION' | grep -q Buddy"]
+    interval: 2s
+    timeout: 3s
+    retries: 60
+
+services:
+  manticore-1:
+    <<: *manticore
+    container_name: manticore-cc-1
+    hostname: manticore-1
+    networks: { manticore: { ipv4_address: 172.28.30.11 } }
+    ports:
+      - "127.0.0.1:${MANTICORE_PORT:-9326}:9306"      # SQL (MySQL protocol), no auth: localhost only
+      - "127.0.0.1:${MANTICORE_HTTP_PORT:-9328}:9308" # HTTP JSON
+    volumes: [manticore-1:/var/lib/manticore, ./sql:/sql:ro]
+  manticore-2:
+    <<: *manticore
+    container_name: manticore-cc-2
+    hostname: manticore-2
+    networks: { manticore: { ipv4_address: 172.28.30.12 } }
+    volumes: [manticore-2:/var/lib/manticore]
+  manticore-3:
+    <<: *manticore
+    container_name: manticore-cc-3
+    hostname: manticore-3
+    networks: { manticore: { ipv4_address: 172.28.30.13 } }
+    volumes: [manticore-3:/var/lib/manticore]
+  # `make scale-out` starts these and joins them to the cluster; `make scale-in` removes them
+  manticore-4:
+    <<: *manticore
+    container_name: manticore-cc-4
+    hostname: manticore-4
+    profiles: [scale]
+    networks: { manticore: { ipv4_address: 172.28.30.14 } }
+    volumes: [manticore-4:/var/lib/manticore]
+  manticore-5:
+    <<: *manticore
+    container_name: manticore-cc-5
+    hostname: manticore-5
+    profiles: [scale]
+    networks: { manticore: { ipv4_address: 172.28.30.15 } }
+    volumes: [manticore-5:/var/lib/manticore]
+
+  # `make failover` / `make scale-*`: client/ (Go, go-sql-driver/mysql over the MySQL protocol)
+  load:
+    build: client
+    image: manticore-cluster-load:local
+    container_name: manticore-cc-load
+    profiles: [load]
+    networks: [manticore]
+    environment:
+      NODES: ${NODES:-manticore-1:9306,manticore-2:9306,manticore-3:9306}
+      VERIFY_NODES: ${VERIFY_NODES:-}
+      WRITERS: ${WRITERS:-4}
+      READERS: ${READERS:-4}
+      BATCH: ${BATCH:-200}
+      DURATION: ${DURATION:-60}
+      INTERVAL: ${INTERVAL:-2}
+      RATE: ${RATE:-0}
+
+networks:
+  manticore:
+    ipam:
+      config: [{ subnet: 172.28.30.0/24 }]
+
+volumes:
+  manticore-1:
+  manticore-2:
+  manticore-3:
+  manticore-4:
+  manticore-5:
