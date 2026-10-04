@@ -1,0 +1,6 @@
+# One node: the chart's worker StatefulSet and balancer Deployment all run on it.
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: manticore-helm
+nodes:
+  - role: control-plane

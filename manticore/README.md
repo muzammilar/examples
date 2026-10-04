@@ -36,6 +36,22 @@ Apple M4 Pro, Docker VM aarch64, shared VM, Manticore 29.9.0, no CPU/memory caps
 | [docker-compose-cluster](docker-compose-cluster/README.md#failover) | 2026-10-04 | Go client, 4 writers (`REPLACE` batches of 200 into both tables), 4 readers; `docker kill` one of 3 nodes for ~27 s | 71–105k rows/s before the kill; no write acknowledged for ~18 s; replicated table: 0 of 1.14M acknowledged rows lost; sharded table: 3,532 lost and the nodes disagree afterwards (two runs) |
 | [docker-compose-cluster](docker-compose-cluster/README.md#scale-out-and-in-3--5--3) | 2026-10-04 | 3 → 5 → 3 nodes, writes paced at 1,000 rows/s per table | joins synced in 1.8–2.7 s; shard layout settled in 11–17 s; replicated table 0 lost in both steps; sharded table lost 10,139 of 100,800 rows on scale-out (the fifth node got no shard), 0 on scale-in |
 
+Full-text search engine (C++, a fork of Sphinx): SQL over the MySQL protocol, HTTP JSON API,
+synchronous multi-master replication (Galera). GPL-3.0; columnar library Apache-2.0.
+
+| folder | what |
+|---|---|
+| [`kubernetes-helm/`](kubernetes-helm) | Official Helm chart 29.9.1 on kind: 3 workers + read balancer, failover (force-delete a worker pod under load), scale 3 → 5 → 3 workers under load. No official operator exists. |
+
+## Benchmark
+
+Apple M4 Pro, Docker VM aarch64, kind, Manticore 29.9.0.1.
+
+| example | date | setup | result |
+|---|---|---|---|
+| [kubernetes-helm failover](kubernetes-helm/README.md#failover) | 2026-10-04 | Go load, 4 writers (`REPLACE` x 200 rows) + 4 readers on 3 workers; worker-1 force-deleted at 15 s | 81,473–89,961 rows/s before; 2,900 rows/s at the low point; back to 72,026 rows/s 13 s after the delete; new pod ready in 11.0 s; 3,788,600 rows acknowledged, 0 lost |
+| [kubernetes-helm scaling](kubernetes-helm/README.md#scale-out-and-in-3--5--3) | 2026-10-04 | `kubectl scale` 3 → 5 → 3, writes paced at 1,000 rows/s | scale-out 148.4 s, scale-in 4.9 s; 0 failed writes; 0 of 160,200 / 46,000 rows lost |
+
 ## Known issues
 
 Seen with Manticore 29.9.0 (Buddy 4.4.3), 2026-10-04. The project is active (29.9.0 on
@@ -59,3 +75,13 @@ Seen with Manticore 29.9.0 (Buddy 4.4.3), 2026-10-04. Details in each example:
 | With `auto_schema` on (default), an `INSERT` during a shard rebalance created a local RT table named like the sharded table | [docker-compose-cluster](docker-compose-cluster/README.md#failover) |
 | Scale-out to 5 nodes left the fifth node without shards and without the sharded table | [docker-compose-cluster](docker-compose-cluster/README.md#scale-out-and-in-3--5--3) |
 | A full disk makes Galera abort the node (`Node consistency compromised, aborting...`) | [docker-compose-cluster](docker-compose-cluster/README.md#known-issues) |
+
+Chart 29.9.1, 2026-10-04. Details in [kubernetes-helm](kubernetes-helm/README.md#known-issues):
+
+| issue |
+|---|
+| Workers OOMKilled (1Gi limit) during state transfer to a new worker at ~10.5M rows; the chart sets no memory limit by default |
+| `autoAddTablesInCluster` only adds tables that exist when a worker starts |
+| Scale-in leaves removed pods in `cluster_…_nodes_set`; their PVCs stay |
+| Full disk: a joining worker cannot allocate its 128 MiB `galera.cache` and loops on `must reinit` |
+| First install takes 295–326 s (60 s wait on worker-0, workers start one at a time) |

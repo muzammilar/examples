@@ -1,0 +1,21 @@
+# manticoresearch/manticoresearch chart 29.9.1 (app 29.9.0.1). Only the changes from the
+# chart's values.yaml; see `helm show values manticoresearch/manticoresearch --version 29.9.1`.
+worker:
+  replicaCount: 3
+  # chart default: multi-master (writes may go to any worker through the worker Service)
+  replicationMode: multi-master
+  image:
+    tag: 29.9.0.1
+  persistence:
+    size: 1Gi # chart default 10Gi (README says 1Gi); 1Gi is plenty for this example on kind
+  resources:
+    requests: { cpu: 250m, memory: 256Mi }
+    # no limits in the chart default; 1Gi got worker-0..2 OOMKilled at ~7-10M rows in `logs`
+    limits: { memory: 2Gi }
+balancer:
+  replicaCount: 1
+  image:
+    tag: 29.9.0.1
+  resources:
+    requests: { cpu: 100m, memory: 128Mi }
+    limits: { memory: 512Mi }
