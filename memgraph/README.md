@@ -63,6 +63,8 @@ library. Images used: `memgraph/memgraph:3.13.1`, `memgraph/memgraph-mage:3.13.1
   Enterprise. Without a license a coordinator answers `Access to high availability requires an
   enterprise, ai_platform, or oem license.` (3.13.1, 2026-10-04).
 
+| [`fraud-detection/`](fraud-detection) | Real-time fraud detection on a payment graph, Go (`neo4j-go-driver`), Memgraph vs Neo4j Community with the same data and queries: bulk load, 20,000 streamed payment authorizations (3-hop risk check + insert, 8 workers), ring detection, shared devices, exposure; result rows compared by hash. |
+
 ## Benchmark
 
 | example | date | setup | result |
@@ -71,6 +73,7 @@ library. Images used: `memgraph/memgraph:3.13.1`, `memgraph/memgraph-mage:3.13.1
 | [docker-compose-cluster](docker-compose-cluster/README.md#results) | 2026-10-04 | 3 instances, 1 CPU each, Go client, 4 writers | MAIN killed under ~450 writes/s: manual promotion 2 s after the kill, longest write gap 1.9 s, 0 acknowledged writes lost on the SYNC replica, 7 missing on the ASYNC replica at the kill (caught up later), 1 duplicate from a retried in-flight write |
 | [docker-compose-cluster](docker-compose-cluster/README.md#read-replicas-make-scale-demo) | 2026-10-04 | 16 readers, 2-hop counts, 1 CPU per replica | 2 → 4 → 2 replicas: 5,048 → 11,934 → 5,710 reads/s (2.36x at 4 replicas), 0 failed reads; `REGISTER`/`DROP REPLICA` needed up to 77 retries under load |
 | [kubernetes-helm](kubernetes-helm/README.md#results) | 2026-10-04 | kind, 1 pod (2 CPU / 2Gi), Go client Job, 4 writers | 16,363–18,368 writes/s; pod kill: 6,386 ms without writes, new pod Ready in 5.5 s, 0 acknowledged writes lost |
+| [fraud-detection](fraud-detection/README.md#results) | 2026-10-04 | 50k accounts, 320k transfers, 4 CPUs / 6 GB per engine, 1 run | load 203,642 vs 68,855 rows/s (2.96x); stream 10,325 vs 2,503 transfers/s (4.12x), risk check p99 1.84 vs 25.31 ms; rings p50 81.69 vs 160.43 ms (1.96x); top receivers p50 241.88 vs 207.35 ms (Neo4j 1.17x faster); identical result rows. Neo4j fsyncs every commit, Memgraph every 100,000 by default. |
 
 ## Known issues
 
@@ -101,3 +104,9 @@ Seen with Memgraph 3.13.1 and chart 1.0.7, 2026-10-04.
 
 - **Chart `helm test` Job uses `memgraph/memgraph:3.5.1`**, not the chart's appVersion.
 - **Chart sysctl init container** is privileged and sets `vm.max_map_count` unconditionally.
+- **Different default durability:** Memgraph fsyncs its WAL every 100,000 transactions
+  (`--storage-wal-file-flush-every-n-tx`), Neo4j on every commit; compare write latencies with that in mind.
+- **DDL is refused inside explicit transactions** (`... is not allowed in multicommand
+  transactions`), which Neo4j drivers' managed transactions use; run DDL as auto-commit queries.
+- **mgBench** (Memgraph's Memgraph-vs-Neo4j benchmark) is vendor-run and its method has been
+  disputed; see the design notes in `fraud-detection/`.

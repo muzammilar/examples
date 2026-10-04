@@ -1,0 +1,76 @@
+name: memgraph-fraud
+
+# Memgraph Community and Neo4j Community side by side, same caps, for the same workload (app/).
+# The app runs the phases against one engine at a time; the other one sits idle.
+x-caps: &caps
+  cpus: ${DB_CPUS:-4}
+  mem_limit: ${DB_MEM:-6g}
+  memswap_limit: ${DB_MEM:-6g}
+
+services:
+  # Memgraph wants vm.max_map_count >= 524288. Not namespaced: raises it for the whole Docker VM
+  # (Docker Desktop, until Docker restarts) or the host (Linux). Never lowers a higher value.
+  sysctl:
+    image: busybox:1.37
+    privileged: true
+    command: ["sh", "-c", "[ $$(sysctl -n vm.max_map_count) -ge 524288 ] || sysctl -w vm.max_map_count=524288"]
+
+  memgraph:
+    <<: *caps
+    image: memgraph/memgraph:${MEMGRAPH_VERSION:-3.13.1}
+    container_name: memgraph-fraud
+    command:
+      - --telemetry-enabled=false
+      - --also-log-to-stderr
+      - --log-level=WARNING
+      - --memory-limit=5120
+    ports: ["127.0.0.1:${MEMGRAPH_PORT:-7693}:7687"]
+    volumes: [memgraph-data:/var/lib/memgraph]
+    depends_on:
+      sysctl: { condition: service_completed_successfully }
+    healthcheck:
+      test: ["CMD-SHELL", "echo 'RETURN 1;' | mgconsole >/dev/null"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+
+  # same version as ../../neo4j; heap and page cache sized so the whole graph is cached
+  neo4j:
+    <<: *caps
+    image: neo4j:${NEO4J_VERSION:-2026.09.0-community}
+    container_name: memgraph-fraud-neo4j
+    environment:
+      NEO4J_AUTH: neo4j/demo-password
+      NEO4J_server_memory_heap_initial__size: 2g
+      NEO4J_server_memory_heap_max__size: 2g
+      NEO4J_server_memory_pagecache_size: 1g
+    ports: ["127.0.0.1:${NEO4J_PORT:-7694}:7687"]
+    volumes: [neo4j-data:/data]
+    healthcheck:
+      test: ["CMD", "cypher-shell", "-u", "neo4j", "-p", "demo-password", "RETURN 1"]
+      interval: 5s
+      timeout: 10s
+      retries: 30
+      start_period: 15s
+
+  # `make run`: app/ (Go, neo4j-go-driver v6 over Bolt to both engines)
+  app:
+    build: app
+    image: memgraph-fraud-app:local
+    profiles: [run]
+    cpus: ${APP_CPUS:-3}
+    environment:
+      ENGINES: ${ENGINES:-memgraph,neo4j}
+      ACCOUNTS: ${ACCOUNTS:-50000}
+      DEVICES: ${DEVICES:-20000}
+      TRANSFERS: ${TRANSFERS:-300000}
+      STREAM: ${STREAM:-20000}
+      WORKERS: ${WORKERS:-8}
+      RUNS: ${RUNS:-5}
+    depends_on:
+      memgraph: { condition: service_healthy }
+      neo4j: { condition: service_healthy }
+
+volumes:
+  memgraph-data:
+  neo4j-data:
