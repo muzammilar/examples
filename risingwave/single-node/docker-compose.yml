@@ -1,0 +1,58 @@
+name: risingwave-single
+
+services:
+  # All four components (meta, compute, frontend, compactor) in one process: `single_node` mode
+  # keeps metadata in SQLite and the Hummock state store on the local filesystem under
+  # --store-directory. https://docs.risingwave.com/get-started/quickstart
+  # Multi-arch image (amd64 + arm64): native on Apple silicon.
+  risingwave:
+    image: risingwavelabs/risingwave:${RW_VERSION:-v3.1.0}
+    container_name: risingwave-single
+    command: ["single_node", "--store-directory", "/data"]
+    environment:
+      ENABLE_TELEMETRY: "false"
+    mem_limit: ${RW_MEM:-8g}   # single_node splits this between components; at 6g the embedded compactor panics
+    cpus: ${RW_CPUS:-4}
+    ports:
+      - "127.0.0.1:${RW_PORT:-4566}:4566"           # Postgres wire protocol (user root, no password)
+      - "127.0.0.1:${RW_DASHBOARD_PORT:-5691}:5691" # web dashboard
+    volumes:
+      - rw-data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c '> /dev/tcp/127.0.0.1/4566'"]
+      interval: 2s
+      timeout: 5s
+      retries: 60
+      start_period: 10s
+
+  # Destination for the native Postgres sink in sql/04-sinks.sql.
+  postgres:
+    image: postgres:17-alpine
+    container_name: risingwave-single-postgres
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: sinkdb
+    volumes:
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d sinkdb"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+
+  # psql client for `make test` / `make cli` (the RisingWave image has no psql).
+  psql:
+    profiles: [tools]
+    image: postgres:17-alpine
+    container_name: risingwave-single-psql
+    environment:
+      PGHOST: risingwave
+      PGPORT: "4566"
+      PGUSER: root
+      PGDATABASE: dev
+    volumes:
+      - ./sql:/sql:ro
+    entrypoint: ["psql"]
+
+volumes:
+  rw-data:
