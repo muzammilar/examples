@@ -1,0 +1,6 @@
+# One node: the operator, Postgres, MinIO and a small RisingWave cluster fit on it.
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: risingwave-operator
+nodes:
+  - role: control-plane

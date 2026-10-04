@@ -1,0 +1,82 @@
+# Metadata store (Postgres) and state store (MinIO) for the RisingWave cluster, as in the
+# operator's docs/manifests/stable/persistent/minio/risingwave.yaml, with emptyDir instead of
+# 10Gi / 100Gi PVCs: `make down` deletes the kind cluster anyway.
+apiVersion: v1
+kind: Secret
+metadata:
+  name: postgres-credentials
+stringData:
+  username: postgres
+  password: postgres
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+spec:
+  selector: { app: postgres }
+  ports: [{ name: pg, port: 5432 }]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: postgres } }
+  template:
+    metadata: { labels: { app: postgres } }
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:17-alpine
+          env:
+            - { name: POSTGRES_PASSWORD, value: postgres }
+            - { name: POSTGRES_DB, value: risingwave }
+          ports: [{ containerPort: 5432 }]
+          readinessProbe:
+            exec: { command: ["pg_isready", "-U", "postgres", "-d", "risingwave"] }
+            periodSeconds: 2
+          volumeMounts: [{ name: data, mountPath: /var/lib/postgresql/data }]
+      volumes: [{ name: data, emptyDir: {} }]
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: minio-credentials
+stringData:
+  username: minioadmin
+  password: minioadmin
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio
+spec:
+  selector: { app: minio }
+  ports: [{ name: s3, port: 9000 }]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minio
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: minio } }
+  template:
+    metadata: { labels: { app: minio } }
+    spec:
+      containers:
+        - name: minio
+          # MinIO no longer publishes community images; Chainguard's free build, pinned by digest.
+          image: cgr.dev/chainguard/minio:latest@sha256:6a1d0b45c8669726bba580ced0bfa4cb9fdeed1ed636dfabd81d1577beb6937b
+          command: ["/bin/sh", "-c", "mkdir -p /data/hummock001 && exec minio server /data"]
+          env:
+            - { name: MINIO_ROOT_USER, value: minioadmin }
+            - { name: MINIO_ROOT_PASSWORD, value: minioadmin }
+          ports: [{ containerPort: 9000 }]
+          readinessProbe:
+            httpGet: { path: /minio/health/ready, port: 9000 }
+            periodSeconds: 2
+          volumeMounts: [{ name: data, mountPath: /data }]
+      volumes: [{ name: data, emptyDir: {} }]

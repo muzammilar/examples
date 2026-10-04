@@ -1,0 +1,60 @@
+# Small RisingWave 3.1.0 cluster: 1 meta, 2 compute, 1 compactor, 1 frontend.
+# Upstream examples request 8 CPU / 32Gi per compute node and 1 CPU / 2Gi for meta and frontend;
+# lowered to fit a laptop. The compute node sizes its memory from the limit.
+apiVersion: risingwave.risingwavelabs.com/v1alpha1
+kind: RisingWave
+metadata:
+  name: risingwave
+spec:
+  image: risingwavelabs/risingwave:v3.1.0
+  metaStore:
+    postgresql:
+      host: postgres
+      port: 5432
+      database: risingwave
+      credentials:
+        secretName: postgres-credentials
+  stateStore:
+    dataDirectory: hummock001
+    minio:
+      endpoint: minio:9000
+      bucket: hummock001
+      credentials:
+        secretName: minio-credentials
+  components:
+    meta:
+      nodeGroups:
+        - name: ""
+          replicas: 1
+          template:
+            spec:
+              resources:
+                requests: { cpu: 250m, memory: 1Gi }
+                limits: { cpu: "1", memory: 1Gi }
+    frontend:
+      nodeGroups:
+        - name: ""
+          replicas: 1
+          template:
+            spec:
+              resources:
+                requests: { cpu: 250m, memory: 1Gi }
+                limits: { cpu: "1", memory: 1Gi }
+    compactor:
+      nodeGroups:
+        - name: ""
+          replicas: 1
+          template:
+            spec:
+              resources:
+                requests: { cpu: 250m, memory: 2Gi }
+                limits: { cpu: "1", memory: 2Gi }
+    compute:
+      nodeGroups:
+        - name: ""
+          replicas: 2
+          template:
+            spec:
+              resources:
+                requests: { cpu: 500m, memory: 3Gi }
+                limits: { cpu: "2", memory: 3Gi }
