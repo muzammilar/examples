@@ -1,24 +1,27 @@
 # examples
-Example Codes in different languages and technologies, for fun.
+
+Example code in different languages and technologies, for fun.
 
 ## Language Examples
 
 These directories were merged from standalone repos (now archived) using `git subtree`, with full history preserved.
 
-| Directory | Former Repo |
-|-----------|-------------|
-| `cpp/` | [`cpp/`](cpp) | [muzammilar/examples-cpp](https://github.com/muzammilar/examples-cpp) |
-| `erlang/` | [`erlang/`](erlang) | N/A |
-| `go/` | [`go/`](go) | [muzammilar/examples-go](https://github.com/muzammilar/examples-go) |
-| `js/` | [`js/`](js) | [muzammilar/examples-js](https://github.com/muzammilar/examples-js) |
-| `python/` | [`python/`](python) | [muzammilar/examples-python](https://github.com/muzammilar/examples-python) |
-| `rust/` | [`rust/`](rust) | [muzammilar/examples-rust](https://github.com/muzammilar/examples-rust) |
+| Directory | Former repo |
+|---|---|
+| [`cpp/`](cpp) | [muzammilar/examples-cpp](https://github.com/muzammilar/examples-cpp) |
+| [`erlang/`](erlang) | — |
+| [`go/`](go) | [muzammilar/examples-go](https://github.com/muzammilar/examples-go) |
+| [`js/`](js) | [muzammilar/examples-js](https://github.com/muzammilar/examples-js) |
+| [`python/`](python) | [muzammilar/examples-python](https://github.com/muzammilar/examples-python) |
+| [`rust/`](rust) | [muzammilar/examples-rust](https://github.com/muzammilar/examples-rust) |
 
 Some Go modules still declare `github.com/muzammilar/examples-go/...` module paths; they build fine from their new location.
 
 ## Systems
 
 Databases, pub/sub, streaming and infrastructure examples, one folder per system.
+
+To add or test a system, follow [`FORMAT.md`](FORMAT.md): folder layout, Make targets, Compose and kind conventions, scaling, failover, benchmarks and README format.
 
 | System | Folder | Category | Website | GitHub |
 |--------|--------|----------|---------|--------|
@@ -63,10 +66,8 @@ Databases, pub/sub, streaming and infrastructure examples, one folder per system
 
 See [git submodule examples](go/ext/README.md).
 
-#### Adding/Updating a submodule
+Add a submodule:
 
 ```sh
-
 git submodule add https://github.com/muzammilar/<repo>.git <repo>
-
 ```
