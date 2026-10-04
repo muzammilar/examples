@@ -26,20 +26,10 @@ library. Images used: `memgraph/memgraph:3.13.1`, `memgraph/memgraph-mage:3.13.1
 ## Examples
 
 | folder | what |
-|---|---|
 | [`single-node/`](single-node) | Memgraph Community (MAGE image) + Memgraph Lab on Docker Compose: indexes and constraints, `*BFS` / `*WSHORTEST` paths, PageRank, Louvain, betweenness, snapshot + WAL recovery after SIGKILL, the social-graph benchmark from `neo4j/single-node`. |
-
-## Clustering and scaling
-
-- **No sharding.** Every instance holds the whole graph in RAM; the dataset must fit on one machine
-  ([replication docs](https://memgraph.com/docs/clustering/replication)). Scaling out means
-  read replicas.
-- **Replication** (one MAIN, SYNC/ASYNC/STRICT_SYNC replicas, manual promotion) is Community.
-- **Automatic failover** (Raft coordinators) is Enterprise. Without a license a coordinator
-  answers `Access to high availability requires an enterprise, ai_platform, or oem license.`
-  (checked on 3.13.1, 2026-10-04).
-
 | [`docker-compose-cluster/`](docker-compose-cluster) | 3 instances (MAIN + SYNC + ASYNC replica), manual failover, read replicas 3 → 5 → 3 instances. Details: `make failover` kills the MAIN under write load and fails over by hand (what was and was not replicated, the old MAIN as a second MAIN, rejoin after a wipe); `make scale-out` / `scale-in` add and remove read replicas (3 → 5 → 3 instances) under read load; `make enterprise-ha-check` shows the coordinator refusing without a license. |
+| [`kubernetes-helm/`](kubernetes-helm) | Official `memgraph/memgraph` chart 1.0.7 (standalone, 1 pod) on kind: walkthrough, pod force-deleted under write load (new pod Ready in 5.5 s, writes stopped 6.4 s, 0 of 569,739 acknowledged writes lost). No scaling: the standalone chart has no replication; the HA chart needs Enterprise. |
+| [`fraud-detection/`](fraud-detection) | Real-time fraud detection on a payment graph, Go (`neo4j-go-driver`), Memgraph vs Neo4j Community with the same data and queries: bulk load, 20,000 streamed payment authorizations (3-hop risk check + insert, 8 workers), ring detection, shared devices, exposure; result rows compared by hash. |
 
 ## Clustering and scaling
 
@@ -47,23 +37,11 @@ library. Images used: `memgraph/memgraph:3.13.1`, `memgraph/memgraph-mage:3.13.1
   machine. Scaling out means read replicas; writes go to the one MAIN
   ([replication docs](https://memgraph.com/docs/clustering/replication)).
 - **Replication** (one MAIN, `SYNC` / `ASYNC` / `STRICT_SYNC` replicas, manual promotion with
-  `SET REPLICATION ROLE TO MAIN`) is Community.
-- **Automatic failover and Bolt routing** need the Raft coordinators of Enterprise HA. Without a
-  license a coordinator answers `Access to high availability requires an enterprise, ai_platform,
-  or oem license.` (3.13.1, 2026-10-04). The example routes reads in the client.
-
-| [`kubernetes-helm/`](kubernetes-helm) | Official `memgraph/memgraph` chart 1.0.7 (standalone, 1 pod) on kind: walkthrough, pod force-deleted under write load (new pod Ready in 5.5 s, writes stopped 6.4 s, 0 of 569,739 acknowledged writes lost). No scaling: the standalone chart has no replication; the HA chart needs Enterprise. |
-
-## Clustering and scaling
-
-- **No sharding.** Every instance holds the whole graph in RAM; scaling out means read replicas.
-- **Replication** (MAIN + replicas, manual promotion) is Community; the standalone Helm chart does
-  not set it up.
-- **Automatic failover** (the `memgraph-high-availability` chart, Raft coordinators) is
-  Enterprise. Without a license a coordinator answers `Access to high availability requires an
-  enterprise, ai_platform, or oem license.` (3.13.1, 2026-10-04).
-
-| [`fraud-detection/`](fraud-detection) | Real-time fraud detection on a payment graph, Go (`neo4j-go-driver`), Memgraph vs Neo4j Community with the same data and queries: bulk load, 20,000 streamed payment authorizations (3-hop risk check + insert, 8 workers), ring detection, shared devices, exposure; result rows compared by hash. |
+  `SET REPLICATION ROLE TO MAIN`) is Community. The standalone Helm chart does not set it up.
+- **Automatic failover and Bolt routing** need the Raft coordinators of Enterprise HA (also the
+  `memgraph-high-availability` chart). Without a license a coordinator answers `Access to high
+  availability requires an enterprise, ai_platform, or oem license.` (3.13.1, 2026-10-04). The
+  cluster example routes reads in the client.
 
 ## Benchmark
 

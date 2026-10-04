@@ -8,17 +8,13 @@ snapshots) or vinyl (LSM on disk), business logic in Lua stored procedures next 
 | folder | what it shows |
 |---|---|
 | [`single-node/`](single-node) | One instance (Tarantool 3.8.1, YAML config): memtx/vinyl spaces, indexes, stored procedures, transactions incl. a net.box stream, recovery from snapshot + WAL after `SIGKILL`, a small net.box benchmark. |
-
-Image: `tarantool/tarantool:3.8.1` is multi-arch (amd64 + arm64) and runs natively on Apple
-Silicon. 3.x tags have shipped arm64 since 3.1 (Docker Hub, checked 2026-10-04).
-
 | [`docker-compose-cluster/`](docker-compose-cluster) | One replicaset of 3 instances (Tarantool 3 YAML config), Raft-based leader election, synchronous space; `make failover` kills the leader under write load and checks no acknowledged write is lost. |
 | [`vshard-cluster/`](vshard-cluster) | Sharded cluster (vshard through the Tarantool 3 `sharding` config): 2-instance storage replicasets + router; `make scale-out` / `make scale-in` grow 2 → 3 → 2 replicasets under load with bucket rebalancing. |
 | [`kubernetes-statefulset/`](kubernetes-statefulset) | 3-instance replicaset (Raft leader election) as a plain StatefulSet on kind; `make failover` force-deletes the leader pod under write load. No maintained CE operator or Helm chart for Tarantool 3. |
 | [`wallet-transfers/`](wallet-transfers) | Wallet transfers in Go (go-tarantool v3): one `transfer()` stored-procedure call vs the same logic as an 8-round-trip interactive transaction vs a Valkey Lua script, 200k transfers with hot accounts, audit of sums, negative balances and idempotent replays. |
 
 Image: `tarantool/tarantool:3.8.1` is multi-arch (amd64 + arm64) and runs natively on Apple
-Silicon (Docker Hub, checked 2026-10-04).
+Silicon. 3.x tags have shipped arm64 since 3.1 (Docker Hub, checked 2026-10-04).
 
 ## Benchmark
 
