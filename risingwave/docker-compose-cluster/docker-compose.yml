@@ -1,0 +1,208 @@
+name: risingwave-cluster
+
+# Distributed RisingWave 3.1.0: one meta, two compute nodes, one compactor, one frontend.
+# Metadata in Postgres (meta `--backend sql`), Hummock state store in MinIO.
+# Layout follows docker/docker-compose-distributed.yml in the RisingWave repo.
+x-rw: &rw
+  image: risingwavelabs/risingwave:${RW_VERSION:-v3.1.0}   # multi-arch, native arm64
+  environment:
+    RUST_BACKTRACE: "1"
+    ENABLE_TELEMETRY: "false"
+  restart: "no"   # `make failover` kills and restarts nodes by hand
+
+x-minio: &minio
+  # MinIO no longer publishes community images; Chainguard's free build is `latest` only,
+  # so it is pinned by digest (same as influxdb/iot-fleet).
+  image: cgr.dev/chainguard/minio:latest@sha256:6a1d0b45c8669726bba580ced0bfa4cb9fdeed1ed636dfabd81d1577beb6937b
+  environment:
+    MINIO_ROOT_USER: minioadmin
+    MINIO_ROOT_PASSWORD: minioadmin
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: risingwave-cluster-postgres
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
+      POSTGRES_DB: metadata
+      POSTGRES_INITDB_ARGS: --encoding=UTF-8 --lc-collate=C --lc-ctype=C
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d metadata"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+
+  minio:
+    <<: *minio
+    container_name: risingwave-cluster-minio
+    command: server /data --console-address :9001
+    ports:
+      - "127.0.0.1:${MINIO_CONSOLE_PORT:-9401}:9001"
+    volumes:
+      - minio-data:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+
+  minio-bucket:
+    <<: *minio
+    container_name: risingwave-cluster-minio-bucket
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - mc alias set local http://minio:9000 minioadmin minioadmin >/dev/null && mc mb --ignore-existing local/hummock001
+    depends_on:
+      minio: { condition: service_healthy }
+
+  meta:
+    <<: *rw
+    container_name: risingwave-cluster-meta
+    command:
+      - meta-node
+      - --listen-addr=0.0.0.0:5690
+      - --advertise-addr=meta:5690
+      - --dashboard-host=0.0.0.0:5691
+      - --prometheus-host=0.0.0.0:1250
+      - --backend=sql
+      - --sql-endpoint=postgres://postgres:@postgres:5432/metadata
+      - --state-store=hummock+minio://minioadmin:minioadmin@minio:9000/hummock001
+      - --data-directory=hummock_001
+    mem_limit: 1g
+    ports:
+      - "127.0.0.1:${RW_DASHBOARD_PORT:-5691}:5691"
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c '> /dev/tcp/127.0.0.1/5690'"]
+      interval: 2s
+      timeout: 5s
+      retries: 60
+    depends_on:
+      postgres: { condition: service_healthy }
+      minio-bucket: { condition: service_completed_successfully }
+
+  compute-1: &compute
+    <<: *rw
+    container_name: risingwave-cluster-compute-1
+    command:
+      - compute-node
+      - --listen-addr=0.0.0.0:5688
+      - --advertise-addr=compute-1:5688
+      - --prometheus-listener-addr=0.0.0.0:1222
+      - --meta-address=http://meta:5690
+      - --parallelism=${COMPUTE_PARALLELISM:-2}
+      - --total-memory-bytes=${COMPUTE_MEMORY_BYTES:-3221225472}   # 3 GiB of the 4 GB limit
+    cpus: ${COMPUTE_CPUS:-2}
+    mem_limit: ${COMPUTE_MEM:-4g}
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c '> /dev/tcp/127.0.0.1/5688'"]
+      interval: 2s
+      timeout: 5s
+      retries: 60
+    depends_on:
+      meta: { condition: service_healthy }
+
+  compute-2:
+    <<: *compute
+    container_name: risingwave-cluster-compute-2
+    command:
+      - compute-node
+      - --listen-addr=0.0.0.0:5688
+      - --advertise-addr=compute-2:5688
+      - --prometheus-listener-addr=0.0.0.0:1222
+      - --meta-address=http://meta:5690
+      - --parallelism=${COMPUTE_PARALLELISM:-2}
+      - --total-memory-bytes=${COMPUTE_MEMORY_BYTES:-3221225472}
+
+  # `make scale-out` starts these two, `make scale-in` unregisters and stops them.
+  compute-3:
+    <<: *compute
+    profiles: [scale]
+    container_name: risingwave-cluster-compute-3
+    command:
+      - compute-node
+      - --listen-addr=0.0.0.0:5688
+      - --advertise-addr=compute-3:5688
+      - --prometheus-listener-addr=0.0.0.0:1222
+      - --meta-address=http://meta:5690
+      - --parallelism=${COMPUTE_PARALLELISM:-2}
+      - --total-memory-bytes=${COMPUTE_MEMORY_BYTES:-3221225472}
+
+  compute-4:
+    <<: *compute
+    profiles: [scale]
+    container_name: risingwave-cluster-compute-4
+    command:
+      - compute-node
+      - --listen-addr=0.0.0.0:5688
+      - --advertise-addr=compute-4:5688
+      - --prometheus-listener-addr=0.0.0.0:1222
+      - --meta-address=http://meta:5690
+      - --parallelism=${COMPUTE_PARALLELISM:-2}
+      - --total-memory-bytes=${COMPUTE_MEMORY_BYTES:-3221225472}
+
+  compactor:
+    <<: *rw
+    container_name: risingwave-cluster-compactor
+    command:
+      - compactor-node
+      - --listen-addr=0.0.0.0:6660
+      - --advertise-addr=compactor:6660
+      - --prometheus-listener-addr=0.0.0.0:1260
+      - --meta-address=http://meta:5690
+    mem_limit: 2g
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c '> /dev/tcp/127.0.0.1/6660'"]
+      interval: 2s
+      timeout: 5s
+      retries: 60
+    depends_on:
+      meta: { condition: service_healthy }
+
+  frontend:
+    <<: *rw
+    container_name: risingwave-cluster-frontend
+    command:
+      - frontend-node
+      - --listen-addr=0.0.0.0:4566
+      - --advertise-addr=frontend:4566
+      - --prometheus-listener-addr=0.0.0.0:2222
+      - --meta-addr=http://meta:5690
+    mem_limit: 2g
+    ports:
+      - "127.0.0.1:${RW_PORT:-4566}:4566"   # Postgres wire protocol, user root, no password
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c '> /dev/tcp/127.0.0.1/4566'"]
+      interval: 2s
+      timeout: 5s
+      retries: 60
+    depends_on:
+      compute-1: { condition: service_healthy }
+      compute-2: { condition: service_healthy }
+
+  psql:
+    profiles: [tools]
+    image: postgres:17-alpine
+    container_name: risingwave-cluster-psql
+    environment:
+      PGHOST: frontend
+      PGPORT: "4566"
+      PGUSER: root
+      PGDATABASE: dev
+    volumes:
+      - ./sql:/sql:ro
+    entrypoint: ["psql"]
+
+  # Go (pgx) writer + reader for `make failover`; built from loader/.
+  loader:
+    profiles: [tools]
+    build: ./loader
+    image: risingwave-cluster-loader:latest
+    container_name: risingwave-cluster-loader
+    environment:
+      PGURL: postgres://root@frontend:4566/dev?sslmode=disable
+
+volumes:
+  pg-data:
+  minio-data:
