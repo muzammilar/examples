@@ -40,6 +40,8 @@ To add or test a system, follow [`FORMAT.md`](FORMAT.md): folder layout, Make ta
 | Kafka | [`kafka/`](kafka) | Streaming | [kafka.apache.org](https://kafka.apache.org/) | [apache/kafka](https://github.com/apache/kafka) |
 | kdb+ | [`kdb/`](kdb) | Time-series | [kx.com](https://kx.com/) | — |
 | Kubernetes | [`k8s/`](k8s) | Container orchestration | [kubernetes.io](https://kubernetes.io/) | [kubernetes/kubernetes](https://github.com/kubernetes/kubernetes) |
+| Manticore Search | [`manticore/`](manticore) | Search | [manticoresearch.com](https://manticoresearch.com/) | [manticoresoftware/manticoresearch](https://github.com/manticoresoftware/manticoresearch) |
+| Memgraph | [`memgraph/`](memgraph) | Graph (in-memory) | [memgraph.com](https://memgraph.com/) | [memgraph/memgraph](https://github.com/memgraph/memgraph) |
 | Milvus | [`milvus/`](milvus) | Vector | [milvus.io](https://milvus.io/) | [milvus-io/milvus](https://github.com/milvus-io/milvus) |
 | NATS | [`nats.io/`](nats.io) | Core NATS: pub/sub; JetStream: streaming / KV | [nats.io](https://nats.io/) | [nats-io/nats-server](https://github.com/nats-io/nats-server) |
 | NebulaGraph | [`nebula-graph/`](nebula-graph) | Graph | [nebula-graph.io](https://www.nebula-graph.io/) | [vesoft-inc/nebula](https://github.com/vesoft-inc/nebula) |
@@ -48,10 +50,13 @@ To add or test a system, follow [`FORMAT.md`](FORMAT.md): folder layout, Make ta
 | Qdrant | [`qdrant/`](qdrant) | Vector | [qdrant.tech](https://qdrant.tech/) | [qdrant/qdrant](https://github.com/qdrant/qdrant) |
 | QEMU | [`qemu/`](qemu) | VM / virtualization | [qemu.org](https://www.qemu.org/) | [qemu/qemu](https://github.com/qemu/qemu) |
 | QuestDB | [`questdb/`](questdb) | Time-series | [questdb.com](https://questdb.com/) | [questdb/questdb](https://github.com/questdb/questdb) |
+| Redpanda | [`redpanda/`](redpanda) | Streaming (Kafka API) | [redpanda.com](https://www.redpanda.com/) | [redpanda-data/redpanda](https://github.com/redpanda-data/redpanda) |
+| RisingWave | [`risingwave/`](risingwave) | Streaming SQL | [risingwave.com](https://risingwave.com/) | [risingwavelabs/risingwave](https://github.com/risingwavelabs/risingwave) |
 | RonDB | [`rondb/`](rondb) | In-memory SQL / key-value | [rondb.com](https://www.rondb.com/) | [logicalclocks/rondb](https://github.com/logicalclocks/rondb) |
 | ScyllaDB | [`scylladb/`](scylladb) | Wide-column | [scylladb.com](https://www.scylladb.com/) | [scylladb/scylladb](https://github.com/scylladb/scylladb) |
 | SingleStore | [`singlestore/`](singlestore) | Distributed SQL | [singlestore.com](https://www.singlestore.com/) | — |
 | Skytable | [`skytable/`](skytable) | Key-value | [skytable.io](https://skytable.io/) | [skytable/skytable](https://github.com/skytable/skytable) |
+| Tarantool | [`tarantool/`](tarantool) | In-memory DB + Lua | [tarantool.io](https://www.tarantool.io/) | [tarantool/tarantool](https://github.com/tarantool/tarantool) |
 | TiDB | [`tidb/`](tidb) | Distributed SQL | [pingcap.com](https://www.pingcap.com/tidb/) | [pingcap/tidb](https://github.com/pingcap/tidb) |
 | TigerBeetle | [`tigerbeetle/`](tigerbeetle) | Ledger / OLTP | [tigerbeetle.com](https://tigerbeetle.com/) | [tigerbeetle/tigerbeetle](https://github.com/tigerbeetle/tigerbeetle) |
 | TiKV | [`tikv/`](tikv) | Key-value | [tikv.org](https://tikv.org/) | [tikv/tikv](https://github.com/tikv/tikv) |

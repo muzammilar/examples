@@ -5,17 +5,17 @@ Candidate databases and systems to add as examples. Branch names follow the exis
 
 ## Already covered
 
-On `main`: Aerospike, Airflow, ArangoDB, CedarDB, ClickHouse, CockroachDB, Dragonfly, DuckDB, Elasticsearch, FoundationDB, Garnet/Valkey (Go comparison), InfluxDB, Kafka, kdb+, Milvus, NATS, NebulaGraph, Neo4j, OceanBase, Postgres (k8s/vagrant), MySQL and SQLite clients, Qdrant, QuestDB, RonDB, ScyllaDB, SingleStore, Skytable, TiDB, TigerBeetle, TiKV, TimescaleDB, Valkey, Weaviate, YDB, YugabyteDB.
+On `main`: Aerospike, Airflow, ArangoDB, CedarDB, ClickHouse, CockroachDB, Dragonfly, DuckDB, Elasticsearch, FoundationDB, Garnet/Valkey (Go comparison), InfluxDB, Kafka, kdb+, Manticore Search, Memgraph, Milvus, NATS, NebulaGraph, Neo4j, OceanBase, Postgres (k8s/vagrant), MySQL and SQLite clients, Qdrant, QuestDB, Redpanda, RisingWave, RonDB, ScyllaDB, SingleStore, Skytable, TiDB, Tarantool, TigerBeetle, TiKV, TimescaleDB, Valkey, Weaviate, YDB, YugabyteDB.
 
 ## Top priority
 
 Fastest in class, free, runnable locally (see the sections below for the example names).
 
-- [ ] Tarantool
-- [ ] RisingWave
-- [ ] Redpanda
-- [ ] Manticore Search
-- [ ] Memgraph
+- [x] Tarantool
+- [x] RisingWave
+- [x] Redpanda
+- [x] Manticore Search
+- [x] Memgraph
 
 ## Priority
 
@@ -39,7 +39,7 @@ Fastest in class, free, runnable locally (see the sections below for the example
 
 ## Streaming databases and CDC
 
-- [ ] `risingwave-single-node` (top priority): Postgres-compatible incremental materialized views with built-in CDC.
+- [x] `risingwave-single-node` (top priority): Postgres-compatible incremental materialized views with built-in CDC.
 - [ ] `materialize-emulator`: strict-serializable incremental views.
 - [ ] `feldera-single-node`: incremental SQL computation (DBSP).
 - [ ] `debezium-postgres-kafka`: CDC from Postgres into Kafka, then ClickHouse.
@@ -54,7 +54,7 @@ Fastest in class, free, runnable locally (see the sections below for the example
 
 ## Message streaming and queues
 
-- [ ] `redpanda-single-node` / `redpanda-docker-compose-cluster` (top priority): Kafka API without JVM or ZooKeeper; compare with the Kafka examples.
+- [x] `redpanda-single-node` / `redpanda-docker-compose-cluster` (top priority): Kafka API without JVM or ZooKeeper; compare with the Kafka examples.
 - [ ] `iggy-single-node`: Apache Iggy, Rust message streaming over TCP/QUIC/HTTP.
 - [ ] `fluvio-single-node`: Rust streaming with WASM SmartModules.
 - [ ] `pulsar-single-node`: broker/BookKeeper split, tiered storage.
@@ -128,7 +128,7 @@ Fastest in class, free, runnable locally (see the sections below for the example
 - [ ] `typesense-single-node`
 - [ ] `quickwit-single-node`: Rust log search on object storage.
 - [ ] `vespa-single-node`: hybrid search and vector ranking.
-- [ ] `manticore-single-node` (top priority): columnar storage + secondary indexes; rerun db-benchmarks.com against the Elasticsearch example.
+- [x] `manticore-single-node` (top priority): columnar storage + secondary indexes; rerun db-benchmarks.com against the Elasticsearch example.
 
 ## Key-value and cache
 
@@ -138,14 +138,14 @@ Fastest in class, free, runnable locally (see the sections below for the example
 - [ ] `keydb-active-replica`: multithreaded Redis fork (Snap) with active-active replicas; low priority, last release v6.3.4 (Oct 2023).
 - [ ] `pika-single-node`: Redis protocol on RocksDB (OpenAtom); compare with Kvrocks for larger-than-memory data.
 - [ ] `ocache-docker-compose-cluster`: Tigris Data's Go cache (in-memory + RocksDB) single node and 3-node cluster; gRPC/HTTP APIs, versioned CAS ops, `ocachecli bench`.
-- [ ] `tarantool-single-node` / `tarantool-replicaset` (top priority): in-memory DB with WAL and Lua stored procedures; memtx vs vinyl engines, synchronous replication.
+- [x] `tarantool-single-node` / `tarantool-replicaset` (top priority): in-memory DB with WAL and Lua stored procedures; memtx vs vinyl engines, synchronous replication.
 - [ ] `memcached-extstore`: pure-cache latency baseline; extstore for large values on flash.
 - [ ] Comparison example: same workload (GET/SET, pipelines, large values, persistence on) across Valkey, Redis 8, Dragonfly, Garnet, KeyDB, Kvrocks, Pika, Tarantool, ocache and Memcached.
 - [ ] `etcd-docker-compose-cluster`: Raft, watches, leases.
 
 ## Graph and multi-model
 
-- [ ] `memgraph-single-node` (top priority): in-memory Cypher; compare with Neo4j.
+- [x] `memgraph-single-node` (top priority): in-memory Cypher; compare with Neo4j.
 - [ ] `ladybugdb-embedded`: embedded columnar graph DB, successor to the archived Kùzu.
 - [ ] `arcadedb-single-node`: Apache 2.0 multi-model.
 - [ ] `surrealdb-single-node`: SurrealDB 3.0 multi-model (document, graph, vector, time-series).
