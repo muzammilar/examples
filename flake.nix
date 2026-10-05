@@ -2,7 +2,7 @@
   description = "Examples dev shell (Go, kind, kubectl, helm, valkey-cli)";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs?ref=master";
+    nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
   };
 
