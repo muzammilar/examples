@@ -19,8 +19,9 @@ Fastest in class, free, runnable locally (see the sections below for the example
 
 ## Priority
 
+- [ ] Postgres scale-out: Citus, PgDog, Multigres, Neon
+- [ ] MySQL sharding: Vitess, ShardingSphere, PolarDB-X, NDB Cluster
 - [ ] pgvector
-- [ ] Citus
 - [ ] StarRocks
 - [ ] Iceberg + Trino + MinIO
 - [ ] MongoDB replica set
@@ -35,6 +36,9 @@ Fastest in class, free, runnable locally (see the sections below for the example
 - [ ] `victoriametrics-docker-compose-cluster`: vminsert/vmselect/vmstorage as Prometheus long-term storage.
 - [x] `influxdb3-core-single-node`: Arrow/Parquet engine with SQL.
 - [ ] `greptimedb-single-node`: unified metrics, logs and traces.
+- [ ] `tdengine-docker-compose-cluster`: IoT time-series (AGPL); one table per device with super tables, vnodes sharding; rerun TSBS against TimescaleDB/QuestDB/InfluxDB.
+- [ ] `iotdb-docker-compose-cluster`: Apache IoTDB (Apache 2.0) ConfigNode/DataNode cluster, TsFile columnar storage; same TSBS run.
+- [ ] `dolphindb-single-node`: free Community Edition (memory/core caps); columnar time-series engine with its own scripting language, used for tick data; compare with kdb+ on the same market data.
 - [ ] `arcticdb-local`: Man Group's DataFrame time-series DB (C++ engine, Python API) on local LMDB and MinIO/S3 backends; versioned symbols, append/update.
 
 ## Streaming databases and CDC
@@ -42,6 +46,7 @@ Fastest in class, free, runnable locally (see the sections below for the example
 - [x] `risingwave-single-node` (top priority): Postgres-compatible incremental materialized views with built-in CDC.
 - [ ] `materialize-emulator`: strict-serializable incremental views.
 - [ ] `feldera-single-node`: incremental SQL computation (DBSP).
+- [ ] `timeplus-proton-single-node`: C++ streaming SQL on ClickHouse code (Apache 2.0); streaming joins and windows from Kafka/Redpanda; compare with RisingWave.
 - [ ] `debezium-postgres-kafka`: CDC from Postgres into Kafka, then ClickHouse.
 - [ ] `debezium-mysql-kafka-flink-clickhouse`: end-to-end e-commerce CDC pipeline, MySQL → Debezium → Kafka → Flink → ClickHouse, orchestrated by Airflow.
   - **Source:** MySQL 8 with `binlog_format=ROW`, `binlog_row_image=FULL`, GTIDs on; `demo` schema with `products`, `orders` (`pending`/`completed`/`canceled`), `order_items` (price and cost price for margin); `debezium` user with `REPLICATION SLAVE`/`REPLICATION CLIENT`/`RELOAD`/`SHOW DATABASES`; seed data plus a load generator for inserts/updates/deletes.
@@ -60,6 +65,7 @@ Fastest in class, free, runnable locally (see the sections below for the example
 - [ ] `pulsar-single-node`: broker/BookKeeper split, tiered storage.
 - [ ] `rabbitmq-streams`: classic queues vs streams.
 - [ ] `aeron-cluster`: Java/C++ microsecond messaging over UDP/IPC with Raft-replicated Aeron Cluster.
+- [ ] `kurrentdb-docker-compose-cluster`: KurrentDB (formerly EventStoreDB) event store; append-only streams, optimistic concurrency, projections, persistent subscriptions; 3-node cluster with `failover`.
 
 ## Durable execution and workflow engines
 
@@ -70,18 +76,65 @@ Fastest in class, free, runnable locally (see the sections below for the example
 - [ ] `dbos-postgres`: durable workflows as a library on top of Postgres.
 - [ ] Comparison example: same order/payment saga implemented in Temporal, Restate and Inngest.
 
+## Postgres and MySQL
+
+No dedicated `postgres/` or `mysql/` folder yet; existing examples live with other systems.
+Planned: Postgres, Citus, PgDog, Multigres and Neon under `postgres/`; MySQL, Vitess and friends under `mysql/`
+(see the two sections below).
+
+| Example | Engine | What |
+|---|---|---|
+| [`k8s/hello-postgres/`](k8s/hello-postgres) | Postgres | PostgreSQL-HA via Helm |
+| [`vagrant/multi-vm-postgres/`](vagrant/multi-vm-postgres) | Postgres | Postgres across Vagrant VMs |
+| [`go/sqlc-students/`](go/sqlc-students) | Postgres | Go + sqlc |
+| [`timescaledb/`](timescaledb) | Postgres | Time-series extension |
+| [`python/mysql-client/`](python/mysql-client) | MySQL | Python client |
+| [`clickhouse/named-collection-mysql/`](clickhouse/named-collection-mysql) | MySQL | ClickHouse reading MySQL |
+
 ## Postgres ecosystem
 
-- [ ] `citus-docker-compose-cluster`: sharded Postgres by distribution column.
+Planned as a `postgres/` folder: a plain Postgres baseline, then each scale-out option on the same
+sharded `orders` workload (distribution key `customer_id`) so results compare directly.
+
+- [ ] `postgres-single-node`: Postgres 18 baseline; async I/O, `pg_stat_statements`, `pgbench`.
+- [ ] `postgres-docker-compose-cluster`: streaming replication with Patroni + etcd; `failover`, sync vs async commit.
+- [ ] `postgres-kubernetes-operator`: CloudNativePG on kind; replicas, switchover, backups to MinIO.
+- [ ] `citus-docker-compose-cluster`: coordinator + workers; distributed and reference tables, co-located joins, `citus_rebalance_start()` on `scale-out`.
+- [ ] `pgdog-docker-compose-cluster`: PgDog (Rust) in front of plain Postgres shards; pooling, read/write split, sharding by key, cross-shard queries, resharding.
+- [ ] `multigres-docker-compose-cluster`: Supabase's Vitess-style architecture for Postgres (gateway, pooler, orchestrator); early-stage, document what runs and what doesn't.
+- [ ] `pgbouncer-pooler`: transaction pooling baseline; compare connection-storm behaviour with PgDog.
+- [ ] `readyset-cache`: ReadySet (BSL) wire-compatible query cache for Postgres and MySQL; incrementally maintained cached queries fed by replication; same read-heavy `orders` queries with and without it.
+- [ ] Comparison example: same `orders` workload and `pgbench` script on single Postgres vs Neon vs Citus vs PgDog vs Multigres; single-shard vs cross-shard latency, resharding under load. Neon scales storage and read replicas, not writes: it shows the cost of remote storage (cold-cache reads, commit latency through safekeepers) against local-disk Postgres.
 - [ ] `pgvector-single-node`: compare with the Milvus, Qdrant and Weaviate examples.
 - [ ] `paradedb-single-node`: BM25 full-text search inside Postgres.
-- [ ] `pgbouncer-pooler` / `pgdog-pooler`: connection pooling and sharding proxy.
-- [ ] `neon-local`: separated storage and compute, branching.
+- [ ] `neon-docker-compose-cluster`: Neon (Apache 2.0) storage/compute split from the upstream `docker-compose/` setup; compute + safekeepers (Paxos WAL quorum) + pageserver + storage broker, layers offloaded to MinIO. Copy-on-write branching, point-in-time branches, read replicas sharing storage, compute restart without data loss; `failover` kills a safekeeper.
 - [ ] `orioledb-single-node`: undo-log storage engine for Postgres.
+- [ ] `cloudberry-docker-compose-cluster`: Apache Cloudberry (open-source Greenplum successor) MPP Postgres; coordinator + segments, distributed analytic queries; compare with Citus for analytics.
+- [ ] `opengauss-single-node`: Huawei's Postgres-derived OLTP engine (Mulan PSL v2); MOT in-memory engine and NUMA-aware threads vs plain Postgres on `pgbench`.
+- [ ] `pg-duckdb-mooncake`: columnar analytics inside Postgres with `pg_duckdb` and `pg_mooncake`; same queries as the DuckDB and ClickHouse examples.
+- [ ] `alloydb-omni-single-node`: Google AlloyDB Omni (free developer use, closed source) in Docker; columnar engine and adaptive autovacuum vs plain Postgres on the same OLTP + analytic queries.
+
+## MySQL ecosystem
+
+Planned as a `mysql/` folder, mirroring the Postgres section with the same `orders` workload.
+
+- [ ] `mysql-single-node`: MySQL 8.4 LTS baseline; `sysbench` OLTP.
+- [ ] `mysql-docker-compose-cluster`: InnoDB Cluster (Group Replication) + MySQL Router; single-primary `failover`.
+- [ ] `mysql-kubernetes-operator`: Oracle MySQL Operator or Percona Operator for MySQL on kind.
+- [ ] `mariadb-galera-cluster`: multi-primary synchronous replication; write conflicts and certification failures.
+- [ ] `proxysql-read-write-split`: query routing, read/write split and query rules in front of replicas.
+- [ ] `vitess-docker-compose-cluster`: VTGate, VTTablet, topo (etcd); VSchema, vindexes, `Reshard` workflow on `scale-out`.
+- [ ] `vitess-kubernetes-operator`: PlanetScale `vitess-operator` on kind.
+- [ ] `ndb-cluster-docker-compose-cluster`: MySQL NDB Cluster (management, data and SQL nodes); auto-sharding by hash, node-group failover; compare with the RonDB fork.
+- [ ] `shardingsphere-proxy`: Apache ShardingSphere-Proxy in front of plain MySQL (and Postgres) shards; sharding rules, read/write split, distributed transactions.
+- [ ] `polardbx-kubernetes-operator`: PolarDB-X (Apache 2.0) on kind; CN/DN/GMS/CDC split, partitioned tables, global secondary indexes.
+- [ ] `matrixone-docker-compose-cluster`: MySQL-compatible HTAP (Apache 2.0, Go); separated storage/compute on S3 (MinIO), CN/TN/LogService; OLTP plus TPC-H on one copy of the data.
+- [ ] Comparison example: same `orders` workload on single MySQL vs Vitess vs ShardingSphere vs PolarDB-X vs NDB/RonDB vs TiDB (existing example); then Vitess vs Citus/PgDog/Multigres for the MySQL-vs-Postgres sharding story.
 
 ## In-memory OLTP
 
 - [ ] `volt-active-data`: partitioned single-threaded in-memory SQL with stored procedures (H-Store lineage); Developer Edition is a free 100-day license, arm64 unknown.
+- [ ] `spacetimedb-single-node`: SpacetimeDB (BSL) in-memory relational DB with WASM modules (Rust/C#) as stored procedures and client subscriptions; multiplayer-game state workload.
 
 ## Real-time OLAP
 
@@ -92,11 +145,15 @@ Fastest in class, free, runnable locally (see the sections below for the example
 - [ ] `databend-single-node`: Rust cloud warehouse on object storage.
 - [ ] `firebolt-core-single-node`: free self-hosted Firebolt engine; compare with ClickHouse and StarRocks.
 - [ ] `exasol-personal`: free single-user in-memory MPP; Docker image is x86-only and capped at 10 GiB.
+- [ ] `vertica-community`: free Community Edition (3 nodes, 1 TB); MPP column store with projections; compare with ClickHouse and StarRocks.
+- [ ] `cratedb-docker-compose-cluster`: CrateDB (Apache 2.0) distributed SQL on Lucene; time-series and full-text in one table, shard allocation and `failover`.
+- [ ] `heavydb-single-node`: HeavyDB (formerly OmniSciDB/MapD, Apache 2.0) GPU-accelerated SQL; CPU mode on a Mac, GPU numbers only with an NVIDIA box.
 
 ## Embedded analytics
 
 - [ ] `hyper-api-embedded`: Salesforce/Tableau Hyper (Umbra lineage, compiled queries) via `pip install tableauhyperapi`; free, closed source. macOS arm64 wheels stop after 0.0.26479 (newer releases: Linux x86_64 and Windows only), so pin that on a Mac. Compare with DuckDB on the same data.
 - [ ] `polars-datafusion`: Polars and DataFusion on the same Parquet files as the DuckDB example.
+- [ ] `monetdb-single-node`: MonetDB (MPL 2.0), the original column store (vectorized execution lineage of DuckDB); same queries as the DuckDB example.
 
 ## Lakehouse and object storage
 
@@ -142,6 +199,9 @@ Fastest in class, free, runnable locally (see the sections below for the example
 - [ ] `memcached-extstore`: pure-cache latency baseline; extstore for large values on flash.
 - [ ] Comparison example: same workload (GET/SET, pipelines, large values, persistence on) across Valkey, Redis 8, Dragonfly, Garnet, KeyDB, Kvrocks, Pika, Tarantool, ocache and Memcached.
 - [ ] `etcd-docker-compose-cluster`: Raft, watches, leases.
+- [ ] `ignite-docker-compose-cluster`: Apache Ignite 3 in-memory distributed SQL + KV with Raft-replicated partitions and colocated compute; compare with Hazelcast and Tarantool.
+- [ ] `infinispan-docker-compose-cluster`: Red Hat Infinispan (Apache 2.0) data grid; distributed caches, RESP endpoint, cross-site replication; same grid comparison.
+- [ ] `oxia-docker-compose-cluster`: StreamNative Oxia (Apache 2.0) sharded metadata store, ZooKeeper/etcd alternative; compare watches, sessions and write throughput with etcd.
 
 ## Graph and multi-model
 
@@ -150,6 +210,9 @@ Fastest in class, free, runnable locally (see the sections below for the example
 - [ ] `arcadedb-single-node`: Apache 2.0 multi-model.
 - [ ] `surrealdb-single-node`: SurrealDB 3.0 multi-model (document, graph, vector, time-series).
 - [ ] `dgraph-single-node`
+- [ ] `falkordb-single-node`: graph on sparse matrices (GraphBLAS) as a Redis-protocol module, OpenCypher; compare with Memgraph and Neo4j on the fraud workload.
+- [ ] `tigergraph-community`: free Community Edition (closed source, x86 only); parallel MPP graph, GSQL deep-link queries; same fraud workload.
+- [ ] `typedb-single-node`: TypeDB 3 (Rust, MPL 2.0) strongly typed graph with TypeQL and functions; same fraud workload modelled with types and relations.
 - [ ] `janusgraph-cassandra`
 
 ## Embedded and edge SQL
@@ -160,10 +223,11 @@ Fastest in class, free, runnable locally (see the sections below for the example
 - [ ] `lancedb-embedded`: embedded vector DB on Lance format.
 - [ ] `go-embedded-kv-comparison`: LMDB/libmdbx vs Badger vs Pebble vs bbolt; point reads, writes, range scans, write amplification.
 
-## Wide-column and sharding
+## Wide-column
 
 - [ ] `cassandra-docker-compose-cluster`: baseline to compare with ScyllaDB.
-- [ ] `vitess-docker-compose-cluster`: sharded MySQL with VSchema and resharding.
+- [ ] `hbase-docker-compose-cluster`: HBase on HDFS with ZooKeeper; region splits, compare with ScyllaDB/Cassandra on wide rows.
+- [ ] `kudu-impala`: Apache Kudu columnar storage with fast upserts, queried from Impala or Trino.
 
 ## Identity and access
 
