@@ -1,0 +1,13 @@
+/results/*
+!/results/.gitkeep
+!/results/20-million-row-mixed.md
+!/results/iceberg-comparison-20261109T152055Z-f9ef5b.json
+!/results/iceberg-benchmark-20261109T152055Z-f9ef5b-duckdb-iceberg.json
+!/results/iceberg-benchmark-20261109T152055Z-f9ef5b-clickhouse-iceberg.json
+!/results/iceberg-benchmark-20261109T152055Z-f9ef5b-clickhouse-native.json
+!/results/20-million-row-compaction.md
+!/results/iceberg-comparison-20261109T155304Z-c7422c.json
+!/results/iceberg-benchmark-20261109T155304Z-c7422c-duckdb-iceberg.json
+!/results/iceberg-benchmark-20261109T155304Z-c7422c-clickhouse-iceberg.json
+!/results/iceberg-benchmark-20261109T155304Z-c7422c-clickhouse-native.json
+__pycache__/

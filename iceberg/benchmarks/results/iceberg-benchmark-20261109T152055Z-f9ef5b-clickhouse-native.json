@@ -1,0 +1,653 @@
+{
+  "baseline_results": {
+    "full_scan": [
+      {
+        "amount": 999900000,
+        "n": 20000000,
+        "versions": 20000000
+      }
+    ],
+    "group_by": [
+      {
+        "amount": 31200000,
+        "n": 625000,
+        "region": 0
+      },
+      {
+        "amount": 31206250,
+        "n": 625000,
+        "region": 1
+      },
+      {
+        "amount": 31212500,
+        "n": 625000,
+        "region": 2
+      },
+      {
+        "amount": 31218750,
+        "n": 625000,
+        "region": 3
+      },
+      {
+        "amount": 31225000,
+        "n": 625000,
+        "region": 4
+      },
+      {
+        "amount": 31231250,
+        "n": 625000,
+        "region": 5
+      },
+      {
+        "amount": 31237500,
+        "n": 625000,
+        "region": 6
+      },
+      {
+        "amount": 31243750,
+        "n": 625000,
+        "region": 7
+      },
+      {
+        "amount": 31250000,
+        "n": 625000,
+        "region": 8
+      },
+      {
+        "amount": 31256250,
+        "n": 625000,
+        "region": 9
+      },
+      {
+        "amount": 31262500,
+        "n": 625000,
+        "region": 10
+      },
+      {
+        "amount": 31268750,
+        "n": 625000,
+        "region": 11
+      },
+      {
+        "amount": 31275000,
+        "n": 625000,
+        "region": 12
+      },
+      {
+        "amount": 31281250,
+        "n": 625000,
+        "region": 13
+      },
+      {
+        "amount": 31287500,
+        "n": 625000,
+        "region": 14
+      },
+      {
+        "amount": 31293750,
+        "n": 625000,
+        "region": 15
+      },
+      {
+        "amount": 31200000,
+        "n": 625000,
+        "region": 16
+      },
+      {
+        "amount": 31206250,
+        "n": 625000,
+        "region": 17
+      },
+      {
+        "amount": 31212500,
+        "n": 625000,
+        "region": 18
+      },
+      {
+        "amount": 31218750,
+        "n": 625000,
+        "region": 19
+      },
+      {
+        "amount": 31225000,
+        "n": 625000,
+        "region": 20
+      },
+      {
+        "amount": 31231250,
+        "n": 625000,
+        "region": 21
+      },
+      {
+        "amount": 31237500,
+        "n": 625000,
+        "region": 22
+      },
+      {
+        "amount": 31243750,
+        "n": 625000,
+        "region": 23
+      },
+      {
+        "amount": 31250000,
+        "n": 625000,
+        "region": 24
+      },
+      {
+        "amount": 31256250,
+        "n": 625000,
+        "region": 25
+      },
+      {
+        "amount": 31262500,
+        "n": 625000,
+        "region": 26
+      },
+      {
+        "amount": 31268750,
+        "n": 625000,
+        "region": 27
+      },
+      {
+        "amount": 31275000,
+        "n": 625000,
+        "region": 28
+      },
+      {
+        "amount": 31281250,
+        "n": 625000,
+        "region": 29
+      },
+      {
+        "amount": 31287500,
+        "n": 625000,
+        "region": 30
+      },
+      {
+        "amount": 31293750,
+        "n": 625000,
+        "region": 31
+      }
+    ],
+    "selective": [
+      {
+        "amount": 9999000,
+        "n": 200000
+      }
+    ]
+  },
+  "created_at_utc": "2026-11-09T15:22:09.209764792Z",
+  "final_results": {
+    "full_scan": [
+      {
+        "amount": 1010099000,
+        "n": 20200000,
+        "versions": 20400000
+      }
+    ],
+    "group_by": [
+      {
+        "amount": 30312000,
+        "n": 606250,
+        "region": 0
+      },
+      {
+        "amount": 31518312.5,
+        "n": 631250,
+        "region": 1
+      },
+      {
+        "amount": 31524625,
+        "n": 631250,
+        "region": 2
+      },
+      {
+        "amount": 32830937.5,
+        "n": 656250,
+        "region": 3
+      },
+      {
+        "amount": 30312250,
+        "n": 606250,
+        "region": 4
+      },
+      {
+        "amount": 31543562.5,
+        "n": 631250,
+        "region": 5
+      },
+      {
+        "amount": 31549875,
+        "n": 631250,
+        "region": 6
+      },
+      {
+        "amount": 32781187.5,
+        "n": 656250,
+        "region": 7
+      },
+      {
+        "amount": 30312500,
+        "n": 606250,
+        "region": 8
+      },
+      {
+        "amount": 31568812.5,
+        "n": 631250,
+        "region": 9
+      },
+      {
+        "amount": 31575125,
+        "n": 631250,
+        "region": 10
+      },
+      {
+        "amount": 32831437.5,
+        "n": 656250,
+        "region": 11
+      },
+      {
+        "amount": 30312750,
+        "n": 606250,
+        "region": 12
+      },
+      {
+        "amount": 31594062.5,
+        "n": 631250,
+        "region": 13
+      },
+      {
+        "amount": 31600375,
+        "n": 631250,
+        "region": 14
+      },
+      {
+        "amount": 32881687.5,
+        "n": 656250,
+        "region": 15
+      },
+      {
+        "amount": 30312000,
+        "n": 606250,
+        "region": 16
+      },
+      {
+        "amount": 31518312.5,
+        "n": 631250,
+        "region": 17
+      },
+      {
+        "amount": 31524625,
+        "n": 631250,
+        "region": 18
+      },
+      {
+        "amount": 32830937.5,
+        "n": 656250,
+        "region": 19
+      },
+      {
+        "amount": 30312250,
+        "n": 606250,
+        "region": 20
+      },
+      {
+        "amount": 31543562.5,
+        "n": 631250,
+        "region": 21
+      },
+      {
+        "amount": 31549875,
+        "n": 631250,
+        "region": 22
+      },
+      {
+        "amount": 32781187.5,
+        "n": 656250,
+        "region": 23
+      },
+      {
+        "amount": 30312500,
+        "n": 606250,
+        "region": 24
+      },
+      {
+        "amount": 31568812.5,
+        "n": 631250,
+        "region": 25
+      },
+      {
+        "amount": 31575125,
+        "n": 631250,
+        "region": 26
+      },
+      {
+        "amount": 32831437.5,
+        "n": 656250,
+        "region": 27
+      },
+      {
+        "amount": 30312750,
+        "n": 606250,
+        "region": 28
+      },
+      {
+        "amount": 31594062.5,
+        "n": 631250,
+        "region": 29
+      },
+      {
+        "amount": 31600375,
+        "n": 631250,
+        "region": 30
+      },
+      {
+        "amount": 32881687.5,
+        "n": 656250,
+        "region": 31
+      }
+    ],
+    "selective": [
+      {
+        "amount": 10001000,
+        "n": 200000
+      }
+    ]
+  },
+  "initial_load_ms": 7425.698,
+  "machine": {
+    "arch": "arm64",
+    "cpu_count_visible": 11,
+    "go_version": "go1.26.10",
+    "os": "linux"
+  },
+  "parameters": {
+    "append_rows_per_batch": 200000,
+    "cpu_limit": 4,
+    "initial_rows": 20000000,
+    "memory_limit": "6g",
+    "read_runs": 5,
+    "update_fraction_per_batch": 0.01,
+    "update_rows_per_batch": 200000,
+    "write_batches": 1
+  },
+  "profile": "mixed",
+  "reads": [
+    {
+      "client_wall_ms": 25.684,
+      "phase": "baseline",
+      "query": "full_scan",
+      "run": 1,
+      "system": "clickhouse-native"
+    },
+    {
+      "client_wall_ms": 25.204,
+      "phase": "baseline",
+      "query": "full_scan",
+      "run": 2,
+      "system": "clickhouse-native"
+    },
+    {
+      "client_wall_ms": 36.001,
+      "phase": "baseline",
+      "query": "full_scan",
+      "run": 3,
+      "system": "clickhouse-native"
+    },
+    {
+      "client_wall_ms": 24.569,
+      "phase": "baseline",
+      "query": "full_scan",
+      "run": 4,
+      "system": "clickhouse-native"
+    },
+    {
+      "client_wall_ms": 25.662,
+      "phase": "baseline",
+      "query": "full_scan",
+      "run": 5,
+      "system": "clickhouse-native"
+    },
+    {
+      "median_client_wall_ms": 25.662,
+      "p95_client_wall_ms": 36.001,
+      "phase": "baseline",
+      "query": "full_scan",
+      "system": "clickhouse-native"
+    },
+    {
+      "client_wall_ms": 36.233,
+      "phase": "baseline",
+      "query": "group_by",
+      "run": 1,
+      "system": "clickhouse-native"
+    },
+    {
+      "client_wall_ms": 30.805,
+      "phase": "baseline",
+      "query": "group_by",
+      "run": 2,
+      "system": "clickhouse-native"
+    },
+    {
+      "client_wall_ms": 33.615,
+      "phase": "baseline",
+      "query": "group_by",
+      "run": 3,
+      "system": "clickhouse-native"
+    },
+    {
+      "client_wall_ms": 24.509,
+      "phase": "baseline",
+      "query": "group_by",
+      "run": 4,
+      "system": "clickhouse-native"
+    },
+    {
+      "client_wall_ms": 23.1,
+      "phase": "baseline",
+      "query": "group_by",
+      "run": 5,
+      "system": "clickhouse-native"
+    },
+    {
+      "median_client_wall_ms": 30.805,
+      "p95_client_wall_ms": 36.233,
+      "phase": "baseline",
+      "query": "group_by",
+      "system": "clickhouse-native"
+    },
+    {
+      "client_wall_ms": 2.891,
+      "phase": "baseline",
+      "query": "selective",
+      "run": 1,
+      "system": "clickhouse-native"
+    },
+    {
+      "client_wall_ms": 2.436,
+      "phase": "baseline",
+      "query": "selective",
+      "run": 2,
+      "system": "clickhouse-native"
+    },
+    {
+      "client_wall_ms": 2.365,
+      "phase": "baseline",
+      "query": "selective",
+      "run": 3,
+      "system": "clickhouse-native"
+    },
+    {
+      "client_wall_ms": 2.251,
+      "phase": "baseline",
+      "query": "selective",
+      "run": 4,
+      "system": "clickhouse-native"
+    },
+    {
+      "client_wall_ms": 2.195,
+      "phase": "baseline",
+      "query": "selective",
+      "run": 5,
+      "system": "clickhouse-native"
+    },
+    {
+      "median_client_wall_ms": 2.365,
+      "p95_client_wall_ms": 2.891,
+      "phase": "baseline",
+      "query": "selective",
+      "system": "clickhouse-native"
+    },
+    {
+      "client_wall_ms": 145.771,
+      "phase": "final",
+      "query": "full_scan",
+      "run": 1,
+      "system": "clickhouse-native"
+    },
+    {
+      "client_wall_ms": 145.555,
+      "phase": "final",
+      "query": "full_scan",
+      "run": 2,
+      "system": "clickhouse-native"
+    },
+    {
+      "client_wall_ms": 147.783,
+      "phase": "final",
+      "query": "full_scan",
+      "run": 3,
+      "system": "clickhouse-native"
+    },
+    {
+      "client_wall_ms": 137.468,
+      "phase": "final",
+      "query": "full_scan",
+      "run": 4,
+      "system": "clickhouse-native"
+    },
+    {
+      "client_wall_ms": 135.545,
+      "phase": "final",
+      "query": "full_scan",
+      "run": 5,
+      "system": "clickhouse-native"
+    },
+    {
+      "median_client_wall_ms": 145.555,
+      "p95_client_wall_ms": 147.783,
+      "phase": "final",
+      "query": "full_scan",
+      "system": "clickhouse-native"
+    },
+    {
+      "client_wall_ms": 146.596,
+      "phase": "final",
+      "query": "group_by",
+      "run": 1,
+      "system": "clickhouse-native"
+    },
+    {
+      "client_wall_ms": 147.497,
+      "phase": "final",
+      "query": "group_by",
+      "run": 2,
+      "system": "clickhouse-native"
+    },
+    {
+      "client_wall_ms": 149.226,
+      "phase": "final",
+      "query": "group_by",
+      "run": 3,
+      "system": "clickhouse-native"
+    },
+    {
+      "client_wall_ms": 143.73,
+      "phase": "final",
+      "query": "group_by",
+      "run": 4,
+      "system": "clickhouse-native"
+    },
+    {
+      "client_wall_ms": 145.881,
+      "phase": "final",
+      "query": "group_by",
+      "run": 5,
+      "system": "clickhouse-native"
+    },
+    {
+      "median_client_wall_ms": 146.596,
+      "p95_client_wall_ms": 149.226,
+      "phase": "final",
+      "query": "group_by",
+      "system": "clickhouse-native"
+    },
+    {
+      "client_wall_ms": 4.803,
+      "phase": "final",
+      "query": "selective",
+      "run": 1,
+      "system": "clickhouse-native"
+    },
+    {
+      "client_wall_ms": 4.913,
+      "phase": "final",
+      "query": "selective",
+      "run": 2,
+      "system": "clickhouse-native"
+    },
+    {
+      "client_wall_ms": 4.462,
+      "phase": "final",
+      "query": "selective",
+      "run": 3,
+      "system": "clickhouse-native"
+    },
+    {
+      "client_wall_ms": 4.792,
+      "phase": "final",
+      "query": "selective",
+      "run": 4,
+      "system": "clickhouse-native"
+    },
+    {
+      "client_wall_ms": 5.3,
+      "phase": "final",
+      "query": "selective",
+      "run": 5,
+      "system": "clickhouse-native"
+    },
+    {
+      "median_client_wall_ms": 4.803,
+      "p95_client_wall_ms": 5.3,
+      "phase": "final",
+      "query": "selective",
+      "system": "clickhouse-native"
+    }
+  ],
+  "run_id": "20261109T152055Z-f9ef5b",
+  "system": "clickhouse-native",
+  "versions": {
+    "clickhouse": "26.10.2.103",
+    "duckdb": "v1.5.5"
+  },
+  "write_timings": {
+    "append_batch_ms": {
+      "count": 1,
+      "max_ms": 138.77,
+      "median_ms": 138.77,
+      "min_ms": 138.77,
+      "p95_ms": 138.77
+    },
+    "append_rows_per_second": 1441233.6960438134,
+    "update_batch_ms": {
+      "count": 1,
+      "max_ms": 125.277,
+      "median_ms": 125.277,
+      "min_ms": 125.277,
+      "p95_ms": 125.277
+    },
+    "update_rows_per_second": 1596462.239676876
+  }
+}

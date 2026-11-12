@@ -1,0 +1,8 @@
+name: iceberg-bench
+
+# Each benchmark subsystem owns its services and Compose file. This root file
+# composes them into one project so Make can control profiles consistently.
+include:
+  - path: ./duckdb-iceberg/compose.yml
+  - path: ./clickhouse-iceberg/compose.yml
+  - path: ./clickhouse-native/compose.yml

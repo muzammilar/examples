@@ -1,0 +1,959 @@
+{
+  "baseline_results": {
+    "full_scan": [
+      {
+        "amount": 999900000,
+        "n": 20000000,
+        "versions": 20000000
+      }
+    ],
+    "group_by": [
+      {
+        "amount": 31200000,
+        "n": 625000,
+        "region": 0
+      },
+      {
+        "amount": 31206250,
+        "n": 625000,
+        "region": 1
+      },
+      {
+        "amount": 31212500,
+        "n": 625000,
+        "region": 2
+      },
+      {
+        "amount": 31218750,
+        "n": 625000,
+        "region": 3
+      },
+      {
+        "amount": 31225000,
+        "n": 625000,
+        "region": 4
+      },
+      {
+        "amount": 31231250,
+        "n": 625000,
+        "region": 5
+      },
+      {
+        "amount": 31237500,
+        "n": 625000,
+        "region": 6
+      },
+      {
+        "amount": 31243750,
+        "n": 625000,
+        "region": 7
+      },
+      {
+        "amount": 31250000,
+        "n": 625000,
+        "region": 8
+      },
+      {
+        "amount": 31256250,
+        "n": 625000,
+        "region": 9
+      },
+      {
+        "amount": 31262500,
+        "n": 625000,
+        "region": 10
+      },
+      {
+        "amount": 31268750,
+        "n": 625000,
+        "region": 11
+      },
+      {
+        "amount": 31275000,
+        "n": 625000,
+        "region": 12
+      },
+      {
+        "amount": 31281250,
+        "n": 625000,
+        "region": 13
+      },
+      {
+        "amount": 31287500,
+        "n": 625000,
+        "region": 14
+      },
+      {
+        "amount": 31293750,
+        "n": 625000,
+        "region": 15
+      },
+      {
+        "amount": 31200000,
+        "n": 625000,
+        "region": 16
+      },
+      {
+        "amount": 31206250,
+        "n": 625000,
+        "region": 17
+      },
+      {
+        "amount": 31212500,
+        "n": 625000,
+        "region": 18
+      },
+      {
+        "amount": 31218750,
+        "n": 625000,
+        "region": 19
+      },
+      {
+        "amount": 31225000,
+        "n": 625000,
+        "region": 20
+      },
+      {
+        "amount": 31231250,
+        "n": 625000,
+        "region": 21
+      },
+      {
+        "amount": 31237500,
+        "n": 625000,
+        "region": 22
+      },
+      {
+        "amount": 31243750,
+        "n": 625000,
+        "region": 23
+      },
+      {
+        "amount": 31250000,
+        "n": 625000,
+        "region": 24
+      },
+      {
+        "amount": 31256250,
+        "n": 625000,
+        "region": 25
+      },
+      {
+        "amount": 31262500,
+        "n": 625000,
+        "region": 26
+      },
+      {
+        "amount": 31268750,
+        "n": 625000,
+        "region": 27
+      },
+      {
+        "amount": 31275000,
+        "n": 625000,
+        "region": 28
+      },
+      {
+        "amount": 31281250,
+        "n": 625000,
+        "region": 29
+      },
+      {
+        "amount": 31287500,
+        "n": 625000,
+        "region": 30
+      },
+      {
+        "amount": 31293750,
+        "n": 625000,
+        "region": 31
+      }
+    ],
+    "selective": [
+      {
+        "amount": 9999000,
+        "n": 200000
+      }
+    ]
+  },
+  "compaction": {
+    "reason": "iceberg_rewrite_data_files is not present in the pinned DuckDB Iceberg extension",
+    "status": "unavailable"
+  },
+  "created_at_utc": "2026-11-09T15:53:27.595066172Z",
+  "final_results": {
+    "full_scan": [
+      {
+        "amount": 1000419950,
+        "n": 20010000,
+        "versions": 20030000
+      }
+    ],
+    "group_by": [
+      {
+        "amount": 31215624.96,
+        "n": 624313,
+        "region": 0
+      },
+      {
+        "amount": 31221878.09,
+        "n": 625313,
+        "region": 1
+      },
+      {
+        "amount": 31228131.22,
+        "n": 625313,
+        "region": 2
+      },
+      {
+        "amount": 31234384.35,
+        "n": 625313,
+        "region": 3
+      },
+      {
+        "amount": 31240637.48,
+        "n": 625313,
+        "region": 4
+      },
+      {
+        "amount": 31246890.61,
+        "n": 625313,
+        "region": 5
+      },
+      {
+        "amount": 31253143.74,
+        "n": 625313,
+        "region": 6
+      },
+      {
+        "amount": 31269396.87,
+        "n": 626313,
+        "region": 7
+      },
+      {
+        "amount": 31265650,
+        "n": 625313,
+        "region": 8
+      },
+      {
+        "amount": 31271903.13,
+        "n": 625313,
+        "region": 9
+      },
+      {
+        "amount": 31278156.26,
+        "n": 625313,
+        "region": 10
+      },
+      {
+        "amount": 31284409.39,
+        "n": 625313,
+        "region": 11
+      },
+      {
+        "amount": 31290662.52,
+        "n": 625313,
+        "region": 12
+      },
+      {
+        "amount": 31296915.65,
+        "n": 625313,
+        "region": 13
+      },
+      {
+        "amount": 31303168.78,
+        "n": 625313,
+        "region": 14
+      },
+      {
+        "amount": 31309421.91,
+        "n": 625313,
+        "region": 15
+      },
+      {
+        "amount": 31215575.04,
+        "n": 624312,
+        "region": 16
+      },
+      {
+        "amount": 31221828.16,
+        "n": 625312,
+        "region": 17
+      },
+      {
+        "amount": 31228081.28,
+        "n": 625312,
+        "region": 18
+      },
+      {
+        "amount": 31234334.4,
+        "n": 625312,
+        "region": 19
+      },
+      {
+        "amount": 31240587.52,
+        "n": 625312,
+        "region": 20
+      },
+      {
+        "amount": 31246840.64,
+        "n": 625312,
+        "region": 21
+      },
+      {
+        "amount": 31253093.76,
+        "n": 625312,
+        "region": 22
+      },
+      {
+        "amount": 31269346.88,
+        "n": 626312,
+        "region": 23
+      },
+      {
+        "amount": 31265600,
+        "n": 625312,
+        "region": 24
+      },
+      {
+        "amount": 31271853.12,
+        "n": 625312,
+        "region": 25
+      },
+      {
+        "amount": 31278106.24,
+        "n": 625312,
+        "region": 26
+      },
+      {
+        "amount": 31284359.36,
+        "n": 625312,
+        "region": 27
+      },
+      {
+        "amount": 31290612.48,
+        "n": 625312,
+        "region": 28
+      },
+      {
+        "amount": 31296865.6,
+        "n": 625312,
+        "region": 29
+      },
+      {
+        "amount": 31303118.72,
+        "n": 625312,
+        "region": 30
+      },
+      {
+        "amount": 31309371.84,
+        "n": 625312,
+        "region": 31
+      }
+    ],
+    "selective": [
+      {
+        "amount": 9999200,
+        "n": 200000
+      }
+    ]
+  },
+  "initial_load_ms": 362.553,
+  "machine": {
+    "arch": "arm64",
+    "cpu_count_visible": 11,
+    "go_version": "go1.26.10",
+    "os": "linux"
+  },
+  "parameters": {
+    "append_rows_per_batch": 1000,
+    "cpu_limit": 4,
+    "initial_rows": 20000000,
+    "memory_limit": "6g",
+    "read_runs": 5,
+    "update_fraction_per_batch": 0.0001,
+    "update_rows_per_batch": 2000,
+    "write_batches": 10
+  },
+  "post_compaction_results": {
+    "full_scan": [
+      {
+        "amount": 1000419950,
+        "n": 20010000,
+        "versions": 20030000
+      }
+    ],
+    "group_by": [
+      {
+        "amount": 31215624.96,
+        "n": 624313,
+        "region": 0
+      },
+      {
+        "amount": 31221878.09,
+        "n": 625313,
+        "region": 1
+      },
+      {
+        "amount": 31228131.22,
+        "n": 625313,
+        "region": 2
+      },
+      {
+        "amount": 31234384.35,
+        "n": 625313,
+        "region": 3
+      },
+      {
+        "amount": 31240637.48,
+        "n": 625313,
+        "region": 4
+      },
+      {
+        "amount": 31246890.61,
+        "n": 625313,
+        "region": 5
+      },
+      {
+        "amount": 31253143.74,
+        "n": 625313,
+        "region": 6
+      },
+      {
+        "amount": 31269396.87,
+        "n": 626313,
+        "region": 7
+      },
+      {
+        "amount": 31265650,
+        "n": 625313,
+        "region": 8
+      },
+      {
+        "amount": 31271903.13,
+        "n": 625313,
+        "region": 9
+      },
+      {
+        "amount": 31278156.26,
+        "n": 625313,
+        "region": 10
+      },
+      {
+        "amount": 31284409.39,
+        "n": 625313,
+        "region": 11
+      },
+      {
+        "amount": 31290662.52,
+        "n": 625313,
+        "region": 12
+      },
+      {
+        "amount": 31296915.65,
+        "n": 625313,
+        "region": 13
+      },
+      {
+        "amount": 31303168.78,
+        "n": 625313,
+        "region": 14
+      },
+      {
+        "amount": 31309421.91,
+        "n": 625313,
+        "region": 15
+      },
+      {
+        "amount": 31215575.04,
+        "n": 624312,
+        "region": 16
+      },
+      {
+        "amount": 31221828.16,
+        "n": 625312,
+        "region": 17
+      },
+      {
+        "amount": 31228081.28,
+        "n": 625312,
+        "region": 18
+      },
+      {
+        "amount": 31234334.4,
+        "n": 625312,
+        "region": 19
+      },
+      {
+        "amount": 31240587.52,
+        "n": 625312,
+        "region": 20
+      },
+      {
+        "amount": 31246840.64,
+        "n": 625312,
+        "region": 21
+      },
+      {
+        "amount": 31253093.76,
+        "n": 625312,
+        "region": 22
+      },
+      {
+        "amount": 31269346.88,
+        "n": 626312,
+        "region": 23
+      },
+      {
+        "amount": 31265600,
+        "n": 625312,
+        "region": 24
+      },
+      {
+        "amount": 31271853.12,
+        "n": 625312,
+        "region": 25
+      },
+      {
+        "amount": 31278106.24,
+        "n": 625312,
+        "region": 26
+      },
+      {
+        "amount": 31284359.36,
+        "n": 625312,
+        "region": 27
+      },
+      {
+        "amount": 31290612.48,
+        "n": 625312,
+        "region": 28
+      },
+      {
+        "amount": 31296865.6,
+        "n": 625312,
+        "region": 29
+      },
+      {
+        "amount": 31303118.72,
+        "n": 625312,
+        "region": 30
+      },
+      {
+        "amount": 31309371.84,
+        "n": 625312,
+        "region": 31
+      }
+    ],
+    "selective": [
+      {
+        "amount": 9999200,
+        "n": 200000
+      }
+    ]
+  },
+  "profile": "mixed",
+  "reads": [
+    {
+      "client_wall_ms": 22.319,
+      "phase": "baseline",
+      "query": "full_scan",
+      "run": 1,
+      "system": "duckdb-iceberg"
+    },
+    {
+      "client_wall_ms": 22.359,
+      "phase": "baseline",
+      "query": "full_scan",
+      "run": 2,
+      "system": "duckdb-iceberg"
+    },
+    {
+      "client_wall_ms": 24.825,
+      "phase": "baseline",
+      "query": "full_scan",
+      "run": 3,
+      "system": "duckdb-iceberg"
+    },
+    {
+      "client_wall_ms": 21.242,
+      "phase": "baseline",
+      "query": "full_scan",
+      "run": 4,
+      "system": "duckdb-iceberg"
+    },
+    {
+      "client_wall_ms": 21.666,
+      "phase": "baseline",
+      "query": "full_scan",
+      "run": 5,
+      "system": "duckdb-iceberg"
+    },
+    {
+      "median_client_wall_ms": 22.319,
+      "p95_client_wall_ms": 24.825,
+      "phase": "baseline",
+      "query": "full_scan",
+      "system": "duckdb-iceberg"
+    },
+    {
+      "client_wall_ms": 26.399,
+      "phase": "baseline",
+      "query": "group_by",
+      "run": 1,
+      "system": "duckdb-iceberg"
+    },
+    {
+      "client_wall_ms": 26.308,
+      "phase": "baseline",
+      "query": "group_by",
+      "run": 2,
+      "system": "duckdb-iceberg"
+    },
+    {
+      "client_wall_ms": 25.806,
+      "phase": "baseline",
+      "query": "group_by",
+      "run": 3,
+      "system": "duckdb-iceberg"
+    },
+    {
+      "client_wall_ms": 24.981,
+      "phase": "baseline",
+      "query": "group_by",
+      "run": 4,
+      "system": "duckdb-iceberg"
+    },
+    {
+      "client_wall_ms": 28.909,
+      "phase": "baseline",
+      "query": "group_by",
+      "run": 5,
+      "system": "duckdb-iceberg"
+    },
+    {
+      "median_client_wall_ms": 26.308,
+      "p95_client_wall_ms": 28.909,
+      "phase": "baseline",
+      "query": "group_by",
+      "system": "duckdb-iceberg"
+    },
+    {
+      "client_wall_ms": 6.905,
+      "phase": "baseline",
+      "query": "selective",
+      "run": 1,
+      "system": "duckdb-iceberg"
+    },
+    {
+      "client_wall_ms": 7.818,
+      "phase": "baseline",
+      "query": "selective",
+      "run": 2,
+      "system": "duckdb-iceberg"
+    },
+    {
+      "client_wall_ms": 7.237,
+      "phase": "baseline",
+      "query": "selective",
+      "run": 3,
+      "system": "duckdb-iceberg"
+    },
+    {
+      "client_wall_ms": 5.842,
+      "phase": "baseline",
+      "query": "selective",
+      "run": 4,
+      "system": "duckdb-iceberg"
+    },
+    {
+      "client_wall_ms": 7.431,
+      "phase": "baseline",
+      "query": "selective",
+      "run": 5,
+      "system": "duckdb-iceberg"
+    },
+    {
+      "median_client_wall_ms": 7.237,
+      "p95_client_wall_ms": 7.818,
+      "phase": "baseline",
+      "query": "selective",
+      "system": "duckdb-iceberg"
+    },
+    {
+      "client_wall_ms": 31.908,
+      "phase": "final",
+      "query": "full_scan",
+      "run": 1,
+      "system": "duckdb-iceberg"
+    },
+    {
+      "client_wall_ms": 32.498,
+      "phase": "final",
+      "query": "full_scan",
+      "run": 2,
+      "system": "duckdb-iceberg"
+    },
+    {
+      "client_wall_ms": 33.11,
+      "phase": "final",
+      "query": "full_scan",
+      "run": 3,
+      "system": "duckdb-iceberg"
+    },
+    {
+      "client_wall_ms": 32.17,
+      "phase": "final",
+      "query": "full_scan",
+      "run": 4,
+      "system": "duckdb-iceberg"
+    },
+    {
+      "client_wall_ms": 33.249,
+      "phase": "final",
+      "query": "full_scan",
+      "run": 5,
+      "system": "duckdb-iceberg"
+    },
+    {
+      "median_client_wall_ms": 32.498,
+      "p95_client_wall_ms": 33.249,
+      "phase": "final",
+      "query": "full_scan",
+      "system": "duckdb-iceberg"
+    },
+    {
+      "client_wall_ms": 39.317,
+      "phase": "final",
+      "query": "group_by",
+      "run": 1,
+      "system": "duckdb-iceberg"
+    },
+    {
+      "client_wall_ms": 38.607,
+      "phase": "final",
+      "query": "group_by",
+      "run": 2,
+      "system": "duckdb-iceberg"
+    },
+    {
+      "client_wall_ms": 36.559,
+      "phase": "final",
+      "query": "group_by",
+      "run": 3,
+      "system": "duckdb-iceberg"
+    },
+    {
+      "client_wall_ms": 37.612,
+      "phase": "final",
+      "query": "group_by",
+      "run": 4,
+      "system": "duckdb-iceberg"
+    },
+    {
+      "client_wall_ms": 36.187,
+      "phase": "final",
+      "query": "group_by",
+      "run": 5,
+      "system": "duckdb-iceberg"
+    },
+    {
+      "median_client_wall_ms": 37.612,
+      "p95_client_wall_ms": 39.317,
+      "phase": "final",
+      "query": "group_by",
+      "system": "duckdb-iceberg"
+    },
+    {
+      "client_wall_ms": 13.179,
+      "phase": "final",
+      "query": "selective",
+      "run": 1,
+      "system": "duckdb-iceberg"
+    },
+    {
+      "client_wall_ms": 11.166,
+      "phase": "final",
+      "query": "selective",
+      "run": 2,
+      "system": "duckdb-iceberg"
+    },
+    {
+      "client_wall_ms": 12.105,
+      "phase": "final",
+      "query": "selective",
+      "run": 3,
+      "system": "duckdb-iceberg"
+    },
+    {
+      "client_wall_ms": 11.643,
+      "phase": "final",
+      "query": "selective",
+      "run": 4,
+      "system": "duckdb-iceberg"
+    },
+    {
+      "client_wall_ms": 11.973,
+      "phase": "final",
+      "query": "selective",
+      "run": 5,
+      "system": "duckdb-iceberg"
+    },
+    {
+      "median_client_wall_ms": 11.973,
+      "p95_client_wall_ms": 13.179,
+      "phase": "final",
+      "query": "selective",
+      "system": "duckdb-iceberg"
+    },
+    {
+      "client_wall_ms": 31.363,
+      "phase": "post_compaction",
+      "query": "full_scan",
+      "run": 1,
+      "system": "duckdb-iceberg"
+    },
+    {
+      "client_wall_ms": 32.137,
+      "phase": "post_compaction",
+      "query": "full_scan",
+      "run": 2,
+      "system": "duckdb-iceberg"
+    },
+    {
+      "client_wall_ms": 32.565,
+      "phase": "post_compaction",
+      "query": "full_scan",
+      "run": 3,
+      "system": "duckdb-iceberg"
+    },
+    {
+      "client_wall_ms": 31.438,
+      "phase": "post_compaction",
+      "query": "full_scan",
+      "run": 4,
+      "system": "duckdb-iceberg"
+    },
+    {
+      "client_wall_ms": 32.304,
+      "phase": "post_compaction",
+      "query": "full_scan",
+      "run": 5,
+      "system": "duckdb-iceberg"
+    },
+    {
+      "median_client_wall_ms": 32.137,
+      "p95_client_wall_ms": 32.565,
+      "phase": "post_compaction",
+      "query": "full_scan",
+      "system": "duckdb-iceberg"
+    },
+    {
+      "client_wall_ms": 36.585,
+      "phase": "post_compaction",
+      "query": "group_by",
+      "run": 1,
+      "system": "duckdb-iceberg"
+    },
+    {
+      "client_wall_ms": 36.056,
+      "phase": "post_compaction",
+      "query": "group_by",
+      "run": 2,
+      "system": "duckdb-iceberg"
+    },
+    {
+      "client_wall_ms": 37.797,
+      "phase": "post_compaction",
+      "query": "group_by",
+      "run": 3,
+      "system": "duckdb-iceberg"
+    },
+    {
+      "client_wall_ms": 37.207,
+      "phase": "post_compaction",
+      "query": "group_by",
+      "run": 4,
+      "system": "duckdb-iceberg"
+    },
+    {
+      "client_wall_ms": 34.979,
+      "phase": "post_compaction",
+      "query": "group_by",
+      "run": 5,
+      "system": "duckdb-iceberg"
+    },
+    {
+      "median_client_wall_ms": 36.585,
+      "p95_client_wall_ms": 37.797,
+      "phase": "post_compaction",
+      "query": "group_by",
+      "system": "duckdb-iceberg"
+    },
+    {
+      "client_wall_ms": 13.233,
+      "phase": "post_compaction",
+      "query": "selective",
+      "run": 1,
+      "system": "duckdb-iceberg"
+    },
+    {
+      "client_wall_ms": 11.222,
+      "phase": "post_compaction",
+      "query": "selective",
+      "run": 2,
+      "system": "duckdb-iceberg"
+    },
+    {
+      "client_wall_ms": 12.259,
+      "phase": "post_compaction",
+      "query": "selective",
+      "run": 3,
+      "system": "duckdb-iceberg"
+    },
+    {
+      "client_wall_ms": 11.979,
+      "phase": "post_compaction",
+      "query": "selective",
+      "run": 4,
+      "system": "duckdb-iceberg"
+    },
+    {
+      "client_wall_ms": 12.069,
+      "phase": "post_compaction",
+      "query": "selective",
+      "run": 5,
+      "system": "duckdb-iceberg"
+    },
+    {
+      "median_client_wall_ms": 12.069,
+      "p95_client_wall_ms": 13.233,
+      "phase": "post_compaction",
+      "query": "selective",
+      "system": "duckdb-iceberg"
+    }
+  ],
+  "run_id": "20261109T155304Z-c7422c",
+  "system": "duckdb-iceberg",
+  "versions": {
+    "duckdb": "v1.5.5"
+  },
+  "write_timings": {
+    "append_batch_ms": {
+      "count": 10,
+      "max_ms": 47.83,
+      "median_ms": 15.032,
+      "min_ms": 13.218,
+      "p95_ms": 47.83
+    },
+    "append_rows_per_second": 54533.06066802998,
+    "update_batch_ms": {
+      "count": 10,
+      "max_ms": 94.534,
+      "median_ms": 89.264,
+      "min_ms": 84.642,
+      "p95_ms": 94.534
+    },
+    "update_rows_per_second": 22347.492332016693
+  }
+}
