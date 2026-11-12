@@ -1,0 +1,48 @@
+services:
+  clickhouse-native:
+    image: clickhouse/clickhouse-server:${CLICKHOUSE_VERSION:-26.10.2.103}
+    profiles: [clickhouse-native]
+    environment:
+      CLICKHOUSE_USER: default
+      CLICKHOUSE_PASSWORD: bench
+      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: 1
+    cpus: ${BENCH_CPUS:-4}
+    mem_limit: ${BENCH_MEM:-6g}
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    volumes:
+      - ch-native-data:/var/lib/clickhouse
+    healthcheck:
+      test: ["CMD", "clickhouse-client", "--query", "SELECT 1"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+
+  bench-clickhouse-native:
+    image: iceberg-bench-runner:local
+    build:
+      context: ..
+      args:
+        DUCKDB_VERSION: ${DUCKDB_VERSION:-1.5.5}
+    profiles: [clickhouse-native]
+    cpus: ${BENCH_CPUS:-4}
+    mem_limit: ${BENCH_MEM:-6g}
+    environment:
+      HOME: /tmp
+      BENCH_CPUS: ${BENCH_CPUS:-4}
+      BENCH_MEM: ${BENCH_MEM:-6g}
+      CLICKHOUSE_ADDR: clickhouse-native:9000
+    volumes:
+      - inputs:/bench-data
+      - ../results:/results
+    depends_on:
+      clickhouse-native:
+        condition: service_healthy
+
+volumes:
+  ch-native-data:
+    name: iceberg-bench-ch-native-data
+  inputs:
+    name: iceberg-bench-inputs

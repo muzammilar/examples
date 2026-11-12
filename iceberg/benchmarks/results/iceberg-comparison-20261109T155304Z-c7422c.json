@@ -1,0 +1,130 @@
+{
+  "run_id": "20261109T155304Z-c7422c",
+  "profile": "mixed",
+  "parameters": {
+    "append_rows_per_batch": 1000,
+    "cpu_limit": 4,
+    "initial_rows": 20000000,
+    "memory_limit": "6g",
+    "read_runs": 5,
+    "update_fraction_per_batch": 0.0001,
+    "update_rows_per_batch": 2000,
+    "write_batches": 10
+  },
+  "correctness": "all systems returned identical baseline, final, and post-compaction query results",
+  "systems": {
+    "clickhouse-iceberg": {
+      "versions": {
+        "clickhouse": "26.10.2.103",
+        "duckdb": "v1.5.5"
+      },
+      "initial_load_ms": 5162.834,
+      "write_timings": {
+        "append_batch_ms": {
+          "count": 10,
+          "max_ms": 71.499,
+          "median_ms": 66.978,
+          "min_ms": 57.049,
+          "p95_ms": 71.499
+        },
+        "append_rows_per_second": 15260.279324152747,
+        "update_batch_ms": {
+          "count": 10,
+          "max_ms": 207.351,
+          "median_ms": 189.548,
+          "min_ms": 178.021,
+          "p95_ms": 207.351
+        },
+        "update_rows_per_second": 10385.68810636191
+      },
+      "compaction": {
+        "operations": [
+          {
+            "elapsed_ms": 5225.16,
+            "name": "apply_position_deletes"
+          },
+          {
+            "elapsed_ms": 1.149,
+            "name": "rewrite_manifests"
+          }
+        ]
+      },
+      "post_compaction_read_median_ms": {
+        "full_scan": 53.7,
+        "group_by": 103.477,
+        "selective": 7.011
+      }
+    },
+    "clickhouse-native": {
+      "versions": {
+        "clickhouse": "26.10.2.103",
+        "duckdb": "v1.5.5"
+      },
+      "initial_load_ms": 6235.889,
+      "write_timings": {
+        "append_batch_ms": {
+          "count": 10,
+          "max_ms": 65.034,
+          "median_ms": 58.344,
+          "min_ms": 56.985,
+          "p95_ms": 65.034
+        },
+        "append_rows_per_second": 16355.342718028982,
+        "update_batch_ms": {
+          "count": 10,
+          "max_ms": 70.131,
+          "median_ms": 68.46,
+          "min_ms": 64.159,
+          "p95_ms": 70.131
+        },
+        "update_rows_per_second": 29484.26130131736
+      },
+      "compaction": {
+        "operations": [
+          {
+            "elapsed_ms": 1450.798,
+            "name": "merge_parts_and_deduplicate"
+          }
+        ]
+      },
+      "post_compaction_read_median_ms": {
+        "full_scan": 39.231,
+        "group_by": 44.807,
+        "selective": 2.743
+      }
+    },
+    "duckdb-iceberg": {
+      "versions": {
+        "duckdb": "v1.5.5"
+      },
+      "initial_load_ms": 362.553,
+      "write_timings": {
+        "append_batch_ms": {
+          "count": 10,
+          "max_ms": 47.83,
+          "median_ms": 15.032,
+          "min_ms": 13.218,
+          "p95_ms": 47.83
+        },
+        "append_rows_per_second": 54533.06066802998,
+        "update_batch_ms": {
+          "count": 10,
+          "max_ms": 94.534,
+          "median_ms": 89.264,
+          "min_ms": 84.642,
+          "p95_ms": 94.534
+        },
+        "update_rows_per_second": 22347.492332016693
+      },
+      "compaction": {
+        "reason": "iceberg_rewrite_data_files is not present in the pinned DuckDB Iceberg extension",
+        "status": "unavailable"
+      },
+      "post_compaction_read_median_ms": {
+        "full_scan": 32.137,
+        "group_by": 36.585,
+        "selective": 12.069
+      }
+    }
+  }
+}

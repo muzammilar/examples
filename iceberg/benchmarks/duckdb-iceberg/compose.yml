@@ -1,0 +1,35 @@
+services:
+  rest:
+    image: apache/iceberg-rest-fixture:1.10.1
+    profiles: [duckdb-iceberg]
+    environment:
+      CATALOG_WAREHOUSE: /data/lake
+    volumes:
+      - warehouse:/data/lake
+
+  bench-duckdb-iceberg:
+    image: iceberg-bench-runner:local
+    build:
+      context: ..
+      args:
+        DUCKDB_VERSION: ${DUCKDB_VERSION:-1.5.5}
+    profiles: [duckdb-iceberg]
+    cpus: ${BENCH_CPUS:-4}
+    mem_limit: ${BENCH_MEM:-6g}
+    environment:
+      HOME: /tmp
+      BENCH_CPUS: ${BENCH_CPUS:-4}
+      BENCH_MEM: ${BENCH_MEM:-6g}
+      ICEBERG_REST_URL: http://rest:8181
+    volumes:
+      - warehouse:/data/lake
+      - inputs:/bench-data
+      - ../results:/results
+    depends_on:
+      - rest
+
+volumes:
+  warehouse:
+    name: iceberg-bench-warehouse
+  inputs:
+    name: iceberg-bench-inputs

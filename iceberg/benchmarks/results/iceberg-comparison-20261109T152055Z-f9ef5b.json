@@ -1,0 +1,106 @@
+{
+  "run_id": "20261109T152055Z-f9ef5b",
+  "profile": "mixed",
+  "parameters": {
+    "append_rows_per_batch": 200000,
+    "cpu_limit": 4,
+    "initial_rows": 20000000,
+    "memory_limit": "6g",
+    "read_runs": 5,
+    "update_fraction_per_batch": 0.01,
+    "update_rows_per_batch": 200000,
+    "write_batches": 1
+  },
+  "correctness": "all systems returned identical baseline and final query results",
+  "systems": {
+    "clickhouse-iceberg": {
+      "versions": {
+        "clickhouse": "26.10.2.103",
+        "duckdb": "v1.5.5"
+      },
+      "initial_load_ms": 5371.564,
+      "write_timings": {
+        "append_batch_ms": {
+          "count": 1,
+          "max_ms": 117.546,
+          "median_ms": 117.546,
+          "min_ms": 117.546,
+          "p95_ms": 117.546
+        },
+        "append_rows_per_second": 1701461.5554761537,
+        "update_batch_ms": {
+          "count": 1,
+          "max_ms": 252.301,
+          "median_ms": 252.301,
+          "min_ms": 252.301,
+          "p95_ms": 252.301
+        },
+        "update_rows_per_second": 792703.9528182608
+      },
+      "final_read_median_ms": {
+        "full_scan": 60.828,
+        "group_by": 107.771,
+        "selective": 9.559
+      }
+    },
+    "clickhouse-native": {
+      "versions": {
+        "clickhouse": "26.10.2.103",
+        "duckdb": "v1.5.5"
+      },
+      "initial_load_ms": 7425.698,
+      "write_timings": {
+        "append_batch_ms": {
+          "count": 1,
+          "max_ms": 138.77,
+          "median_ms": 138.77,
+          "min_ms": 138.77,
+          "p95_ms": 138.77
+        },
+        "append_rows_per_second": 1441233.6960438134,
+        "update_batch_ms": {
+          "count": 1,
+          "max_ms": 125.277,
+          "median_ms": 125.277,
+          "min_ms": 125.277,
+          "p95_ms": 125.277
+        },
+        "update_rows_per_second": 1596462.239676876
+      },
+      "final_read_median_ms": {
+        "full_scan": 145.555,
+        "group_by": 146.596,
+        "selective": 4.803
+      }
+    },
+    "duckdb-iceberg": {
+      "versions": {
+        "duckdb": "v1.5.5"
+      },
+      "initial_load_ms": 425.735,
+      "write_timings": {
+        "append_batch_ms": {
+          "count": 1,
+          "max_ms": 58.086,
+          "median_ms": 58.086,
+          "min_ms": 58.086,
+          "p95_ms": 58.086
+        },
+        "append_rows_per_second": 3443170.4713700376,
+        "update_batch_ms": {
+          "count": 1,
+          "max_ms": 150.048,
+          "median_ms": 150.048,
+          "min_ms": 150.048,
+          "p95_ms": 150.048
+        },
+        "update_rows_per_second": 1332906.8031563233
+      },
+      "final_read_median_ms": {
+        "full_scan": 43.229,
+        "group_by": 51.205,
+        "selective": 18.443
+      }
+    }
+  }
+}
