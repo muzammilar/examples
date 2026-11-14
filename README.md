@@ -43,6 +43,7 @@ To add or test a system, follow [`FORMAT.md`](FORMAT.md): folder layout, Make ta
 | Manticore Search | [`manticore/`](manticore) | Search | [manticoresearch.com](https://manticoresearch.com/) | [manticoresoftware/manticoresearch](https://github.com/manticoresoftware/manticoresearch) |
 | Memgraph | [`memgraph/`](memgraph) | Graph (in-memory) | [memgraph.com](https://memgraph.com/) | [memgraph/memgraph](https://github.com/memgraph/memgraph) |
 | Milvus | [`milvus/`](milvus) | Vector | [milvus.io](https://milvus.io/) | [milvus-io/milvus](https://github.com/milvus-io/milvus) |
+| MySQL | [`mysql/`](mysql) | Relational / distributed SQL | [mysql.com](https://www.mysql.com/) | [mysql/mysql-server](https://github.com/mysql/mysql-server) |
 | NATS | [`nats.io/`](nats.io) | Core NATS: pub/sub; JetStream: streaming / KV | [nats.io](https://nats.io/) | [nats-io/nats-server](https://github.com/nats-io/nats-server) |
 | NebulaGraph | [`nebula-graph/`](nebula-graph) | Graph | [nebula-graph.io](https://www.nebula-graph.io/) | [vesoft-inc/nebula](https://github.com/vesoft-inc/nebula) |
 | Neo4j | [`neo4j/`](neo4j) | Graph | [neo4j.com](https://neo4j.com/) | [neo4j/neo4j](https://github.com/neo4j/neo4j) |

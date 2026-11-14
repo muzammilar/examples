@@ -125,7 +125,8 @@ Planned as a `mysql/` folder, mirroring the Postgres section with the same `orde
 - [ ] `mysql-kubernetes-operator`: Oracle MySQL Operator or Percona Operator for MySQL on kind.
 - [ ] `mariadb-galera-cluster`: multi-primary synchronous replication; write conflicts and certification failures.
 - [ ] `proxysql-read-write-split`: query routing, read/write split and query rules in front of replicas.
-- [ ] `vitess-docker-compose-cluster`: VTGate, VTTablet, topo (etcd); VSchema, vindexes, `Reshard` workflow on `scale-out`.
+- [x] `vitess-docker-compose-cluster`: unsharded deployment, 3 MySQL copies, VTGate/VTctld/etcd/VTOrc, semi-sync primary failure and million-order loss tracking.
+- [ ] Extend Vitess deployment with online `Reshard` workflow and scaling measurements.
 - [ ] `vitess-kubernetes-operator`: PlanetScale `vitess-operator` on kind.
 - [ ] `ndb-cluster-docker-compose-cluster`: MySQL NDB Cluster (management, data and SQL nodes); auto-sharding by hash, node-group failover; compare with the RonDB fork.
 - [ ] `shardingsphere-proxy`: Apache ShardingSphere-Proxy in front of plain MySQL (and Postgres) shards; sharding rules, read/write split, distributed transactions.

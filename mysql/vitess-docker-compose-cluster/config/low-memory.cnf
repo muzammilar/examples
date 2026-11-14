@@ -1,0 +1,7 @@
+[mysqld]
+innodb_buffer_pool_size=64M
+max_connections=100
+innodb_flush_log_at_trx_commit=1
+sync_binlog=1
+# Keep semi-sync acknowledgement on the durable relay log path.
+sync_relay_log=1
