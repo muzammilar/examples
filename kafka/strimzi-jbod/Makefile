@@ -6,23 +6,28 @@ STRIMZI_VERSION := 1.3.1
 KAFKA_VERSION := 4.3.2
 PRODUCER_IMAGE := kafka-strimzi-producer:dev
 CONSUMER_IMAGE := kafka-strimzi-consumer:dev
-COUNT ?= 100
+COUNT ?= 1000000
 REBALANCE ?= kafka-jbod-rebalance
 RUN_ID ?= $(shell date -u +%Y%m%dT%H%M%SZ)
 
-.PHONY: up kind-cluster namespace operator cluster images demo test disk-add disk-rebalance-plan disk-remove-plan disk-approve disk-remove-finish status cli logs down
+.PHONY: kind-up kind-cluster up namespace operator cluster images topic-reset demo test disk-add disk-rebalance-plan disk-remove-plan disk-approve disk-remove-finish status cli logs down kind-down
 
-up: kind-cluster namespace operator cluster
+kind-up: kind-cluster
 
 kind-cluster:
 	kind get clusters | grep -qx $(CLUSTER_NAME) || kind create cluster --config kind-config.yaml
+
+up: kind-up
+	$(MAKE) namespace
+	$(MAKE) operator
+	$(MAKE) cluster
 
 namespace:
 	$(KUBECTL) get namespace $(NAMESPACE) >/dev/null 2>&1 || kubectl --context kind-$(CLUSTER_NAME) create namespace $(NAMESPACE)
 
 operator:
-	helm repo add strimzi https://strimzi.io/charts/ >/dev/null 2>&1 || true
-	helm repo update strimzi
+	$(HELM) repo add strimzi https://strimzi.io/charts/ >/dev/null 2>&1 || true
+	$(HELM) repo update strimzi
 	$(HELM) upgrade --install strimzi-operator strimzi/strimzi-kafka-operator \
 		--version $(STRIMZI_VERSION) --namespace $(NAMESPACE) --wait --timeout 5m \
 		--set 'watchNamespaces={$(NAMESPACE)}'
@@ -38,21 +43,18 @@ images:
 	docker build -f consumer/Dockerfile -t $(CONSUMER_IMAGE) .
 	kind load docker-image --name $(CLUSTER_NAME) $(PRODUCER_IMAGE) $(CONSUMER_IMAGE)
 
-demo: images
+topic-reset:
+	-$(KUBECTL) delete kafkatopic orders --wait=true --timeout=2m
+	$(KUBECTL) apply -f manifests/topic.yaml
+	$(KUBECTL) wait kafkatopic/orders --for=condition=Ready --timeout=2m
+
+demo: images topic-reset
 	-$(KUBECTL) delete job kafka-consumer kafka-producer --ignore-not-found
-	RUN_ID=$(RUN_ID) COUNT=$(COUNT) envsubst < jobs/consumer.yaml | $(KUBECTL) apply -f -
-	kubectl --context kind-$(CLUSTER_NAME) -n $(NAMESPACE) wait pod -l app=kafka-consumer --for=condition=Ready --timeout=2m
-	@for i in $$(seq 60); do \
-		state=$$(kubectl --context kind-$(CLUSTER_NAME) -n $(NAMESPACE) exec kafka-kafka-0 -c kafka -- \
-			/opt/kafka/bin/kafka-consumer-groups.sh --bootstrap-server kafka-kafka-bootstrap:9092 \
-			--describe --group kafka-jbod-$(RUN_ID) --state 2>/dev/null | awk 'NR > 1 {print $$2; exit}'); \
-		[ "$$state" = "Stable" ] && { echo "consumer group is assigned"; exit 0; }; \
-		sleep 2; \
-	done; echo "consumer group did not become stable"; exit 1
-	COUNT=$(COUNT) envsubst < jobs/producer.yaml | $(KUBECTL) apply -f -
-	$(KUBECTL) wait job/kafka-producer --for=condition=complete --timeout=3m
+	RUN_ID=$(RUN_ID) COUNT=$(COUNT) envsubst < jobs/producer.yaml | $(KUBECTL) apply -f -
+	$(KUBECTL) wait job/kafka-producer --for=condition=complete --timeout=20m
 	$(KUBECTL) logs job/kafka-producer
-	$(KUBECTL) wait job/kafka-consumer --for=condition=complete --timeout=3m
+	RUN_ID=$(RUN_ID) COUNT=$(COUNT) envsubst < jobs/consumer.yaml | $(KUBECTL) apply -f -
+	$(KUBECTL) wait job/kafka-consumer --for=condition=complete --timeout=20m
 	$(KUBECTL) logs job/kafka-consumer
 
 test: demo
@@ -91,9 +93,16 @@ logs:
 	$(KUBECTL) logs -l strimzi.io/cluster=kafka -c kafka --tail=100
 
 cli:
-	$(KUBECTL) exec -it kafka-kafka-0 -c kafka -- /opt/kafka/bin/kafka-topics.sh \
+	$(KUBECTL) exec -it kafka-brokers-3 -c kafka -- /opt/kafka/bin/kafka-topics.sh \
 		--bootstrap-server kafka-kafka-bootstrap:9092 --list
 
 down:
+	-kubectl --context kind-$(CLUSTER_NAME) -n $(NAMESPACE) delete kafkarebalance --all --ignore-not-found --wait=true --timeout=2m
+	-kubectl --context kind-$(CLUSTER_NAME) -n $(NAMESPACE) delete kafkatopic --all --ignore-not-found --wait=true --timeout=2m
+	-kubectl --context kind-$(CLUSTER_NAME) -n $(NAMESPACE) delete kafka kafka --ignore-not-found --wait=true --timeout=15m
+	-$(HELM) uninstall strimzi-operator --namespace $(NAMESPACE) --wait
+	-kubectl --context kind-$(CLUSTER_NAME) delete namespace $(NAMESPACE) --ignore-not-found --wait=true --timeout=3m
+
+kind-down:
 	kind delete cluster --name $(CLUSTER_NAME)
 	-docker image rm $(PRODUCER_IMAGE) $(CONSUMER_IMAGE)

@@ -6,7 +6,7 @@ metadata:
     app: kafka-consumer
 spec:
   backoffLimit: 0
-  activeDeadlineSeconds: 240
+  activeDeadlineSeconds: 1500
   template:
     metadata:
       labels:
@@ -30,10 +30,12 @@ spec:
               value: orders
             - name: GROUP_ID
               value: kafka-jbod-${RUN_ID}
+            - name: RUN_ID
+              value: "${RUN_ID}"
             - name: EXPECTED_COUNT
               value: "${COUNT}"
             - name: TIMEOUT_SECONDS
-              value: "180"
+              value: "1200"
           resources:
             requests:
               cpu: 100m

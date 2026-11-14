@@ -38,15 +38,15 @@ class DeliveryReport final : public RdKafka::DeliveryReportCb {
 };
 
 int parse_count() {
-  const auto raw = env_or("COUNT", "100");
+  const auto raw = env_or("COUNT", "1000000");
   try {
     const auto count = std::stol(raw);
-    if (count < 1 || count > 1000000) {
+    if (count < 1 || count > 2000000) {
       throw std::out_of_range("COUNT");
     }
     return static_cast<int>(count);
   } catch (const std::exception&) {
-    throw std::runtime_error("COUNT must be an integer between 1 and 1000000");
+    throw std::runtime_error("COUNT must be an integer between 1 and 2000000");
   }
 }
 
@@ -57,6 +57,7 @@ int main() {
     const auto bootstrap = env_or(
         "BOOTSTRAP_SERVERS", "kafka-kafka-bootstrap.kafka.svc:9092");
     const auto topic_name = env_or("TOPIC", "orders");
+    const auto run_id = env_or("RUN_ID", "strimzi-demo");
     const int count = parse_count();
 
     std::string error;
@@ -94,7 +95,7 @@ int main() {
                          .count();
     for (int i = 0; i < count; ++i) {
       kafka::demo::v1::Order order;
-      const auto id = "order-" + std::to_string(i);
+      const auto id = run_id + "-order-" + std::to_string(i);
       order.set_order_id(id);
       order.set_customer_id("customer-" + std::to_string(i % 10));
       order.set_amount_cents(1000 + (i % 5000));

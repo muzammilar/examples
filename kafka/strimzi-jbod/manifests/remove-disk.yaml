@@ -7,9 +7,9 @@ metadata:
 spec:
   mode: remove-disks
   moveReplicasOffVolumes:
-    - brokerId: 0
+    - brokerId: 3
       volumeIds: [1]
-    - brokerId: 1
+    - brokerId: 4
       volumeIds: [1]
-    - brokerId: 2
+    - brokerId: 5
       volumeIds: [1]

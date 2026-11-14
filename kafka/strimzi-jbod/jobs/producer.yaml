@@ -30,6 +30,8 @@ spec:
               value: orders
             - name: COUNT
               value: "${COUNT}"
+            - name: RUN_ID
+              value: "${RUN_ID}"
           resources:
             requests:
               cpu: 100m
