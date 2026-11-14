@@ -118,6 +118,8 @@ sharded `orders` workload (distribution key `customer_id`) so results compare di
 
 ## MySQL ecosystem
 
+- [x] `mysql/customer-sharding`: separate Vitess workload with 3 customer shards, 3 copies per shard, live primary failures on every shard, GTID catch-up and acknowledged-data tracking.
+
 Planned as a `mysql/` folder, mirroring the Postgres section with the same `orders` workload.
 
 - [ ] `mysql-single-node`: MySQL 8.4 LTS baseline; `sysbench` OLTP.

@@ -1,0 +1,361 @@
+name: mysql-customer-sharding
+services:
+  etcd0:
+    image: quay.io/coreos/etcd:v3.5.21
+    hostname: etcd0
+    command:
+      - etcd
+      - --name=etcd0
+      - --data-dir=/etcd-data
+      - --listen-client-urls=http://0.0.0.0:2379
+      - --advertise-client-urls=http://etcd0:2379
+      - --listen-peer-urls=http://0.0.0.0:2380
+      - --initial-advertise-peer-urls=http://etcd0:2380
+      - --initial-cluster=etcd0=http://etcd0:2380,etcd1=http://etcd1:2380,etcd2=http://etcd2:2380
+      - --initial-cluster-token=customer-sharding
+    volumes:
+      - etcd0:/etcd-data
+    healthcheck:
+      test: [CMD, etcdctl, endpoint, health]
+      interval: 3s
+      timeout: 3s
+      retries: 40
+  etcd1:
+    image: quay.io/coreos/etcd:v3.5.21
+    hostname: etcd1
+    command:
+      - etcd
+      - --name=etcd1
+      - --data-dir=/etcd-data
+      - --listen-client-urls=http://0.0.0.0:2379
+      - --advertise-client-urls=http://etcd1:2379
+      - --listen-peer-urls=http://0.0.0.0:2380
+      - --initial-advertise-peer-urls=http://etcd1:2380
+      - --initial-cluster=etcd0=http://etcd0:2380,etcd1=http://etcd1:2380,etcd2=http://etcd2:2380
+      - --initial-cluster-token=customer-sharding
+    volumes:
+      - etcd1:/etcd-data
+    healthcheck:
+      test: [CMD, etcdctl, endpoint, health]
+      interval: 3s
+      timeout: 3s
+      retries: 40
+  etcd2:
+    image: quay.io/coreos/etcd:v3.5.21
+    hostname: etcd2
+    command:
+      - etcd
+      - --name=etcd2
+      - --data-dir=/etcd-data
+      - --listen-client-urls=http://0.0.0.0:2379
+      - --advertise-client-urls=http://etcd2:2379
+      - --listen-peer-urls=http://0.0.0.0:2380
+      - --initial-advertise-peer-urls=http://etcd2:2380
+      - --initial-cluster=etcd0=http://etcd0:2380,etcd1=http://etcd1:2380,etcd2=http://etcd2:2380
+      - --initial-cluster-token=customer-sharding
+    volumes:
+      - etcd2:/etcd-data
+    healthcheck:
+      test: [CMD, etcdctl, endpoint, health]
+      interval: 3s
+      timeout: 3s
+      retries: 40
+  vtctld:
+    image: vitess/lite:v23.0.0
+    platform: linux/amd64
+    volumes:
+      - ./sql:/sql:ro
+      - ./config:/config:ro
+    command:
+      - /vt/bin/vtctld
+      - --topo-implementation=etcd2
+      - --topo-global-server-address=etcd0:2379,etcd1:2379,etcd2:2379
+      - --topo-global-root=/vitess/global
+      - --cell=zone1
+      - --service-map=grpc-vtctld
+      - --port=8080
+      - --grpc-port=15999
+      - --logtostderr
+    depends_on:
+      etcd0: {condition: service_healthy}
+      etcd1: {condition: service_healthy}
+      etcd2: {condition: service_healthy}
+    healthcheck:
+      test: [CMD, curl, -fsS, http://localhost:8080/debug/vars]
+      interval: 5s
+      timeout: 5s
+      retries: 60
+  cell:
+    image: vitess/lite:v23.0.0
+    platform: linux/amd64
+    command: [sh, /scripts/cell.sh]
+    volumes:
+      - ./scripts:/scripts:ro
+    depends_on:
+      vtctld: {condition: service_healthy}
+  t100:
+    image: vitess/lite:v23.0.0
+    platform: linux/amd64
+    hostname: t100
+    init: true
+    command: [bash, /scripts/tablet.sh]
+    environment:
+      TABLET_UID: '100'
+      SHARD: '-55'
+    volumes:
+      - t100:/vt/vtdataroot
+      - ./scripts:/scripts:ro
+      - ./config:/config:ro
+    depends_on:
+      cell: {condition: service_completed_successfully}
+    healthcheck:
+      test: [CMD, sh, /scripts/tablet-health.sh]
+      interval: 5s
+      timeout: 5s
+      retries: 90
+      start_period: 30s
+  t101:
+    image: vitess/lite:v23.0.0
+    platform: linux/amd64
+    hostname: t101
+    init: true
+    command: [bash, /scripts/tablet.sh]
+    environment:
+      TABLET_UID: '101'
+      SHARD: '-55'
+    volumes:
+      - t101:/vt/vtdataroot
+      - ./scripts:/scripts:ro
+      - ./config:/config:ro
+    depends_on:
+      cell: {condition: service_completed_successfully}
+    healthcheck:
+      test: [CMD, sh, /scripts/tablet-health.sh]
+      interval: 5s
+      timeout: 5s
+      retries: 90
+      start_period: 30s
+  t102:
+    image: vitess/lite:v23.0.0
+    platform: linux/amd64
+    hostname: t102
+    init: true
+    command: [bash, /scripts/tablet.sh]
+    environment:
+      TABLET_UID: '102'
+      SHARD: '-55'
+    volumes:
+      - t102:/vt/vtdataroot
+      - ./scripts:/scripts:ro
+      - ./config:/config:ro
+    depends_on:
+      cell: {condition: service_completed_successfully}
+    healthcheck:
+      test: [CMD, sh, /scripts/tablet-health.sh]
+      interval: 5s
+      timeout: 5s
+      retries: 90
+      start_period: 30s
+  t200:
+    image: vitess/lite:v23.0.0
+    platform: linux/amd64
+    hostname: t200
+    init: true
+    command: [bash, /scripts/tablet.sh]
+    environment:
+      TABLET_UID: '200'
+      SHARD: '55-aa'
+    volumes:
+      - t200:/vt/vtdataroot
+      - ./scripts:/scripts:ro
+      - ./config:/config:ro
+    depends_on:
+      cell: {condition: service_completed_successfully}
+    healthcheck:
+      test: [CMD, sh, /scripts/tablet-health.sh]
+      interval: 5s
+      timeout: 5s
+      retries: 90
+      start_period: 30s
+  t201:
+    image: vitess/lite:v23.0.0
+    platform: linux/amd64
+    hostname: t201
+    init: true
+    command: [bash, /scripts/tablet.sh]
+    environment:
+      TABLET_UID: '201'
+      SHARD: '55-aa'
+    volumes:
+      - t201:/vt/vtdataroot
+      - ./scripts:/scripts:ro
+      - ./config:/config:ro
+    depends_on:
+      cell: {condition: service_completed_successfully}
+    healthcheck:
+      test: [CMD, sh, /scripts/tablet-health.sh]
+      interval: 5s
+      timeout: 5s
+      retries: 90
+      start_period: 30s
+  t202:
+    image: vitess/lite:v23.0.0
+    platform: linux/amd64
+    hostname: t202
+    init: true
+    command: [bash, /scripts/tablet.sh]
+    environment:
+      TABLET_UID: '202'
+      SHARD: '55-aa'
+    volumes:
+      - t202:/vt/vtdataroot
+      - ./scripts:/scripts:ro
+      - ./config:/config:ro
+    depends_on:
+      cell: {condition: service_completed_successfully}
+    healthcheck:
+      test: [CMD, sh, /scripts/tablet-health.sh]
+      interval: 5s
+      timeout: 5s
+      retries: 90
+      start_period: 30s
+  t300:
+    image: vitess/lite:v23.0.0
+    platform: linux/amd64
+    hostname: t300
+    init: true
+    command: [bash, /scripts/tablet.sh]
+    environment:
+      TABLET_UID: '300'
+      SHARD: 'aa-'
+    volumes:
+      - t300:/vt/vtdataroot
+      - ./scripts:/scripts:ro
+      - ./config:/config:ro
+    depends_on:
+      cell: {condition: service_completed_successfully}
+    healthcheck:
+      test: [CMD, sh, /scripts/tablet-health.sh]
+      interval: 5s
+      timeout: 5s
+      retries: 90
+      start_period: 30s
+  t301:
+    image: vitess/lite:v23.0.0
+    platform: linux/amd64
+    hostname: t301
+    init: true
+    command: [bash, /scripts/tablet.sh]
+    environment:
+      TABLET_UID: '301'
+      SHARD: 'aa-'
+    volumes:
+      - t301:/vt/vtdataroot
+      - ./scripts:/scripts:ro
+      - ./config:/config:ro
+    depends_on:
+      cell: {condition: service_completed_successfully}
+    healthcheck:
+      test: [CMD, sh, /scripts/tablet-health.sh]
+      interval: 5s
+      timeout: 5s
+      retries: 90
+      start_period: 30s
+  t302:
+    image: vitess/lite:v23.0.0
+    platform: linux/amd64
+    hostname: t302
+    init: true
+    command: [bash, /scripts/tablet.sh]
+    environment:
+      TABLET_UID: '302'
+      SHARD: 'aa-'
+    volumes:
+      - t302:/vt/vtdataroot
+      - ./scripts:/scripts:ro
+      - ./config:/config:ro
+    depends_on:
+      cell: {condition: service_completed_successfully}
+    healthcheck:
+      test: [CMD, sh, /scripts/tablet-health.sh]
+      interval: 5s
+      timeout: 5s
+      retries: 90
+      start_period: 30s
+  vtgate:
+    image: vitess/lite:v23.0.0
+    platform: linux/amd64
+    command:
+      - /vt/bin/vtgate
+      - --topo-implementation=etcd2
+      - --topo-global-server-address=etcd0:2379,etcd1:2379,etcd2:2379
+      - --topo-global-root=/vitess/global
+      - --cell=zone1
+      - --cells-to-watch=zone1
+      - --tablet-types-to-wait=PRIMARY,REPLICA
+      - --gateway-initial-tablet-timeout=1s
+      - --mysql-server-port=15306
+      - --mysql-auth-server-impl=none
+      - --port=8080
+      - --grpc-port=15999
+      - --service-map=grpc-vtgateservice
+      - --normalize-queries=true
+      - --logtostderr
+    depends_on:
+      cell: {condition: service_completed_successfully}
+    ports:
+      - "127.0.0.1:${VITESS_PORT:-15306}:15306"
+    healthcheck:
+      test: [CMD, curl, -fsS, http://localhost:8080/debug/vars]
+      interval: 5s
+      timeout: 5s
+      retries: 60
+  vtorc:
+    profiles: [recovery]
+    image: vitess/lite:v23.0.0
+    platform: linux/amd64
+    command:
+      - /vt/bin/vtorc
+      - --topo-implementation=etcd2
+      - --topo-global-server-address=etcd0:2379,etcd1:2379,etcd2:2379
+      - --topo-global-root=/vitess/global
+      - --clusters-to-watch=orders
+      - --instance-poll-time=1s
+      - --topo-information-refresh-duration=3s
+      - --port=8080
+      - --logtostderr
+    depends_on:
+      vtctld: {condition: service_healthy}
+    healthcheck:
+      test: [CMD, curl, -fsS, http://localhost:8080/debug/vars]
+      interval: 5s
+      timeout: 5s
+      retries: 60
+  workload:
+    profiles: [tools]
+    image: mysql-customer-workload:dev
+    build: ./app
+    environment:
+      VITESS: "1"
+      DSN: "root@tcp(vtgate:15306)/orders?interpolateParams=true&timeout=2s&readTimeout=15s&writeTimeout=15s"
+      COUNT: ${COUNT:-1000000}
+      CUSTOMERS: ${CUSTOMERS:-10000}
+      WORKERS: ${WORKERS:-8}
+      BATCH: ${BATCH:-100}
+      BULK: ${BULK:-1}
+      RATE: ${RATE:-0}
+    volumes:
+      - ./${RESULTS_DIR:-results/manual}:/results
+volumes:
+  etcd0:
+  etcd1:
+  etcd2:
+  t100:
+  t101:
+  t102:
+  t200:
+  t201:
+  t202:
+  t300:
+  t301:
+  t302:
