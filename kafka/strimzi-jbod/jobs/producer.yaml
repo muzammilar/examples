@@ -6,7 +6,7 @@ metadata:
     app: kafka-producer
 spec:
   backoffLimit: 0
-  activeDeadlineSeconds: 180
+  activeDeadlineSeconds: 1500
   template:
     metadata:
       labels:
@@ -32,6 +32,10 @@ spec:
               value: "${COUNT}"
             - name: RUN_ID
               value: "${RUN_ID}"
+            - name: CHAOS_AFTER_RECORDS
+              value: "${CHAOS_AFTER_RECORDS}"
+            - name: CHAOS_PAUSE_SECONDS
+              value: "${CHAOS_PAUSE_SECONDS}"
           resources:
             requests:
               cpu: 100m

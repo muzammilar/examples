@@ -7,10 +7,13 @@ KAFKA_VERSION := 4.3.2
 PRODUCER_IMAGE := kafka-strimzi-producer:dev
 CONSUMER_IMAGE := kafka-strimzi-consumer:dev
 COUNT ?= 1000000
+CHAOS_BROKER ?= kafka-brokers-3
+CHAOS_AFTER_RECORDS ?= $(shell expr $(COUNT) / 2)
+CHAOS_PAUSE_SECONDS ?= 30
 REBALANCE ?= kafka-jbod-rebalance
 RUN_ID ?= $(shell date -u +%Y%m%dT%H%M%SZ)
 
-.PHONY: kind-up kind-cluster up namespace operator cluster images topic-reset demo test disk-add disk-rebalance-plan disk-remove-plan disk-approve disk-remove-finish status cli logs down kind-down
+.PHONY: kind-up kind-cluster up namespace operator cluster images topic-reset demo chaos test disk-add disk-rebalance-plan disk-remove-plan disk-approve disk-remove-finish status cli logs down kind-down
 
 kind-up: kind-cluster
 
@@ -50,8 +53,37 @@ topic-reset:
 
 demo: images topic-reset
 	-$(KUBECTL) delete job kafka-consumer kafka-producer --ignore-not-found
-	RUN_ID=$(RUN_ID) COUNT=$(COUNT) envsubst < jobs/producer.yaml | $(KUBECTL) apply -f -
+	RUN_ID=$(RUN_ID) COUNT=$(COUNT) CHAOS_AFTER_RECORDS=0 CHAOS_PAUSE_SECONDS=0 envsubst < jobs/producer.yaml | $(KUBECTL) apply -f -
 	$(KUBECTL) wait job/kafka-producer --for=condition=complete --timeout=20m
+	$(KUBECTL) logs job/kafka-producer
+	RUN_ID=$(RUN_ID) COUNT=$(COUNT) envsubst < jobs/consumer.yaml | $(KUBECTL) apply -f -
+	$(KUBECTL) wait job/kafka-consumer --for=condition=complete --timeout=20m
+	$(KUBECTL) logs job/kafka-consumer
+
+chaos: images topic-reset
+	@test $(COUNT) -ge 2 && test $(CHAOS_AFTER_RECORDS) -ge 1 && test $(CHAOS_AFTER_RECORDS) -lt $(COUNT) || \
+		{ echo 'COUNT must be at least 2 and CHAOS_AFTER_RECORDS must be between 1 and COUNT-1' >&2; exit 1; }
+	-$(KUBECTL) delete job kafka-consumer kafka-producer --ignore-not-found
+	RUN_ID=$(RUN_ID) COUNT=$(COUNT) CHAOS_AFTER_RECORDS=$(CHAOS_AFTER_RECORDS) CHAOS_PAUSE_SECONDS=$(CHAOS_PAUSE_SECONDS) envsubst < jobs/producer.yaml | $(KUBECTL) apply -f -
+	$(KUBECTL) wait pod -l app=kafka-producer --for=condition=Ready --timeout=2m
+	@for i in $$(seq 300); do \
+		logs=$$($(KUBECTL) logs job/kafka-producer 2>/dev/null || true); \
+		echo "$$logs" | grep -q 'CHAOS_CHECKPOINT' && { echo "$$logs" | grep 'CHAOS_CHECKPOINT' | tail -1; exit 0; }; \
+		sleep 1; \
+	done; echo 'producer did not reach the chaos checkpoint' >&2; exit 1
+	@old_uid=$$($(KUBECTL) get pod $(CHAOS_BROKER) -o jsonpath='{.metadata.uid}'); \
+	$(KUBECTL) delete pod $(CHAOS_BROKER) --wait=true --timeout=2m; \
+	for i in $$(seq 60); do \
+		new_uid=$$($(KUBECTL) get pod $(CHAOS_BROKER) -o jsonpath='{.metadata.uid}' 2>/dev/null || true); \
+		[ -n "$$new_uid" ] && [ "$$new_uid" != "$$old_uid" ] && { echo 'Strimzi created a replacement broker pod'; exit 0; }; \
+		sleep 1; \
+	done; echo 'Strimzi did not replace the broker pod' >&2; exit 1
+	@set -e; \
+	$(KUBECTL) wait pod/$(CHAOS_BROKER) --for=condition=Ready --timeout=10m & pod_wait=$$!; \
+	$(KUBECTL) wait kafka/kafka --for=condition=Ready --timeout=10m & kafka_wait=$$!; \
+	$(KUBECTL) wait job/kafka-producer --for=condition=complete --timeout=20m; \
+	wait $$pod_wait; \
+	wait $$kafka_wait
 	$(KUBECTL) logs job/kafka-producer
 	RUN_ID=$(RUN_ID) COUNT=$(COUNT) envsubst < jobs/consumer.yaml | $(KUBECTL) apply -f -
 	$(KUBECTL) wait job/kafka-consumer --for=condition=complete --timeout=20m

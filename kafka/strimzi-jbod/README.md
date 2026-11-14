@@ -29,6 +29,10 @@ Use `make status`, `make cli`, and `make logs` to inspect the cluster.
 
 `disk-approve` intentionally approves the currently pending `KafkaRebalance` after you inspect its proposal. Run it only after a `ProposalReady` status is visible. The remove plan targets volume 1 on all brokers; do not remove a volume while it still hosts replicas.
 
+## Broker failure exercise
+
+Run `make chaos` after `make up` to reset the test topic, send half of the configured workload, pause the producer, delete broker pod `kafka-brokers-3`, and wait for Strimzi to recreate it. The producer then resumes and the Rust consumer verifies every record. Override `COUNT`, `CHAOS_BROKER`, `CHAOS_AFTER_RECORDS`, or `CHAOS_PAUSE_SECONDS` to change the run. This is a broker-pod failure and recovery test; ephemeral JBOD storage means it does not simulate replacing a failed physical disk.
+
 ## What it demonstrates
 
 - Strimzi 1.3.1 with Kafka 4.3.2 in KRaft mode and Strimzi's `KafkaNodePool` API.
@@ -41,7 +45,7 @@ The cluster uses ephemeral storage to keep the local demo self-contained. Strimz
 
 ## Verified run
 
-On 2026-11-14, the default `make test` reset the `orders` topic, built both client images, delivered 1,000,000 protobuf orders, and validated 1,000,000 unique orders in the Rust consumer. Their amount sum was 3,499,500,000 cents. This is a correctness/load-size check, not a throughput benchmark. A separate earlier 100-order disk walkthrough added volume 1 to brokers 3–5, completed 9 intra-broker movements for the rebalance proposal and 189 movements for the remove-disks proposal, then returned all 3 brokers to one volume; Cruise Control reported 0 MB to move in both plans. Those disk-movement figures are not measurements from the million-order run.
+On 2026-11-14, the default `make test` reset the `orders` topic, built both client images, delivered 1,000,000 protobuf orders, and validated 1,000,000 unique orders in the Rust consumer. Their amount sum was 3,499,500,000 cents. The default `make chaos` then flushed 500,000 orders, deleted broker pod `kafka-brokers-3` during the producer pause, waited for Strimzi to recreate it, and delivered and validated all 1,000,000 orders; the producer reconnected after broker disconnections. These counts verify correctness and recovery, not throughput. A separate earlier 100-order disk walkthrough added volume 1 to brokers 3–5, completed 9 intra-broker movements for the rebalance proposal and 189 movements for the remove-disks proposal, then returned all 3 brokers to one volume; Cruise Control reported 0 MB to move in both plans. Those disk-movement figures are not measurements from the million-order runs.
 
 ## Setup
 
@@ -68,7 +72,9 @@ The selected Strimzi release supports Kafka 4.3 and requires Kubernetes 1.32 or 
 
 - [Strimzi JBOD storage and disk rebalancing](https://strimzi.io/docs/operators/latest/full/deploying.html)
 - [Strimzi 1.3.1 source](https://github.com/strimzi/strimzi-kafka-operator/tree/1.3.1)
+- [Strimzi 1.3.1 Kafka reconciliation source](https://github.com/strimzi/strimzi-kafka-operator/blob/1.3.1/cluster-operator/src/main/java/io/strimzi/operator/cluster/operator/assembly/KafkaReconciler.java)
 - [Apache Kafka 4.3 disk and replica reassignment operations](https://kafka.apache.org/43/operations/basic-kafka-operations/)
+- [Apache Kafka 4.3 replication and failure semantics](https://kafka.apache.org/43/design/design/)
 - [Apache Kafka 4.3.2 source](https://github.com/apache/kafka/tree/4.3.2)
 - [Strimzi 1.3.1 release](https://github.com/strimzi/strimzi-kafka-operator/releases/tag/1.3.1)
 - [librdkafka 2.0.2 C++ API and producer guarantees](https://github.com/confluentinc/librdkafka/blob/v2.0.2/INTRODUCTION.md)
