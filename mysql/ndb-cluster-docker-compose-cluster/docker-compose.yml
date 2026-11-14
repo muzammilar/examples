@@ -1,0 +1,296 @@
+name: mysql-ndb-cluster
+x-ndb: &ndb
+  image: container-registry.oracle.com/mysql/community-cluster:8.4.11
+  platform: linux/amd64
+services:
+  mgm0:
+    <<: *ndb
+    command: [ndb_mgmd, --ndb-nodeid=49, --reload]
+    volumes:
+      - ./config/config.ini:/etc/mysql-cluster.cnf:ro
+      - mgm0:/var/lib/mysql
+    healthcheck:
+      test: [CMD, ndb_mgm, --ndb-connectstring=localhost:1186, -e, show]
+      interval: 3s
+      timeout: 5s
+      retries: 60
+  mgm1:
+    <<: *ndb
+    command: [ndb_mgmd, --ndb-nodeid=50, --reload]
+    volumes:
+      - ./config/config.ini:/etc/mysql-cluster.cnf:ro
+      - mgm1:/var/lib/mysql
+    healthcheck:
+      test: [CMD, ndb_mgm, --ndb-connectstring=localhost:1186, -e, show]
+      interval: 3s
+      timeout: 5s
+      retries: 60
+  data1:
+    <<: *ndb
+    command:
+      - sh
+      - -c
+      - exec ndbmtd --nodaemon --ndb-nodeid=1 --ndb-connectstring=mgm0:1186,mgm1:1186 $$([ -d /var/lib/mysql/ndb_1_fs ] || echo --initial)
+    volumes:
+      - ./config/my.cnf:/etc/my.cnf:ro
+      - data1:/var/lib/mysql
+    depends_on:
+      mgm0: {condition: service_healthy}
+      mgm1: {condition: service_healthy}
+    healthcheck:
+      test: [CMD-SHELL, "ndb_mgm --ndb-connectstring=mgm0:1186,mgm1:1186 -e '1 status' | grep -q 'Node 1: started'"]
+      interval: 5s
+      timeout: 10s
+      retries: 90
+      start_period: 30s
+  data2:
+    <<: *ndb
+    command:
+      - sh
+      - -c
+      - exec ndbmtd --nodaemon --ndb-nodeid=2 --ndb-connectstring=mgm0:1186,mgm1:1186 $$([ -d /var/lib/mysql/ndb_2_fs ] || echo --initial)
+    volumes:
+      - ./config/my.cnf:/etc/my.cnf:ro
+      - data2:/var/lib/mysql
+    depends_on:
+      mgm0: {condition: service_healthy}
+      mgm1: {condition: service_healthy}
+    healthcheck:
+      test: [CMD-SHELL, "ndb_mgm --ndb-connectstring=mgm0:1186,mgm1:1186 -e '2 status' | grep -q 'Node 2: started'"]
+      interval: 5s
+      timeout: 10s
+      retries: 90
+      start_period: 30s
+  data3:
+    <<: *ndb
+    command:
+      - sh
+      - -c
+      - exec ndbmtd --nodaemon --ndb-nodeid=3 --ndb-connectstring=mgm0:1186,mgm1:1186 $$([ -d /var/lib/mysql/ndb_3_fs ] || echo --initial)
+    volumes:
+      - ./config/my.cnf:/etc/my.cnf:ro
+      - data3:/var/lib/mysql
+    depends_on:
+      mgm0: {condition: service_healthy}
+      mgm1: {condition: service_healthy}
+    healthcheck:
+      test: [CMD-SHELL, "ndb_mgm --ndb-connectstring=mgm0:1186,mgm1:1186 -e '3 status' | grep -q 'Node 3: started'"]
+      interval: 5s
+      timeout: 10s
+      retries: 90
+      start_period: 30s
+  data4:
+    <<: *ndb
+    command:
+      - sh
+      - -c
+      - exec ndbmtd --nodaemon --ndb-nodeid=4 --ndb-connectstring=mgm0:1186,mgm1:1186 $$([ -d /var/lib/mysql/ndb_4_fs ] || echo --initial)
+    volumes:
+      - ./config/my.cnf:/etc/my.cnf:ro
+      - data4:/var/lib/mysql
+    depends_on:
+      mgm0: {condition: service_healthy}
+      mgm1: {condition: service_healthy}
+    healthcheck:
+      test: [CMD-SHELL, "ndb_mgm --ndb-connectstring=mgm0:1186,mgm1:1186 -e '4 status' | grep -q 'Node 4: started'"]
+      interval: 5s
+      timeout: 10s
+      retries: 90
+      start_period: 30s
+  data5:
+    <<: *ndb
+    command:
+      - sh
+      - -c
+      - exec ndbmtd --nodaemon --ndb-nodeid=5 --ndb-connectstring=mgm0:1186,mgm1:1186 $$([ -d /var/lib/mysql/ndb_5_fs ] || echo --initial)
+    volumes:
+      - ./config/my.cnf:/etc/my.cnf:ro
+      - data5:/var/lib/mysql
+    depends_on:
+      mgm0: {condition: service_healthy}
+      mgm1: {condition: service_healthy}
+    healthcheck:
+      test: [CMD-SHELL, "ndb_mgm --ndb-connectstring=mgm0:1186,mgm1:1186 -e '5 status' | grep -q 'Node 5: started'"]
+      interval: 5s
+      timeout: 10s
+      retries: 90
+      start_period: 30s
+  data6:
+    <<: *ndb
+    command:
+      - sh
+      - -c
+      - exec ndbmtd --nodaemon --ndb-nodeid=6 --ndb-connectstring=mgm0:1186,mgm1:1186 $$([ -d /var/lib/mysql/ndb_6_fs ] || echo --initial)
+    volumes:
+      - ./config/my.cnf:/etc/my.cnf:ro
+      - data6:/var/lib/mysql
+    depends_on:
+      mgm0: {condition: service_healthy}
+      mgm1: {condition: service_healthy}
+    healthcheck:
+      test: [CMD-SHELL, "ndb_mgm --ndb-connectstring=mgm0:1186,mgm1:1186 -e '6 status' | grep -q 'Node 6: started'"]
+      interval: 5s
+      timeout: 10s
+      retries: 90
+      start_period: 30s
+  data7:
+    <<: *ndb
+    command:
+      - sh
+      - -c
+      - exec ndbmtd --nodaemon --ndb-nodeid=7 --ndb-connectstring=mgm0:1186,mgm1:1186 $$([ -d /var/lib/mysql/ndb_7_fs ] || echo --initial)
+    volumes:
+      - ./config/my.cnf:/etc/my.cnf:ro
+      - data7:/var/lib/mysql
+    depends_on:
+      mgm0: {condition: service_healthy}
+      mgm1: {condition: service_healthy}
+    healthcheck:
+      test: [CMD-SHELL, "ndb_mgm --ndb-connectstring=mgm0:1186,mgm1:1186 -e '7 status' | grep -q 'Node 7: started'"]
+      interval: 5s
+      timeout: 10s
+      retries: 90
+      start_period: 30s
+  data8:
+    <<: *ndb
+    command:
+      - sh
+      - -c
+      - exec ndbmtd --nodaemon --ndb-nodeid=8 --ndb-connectstring=mgm0:1186,mgm1:1186 $$([ -d /var/lib/mysql/ndb_8_fs ] || echo --initial)
+    volumes:
+      - ./config/my.cnf:/etc/my.cnf:ro
+      - data8:/var/lib/mysql
+    depends_on:
+      mgm0: {condition: service_healthy}
+      mgm1: {condition: service_healthy}
+    healthcheck:
+      test: [CMD-SHELL, "ndb_mgm --ndb-connectstring=mgm0:1186,mgm1:1186 -e '8 status' | grep -q 'Node 8: started'"]
+      interval: 5s
+      timeout: 10s
+      retries: 90
+      start_period: 30s
+  data9:
+    <<: *ndb
+    command:
+      - sh
+      - -c
+      - exec ndbmtd --nodaemon --ndb-nodeid=9 --ndb-connectstring=mgm0:1186,mgm1:1186 $$([ -d /var/lib/mysql/ndb_9_fs ] || echo --initial)
+    volumes:
+      - ./config/my.cnf:/etc/my.cnf:ro
+      - data9:/var/lib/mysql
+    depends_on:
+      mgm0: {condition: service_healthy}
+      mgm1: {condition: service_healthy}
+    healthcheck:
+      test: [CMD-SHELL, "ndb_mgm --ndb-connectstring=mgm0:1186,mgm1:1186 -e '9 status' | grep -q 'Node 9: started'"]
+      interval: 5s
+      timeout: 10s
+      retries: 90
+      start_period: 30s
+  sql0:
+    <<: *ndb
+    command: [mysqld, --ndb-nodeid=51]
+    environment:
+      MYSQL_ROOT_PASSWORD: local-root
+      MYSQL_DATABASE: orders
+      MYSQL_USER: app
+      MYSQL_PASSWORD: local-app
+    volumes:
+      - ./config/my.cnf:/etc/my.cnf:ro
+      - sql0:/var/lib/mysql
+    depends_on:
+      data1: {condition: service_healthy}
+      data2: {condition: service_healthy}
+      data3: {condition: service_healthy}
+      data4: {condition: service_healthy}
+      data5: {condition: service_healthy}
+      data6: {condition: service_healthy}
+      data7: {condition: service_healthy}
+      data8: {condition: service_healthy}
+      data9: {condition: service_healthy}
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >-
+          MYSQL_PWD=local-root mysql -uroot -Nse "SHOW STATUS LIKE 'Ndb_number_of_ready_data_nodes'" |
+          awk '$$2 == 9 {ok=1} END {exit !ok}'
+      interval: 5s
+      timeout: 10s
+      retries: 60
+      start_period: 30s
+  sql1:
+    <<: *ndb
+    command: [mysqld, --ndb-nodeid=52]
+    environment:
+      MYSQL_ROOT_PASSWORD: local-root
+      MYSQL_DATABASE: orders
+      MYSQL_USER: app
+      MYSQL_PASSWORD: local-app
+    volumes:
+      - ./config/my.cnf:/etc/my.cnf:ro
+      - sql1:/var/lib/mysql
+    depends_on:
+      data1: {condition: service_healthy}
+      data2: {condition: service_healthy}
+      data3: {condition: service_healthy}
+      data4: {condition: service_healthy}
+      data5: {condition: service_healthy}
+      data6: {condition: service_healthy}
+      data7: {condition: service_healthy}
+      data8: {condition: service_healthy}
+      data9: {condition: service_healthy}
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >-
+          MYSQL_PWD=local-root mysql -uroot -Nse "SHOW STATUS LIKE 'Ndb_number_of_ready_data_nodes'" |
+          awk '$$2 == 9 {ok=1} END {exit !ok}'
+      interval: 5s
+      timeout: 10s
+      retries: 60
+      start_period: 30s
+  router:
+    image: haproxy:3.2.4-alpine
+    ports:
+      - "127.0.0.1:${NDB_PORT:-13306}:3306"
+    volumes:
+      - ./config/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+    depends_on:
+      sql0: {condition: service_healthy}
+      sql1: {condition: service_healthy}
+    healthcheck:
+      test: [CMD, wget, -q, --spider, http://127.0.0.1:8404/]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+  workload:
+    profiles: [tools]
+    image: mysql-ndb-workload:dev
+    build: ./app
+    environment:
+      DSN: "app:local-app@tcp(router:3306)/orders?interpolateParams=true&timeout=2s&readTimeout=15s&writeTimeout=15s"
+      COUNT: ${COUNT:-1000000}
+      SUBSCRIBER_LOOKUPS: ${SUBSCRIBER_LOOKUPS:-10000}
+      SUBSCRIBER_SCANS: ${SUBSCRIBER_SCANS:-20}
+      SUBSCRIBER_OPERATIONS: ${SUBSCRIBER_OPERATIONS:-10000}
+      CUSTOMERS: ${CUSTOMERS:-10000}
+      WORKERS: ${WORKERS:-8}
+      BATCH: ${BATCH:-100}
+      BULK: ${BULK:-1}
+      RATE: ${RATE:-0}
+    volumes:
+      - ./${RESULTS_DIR:-results/manual}:/results
+volumes:
+  mgm0:
+  mgm1:
+  data1:
+  data2:
+  data3:
+  data4:
+  data5:
+  data6:
+  data7:
+  data8:
+  data9:
+  sql0:
+  sql1:

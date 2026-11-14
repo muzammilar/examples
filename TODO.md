@@ -130,7 +130,7 @@ Planned as a `mysql/` folder, mirroring the Postgres section with the same `orde
 - [x] `vitess-docker-compose-cluster`: unsharded deployment, 3 MySQL copies, VTGate/VTctld/etcd/VTOrc, semi-sync primary failure and million-order loss tracking.
 - [ ] Extend Vitess deployment with online `Reshard` workflow and scaling measurements.
 - [ ] `vitess-kubernetes-operator`: PlanetScale `vitess-operator` on kind.
-- [ ] `ndb-cluster-docker-compose-cluster`: MySQL NDB Cluster (management, data and SQL nodes); auto-sharding by hash, node-group failover; compare with the RonDB fork.
+- [x] `ndb-cluster-docker-compose-cluster`: Community 8.4.11; 3 partitions × 3 copies, data/SQL/management failures, loss tracking and Vitess architecture comparison. Separate correlated disk-full crash lost 6,800 acknowledged orders.
 - [ ] `shardingsphere-proxy`: Apache ShardingSphere-Proxy in front of plain MySQL (and Postgres) shards; sharding rules, read/write split, distributed transactions.
 - [ ] `polardbx-kubernetes-operator`: PolarDB-X (Apache 2.0) on kind; CN/DN/GMS/CDC split, partitioned tables, global secondary indexes.
 - [ ] `matrixone-docker-compose-cluster`: MySQL-compatible HTAP (Apache 2.0, Go); separated storage/compute on S3 (MinIO), CN/TN/LogService; OLTP plus TPC-H on one copy of the data.
