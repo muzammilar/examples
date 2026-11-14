@@ -4,7 +4,7 @@ metadata:
   name: replication
 spec:
   version: 4.3.2
-  replicas: 2
+  replicas: ${MM2_REPLICAS}
   target:
     alias: west
     bootstrapServers: west-kafka-bootstrap:9092
@@ -14,6 +14,7 @@ spec:
     statusStorageTopic: mm2-west-status
     config:
       exactly.once.source.support: enabled
+      scheduled.rebalance.max.delay.ms: ${MM2_REBALANCE_MAX_DELAY_MS}
       config.storage.replication.factor: 3
       offset.storage.replication.factor: 3
       status.storage.replication.factor: 3
@@ -22,26 +23,29 @@ spec:
         alias: east
         bootstrapServers: east-kafka-bootstrap:9092
       sourceConnector:
-        tasksMax: 3
+        tasksMax: ${MM2_TASKS_MAX}
         config:
-          replication.policy.class: org.apache.kafka.connect.mirror.IdentityReplicationPolicy
+          replication.policy.class: ${MM2_REPLICATION_POLICY_CLASS}
           exactly.once.support: required
           consumer.isolation.level: read_committed
           replication.factor: 3
           offset-syncs.topic.replication.factor: 3
-          refresh.topics.interval.seconds: 5
+          offset-syncs.topic.location: ${MM2_OFFSET_SYNC_LOCATION}
+          refresh.topics.interval.seconds: ${MM2_TOPIC_REFRESH_INTERVAL_SECONDS}
           sync.topic.configs.enabled: true
+          sync.topic.configs.interval.seconds: ${MM2_TOPIC_CONFIG_SYNC_INTERVAL_SECONDS}
           sync.topic.acls.enabled: false
       checkpointConnector:
         tasksMax: 1
         config:
-          replication.policy.class: org.apache.kafka.connect.mirror.IdentityReplicationPolicy
+          replication.policy.class: ${MM2_REPLICATION_POLICY_CLASS}
+          offset-syncs.topic.location: ${MM2_OFFSET_SYNC_LOCATION}
           checkpoints.topic.replication.factor: 3
           emit.checkpoints.enabled: true
-          emit.checkpoints.interval.seconds: 5
-          refresh.groups.interval.seconds: 5
+          emit.checkpoints.interval.seconds: ${MM2_CHECKPOINT_INTERVAL_SECONDS}
+          refresh.groups.interval.seconds: ${MM2_GROUP_REFRESH_INTERVAL_SECONDS}
           sync.group.offsets.enabled: true
-          sync.group.offsets.interval.seconds: 5
+          sync.group.offsets.interval.seconds: ${MM2_GROUP_OFFSET_SYNC_INTERVAL_SECONDS}
       topicsPattern: "^orders-[0-9]+$"
       groupsPattern: "^dr-.*"
   resources:

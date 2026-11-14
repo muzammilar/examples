@@ -32,6 +32,24 @@ The workload uses idempotent `acks=all` producer writes. MM2's source connector 
 - `offset-syncs` map source record offsets to target record offsets. The checkpoint connector translates the `dr-*` consumer group's committed offsets for the identically named topic. The target consumer starts at that checkpoint before the target producer writes its new batch.
 - Exactly-once source support is explicit: the Connect worker enables it, the MM2 source connector requires it, and its source consumer uses `read_committed`. This behavior applies to MM2's source-to-target Kafka writes; it is not a transaction spanning both clusters or application side effects.
 
+## Architecture experiments
+
+Run these against the same example with `make test`; no extra cluster or example directory is needed. The selected Make variables are rendered into `manifests/mirrormaker2.yaml`, and the cutover producer and consumer follow the selected target topic name.
+
+| Question | Command | What to observe |
+|---|---|---|
+| Preserve topic names, or include source identity? | `make test MM2_REPLICATION_POLICY=identity` or `make test MM2_REPLICATION_POLICY=default` | `identity` mirrors `orders-*` as-is and is convenient for same-name promotion. `default` mirrors as `east.orders-*`; the test follows that prefix during target validation and cutover. Source-prefixed names help distinguish remote data and reduce accidental replication loops in multi-cluster topologies. |
+| Where should MM2 keep offset-sync mappings? | `make test MM2_OFFSET_SYNC_LOCATION=source` or `make test MM2_OFFSET_SYNC_LOCATION=target` | Compare failover dependencies when the source is unavailable. This controls the location of the MM2 `offset-syncs` topic; it does not make checkpointing synchronous or remove the need to retain valid offset mappings. |
+| How long should Connect wait for a departed worker before task reassignment? | `make test MM2_REBALANCE_MAX_DELAY_MS=300000` or `make test MM2_REBALANCE_MAX_DELAY_MS=30000` | The default is five minutes. A shorter grace can recover tasks sooner after a worker loss but can trigger reassignment during a temporary interruption. |
+| How much replication parallelism should we allocate? | `make test MM2_REPLICAS=2 MM2_TASKS_MAX=3` or adjust either value | Watch MM2 worker/task logs and Kafka lag while balancing faster recovery and throughput against worker resources and rebalance cost. More tasks only help when the topic has enough partitions. |
+| What is the tradeoff between fresh metadata and control-plane work? | Vary `MM2_TOPIC_REFRESH_INTERVAL_SECONDS`, `MM2_GROUP_REFRESH_INTERVAL_SECONDS`, `MM2_CHECKPOINT_INTERVAL_SECONDS`, `MM2_GROUP_OFFSET_SYNC_INTERVAL_SECONDS`, and `MM2_TOPIC_CONFIG_SYNC_INTERVAL_SECONDS` | The lab defaults are five seconds to make changes visible during a demo. Larger values reduce polling/sync activity and increase how long changes or offsets can take to propagate. |
+
+Example: `make test COUNT=2000000 MM2_REPLICATION_POLICY=default MM2_REBALANCE_MAX_DELAY_MS=30000 MM2_REPLICAS=2 MM2_TASKS_MAX=3`. The defaults reproduce the current identity-name cutover path. MM2 documents `offset-syncs.topic.location` as `source` or `target`, and Kafka Connect documents a 300,000 ms default for `scheduled.rebalance.max.delay.ms`; the knobs above expose those decisions without changing the example's workflow. [MirrorMaker 2 configuration](https://kafka.apache.org/43/configuration/mirrormaker-configs/) · [Kafka Connect worker configuration](https://kafka.apache.org/43/configuration/kafka-connect-configs/)
+
+### Experiment results
+
+On 2026-11-14, `make test COUNT=2000000` passed with the defaults: the target validated 2,000,000 mirrored records, synced the six DR partition offsets, and completed consumer and producer cutover. With `MM2_REPLICATION_POLICY=default MM2_OFFSET_SYNC_LOCATION=source`, West received all 2,000,000 records under the `east.orders-*` topic name, but MM2 did not sync the DR group offsets; the run stopped before cutover. With both `MM2_REPLICATION_POLICY=default` and `MM2_OFFSET_SYNC_LOCATION=target`, the prefixed target topic remained empty and no DR offsets appeared. Those alternate combinations are recorded as failing experiments, not verified cutover configurations; use `identity` with source-side offset-sync storage for the passing path while investigating the alternatives.
+
 ## Other replication approaches
 
 This example uses MM2 because it is part of Apache Kafka and Strimzi manages it directly. It runs on Kafka Connect workers, so there is an extra worker deployment and asynchronous offset translation to understand.

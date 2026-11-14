@@ -12,11 +12,29 @@ PRODUCER_IMAGE := kafka-mirror-producer:dev
 CONSUMER_IMAGE := kafka-mirror-consumer:dev
 COUNT ?= 2000000
 PROGRESS_EVERY ?= 10000
+MM2_REPLICAS ?= 2
+MM2_TASKS_MAX ?= 3
+MM2_REBALANCE_MAX_DELAY_MS ?= 300000
+MM2_REPLICATION_POLICY ?= identity
+MM2_OFFSET_SYNC_LOCATION ?= source
+MM2_TOPIC_REFRESH_INTERVAL_SECONDS ?= 5
+MM2_GROUP_REFRESH_INTERVAL_SECONDS ?= 5
+MM2_CHECKPOINT_INTERVAL_SECONDS ?= 5
+MM2_GROUP_OFFSET_SYNC_INTERVAL_SECONDS ?= 5
+MM2_TOPIC_CONFIG_SYNC_INTERVAL_SECONDS ?= 5
 TOPIC ?= orders-$(shell date -u +%Y%m%d%H%M%S)
 RUN_ID ?= $(shell date -u +%Y%m%dT%H%M%SZ)
 TOPIC := $(TOPIC)
 RUN_ID := $(RUN_ID)
+ifeq ($(MM2_REPLICATION_POLICY),identity)
+MM2_REPLICATION_POLICY_CLASS := org.apache.kafka.connect.mirror.IdentityReplicationPolicy
 TARGET_TOPIC := $(TOPIC)
+else ifeq ($(MM2_REPLICATION_POLICY),default)
+MM2_REPLICATION_POLICY_CLASS := org.apache.kafka.connect.mirror.DefaultReplicationPolicy
+TARGET_TOPIC := $(SOURCE_ALIAS).$(TOPIC)
+else
+$(error MM2_REPLICATION_POLICY must be identity or default)
+endif
 
 .PHONY: kind-up kind-cluster namespace operator clusters mirror up images topic test verify-mirror chaos-mm2-worker chaos-broker-disk-loss chaos-target-broker status logs logs-mm2 cli down kind-down
 
@@ -45,7 +63,16 @@ clusters: operator
 	$(KUBECTL) wait pods -l strimzi.io/pool-name=$(TARGET_ALIAS)-brokers --for=condition=Ready --timeout=10m
 
 mirror:
-	$(KUBECTL) apply -f manifests/mirrormaker2.yaml
+	MM2_REPLICAS=$(MM2_REPLICAS) MM2_TASKS_MAX=$(MM2_TASKS_MAX) \
+	MM2_REBALANCE_MAX_DELAY_MS=$(MM2_REBALANCE_MAX_DELAY_MS) \
+	MM2_REPLICATION_POLICY_CLASS=$(MM2_REPLICATION_POLICY_CLASS) \
+	MM2_OFFSET_SYNC_LOCATION=$(MM2_OFFSET_SYNC_LOCATION) \
+	MM2_TOPIC_REFRESH_INTERVAL_SECONDS=$(MM2_TOPIC_REFRESH_INTERVAL_SECONDS) \
+	MM2_GROUP_REFRESH_INTERVAL_SECONDS=$(MM2_GROUP_REFRESH_INTERVAL_SECONDS) \
+	MM2_CHECKPOINT_INTERVAL_SECONDS=$(MM2_CHECKPOINT_INTERVAL_SECONDS) \
+	MM2_GROUP_OFFSET_SYNC_INTERVAL_SECONDS=$(MM2_GROUP_OFFSET_SYNC_INTERVAL_SECONDS) \
+	MM2_TOPIC_CONFIG_SYNC_INTERVAL_SECONDS=$(MM2_TOPIC_CONFIG_SYNC_INTERVAL_SECONDS) \
+	envsubst < manifests/mirrormaker2.yaml | $(KUBECTL) apply -f -
 	$(KUBECTL) wait kafkamirrormaker2/$(MM2_NAME) --for=condition=Ready --timeout=10m
 	$(KUBECTL) wait pods -l strimzi.io/kind=KafkaMirrorMaker2 --for=condition=Ready --timeout=10m
 
@@ -71,9 +98,9 @@ test: images topic
 	$(KUBECTL) wait --for=delete pod -l strimzi.io/kind=KafkaMirrorMaker2 --timeout=5m
 	-$(KUBECTL) delete job kafka-consumer --ignore-not-found
 	-$(KUBECTL) delete job kafka-producer --ignore-not-found
-	RUN_ID=$(RUN_ID)-west COUNT=$(COUNT) TOPIC=$(TOPIC) GROUP_ID=dr-$(RUN_ID) BOOTSTRAP_SERVERS=$(TARGET_ALIAS)-kafka-bootstrap:9092 envsubst < jobs/consumer.yaml | $(KUBECTL) apply -f -
+	RUN_ID=$(RUN_ID)-west COUNT=$(COUNT) TOPIC=$(TARGET_TOPIC) GROUP_ID=dr-$(RUN_ID) BOOTSTRAP_SERVERS=$(TARGET_ALIAS)-kafka-bootstrap:9092 envsubst < jobs/consumer.yaml | $(KUBECTL) apply -f -
 	$(KUBECTL) wait pod -l app=kafka-consumer --for=condition=Ready --timeout=2m
-	RUN_ID=$(RUN_ID)-west COUNT=$(COUNT) TOPIC=$(TOPIC) PROGRESS_EVERY=$(PROGRESS_EVERY) BOOTSTRAP_SERVERS=$(TARGET_ALIAS)-kafka-bootstrap:9092 envsubst < jobs/producer.yaml | $(KUBECTL) apply -f -
+	RUN_ID=$(RUN_ID)-west COUNT=$(COUNT) TOPIC=$(TARGET_TOPIC) PROGRESS_EVERY=$(PROGRESS_EVERY) BOOTSTRAP_SERVERS=$(TARGET_ALIAS)-kafka-bootstrap:9092 envsubst < jobs/producer.yaml | $(KUBECTL) apply -f -
 	$(KUBECTL) wait job/kafka-producer --for=condition=complete --timeout=30m
 	$(KUBECTL) wait job/kafka-consumer --for=condition=complete --timeout=30m
 	$(KUBECTL) logs job/kafka-consumer
