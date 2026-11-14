@@ -9,6 +9,7 @@ Website: [kafka.apache.org](https://kafka.apache.org/) | GitHub: [apache/kafka](
 | [`vagrant-single-vm/`](vagrant-single-vm/) | Kafka on a single Vagrant VM. |
 | [`strimzi-jbod/`](strimzi-jbod/) | Strimzi on kind; add a JBOD volume, rebalance replicas between disks, then safely remove it; C++ protobuf producer and Rust consumer. |
 | [`connect-postgres-enrichment/`](connect-postgres-enrichment/) | Distributed Kafka Connect with Debezium PostgreSQL CDC, Go stream-table enrichment, and C++/Rust protobuf clients. |
+| [`cross-cluster-mirroring/`](cross-cluster-mirroring/) | Two Strimzi KRaft clusters with Apache MirrorMaker 2, offset checkpoints, and producer-under-failure recovery tests. |
 
 ## Benchmarks
 

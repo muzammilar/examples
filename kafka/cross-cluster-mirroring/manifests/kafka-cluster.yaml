@@ -1,0 +1,72 @@
+apiVersion: kafka.strimzi.io/v1
+kind: KafkaNodePool
+metadata:
+  name: ${CLUSTER_NAME}-controllers
+  labels:
+    strimzi.io/cluster: ${CLUSTER_NAME}
+  annotations:
+    strimzi.io/next-node-ids: "[0-2]"
+spec:
+  replicas: 3
+  roles:
+    - controller
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+  jvmOptions:
+    -Xms: 256m
+    -Xmx: 256m
+  storage:
+    type: ephemeral
+---
+apiVersion: kafka.strimzi.io/v1
+kind: KafkaNodePool
+metadata:
+  name: ${CLUSTER_NAME}-brokers
+  labels:
+    strimzi.io/cluster: ${CLUSTER_NAME}
+  annotations:
+    strimzi.io/next-node-ids: "[3-5]"
+spec:
+  replicas: 3
+  roles:
+    - broker
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+  jvmOptions:
+    -Xms: 256m
+    -Xmx: 256m
+  storage:
+    type: ephemeral
+---
+apiVersion: kafka.strimzi.io/v1
+kind: Kafka
+metadata:
+  name: ${CLUSTER_NAME}
+spec:
+  kafka:
+    version: 4.3.2
+    metadataVersion: 4.3-IV0
+    listeners:
+      - name: plain
+        port: 9092
+        type: internal
+        tls: false
+    config:
+      default.replication.factor: 3
+      min.insync.replicas: 2
+      offsets.topic.replication.factor: 3
+      transaction.state.log.replication.factor: 3
+      transaction.state.log.min.isr: 2
+      auto.create.topics.enable: false
+    template:
+      pod:
+        metadata:
+          labels:
+            app.kubernetes.io/part-of: kafka-cross-cluster-mirroring
+  entityOperator:
+    topicOperator: {}
+    userOperator: {}

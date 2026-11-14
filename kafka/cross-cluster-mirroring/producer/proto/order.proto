@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package kafka.demo.v1;
+
+option optimize_for = SPEED;
+
+message Order {
+  string order_id = 1;
+  string customer_id = 2;
+  int64 amount_cents = 3;
+  int64 created_at_unix_ms = 4;
+}

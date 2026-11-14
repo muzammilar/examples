@@ -1,0 +1,50 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: kafka-consumer
+  labels:
+    app: kafka-consumer
+spec:
+  backoffLimit: 0
+  activeDeadlineSeconds: 1800
+  template:
+    metadata:
+      labels:
+        app: kafka-consumer
+    spec:
+      restartPolicy: Never
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: consumer
+          image: kafka-mirror-consumer:dev
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: BOOTSTRAP_SERVERS
+              value: "${BOOTSTRAP_SERVERS}"
+            - name: TOPIC
+              value: "${TOPIC}"
+            - name: GROUP_ID
+              value: "${GROUP_ID}"
+            - name: RUN_ID
+              value: "${RUN_ID}"
+            - name: EXPECTED_COUNT
+              value: "${COUNT}"
+            - name: TIMEOUT_SECONDS
+              value: "1800"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 64Mi
+            limits:
+              cpu: "1"
+              memory: 256Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: [ALL]
