@@ -10,7 +10,15 @@ Every commit title must use this format:
 [SYSTEM] Short Commit Message
 ```
 
-Use the system or top-level area being changed for `SYSTEM` (for example, `[ClickHouse]` or `[Go]`). Keep the summary short and descriptive.
+`SYSTEM` is a placeholder: replace it with the uppercase technology or change category. Never use the literal `[SYSTEM]` prefix. Keep the summary short and descriptive.
+
+Examples:
+
+- `[KAFKA] Add MirrorMaker architecture experiments`
+- `[NEO4J] Add cluster recovery example`
+- `[CLICKHOUSE] Add ingestion benchmark`
+- `[DOCS] Clarify example conventions`
+- `[FIX] Correct shared cleanup behavior`
 
 ## Repository layout
 
