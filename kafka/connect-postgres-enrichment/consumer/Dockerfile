@@ -1,6 +1,6 @@
 FROM rust:1.91.1-bookworm AS build
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    cmake g++ libssl-dev pkg-config protobuf-compiler \
+    build-essential cmake libssl-dev pkg-config protobuf-compiler \
     && rm -rf /var/lib/apt/lists/*
 WORKDIR /src
 COPY proto/order.proto proto/order.proto

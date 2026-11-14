@@ -1,6 +1,6 @@
 FROM debian:bookworm-slim AS build
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    ca-certificates cmake g++ librdkafka-dev libprotobuf-dev protobuf-compiler \
+    ca-certificates cmake g++ make pkg-config librdkafka-dev libprotobuf-dev protobuf-compiler \
     && rm -rf /var/lib/apt/lists/*
 WORKDIR /src
 COPY proto/order.proto proto/order.proto
@@ -11,7 +11,7 @@ RUN cmake -S producer -B build -DCMAKE_BUILD_TYPE=Release \
 
 FROM debian:bookworm-slim
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    ca-certificates librdkafka1 libprotobuf32 \
+    ca-certificates librdkafka++1 librdkafka1 libprotobuf32 \
     && rm -rf /var/lib/apt/lists/* \
     && useradd --uid 10001 --create-home --shell /usr/sbin/nologin app
 COPY --from=build /src/build/order-producer /usr/local/bin/order-producer

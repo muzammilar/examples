@@ -7,17 +7,10 @@ CREATE TABLE public.customers (
     segment text NOT NULL CHECK (segment IN ('standard', 'silver', 'gold'))
 );
 
-INSERT INTO public.customers (id, display_name, segment) VALUES
-    ('customer-0', 'Ada Lovelace', 'gold'),
-    ('customer-1', 'Grace Hopper', 'silver'),
-    ('customer-2', 'Katherine Johnson', 'gold'),
-    ('customer-3', 'Edsger Dijkstra', 'standard'),
-    ('customer-4', 'Barbara Liskov', 'silver'),
-    ('customer-5', 'Donald Knuth', 'gold'),
-    ('customer-6', 'Margaret Hamilton', 'silver'),
-    ('customer-7', 'Alan Turing', 'gold'),
-    ('customer-8', 'Frances Allen', 'standard'),
-    ('customer-9', 'Leslie Lamport', 'silver');
+INSERT INTO public.customers (id, display_name, segment)
+SELECT 'customer-' || n::text, 'Customer ' || n::text,
+       CASE n % 3 WHEN 0 THEN 'gold' WHEN 1 THEN 'silver' ELSE 'standard' END
+FROM generate_series(0, (:'customer_count')::integer - 1) AS series(n);
 
 ALTER TABLE public.customers OWNER TO debezium;
 GRANT USAGE ON SCHEMA public TO debezium;

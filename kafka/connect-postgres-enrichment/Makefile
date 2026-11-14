@@ -1,20 +1,24 @@
 COMPOSE := docker compose -f docker-compose.yml
-COUNT ?= 100
+COUNT ?= 2000000
+CUSTOMER_COUNT ?= 10000
+TIMEOUT_SECONDS ?= 1800
 CONNECT_PORT ?= 8083
 POSTGRES_PORT ?= 55432
 KAFKA_BROKER_1_PORT ?= 29092
 KAFKA_BROKER_2_PORT ?= 39092
 KAFKA_BROKER_3_PORT ?= 49092
 PROCESSOR_PORT ?= 8080
-export CONNECT_PORT POSTGRES_PORT KAFKA_BROKER_1_PORT KAFKA_BROKER_2_PORT KAFKA_BROKER_3_PORT PROCESSOR_PORT
+export CONNECT_PORT POSTGRES_PORT KAFKA_BROKER_1_PORT KAFKA_BROKER_2_PORT KAFKA_BROKER_3_PORT PROCESSOR_PORT CUSTOMER_COUNT
 CONNECT_URL := http://127.0.0.1:$(CONNECT_PORT)
 RUN_ID ?= $(shell date -u +%Y%m%dT%H%M%SZ)
 
-.PHONY: up kafka-topics connector processor demo test status logs cli down
+.PHONY: docker-up up kafka-topics connector processor demo test status logs cli down docker-down
 
-up:
+docker-up:
 	$(COMPOSE) up --build --detach --wait kafka-controller-1 kafka-controller-2 kafka-controller-3 \
 		kafka-broker-1 kafka-broker-2 kafka-broker-3 postgres connect-1 connect-2
+
+up: docker-up
 	$(MAKE) kafka-topics
 	$(MAKE) connector
 	$(COMPOSE) up --build --detach --wait processor
@@ -45,8 +49,8 @@ processor:
 	$(COMPOSE) up --build --detach --wait processor
 
 demo:
-	$(COMPOSE) run --rm --build -e COUNT=$(COUNT) -e RUN_ID=$(RUN_ID) producer
-	$(COMPOSE) run --rm --build -e EXPECTED_COUNT=$(COUNT) -e RUN_ID=$(RUN_ID) consumer
+	$(COMPOSE) run --rm --build -e COUNT=$(COUNT) -e CUSTOMER_COUNT=$(CUSTOMER_COUNT) -e RUN_ID=$(RUN_ID) producer
+	$(COMPOSE) run --rm --build -e EXPECTED_COUNT=$(COUNT) -e TIMEOUT_SECONDS=$(TIMEOUT_SECONDS) -e RUN_ID=$(RUN_ID) consumer
 
 test: demo
 
@@ -64,4 +68,8 @@ cli:
 	$(COMPOSE) exec postgres psql -U admin -d enrichment
 
 down:
+	-$(COMPOSE) stop processor
+	-$(COMPOSE) rm --force processor
+
+docker-down:
 	$(COMPOSE) --profile apps down --volumes --remove-orphans --rmi local

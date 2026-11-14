@@ -6,17 +6,17 @@ Kafka Connect connector plugins implement JVM APIs, so a Go program cannot run a
 
 ## Quick start
 
-```sh
-make up
-make demo
-make status
-make cli
-make down
-```
+1. `make docker-up` — start Kafka, PostgreSQL, and the Connect workers.
+2. `make up` — create topics, register Debezium, and wait for the Go processor.
+3. `make test` — produce 2,000,000 protobuf orders by default and check every enriched output (`make test COUNT=3000000` changes the workload; the producer allows up to 5,000,000).
+4. `make down` — stop and remove the Go processor container while keeping the services and data available.
+5. `make docker-down` — stop the Compose stack and remove its volumes and local images.
 
 Prerequisites: Docker with the Compose v2 plugin, `make`, `curl`, `jq`, and `seq`. C++, Go, Rust, and `protoc` toolchains run in the image builds.
 
-`make up` starts Kafka, PostgreSQL and two distributed Connect workers, creates topics, registers the Debezium connector, and waits until the Go customer cache has loaded the ten seeded rows. `make demo` sends a finite order batch and checks the enriched output.
+Use `make status`, `make logs`, and `make cli` for inspection and database access. `make demo` reruns the producer/consumer flow without rebuilding the infrastructure.
+
+`make up` can also be run directly; it starts the Compose infrastructure before provisioning the example. `make demo` runs the same producer/consumer flow as `make test`.
 
 ## What it demonstrates
 
@@ -28,6 +28,10 @@ Prerequisites: Docker with the Compose v2 plugin, `make`, `curl`, `jq`, and `seq
 
 The Compose setup is local development infrastructure. Kafka has three brokers and three KRaft controllers, but it has no TLS or SASL and is not a production security configuration. The demo binds host access to loopback and keeps services on a private Compose network.
 
+## Verified run
+
+On 2026-11-14, the default `make test` built the C++ producer and Rust consumer images, sent 2,000,000 protobuf orders, and validated 2,000,000 unique enriched protobuf orders. PostgreSQL contained 10,000 customer rows; the Go processor log confirmed it loaded all 10,000 from the Debezium CDC topic before processing orders. These counts verify the end-to-end join and republish path; they are not throughput measurements. Set `COUNT` to change the message count and `CUSTOMER_COUNT` to change the PostgreSQL seed size and matching application configuration.
+
 ## Setup
 
 | Service | Image / version | Host port | Role |
@@ -36,16 +40,16 @@ The Compose setup is local development infrastructure. Kafka has three brokers a
 | Kafka Connect | `quay.io/debezium/connect:3.7.1.Final` | `8083` (override with `CONNECT_PORT`) | Two distributed workers with Debezium PostgreSQL plugin |
 | PostgreSQL | `postgres:18.7` | `55432` (override with `POSTGRES_PORT`) | Logical replication source database |
 | Go processor | Go `1.27.4`, `franz-go 1.22.3` | `8080` (override with `PROCESSOR_PORT`) | CDC cache, transactional order enrichment, readiness endpoint |
-| C++ producer / Rust consumer | Built from local Dockerfiles | — | Protobuf application clients; started by `make demo` |
+| C++ producer / Rust consumer | CMake / Cargo; built from local Dockerfiles | — | Protobuf application clients; started by `make demo` |
 
-The Go service consumes the PostgreSQL CDC topic into memory at startup. Restarting it rebuilds the cache from the compacted topic before processing orders. This demo keeps the ten-row reference set small; it does not implement a general-purpose persistent state store or handle schema evolution. PostgreSQL credentials are demo-only values in Compose and are not suitable for a shared or production environment.
+The Go service consumes the PostgreSQL CDC topic into memory at startup. Restarting it rebuilds the cache from the compacted topic before processing orders. The default 10,000-row seed exercises a larger in-memory lookup set; it does not implement a general-purpose persistent state store or handle schema evolution. PostgreSQL credentials are demo-only values in Compose and are not suitable for a shared or production environment.
 
 ## Layout
 
 | Path | Purpose |
 |---|---|
 | `docker-compose.yml` | Kafka, Connect workers, PostgreSQL, and application images |
-| `postgres/init.sql` | Logical-replication role, schema, and ten reference customers |
+| `postgres/init.sh`, `postgres/init.sql` | Logical-replication role, schema, and configurable customer seed (10,000 by default) |
 | `connectors/postgres-customers.json` | Debezium PostgreSQL connector configuration |
 | `proto/order.proto` | Shared order, customer, and enriched-order protobuf contract |
 | `producer/`, `processor/`, `consumer/` | C++, Go, and Rust applications |

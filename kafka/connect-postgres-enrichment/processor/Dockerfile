@@ -4,7 +4,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends protobuf-compil
 RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.36.12
 WORKDIR /src
 COPY proto/order.proto /src/proto/order.proto
-COPY processor/go.mod /src/processor/
+COPY processor/go.mod processor/go.sum /src/processor/
 WORKDIR /src/processor
 RUN go mod download
 COPY processor/*.go ./

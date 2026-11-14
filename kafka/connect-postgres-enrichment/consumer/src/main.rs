@@ -1,5 +1,4 @@
 use std::{
-    collections::HashSet,
     env,
     error::Error,
     thread,
@@ -43,13 +42,14 @@ fn main() -> Result<(), Box<dyn Error>> {
     let topic = env_or("TOPIC", "orders.enriched");
     let run_id = env_or("RUN_ID", "connect-demo");
     let run_prefix = format!("{run_id}-order-");
-    let expected: usize = env_or("EXPECTED_COUNT", "100").parse()?;
-    let timeout = Duration::from_secs(env_or("TIMEOUT_SECONDS", "180").parse()?);
+    let expected: usize = env_or("EXPECTED_COUNT", "2000000").parse()?;
+    let timeout = Duration::from_secs(env_or("TIMEOUT_SECONDS", "1800").parse()?);
     consumer.subscribe(&[&topic])?;
 
     let deadline = Instant::now() + timeout;
-    let mut seen = HashSet::with_capacity(expected);
-    while seen.len() < expected && Instant::now() < deadline {
+    let mut seen = vec![false; expected];
+    let mut received = 0;
+    while received < expected && Instant::now() < deadline {
         match consumer.poll(Duration::from_millis(500)) {
             Some(Ok(message)) => {
                 let payload = message.payload().ok_or("record has no value")?;
@@ -60,29 +60,33 @@ fn main() -> Result<(), Box<dyn Error>> {
                     consumer.commit_message(&message, CommitMode::Sync)?;
                     continue;
                 }
-                if order.order_id.is_empty() || customer.customer_id != order.customer_id {
+                if order.order_id.is_empty() || customer.customer_id != order.customer_id
+                    || customer.display_name.is_empty() || customer.segment.is_empty() {
                     return Err("order/customer IDs do not match".into());
                 }
-                if !seen.insert(order.order_id.clone()) {
-                    return Err(format!("duplicate order id: {}", order.order_id).into());
+                let index: usize = order.order_id.strip_prefix(&run_prefix)
+                    .ok_or("order ID does not match this run")?.parse()?;
+                if index >= expected || seen[index] {
+                    return Err(format!("duplicate or out-of-range order ID: {}", order.order_id).into());
                 }
-                println!(
-                    "{} -> {} ({})",
-                    order.order_id, customer.display_name, customer.segment
-                );
-                consumer.commit_message(&message, CommitMode::Sync)?;
+                seen[index] = true;
+                received += 1;
+                if received % 1000 == 0 {
+                    consumer.commit_message(&message, CommitMode::Async)?;
+                }
             }
             Some(Err(error)) => return Err(error.into()),
             None => thread::sleep(Duration::from_millis(50)),
         }
     }
-    if seen.len() != expected {
+    if received != expected {
         return Err(format!(
             "timed out after receiving {} of {expected} enriched orders",
-            seen.len()
+            received
         )
         .into());
     }
-    println!("consumed {} unique enriched protobuf orders", seen.len());
+    consumer.commit_consumer_state(CommitMode::Sync)?;
+    println!("consumed {received} unique enriched protobuf orders");
     Ok(())
 }

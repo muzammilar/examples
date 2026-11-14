@@ -35,6 +35,16 @@ type cdcRecord struct {
 	Op string `json:"op"`
 }
 
+func unwrapConnectPayload(raw json.RawMessage) json.RawMessage {
+	var message struct {
+		Payload json.RawMessage `json:"payload"`
+	}
+	if err := json.Unmarshal(raw, &message); err == nil && message.Payload != nil {
+		return message.Payload
+	}
+	return raw
+}
+
 func env(key, fallback string) string {
 	if value := os.Getenv(key); value != "" {
 		return value
@@ -49,7 +59,7 @@ func (s *customerState) apply(record *kgo.Record) error {
 	var key struct {
 		ID string `json:"id"`
 	}
-	if err := json.Unmarshal(record.Key, &key); err != nil {
+	if err := json.Unmarshal(unwrapConnectPayload(record.Key), &key); err != nil {
 		return fmt.Errorf("decode customer key: %w", err)
 	}
 	if key.ID == "" {
@@ -62,7 +72,7 @@ func (s *customerState) apply(record *kgo.Record) error {
 		return nil
 	}
 	var change cdcRecord
-	if err := json.Unmarshal(record.Value, &change); err != nil {
+	if err := json.Unmarshal(unwrapConnectPayload(record.Value), &change); err != nil {
 		return fmt.Errorf("decode Debezium envelope: %w", err)
 	}
 	if change.Op == "d" || change.After == nil {

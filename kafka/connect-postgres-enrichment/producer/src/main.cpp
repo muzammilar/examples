@@ -37,11 +37,11 @@ class DeliveryReport final : public RdKafka::DeliveryReportCb {
 
 int parse_count() {
   try {
-    const auto count = std::stol(env_or("COUNT", "100"));
-    if (count < 1 || count > 1000000) throw std::out_of_range("COUNT");
+    const auto count = std::stol(env_or("COUNT", "2000000"));
+    if (count < 1 || count > 5000000) throw std::out_of_range("COUNT");
     return static_cast<int>(count);
   } catch (const std::exception&) {
-    throw std::runtime_error("COUNT must be an integer between 1 and 1000000");
+    throw std::runtime_error("COUNT must be an integer between 1 and 5000000");
   }
 }
 }  // namespace
@@ -52,6 +52,8 @@ int main() {
     const auto topic_name = env_or("TOPIC", "orders");
     const auto run_id = env_or("RUN_ID", "connect-demo");
     const int count = parse_count();
+    const auto customer_count = std::stol(env_or("CUSTOMER_COUNT", "10000"));
+    if (customer_count < 1) throw std::runtime_error("CUSTOMER_COUNT must be positive");
     std::string error;
     std::unique_ptr<RdKafka::Conf> config(RdKafka::Conf::create(RdKafka::Conf::CONF_GLOBAL));
     DeliveryReport reports;
@@ -72,7 +74,7 @@ int main() {
       kafka::demo::v1::Order order;
       const auto id = run_id + "-order-" + std::to_string(i);
       order.set_order_id(id);
-      order.set_customer_id("customer-" + std::to_string(i % 10));
+      order.set_customer_id("customer-" + std::to_string(i % customer_count));
       order.set_amount_cents(1000 + i % 5000);
       order.set_created_at_unix_ms(now + i);
       std::string payload;
