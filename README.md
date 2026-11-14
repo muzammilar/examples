@@ -47,6 +47,7 @@ To add or test a system, follow [`FORMAT.md`](FORMAT.md): folder layout, Make ta
 | NebulaGraph | [`nebula-graph/`](nebula-graph) | Graph | [nebula-graph.io](https://www.nebula-graph.io/) | [vesoft-inc/nebula](https://github.com/vesoft-inc/nebula) |
 | Neo4j | [`neo4j/`](neo4j) | Graph | [neo4j.com](https://neo4j.com/) | [neo4j/neo4j](https://github.com/neo4j/neo4j) |
 | OceanBase | [`oceanbase/`](oceanbase) | Distributed SQL | [oceanbase.com](https://en.oceanbase.com/) | [oceanbase/oceanbase](https://github.com/oceanbase/oceanbase) |
+| PostgreSQL | [`postgres/`](postgres) | Relational / sharding | [postgresql.org](https://www.postgresql.org/) | [postgres/postgres](https://github.com/postgres/postgres) |
 | Qdrant | [`qdrant/`](qdrant) | Vector | [qdrant.tech](https://qdrant.tech/) | [qdrant/qdrant](https://github.com/qdrant/qdrant) |
 | QEMU | [`qemu/`](qemu) | VM / virtualization | [qemu.org](https://www.qemu.org/) | [qemu/qemu](https://github.com/qemu/qemu) |
 | QuestDB | [`questdb/`](questdb) | Time-series | [questdb.com](https://questdb.com/) | [questdb/questdb](https://github.com/questdb/questdb) |

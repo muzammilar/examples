@@ -99,7 +99,7 @@ sharded `orders` workload (distribution key `customer_id`) so results compare di
 - [ ] `postgres-single-node`: Postgres 18 baseline; async I/O, `pg_stat_statements`, `pgbench`.
 - [ ] `postgres-docker-compose-cluster`: streaming replication with Patroni + etcd; `failover`, sync vs async commit.
 - [ ] `postgres-kubernetes-operator`: CloudNativePG on kind; replicas, switchover, backups to MinIO.
-- [ ] `citus-docker-compose-cluster`: coordinator + workers; distributed and reference tables, co-located joins, `citus_rebalance_start()` on `scale-out`.
+- [x] `citus-docker-compose-cluster`: 3 replicated worker groups plus replicated coordinator; colocated distributed tables, worker/coordinator failover, replica stalls and active-write rebalancing 3 → 5 → 3.
 - [ ] `pgdog-docker-compose-cluster`: PgDog (Rust) in front of plain Postgres shards; pooling, read/write split, sharding by key, cross-shard queries, resharding.
 - [ ] `multigres-docker-compose-cluster`: Supabase's Vitess-style architecture for Postgres (gateway, pooler, orchestrator); early-stage, document what runs and what doesn't.
 - [ ] `pgbouncer-pooler`: transaction pooling baseline; compare connection-storm behaviour with PgDog.
