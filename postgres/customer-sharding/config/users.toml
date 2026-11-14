@@ -1,0 +1,4 @@
+[[users]]
+name = "postgres"
+password = "local-postgres"
+database = "orders"

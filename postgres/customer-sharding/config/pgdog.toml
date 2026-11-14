@@ -1,0 +1,83 @@
+[general]
+host = "0.0.0.0"
+port = 6432
+pooler_mode = "transaction"
+default_pool_size = 16
+min_pool_size = 1
+read_write_split = "prefer_primary"
+lsn_check_delay = 0
+healthcheck_interval = 1000
+connect_timeout = 1000
+checkout_timeout = 5000
+query_timeout = 10000
+[admin]
+user = "admin"
+password = "local-admin"
+
+[[databases]]
+name = "orders"
+database_name = "postgres"
+host = "s0n0"
+shard = 0
+role = "auto"
+
+[[databases]]
+name = "orders"
+database_name = "postgres"
+host = "s0n1"
+shard = 0
+role = "auto"
+
+[[databases]]
+name = "orders"
+database_name = "postgres"
+host = "s0n2"
+shard = 0
+role = "auto"
+
+[[databases]]
+name = "orders"
+database_name = "postgres"
+host = "s1n0"
+shard = 1
+role = "auto"
+
+[[databases]]
+name = "orders"
+database_name = "postgres"
+host = "s1n1"
+shard = 1
+role = "auto"
+
+[[databases]]
+name = "orders"
+database_name = "postgres"
+host = "s1n2"
+shard = 1
+role = "auto"
+
+[[databases]]
+name = "orders"
+database_name = "postgres"
+host = "s2n0"
+shard = 2
+role = "auto"
+
+[[databases]]
+name = "orders"
+database_name = "postgres"
+host = "s2n1"
+shard = 2
+role = "auto"
+
+[[databases]]
+name = "orders"
+database_name = "postgres"
+host = "s2n2"
+shard = 2
+role = "auto"
+
+[[sharded_tables]]
+database = "orders"
+column = "customer_id"
+data_type = "bigint"

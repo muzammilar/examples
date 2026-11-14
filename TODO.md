@@ -93,6 +93,8 @@ Planned: Postgres, Citus, PgDog, Multigres and Neon under `postgres/`; MySQL, Vi
 
 ## Postgres ecosystem
 
+- [x] `postgres/customer-sharding`: PgDog + Patroni, three shards with three copies each; primary failures, replica stalls and acknowledgement reconciliation.
+
 Planned as a `postgres/` folder: a plain Postgres baseline, then each scale-out option on the same
 sharded `orders` workload (distribution key `customer_id`) so results compare directly.
 
