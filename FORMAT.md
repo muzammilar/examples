@@ -54,19 +54,52 @@ Each example folder:
 | `scale-out` / `scale-in` | cluster / Kubernetes examples | add nodes, then remove them, with load running |
 | `logs` | optional | follow logs |
 | `kind-cluster`, `operator`, `cluster` | kind examples | steps of `up`, each idempotent |
+| `kind-up` / `kind-down` | layered kind examples | create/delete the kind cluster separately from the example |
+| `docker-up` / `docker-down` | layered Compose examples | start/fully remove Compose infrastructure separately from the example |
 | `aio-max-nr` etc. | when a kernel setting is needed | prerequisite of `up` (see `oceanbase/*/Makefile`) |
+
+### Quick-start lifecycle
+
+Every runnable example README starts with a numbered, copy-pasteable sequence. For kind:
+
+1. `make kind-up` — create the kind cluster.
+2. `make up` — install/configure the example and wait until healthy.
+3. `make test` — run the example's checks.
+4. `make down` — remove the example resources, keeping kind available.
+5. `make kind-down` — delete the kind cluster and its example-owned images/state.
+
+For Docker Compose, use the same order with `docker-up` and `docker-down` replacing `kind-up` and
+`kind-down`. `docker-up` starts the supporting Compose infrastructure; `up` provisions the example;
+`down` removes the example layer; `docker-down` removes its Compose services and volumes. Put
+scenario-specific operations in a separate README section. Keep existing examples as-is unless the
+task asks to migrate them.
+
+For kind, set `CLUSTER_NAME := <system>-<example>` and pass `--context kind-$(CLUSTER_NAME)` on
+**every** `kubectl` invocation. The shared `KUBECTL` Make variable must include this context, and
+direct `kubectl` calls in recipes must include it too. Helm invocations must include
+`--kube-context kind-$(CLUSTER_NAME)`. Never rely on the user's current Kubernetes context or change
+it; for example, a Kafka example uses `kind-kafka-strimzi-jbod` explicitly.
+
+Layered examples preserve that boundary in the Makefile: kind `down` removes the example resources
+and operator while keeping the kind cluster, and Compose `down` removes the example workload while
+keeping its supporting services. The final `kind-down` or `docker-down` target removes the remaining
+infrastructure and example-owned state. For a clean rerun, use the full five-command sequence in the
+README.
 
 ### `make down`
 
-Leaves nothing behind that the example created, and nothing else:
+Single-layer examples remove their entire deployment with `down`. Layered examples split workload
+cleanup from infrastructure teardown:
 
 | Deployment | Command |
 |---|---|
-| Compose | `docker compose --profile <every profile> down --volumes --remove-orphans --rmi local` |
-| kind | `kind delete cluster --name $(CLUSTER_NAME)` (plus `docker image rm` of images built for it) |
+| Compose, single-layer | `docker compose --profile <every profile> down --volumes --remove-orphans --rmi local` |
+| Compose, layered | `down` removes the example workload; `docker-down` runs the full Compose cleanup above |
+| kind, single-layer | `kind delete cluster --name $(CLUSTER_NAME)` (plus `docker image rm` of images built for it) |
+| kind, layered | `down` removes example resources; `kind-down` deletes the kind cluster and example-built images |
 
 - Never `docker system prune`, `docker volume prune` or remove images the example did not build.
-- `make down && make up` must start from a clean state.
+- The README's full lifecycle sequence must start from and return to a clean state.
 
 ## Docker Compose
 
