@@ -1,7 +1,7 @@
 apiVersion: kafka.strimzi.io/v1
 kind: KafkaTopic
 metadata:
-  name: orders
+  name: ${TOPIC}
   labels:
     strimzi.io/cluster: kafka
 spec:

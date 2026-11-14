@@ -27,7 +27,7 @@ spec:
             - name: BOOTSTRAP_SERVERS
               value: kafka-kafka-bootstrap.kafka.svc:9092
             - name: TOPIC
-              value: orders
+              value: "${TOPIC}"
             - name: GROUP_ID
               value: kafka-jbod-${RUN_ID}
             - name: RUN_ID

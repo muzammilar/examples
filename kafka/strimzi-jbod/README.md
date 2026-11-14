@@ -29,9 +29,14 @@ Use `make status`, `make cli`, and `make logs` to inspect the cluster.
 
 `disk-approve` intentionally approves the currently pending `KafkaRebalance` after you inspect its proposal. Run it only after a `ProposalReady` status is visible. The remove plan targets volume 1 on all brokers; do not remove a volume while it still hosts replicas.
 
-## Broker failure exercise
+## Failure and recovery exercises
 
-Run `make chaos` after `make up` to reset the test topic, send half of the configured workload, pause the producer, delete broker pod `kafka-brokers-3`, and wait for Strimzi to recreate it. The producer then resumes and the Rust consumer verifies every record. Override `COUNT`, `CHAOS_BROKER`, `CHAOS_AFTER_RECORDS`, or `CHAOS_PAUSE_SECONDS` to change the run. This is a broker-pod failure and recovery test; ephemeral JBOD storage means it does not simulate replacing a failed physical disk.
+Each chaos test runs the producer continuously while the fault is injected. The producer does not pause at a checkpoint.
+
+- `make chaos-broker` deletes broker pod `kafka-brokers-3` while producing. Strimzi recreates the pod, and the Rust consumer verifies all records after recovery. Override `COUNT` or `CHAOS_BROKER` to change the run.
+- `make chaos-disk` adds a second JBOD volume, creates a separate test topic, explicitly moves its broker 3 replicas onto volume 1, and removes write permission from that log directory while producing. It waits for Kafka to report the log directory failure, restores permission, restarts that broker, and verifies all records with the Rust consumer. Override `COUNT`, `CHAOS_BROKER`, `CHAOS_BROKER_ID`, `CHAOS_VOLUME_ID`, or `CHAOS_TOPIC` to change the run.
+
+The disk test injects a filesystem write error (permission denied) against one broker's data volume. It exercises Kafka's KRaft JBOD log-directory failure handling and recovery, but does not emulate a failed physical device, controller failure, or storage-provider behavior. The example uses ephemeral storage.
 
 ## What it demonstrates
 
@@ -45,7 +50,7 @@ The cluster uses ephemeral storage to keep the local demo self-contained. Strimz
 
 ## Verified run
 
-On 2026-11-14, the default `make test` reset the `orders` topic, built both client images, delivered 1,000,000 protobuf orders, and validated 1,000,000 unique orders in the Rust consumer. Their amount sum was 3,499,500,000 cents. The default `make chaos` then flushed 500,000 orders, deleted broker pod `kafka-brokers-3` during the producer pause, waited for Strimzi to recreate it, and delivered and validated all 1,000,000 orders; the producer reconnected after broker disconnections. These counts verify correctness and recovery, not throughput. A separate earlier 100-order disk walkthrough added volume 1 to brokers 3–5, completed 9 intra-broker movements for the rebalance proposal and 189 movements for the remove-disks proposal, then returned all 3 brokers to one volume; Cruise Control reported 0 MB to move in both plans. Those disk-movement figures are not measurements from the million-order runs.
+On 2026-11-14, `make chaos-broker COUNT=1000000` deleted broker pod `kafka-brokers-3` after the live producer had enqueued about 410,000 records. The producer completed and the Rust consumer validated 1,000,000 unique orders with an amount sum of 3,499,500,000 cents. `make chaos-disk COUNT=1000000` injected a write-permission failure on broker 3's volume 1 while producing; Kafka reported a failed log directory, the producer completed, the broker recovered after the directory was restored and its pod restarted, and the Rust consumer validated all 1,000,000 unique orders with the same amount sum. These counts verify correctness and recovery, not throughput. The disk fault is a filesystem permission error, not a physical-device failure. A separate earlier 100-order disk walkthrough added volume 1 to brokers 3–5, completed 9 intra-broker movements for the rebalance proposal and 189 movements for the remove-disks proposal, then returned all 3 brokers to one volume; Cruise Control reported 0 MB to move in both plans. Those disk-movement figures are not measurements from the million-order runs.
 
 ## Setup
 
@@ -64,6 +69,7 @@ The selected Strimzi release supports Kafka 4.3 and requires Kubernetes 1.32 or 
 | Path | Purpose |
 |---|---|
 | `manifests/` | Strimzi Kafka, one-volume/two-volume pools, topic, and rebalance resources |
+| `scripts/` | Generates an exact Kafka replica reassignment to the selected broker log directory |
 | `producer/` | C++ producer and protobuf schema; `protoc` runs in the image build |
 | `consumer/` | Rust consumer and protobuf generation |
 | `jobs/` | Kubernetes Jobs for the one-shot producer and consumer |

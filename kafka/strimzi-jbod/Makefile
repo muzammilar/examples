@@ -7,13 +7,16 @@ KAFKA_VERSION := 4.3.2
 PRODUCER_IMAGE := kafka-strimzi-producer:dev
 CONSUMER_IMAGE := kafka-strimzi-consumer:dev
 COUNT ?= 1000000
+TOPIC ?= orders
 CHAOS_BROKER ?= kafka-brokers-3
-CHAOS_AFTER_RECORDS ?= $(shell expr $(COUNT) / 2)
-CHAOS_PAUSE_SECONDS ?= 30
+CHAOS_BROKER_ID ?= 3
+CHAOS_VOLUME_ID ?= 1
+CHAOS_PROGRESS_RECORDS ?= 10000
+CHAOS_TOPIC ?= disk-chaos-orders
 REBALANCE ?= kafka-jbod-rebalance
 RUN_ID ?= $(shell date -u +%Y%m%dT%H%M%SZ)
 
-.PHONY: kind-up kind-cluster up namespace operator cluster images topic-reset demo chaos test disk-add disk-rebalance-plan disk-remove-plan disk-approve disk-remove-finish status cli logs down kind-down
+.PHONY: kind-up kind-cluster up namespace operator cluster images topic-reset demo chaos-broker chaos-disk test disk-add disk-rebalance-plan disk-remove-plan disk-approve disk-remove-finish status cli logs down kind-down
 
 kind-up: kind-cluster
 
@@ -47,30 +50,25 @@ images:
 	kind load docker-image --name $(CLUSTER_NAME) $(PRODUCER_IMAGE) $(CONSUMER_IMAGE)
 
 topic-reset:
-	-$(KUBECTL) delete kafkatopic orders --wait=true --timeout=2m
-	$(KUBECTL) apply -f manifests/topic.yaml
-	$(KUBECTL) wait kafkatopic/orders --for=condition=Ready --timeout=2m
+	-$(KUBECTL) delete kafkatopic $(TOPIC) --wait=true --timeout=2m
+	TOPIC=$(TOPIC) envsubst < manifests/topic.yaml | $(KUBECTL) apply -f -
+	$(KUBECTL) wait kafkatopic/$(TOPIC) --for=condition=Ready --timeout=2m
 
 demo: images topic-reset
 	-$(KUBECTL) delete job kafka-consumer kafka-producer --ignore-not-found
-	RUN_ID=$(RUN_ID) COUNT=$(COUNT) CHAOS_AFTER_RECORDS=0 CHAOS_PAUSE_SECONDS=0 envsubst < jobs/producer.yaml | $(KUBECTL) apply -f -
+	RUN_ID=$(RUN_ID) COUNT=$(COUNT) TOPIC=$(TOPIC) PROGRESS_EVERY=$(CHAOS_PROGRESS_RECORDS) envsubst < jobs/producer.yaml | $(KUBECTL) apply -f -
 	$(KUBECTL) wait job/kafka-producer --for=condition=complete --timeout=20m
 	$(KUBECTL) logs job/kafka-producer
-	RUN_ID=$(RUN_ID) COUNT=$(COUNT) envsubst < jobs/consumer.yaml | $(KUBECTL) apply -f -
+	RUN_ID=$(RUN_ID) COUNT=$(COUNT) TOPIC=$(TOPIC) envsubst < jobs/consumer.yaml | $(KUBECTL) apply -f -
 	$(KUBECTL) wait job/kafka-consumer --for=condition=complete --timeout=20m
 	$(KUBECTL) logs job/kafka-consumer
 
-chaos: images topic-reset
-	@test $(COUNT) -ge 2 && test $(CHAOS_AFTER_RECORDS) -ge 1 && test $(CHAOS_AFTER_RECORDS) -lt $(COUNT) || \
-		{ echo 'COUNT must be at least 2 and CHAOS_AFTER_RECORDS must be between 1 and COUNT-1' >&2; exit 1; }
+chaos-broker: images topic-reset
+	@test $(COUNT) -ge $(CHAOS_PROGRESS_RECORDS) || { echo 'COUNT must be at least CHAOS_PROGRESS_RECORDS' >&2; exit 1; }
 	-$(KUBECTL) delete job kafka-consumer kafka-producer --ignore-not-found
-	RUN_ID=$(RUN_ID) COUNT=$(COUNT) CHAOS_AFTER_RECORDS=$(CHAOS_AFTER_RECORDS) CHAOS_PAUSE_SECONDS=$(CHAOS_PAUSE_SECONDS) envsubst < jobs/producer.yaml | $(KUBECTL) apply -f -
+	RUN_ID=$(RUN_ID) COUNT=$(COUNT) TOPIC=$(TOPIC) PROGRESS_EVERY=$(CHAOS_PROGRESS_RECORDS) envsubst < jobs/producer.yaml | $(KUBECTL) apply -f -
 	$(KUBECTL) wait pod -l app=kafka-producer --for=condition=Ready --timeout=2m
-	@for i in $$(seq 300); do \
-		logs=$$($(KUBECTL) logs job/kafka-producer 2>/dev/null || true); \
-		echo "$$logs" | grep -q 'CHAOS_CHECKPOINT' && { echo "$$logs" | grep 'CHAOS_CHECKPOINT' | tail -1; exit 0; }; \
-		sleep 1; \
-	done; echo 'producer did not reach the chaos checkpoint' >&2; exit 1
+	@$(KUBECTL) logs -f job/kafka-producer | grep -m1 'PRODUCER_PROGRESS'
 	@old_uid=$$($(KUBECTL) get pod $(CHAOS_BROKER) -o jsonpath='{.metadata.uid}'); \
 	$(KUBECTL) delete pod $(CHAOS_BROKER) --wait=true --timeout=2m; \
 	for i in $$(seq 60); do \
@@ -85,7 +83,40 @@ chaos: images topic-reset
 	wait $$pod_wait; \
 	wait $$kafka_wait
 	$(KUBECTL) logs job/kafka-producer
-	RUN_ID=$(RUN_ID) COUNT=$(COUNT) envsubst < jobs/consumer.yaml | $(KUBECTL) apply -f -
+	RUN_ID=$(RUN_ID) COUNT=$(COUNT) TOPIC=$(TOPIC) envsubst < jobs/consumer.yaml | $(KUBECTL) apply -f -
+	$(KUBECTL) wait job/kafka-consumer --for=condition=complete --timeout=20m
+	$(KUBECTL) logs job/kafka-consumer
+
+chaos-disk: images disk-add
+	@test $(COUNT) -ge $(CHAOS_PROGRESS_RECORDS) || { echo 'COUNT must be at least CHAOS_PROGRESS_RECORDS' >&2; exit 1; }
+	$(MAKE) topic-reset TOPIC=$(CHAOS_TOPIC)
+	$(KUBECTL) exec $(CHAOS_BROKER) -c kafka -- /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka-kafka-bootstrap:9092 --describe --topic $(CHAOS_TOPIC) | \
+	awk -v topic='$(CHAOS_TOPIC)' -v broker_id='$(CHAOS_BROKER_ID)' -v target_directory='/var/lib/kafka/data-$(CHAOS_VOLUME_ID)/kafka-log$(CHAOS_BROKER_ID)' -f scripts/disk-reassignment.awk | \
+	$(KUBECTL) exec -i $(CHAOS_BROKER) -c kafka -- sh -ec 'cat > /tmp/disk-failure-reassignment.json'
+	$(KUBECTL) exec $(CHAOS_BROKER) -c kafka -- grep -q '"topic":"$(CHAOS_TOPIC)"' /tmp/disk-failure-reassignment.json
+	$(KUBECTL) exec $(CHAOS_BROKER) -c kafka -- /opt/kafka/bin/kafka-reassign-partitions.sh --bootstrap-server kafka-kafka-bootstrap:9092 --execute --reassignment-json-file /tmp/disk-failure-reassignment.json
+	@for i in $$(seq 120); do \
+		result=$$($(KUBECTL) exec $(CHAOS_BROKER) -c kafka -- /opt/kafka/bin/kafka-reassign-partitions.sh --bootstrap-server kafka-kafka-bootstrap:9092 --verify --reassignment-json-file /tmp/disk-failure-reassignment.json 2>&1 || true); \
+		echo "$$result" | grep -q 'is complete' && { echo 'Replica moved to the selected JBOD volume'; break; }; \
+		test $$i -lt 120 || { echo "$$result" >&2; echo 'Replica did not move to the selected JBOD volume' >&2; exit 1; }; sleep 1; \
+	done
+	-$(KUBECTL) delete job kafka-consumer kafka-producer --ignore-not-found
+	RUN_ID=$(RUN_ID) COUNT=$(COUNT) TOPIC=$(CHAOS_TOPIC) PROGRESS_EVERY=$(CHAOS_PROGRESS_RECORDS) envsubst < jobs/producer.yaml | $(KUBECTL) apply -f -
+	$(KUBECTL) wait pod -l app=kafka-producer --for=condition=Ready --timeout=2m
+	@$(KUBECTL) logs -f job/kafka-producer | grep -m1 'PRODUCER_PROGRESS'
+	$(KUBECTL) exec $(CHAOS_BROKER) -c kafka -- sh -ec 'test -d /var/lib/kafka/data-$(CHAOS_VOLUME_ID)/kafka-log$(CHAOS_BROKER_ID); find /var/lib/kafka/data-$(CHAOS_VOLUME_ID)/kafka-log$(CHAOS_BROKER_ID) -maxdepth 1 -type d -name "$(CHAOS_TOPIC)-*" | grep -q .; chmod -R a-w /var/lib/kafka/data-$(CHAOS_VOLUME_ID)/kafka-log$(CHAOS_BROKER_ID)'
+	@for i in $$(seq 120); do \
+		logs=$$($(KUBECTL) logs $(CHAOS_BROKER) -c kafka --since=3m 2>/dev/null || true); \
+		echo "$$logs" | grep -Eqi 'LogDirFailureHandler|LogDirFailureChannel|offline log directory|KafkaStorageException' && { echo 'Kafka observed the injected disk write failure'; echo "$$logs" | grep -Ei 'LogDirFailureHandler|LogDirFailureChannel|offline log directory|KafkaStorageException' | tail -5; exit 0; }; \
+		sleep 1; \
+	done; echo 'Kafka did not report the injected disk write failure' >&2; exit 1
+	$(KUBECTL) wait job/kafka-producer --for=condition=complete --timeout=20m
+	$(KUBECTL) logs job/kafka-producer
+	$(KUBECTL) exec $(CHAOS_BROKER) -c kafka -- sh -ec 'chmod -R u+w /var/lib/kafka/data-$(CHAOS_VOLUME_ID)/kafka-log$(CHAOS_BROKER_ID)'
+	-$(KUBECTL) delete pod $(CHAOS_BROKER) --wait=true --timeout=2m
+	$(KUBECTL) wait pod/$(CHAOS_BROKER) --for=condition=Ready --timeout=10m
+	$(KUBECTL) wait kafka/kafka --for=condition=Ready --timeout=10m
+	RUN_ID=$(RUN_ID) COUNT=$(COUNT) TOPIC=$(CHAOS_TOPIC) envsubst < jobs/consumer.yaml | $(KUBECTL) apply -f -
 	$(KUBECTL) wait job/kafka-consumer --for=condition=complete --timeout=20m
 	$(KUBECTL) logs job/kafka-consumer
 
@@ -94,6 +125,7 @@ test: demo
 disk-add:
 	$(KUBECTL) apply -f manifests/kafka-two-disks.yaml
 	$(KUBECTL) wait kafka/kafka --for=condition=Ready --timeout=10m
+	$(KUBECTL) wait pods -l strimzi.io/pool-name=brokers --for=condition=Ready --timeout=10m
 
 disk-rebalance-plan:
 	$(KUBECTL) delete kafkarebalance $(REBALANCE) --ignore-not-found

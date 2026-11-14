@@ -8,7 +8,6 @@
 #include <memory>
 #include <stdexcept>
 #include <string>
-#include <thread>
 
 #include "order.pb.h"
 
@@ -60,12 +59,9 @@ int main() {
     const auto topic_name = env_or("TOPIC", "orders");
     const auto run_id = env_or("RUN_ID", "strimzi-demo");
     const int count = parse_count();
-    const auto chaos_after = std::stol(env_or("CHAOS_AFTER_RECORDS", "0"));
-    const auto chaos_pause_seconds = std::stol(env_or("CHAOS_PAUSE_SECONDS", "0"));
-    if (chaos_after < 0 || chaos_after >= count ||
-        (chaos_after > 0 && chaos_pause_seconds < 1)) {
-      throw std::runtime_error(
-          "CHAOS_AFTER_RECORDS must be 0 or less than COUNT, and a chaos pause must be positive");
+    const auto progress_every = std::stol(env_or("PROGRESS_EVERY", "100000"));
+    if (progress_every < 1) {
+      throw std::runtime_error("PROGRESS_EVERY must be a positive integer");
     }
 
     std::string error;
@@ -130,17 +126,9 @@ int main() {
       }
       producer->poll(0);
 
-      if (chaos_after > 0 && i + 1 == chaos_after) {
-        const auto remaining = producer->flush(120000);
-        if (remaining != 0 || delivery_report.failed() ||
-            delivery_report.delivered() != static_cast<std::uint64_t>(chaos_after)) {
-          throw std::runtime_error("producer failed to flush before the chaos checkpoint");
-        }
-        std::cout << "CHAOS_CHECKPOINT delivered " << delivery_report.delivered()
-                  << " records; pausing " << chaos_pause_seconds << " seconds"
+      if ((i + 1) % progress_every == 0) {
+        std::cout << "PRODUCER_PROGRESS enqueued " << (i + 1) << " records"
                   << std::endl;
-        std::this_thread::sleep_for(
-            std::chrono::seconds(chaos_pause_seconds));
       }
     }
 

@@ -27,15 +27,13 @@ spec:
             - name: BOOTSTRAP_SERVERS
               value: kafka-kafka-bootstrap.kafka.svc:9092
             - name: TOPIC
-              value: orders
+              value: "${TOPIC}"
             - name: COUNT
               value: "${COUNT}"
             - name: RUN_ID
               value: "${RUN_ID}"
-            - name: CHAOS_AFTER_RECORDS
-              value: "${CHAOS_AFTER_RECORDS}"
-            - name: CHAOS_PAUSE_SECONDS
-              value: "${CHAOS_PAUSE_SECONDS}"
+            - name: PROGRESS_EVERY
+              value: "${PROGRESS_EVERY}"
           resources:
             requests:
               cpu: 100m
