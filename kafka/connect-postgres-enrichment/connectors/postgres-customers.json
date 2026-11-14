@@ -1,0 +1,18 @@
+{
+  "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
+  "tasks.max": "1",
+  "database.hostname": "postgres",
+  "database.port": "5432",
+  "database.user": "debezium",
+  "database.password": "demo-cdc-password",
+  "database.dbname": "enrichment",
+  "topic.prefix": "pg",
+  "plugin.name": "pgoutput",
+  "slot.name": "customers_cdc",
+  "publication.name": "customers_publication",
+  "publication.autocreate.mode": "filtered",
+  "table.include.list": "public.customers",
+  "snapshot.mode": "initial",
+  "tombstones.on.delete": "true",
+  "decimal.handling.mode": "string"
+}

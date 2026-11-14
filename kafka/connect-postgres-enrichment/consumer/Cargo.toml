@@ -1,0 +1,12 @@
+[package]
+name = "enriched-order-consumer"
+version = "0.1.0"
+edition = "2024"
+build = "build.rs"
+
+[dependencies]
+rdkafka = { version = "=0.39.0", features = ["cmake-build"] }
+prost = "=0.14.1"
+
+[build-dependencies]
+prost-build = "=0.14.1"

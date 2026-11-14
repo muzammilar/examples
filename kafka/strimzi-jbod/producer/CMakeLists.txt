@@ -1,0 +1,16 @@
+cmake_minimum_required(VERSION 3.20)
+project(kafka_order_producer LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+find_package(Protobuf REQUIRED)
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(RDKAFKA REQUIRED IMPORTED_TARGET rdkafka++)
+
+protobuf_generate_cpp(PROTO_SOURCES PROTO_HEADERS proto/order.proto)
+add_executable(order-producer src/main.cpp ${PROTO_SOURCES} ${PROTO_HEADERS})
+target_include_directories(order-producer PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
+target_link_libraries(order-producer PRIVATE protobuf::libprotobuf PkgConfig::RDKAFKA)
+target_compile_options(order-producer PRIVATE -Wall -Wextra -Wpedantic -Werror)

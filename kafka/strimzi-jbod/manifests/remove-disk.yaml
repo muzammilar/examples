@@ -1,0 +1,15 @@
+apiVersion: kafka.strimzi.io/v1
+kind: KafkaRebalance
+metadata:
+  name: kafka-jbod-rebalance
+  labels:
+    strimzi.io/cluster: kafka
+spec:
+  mode: remove-disks
+  moveReplicasOffVolumes:
+    - brokerId: 0
+      volumeIds: [1]
+    - brokerId: 1
+      volumeIds: [1]
+    - brokerId: 2
+      volumeIds: [1]

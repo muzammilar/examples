@@ -1,0 +1,3 @@
+/producer/build/
+/processor/kafka/
+/consumer/target/

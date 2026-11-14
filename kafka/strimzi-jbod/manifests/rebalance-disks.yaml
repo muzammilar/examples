@@ -1,0 +1,8 @@
+apiVersion: kafka.strimzi.io/v1
+kind: KafkaRebalance
+metadata:
+  name: kafka-jbod-rebalance
+  labels:
+    strimzi.io/cluster: kafka
+spec:
+  rebalanceDisk: true
