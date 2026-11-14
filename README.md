@@ -36,6 +36,7 @@ To add or test a system, follow [`FORMAT.md`](FORMAT.md): folder layout, Make ta
 | DuckDB | [`duckdb/`](duckdb) | Embedded analytics | [duckdb.org](https://duckdb.org/) | [duckdb/duckdb](https://github.com/duckdb/duckdb) |
 | Elasticsearch | [`elasticsearch/`](elasticsearch) | Search | [elastic.co](https://www.elastic.co/elasticsearch) | [elastic/elasticsearch](https://github.com/elastic/elasticsearch) |
 | FoundationDB | [`foundationdb/`](foundationdb) | Key-value | [foundationdb.org](https://www.foundationdb.org/) | [apple/foundationdb](https://github.com/apple/foundationdb) |
+| Iceberg | [`iceberg/`](iceberg) | Lakehouse tables | [iceberg.apache.org](https://iceberg.apache.org/) | [apache/iceberg](https://github.com/apache/iceberg) |
 | InfluxDB | [`influxdb/`](influxdb) | Time-series | [influxdata.com](https://www.influxdata.com/products/influxdb/) | [influxdata/influxdb](https://github.com/influxdata/influxdb) |
 | Kafka | [`kafka/`](kafka) | Streaming | [kafka.apache.org](https://kafka.apache.org/) | [apache/kafka](https://github.com/apache/kafka) |
 | kdb+ | [`kdb/`](kdb) | Time-series | [kx.com](https://kx.com/) | — |

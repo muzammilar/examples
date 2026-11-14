@@ -23,7 +23,7 @@ Fastest in class, free, runnable locally (see the sections below for the example
 - [ ] MySQL sharding: Vitess, ShardingSphere, PolarDB-X, NDB Cluster
 - [ ] pgvector
 - [ ] StarRocks
-- [ ] Iceberg + Trino + MinIO
+- [x] Iceberg + Trino + MinIO
 - [ ] MongoDB replica set
 - [ ] Temporal
 - [ ] Restate
@@ -162,7 +162,9 @@ Planned as a `mysql/` folder, mirroring the Postgres section with the same `orde
 
 ## Lakehouse and object storage
 
-- [ ] `iceberg-trino-minio`: Iceberg REST catalog (Polaris or Nessie) + MinIO + Trino; also read from DuckDB and ClickHouse.
+- [ ] `hoglake-local`: [PostHog Hoglake](https://github.com/PostHog/hoglake), a Postgres-native lakehouse catalog; investigate its native Trino connector and catalog recovery. Documentation backlog only; no implementation in the current Iceberg + Trino + MinIO work.
+- [x] `iceberg-trino-minio`: persistent Iceberg REST fixture + 4 MinIO nodes + Trino 484 coordinator/3 workers; million-row reconciliation, worker task retry, storage-node failure and catalog restart.
+- [ ] Extend Iceberg REST examples to Polaris/Nessie and readers in DuckDB and ClickHouse.
 - [ ] `delta-lake-duckdb`: Delta tables read from DuckDB and Spark.
 - [ ] `paimon-flink-minio`: Apache Paimon (LSM-based primary-key tables, changelog for streaming) written by Flink to MinIO; read from Spark/StarRocks/Trino; compare upsert throughput and freshness with Iceberg.
 - [ ] `garage-docker-compose-cluster`: self-hosted S3-compatible storage.
