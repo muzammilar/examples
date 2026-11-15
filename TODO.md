@@ -69,7 +69,7 @@ Fastest in class, free, runnable locally (see the sections below for the example
 - [x] `questdb-single-node`: ILP ingest and `SAMPLE BY` queries.
 - [ ] `victoriametrics-docker-compose-cluster`: vminsert/vmselect/vmstorage as Prometheus long-term storage.
 - [x] `influxdb3-core-single-node`: Arrow/Parquet engine with SQL.
-- [ ] `greptimedb`: Rust telemetry engine; single-node, Compose cluster, Kubernetes operator and clustered fleet metrics/logs workload. Compare metrics with VictoriaMetrics / Mimir / Cortex; compare logs with VictoriaLogs. Use matching ingestion/query semantics and separate correctness oracles.
+- [ ] [`greptimedb`](greptimedb/): single-node and Compose full lifecycles passed. Operator latest scale-out/in passed, but vertical scale-up failed readback with 666,600 missing metric samples; investigate without resetting data, then finish the remaining matrix and teardown. Mimir/Cortex and tracing comparisons remain future work.
 - [ ] `tdengine-docker-compose-cluster`: IoT time-series (AGPL); one table per device with super tables, vnodes sharding; rerun TSBS against TimescaleDB/QuestDB/InfluxDB.
 - [ ] `iotdb-docker-compose-cluster`: Apache IoTDB (Apache 2.0) ConfigNode/DataNode cluster, TsFile columnar storage; same TSBS run.
 - [ ] `dolphindb-single-node`: free Community Edition (memory/core caps); columnar time-series engine with its own scripting language, used for tick data; compare with kdb+ on the same market data.
@@ -143,7 +143,7 @@ sharded `orders` workload (distribution key `customer_id`) so results compare di
 - [ ] Comparison example: same `orders` workload and `pgbench` script on single Postgres vs Neon vs Citus vs PgDog vs Multigres; single-shard vs cross-shard latency, resharding under load. Neon scales storage and read replicas, not writes: it shows the cost of remote storage (cold-cache reads, commit latency through safekeepers) against local-disk Postgres.
 - [x] [`postgres/pgvector-product-search`](postgres/pgvector-product-search/): single and three-copy Patroni profiles, 100,000-product inventory joins, filtered HNSW/hybrid retrieval, full-row replica checks, primary loss and measured benchmarks. Milvus/Qdrant/Weaviate comparisons remain separate work.
 - [ ] `paradedb-single-node`: BM25 full-text search inside Postgres.
-- [ ] `neon-docker-compose-cluster`: Neon (Apache 2.0) storage/compute split from the upstream `docker-compose/` setup; compute + safekeepers (Paxos WAL quorum) + pageserver + storage broker, layers offloaded to MinIO. Copy-on-write branching, point-in-time branches, read replicas sharing storage, compute restart without data loss; `failover` kills a safekeeper.
+- [ ] [Neon single-node and clustered recovery](postgres/neon/): examples implemented with historical million-row checks and Compose WAL/compute recovery measurements. Rerun the final source-materialization and independent-reader revision through full lifecycles; Kubernetes qualification is documented separately. Local clustered object storage is Garage.
 - [ ] `orioledb-single-node`: undo-log storage engine for Postgres.
 - [ ] `cloudberry-docker-compose-cluster`: Apache Cloudberry (open-source Greenplum successor) MPP Postgres; coordinator + segments, distributed analytic queries; compare with Citus for analytics.
 - [ ] `opengauss-single-node`: Huawei's Postgres-derived OLTP engine (Mulan PSL v2); MOT in-memory engine and NUMA-aware threads vs plain Postgres on `pgbench`.

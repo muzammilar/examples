@@ -43,6 +43,7 @@ To add or test a system, follow [`FORMAT.md`](FORMAT.md): folder layout, Make ta
 | Elasticsearch | [`elasticsearch/`](elasticsearch) | Search | [elastic.co](https://www.elastic.co/elasticsearch) | [elastic/elasticsearch](https://github.com/elastic/elasticsearch) |
 | FoundationDB | [`foundationdb/`](foundationdb) | Key-value | [foundationdb.org](https://www.foundationdb.org/) | [apple/foundationdb](https://github.com/apple/foundationdb) |
 | Garage | [`garage/`](garage) | S3 object storage | [garagehq.deuxfleurs.fr](https://garagehq.deuxfleurs.fr/) | [deuxfleurs-org/garage](https://github.com/deuxfleurs-org/garage) |
+| GreptimeDB | [`greptimedb/`](greptimedb) | Metrics / logs / observability | [greptime.com](https://greptime.com/) | [GreptimeTeam/greptimedb](https://github.com/GreptimeTeam/greptimedb) |
 | Iceberg | [`iceberg/`](iceberg) | Lakehouse tables | [iceberg.apache.org](https://iceberg.apache.org/) | [apache/iceberg](https://github.com/apache/iceberg) |
 | InfluxDB | [`influxdb/`](influxdb) | Time-series | [influxdata.com](https://www.influxdata.com/products/influxdb/) | [influxdata/influxdb](https://github.com/influxdata/influxdb) |
 | Kafka | [`kafka/`](kafka) | Streaming | [kafka.apache.org](https://kafka.apache.org/) | [apache/kafka](https://github.com/apache/kafka) |
