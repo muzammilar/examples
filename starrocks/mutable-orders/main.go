@@ -37,7 +37,13 @@ func check(err error) {
 func save(name string, value any) {
 	text, err := json.MarshalIndent(value, "", "  ")
 	check(err)
-	check(os.WriteFile(filepath.Join(results, name+".json"), append(text, '\n'), 0644))
+	path := filepath.Join(results, name+".json")
+	file, err := os.OpenFile(path, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
+	check(err)
+	_, err = file.Write(append(text, '\n'))
+	check(err)
+	check(file.Sync())
+	check(file.Close())
 	fmt.Println("saved", filepath.Join(results, name+".json"))
 }
 func rows(system, text string) [][]string { data, err := query(system, text); check(err); return data }

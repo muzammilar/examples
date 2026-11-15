@@ -44,7 +44,13 @@ report = {
     "artifact_present": artifact.is_file(),
 }
 (root / "benchmark-exit.json").write_text(json.dumps(report, indent=2) + "\n")
-if result.returncode or info["State"]["ExitCode"] or not artifact.is_file():
+if (
+    result.returncode
+    or info["State"]["Status"] != "exited"
+    or info["State"]["OOMKilled"]
+    or info["State"]["ExitCode"]
+    or not artifact.is_file()
+):
     raise RuntimeError(
         "benchmark did not produce verified results; retain container and benchmark-exit.json for diagnosis"
     )
