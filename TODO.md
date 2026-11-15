@@ -21,7 +21,7 @@ Fastest in class, free, runnable locally (see the sections below for the example
 
 - [ ] Postgres scale-out: Citus, PgDog, Multigres, Neon
 - [ ] MySQL sharding: Vitess, ShardingSphere, PolarDB-X, NDB Cluster
-- [ ] pgvector
+- [x] pgvector
 - [ ] StarRocks
 - [x] Iceberg + Trino + MinIO
 - [ ] MongoDB replica set
@@ -107,7 +107,7 @@ sharded `orders` workload (distribution key `customer_id`) so results compare di
 - [ ] `pgbouncer-pooler`: transaction pooling baseline; compare connection-storm behaviour with PgDog.
 - [ ] `readyset-cache`: ReadySet (BSL) wire-compatible query cache for Postgres and MySQL; incrementally maintained cached queries fed by replication; same read-heavy `orders` queries with and without it.
 - [ ] Comparison example: same `orders` workload and `pgbench` script on single Postgres vs Neon vs Citus vs PgDog vs Multigres; single-shard vs cross-shard latency, resharding under load. Neon scales storage and read replicas, not writes: it shows the cost of remote storage (cold-cache reads, commit latency through safekeepers) against local-disk Postgres.
-- [ ] `pgvector-single-node`: compare with the Milvus, Qdrant and Weaviate examples.
+- [x] [`postgres/pgvector-product-search`](postgres/pgvector-product-search/): single and three-copy Patroni profiles, 100,000-product inventory joins, filtered HNSW/hybrid retrieval, full-row replica checks, primary loss and measured benchmarks. Milvus/Qdrant/Weaviate comparisons remain separate work.
 - [ ] `paradedb-single-node`: BM25 full-text search inside Postgres.
 - [ ] `neon-docker-compose-cluster`: Neon (Apache 2.0) storage/compute split from the upstream `docker-compose/` setup; compute + safekeepers (Paxos WAL quorum) + pageserver + storage broker, layers offloaded to MinIO. Copy-on-write branching, point-in-time branches, read replicas sharing storage, compute restart without data loss; `failover` kills a safekeeper.
 - [ ] `orioledb-single-node`: undo-log storage engine for Postgres.
@@ -196,11 +196,10 @@ Planned as a `mysql/` folder, mirroring the Postgres section with the same `orde
 
 - [ ] `opensearch-docker-compose-cluster`
 - [ ] `meilisearch-single-node`: Rust, typo-tolerant app search.
-- [ ] `typesense-single-node`: deterministic import/search correctness, indexing/query benchmarks.
-- [ ] `typesense-docker-compose-cluster`: replicated search under load, node/leader failover, acknowledged-document reconciliation and rejoin.
-- [ ] `typesense-product-catalog`: typo tolerance, facets, filtering and ranking with expected-result assertions.
+- [x] [`typesense/product-search`](typesense/product-search/): consolidated single/three-Raft-replica storefront workload and three application-managed customer shards with three replicas each, 100,000 products, typo/facet/filter tests, hybrid ranking, leader-loss reconciliation and measured benchmarks.
 - [ ] `quickwit-single-node`: Rust log search on object storage.
-- [ ] `vespa-single-node`: hybrid search and vector ranking.
+- [x] [`vespa/phased-product-search`](vespa/phased-product-search/): single/three-content-node profiles, 100,000 products, four ranking modes, controller/node failure under load, native metadata/version verification on every physical copy and measured benchmarks.
+- [ ] Vespa storage sharding: grouped content distribution with three copies, physical placement checks, failover and benchmarks; current three-node profile holds the entire catalog on every node.
 - [x] `manticore-single-node` (top priority): columnar storage + secondary indexes; rerun db-benchmarks.com against the Elasticsearch example.
 
 ## Key-value and cache
@@ -236,7 +235,7 @@ Planned as a `mysql/` folder, mirroring the Postgres section with the same `orde
 - [ ] `turso-single-node`: SQLite rewrite in Rust with MVCC `BEGIN CONCURRENT`.
 - [ ] `rqlite-docker-compose-cluster`: SQLite replicated over Raft.
 - [ ] `litefs-litestream`: SQLite replication and backup to S3.
-- [ ] `lancedb-embedded`: embedded vector DB on Lance format.
+- [x] [`lancedb/versioned-product-search`](lancedb/versioned-product-search/): 100,000-product embedded/versioned retrieval, single and three-reader serving profiles, pinned snapshots, unindexed-tail visibility, compaction, isolated writer/reader crashes and measured benchmarks. Shared-volume serving is not replicated database HA.
 - [ ] `go-embedded-kv-comparison`: LMDB/libmdbx vs Badger vs Pebble vs bbolt; point reads, writes, range scans, write amplification.
 
 ## Wide-column

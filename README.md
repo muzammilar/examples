@@ -41,6 +41,7 @@ To add or test a system, follow [`FORMAT.md`](FORMAT.md): folder layout, Make ta
 | Kafka | [`kafka/`](kafka) | Streaming | [kafka.apache.org](https://kafka.apache.org/) | [apache/kafka](https://github.com/apache/kafka) |
 | kdb+ | [`kdb/`](kdb) | Time-series | [kx.com](https://kx.com/) | — |
 | Kubernetes | [`k8s/`](k8s) | Container orchestration | [kubernetes.io](https://kubernetes.io/) | [kubernetes/kubernetes](https://github.com/kubernetes/kubernetes) |
+| LanceDB | [`lancedb/`](lancedb) | Embedded vector / hybrid retrieval | [lancedb.com](https://lancedb.com/) | [lancedb/lancedb](https://github.com/lancedb/lancedb) |
 | Manticore Search | [`manticore/`](manticore) | Search | [manticoresearch.com](https://manticoresearch.com/) | [manticoresoftware/manticoresearch](https://github.com/manticoresoftware/manticoresearch) |
 | Memgraph | [`memgraph/`](memgraph) | Graph (in-memory) | [memgraph.com](https://memgraph.com/) | [memgraph/memgraph](https://github.com/memgraph/memgraph) |
 | Milvus | [`milvus/`](milvus) | Vector | [milvus.io](https://milvus.io/) | [milvus-io/milvus](https://github.com/milvus-io/milvus) |
@@ -64,8 +65,10 @@ To add or test a system, follow [`FORMAT.md`](FORMAT.md): folder layout, Make ta
 | TigerBeetle | [`tigerbeetle/`](tigerbeetle) | Ledger / OLTP | [tigerbeetle.com](https://tigerbeetle.com/) | [tigerbeetle/tigerbeetle](https://github.com/tigerbeetle/tigerbeetle) |
 | TiKV | [`tikv/`](tikv) | Key-value | [tikv.org](https://tikv.org/) | [tikv/tikv](https://github.com/tikv/tikv) |
 | TimescaleDB | [`timescaledb/`](timescaledb) | Time-series | [tigerdata.com](https://www.tigerdata.com/timescaledb) | [timescale/timescaledb](https://github.com/timescale/timescaledb) |
+| Typesense | [`typesense/`](typesense) | Faceted / hybrid search | [typesense.org](https://typesense.org/) | [typesense/typesense](https://github.com/typesense/typesense) |
 | Vagrant | [`vagrant/`](vagrant) | VM / virtualization | [vagrantup.com](https://www.vagrantup.com/) | [hashicorp/vagrant](https://github.com/hashicorp/vagrant) |
 | Valkey | [`valkey/`](valkey) | Cache / in-memory | [valkey.io](https://valkey.io/) | [valkey-io/valkey](https://github.com/valkey-io/valkey) |
+| Vespa | [`vespa/`](vespa) | Distributed retrieval / ranking | [vespa.ai](https://vespa.ai/) | [vespa-engine/vespa](https://github.com/vespa-engine/vespa) |
 | Weaviate | [`weaviate/`](weaviate) | Vector | [weaviate.io](https://weaviate.io/) | [weaviate/weaviate](https://github.com/weaviate/weaviate) |
 | YDB | [`ydb/`](ydb) | Distributed SQL | [ydb.tech](https://ydb.tech/) | [ydb-platform/ydb](https://github.com/ydb-platform/ydb) |
 | YugabyteDB | [`yugabyte/`](yugabyte) | Distributed SQL (YSQL + YCQL) | [yugabyte.com](https://www.yugabyte.com/) | [yugabyte/yugabyte-db](https://github.com/yugabyte/yugabyte-db) |
