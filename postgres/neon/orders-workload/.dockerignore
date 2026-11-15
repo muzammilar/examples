@@ -1,0 +1,8 @@
+*
+!*.go
+!go.mod
+!go.sum
+!*.py
+!requirements.txt
+!entrypoint.sh
+!Dockerfile

@@ -1,0 +1,8 @@
+broker_endpoint = "http://broker:50051"
+pg_distrib_dir = "/usr/local/"
+listen_pg_addr = "0.0.0.0:6400"
+listen_http_addr = "0.0.0.0:9898"
+remote_storage = { endpoint="http://s3:9000", bucket_name="lab-objects", bucket_region="us-east-1", prefix_in_bucket="neon/pageserver" }
+control_plane_api = "http://127.0.0.1:6666"
+control_plane_emergency_mode = true
+virtual_file_io_mode = "buffered"

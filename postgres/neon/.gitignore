@@ -1,0 +1,9 @@
+**/results/
+**/config/generated/
+**/__pycache__/
+single-node/docker-compose.json
+kubernetes-statefulset/kind-config.json
+kubernetes-statefulset/images.json
+kubernetes-statefulset/storage.json
+kubernetes-statefulset/compute.json
+kubernetes-statefulset/branch.json

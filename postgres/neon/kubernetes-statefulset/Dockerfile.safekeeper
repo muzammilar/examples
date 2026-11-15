@@ -1,0 +1,10 @@
+FROM ghcr.io/neondatabase/neon@sha256:7a4f124917bb929964b2d696d710f19584f80bb9bd51b2af4a6e2425434c761f AS upstream
+# The upstream executable only links glibc, libm and libgcc. Keep the upstream
+# runtime libraries with it; WAL-only workers need no PostgreSQL distributions.
+FROM scratch
+COPY --from=upstream /lib/ /lib/
+COPY --from=upstream /usr/local/bin/safekeeper /usr/local/bin/safekeeper
+COPY --from=upstream /etc/nsswitch.conf /etc/nsswitch.conf
+COPY --from=upstream /etc/ssl/certs/ /etc/ssl/certs/
+ENV PATH=/usr/local/bin:/usr/bin:/bin
+ENTRYPOINT ["/usr/local/bin/safekeeper"]
