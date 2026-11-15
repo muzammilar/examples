@@ -1,0 +1,95 @@
+name: iceberg-multi-system
+services:
+  storage:
+    image: chrislusf/seaweedfs:4.53
+    command: [mini, -dir=/data, -ip=storage, -ip.bind=0.0.0.0, -s3.port=8333, -s3.port.iceberg=8181, -volume.max=4, -master.volumeSizeLimitMB=256]
+    environment:
+      S3_TABLE_BUCKET: warehouse
+      AWS_ACCESS_KEY_ID: demo
+      AWS_SECRET_ACCESS_KEY: demo
+    volumes:
+      - storage:/data
+    mem_limit: 1g
+    ports:
+      - '127.0.0.1:${S3_PORT:-18333}:8333'
+      - '127.0.0.1:${CATALOG_PORT:-18181}:8181'
+    healthcheck:
+      test: [CMD, wget, -q, -O, /dev/null, http://127.0.0.1:8181/v1/config]
+      interval: 3s
+      timeout: 5s
+      retries: 60
+      start_period: 10s
+  clickhouse:
+    image: clickhouse/clickhouse-server:26.10.2.103
+    hostname: clickhouse
+    environment:
+      CLICKHOUSE_USER: default
+      CLICKHOUSE_PASSWORD: local-reader
+      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: '1'
+    volumes:
+      - ./config/clickhouse.xml:/etc/clickhouse-server/config.d/lab.xml:ro
+      - ./config/generated/remote.xml:/etc/clickhouse-server/config.d/remote.xml:ro
+      - clickhouse:/var/lib/clickhouse
+    mem_limit: 1536m
+    cpus: 2
+    healthcheck:
+      test: [CMD, clickhouse-client, --password, local-reader, --query, 'SELECT 1']
+      interval: 3s
+      timeout: 5s
+      retries: 60
+      start_period: 15s
+  ch-workload:
+    profiles: [tools]
+    image: iceberg-multi-ch-workload:dev
+    build: ../../clickhouse/iceberg/app
+    environment:
+      ROWS: ${ROWS:-2000000}
+      CUSTOMERS: ${CUSTOMERS:-10000}
+      BATCH_ROWS: ${BATCH_ROWS:-100000}
+      QUERY_RUNS: ${QUERY_RUNS:-20}
+      BENCH_NATIVE: ${BENCH_NATIVE:-false}
+      BENCH_MODE: ${BENCH_MODE:-direct}
+      RESULTS_DIR: /results
+    volumes:
+      - ./${RESULTS_DIR:-results/manual}:/results
+    mem_limit: 1g
+    cpus: 2
+  compactor:
+    profiles: [tools]
+    image: iceberg-multi-compactor:dev
+    build:
+      context: ../../clickhouse/iceberg/compactor
+      args:
+        LOCAL_UID: ${LOCAL_UID:-10001}
+    environment:
+      AWS_REGION: us-east-1
+      AWS_EC2_METADATA_DISABLED: 'true'
+      TABLE: ${TABLE:-lab.probe}
+      TARGET_FILE_BYTES: ${TARGET_FILE_BYTES:-134217728}
+    volumes:
+      - ./${RESULTS_DIR:-results/manual}:/results
+    mem_limit: 2g
+    cpus: 2
+  runner:
+    profiles: [tools]
+    image: iceberg-multi-runner:dev
+    build: ./app
+    environment:
+      CATALOG_URL: http://storage:8181
+      S3_ENDPOINT: storage:8333
+      CLICKHOUSE_ADDR: clickhouse:9000
+      CLICKHOUSE_PASSWORD: local-reader
+      ROWS: ${ROWS:-2000000}
+      CUSTOMERS: ${CUSTOMERS:-10000}
+      BATCH_ROWS: ${BATCH_ROWS:-100000}
+      QUERY_RUNS: ${QUERY_RUNS:-20}
+      BENCH_NATIVE: ${BENCH_NATIVE:-false}
+      BENCH_MODE: ${BENCH_MODE:-direct}
+      RESULTS_DIR: /results
+    volumes:
+      - ./${RESULTS_DIR:-results/manual}:/results
+    mem_limit: 2g
+    cpus: 2
+volumes:
+  storage:
+  clickhouse:
