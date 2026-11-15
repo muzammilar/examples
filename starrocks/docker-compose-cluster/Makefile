@@ -1,0 +1,59 @@
+SHELL := /bin/sh
+COMPOSE_PROJECT_NAME := starrocks-orders
+COUNT ?= 1000000
+FAULT_BATCH_ROWS ?= 1000
+FAULT_PAUSE_MS ?= 1000
+FAULT_SERVICE ?=
+export COMPOSE_PROJECT_NAME COUNT FAULT_BATCH_ROWS FAULT_PAUSE_MS FAULT_SERVICE
+COMPOSE := docker compose -f docker-compose.json
+RUN := $(COMPOSE) run --rm client
+.NOTPARALLEL:
+.PHONY: docker-up up test benchmark down status docker-down failover disk-failure chaos-fe-leader comparison-failover comparison-disk-failure chaos-keeper-leader test-production
+docker-up:
+	python3 lifecycle.py $(COMPOSE_PROJECT_NAME)
+	python3 prepare.py mutable-orders docker
+	python3 config.py
+	$(COMPOSE) build sr-fe-0 sr-be-0 client
+	$(COMPOSE) up -d --no-deps sr-fe-0 sr-fe-1 sr-fe-2
+	python3 ready.py
+	$(COMPOSE) up -d --wait --wait-timeout 600
+up:
+	python3 ready.py all
+	$(RUN) setup
+	@if test -f results/seed.json; then $(RUN) verify; else $(RUN) seed; fi
+test:
+	$(RUN) verify
+benchmark:
+	python3 run_benchmark.py
+failover:
+	python3 fault.py starrocks process
+disk-failure:
+	python3 fault.py starrocks disk
+chaos-fe-leader:
+	python3 fault.py starrocks leader
+comparison-failover:
+	python3 fault.py clickhouse process
+comparison-disk-failure:
+	python3 fault.py clickhouse disk
+chaos-keeper-leader:
+	python3 fault.py clickhouse leader
+test-production:
+	$(MAKE) test
+	$(MAKE) failover
+	$(MAKE) disk-failure
+	$(MAKE) failover FAULT_SERVICE=sr-be-1
+	$(MAKE) chaos-fe-leader
+	$(MAKE) comparison-failover
+	$(MAKE) comparison-disk-failure
+	$(MAKE) comparison-failover FAULT_SERVICE=ch01
+	$(MAKE) chaos-keeper-leader
+	$(MAKE) test
+down:
+	$(RUN) drop
+status:
+	$(COMPOSE) ps
+	$(COMPOSE) exec -T sr-fe-0 mysql -h 127.0.0.1 -P 9030 -u root -e 'SHOW FRONTENDS; SHOW BACKENDS;'
+docker-down:
+	$(COMPOSE) --profile tools down --volumes --remove-orphans
+	docker image rm $(COMPOSE_PROJECT_NAME)-fe:dev $(COMPOSE_PROJECT_NAME)-be:dev $(COMPOSE_PROJECT_NAME)-client:dev
+	rm -f docker-compose.json
