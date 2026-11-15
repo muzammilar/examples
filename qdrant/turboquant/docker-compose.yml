@@ -1,0 +1,65 @@
+name: ${COMPOSE_PROJECT_NAME:-qdrant-turboquant}
+x-server: &server
+  image: ${COMPOSE_PROJECT_NAME:-qdrant-turboquant}-server:dev
+  build:
+    context: ./quantization-workload
+    target: server
+  cpus: 1
+  mem_limit: 2g
+  environment:
+    QDRANT__CLUSTER__ENABLED: 'true'
+    QDRANT__TELEMETRY_DISABLED: 'true'
+    QDRANT__STORAGE__PERFORMANCE__MAX_SEARCH_THREADS: '2'
+    QDRANT__STORAGE__PERFORMANCE__OPTIMIZER_CPU_BUDGET: '1'
+  healthcheck:
+    test: [CMD, /probe, health]
+    interval: 5s
+    timeout: 5s
+    retries: 60
+    start_period: 15s
+services:
+  q0:
+    <<: *server
+    hostname: q0
+    command: [./entrypoint.sh, --uri, 'http://q0:6335']
+    volumes: [q0:/qdrant/storage]
+  q1:
+    <<: *server
+    hostname: q1
+    command: [./entrypoint.sh, --bootstrap, 'http://q0:6335', --uri, 'http://q1:6335']
+    volumes: [q1:/qdrant/storage]
+    depends_on: {q0: {condition: service_started}}
+  q2:
+    <<: *server
+    hostname: q2
+    command: [./entrypoint.sh, --bootstrap, 'http://q0:6335', --uri, 'http://q2:6335']
+    volumes: [q2:/qdrant/storage]
+    depends_on: {q0: {condition: service_started}}
+  vector-workload: &workload
+    image: ${COMPOSE_PROJECT_NAME:-qdrant-turboquant}-workload:dev
+    build: {context: ./quantization-workload, target: workload}
+    profiles: [tools]
+    cpus: 2
+    mem_limit: 2g
+    environment:
+      POINTS: ${POINTS:-100000}
+      DIMENSIONS: ${DIMENSIONS:-384}
+      QUERIES: ${QUERIES:-100}
+      HNSW_EF: ${HNSW_EF:-128}
+      CONCURRENCY: ${CONCURRENCY:-4}
+      DURATION: ${DURATION:-10}
+    volumes: [./results:/results]
+  writer:
+    <<: *workload
+    cpus: 1
+    mem_limit: 512m
+    command: [churn]
+  reader:
+    <<: *workload
+    cpus: 0.5
+    mem_limit: 256m
+    command: [watch]
+volumes:
+  q0: {}
+  q1: {}
+  q2: {}
