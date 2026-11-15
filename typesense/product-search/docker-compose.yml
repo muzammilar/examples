@@ -1,0 +1,184 @@
+name: typesense-product-search
+services:
+  ts1:
+    image: typesense-products-server:dev
+    build: ./server
+    hostname: ts1
+    command: ["--data-dir=/data", "--api-key=local-search-key", "--nodes=/etc/typesense/nodes", "--peering-address=${NETWORK_PREFIX:-172.30.61}.11", "--api-port=8108", "--peering-port=8107"]
+    volumes: [ts1:/data, ./config/generated/nodes:/etc/typesense/nodes:ro]
+    mem_limit: 2g
+    cpus: 2
+    networks:
+      default: {ipv4_address: '${NETWORK_PREFIX:-172.30.61}.11'}
+    healthcheck:
+      test: [CMD, curl, -fsS, http://localhost:8108/health]
+      interval: 3s
+      timeout: 5s
+      retries: 120
+      start_period: 20s
+  ts2:
+    image: typesense-products-server:dev
+    build: ./server
+    hostname: ts2
+    profiles: [cluster, sharded]
+    command: ["--data-dir=/data", "--api-key=local-search-key", "--nodes=/etc/typesense/nodes", "--peering-address=${NETWORK_PREFIX:-172.30.61}.12", "--api-port=8108", "--peering-port=8107"]
+    volumes: [ts2:/data, ./config/generated/nodes:/etc/typesense/nodes:ro]
+    mem_limit: 2g
+    cpus: 2
+    networks:
+      default: {ipv4_address: '${NETWORK_PREFIX:-172.30.61}.12'}
+    healthcheck:
+      test: [CMD, curl, -fsS, http://localhost:8108/health]
+      interval: 3s
+      timeout: 5s
+      retries: 120
+      start_period: 20s
+  ts3:
+    image: typesense-products-server:dev
+    build: ./server
+    hostname: ts3
+    profiles: [cluster, sharded]
+    command: ["--data-dir=/data", "--api-key=local-search-key", "--nodes=/etc/typesense/nodes", "--peering-address=${NETWORK_PREFIX:-172.30.61}.13", "--api-port=8108", "--peering-port=8107"]
+    volumes: [ts3:/data, ./config/generated/nodes:/etc/typesense/nodes:ro]
+    mem_limit: 2g
+    cpus: 2
+    networks:
+      default: {ipv4_address: '${NETWORK_PREFIX:-172.30.61}.13'}
+    healthcheck:
+      test: [CMD, curl, -fsS, http://localhost:8108/health]
+      interval: 3s
+      timeout: 5s
+      retries: 120
+      start_period: 20s
+  ts4:
+    image: typesense-products-server:dev
+    build: ./server
+    hostname: ts4
+    profiles: [sharded]
+    command: ["--data-dir=/data", "--api-key=local-search-key", "--nodes=/etc/typesense/nodes", "--peering-address=${NETWORK_PREFIX:-172.30.61}.14", "--api-port=8108", "--peering-port=8107"]
+    volumes: [ts4:/data, ./config/generated/nodes1:/etc/typesense/nodes:ro]
+    mem_limit: 2g
+    cpus: 2
+    networks:
+      default: {ipv4_address: '${NETWORK_PREFIX:-172.30.61}.14'}
+    healthcheck:
+      test: [CMD, curl, -fsS, http://localhost:8108/health]
+      interval: 3s
+      timeout: 5s
+      retries: 120
+      start_period: 20s
+  ts5:
+    image: typesense-products-server:dev
+    build: ./server
+    hostname: ts5
+    profiles: [sharded]
+    command: ["--data-dir=/data", "--api-key=local-search-key", "--nodes=/etc/typesense/nodes", "--peering-address=${NETWORK_PREFIX:-172.30.61}.15", "--api-port=8108", "--peering-port=8107"]
+    volumes: [ts5:/data, ./config/generated/nodes1:/etc/typesense/nodes:ro]
+    mem_limit: 2g
+    cpus: 2
+    networks:
+      default: {ipv4_address: '${NETWORK_PREFIX:-172.30.61}.15'}
+    healthcheck:
+      test: [CMD, curl, -fsS, http://localhost:8108/health]
+      interval: 3s
+      timeout: 5s
+      retries: 120
+      start_period: 20s
+  ts6:
+    image: typesense-products-server:dev
+    build: ./server
+    hostname: ts6
+    profiles: [sharded]
+    command: ["--data-dir=/data", "--api-key=local-search-key", "--nodes=/etc/typesense/nodes", "--peering-address=${NETWORK_PREFIX:-172.30.61}.16", "--api-port=8108", "--peering-port=8107"]
+    volumes: [ts6:/data, ./config/generated/nodes1:/etc/typesense/nodes:ro]
+    mem_limit: 2g
+    cpus: 2
+    networks:
+      default: {ipv4_address: '${NETWORK_PREFIX:-172.30.61}.16'}
+    healthcheck:
+      test: [CMD, curl, -fsS, http://localhost:8108/health]
+      interval: 3s
+      timeout: 5s
+      retries: 120
+      start_period: 20s
+  ts7:
+    image: typesense-products-server:dev
+    build: ./server
+    hostname: ts7
+    profiles: [sharded]
+    command: ["--data-dir=/data", "--api-key=local-search-key", "--nodes=/etc/typesense/nodes", "--peering-address=${NETWORK_PREFIX:-172.30.61}.17", "--api-port=8108", "--peering-port=8107"]
+    volumes: [ts7:/data, ./config/generated/nodes2:/etc/typesense/nodes:ro]
+    mem_limit: 2g
+    cpus: 2
+    networks:
+      default: {ipv4_address: '${NETWORK_PREFIX:-172.30.61}.17'}
+    healthcheck:
+      test: [CMD, curl, -fsS, http://localhost:8108/health]
+      interval: 3s
+      timeout: 5s
+      retries: 120
+      start_period: 20s
+  ts8:
+    image: typesense-products-server:dev
+    build: ./server
+    hostname: ts8
+    profiles: [sharded]
+    command: ["--data-dir=/data", "--api-key=local-search-key", "--nodes=/etc/typesense/nodes", "--peering-address=${NETWORK_PREFIX:-172.30.61}.18", "--api-port=8108", "--peering-port=8107"]
+    volumes: [ts8:/data, ./config/generated/nodes2:/etc/typesense/nodes:ro]
+    mem_limit: 2g
+    cpus: 2
+    networks:
+      default: {ipv4_address: '${NETWORK_PREFIX:-172.30.61}.18'}
+    healthcheck:
+      test: [CMD, curl, -fsS, http://localhost:8108/health]
+      interval: 3s
+      timeout: 5s
+      retries: 120
+      start_period: 20s
+  ts9:
+    image: typesense-products-server:dev
+    build: ./server
+    hostname: ts9
+    profiles: [sharded]
+    command: ["--data-dir=/data", "--api-key=local-search-key", "--nodes=/etc/typesense/nodes", "--peering-address=${NETWORK_PREFIX:-172.30.61}.19", "--api-port=8108", "--peering-port=8107"]
+    volumes: [ts9:/data, ./config/generated/nodes2:/etc/typesense/nodes:ro]
+    mem_limit: 2g
+    cpus: 2
+    networks:
+      default: {ipv4_address: '${NETWORK_PREFIX:-172.30.61}.19'}
+    healthcheck:
+      test: [CMD, curl, -fsS, http://localhost:8108/health]
+      interval: 3s
+      timeout: 5s
+      retries: 120
+      start_period: 20s
+  tools:
+    profiles: [tools]
+    image: typesense-product-tools:dev
+    build: {context: ../.., dockerfile: typesense/product-search/app/Dockerfile}
+    environment:
+      MODE: ${MODE:-cluster}
+      URLS: ${URLS:-http://ts1:8108,http://ts2:8108,http://ts3:8108}
+      BENCH_QUERIES: ${BENCH_QUERIES:-1000}
+      QUALITY_QUERIES: ${QUALITY_QUERIES:-100}
+      CHECK_QUERIES: ${CHECK_QUERIES:-50}
+      DURATION: ${DURATION:-75}
+    volumes:
+      - ${CORPUS_DIR:-../../datasets/esci/prepared}:/corpus:ro
+      - ./${RESULTS_DIR:-results/manual}:/results
+    mem_limit: 3g
+    cpus: 2
+networks:
+  default:
+    ipam:
+      config: [{subnet: '${NETWORK_PREFIX:-172.30.61}.0/24'}]
+volumes:
+  ts1:
+  ts2:
+  ts3:
+  ts4:
+  ts5:
+  ts6:
+  ts7:
+  ts8:
+  ts9:
