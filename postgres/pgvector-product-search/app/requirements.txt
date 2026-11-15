@@ -1,0 +1,2 @@
+psycopg[binary,pool]==3.3.9
+pgvector==0.5.1

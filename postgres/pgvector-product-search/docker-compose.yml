@@ -1,0 +1,138 @@
+name: pgvector-product-search
+services:
+  etcd0:
+    image: quay.io/coreos/etcd:v3.5.21
+    command: [etcd, --name=etcd0, --data-dir=/etcd-data, --listen-client-urls=http://0.0.0.0:2379, --advertise-client-urls=http://etcd0:2379, --listen-peer-urls=http://0.0.0.0:2380, --initial-advertise-peer-urls=http://etcd0:2380, '--initial-cluster=etcd0=http://etcd0:2380,etcd1=http://etcd1:2380,etcd2=http://etcd2:2380', --initial-cluster-token=pgvector-products]
+    volumes: [etcd0:/etcd-data]
+    mem_limit: 256m
+    cpus: 0.5
+    healthcheck:
+      test: [CMD, etcdctl, endpoint, health]
+      interval: 3s
+      timeout: 5s
+      retries: 60
+  etcd1:
+    image: quay.io/coreos/etcd:v3.5.21
+    command: [etcd, --name=etcd1, --data-dir=/etcd-data, --listen-client-urls=http://0.0.0.0:2379, --advertise-client-urls=http://etcd1:2379, --listen-peer-urls=http://0.0.0.0:2380, --initial-advertise-peer-urls=http://etcd1:2380, '--initial-cluster=etcd0=http://etcd0:2380,etcd1=http://etcd1:2380,etcd2=http://etcd2:2380', --initial-cluster-token=pgvector-products]
+    volumes: [etcd1:/etcd-data]
+    mem_limit: 256m
+    cpus: 0.5
+    healthcheck:
+      test: [CMD, etcdctl, endpoint, health]
+      interval: 3s
+      timeout: 5s
+      retries: 60
+  etcd2:
+    image: quay.io/coreos/etcd:v3.5.21
+    command: [etcd, --name=etcd2, --data-dir=/etcd-data, --listen-client-urls=http://0.0.0.0:2379, --advertise-client-urls=http://etcd2:2379, --listen-peer-urls=http://0.0.0.0:2380, --initial-advertise-peer-urls=http://etcd2:2380, '--initial-cluster=etcd0=http://etcd0:2380,etcd1=http://etcd1:2380,etcd2=http://etcd2:2380', --initial-cluster-token=pgvector-products]
+    volumes: [etcd2:/etcd-data]
+    mem_limit: 256m
+    cpus: 0.5
+    healthcheck:
+      test: [CMD, etcdctl, endpoint, health]
+      interval: 3s
+      timeout: 5s
+      retries: 60
+  pg0:
+    image: pgvector-products-patroni:dev
+    shm_size: 1g
+    build: ./patroni
+    environment:
+      PATRONI_SCOPE: products
+      PATRONI_NAME: pg0
+      PATRONI_RESTAPI_CONNECT_ADDRESS: pg0:8008
+      PATRONI_POSTGRESQL_CONNECT_ADDRESS: pg0:5432
+    depends_on:
+      etcd0: {condition: service_healthy}
+      etcd1: {condition: service_healthy}
+      etcd2: {condition: service_healthy}
+    volumes: [pg0:/var/lib/postgresql/patroni]
+    mem_limit: 2g
+    cpus: 2
+    healthcheck:
+      test: [CMD, curl, -fsS, http://localhost:8008/health]
+      interval: 3s
+      timeout: 5s
+      retries: 120
+      start_period: 30s
+  pg1:
+    image: pgvector-products-patroni:dev
+    shm_size: 1g
+    build: ./patroni
+    environment:
+      PATRONI_SCOPE: products
+      PATRONI_NAME: pg1
+      PATRONI_RESTAPI_CONNECT_ADDRESS: pg1:8008
+      PATRONI_POSTGRESQL_CONNECT_ADDRESS: pg1:5432
+    depends_on:
+      etcd0: {condition: service_healthy}
+      etcd1: {condition: service_healthy}
+      etcd2: {condition: service_healthy}
+    volumes: [pg1:/var/lib/postgresql/patroni]
+    mem_limit: 2g
+    cpus: 2
+    healthcheck:
+      test: [CMD, curl, -fsS, http://localhost:8008/health]
+      interval: 3s
+      timeout: 5s
+      retries: 120
+      start_period: 30s
+  pg2:
+    image: pgvector-products-patroni:dev
+    shm_size: 1g
+    build: ./patroni
+    environment:
+      PATRONI_SCOPE: products
+      PATRONI_NAME: pg2
+      PATRONI_RESTAPI_CONNECT_ADDRESS: pg2:8008
+      PATRONI_POSTGRESQL_CONNECT_ADDRESS: pg2:5432
+    depends_on:
+      etcd0: {condition: service_healthy}
+      etcd1: {condition: service_healthy}
+      etcd2: {condition: service_healthy}
+    volumes: [pg2:/var/lib/postgresql/patroni]
+    mem_limit: 2g
+    cpus: 2
+    healthcheck:
+      test: [CMD, curl, -fsS, http://localhost:8008/health]
+      interval: 3s
+      timeout: 5s
+      retries: 120
+      start_period: 30s
+  single:
+    profiles: [single]
+    image: pgvector/pgvector:0.8.7-pg17-bookworm
+    shm_size: 1g
+    environment: {POSTGRES_PASSWORD: local-postgres}
+    volumes: [single:/var/lib/postgresql/data]
+    mem_limit: 2g
+    cpus: 2
+    healthcheck:
+      test: [CMD, pg_isready, -U, postgres]
+      interval: 3s
+      timeout: 5s
+      retries: 60
+  tools:
+    profiles: [tools]
+    image: pgvector-product-tools:dev
+    build: {context: ../.., dockerfile: postgres/pgvector-product-search/app/Dockerfile}
+    environment:
+      MODE: ${MODE:-cluster}
+      PG_NODES: ${PG_NODES:-pg0,pg1,pg2}
+      BENCH_QUERIES: ${BENCH_QUERIES:-1000}
+      QUALITY_QUERIES: ${QUALITY_QUERIES:-100}
+      CHECK_QUERIES: ${CHECK_QUERIES:-50}
+      DURATION: ${DURATION:-75}
+    volumes:
+      - ${CORPUS_DIR:-../../datasets/esci/prepared}:/corpus:ro
+      - ./${RESULTS_DIR:-results/manual}:/results
+    mem_limit: 3g
+    cpus: 2
+volumes:
+  etcd0:
+  etcd1:
+  etcd2:
+  pg0:
+  pg1:
+  pg2:
+  single:
