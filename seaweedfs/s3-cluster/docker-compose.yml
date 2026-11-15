@@ -1,0 +1,765 @@
+name: ${COMPOSE_PROJECT_NAME:-seaweedfs-s3-cluster}
+services:
+  master0:
+    image: chrislusf/seaweedfs:4.53
+    hostname: master0
+    command:
+    - master
+    - -ip=master0
+    - -ip.bind=0.0.0.0
+    - -mdir=/data
+    - -peers=master0:9333,master1:9333,master2:9333
+    - -defaultReplication=200
+    - -volumeSizeLimitMB=64
+    cpus: 0.5
+    mem_limit: 512m
+    healthcheck:
+      test:
+      - CMD
+      - wget
+      - -q
+      - -O
+      - /dev/null
+      - http://127.0.0.1:9333/cluster/status
+      interval: 5s
+      timeout: 5s
+      retries: 60
+      start_period: 10s
+    volumes:
+    - master0:/data
+  master1:
+    image: chrislusf/seaweedfs:4.53
+    hostname: master1
+    command:
+    - master
+    - -ip=master1
+    - -ip.bind=0.0.0.0
+    - -mdir=/data
+    - -peers=master0:9333,master1:9333,master2:9333
+    - -defaultReplication=200
+    - -volumeSizeLimitMB=64
+    cpus: 0.5
+    mem_limit: 512m
+    healthcheck:
+      test:
+      - CMD
+      - wget
+      - -q
+      - -O
+      - /dev/null
+      - http://127.0.0.1:9333/cluster/status
+      interval: 5s
+      timeout: 5s
+      retries: 60
+      start_period: 10s
+    volumes:
+    - master1:/data
+  master2:
+    image: chrislusf/seaweedfs:4.53
+    hostname: master2
+    command:
+    - master
+    - -ip=master2
+    - -ip.bind=0.0.0.0
+    - -mdir=/data
+    - -peers=master0:9333,master1:9333,master2:9333
+    - -defaultReplication=200
+    - -volumeSizeLimitMB=64
+    cpus: 0.5
+    mem_limit: 512m
+    healthcheck:
+      test:
+      - CMD
+      - wget
+      - -q
+      - -O
+      - /dev/null
+      - http://127.0.0.1:9333/cluster/status
+      interval: 5s
+      timeout: 5s
+      retries: 60
+      start_period: 10s
+    volumes:
+    - master2:/data
+  etcd0:
+    image: gcr.io/etcd-development/etcd:v3.6.16
+    hostname: etcd0
+    entrypoint:
+    - /usr/local/bin/etcd
+    command:
+    - --name=etcd0
+    - --data-dir=/data
+    - --listen-client-urls=http://0.0.0.0:2379
+    - --advertise-client-urls=http://etcd0:2379
+    - --listen-peer-urls=http://0.0.0.0:2380
+    - --initial-advertise-peer-urls=http://etcd0:2380
+    - --initial-cluster=etcd0=http://etcd0:2380,etcd1=http://etcd1:2380,etcd2=http://etcd2:2380
+    - --initial-cluster-token=seaweed-s3-example
+    - --auto-compaction-retention=1
+    volumes:
+    - etcd0:/data
+    cpus: 0.5
+    mem_limit: 512m
+    healthcheck:
+      test:
+      - CMD
+      - /usr/local/bin/etcdctl
+      - endpoint
+      - health
+      interval: 5s
+      timeout: 5s
+      retries: 60
+  etcd1:
+    image: gcr.io/etcd-development/etcd:v3.6.16
+    hostname: etcd1
+    entrypoint:
+    - /usr/local/bin/etcd
+    command:
+    - --name=etcd1
+    - --data-dir=/data
+    - --listen-client-urls=http://0.0.0.0:2379
+    - --advertise-client-urls=http://etcd1:2379
+    - --listen-peer-urls=http://0.0.0.0:2380
+    - --initial-advertise-peer-urls=http://etcd1:2380
+    - --initial-cluster=etcd0=http://etcd0:2380,etcd1=http://etcd1:2380,etcd2=http://etcd2:2380
+    - --initial-cluster-token=seaweed-s3-example
+    - --auto-compaction-retention=1
+    volumes:
+    - etcd1:/data
+    cpus: 0.5
+    mem_limit: 512m
+    healthcheck:
+      test:
+      - CMD
+      - /usr/local/bin/etcdctl
+      - endpoint
+      - health
+      interval: 5s
+      timeout: 5s
+      retries: 60
+  etcd2:
+    image: gcr.io/etcd-development/etcd:v3.6.16
+    hostname: etcd2
+    entrypoint:
+    - /usr/local/bin/etcd
+    command:
+    - --name=etcd2
+    - --data-dir=/data
+    - --listen-client-urls=http://0.0.0.0:2379
+    - --advertise-client-urls=http://etcd2:2379
+    - --listen-peer-urls=http://0.0.0.0:2380
+    - --initial-advertise-peer-urls=http://etcd2:2380
+    - --initial-cluster=etcd0=http://etcd0:2380,etcd1=http://etcd1:2380,etcd2=http://etcd2:2380
+    - --initial-cluster-token=seaweed-s3-example
+    - --auto-compaction-retention=1
+    volumes:
+    - etcd2:/data
+    cpus: 0.5
+    mem_limit: 512m
+    healthcheck:
+      test:
+      - CMD
+      - /usr/local/bin/etcdctl
+      - endpoint
+      - health
+      interval: 5s
+      timeout: 5s
+      retries: 60
+  volume0:
+    image: chrislusf/seaweedfs:4.53
+    hostname: volume0
+    command:
+    - volume
+    - -ip=volume0
+    - -ip.bind=0.0.0.0
+    - -port=8080
+    - -dir=/data
+    - -master=master0:9333,master1:9333,master2:9333
+    - -max=128
+    - -dataCenter=zone0
+    - -rack=rack0
+    - -minFreeSpace=1GiB
+    cpus: 1
+    mem_limit: 512m
+    healthcheck:
+      test:
+      - CMD
+      - wget
+      - -q
+      - -O
+      - /dev/null
+      - http://127.0.0.1:8080/healthz
+      interval: 5s
+      timeout: 5s
+      retries: 60
+      start_period: 10s
+    volumes:
+    - volume0:/data
+    depends_on:
+      master0:
+        condition: service_healthy
+      master1:
+        condition: service_healthy
+      master2:
+        condition: service_healthy
+  volume1:
+    image: chrislusf/seaweedfs:4.53
+    hostname: volume1
+    command:
+    - volume
+    - -ip=volume1
+    - -ip.bind=0.0.0.0
+    - -port=8080
+    - -dir=/data
+    - -master=master0:9333,master1:9333,master2:9333
+    - -max=128
+    - -dataCenter=zone0
+    - -rack=rack1
+    - -minFreeSpace=1GiB
+    cpus: 1
+    mem_limit: 512m
+    healthcheck:
+      test:
+      - CMD
+      - wget
+      - -q
+      - -O
+      - /dev/null
+      - http://127.0.0.1:8080/healthz
+      interval: 5s
+      timeout: 5s
+      retries: 60
+      start_period: 10s
+    volumes:
+    - volume1:/data
+    depends_on:
+      master0:
+        condition: service_healthy
+      master1:
+        condition: service_healthy
+      master2:
+        condition: service_healthy
+  volume2:
+    image: chrislusf/seaweedfs:4.53
+    hostname: volume2
+    command:
+    - volume
+    - -ip=volume2
+    - -ip.bind=0.0.0.0
+    - -port=8080
+    - -dir=/data
+    - -master=master0:9333,master1:9333,master2:9333
+    - -max=128
+    - -dataCenter=zone0
+    - -rack=rack2
+    - -minFreeSpace=1GiB
+    cpus: 1
+    mem_limit: 512m
+    healthcheck:
+      test:
+      - CMD
+      - wget
+      - -q
+      - -O
+      - /dev/null
+      - http://127.0.0.1:8080/healthz
+      interval: 5s
+      timeout: 5s
+      retries: 60
+      start_period: 10s
+    volumes:
+    - volume2:/data
+    depends_on:
+      master0:
+        condition: service_healthy
+      master1:
+        condition: service_healthy
+      master2:
+        condition: service_healthy
+  volume3:
+    image: chrislusf/seaweedfs:4.53
+    hostname: volume3
+    command:
+    - volume
+    - -ip=volume3
+    - -ip.bind=0.0.0.0
+    - -port=8080
+    - -dir=/data
+    - -master=master0:9333,master1:9333,master2:9333
+    - -max=128
+    - -dataCenter=zone1
+    - -rack=rack3
+    - -minFreeSpace=1GiB
+    cpus: 1
+    mem_limit: 512m
+    healthcheck:
+      test:
+      - CMD
+      - wget
+      - -q
+      - -O
+      - /dev/null
+      - http://127.0.0.1:8080/healthz
+      interval: 5s
+      timeout: 5s
+      retries: 60
+      start_period: 10s
+    volumes:
+    - volume3:/data
+    depends_on:
+      master0:
+        condition: service_healthy
+      master1:
+        condition: service_healthy
+      master2:
+        condition: service_healthy
+  volume4:
+    image: chrislusf/seaweedfs:4.53
+    hostname: volume4
+    command:
+    - volume
+    - -ip=volume4
+    - -ip.bind=0.0.0.0
+    - -port=8080
+    - -dir=/data
+    - -master=master0:9333,master1:9333,master2:9333
+    - -max=128
+    - -dataCenter=zone1
+    - -rack=rack4
+    - -minFreeSpace=1GiB
+    cpus: 1
+    mem_limit: 512m
+    healthcheck:
+      test:
+      - CMD
+      - wget
+      - -q
+      - -O
+      - /dev/null
+      - http://127.0.0.1:8080/healthz
+      interval: 5s
+      timeout: 5s
+      retries: 60
+      start_period: 10s
+    volumes:
+    - volume4:/data
+    depends_on:
+      master0:
+        condition: service_healthy
+      master1:
+        condition: service_healthy
+      master2:
+        condition: service_healthy
+  volume5:
+    image: chrislusf/seaweedfs:4.53
+    hostname: volume5
+    command:
+    - volume
+    - -ip=volume5
+    - -ip.bind=0.0.0.0
+    - -port=8080
+    - -dir=/data
+    - -master=master0:9333,master1:9333,master2:9333
+    - -max=128
+    - -dataCenter=zone1
+    - -rack=rack5
+    - -minFreeSpace=1GiB
+    cpus: 1
+    mem_limit: 512m
+    healthcheck:
+      test:
+      - CMD
+      - wget
+      - -q
+      - -O
+      - /dev/null
+      - http://127.0.0.1:8080/healthz
+      interval: 5s
+      timeout: 5s
+      retries: 60
+      start_period: 10s
+    volumes:
+    - volume5:/data
+    depends_on:
+      master0:
+        condition: service_healthy
+      master1:
+        condition: service_healthy
+      master2:
+        condition: service_healthy
+  volume6:
+    image: chrislusf/seaweedfs:4.53
+    hostname: volume6
+    command:
+    - volume
+    - -ip=volume6
+    - -ip.bind=0.0.0.0
+    - -port=8080
+    - -dir=/data
+    - -master=master0:9333,master1:9333,master2:9333
+    - -max=128
+    - -dataCenter=zone2
+    - -rack=rack6
+    - -minFreeSpace=1GiB
+    cpus: 1
+    mem_limit: 512m
+    healthcheck:
+      test:
+      - CMD
+      - wget
+      - -q
+      - -O
+      - /dev/null
+      - http://127.0.0.1:8080/healthz
+      interval: 5s
+      timeout: 5s
+      retries: 60
+      start_period: 10s
+    volumes:
+    - volume6:/data
+    depends_on:
+      master0:
+        condition: service_healthy
+      master1:
+        condition: service_healthy
+      master2:
+        condition: service_healthy
+  volume7:
+    image: chrislusf/seaweedfs:4.53
+    hostname: volume7
+    command:
+    - volume
+    - -ip=volume7
+    - -ip.bind=0.0.0.0
+    - -port=8080
+    - -dir=/data
+    - -master=master0:9333,master1:9333,master2:9333
+    - -max=128
+    - -dataCenter=zone2
+    - -rack=rack7
+    - -minFreeSpace=1GiB
+    cpus: 1
+    mem_limit: 512m
+    healthcheck:
+      test:
+      - CMD
+      - wget
+      - -q
+      - -O
+      - /dev/null
+      - http://127.0.0.1:8080/healthz
+      interval: 5s
+      timeout: 5s
+      retries: 60
+      start_period: 10s
+    volumes:
+    - volume7:/data
+    depends_on:
+      master0:
+        condition: service_healthy
+      master1:
+        condition: service_healthy
+      master2:
+        condition: service_healthy
+  volume8:
+    image: chrislusf/seaweedfs:4.53
+    hostname: volume8
+    command:
+    - volume
+    - -ip=volume8
+    - -ip.bind=0.0.0.0
+    - -port=8080
+    - -dir=/data
+    - -master=master0:9333,master1:9333,master2:9333
+    - -max=128
+    - -dataCenter=zone2
+    - -rack=rack8
+    - -minFreeSpace=1GiB
+    cpus: 1
+    mem_limit: 512m
+    healthcheck:
+      test:
+      - CMD
+      - wget
+      - -q
+      - -O
+      - /dev/null
+      - http://127.0.0.1:8080/healthz
+      interval: 5s
+      timeout: 5s
+      retries: 60
+      start_period: 10s
+    volumes:
+    - volume8:/data
+    depends_on:
+      master0:
+        condition: service_healthy
+      master1:
+        condition: service_healthy
+      master2:
+        condition: service_healthy
+  filer0:
+    image: chrislusf/seaweedfs:4.53
+    hostname: filer0
+    command:
+    - filer
+    - -ip=filer0
+    - -ip.bind=0.0.0.0
+    - -master=master0:9333,master1:9333,master2:9333
+    - -defaultReplicaPlacement=200
+    - -maxMB=4
+    cpus: 1
+    mem_limit: 768m
+    healthcheck:
+      test:
+      - CMD
+      - wget
+      - -q
+      - -O
+      - /dev/null
+      - http://127.0.0.1:8888/healthz
+      interval: 5s
+      timeout: 5s
+      retries: 60
+      start_period: 10s
+    volumes:
+    - ./config/filer.toml:/etc/seaweedfs/filer.toml:ro
+    depends_on:
+      etcd0:
+        condition: service_healthy
+      etcd1:
+        condition: service_healthy
+      etcd2:
+        condition: service_healthy
+  filer1:
+    image: chrislusf/seaweedfs:4.53
+    hostname: filer1
+    command:
+    - filer
+    - -ip=filer1
+    - -ip.bind=0.0.0.0
+    - -master=master0:9333,master1:9333,master2:9333
+    - -defaultReplicaPlacement=200
+    - -maxMB=4
+    cpus: 1
+    mem_limit: 768m
+    healthcheck:
+      test:
+      - CMD
+      - wget
+      - -q
+      - -O
+      - /dev/null
+      - http://127.0.0.1:8888/healthz
+      interval: 5s
+      timeout: 5s
+      retries: 60
+      start_period: 10s
+    volumes:
+    - ./config/filer.toml:/etc/seaweedfs/filer.toml:ro
+    depends_on:
+      etcd0:
+        condition: service_healthy
+      etcd1:
+        condition: service_healthy
+      etcd2:
+        condition: service_healthy
+  filer2:
+    image: chrislusf/seaweedfs:4.53
+    hostname: filer2
+    command:
+    - filer
+    - -ip=filer2
+    - -ip.bind=0.0.0.0
+    - -master=master0:9333,master1:9333,master2:9333
+    - -defaultReplicaPlacement=200
+    - -maxMB=4
+    cpus: 1
+    mem_limit: 768m
+    healthcheck:
+      test:
+      - CMD
+      - wget
+      - -q
+      - -O
+      - /dev/null
+      - http://127.0.0.1:8888/healthz
+      interval: 5s
+      timeout: 5s
+      retries: 60
+      start_period: 10s
+    volumes:
+    - ./config/filer.toml:/etc/seaweedfs/filer.toml:ro
+    depends_on:
+      etcd0:
+        condition: service_healthy
+      etcd1:
+        condition: service_healthy
+      etcd2:
+        condition: service_healthy
+  s3api0:
+    image: chrislusf/seaweedfs:4.53
+    hostname: s3api0
+    command:
+    - s3
+    - -ip.bind=0.0.0.0
+    - -port=8333
+    - -filer=filer0:8888,filer1:8888,filer2:8888
+    - -config=/etc/seaweedfs/s3.json
+    - -cacheCapacityMB=0
+    - -port.iceberg=0
+    - -port.lance=0
+    cpus: 1
+    mem_limit: 512m
+    healthcheck:
+      test:
+      - CMD
+      - wget
+      - -q
+      - -O
+      - /dev/null
+      - http://127.0.0.1:8333/status
+      interval: 5s
+      timeout: 5s
+      retries: 60
+      start_period: 10s
+    volumes:
+    - ./config/s3.json:/etc/seaweedfs/s3.json:ro
+    depends_on:
+      filer0:
+        condition: service_healthy
+      filer1:
+        condition: service_healthy
+      filer2:
+        condition: service_healthy
+  s3api1:
+    image: chrislusf/seaweedfs:4.53
+    hostname: s3api1
+    command:
+    - s3
+    - -ip.bind=0.0.0.0
+    - -port=8333
+    - -filer=filer0:8888,filer1:8888,filer2:8888
+    - -config=/etc/seaweedfs/s3.json
+    - -cacheCapacityMB=0
+    - -port.iceberg=0
+    - -port.lance=0
+    cpus: 1
+    mem_limit: 512m
+    healthcheck:
+      test:
+      - CMD
+      - wget
+      - -q
+      - -O
+      - /dev/null
+      - http://127.0.0.1:8333/status
+      interval: 5s
+      timeout: 5s
+      retries: 60
+      start_period: 10s
+    volumes:
+    - ./config/s3.json:/etc/seaweedfs/s3.json:ro
+    depends_on:
+      filer0:
+        condition: service_healthy
+      filer1:
+        condition: service_healthy
+      filer2:
+        condition: service_healthy
+  s3api2:
+    image: chrislusf/seaweedfs:4.53
+    hostname: s3api2
+    command:
+    - s3
+    - -ip.bind=0.0.0.0
+    - -port=8333
+    - -filer=filer0:8888,filer1:8888,filer2:8888
+    - -config=/etc/seaweedfs/s3.json
+    - -cacheCapacityMB=0
+    - -port.iceberg=0
+    - -port.lance=0
+    cpus: 1
+    mem_limit: 512m
+    healthcheck:
+      test:
+      - CMD
+      - wget
+      - -q
+      - -O
+      - /dev/null
+      - http://127.0.0.1:8333/status
+      interval: 5s
+      timeout: 5s
+      retries: 60
+      start_period: 10s
+    volumes:
+    - ./config/s3.json:/etc/seaweedfs/s3.json:ro
+    depends_on:
+      filer0:
+        condition: service_healthy
+      filer1:
+        condition: service_healthy
+      filer2:
+        condition: service_healthy
+  s3:
+    image: haproxy:3.2.8-alpine
+    cpus: 0.5
+    mem_limit: 128m
+    volumes:
+    - ./config/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+    healthcheck:
+      test:
+      - CMD
+      - wget
+      - -q
+      - -O
+      - /dev/null
+      - http://127.0.0.1:8404/health
+      interval: 3s
+      timeout: 3s
+      retries: 30
+    depends_on:
+      s3api0:
+        condition: service_healthy
+      s3api1:
+        condition: service_healthy
+      s3api2:
+        condition: service_healthy
+  tools:
+    image: ${COMPOSE_PROJECT_NAME:-seaweedfs-s3-cluster}-tools:dev
+    build:
+      context: ../..
+      dockerfile: object-storage/client/Dockerfile
+    profiles:
+    - tools
+    cpus: 2
+    mem_limit: 2g
+    environment:
+      S3_ENDPOINT: http://s3:9000
+      AWS_ACCESS_KEY_ID: ${S3_ACCESS_KEY:-GK0123456789abcdef01234567}
+      AWS_SECRET_ACCESS_KEY: ${S3_SECRET_KEY:-local-only-object-storage-secret-key}
+      OBJECTS: ${OBJECTS:-10000}
+      LARGE_OBJECTS: ${LARGE_OBJECTS:-128}
+      DURATION: ${DURATION:-120}
+      BENCH_SMALL_REQUESTS: ${BENCH_SMALL_REQUESTS:-10000}
+      BENCH_REQUESTS: ${BENCH_REQUESTS:-256}
+      BENCH_LARGE_REQUESTS: ${BENCH_LARGE_REQUESTS:-128}
+    volumes:
+    - ./${RESULTS_DIR:-results/verified}:/results
+volumes:
+  master0: {}
+  master1: {}
+  master2: {}
+  etcd0: {}
+  etcd1: {}
+  etcd2: {}
+  volume0: {}
+  volume1: {}
+  volume2: {}
+  volume3: {}
+  volume4: {}
+  volume5: {}
+  volume6: {}
+  volume7: {}
+  volume8: {}

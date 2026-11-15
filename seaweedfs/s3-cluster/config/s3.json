@@ -1,0 +1,20 @@
+{
+  "identities": [
+    {
+      "name": "lab-client",
+      "credentials": [
+        {
+          "accessKey": "GK0123456789abcdef01234567",
+          "secretKey": "local-only-object-storage-secret-key"
+        }
+      ],
+      "actions": [
+        "Admin",
+        "Read",
+        "Write",
+        "List",
+        "Tagging"
+      ]
+    }
+  ]
+}
