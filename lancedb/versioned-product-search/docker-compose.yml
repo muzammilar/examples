@@ -1,0 +1,53 @@
+name: lancedb-versioned-product-search
+x-server: &server
+  image: lancedb-product-tools:dev
+  build:
+    context: ../..
+    dockerfile: lancedb/versioned-product-search/app/Dockerfile
+  entrypoint: [python, /app/server.py]
+  cpus: 2
+  mem_limit: 3g
+  healthcheck:
+    test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://localhost:8080/health')"]
+    interval: 5s
+    timeout: 3s
+    retries: 60
+  volumes:
+    - ${CORPUS_DIR:-../../datasets/esci/prepared}:/corpus:ro
+    - catalog:/data
+services:
+  writer:
+    <<: *server
+  reader1: &reader
+    <<: *server
+    profiles: [cluster]
+    environment: {READ_ONLY: '1'}
+    depends_on:
+      writer: {condition: service_healthy}
+    volumes:
+      - ${CORPUS_DIR:-../../datasets/esci/prepared}:/corpus:ro
+      - catalog:/data:ro
+  reader2:
+    <<: *reader
+  reader3:
+    <<: *reader
+  tools:
+    image: lancedb-product-tools:dev
+    build:
+      context: ../..
+      dockerfile: lancedb/versioned-product-search/app/Dockerfile
+    profiles: [tools]
+    cpus: 2
+    mem_limit: 3g
+    environment:
+      MODE: ${MODE:-cluster}
+      URLS: ${URLS:-http://reader1:8080,http://reader2:8080,http://reader3:8080}
+      BENCH_QUERIES: ${BENCH_QUERIES:-1000}
+      QUALITY_QUERIES: ${QUALITY_QUERIES:-100}
+      CHECK_QUERIES: ${CHECK_QUERIES:-50}
+      DURATION: ${DURATION:-75}
+    volumes:
+      - ${CORPUS_DIR:-../../datasets/esci/prepared}:/corpus:ro
+      - ./${RESULTS_DIR:-results/cluster}:/results
+volumes:
+  catalog:

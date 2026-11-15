@@ -1,0 +1,11 @@
+**
+!datasets/
+!datasets/esci/
+!datasets/esci/client/
+!datasets/esci/client/**
+!lancedb/
+!lancedb/versioned-product-search/
+!lancedb/versioned-product-search/app/
+!lancedb/versioned-product-search/app/**
+**/__pycache__/**
+**/*.pyc
