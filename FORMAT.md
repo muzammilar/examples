@@ -37,7 +37,8 @@ Each example folder:
 | `.gitignore` | `results/`, image tarballs, license files, local state |
 | `sql/`, `cql/`, `scripts/` | numbered files run by `make test` (`01-schema.sql`, `02-…`) |
 | `bench/` | `run.sh`, `limits.sh`, optional `report.py` + `pyproject.toml` + `uv.lock` |
-| `app/` or `client/` | the workload program (Go, Rust or C++), built by a Dockerfile |
+| `orders-workload/`, `telemetry-workload/`, `producer/`, etc. | meaningfully named workload source (Go, Rust or C++), with its Dockerfile |
+| `docker/` | service image Dockerfiles, when an upstream image needs customization |
 
 ## Make targets
 
@@ -116,21 +117,31 @@ cleanup from infrastructure teardown:
 
 ## kind (Kubernetes)
 
+Each system/example gets its own kind cluster, context and kubeconfig. Do not
+share clusters across different examples. `kind-up` creates them; `kind-down`
+deletes the owned cluster and context/config. A rerun may reuse only that same
+example's cluster. Keep deletion scoped to its configured name.
+
 Export a lab-specific `KUBECONFIG` before invoking kind; cluster creation otherwise
 changes the default context in the user's kubeconfig. Keep the explicit context on
 every kubectl/Helm command even with this isolated file.
 
 ```make
-CLUSTER_NAME := <system>-operator
+CLUSTER_NAME := <system>-<example>
+KUBECONFIG := $(CURDIR)/results/kubeconfig
+export KUBECONFIG
 KUBECTL := kubectl --context kind-$(CLUSTER_NAME)
 HELM    := helm --kube-context kind-$(CLUSTER_NAME)
 
-kind-cluster:
-	kind get clusters | grep -qx $(CLUSTER_NAME) || kind create cluster --config kind-config.yaml
+kind-up:
+	@mkdir -p results
+	kind get clusters | grep -qx $(CLUSTER_NAME) || kind create cluster --name $(CLUSTER_NAME) --config kind-config.yaml
 ```
 
-- `kind-config.yaml`: one node is enough for most operators. Use 3 workers, one per
-  `topology.kubernetes.io/zone` label, when the example needs zone-aware placement (`ydb/`, `tigerbeetle/`).
+- `kind-config.yaml`: provide enough workers for member placement, worker restart and
+  drain tests while retaining the control plane and workload witness. Use 3 workers,
+  one per `topology.kubernetes.io/zone` label, for zone-aware placement. State that
+  these labels do not create independent physical failure domains.
 - Pin chart and operator versions (`--version`). `helm upgrade --install --wait --timeout`.
 - Wait on the real readiness signal: `kubectl wait --for=jsonpath='{.status.state}'=Ready`.
 - `kind load docker-image` fails for multi-arch images on Docker Desktop (`content digest not found`):
@@ -148,7 +159,7 @@ It may share an existing cluster example rather than duplicate deployment files.
 Explain any single-node-only boundary. This is the example that shows why someone
 would pick the system.
 
-- Folder named after the workload (`payments-ledger/`, `market-data/`), program in `app/` or `client/`
+- Folder named after the workload (`payments-ledger/`, `market-data/`), program in a descriptive directory such as `orders-workload/`
   (Go, Rust or C++; official client library where one exists), built by a Dockerfile so the host needs
   only Docker. `make up`, `make run`, `make down`.
 - Model a realistic workload, not a microbenchmark: real schema, mixed operations, concurrency.
@@ -176,9 +187,19 @@ separate folders and stay as they are.)
 
 ## Failover
 
-- Run a load generator, stop one node (`docker stop` / `kubectl delete pod --force`).
-- Report: time until writes resume, failed and retried requests, acknowledged writes lost (must be 0;
-  check by counting), time for the node to rejoin.
+Follow [AGENTS.md production tests](AGENTS.md#non-functional--production-tests): shared evidence
+requirements, separate Compose and Kubernetes operator matrices, workload-specific
+cases and performance checks. Implement applicable cases as independent Make
+targets and a documented serial `test-production` aggregate. Existing examples do
+not become qualified merely because these requirements were added.
+
+- Keep load running through the outage and native repair. Distinguish graceful
+  restart, crash, node outage, network partition and permanent disk loss.
+- Reconcile external acknowledged IDs and complete expected values/versions;
+  counts alone cannot prove no loss. Assert the configured durability contract,
+  including quantified asynchronous/snapshot RPO where applicable.
+- Report first successful operation, longest outage, errors/retries, election,
+  catch-up and restored redundancy separately. Pod readiness alone is insufficient.
 
 ## Benchmarks
 
