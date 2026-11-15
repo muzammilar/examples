@@ -1,0 +1,6 @@
+**
+!object-storage/
+!object-storage/client/
+!object-storage/client/**
+**/__pycache__/**
+**/*.pyc
