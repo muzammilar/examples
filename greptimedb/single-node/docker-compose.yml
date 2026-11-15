@@ -1,0 +1,92 @@
+name: ${COMPOSE_PROJECT_NAME:-greptime-single}
+services:
+  greptime:
+    image: greptime/greptimedb:v1.3.1
+    command:
+    - standalone
+    - start
+    - -c
+    - /config/greptime.toml
+    cpus: 2
+    mem_limit: 2g
+    volumes:
+    - ./greptime.toml:/config/greptime.toml:ro
+    - greptime:/data
+    healthcheck:
+      test:
+      - CMD
+      - curl
+      - -fsS
+      - http://localhost:4000/health
+      interval: 5s
+      timeout: 5s
+      retries: 60
+  victoria:
+    image: victoriametrics/victoria-metrics:v1.156.0
+    command:
+    - -storageDataPath=/data
+    - -retentionPeriod=1
+    - -dedup.minScrapeInterval=1ms
+    cpus: 2
+    mem_limit: 2g
+    volumes:
+    - victoria:/data
+    healthcheck:
+      test:
+      - CMD
+      - wget
+      - -q
+      - -O
+      - /dev/null
+      - http://127.0.0.1:8428/health
+      interval: 5s
+      timeout: 5s
+      retries: 60
+  vlogs:
+    image: ${COMPOSE_PROJECT_NAME}-vlogs:dev
+    command:
+    - -storageDataPath=/data
+    - -retentionPeriod=7d
+    - -delete.enable
+    cpus: 2
+    mem_limit: 2g
+    volumes:
+    - vlogs:/data
+    healthcheck:
+      test:
+      - CMD
+      - /probe
+      - health
+      - http://127.0.0.1:9428/health
+      interval: 5s
+      timeout: 5s
+      retries: 60
+    build:
+      context: ./.build/telemetry-workload
+      target: service
+      args:
+        BASE_IMAGE: victoriametrics/victoria-logs:v1.54.0
+  client:
+    image: ${COMPOSE_PROJECT_NAME:-greptime-single}-client:dev
+    build:
+      context: ./.build/telemetry-workload
+      target: client
+    profiles:
+    - tools
+    cpus: 2
+    mem_limit: 2g
+    environment:
+      GREPTIME: http://greptime:4000
+      VM_WRITE: http://victoria:8428/api/v1/write
+      VM_QUERY: http://victoria:8428
+      VLOGS: http://vlogs:9428
+      STANDALONE: 'true'
+      SERIES: ${SERIES:-10000}
+      POINTS: ${POINTS:-100}
+      LOGS: ${LOGS:-1000000}
+    volumes:
+    - ./results:/results
+volumes:
+  greptime: {}
+  victoria: {}
+  vlogs: {}

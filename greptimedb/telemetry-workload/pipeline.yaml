@@ -1,0 +1,12 @@
+version: 2
+transform:
+  - fields: [event_id]
+    type: int64
+  - fields: [tenant]
+    type: string
+    index: tag
+  - fields: [level,message,timestamp]
+    type: string
+  - fields: ["epoch_ms,event_time"]
+    type: epoch, ms
+    index: timestamp

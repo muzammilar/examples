@@ -1,0 +1,5 @@
+**/results/
+**/config/generated/
+**/__pycache__/
+kubernetes-operator/kind-config.json
+kubernetes-operator/client.json
