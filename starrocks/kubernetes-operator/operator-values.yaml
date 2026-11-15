@@ -1,0 +1,15 @@
+nameOverride: orders
+starrocksOperator:
+  image:
+    tag: v1.11.8
+  imagePullPolicy: IfNotPresent
+  watchNamespace: starrocks-lab
+  nodeSelector:
+    kubernetes.io/hostname: starrocks-operator-control-plane
+  tolerations:
+    - key: node-role.kubernetes.io/control-plane
+      operator: Exists
+      effect: NoSchedule
+  resources:
+    requests: {cpu: 100m, memory: 128Mi}
+    limits: {cpu: 500m, memory: 512Mi}

@@ -11,6 +11,7 @@ it checks complete values and compares the same history with ClickHouse.
 |---|---|---|
 | [Single-copy](single-node/) | One FE + one BE, 1,000,000 orders, upserts/stale replay; one-copy ClickHouse baseline | Full lifecycle, correctness, benchmark and cleanup passed |
 | [Compose cluster](docker-compose-cluster/) | 3 FE / 3 BE; 3 buckets × 3 copies, vs ClickHouse 3 shards × 3 copies; live readers/writers through crashes and empty-disk repair | Eight recovery cases passed; 373,000 acknowledged recovery rows across both systems, zero loss |
+| [Kubernetes operator](kubernetes-operator/) | Official operator, separate kind cluster/context, scaling and failure experiments | 13 operational cases passed; 1,047,000 historical ACKs reconciled without loss; full lifecycle/cleanup passed |
 
 Each example exposes meaningful local source links and builds from an ignored
 materialized `.build/` context. Configuration, dependency definitions, lifecycle
@@ -25,6 +26,7 @@ measurements, not capacity rankings. Budgets, methods and limits are in each REA
 |---|---|---|
 | [Single-copy](single-node/#benchmark) | 96,291.9 rows/s / 104,120.5 rows/s | 98.659 ms / 309.203 ms |
 | [Equal-budget cluster](docker-compose-cluster/#benchmark) | 85,913.5 rows/s / 51,310.3 rows/s | 184.561 ms / 285.788 ms |
+| [Operator](kubernetes-operator/#measured-results) | 72,061.4 rows/s / no CH run | 156.029 ms / no CH run |
 
 ## Known issues
 

@@ -56,7 +56,7 @@ Fastest in class, free, runnable locally (see the sections below for the example
 - [ ] Postgres scale-out: Citus, PgDog, Multigres, Neon
 - [ ] MySQL sharding: Vitess, ShardingSphere, PolarDB-X, NDB Cluster
 - [x] pgvector
-- [ ] StarRocks operator qualification; [single-node and Compose examples](starrocks/) are complete.
+- [x] [StarRocks](starrocks/): single-node, Compose comparison and official operator; mutable-order correctness, benchmarks and 13 operator production cases, with failed attempts and recovery limits documented.
 - [x] Iceberg + Trino + MinIO
 - [ ] MongoDB replica set
 - [ ] Temporal
