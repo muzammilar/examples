@@ -127,7 +127,8 @@ their surviving data does not turn them into successful operational tests. The
 following worker outage required writes through the rebuilt safekeeper plus the
 other survivor, demonstrating the replacement was usable. Native flush/commit LSNs
 passed fixed external-ACK barriers on all three safekeepers before injection and
-after repair in the corrected controller. Raw LSNs are not an independent hash of
+after repair in the corrected controller. Raw evidence is preserved under `results/archive-20261115T231528.620208/`.
+Raw LSNs are not an independent hash of
 every WAL byte. Existing successful process reports predate the added pre-injection
 barrier, while the disk/node/compute reruns exercise it.
 
@@ -139,6 +140,11 @@ barrier, while the disk/node/compute reruns exercise it.
   cleanup reclaimed capacity. No populated workload was reset. Import capacity
   guards and role-specific images now prevent that setup from silently consuming
   the remaining shared disk.
+- An older completed lifecycle left its generated Garage identity marker after
+  deleting the actual volumes. Teardown now removes that generated directory;
+  archival also preserves/removes old generated support state only after proving
+  successful cleanup and absence of owned containers, volumes and kind nodes.
+  Never discard a live cluster's identity marker to force bootstrap to succeed.
 - Digest-only exports produced transient `import-...` aliases. containerd/CRI then
   rejected broker/pageserver with a missing checkpoint-image reference. Stable
   local names derived from the pinned source digests fixed bootstrap; the original

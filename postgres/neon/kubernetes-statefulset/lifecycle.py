@@ -44,6 +44,9 @@ if (
     raise SystemExit(0)
 archive = root / ("archive-" + datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S.%f"))
 archive.mkdir()
+generated = Path("config/generated")
+if generated.exists():
+    shutil.move(generated, archive / "support-generated-config")
 for path in list(root.iterdir()):
     if path.name.startswith("archive-"):
         continue

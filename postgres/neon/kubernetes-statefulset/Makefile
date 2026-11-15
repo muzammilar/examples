@@ -76,6 +76,7 @@ kind-down:
 	docker image rm neon-kind-safekeeper:dev
 	python3 import_images.py clean
 	rm -f kind-config.json images.json storage.json compute.json branch.json results/kubeconfig
+	rm -rf config/generated .build
 
 # Local build context is generated from the tracked source link.
 clean-build:
