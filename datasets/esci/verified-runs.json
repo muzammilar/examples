@@ -1,0 +1,1600 @@
+{
+  "measured_date": "2026-11-15",
+  "audited_date": "2026-11-15",
+  "scope": "Saved results of the implemented ESCI retrieval profiles; not every parameter combination or proposed topology.",
+  "fixture_sha256": {
+    "products.jsonl": "90c1c5f5fb58b9ffc770a775ed07c446a89f661c2a66bd58fc1226bc9bb5e856",
+    "queries.jsonl": "1aea614338c9563deeaf7815b0b5d36acab52e0772bdca0da9fff83b8e0037c1",
+    "vectors.f32": "de5d75f052a2449a282e8683088caf3d8d232a5fc1d920ac7e902b6a6e9f64a3",
+    "query_vectors.f32": "1a8c9fb63e42a60b463ce2e9f3779bd7c9b2c7b912a199142fe0e3614ef43b3a",
+    "vectors.npy": "0789fb3c65873c33847b20de1e60b75fe8f746dbcb6fc20707feaa7d0dc62358",
+    "query_vectors.npy": "abcdba7676ce0112a04d86855623966db7f84cc79158feb1f25f5330f3923da6",
+    "exact.json": "6da1a9d06015524e5db780ca8425aac4ca215ff7594552c196c41e7fa494d85e"
+  },
+  "runs": [
+    {
+      "example": "typesense/product-search",
+      "mode": "single",
+      "load_rows": 100000,
+      "load_seconds": 87.5171135810001,
+      "oracle": {
+        "rows": 100000,
+        "missing_ids": 0,
+        "duplicate_ids": 0,
+        "invalid_rows": 0,
+        "missing_acknowledged_versions": 0
+      },
+      "replicas": {
+        "http://ts1:8108": {
+          "rows": 100000,
+          "missing_ids": 0,
+          "duplicate_ids": 0,
+          "invalid_rows": 0,
+          "missing_acknowledged_versions": 0
+        }
+      },
+      "dense_correctness_recall_at_k": 0.99,
+      "filtered_correctness_recall_at_k": 1.0,
+      "benchmark_cases": {
+        "lexical/clients-1": {
+          "samples": 1000,
+          "p50_ms": 1.8130409998775576,
+          "p95_ms": 17.507541999748355,
+          "p99_ms": 43.400457999723585,
+          "max_ms": 555.1350829996409,
+          "seconds": 5.931393544999992,
+          "qps": 168.5944445286342,
+          "failures": 0
+        },
+        "lexical/clients-8": {
+          "samples": 1000,
+          "p50_ms": 3.497125000194501,
+          "p95_ms": 99.07170799988307,
+          "p99_ms": 204.63691700024356,
+          "max_ms": 3191.100584999731,
+          "seconds": 4.264703959999679,
+          "qps": 234.48286431587982,
+          "failures": 0
+        },
+        "dense/clients-1": {
+          "samples": 1000,
+          "p50_ms": 2.6195000000370783,
+          "p95_ms": 3.105000000232394,
+          "p99_ms": 3.2580000001871667,
+          "max_ms": 5.270957999982784,
+          "seconds": 2.761348334000104,
+          "qps": 362.1419245399564,
+          "failures": 0,
+          "recall_at_k": 0.9882
+        },
+        "dense/clients-8": {
+          "samples": 1000,
+          "p50_ms": 6.2847919998603174,
+          "p95_ms": 37.74599999997008,
+          "p99_ms": 41.99170800029606,
+          "max_ms": 45.32825000023877,
+          "seconds": 1.2993588750000526,
+          "qps": 769.6103203204423,
+          "failures": 0,
+          "recall_at_k": 0.9882
+        },
+        "hybrid/clients-1": {
+          "samples": 1000,
+          "p50_ms": 3.876708999996481,
+          "p95_ms": 19.44012500007375,
+          "p99_ms": 44.59233299985499,
+          "max_ms": 560.288875000424,
+          "seconds": 8.078736211999967,
+          "qps": 123.7817368655537,
+          "failures": 0
+        },
+        "hybrid/clients-8": {
+          "samples": 1000,
+          "p50_ms": 7.442167000135669,
+          "p95_ms": 102.74533300025723,
+          "p99_ms": 217.5680000000284,
+          "max_ms": 3108.351126999878,
+          "seconds": 5.799109750999833,
+          "qps": 172.44026116725738,
+          "failures": 0
+        }
+      },
+      "candidate_ranking": {
+        "lexical": {
+          "candidate_ndcg_at_k": 0.31916125573447973,
+          "scorable_queries": 100,
+          "zero_idcg_queries": 0
+        },
+        "dense": {
+          "candidate_ndcg_at_k": 0.5701699102781755,
+          "scorable_queries": 100,
+          "zero_idcg_queries": 0
+        },
+        "hybrid": {
+          "candidate_ndcg_at_k": 0.6028457369858872,
+          "scorable_queries": 100,
+          "zero_idcg_queries": 0
+        }
+      },
+      "caps": {
+        "typesense-product-search-ts1-1": {
+          "nano_cpus": 2000000000,
+          "memory_bytes": 2147483648,
+          "image": "typesense-products-server:dev"
+        }
+      },
+      "reports": [
+        {
+          "path": "typesense/product-search/results/single/load.json",
+          "sha256": "b22e877a88b2fa36ad972771a90dfa9f287146869b8135d822a1e25e577e9430"
+        },
+        {
+          "path": "typesense/product-search/results/single/correctness.json",
+          "sha256": "a025dd15d9a0b97f006463e6299447689c3c8f7caabed6afafdfcbbf5e44693b"
+        },
+        {
+          "path": "typesense/product-search/results/single/benchmark.json",
+          "sha256": "a799ef1a864203a79be169abf5c81e5bf24f32fc345eab3cc048f64fe8d75337"
+        },
+        {
+          "path": "typesense/product-search/results/single/resources.json",
+          "sha256": "e4324debec3f61fe51f24c58d18662ddfb0653de0166ee69c3979b332d0f4322"
+        }
+      ],
+      "faults": []
+    },
+    {
+      "example": "typesense/product-search",
+      "mode": "cluster",
+      "load_rows": 100000,
+      "load_seconds": 344.9201965739999,
+      "oracle": {
+        "rows": 100000,
+        "missing_ids": 0,
+        "duplicate_ids": 0,
+        "invalid_rows": 0,
+        "missing_acknowledged_versions": 0
+      },
+      "replicas": {
+        "http://ts1:8108": {
+          "rows": 100000,
+          "missing_ids": 0,
+          "duplicate_ids": 0,
+          "invalid_rows": 0,
+          "missing_acknowledged_versions": 0
+        },
+        "http://ts2:8108": {
+          "rows": 100000,
+          "missing_ids": 0,
+          "duplicate_ids": 0,
+          "invalid_rows": 0,
+          "missing_acknowledged_versions": 0
+        },
+        "http://ts3:8108": {
+          "rows": 100000,
+          "missing_ids": 0,
+          "duplicate_ids": 0,
+          "invalid_rows": 0,
+          "missing_acknowledged_versions": 0
+        }
+      },
+      "dense_correctness_recall_at_k": 0.992,
+      "filtered_correctness_recall_at_k": 1.0,
+      "benchmark_cases": {
+        "lexical/clients-1": {
+          "samples": 1000,
+          "p50_ms": 2.121707999776845,
+          "p95_ms": 18.618209000123898,
+          "p99_ms": 45.358957999724225,
+          "max_ms": 562.5288749997708,
+          "seconds": 6.451624168999842,
+          "qps": 154.9997293402514,
+          "failures": 0
+        },
+        "lexical/clients-8": {
+          "samples": 1000,
+          "p50_ms": 2.9981669999870064,
+          "p95_ms": 35.599958000148035,
+          "p99_ms": 67.34862499979499,
+          "max_ms": 905.9165839998968,
+          "seconds": 1.2936807080000108,
+          "qps": 772.9882604077541,
+          "failures": 0
+        },
+        "dense/clients-1": {
+          "samples": 1000,
+          "p50_ms": 3.297666999969806,
+          "p95_ms": 4.057084000123723,
+          "p99_ms": 4.5626250002896995,
+          "max_ms": 9.0341250001984,
+          "seconds": 3.5300010020000627,
+          "qps": 283.2860385686605,
+          "failures": 0,
+          "recall_at_k": 0.988
+        },
+        "dense/clients-8": {
+          "samples": 1000,
+          "p50_ms": 6.740958000136743,
+          "p95_ms": 9.718750000047294,
+          "p99_ms": 12.21870899962596,
+          "max_ms": 18.73566700032825,
+          "seconds": 0.9224217510000017,
+          "qps": 1084.1027967043226,
+          "failures": 0,
+          "recall_at_k": 0.9888
+        },
+        "hybrid/clients-1": {
+          "samples": 1000,
+          "p50_ms": 4.13754200008043,
+          "p95_ms": 20.354082999801903,
+          "p99_ms": 45.550249999905645,
+          "max_ms": 574.3822499998714,
+          "seconds": 8.553419880000092,
+          "qps": 116.91230104793934,
+          "failures": 0
+        },
+        "hybrid/clients-8": {
+          "samples": 1000,
+          "p50_ms": 5.475958000261016,
+          "p95_ms": 43.00120799962315,
+          "p99_ms": 73.26175000025614,
+          "max_ms": 954.2647930002204,
+          "seconds": 1.761327084000186,
+          "qps": 567.7537176847809,
+          "failures": 0
+        }
+      },
+      "candidate_ranking": {
+        "lexical": {
+          "candidate_ndcg_at_k": 0.31916125573447973,
+          "scorable_queries": 100,
+          "zero_idcg_queries": 0
+        },
+        "dense": {
+          "candidate_ndcg_at_k": 0.5701699102781755,
+          "scorable_queries": 100,
+          "zero_idcg_queries": 0
+        },
+        "hybrid": {
+          "candidate_ndcg_at_k": 0.6028457369858872,
+          "scorable_queries": 100,
+          "zero_idcg_queries": 0
+        }
+      },
+      "caps": {
+        "typesense-product-search-ts1-1": {
+          "nano_cpus": 2000000000,
+          "memory_bytes": 2147483648,
+          "image": "typesense-products-server:dev"
+        },
+        "typesense-product-search-ts2-1": {
+          "nano_cpus": 2000000000,
+          "memory_bytes": 2147483648,
+          "image": "typesense-products-server:dev"
+        },
+        "typesense-product-search-ts3-1": {
+          "nano_cpus": 2000000000,
+          "memory_bytes": 2147483648,
+          "image": "typesense-products-server:dev"
+        }
+      },
+      "reports": [
+        {
+          "path": "typesense/product-search/results/cluster/load.json",
+          "sha256": "f237c15ef84708dfb679519032b3807f77c11af523dfd0fad74e2f320a6ef5fb"
+        },
+        {
+          "path": "typesense/product-search/results/cluster/correctness.json",
+          "sha256": "8584f9b4656818281cdb516daa4f35abcfe95315917d17bd9911df212957d93b"
+        },
+        {
+          "path": "typesense/product-search/results/cluster/benchmark.json",
+          "sha256": "50c6bfdf327a5e7c6bd574d5b794860563356e3b3718b539ab2893b4aacb35b6"
+        },
+        {
+          "path": "typesense/product-search/results/cluster/resources.json",
+          "sha256": "bddf50460c4d17b94877ebe04f099c72480c35bacd807bab104b172f919bbdbd"
+        }
+      ],
+      "faults": [
+        {
+          "service": "ts2",
+          "acknowledged_unique_ids": 1640,
+          "missing_acknowledged_versions": 0,
+          "acks_while_node_absent": 139,
+          "searches_while_node_absent": 143,
+          "write_recovery_seconds": 12.386107964000075,
+          "reports": [
+            {
+              "path": "typesense/product-search/results/cluster/fault.json",
+              "sha256": "0ea5c00f7b3d12aeb0170705b28362e2e7ad4f5751146a9401a417ca4e4f22bb"
+            },
+            {
+              "path": "typesense/product-search/results/cluster/reconciliation.json",
+              "sha256": "a93f89877acb734a133b4a0d6fdedeab96d6b81b7804a795c9fba3c2e8067104"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "example": "typesense/product-search",
+      "mode": "sharded",
+      "load_rows": 100000,
+      "load_seconds": 146.46168431799998,
+      "oracle": {
+        "rows": 100000,
+        "missing_ids": 0,
+        "duplicate_ids": 0,
+        "invalid_rows": 0,
+        "missing_acknowledged_versions": 0
+      },
+      "replicas": {
+        "copy-0": {
+          "rows": 100000,
+          "missing_ids": 0,
+          "duplicate_ids": 0,
+          "invalid_rows": 0,
+          "missing_acknowledged_versions": 0
+        },
+        "copy-1": {
+          "rows": 100000,
+          "missing_ids": 0,
+          "duplicate_ids": 0,
+          "invalid_rows": 0,
+          "missing_acknowledged_versions": 0
+        },
+        "copy-2": {
+          "rows": 100000,
+          "missing_ids": 0,
+          "duplicate_ids": 0,
+          "invalid_rows": 0,
+          "missing_acknowledged_versions": 0
+        }
+      },
+      "dense_correctness_recall_at_k": 0.996,
+      "filtered_correctness_recall_at_k": 1.0,
+      "benchmark_cases": {
+        "dense/clients-1": {
+          "samples": 1000,
+          "p50_ms": 4.053166999995028,
+          "p95_ms": 4.7488750000184154,
+          "p99_ms": 5.218041999967227,
+          "max_ms": 9.638582999969003,
+          "seconds": 4.268742502000009,
+          "qps": 234.2610264103482,
+          "failures": 0,
+          "recall_at_k": 0.9958
+        },
+        "dense/clients-8": {
+          "samples": 1000,
+          "p50_ms": 19.617708999987826,
+          "p95_ms": 32.5126249999812,
+          "p99_ms": 39.50658299999077,
+          "max_ms": 67.63233300000593,
+          "seconds": 2.8469817929999977,
+          "qps": 351.2491728815214,
+          "failures": 0,
+          "recall_at_k": 0.9955
+        },
+        "tenant-lexical/clients-1": {
+          "samples": 1000,
+          "p50_ms": 7.410167000045931,
+          "p95_ms": 24.94216600001664,
+          "p99_ms": 42.634917000043515,
+          "max_ms": 261.4532079999776,
+          "qps": 101.16660860467167,
+          "seconds": 9.884684420999974,
+          "failures": 0
+        },
+        "tenant-lexical/clients-8": {
+          "samples": 1000,
+          "p50_ms": 8.704207999983282,
+          "p95_ms": 30.8558749999861,
+          "p99_ms": 47.77108299998645,
+          "max_ms": 315.9494579999773,
+          "qps": 652.0941198300061,
+          "seconds": 1.5335209590000431,
+          "failures": 0
+        },
+        "tenant-dense/clients-1": {
+          "samples": 1000,
+          "p50_ms": 15.628582999966056,
+          "p95_ms": 22.648500000002514,
+          "p99_ms": 27.7867500000184,
+          "max_ms": 44.59120899997515,
+          "qps": 60.07703510596709,
+          "seconds": 16.645295465000004,
+          "failures": 0,
+          "recall_at_k": 1.0,
+          "recall_queries": 100
+        },
+        "tenant-dense/clients-8": {
+          "samples": 1000,
+          "p50_ms": 19.49541699997326,
+          "p95_ms": 26.983083000004626,
+          "p99_ms": 32.569292000005134,
+          "max_ms": 37.57050000001527,
+          "qps": 392.82474167635297,
+          "seconds": 2.545664501000033,
+          "failures": 0,
+          "recall_at_k": 1.0,
+          "recall_queries": 100
+        },
+        "tenant-hybrid/clients-1": {
+          "samples": 1000,
+          "p50_ms": 21.96758399998089,
+          "p95_ms": 41.29587500000298,
+          "p99_ms": 60.30958299999156,
+          "max_ms": 307.297665999954,
+          "qps": 39.635560712521155,
+          "seconds": 25.229868885999963,
+          "failures": 0
+        },
+        "tenant-hybrid/clients-8": {
+          "samples": 1000,
+          "p50_ms": 27.098667000018395,
+          "p95_ms": 53.186790999973255,
+          "p99_ms": 75.92983299997513,
+          "max_ms": 333.8839589999907,
+          "qps": 257.82229058999224,
+          "seconds": 3.878640584999971,
+          "failures": 0
+        }
+      },
+      "candidate_ranking": {
+        "dense": {
+          "candidate_ndcg_at_k": 0.5701699102781755,
+          "scorable_queries": 100,
+          "zero_idcg_queries": 0
+        }
+      },
+      "caps": {
+        "typesense-product-search-ts1-1": {
+          "nano_cpus": 2000000000,
+          "memory_bytes": 2147483648,
+          "image": "typesense-products-server:dev"
+        },
+        "typesense-product-search-ts2-1": {
+          "nano_cpus": 2000000000,
+          "memory_bytes": 2147483648,
+          "image": "typesense-products-server:dev"
+        },
+        "typesense-product-search-ts3-1": {
+          "nano_cpus": 2000000000,
+          "memory_bytes": 2147483648,
+          "image": "typesense-products-server:dev"
+        },
+        "typesense-product-search-ts4-1": {
+          "nano_cpus": 2000000000,
+          "memory_bytes": 2147483648,
+          "image": "typesense-products-server:dev"
+        },
+        "typesense-product-search-ts5-1": {
+          "nano_cpus": 2000000000,
+          "memory_bytes": 2147483648,
+          "image": "typesense-products-server:dev"
+        },
+        "typesense-product-search-ts6-1": {
+          "nano_cpus": 2000000000,
+          "memory_bytes": 2147483648,
+          "image": "typesense-products-server:dev"
+        },
+        "typesense-product-search-ts7-1": {
+          "nano_cpus": 2000000000,
+          "memory_bytes": 2147483648,
+          "image": "typesense-products-server:dev"
+        },
+        "typesense-product-search-ts8-1": {
+          "nano_cpus": 2000000000,
+          "memory_bytes": 2147483648,
+          "image": "typesense-products-server:dev"
+        },
+        "typesense-product-search-ts9-1": {
+          "nano_cpus": 2000000000,
+          "memory_bytes": 2147483648,
+          "image": "typesense-products-server:dev"
+        }
+      },
+      "reports": [
+        {
+          "path": "typesense/product-search/results/sharded/load.json",
+          "sha256": "5e99ae86f7fc3024511a54da9cf09b56b36391b95307d3bcf6058569e1798223"
+        },
+        {
+          "path": "typesense/product-search/results/sharded/correctness.json",
+          "sha256": "dc18d4132d0f5901ffaabe77071dba417694e7cca01f0cb0dcc4ca24b5d14b4d"
+        },
+        {
+          "path": "typesense/product-search/results/sharded/benchmark.json",
+          "sha256": "7e9b83256148a2ab9a71250d8b4b17c67fef5d114552f59d4e4f171cf7595375"
+        },
+        {
+          "path": "typesense/product-search/results/sharded/resources.json",
+          "sha256": "dc88241f1106d4558d375ca8ab10a44d33171724090ead02dd8f690bc2ec875a"
+        }
+      ],
+      "faults": [
+        {
+          "service": "ts3",
+          "acknowledged_unique_ids": 2070,
+          "missing_acknowledged_versions": 0,
+          "acks_while_node_absent": 154,
+          "searches_while_node_absent": 175,
+          "write_recovery_seconds": 6.395934420000003,
+          "reports": [
+            {
+              "path": "typesense/product-search/results/sharded/fault.json",
+              "sha256": "00ef64f020beb8ea4b3c7e0c1e5fe269bb22082adb6a53b45dbcb61fb62332d3"
+            },
+            {
+              "path": "typesense/product-search/results/sharded/reconciliation.json",
+              "sha256": "aa77e7f460dfa916cb5e4e71cfef173737c91508186b75fa84290c57bd64c18e"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "example": "postgres/pgvector-product-search",
+      "mode": "single",
+      "load_rows": 100000,
+      "load_seconds": 37.74191039299967,
+      "oracle": {
+        "rows": 100000,
+        "missing_ids": 0,
+        "duplicate_ids": 0,
+        "invalid_rows": 0,
+        "missing_acknowledged_versions": 0
+      },
+      "replicas": {
+        "single": {
+          "rows": 100000,
+          "missing_ids": 0,
+          "duplicate_ids": 0,
+          "invalid_rows": 0,
+          "missing_acknowledged_versions": 0
+        }
+      },
+      "dense_correctness_recall_at_k": 0.998,
+      "filtered_correctness_recall_at_k": 0.9400000000000001,
+      "benchmark_cases": {
+        "dense/clients-1": {
+          "samples": 1000,
+          "p50_ms": 3.447166000114521,
+          "p95_ms": 4.8795419997986755,
+          "p99_ms": 5.582082999353588,
+          "max_ms": 6.904042000314803,
+          "seconds": 3.649258335000013,
+          "qps": 274.0282841609229,
+          "failures": 0,
+          "recall_at_k": 0.9915
+        },
+        "dense/clients-8": {
+          "samples": 1000,
+          "p50_ms": 8.640750000267872,
+          "p95_ms": 83.2326669997201,
+          "p99_ms": 89.39691700015828,
+          "max_ms": 107.61299999921903,
+          "seconds": 3.431082375999722,
+          "qps": 291.4532180850446,
+          "failures": 0,
+          "recall_at_k": 0.9915
+        },
+        "lexical/clients-1": {
+          "samples": 1000,
+          "p50_ms": 0.3803329991569626,
+          "p95_ms": 0.9942910000972915,
+          "p99_ms": 4.114208000828512,
+          "max_ms": 10.36858299994492,
+          "seconds": 0.5605039169995507,
+          "qps": 1784.108852179175,
+          "failures": 0
+        },
+        "lexical/clients-8": {
+          "samples": 1000,
+          "p50_ms": 3.942542000004323,
+          "p95_ms": 6.819957999141479,
+          "p99_ms": 9.765542000423011,
+          "max_ms": 17.97783299934963,
+          "seconds": 0.5214044589993136,
+          "qps": 1917.8969085136196,
+          "failures": 0
+        },
+        "hybrid/clients-1": {
+          "samples": 1000,
+          "p50_ms": 4.652624999835098,
+          "p95_ms": 6.738083000527695,
+          "p99_ms": 9.781582999494276,
+          "max_ms": 23.704541000370227,
+          "seconds": 4.8683061689998794,
+          "qps": 205.41025261881487,
+          "failures": 0
+        },
+        "hybrid/clients-8": {
+          "samples": 1000,
+          "p50_ms": 10.767875000055938,
+          "p95_ms": 87.91470899996057,
+          "p99_ms": 126.27687500025786,
+          "max_ms": 190.56962500053487,
+          "seconds": 4.450620794000315,
+          "qps": 224.6877562222456,
+          "failures": 0
+        }
+      },
+      "candidate_ranking": {
+        "dense": {
+          "candidate_ndcg_at_k": 0.5701699102781755,
+          "scorable_queries": 100,
+          "zero_idcg_queries": 0
+        },
+        "lexical": {
+          "candidate_ndcg_at_k": 0.19751532135894984,
+          "scorable_queries": 100,
+          "zero_idcg_queries": 0
+        },
+        "hybrid": {
+          "candidate_ndcg_at_k": 0.5858071345168325,
+          "scorable_queries": 100,
+          "zero_idcg_queries": 0
+        }
+      },
+      "caps": {
+        "pgvector-product-search-single-1": {
+          "nano_cpus": 2000000000,
+          "memory_bytes": 2147483648,
+          "image": "pgvector/pgvector:0.8.7-pg17-bookworm"
+        }
+      },
+      "reports": [
+        {
+          "path": "postgres/pgvector-product-search/results/single/load.json",
+          "sha256": "0f56ddebccc8473e2b85c8f01632ab540cabce025d2be070485d0ad6f2c6b4f7"
+        },
+        {
+          "path": "postgres/pgvector-product-search/results/single/correctness.json",
+          "sha256": "84c06fa091b550d1e35e13b47aee83c128766a56717c9e3fc54f1c76402f95a2"
+        },
+        {
+          "path": "postgres/pgvector-product-search/results/single/benchmark.json",
+          "sha256": "da8e453be21bdf2ccf5b8e607abe1c54bbcb176513d75810744653fd68336c91"
+        },
+        {
+          "path": "postgres/pgvector-product-search/results/single/resources.json",
+          "sha256": "29961b35d54c4dcd59b33651ffefdbd3333374bd10bba4e3fd6791064520fb06"
+        }
+      ],
+      "faults": []
+    },
+    {
+      "example": "postgres/pgvector-product-search",
+      "mode": "cluster",
+      "load_rows": 100000,
+      "load_seconds": 39.06419085200014,
+      "oracle": {
+        "rows": 100000,
+        "missing_ids": 0,
+        "duplicate_ids": 0,
+        "invalid_rows": 0,
+        "missing_acknowledged_versions": 0
+      },
+      "replicas": {
+        "pg0": {
+          "rows": 100000,
+          "missing_ids": 0,
+          "duplicate_ids": 0,
+          "invalid_rows": 0,
+          "missing_acknowledged_versions": 0
+        },
+        "pg1": {
+          "rows": 100000,
+          "missing_ids": 0,
+          "duplicate_ids": 0,
+          "invalid_rows": 0,
+          "missing_acknowledged_versions": 0
+        },
+        "pg2": {
+          "rows": 100000,
+          "missing_ids": 0,
+          "duplicate_ids": 0,
+          "invalid_rows": 0,
+          "missing_acknowledged_versions": 0
+        }
+      },
+      "dense_correctness_recall_at_k": 0.998,
+      "filtered_correctness_recall_at_k": 0.9400000000000001,
+      "benchmark_cases": {
+        "dense/clients-1": {
+          "samples": 1000,
+          "p50_ms": 3.628417000072659,
+          "p95_ms": 5.366958999729832,
+          "p99_ms": 6.261832999371109,
+          "max_ms": 7.206000000223867,
+          "seconds": 3.910996544000227,
+          "qps": 255.68930801896968,
+          "failures": 0,
+          "recall_at_k": 0.9919
+        },
+        "dense/clients-8": {
+          "samples": 1000,
+          "p50_ms": 8.58837499981746,
+          "p95_ms": 83.46795799934625,
+          "p99_ms": 86.29287500025384,
+          "max_ms": 93.46704099971248,
+          "seconds": 3.438509251999676,
+          "qps": 290.82370490015313,
+          "failures": 0,
+          "recall_at_k": 0.9919
+        },
+        "lexical/clients-1": {
+          "samples": 1000,
+          "p50_ms": 0.3839999999399879,
+          "p95_ms": 1.0648329998730333,
+          "p99_ms": 4.307291999793961,
+          "max_ms": 9.747541999786336,
+          "seconds": 0.5719486670004699,
+          "qps": 1748.408655700527,
+          "failures": 0
+        },
+        "lexical/clients-8": {
+          "samples": 1000,
+          "p50_ms": 3.7854169995625853,
+          "p95_ms": 7.256083999891416,
+          "p99_ms": 9.782000000086555,
+          "max_ms": 16.168375000233937,
+          "seconds": 0.5073052919997281,
+          "qps": 1971.1996223381325,
+          "failures": 0
+        },
+        "hybrid/clients-1": {
+          "samples": 1000,
+          "p50_ms": 4.883917000370275,
+          "p95_ms": 7.215375000669155,
+          "p99_ms": 10.601541000141879,
+          "max_ms": 24.862083000698476,
+          "seconds": 5.149617668999781,
+          "qps": 194.18917369728376,
+          "failures": 0
+        },
+        "hybrid/clients-8": {
+          "samples": 1000,
+          "p50_ms": 11.457707999397826,
+          "p95_ms": 87.57099999911588,
+          "p99_ms": 93.21754100074031,
+          "max_ms": 191.39895799980877,
+          "seconds": 4.537968460999764,
+          "qps": 220.36292420148047,
+          "failures": 0
+        }
+      },
+      "candidate_ranking": {
+        "dense": {
+          "candidate_ndcg_at_k": 0.5701699102781755,
+          "scorable_queries": 100,
+          "zero_idcg_queries": 0
+        },
+        "lexical": {
+          "candidate_ndcg_at_k": 0.19751532135894984,
+          "scorable_queries": 100,
+          "zero_idcg_queries": 0
+        },
+        "hybrid": {
+          "candidate_ndcg_at_k": 0.5858071345168325,
+          "scorable_queries": 100,
+          "zero_idcg_queries": 0
+        }
+      },
+      "caps": {
+        "pgvector-product-search-etcd0-1": {
+          "nano_cpus": 500000000,
+          "memory_bytes": 268435456,
+          "image": "quay.io/coreos/etcd:v3.5.21"
+        },
+        "pgvector-product-search-etcd1-1": {
+          "nano_cpus": 500000000,
+          "memory_bytes": 268435456,
+          "image": "quay.io/coreos/etcd:v3.5.21"
+        },
+        "pgvector-product-search-etcd2-1": {
+          "nano_cpus": 500000000,
+          "memory_bytes": 268435456,
+          "image": "quay.io/coreos/etcd:v3.5.21"
+        },
+        "pgvector-product-search-pg0-1": {
+          "nano_cpus": 2000000000,
+          "memory_bytes": 2147483648,
+          "image": "pgvector-products-patroni:dev"
+        },
+        "pgvector-product-search-pg1-1": {
+          "nano_cpus": 2000000000,
+          "memory_bytes": 2147483648,
+          "image": "pgvector-products-patroni:dev"
+        },
+        "pgvector-product-search-pg2-1": {
+          "nano_cpus": 2000000000,
+          "memory_bytes": 2147483648,
+          "image": "pgvector-products-patroni:dev"
+        }
+      },
+      "reports": [
+        {
+          "path": "postgres/pgvector-product-search/results/cluster/load.json",
+          "sha256": "3d6dda2ac3a48553adf550ec3f50fb47e9e7df0eeca6176eec179020446daea2"
+        },
+        {
+          "path": "postgres/pgvector-product-search/results/cluster/correctness.json",
+          "sha256": "ef79e341a58b5b4b75f7441fb8bdc421adff8e966397f995ddfd82546f14a509"
+        },
+        {
+          "path": "postgres/pgvector-product-search/results/cluster/benchmark.json",
+          "sha256": "830d0e0deb1abc608c5f9704292dafac6aeed7a36d7df78f91880110c24851a6"
+        },
+        {
+          "path": "postgres/pgvector-product-search/results/cluster/resources.json",
+          "sha256": "6600dea0075f36dcd61190f5fe332a46d4e98dbedc5d6420abcd3a3645772d35"
+        }
+      ],
+      "faults": [
+        {
+          "service": "pg0",
+          "acknowledged_unique_ids": 4480,
+          "missing_acknowledged_versions": 0,
+          "acks_while_node_absent": 79,
+          "searches_while_node_absent": 81,
+          "write_recovery_seconds": 20.60751030100073,
+          "reports": [
+            {
+              "path": "postgres/pgvector-product-search/results/cluster/fault.json",
+              "sha256": "834a0050bbeb1cad0ddfc14fecf085ad5ebf28ffd18d6af4ac7e96d332bcfef3"
+            },
+            {
+              "path": "postgres/pgvector-product-search/results/cluster/reconciliation.json",
+              "sha256": "6a020743c76761aa980af6048550bd2bb9305995e6b51b82a13fb3e4f8068094"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "example": "lancedb/versioned-product-search",
+      "mode": "single",
+      "load_rows": 100000,
+      "load_seconds": 10.330574005000017,
+      "oracle": {
+        "rows": 100000,
+        "missing_ids": 0,
+        "duplicate_ids": 0,
+        "invalid_rows": 0,
+        "missing_acknowledged_versions": 0
+      },
+      "replicas": {
+        "http://writer:8080": {
+          "rows": 100000,
+          "missing_ids": 0,
+          "duplicate_ids": 0,
+          "invalid_rows": 0,
+          "missing_acknowledged_versions": 0
+        }
+      },
+      "dense_correctness_recall_at_k": 0.974,
+      "filtered_correctness_recall_at_k": 1.0,
+      "benchmark_cases": {
+        "lexical/clients-1": {
+          "samples": 1000,
+          "p50_ms": 3.922707999663544,
+          "p95_ms": 4.648624999390449,
+          "p99_ms": 5.9977079999953276,
+          "max_ms": 45.81395800050814,
+          "seconds": 4.339350459999878,
+          "qps": 230.4492364048485,
+          "failures": 0
+        },
+        "lexical/clients-8": {
+          "samples": 1000,
+          "p50_ms": 19.06425000015588,
+          "p95_ms": 40.20233299979736,
+          "p99_ms": 45.52416699971218,
+          "max_ms": 70.44725000014296,
+          "seconds": 2.862719083999764,
+          "qps": 349.31824278154795,
+          "failures": 0
+        },
+        "dense/clients-1": {
+          "samples": 1000,
+          "p50_ms": 4.981375000170374,
+          "p95_ms": 5.599416999757523,
+          "p99_ms": 6.48458399973606,
+          "max_ms": 8.121374999973341,
+          "seconds": 5.176814627000567,
+          "qps": 193.16897977847768,
+          "failures": 0,
+          "recall_at_k": 0.9519
+        },
+        "dense/clients-8": {
+          "samples": 1000,
+          "p50_ms": 21.6904170001726,
+          "p95_ms": 49.85691699948802,
+          "p99_ms": 54.541417000109504,
+          "max_ms": 66.72433299991098,
+          "seconds": 3.5054144599998835,
+          "qps": 285.27297168735737,
+          "failures": 0,
+          "recall_at_k": 0.9519
+        },
+        "hybrid/clients-1": {
+          "samples": 1000,
+          "p50_ms": 6.49337499999092,
+          "p95_ms": 7.140749999962281,
+          "p99_ms": 7.671332999962033,
+          "max_ms": 13.982833999762079,
+          "seconds": 6.555431461999433,
+          "qps": 152.54526049075585,
+          "failures": 0
+        },
+        "hybrid/clients-8": {
+          "samples": 1000,
+          "p50_ms": 57.60350000036851,
+          "p95_ms": 75.21129199994903,
+          "p99_ms": 80.33412500026316,
+          "max_ms": 88.66487500017683,
+          "seconds": 7.018677586999729,
+          "qps": 142.4769819676914,
+          "failures": 0
+        }
+      },
+      "candidate_ranking": {
+        "lexical": {
+          "candidate_ndcg_at_k": 0.5815198632615642,
+          "scorable_queries": 100,
+          "zero_idcg_queries": 0
+        },
+        "dense": {
+          "candidate_ndcg_at_k": 0.5701699102781755,
+          "scorable_queries": 100,
+          "zero_idcg_queries": 0
+        },
+        "hybrid": {
+          "candidate_ndcg_at_k": 0.5836287713371119,
+          "scorable_queries": 100,
+          "zero_idcg_queries": 0
+        }
+      },
+      "caps": {
+        "lancedb-versioned-product-search-writer-1": {
+          "nano_cpus": 2000000000,
+          "memory_bytes": 3221225472,
+          "image": "lancedb-product-tools:dev"
+        }
+      },
+      "reports": [
+        {
+          "path": "lancedb/versioned-product-search/results/single/load.json",
+          "sha256": "c1bded82af04f6bf6b3b229347e62accac0fd903759135a22674b753be0f6aa3"
+        },
+        {
+          "path": "lancedb/versioned-product-search/results/single/correctness.json",
+          "sha256": "e29a5a00c01b41d9ee5ccc8bac97c7f127bcc2923e5261b7ee28a63fc68a6ad6"
+        },
+        {
+          "path": "lancedb/versioned-product-search/results/single/benchmark.json",
+          "sha256": "d23c33a31710310bc816bd8ad3822686d33cb7d180d6fed12f08b784ee3c8161"
+        },
+        {
+          "path": "lancedb/versioned-product-search/results/single/resources.json",
+          "sha256": "8e64d9257157d3a4ff74347dae6fbb7341377f1d68cd0e03d8dc4623b319ec4c"
+        }
+      ],
+      "faults": []
+    },
+    {
+      "example": "lancedb/versioned-product-search",
+      "mode": "cluster",
+      "load_rows": 100000,
+      "load_seconds": 11.488357879999967,
+      "oracle": {
+        "rows": 100000,
+        "missing_ids": 0,
+        "duplicate_ids": 0,
+        "invalid_rows": 0,
+        "missing_acknowledged_versions": 0
+      },
+      "replicas": {
+        "http://reader1:8080": {
+          "rows": 100000,
+          "missing_ids": 0,
+          "duplicate_ids": 0,
+          "invalid_rows": 0,
+          "missing_acknowledged_versions": 0
+        },
+        "http://reader2:8080": {
+          "rows": 100000,
+          "missing_ids": 0,
+          "duplicate_ids": 0,
+          "invalid_rows": 0,
+          "missing_acknowledged_versions": 0
+        },
+        "http://reader3:8080": {
+          "rows": 100000,
+          "missing_ids": 0,
+          "duplicate_ids": 0,
+          "invalid_rows": 0,
+          "missing_acknowledged_versions": 0
+        }
+      },
+      "dense_correctness_recall_at_k": 0.984,
+      "filtered_correctness_recall_at_k": 1.0,
+      "benchmark_cases": {
+        "lexical/clients-1": {
+          "samples": 1000,
+          "p50_ms": 4.938166999636451,
+          "p95_ms": 5.9285410006850725,
+          "p99_ms": 6.95941599951766,
+          "max_ms": 46.56170799989923,
+          "seconds": 5.368659085999752,
+          "qps": 186.26625084237023,
+          "failures": 0
+        },
+        "lexical/clients-8": {
+          "samples": 1000,
+          "p50_ms": 8.48516699988977,
+          "p95_ms": 11.227459000110684,
+          "p99_ms": 18.898874999649706,
+          "max_ms": 48.98729100023047,
+          "seconds": 1.1352442090001205,
+          "qps": 880.8677393569457,
+          "failures": 0
+        },
+        "dense/clients-1": {
+          "samples": 1000,
+          "p50_ms": 5.9617919996526325,
+          "p95_ms": 6.691083000077924,
+          "p99_ms": 7.6119170007586945,
+          "max_ms": 9.117790999880526,
+          "seconds": 6.207791252999414,
+          "qps": 161.08789088499566,
+          "failures": 0,
+          "recall_at_k": 0.949
+        },
+        "dense/clients-8": {
+          "samples": 1000,
+          "p50_ms": 10.29741699949227,
+          "p95_ms": 13.510415999917313,
+          "p99_ms": 15.569749999485794,
+          "max_ms": 18.711833000452316,
+          "seconds": 1.3619311260008544,
+          "qps": 734.2515204394944,
+          "failures": 0,
+          "recall_at_k": 0.949
+        },
+        "hybrid/clients-1": {
+          "samples": 1000,
+          "p50_ms": 7.587207999677048,
+          "p95_ms": 8.30754100024933,
+          "p99_ms": 9.073584000361734,
+          "max_ms": 17.029707999427046,
+          "seconds": 7.655071793999923,
+          "qps": 130.63234766574027,
+          "failures": 0
+        },
+        "hybrid/clients-8": {
+          "samples": 1000,
+          "p50_ms": 14.951416000258178,
+          "p95_ms": 38.6199590002434,
+          "p99_ms": 43.56825000013487,
+          "max_ms": 49.50379199999588,
+          "seconds": 2.513811333999911,
+          "qps": 397.8023276746176,
+          "failures": 0
+        }
+      },
+      "candidate_ranking": {
+        "lexical": {
+          "candidate_ndcg_at_k": 0.5815198632615642,
+          "scorable_queries": 100,
+          "zero_idcg_queries": 0
+        },
+        "dense": {
+          "candidate_ndcg_at_k": 0.5701699102781755,
+          "scorable_queries": 100,
+          "zero_idcg_queries": 0
+        },
+        "hybrid": {
+          "candidate_ndcg_at_k": 0.5836287713371119,
+          "scorable_queries": 100,
+          "zero_idcg_queries": 0
+        }
+      },
+      "caps": {
+        "lancedb-versioned-product-search-reader1-1": {
+          "nano_cpus": 2000000000,
+          "memory_bytes": 3221225472,
+          "image": "lancedb-product-tools:dev"
+        },
+        "lancedb-versioned-product-search-reader2-1": {
+          "nano_cpus": 2000000000,
+          "memory_bytes": 3221225472,
+          "image": "lancedb-product-tools:dev"
+        },
+        "lancedb-versioned-product-search-reader3-1": {
+          "nano_cpus": 2000000000,
+          "memory_bytes": 3221225472,
+          "image": "lancedb-product-tools:dev"
+        },
+        "lancedb-versioned-product-search-writer-1": {
+          "nano_cpus": 2000000000,
+          "memory_bytes": 3221225472,
+          "image": "lancedb-product-tools:dev"
+        }
+      },
+      "reports": [
+        {
+          "path": "lancedb/versioned-product-search/results/cluster/load.json",
+          "sha256": "61ef2475fb363d8f7a67d19ca9b876fa495ac59b16628b81c57e865a0326d11f"
+        },
+        {
+          "path": "lancedb/versioned-product-search/results/cluster/correctness.json",
+          "sha256": "163ca9e9d36c4064a0e9f1d0d9e74c4c0c1887f34100b5fbb2e3498a6c7c1a1a"
+        },
+        {
+          "path": "lancedb/versioned-product-search/results/cluster/benchmark.json",
+          "sha256": "043c58919b4480a2cdd60a64eaca84a75bc27508a13122bfeadda8f8f02fb39c"
+        },
+        {
+          "path": "lancedb/versioned-product-search/results/cluster/resources.json",
+          "sha256": "551aeb1834077db054f04467bc5ac57f307d73f18b7c2c96e9e9bed862357864"
+        }
+      ],
+      "faults": [
+        {
+          "service": "writer",
+          "acknowledged_unique_ids": 2990,
+          "missing_acknowledged_versions": 0,
+          "acks_while_node_absent": 0,
+          "searches_while_node_absent": 234,
+          "write_recovery_seconds": 31.32031180499962,
+          "reports": [
+            {
+              "path": "lancedb/versioned-product-search/results/cluster/writer-isolation/fault.json",
+              "sha256": "d19435d5c2065f7adbbef34e472c481bb82bb6a109f7832203d1f1507be375bc"
+            },
+            {
+              "path": "lancedb/versioned-product-search/results/cluster/writer-isolation/reconciliation.json",
+              "sha256": "9247a2cca1506ca478320732521fc3b578b49c70a416338c4d37455ef12fef49"
+            }
+          ]
+        },
+        {
+          "service": "reader1",
+          "acknowledged_unique_ids": 4990,
+          "missing_acknowledged_versions": 0,
+          "acks_while_node_absent": 218,
+          "searches_while_node_absent": 217,
+          "write_recovery_seconds": null,
+          "reports": [
+            {
+              "path": "lancedb/versioned-product-search/results/cluster/reader-loss/fault.json",
+              "sha256": "a6fd37337a590f0a028a48d0591059624a167fd07d1da6ca67da72722b316bec"
+            },
+            {
+              "path": "lancedb/versioned-product-search/results/cluster/reader-loss/reconciliation.json",
+              "sha256": "643745070706602c34c541e25bc2b726a084d49f424e1256a537a1cf95d8425f"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "example": "vespa/phased-product-search",
+      "mode": "single",
+      "load_rows": 100000,
+      "load_seconds": 330.17511735900007,
+      "oracle": {
+        "rows": 100000,
+        "missing_ids": 0,
+        "duplicate_ids": 0,
+        "invalid_rows": 0,
+        "missing_acknowledged_versions": 0
+      },
+      "replicas": {
+        "physical_document_counts": {
+          "http://node0:8080": {
+            "total": 100000,
+            "ready": 100000,
+            "active": 100000
+          }
+        },
+        "logical_payload_oracle": {
+          "rows": 100000,
+          "missing_ids": 0,
+          "duplicate_ids": 0,
+          "invalid_rows": 0,
+          "missing_acknowledged_versions": 0
+        },
+        "scope": "per-node total/ready counts plus logical full-row visitor; not a local-file payload checksum of every replica"
+      },
+      "dense_correctness_recall_at_k": 1.0,
+      "filtered_correctness_recall_at_k": 1.0,
+      "benchmark_cases": {
+        "lexical/clients-1": {
+          "samples": 1000,
+          "p50_ms": 2.412374999948952,
+          "p95_ms": 3.651457999694685,
+          "p99_ms": 5.470750000313274,
+          "max_ms": 15.360458999566617,
+          "seconds": 2.5681518759993196,
+          "qps": 389.38507077618993,
+          "failures": 0
+        },
+        "lexical/clients-8": {
+          "samples": 1000,
+          "p50_ms": 5.220082999585429,
+          "p95_ms": 52.216666000276746,
+          "p99_ms": 57.88708299951395,
+          "max_ms": 61.546709000140254,
+          "seconds": 1.2446055010004784,
+          "qps": 803.4674434558968,
+          "failures": 0
+        },
+        "dense/clients-1": {
+          "samples": 1000,
+          "p50_ms": 3.4567500006232876,
+          "p95_ms": 4.4735840001521865,
+          "p99_ms": 5.131916999744135,
+          "max_ms": 7.401833000585611,
+          "seconds": 3.7048693760007154,
+          "qps": 269.91504922623403,
+          "failures": 0,
+          "recall_at_k": 0.9921
+        },
+        "dense/clients-8": {
+          "samples": 1000,
+          "p50_ms": 7.719666999946639,
+          "p95_ms": 54.023500000766944,
+          "p99_ms": 59.13729199983209,
+          "max_ms": 62.65570800042042,
+          "seconds": 1.8442627089998496,
+          "qps": 542.222100528348,
+          "failures": 0,
+          "recall_at_k": 0.9921
+        },
+        "hybrid/clients-1": {
+          "samples": 1000,
+          "p50_ms": 4.084417000740359,
+          "p95_ms": 5.445708000479499,
+          "p99_ms": 8.02566700076568,
+          "max_ms": 13.555958000324608,
+          "seconds": 4.220579419000387,
+          "qps": 236.93429283622925,
+          "failures": 0
+        },
+        "hybrid/clients-8": {
+          "samples": 1000,
+          "p50_ms": 7.540665999840712,
+          "p95_ms": 75.53995899979782,
+          "p99_ms": 78.75458299986349,
+          "max_ms": 82.70508399982646,
+          "seconds": 2.560159208999721,
+          "qps": 390.60070814529917,
+          "failures": 0
+        },
+        "rerank/clients-1": {
+          "samples": 1000,
+          "p50_ms": 4.063250000399421,
+          "p95_ms": 5.7054170001720195,
+          "p99_ms": 8.683832999849983,
+          "max_ms": 13.20945799943729,
+          "seconds": 4.224914419000015,
+          "qps": 236.69118491557222,
+          "failures": 0
+        },
+        "rerank/clients-8": {
+          "samples": 1000,
+          "p50_ms": 7.565834000160976,
+          "p95_ms": 75.58129199969699,
+          "p99_ms": 79.83233300001302,
+          "max_ms": 85.8635829999912,
+          "seconds": 2.632864416999837,
+          "qps": 379.81446881321193,
+          "failures": 0
+        }
+      },
+      "candidate_ranking": {
+        "lexical": {
+          "candidate_ndcg_at_k": 0.549109768395938,
+          "scorable_queries": 100,
+          "zero_idcg_queries": 0
+        },
+        "dense": {
+          "candidate_ndcg_at_k": 0.5701699102781755,
+          "scorable_queries": 100,
+          "zero_idcg_queries": 0
+        },
+        "hybrid": {
+          "candidate_ndcg_at_k": 0.5916628806607093,
+          "scorable_queries": 100,
+          "zero_idcg_queries": 0
+        },
+        "rerank": {
+          "candidate_ndcg_at_k": 0.5909555724915612,
+          "scorable_queries": 100,
+          "zero_idcg_queries": 0
+        }
+      },
+      "caps": {
+        "vespa-products-node0": {
+          "nano_cpus": 2000000000,
+          "memory_bytes": 4294967296,
+          "image": "vespaengine/vespa:8.781.11"
+        }
+      },
+      "reports": [
+        {
+          "path": "vespa/phased-product-search/results/single/load.json",
+          "sha256": "efdd6563c4c8881e9b7d697e8a6ca896f735ceb4af96afb751e66d61309b3939"
+        },
+        {
+          "path": "vespa/phased-product-search/results/single/correctness.json",
+          "sha256": "8ee7e75735b8fdf0c6e4f60787ca31678cdf61a1d4dcb83bcaa23708748cce86"
+        },
+        {
+          "path": "vespa/phased-product-search/results/single/benchmark.json",
+          "sha256": "b4661f8d91f8612c54ffe2c486c05103007fa4e6d6fcc75b9bfffd473c93b1c9"
+        },
+        {
+          "path": "vespa/phased-product-search/results/single/resources.json",
+          "sha256": "2cd3d1a2c83925c2f4d238bd474d1d17241fc982f8f974750489409aa7451399"
+        }
+      ],
+      "faults": [],
+      "native_physical_copies": [
+        {
+          "rows": 100000,
+          "missing_ids": 0,
+          "duplicate_ids": 0,
+          "invalid_rows": 0,
+          "missing_acknowledged_versions": 0,
+          "scope": "all IDs and metadata read using native vespa-get --replica-override; vectors excluded",
+          "node": 0
+        }
+      ]
+    },
+    {
+      "example": "vespa/phased-product-search",
+      "mode": "cluster",
+      "load_rows": 100000,
+      "load_seconds": 377.7167198400002,
+      "oracle": {
+        "rows": 100000,
+        "missing_ids": 0,
+        "duplicate_ids": 0,
+        "invalid_rows": 0,
+        "missing_acknowledged_versions": 0
+      },
+      "replicas": {
+        "physical_document_counts": {
+          "http://node0:8080": {
+            "total": 100000,
+            "ready": 100000,
+            "active": 33102
+          },
+          "http://node1:8080": {
+            "total": 100000,
+            "ready": 100000,
+            "active": 33529
+          },
+          "http://node2:8080": {
+            "total": 100000,
+            "ready": 100000,
+            "active": 33369
+          }
+        },
+        "logical_payload_oracle": {
+          "rows": 100000,
+          "missing_ids": 0,
+          "duplicate_ids": 0,
+          "invalid_rows": 0,
+          "missing_acknowledged_versions": 0
+        },
+        "scope": "per-node total/ready counts plus logical full-row visitor; not a local-file payload checksum of every replica"
+      },
+      "dense_correctness_recall_at_k": 1.0,
+      "filtered_correctness_recall_at_k": 1.0,
+      "benchmark_cases": {
+        "lexical/clients-1": {
+          "samples": 1000,
+          "p50_ms": 3.4915409996756352,
+          "p95_ms": 4.716166999969573,
+          "p99_ms": 6.052458000340266,
+          "max_ms": 7.931209000162198,
+          "seconds": 3.6395218349998686,
+          "qps": 274.7613684807131,
+          "failures": 0
+        },
+        "lexical/clients-8": {
+          "samples": 1000,
+          "p50_ms": 7.446333000189043,
+          "p95_ms": 25.483124999482243,
+          "p99_ms": 35.80262500054232,
+          "max_ms": 47.73816600027203,
+          "seconds": 1.197924332999719,
+          "qps": 834.7772663536292,
+          "failures": 0
+        },
+        "dense/clients-1": {
+          "samples": 1000,
+          "p50_ms": 8.289791999231966,
+          "p95_ms": 10.155834000215691,
+          "p99_ms": 10.685625000405707,
+          "max_ms": 11.573791000046185,
+          "seconds": 8.523933879000651,
+          "qps": 117.31672420214038,
+          "failures": 0,
+          "recall_at_k": 0.9974
+        },
+        "dense/clients-8": {
+          "samples": 1000,
+          "p50_ms": 19.888124999852153,
+          "p95_ms": 61.06062500020926,
+          "p99_ms": 66.3518750006915,
+          "max_ms": 70.58833399969444,
+          "seconds": 3.4682609179999417,
+          "qps": 288.32894169238995,
+          "failures": 0,
+          "recall_at_k": 0.9974
+        },
+        "hybrid/clients-1": {
+          "samples": 1000,
+          "p50_ms": 8.884916000170051,
+          "p95_ms": 10.841208000783809,
+          "p99_ms": 12.59620799919503,
+          "max_ms": 17.126542000369227,
+          "seconds": 8.953132629999345,
+          "qps": 111.69274949075262,
+          "failures": 0
+        },
+        "hybrid/clients-8": {
+          "samples": 1000,
+          "p50_ms": 23.176708000391955,
+          "p95_ms": 62.79983300009917,
+          "p99_ms": 71.19220799995674,
+          "max_ms": 78.09304199963663,
+          "seconds": 3.9292190440000923,
+          "qps": 254.5035002634932,
+          "failures": 0
+        },
+        "rerank/clients-1": {
+          "samples": 1000,
+          "p50_ms": 8.958999999777006,
+          "p95_ms": 11.006625000845816,
+          "p99_ms": 12.78279200050747,
+          "max_ms": 17.19962500010297,
+          "seconds": 9.031230503999723,
+          "qps": 110.72688262769101,
+          "failures": 0
+        },
+        "rerank/clients-8": {
+          "samples": 1000,
+          "p50_ms": 26.162833999478607,
+          "p95_ms": 63.15570799961279,
+          "p99_ms": 70.51058400065813,
+          "max_ms": 83.42262499991193,
+          "seconds": 3.978379460000724,
+          "qps": 251.35862731400135,
+          "failures": 0
+        }
+      },
+      "candidate_ranking": {
+        "lexical": {
+          "candidate_ndcg_at_k": 0.5492753806840059,
+          "scorable_queries": 100,
+          "zero_idcg_queries": 0
+        },
+        "dense": {
+          "candidate_ndcg_at_k": 0.5701699102781755,
+          "scorable_queries": 100,
+          "zero_idcg_queries": 0
+        },
+        "hybrid": {
+          "candidate_ndcg_at_k": 0.5916628806607093,
+          "scorable_queries": 100,
+          "zero_idcg_queries": 0
+        },
+        "rerank": {
+          "candidate_ndcg_at_k": 0.5908153336537741,
+          "scorable_queries": 100,
+          "zero_idcg_queries": 0
+        }
+      },
+      "caps": {
+        "vespa-products-node0": {
+          "nano_cpus": 2000000000,
+          "memory_bytes": 4294967296,
+          "image": "vespaengine/vespa:8.781.11"
+        },
+        "vespa-products-node1": {
+          "nano_cpus": 2000000000,
+          "memory_bytes": 4294967296,
+          "image": "vespaengine/vespa:8.781.11"
+        },
+        "vespa-products-node2": {
+          "nano_cpus": 2000000000,
+          "memory_bytes": 4294967296,
+          "image": "vespaengine/vespa:8.781.11"
+        }
+      },
+      "reports": [
+        {
+          "path": "vespa/phased-product-search/results/cluster/load.json",
+          "sha256": "04b9d5deccdb7729a306faf2460e01891d901a448e093bb9a0bb245dc85760d2"
+        },
+        {
+          "path": "vespa/phased-product-search/results/cluster/correctness.json",
+          "sha256": "a786275027ec302d87b2aaa3401701a3e78337d33d390f1152646f436b29e940"
+        },
+        {
+          "path": "vespa/phased-product-search/results/cluster/benchmark.json",
+          "sha256": "f12f713df793fab793243479e0874645c2e2dfed7326e3eda0313d12e45257b0"
+        },
+        {
+          "path": "vespa/phased-product-search/results/cluster/resources.json",
+          "sha256": "8ff03ffbdcf93aa4516a441657819456fb5a6d2f8e9c053d88b50a1477c680ce"
+        }
+      ],
+      "faults": [
+        {
+          "service": "node0",
+          "acknowledged_unique_ids": 4880,
+          "missing_acknowledged_versions": 0,
+          "acks_while_node_absent": 173,
+          "searches_while_node_absent": 212,
+          "write_recovery_seconds": 119.75017380400004,
+          "reports": [
+            {
+              "path": "vespa/phased-product-search/results/cluster/fault.json",
+              "sha256": "ed74080730b21d37d576f83764ed04fdc8fdf5c95868161b607111a5fde7561b"
+            },
+            {
+              "path": "vespa/phased-product-search/results/cluster/reconciliation.json",
+              "sha256": "7365a613a6d58d1388a263dcf096132162dee0d9a06eac9f482fc6678e048d22"
+            }
+          ]
+        }
+      ],
+      "native_physical_copies": [
+        {
+          "rows": 100000,
+          "missing_ids": 0,
+          "duplicate_ids": 0,
+          "invalid_rows": 0,
+          "missing_acknowledged_versions": 0,
+          "scope": "all IDs and metadata read using native vespa-get --replica-override; vectors excluded",
+          "node": 0
+        },
+        {
+          "rows": 100000,
+          "missing_ids": 0,
+          "duplicate_ids": 0,
+          "invalid_rows": 0,
+          "missing_acknowledged_versions": 0,
+          "scope": "all IDs and metadata read using native vespa-get --replica-override; vectors excluded",
+          "node": 1
+        },
+        {
+          "rows": 100000,
+          "missing_ids": 0,
+          "duplicate_ids": 0,
+          "invalid_rows": 0,
+          "missing_acknowledged_versions": 0,
+          "scope": "all IDs and metadata read using native vespa-get --replica-override; vectors excluded",
+          "node": 2
+        }
+      ]
+    }
+  ],
+  "not_implemented_or_not_run": [
+    "Vespa storage-sharded/grouped distribution topology is not implemented; three nodes each store the full catalog.",
+    "Typesense sharded leader crashes were run for shard 0 only; FAULT_SHARD=1 and 2 were not separately run.",
+    "No disk corruption, quorum-loss, network-partition, independent-host, or cold-cache experiments."
+  ],
+  "timed_benchmark_requests": 60000
+}
