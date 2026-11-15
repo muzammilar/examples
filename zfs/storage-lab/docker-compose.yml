@@ -1,0 +1,43 @@
+name: zfs-storage-lab
+x-vm: &vm
+  platform: linux/arm64
+  image: zfs-storage-lab:dev
+  build:
+    context: .
+    dockerfile: vm/Dockerfile
+    args: {LOCAL_UID: '${LOCAL_UID:-1000}'}
+  mem_limit: 3g
+  memswap_limit: 3g
+  cpus: 2
+  healthcheck:
+    test: [CMD-SHELL, "ssh -i /keys/id_ed25519 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR -o BatchMode=yes -o ConnectTimeout=3 -p 2222 lab@127.0.0.1 'test -f /var/lib/cloud/instance/boot-finished && sudo modprobe zfs'"]
+    interval: 10s
+    timeout: 15s
+    retries: 120
+    start_period: 60s
+services:
+  source:
+    <<: *vm
+    environment: {NODE: zfslab-source, DISK_GIB: '${DISK_GIB:-16}'}
+    volumes: ['./state/ssh:/keys:ro', 'source:/state']
+  target:
+    <<: *vm
+    environment: {NODE: zfslab-target, DISK_GIB: '${DISK_GIB:-16}'}
+    volumes: ['./state/ssh:/keys:ro', 'target:/state']
+  runner:
+    profiles: [tools]
+    platform: linux/arm64
+    image: zfs-storage-lab:dev
+    entrypoint: [python3, /opt/lab/app/lab.py]
+    user: '${LOCAL_UID:-1000}:${LOCAL_GID:-1000}'
+    environment:
+      DATA_MIB: ${DATA_MIB:-512}
+      WRITE_MIB_S: ${WRITE_MIB_S:-8}
+      BENCH_MIB: ${BENCH_MIB:-256}
+      BENCH_SECONDS: ${BENCH_SECONDS:-10}
+    volumes: ['./state/ssh:/keys:ro', './${RESULTS_DIR:-results/manual}:/results']
+    mem_limit: 256m
+    cpus: 1
+volumes:
+  source:
+  target:

@@ -69,6 +69,7 @@ To add or test a system, follow [`FORMAT.md`](FORMAT.md): folder layout, Make ta
 | Weaviate | [`weaviate/`](weaviate) | Vector | [weaviate.io](https://weaviate.io/) | [weaviate/weaviate](https://github.com/weaviate/weaviate) |
 | YDB | [`ydb/`](ydb) | Distributed SQL | [ydb.tech](https://ydb.tech/) | [ydb-platform/ydb](https://github.com/ydb-platform/ydb) |
 | YugabyteDB | [`yugabyte/`](yugabyte) | Distributed SQL (YSQL + YCQL) | [yugabyte.com](https://www.yugabyte.com/) | [yugabyte/yugabyte-db](https://github.com/yugabyte/yugabyte-db) |
+| ZFS | [`zfs/`](zfs) | Filesystem / volume manager | [openzfs.org](https://openzfs.org/) | [openzfs/zfs](https://github.com/openzfs/zfs) |
 
 ## External Projects (Git Submodules)
 
