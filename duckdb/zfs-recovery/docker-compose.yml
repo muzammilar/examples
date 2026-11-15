@@ -1,0 +1,55 @@
+name: duckdb-zfs-recovery
+x-vm: &vm
+  platform: linux/arm64
+  image: duckdb-zfs-lab:dev
+  build:
+    context: .
+    dockerfile: vm/Dockerfile
+    args:
+      LOCAL_UID: ${LOCAL_UID:-1000}
+  mem_limit: 3g
+  memswap_limit: 3g
+  cpus: 2
+  volumes:
+    - ./state/ssh:/keys:ro
+  healthcheck:
+    test: [CMD-SHELL, "ssh -i /keys/id_ed25519 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR -o BatchMode=yes -o ConnectTimeout=3 -p 2222 lab@127.0.0.1 'test -f /var/lib/cloud/instance/boot-finished && sudo modprobe zfs'"]
+    interval: 10s
+    timeout: 15s
+    retries: 180
+    start_period: 60s
+services:
+  primary:
+    <<: *vm
+    environment: {NODE: ducklab-primary, DISK_GIB: "${DISK_GIB:-16}"}
+    volumes:
+      - ./state/ssh:/keys:ro
+      - primary:/state
+  standby:
+    <<: *vm
+    environment: {NODE: ducklab-standby, DISK_GIB: "${DISK_GIB:-16}"}
+    volumes:
+      - ./state/ssh:/keys:ro
+      - standby:/state
+  controller:
+    profiles: [tools]
+    platform: linux/arm64
+    image: duckdb-zfs-lab:dev
+    entrypoint: [/opt/venv/bin/python, /opt/lab/app/lab.py]
+    user: ${LOCAL_UID:-1000}:${LOCAL_GID:-1000}
+    environment:
+      QUERY_RUNS: ${QUERY_RUNS:-20}
+      BENCH_ROWS: ${BENCH_ROWS:-200000}
+      ROWS: ${ROWS:-2000000}
+      CUSTOMERS: ${CUSTOMERS:-10000}
+      BATCH_ROWS: ${BATCH_ROWS:-10000}
+      CLIENTS: ${CLIENTS:-4}
+      BATCH_DELAY_MS: ${BATCH_DELAY_MS:-1000}
+    volumes:
+      - ./state/ssh:/keys:ro
+      - ./${RESULTS_DIR:-results/manual}:/results
+    mem_limit: 1g
+    cpus: 2
+volumes:
+  primary:
+  standby:
