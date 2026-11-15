@@ -532,6 +532,42 @@
               "sha256": "aa77e7f460dfa916cb5e4e71cfef173737c91508186b75fa84290c57bd64c18e"
             }
           ]
+        },
+        {
+          "service": "ts6",
+          "acknowledged_unique_ids": 4800,
+          "missing_acknowledged_versions": 0,
+          "acks_while_node_absent": 139,
+          "searches_while_node_absent": 142,
+          "write_recovery_seconds": 8.337703670000053,
+          "reports": [
+            {
+              "path": "typesense/product-search/results/sharded/fault-shard-1/fault.json",
+              "sha256": "60f006a185a275b0490d1b11b1e897d33d00b96cb2b9385006d78f7e311be651"
+            },
+            {
+              "path": "typesense/product-search/results/sharded/fault-shard-1/reconciliation.json",
+              "sha256": "f002f8f65eecb25a4f94f5c953161eb91c232eb7c7129a5623bdce4a32a22318"
+            }
+          ]
+        },
+        {
+          "service": "ts7",
+          "acknowledged_unique_ids": 4190,
+          "missing_acknowledged_versions": 0,
+          "acks_while_node_absent": 164,
+          "searches_while_node_absent": 166,
+          "write_recovery_seconds": 4.1633795440000085,
+          "reports": [
+            {
+              "path": "typesense/product-search/results/sharded/fault-shard-2/fault.json",
+              "sha256": "cb778d3eb32b0f47f6e5258192f2499cedea29cbb74da329b30253fbf5d1f506"
+            },
+            {
+              "path": "typesense/product-search/results/sharded/fault-shard-2/reconciliation.json",
+              "sha256": "9a1ca792b51743193d32eefcdc8b0b9a998109f87fb69232f450b290336b9e8f"
+            }
+          ]
         }
       ]
     },
@@ -1589,12 +1625,383 @@
           "node": 2
         }
       ]
+    },
+    {
+      "example": "vespa/phased-product-search",
+      "mode": "sharded",
+      "load_rows": 100000,
+      "load_seconds": 430.60927698800003,
+      "oracle": {
+        "rows": 100000,
+        "missing_ids": 0,
+        "duplicate_ids": 0,
+        "invalid_rows": 0,
+        "missing_acknowledged_versions": 0
+      },
+      "replicas": {
+        "physical_document_counts": {
+          "http://content0:19092": {
+            "total": 33102,
+            "ready": 33102,
+            "active": 33102
+          },
+          "http://content1:19092": {
+            "total": 33529,
+            "ready": 33529,
+            "active": 33529
+          },
+          "http://content2:19092": {
+            "total": 33369,
+            "ready": 33369,
+            "active": 33369
+          },
+          "http://content3:19092": {
+            "total": 34537,
+            "ready": 34537,
+            "active": 34537
+          },
+          "http://content4:19092": {
+            "total": 32984,
+            "ready": 32984,
+            "active": 32984
+          },
+          "http://content5:19092": {
+            "total": 32479,
+            "ready": 32479,
+            "active": 32479
+          },
+          "http://content6:19092": {
+            "total": 33007,
+            "ready": 33007,
+            "active": 33007
+          },
+          "http://content7:19092": {
+            "total": 33533,
+            "ready": 33533,
+            "active": 33533
+          },
+          "http://content8:19092": {
+            "total": 33460,
+            "ready": 33460,
+            "active": 33460
+          }
+        },
+        "logical_payload_oracle": {
+          "rows": 100000,
+          "missing_ids": 0,
+          "duplicate_ids": 0,
+          "invalid_rows": 0,
+          "missing_acknowledged_versions": 0
+        },
+        "scope": "per-node total/ready counts plus logical full-row visitor; not a local-file payload checksum of every replica"
+      },
+      "dense_correctness_recall_at_k": 1.0,
+      "filtered_correctness_recall_at_k": 1.0,
+      "benchmark_cases": {
+        "lexical/clients-1": {
+          "samples": 1000,
+          "p50_ms": 3.6688749999029824,
+          "p95_ms": 4.96308400011003,
+          "p99_ms": 6.438625000100728,
+          "max_ms": 7.621833999792216,
+          "seconds": 3.831152336000059,
+          "qps": 261.0180729707179,
+          "failures": 0
+        },
+        "lexical/clients-8": {
+          "samples": 1000,
+          "p50_ms": 7.946708999952534,
+          "p95_ms": 12.630708000187951,
+          "p99_ms": 15.865875000145024,
+          "max_ms": 29.638208000051236,
+          "seconds": 1.0542356259998087,
+          "qps": 948.5545501762255,
+          "failures": 0
+        },
+        "dense/clients-1": {
+          "samples": 1000,
+          "p50_ms": 5.304709000029106,
+          "p95_ms": 6.292416999940542,
+          "p99_ms": 7.217707999870981,
+          "max_ms": 11.94041600001583,
+          "seconds": 5.587824835999982,
+          "qps": 178.96051314232773,
+          "failures": 0,
+          "recall_at_k": 0.9963
+        },
+        "dense/clients-8": {
+          "samples": 1000,
+          "p50_ms": 13.04808400004731,
+          "p95_ms": 19.98366599991641,
+          "p99_ms": 24.308249999876352,
+          "max_ms": 41.449333999935334,
+          "seconds": 1.7815847090000716,
+          "qps": 561.2980370499799,
+          "failures": 0,
+          "recall_at_k": 0.9966
+        },
+        "hybrid/clients-1": {
+          "samples": 1000,
+          "p50_ms": 5.703584000002593,
+          "p95_ms": 6.903416000113793,
+          "p99_ms": 8.592458000066472,
+          "max_ms": 15.282250000154818,
+          "seconds": 5.817732085999978,
+          "qps": 171.88828657243255,
+          "failures": 0
+        },
+        "hybrid/clients-8": {
+          "samples": 1000,
+          "p50_ms": 14.012291999961235,
+          "p95_ms": 20.944875000168395,
+          "p99_ms": 24.309583000103885,
+          "max_ms": 33.27112499982832,
+          "seconds": 1.8068625420000899,
+          "qps": 553.445531552754,
+          "failures": 0
+        },
+        "rerank/clients-1": {
+          "samples": 1000,
+          "p50_ms": 5.780624999943029,
+          "p95_ms": 7.129999999961001,
+          "p99_ms": 8.98670900005527,
+          "max_ms": 15.204583000013372,
+          "seconds": 5.908434294000017,
+          "qps": 169.24957615514055,
+          "failures": 0
+        },
+        "rerank/clients-8": {
+          "samples": 1000,
+          "p50_ms": 14.172375000043758,
+          "p95_ms": 21.029624999982843,
+          "p99_ms": 24.700208000012935,
+          "max_ms": 33.0764170000748,
+          "seconds": 1.8286902510001255,
+          "qps": 546.83946581609,
+          "failures": 0
+        }
+      },
+      "candidate_ranking": {
+        "lexical": {
+          "candidate_ndcg_at_k": 0.5527695631490966,
+          "scorable_queries": 100,
+          "zero_idcg_queries": 0
+        },
+        "dense": {
+          "candidate_ndcg_at_k": 0.5701699102781755,
+          "scorable_queries": 100,
+          "zero_idcg_queries": 0
+        },
+        "hybrid": {
+          "candidate_ndcg_at_k": 0.5929391244705724,
+          "scorable_queries": 100,
+          "zero_idcg_queries": 0
+        },
+        "rerank": {
+          "candidate_ndcg_at_k": 0.5910538506044009,
+          "scorable_queries": 100,
+          "zero_idcg_queries": 0
+        }
+      },
+      "caps": {
+        "vespa-products-content0": {
+          "nano_cpus": 1000000000,
+          "memory_bytes": 1610612736,
+          "image": "vespaengine/vespa:8.781.11"
+        },
+        "vespa-products-content1": {
+          "nano_cpus": 1000000000,
+          "memory_bytes": 1610612736,
+          "image": "vespaengine/vespa:8.781.11"
+        },
+        "vespa-products-content2": {
+          "nano_cpus": 1000000000,
+          "memory_bytes": 1610612736,
+          "image": "vespaengine/vespa:8.781.11"
+        },
+        "vespa-products-content3": {
+          "nano_cpus": 1000000000,
+          "memory_bytes": 1610612736,
+          "image": "vespaengine/vespa:8.781.11"
+        },
+        "vespa-products-content4": {
+          "nano_cpus": 1000000000,
+          "memory_bytes": 1610612736,
+          "image": "vespaengine/vespa:8.781.11"
+        },
+        "vespa-products-content5": {
+          "nano_cpus": 1000000000,
+          "memory_bytes": 1610612736,
+          "image": "vespaengine/vespa:8.781.11"
+        },
+        "vespa-products-content6": {
+          "nano_cpus": 1000000000,
+          "memory_bytes": 1610612736,
+          "image": "vespaengine/vespa:8.781.11"
+        },
+        "vespa-products-content7": {
+          "nano_cpus": 1000000000,
+          "memory_bytes": 1610612736,
+          "image": "vespaengine/vespa:8.781.11"
+        },
+        "vespa-products-content8": {
+          "nano_cpus": 1000000000,
+          "memory_bytes": 1610612736,
+          "image": "vespaengine/vespa:8.781.11"
+        },
+        "vespa-products-node0": {
+          "nano_cpus": 2000000000,
+          "memory_bytes": 2147483648,
+          "image": "vespaengine/vespa:8.781.11"
+        },
+        "vespa-products-node1": {
+          "nano_cpus": 2000000000,
+          "memory_bytes": 2147483648,
+          "image": "vespaengine/vespa:8.781.11"
+        },
+        "vespa-products-node2": {
+          "nano_cpus": 2000000000,
+          "memory_bytes": 2147483648,
+          "image": "vespaengine/vespa:8.781.11"
+        }
+      },
+      "reports": [
+        {
+          "path": "vespa/phased-product-search/results/sharded/load.json",
+          "sha256": "7fa5369f0990cbb3a6f1f4ea1da7a1268c948ce082b0763cea7f27d36ce96de6"
+        },
+        {
+          "path": "vespa/phased-product-search/results/sharded/correctness.json",
+          "sha256": "1ff7ee6a8f14935228e8a048485c6763accd28a1a91f80e49263de7cf7a018b3"
+        },
+        {
+          "path": "vespa/phased-product-search/results/sharded/benchmark.json",
+          "sha256": "69c2269380cc1aa6018e46fa68471b12dfb5371a687821d734896d02d554f05e"
+        },
+        {
+          "path": "vespa/phased-product-search/results/sharded/resources.json",
+          "sha256": "8ecc304d4c55c8d23dae10af1683f93b9ffd39f405d848b287945c86a25dde8f"
+        },
+        {
+          "path": "vespa/phased-product-search/results/sharded/copy-baseline-placement.json",
+          "sha256": "f15e81bd5de9c51d637b93b87e72ecf4cd0de6b4907994e6d9b8775621318ea0"
+        },
+        {
+          "path": "vespa/phased-product-search/results/sharded/copy-fault-placement.json",
+          "sha256": "f15e81bd5de9c51d637b93b87e72ecf4cd0de6b4907994e6d9b8775621318ea0"
+        }
+      ],
+      "faults": [
+        {
+          "service": "content0",
+          "acknowledged_unique_ids": 2960,
+          "missing_acknowledged_versions": 0,
+          "acks_while_node_absent": 124,
+          "searches_while_node_absent": 129,
+          "write_recovery_seconds": 6.604178128000058,
+          "reports": [
+            {
+              "path": "vespa/phased-product-search/results/sharded/fault.json",
+              "sha256": "272104130708574b18c7510b82700794f6331fa1144269d4751394bf2872ef05"
+            },
+            {
+              "path": "vespa/phased-product-search/results/sharded/reconciliation.json",
+              "sha256": "45d74084ed7d842b174c37c00932e50ffd5d0cb5a181abc3f364d58efc32ac0a"
+            }
+          ]
+        }
+      ],
+      "native_group_placement": [
+        {
+          "groups": {
+            "0": {
+              "rows": 100000,
+              "missing_ids": 0,
+              "duplicate_ids": 0,
+              "invalid_rows": 0,
+              "missing_acknowledged_versions": 0
+            },
+            "1": {
+              "rows": 100000,
+              "missing_ids": 0,
+              "duplicate_ids": 0,
+              "invalid_rows": 0,
+              "missing_acknowledged_versions": 0
+            },
+            "2": {
+              "rows": 100000,
+              "missing_ids": 0,
+              "duplicate_ids": 0,
+              "invalid_rows": 0,
+              "missing_acknowledged_versions": 0
+            }
+          },
+          "rows_per_node": {
+            "0": 33102,
+            "1": 33529,
+            "2": 33369,
+            "3": 34537,
+            "4": 32984,
+            "5": 32479,
+            "6": 33007,
+            "7": 33533,
+            "8": 33460
+          },
+          "stored_rows": 300000,
+          "directed_gets": 900000,
+          "absent_copies": 600000,
+          "logical_rows": 100000,
+          "copies_per_document": 3,
+          "scope": "native replica-directed get for every ID on all 9 content nodes; each group contains exactly one full metadata copy, vectors excluded"
+        },
+        {
+          "groups": {
+            "0": {
+              "rows": 100000,
+              "missing_ids": 0,
+              "duplicate_ids": 0,
+              "invalid_rows": 0,
+              "missing_acknowledged_versions": 0
+            },
+            "1": {
+              "rows": 100000,
+              "missing_ids": 0,
+              "duplicate_ids": 0,
+              "invalid_rows": 0,
+              "missing_acknowledged_versions": 0
+            },
+            "2": {
+              "rows": 100000,
+              "missing_ids": 0,
+              "duplicate_ids": 0,
+              "invalid_rows": 0,
+              "missing_acknowledged_versions": 0
+            }
+          },
+          "rows_per_node": {
+            "0": 33102,
+            "1": 33529,
+            "2": 33369,
+            "3": 34537,
+            "4": 32984,
+            "5": 32479,
+            "6": 33007,
+            "7": 33533,
+            "8": 33460
+          },
+          "stored_rows": 300000,
+          "directed_gets": 900000,
+          "absent_copies": 600000,
+          "logical_rows": 100000,
+          "copies_per_document": 3,
+          "scope": "native replica-directed get for every ID on all 9 content nodes; each group contains exactly one full metadata copy, vectors excluded"
+        }
+      ]
     }
   ],
   "not_implemented_or_not_run": [
-    "Vespa storage-sharded/grouped distribution topology is not implemented; three nodes each store the full catalog.",
-    "Typesense sharded leader crashes were run for shard 0 only; FAULT_SHARD=1 and 2 were not separately run.",
-    "No disk corruption, quorum-loss, network-partition, independent-host, or cold-cache experiments."
+    "Vespa storage-sharded crash coverage targets content0; other selectable content hosts were not individually killed.",
+    "No disk corruption, quorum-loss, network-partition, independent-host, online topology scaling, or cold-cache experiments."
   ],
-  "timed_benchmark_requests": 60000
+  "timed_benchmark_requests": 68000
 }

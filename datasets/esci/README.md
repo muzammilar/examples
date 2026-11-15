@@ -95,12 +95,12 @@ index is used.
 
 ## Verified runs
 
-[`verified-runs.json`](verified-runs.json) records the audited **9 implemented
-profiles**, **60,000 timed benchmark requests**, and **6 fault runs** across the
+[`verified-runs.json`](verified-runs.json) records the audited **10 implemented
+profiles**, **68,000 timed benchmark requests**, and **9 fault runs** across the
 four examples, with input hashes, caps, numerical results and hashes of local raw
 reports. Raw reports remain in ignored `results/` directories; their hashes are
 provenance records, not a replacement for rerunning the tests. The record explicitly
-excludes unimplemented Vespa storage sharding and unrun optional fault targets.
+distinguishes the tested fault targets from unrun optional host permutations.
 
 ## Files and licensing
 

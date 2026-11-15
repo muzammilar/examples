@@ -199,7 +199,7 @@ Planned as a `mysql/` folder, mirroring the Postgres section with the same `orde
 - [x] [`typesense/product-search`](typesense/product-search/): consolidated single/three-Raft-replica storefront workload and three application-managed customer shards with three replicas each, 100,000 products, typo/facet/filter tests, hybrid ranking, leader-loss reconciliation and measured benchmarks.
 - [ ] `quickwit-single-node`: Rust log search on object storage.
 - [x] [`vespa/phased-product-search`](vespa/phased-product-search/): single/three-content-node profiles, 100,000 products, four ranking modes, controller/node failure under load, native metadata/version verification on every physical copy and measured benchmarks.
-- [ ] Vespa storage sharding: grouped content distribution with three copies, physical placement checks, failover and benchmarks; current three-node profile holds the entire catalog on every node.
+- [x] [Vespa storage sharding](vespa/phased-product-search/#native-storage-sharding): 3 groups × 3 content nodes plus separate control/query hosts, 900,000 replica-directed gets per phase, content-node failure with 0 acknowledged loss and four-mode benchmarks.
 - [x] `manticore-single-node` (top priority): columnar storage + secondary indexes; rerun db-benchmarks.com against the Elasticsearch example.
 
 ## Key-value and cache
