@@ -30,12 +30,14 @@ To add or test a system, follow [`FORMAT.md`](FORMAT.md): folder layout, Make ta
 | Ansible | [`ansible/`](ansible) | Configuration management | [ansible.com](https://www.ansible.com/) | [ansible/ansible](https://github.com/ansible/ansible) |
 | ArangoDB | [`arrangodb/`](arrangodb) | Multi-model (document + graph) | [arango.ai](https://arango.ai/) | [arangodb/arangodb](https://github.com/arangodb/arangodb) |
 | CedarDB | [`cedardb/`](cedardb) | HTAP / relational | [cedardb.com](https://cedardb.com/) | — |
+| Ceph | [`ceph/`](ceph) | Object / block / filesystem | [ceph.io](https://ceph.io/) | [ceph/ceph](https://github.com/ceph/ceph) |
 | ClickHouse | [`clickhouse/`](clickhouse) | OLAP / analytics | [clickhouse.com](https://clickhouse.com/) | [ClickHouse/ClickHouse](https://github.com/ClickHouse/ClickHouse) |
 | CockroachDB | [`cockroachdb/`](cockroachdb) | Distributed SQL | [cockroachlabs.com](https://www.cockroachlabs.com/) | [cockroachdb/cockroach](https://github.com/cockroachdb/cockroach) |
 | Dragonfly | [`dragonfly/`](dragonfly) | Cache / in-memory | [dragonflydb.io](https://www.dragonflydb.io/) | [dragonflydb/dragonfly](https://github.com/dragonflydb/dragonfly) |
 | DuckDB | [`duckdb/`](duckdb) | Embedded analytics | [duckdb.org](https://duckdb.org/) | [duckdb/duckdb](https://github.com/duckdb/duckdb) |
 | Elasticsearch | [`elasticsearch/`](elasticsearch) | Search | [elastic.co](https://www.elastic.co/elasticsearch) | [elastic/elasticsearch](https://github.com/elastic/elasticsearch) |
 | FoundationDB | [`foundationdb/`](foundationdb) | Key-value | [foundationdb.org](https://www.foundationdb.org/) | [apple/foundationdb](https://github.com/apple/foundationdb) |
+| Garage | [`garage/`](garage) | S3 object storage | [garagehq.deuxfleurs.fr](https://garagehq.deuxfleurs.fr/) | [deuxfleurs-org/garage](https://github.com/deuxfleurs-org/garage) |
 | Iceberg | [`iceberg/`](iceberg) | Lakehouse tables | [iceberg.apache.org](https://iceberg.apache.org/) | [apache/iceberg](https://github.com/apache/iceberg) |
 | InfluxDB | [`influxdb/`](influxdb) | Time-series | [influxdata.com](https://www.influxdata.com/products/influxdb/) | [influxdata/influxdb](https://github.com/influxdata/influxdb) |
 | Kafka | [`kafka/`](kafka) | Streaming | [kafka.apache.org](https://kafka.apache.org/) | [apache/kafka](https://github.com/apache/kafka) |
@@ -57,7 +59,9 @@ To add or test a system, follow [`FORMAT.md`](FORMAT.md): folder layout, Make ta
 | Redpanda | [`redpanda/`](redpanda) | Streaming (Kafka API) | [redpanda.com](https://www.redpanda.com/) | [redpanda-data/redpanda](https://github.com/redpanda-data/redpanda) |
 | RisingWave | [`risingwave/`](risingwave) | Streaming SQL | [risingwave.com](https://risingwave.com/) | [risingwavelabs/risingwave](https://github.com/risingwavelabs/risingwave) |
 | RonDB | [`rondb/`](rondb) | In-memory SQL / key-value | [rondb.com](https://www.rondb.com/) | [logicalclocks/rondb](https://github.com/logicalclocks/rondb) |
+| RustFS | [`rustfs/`](rustfs) | S3 object storage | [rustfs.com](https://rustfs.com/) | [rustfs/rustfs](https://github.com/rustfs/rustfs) |
 | ScyllaDB | [`scylladb/`](scylladb) | Wide-column | [scylladb.com](https://www.scylladb.com/) | [scylladb/scylladb](https://github.com/scylladb/scylladb) |
+| SeaweedFS | [`seaweedfs/`](seaweedfs) | Distributed filesystem / S3 | [seaweedfs.com](https://seaweedfs.com/) | [seaweedfs/seaweedfs](https://github.com/seaweedfs/seaweedfs) |
 | SingleStore | [`singlestore/`](singlestore) | Distributed SQL | [singlestore.com](https://www.singlestore.com/) | — |
 | Skytable | [`skytable/`](skytable) | Key-value | [skytable.io](https://skytable.io/) | [skytable/skytable](https://github.com/skytable/skytable) |
 | Tarantool | [`tarantool/`](tarantool) | In-memory DB + Lua | [tarantool.io](https://www.tarantool.io/) | [tarantool/tarantool](https://github.com/tarantool/tarantool) |
@@ -73,6 +77,9 @@ To add or test a system, follow [`FORMAT.md`](FORMAT.md): folder layout, Make ta
 | YDB | [`ydb/`](ydb) | Distributed SQL | [ydb.tech](https://ydb.tech/) | [ydb-platform/ydb](https://github.com/ydb-platform/ydb) |
 | YugabyteDB | [`yugabyte/`](yugabyte) | Distributed SQL (YSQL + YCQL) | [yugabyte.com](https://www.yugabyte.com/) | [yugabyte/yugabyte-db](https://github.com/yugabyte/yugabyte-db) |
 | ZFS | [`zfs/`](zfs) | Filesystem / volume manager | [openzfs.org](https://openzfs.org/) | [openzfs/zfs](https://github.com/openzfs/zfs) |
+
+See [S3 object-storage comparisons](object-storage/) for clustered S3 workloads,
+disk-replacement tests, acknowledged-loss accounting and benchmark limitations.
 
 ## External Projects (Git Submodules)
 

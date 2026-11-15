@@ -14,7 +14,7 @@ covers open-table interoperability and archive handoffs separately.
 4. `make down` — synchronously drop the example table; keep infrastructure running.
 5. `make docker-down` — remove this project's services, disks and built clients.
 
-Requires Docker Compose, Python 3, at least 20 GiB Docker RAM and 15 GiB free
+Requires Docker Compose with `include` support (tested 5.1.4), Python 3, at least 20 GiB Docker RAM and 15 GiB free
 Docker disk. Credentials are local fixtures and services use the private Docker
 network. Real production deployments need independent hosts/disks, redundant S3
 routing, TLS, managed credentials, monitoring, backups and capacity headroom.

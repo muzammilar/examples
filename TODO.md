@@ -27,7 +27,7 @@ Fastest in class, free, runnable locally (see the sections below for the example
 - [ ] MongoDB replica set
 - [ ] Temporal
 - [ ] Restate
-- [ ] SeaweedFS
+- [x] SeaweedFS — [replicated S3 and disk recovery](seaweedfs/s3-cluster/)
 
 ## Time-series
 
@@ -172,8 +172,12 @@ Planned as a `mysql/` folder, mirroring the Postgres section with the same `orde
 - [ ] `ducklake-multi-writer`: independent DuckDB writers coordinated through a PostgreSQL DuckLake catalog; deferred at the user's request.
 - [ ] `delta-lake-duckdb`: Delta tables read from DuckDB and Spark.
 - [ ] `paimon-flink-minio`: Apache Paimon (LSM-based primary-key tables, changelog for streaming) written by Flink to MinIO; read from Spark/StarRocks/Trino; compare upsert throughput and freshness with Iceberg.
-- [ ] `garage-docker-compose-cluster`: self-hosted S3-compatible storage.
-- [ ] `seaweedfs-docker-compose-cluster`: master/volume/filer with `xyz` replication (`001`/`010`/`100`), S3 gateway, erasure coding for warm volumes, `filer.sync` cross-cluster replication.
+- [x] `garage/s3-cluster`: nine nodes, three zones, fsync/quorums, empty-disk replacement and physical replica audits.
+- [x] `seaweedfs/s3-cluster`: separated HA master/volume/filer/etcd/S3 roles, three-datacenter `200` replication, fsync, disk replacement and full replica-byte checks.
+- [ ] SeaweedFS extensions: erasure coding for warm volumes and `filer.sync` cross-cluster replication.
+- [x] `rustfs/s3-cluster`: four-node EC2+2, strict durability, deep heal and independent rebuilt-shard checks.
+- [x] [`ceph/s3-cluster`](ceph/s3-cluster/): three guests, nine BlueStore OSDs, three RGWs, host-domain replication, native deep scrubs, guest crash and permanent disk replacement under load, measured emulated benchmarks and operational gotchas.
+- [x] `clickhouse/s3-tiered-storage`: replicated MergeTree TTL movement to Garage, hot/cold/cache benchmarks and three separate failure tests.
 - [ ] Comparison example: 1-4 MB blob put/update/delete latency in SeaweedFS vs Aerospike (`write-block-size 8M`) vs ScyllaDB (large-cell threshold, 16 MB mutation cap); plus metadata-in-Scylla + blob-in-SeaweedFS pattern.
 
 ## Low-latency and HPC storage
