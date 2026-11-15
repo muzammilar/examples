@@ -1,0 +1,20 @@
+node_id = 0
+[http]
+addr = "0.0.0.0:4000"
+[grpc]
+bind_addr = "0.0.0.0:3001"
+server_addr = "data0:3001"
+[meta_client]
+metasrv_addrs = ["meta0:3002", "meta1:3002", "meta2:3002"]
+[wal]
+provider = "kafka"
+broker_endpoints = ["wal0:9092", "wal1:9092", "wal2:9092"]
+[storage]
+data_home = "/data"
+type = "S3"
+bucket = "lab-objects"
+root = "greptime/"
+access_key_id = "GK0123456789abcdef01234567"
+secret_access_key = "local-only-object-storage-secret-key"
+endpoint = "http://s3:9000"
+region = "us-east-1"

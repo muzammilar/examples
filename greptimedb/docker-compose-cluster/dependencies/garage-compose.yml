@@ -1,0 +1,107 @@
+name: ${COMPOSE_PROJECT_NAME:-garage-s3-cluster}
+x-garage: &garage
+  image: dxflrs/garage:v2.5.0
+  command: [/garage, server]
+  cpus: 1
+  mem_limit: 768m
+  healthcheck:
+    test: [CMD, /garage, status]
+    interval: 5s
+    timeout: 10s
+    retries: 60
+    start_period: 10s
+services:
+  garage0:
+    <<: *garage
+    hostname: garage0
+    volumes:
+      - ${GARAGE_CONFIG_DIR:-./config/generated}/garage0.toml:/etc/garage.toml:ro
+      - meta0:/meta
+      - data0:/data
+  garage1:
+    <<: *garage
+    hostname: garage1
+    volumes:
+      - ${GARAGE_CONFIG_DIR:-./config/generated}/garage1.toml:/etc/garage.toml:ro
+      - meta1:/meta
+      - data1:/data
+  garage2:
+    <<: *garage
+    hostname: garage2
+    volumes:
+      - ${GARAGE_CONFIG_DIR:-./config/generated}/garage2.toml:/etc/garage.toml:ro
+      - meta2:/meta
+      - data2:/data
+  garage3:
+    <<: *garage
+    hostname: garage3
+    volumes:
+      - ${GARAGE_CONFIG_DIR:-./config/generated}/garage3.toml:/etc/garage.toml:ro
+      - meta3:/meta
+      - data3:/data
+  garage4:
+    <<: *garage
+    hostname: garage4
+    volumes:
+      - ${GARAGE_CONFIG_DIR:-./config/generated}/garage4.toml:/etc/garage.toml:ro
+      - meta4:/meta
+      - data4:/data
+  garage5:
+    <<: *garage
+    hostname: garage5
+    volumes:
+      - ${GARAGE_CONFIG_DIR:-./config/generated}/garage5.toml:/etc/garage.toml:ro
+      - meta5:/meta
+      - data5:/data
+  garage6:
+    <<: *garage
+    hostname: garage6
+    volumes:
+      - ${GARAGE_CONFIG_DIR:-./config/generated}/garage6.toml:/etc/garage.toml:ro
+      - meta6:/meta
+      - data6:/data
+  garage7:
+    <<: *garage
+    hostname: garage7
+    volumes:
+      - ${GARAGE_CONFIG_DIR:-./config/generated}/garage7.toml:/etc/garage.toml:ro
+      - meta7:/meta
+      - data7:/data
+  garage8:
+    <<: *garage
+    hostname: garage8
+    volumes:
+      - ${GARAGE_CONFIG_DIR:-./config/generated}/garage8.toml:/etc/garage.toml:ro
+      - meta8:/meta
+      - data8:/data
+  s3:
+    image: haproxy:3.2.8-alpine
+    cpus: 0.5
+    mem_limit: 128m
+    volumes:
+      - ${GARAGE_CONFIG_DIR:-./config/generated}/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+    healthcheck:
+      test: [CMD, wget, -q, -O, /dev/null, http://127.0.0.1:8404/health]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+
+volumes:
+  meta0:
+  data0:
+  meta1:
+  data1:
+  meta2:
+  data2:
+  meta3:
+  data3:
+  meta4:
+  data4:
+  meta5:
+  data5:
+  meta6:
+  data6:
+  meta7:
+  data7:
+  meta8:
+  data8:

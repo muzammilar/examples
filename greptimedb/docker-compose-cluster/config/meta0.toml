@@ -1,0 +1,16 @@
+data_home = "/data"
+store_addrs = ["meta-store0:2379", "meta-store1:2379", "meta-store2:2379"]
+store_key_prefix = "telemetry/"
+enable_region_failover = true
+allow_region_failover_on_local_wal = false
+region_failure_detector_initialization_delay = "30s"
+[grpc]
+bind_addr = "0.0.0.0:3002"
+server_addr = "meta0:3002"
+[http]
+addr = "0.0.0.0:4000"
+[wal]
+provider = "kafka"
+broker_endpoints = ["wal0:9092", "wal1:9092", "wal2:9092"]
+num_topics = 12
+replication_factor = 3
