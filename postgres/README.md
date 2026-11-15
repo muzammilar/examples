@@ -10,6 +10,7 @@ GitHub: [postgres/postgres](https://github.com/postgres/postgres), [citusdata/ci
 | [PgDog pooling](pgdog-docker-compose-cluster/) | Transaction pooling, pool-size reload, explicit replica reads and Patroni primary failover; one primary plus two replicas |
 | [pgvector product retrieval](pgvector-product-search/) | Single/three-copy profiles, transactional inventory joins, filtered HNSW/hybrid retrieval and primary-loss reconciliation |
 | [Customer sharding](customer-sharding/) | PgDog routes by `customer_id` across three Postgres shards, each with one primary and two replicas; Patroni failover, synchronous-replica stalls and acknowledgement reconciliation. |
+| [Neon Kubernetes recovery](neon/) | Native compute/storage separation, ancestor-LSN branch isolation and WAL/worker/compute recovery; 300,400 historical ACKs reconciled without loss |
 
 | Example | Date / setup | Observed result |
 |---|---|---|

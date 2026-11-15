@@ -69,6 +69,7 @@ To add or test a system, follow [`FORMAT.md`](FORMAT.md): folder layout, Make ta
 | SeaweedFS | [`seaweedfs/`](seaweedfs) | Distributed filesystem / S3 | [seaweedfs.com](https://seaweedfs.com/) | [seaweedfs/seaweedfs](https://github.com/seaweedfs/seaweedfs) |
 | SingleStore | [`singlestore/`](singlestore) | Distributed SQL | [singlestore.com](https://www.singlestore.com/) | — |
 | Skytable | [`skytable/`](skytable) | Key-value | [skytable.io](https://skytable.io/) | [skytable/skytable](https://github.com/skytable/skytable) |
+| StarRocks | [`starrocks/`](starrocks) | Mutable analytics | [starrocks.io](https://www.starrocks.io/) | [StarRocks/starrocks](https://github.com/StarRocks/starrocks) |
 | Tarantool | [`tarantool/`](tarantool) | In-memory DB + Lua | [tarantool.io](https://www.tarantool.io/) | [tarantool/tarantool](https://github.com/tarantool/tarantool) |
 | TiDB | [`tidb/`](tidb) | Distributed SQL | [pingcap.com](https://www.pingcap.com/tidb/) | [pingcap/tidb](https://github.com/pingcap/tidb) |
 | TigerBeetle | [`tigerbeetle/`](tigerbeetle) | Ledger / OLTP | [tigerbeetle.com](https://tigerbeetle.com/) | [tigerbeetle/tigerbeetle](https://github.com/tigerbeetle/tigerbeetle) |

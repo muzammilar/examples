@@ -3,6 +3,34 @@
 Candidate databases and systems to add as examples. Branch names follow the existing
 `<system>-single-node`, `<system>-docker-compose-cluster` and `<system>-kubernetes-{operator,helm}` convention.
 
+## Break and recover: all existing and future examples
+
+Apply the [production-test requirements](AGENTS.md#non-functional--production-tests) to every
+system, including older examples. Deliberately find how it breaks, measure the
+availability/data-loss boundary, and demonstrate recovery. Multiple replicas and
+healthy pods alone do not qualify an example as production ready.
+
+- [ ] Audit older examples for operational coverage; record missing, failed,
+  blocked and unsupported cases without reclassifying them as passing.
+- [ ] Add independent live writers/readers, an external durable witness,
+  timestamped operation phases and numeric behavior reports where missing;
+  observe read/write failures and latencies throughout each operation, then
+  reconcile data and restored replicas.
+- [ ] Add and run the applicable Compose and Kubernetes/operator tests: scaling
+  both directions, rolling maintenance, leader/follower crashes, worker-node
+  outage/restart, partition/lag, dependency failures, resource exhaustion and
+  permanent disk/PVC replacement with native repair verification.
+- [ ] Exercise operator outage/reconciliation, safe drain/PDB behavior and CR
+  validation where applicable; keep workload and external ACK witnesses running.
+- [ ] Go beyond a single tolerated failure where practical in isolated owned
+  infrastructure: demonstrate quorum loss, correlated failures or exhausted
+  capacity, then recover without hiding lost or corrupt data behind a reset.
+- [ ] Verify backup/restore, fencing, data correctness and rebuilt redundancy;
+  publish numeric RPO/recovery results and exact recovery commands, including
+  gotchas, manual intervention and states that cannot be recovered.
+- [ ] Run correctness/recovery before performance; retain raw evidence and
+  document actual limits. Apply the same requirements to every future example.
+
 ## Already covered
 
 On `main`: Aerospike, Airflow, ArangoDB, CedarDB, ClickHouse, CockroachDB, Dragonfly, DuckDB, Elasticsearch, FoundationDB, Garnet/Valkey (Go comparison), InfluxDB, Kafka, kdb+, Manticore Search, Memgraph, Milvus, NATS, NebulaGraph, Neo4j, OceanBase, Postgres (k8s/vagrant), MySQL and SQLite clients, Qdrant, QuestDB, Redpanda, RisingWave, RonDB, ScyllaDB, SingleStore, Skytable, TiDB, Tarantool, TigerBeetle, TiKV, TimescaleDB, Valkey, Weaviate, YDB, YugabyteDB.
@@ -19,10 +47,16 @@ Fastest in class, free, runnable locally (see the sections below for the example
 
 ## Priority
 
+- [x] [Neon Kubernetes storage/recovery](postgres/neon/kubernetes-statefulset/): million-row parent/branch checks and five live recovery cases; bootstrap/controller gotchas documented.
+
+- [x] Qdrant [`turboquant/`](qdrant/turboquant/) (pinned v1.18.3): clustered float32 vs scalar int8 vs TurboQuant;
+  exact recall@10, filtered/unfiltered p50/p99 and QPS, indexing and native
+  RAM/page-cache/disk accounting, oversampling/rescoring tradeoffs, peer/disk
+  recovery under live reads/writes. [Release and minimum version](https://qdrant.tech/blog/qdrant-1.18.x/).
 - [ ] Postgres scale-out: Citus, PgDog, Multigres, Neon
 - [ ] MySQL sharding: Vitess, ShardingSphere, PolarDB-X, NDB Cluster
 - [x] pgvector
-- [ ] StarRocks
+- [ ] StarRocks operator qualification; [single-node and Compose examples](starrocks/) are complete.
 - [x] Iceberg + Trino + MinIO
 - [ ] MongoDB replica set
 - [ ] Temporal
