@@ -7,6 +7,7 @@ import time
 import zipfile
 from pathlib import Path
 from workload import HTTP, META, Fixture, main, oracle, read_records, save
+from native import read_copy
 
 
 class Adapter:
@@ -16,6 +17,11 @@ class Adapter:
         self.fixture = fixture
         self.urls = os.environ["URLS"].split(",")
         self.http = HTTP(self.urls)
+        self.storage_urls = (
+            [f"http://content{i}:19092" for i in range(9)]
+            if os.environ.get("MODE") == "sharded"
+            else self.urls
+        )
 
     def deploy(self):
         archive = io.BytesIO()
@@ -195,7 +201,7 @@ class Adapter:
 
     def stats(self):
         stats = {}
-        for url in self.urls:
+        for url in self.storage_urls:
             try:
                 host = url.split(":")[1].strip("/")
                 metrics = self.http.client.get(
@@ -229,7 +235,7 @@ class Adapter:
         return stats
 
     def verify_replicas(self, fixture, versions=None, attempted=None):
-        deadline = time.monotonic() + 180
+        deadline = time.monotonic() + 300
         while True:
             stats = self.stats()
             counts = {}
@@ -241,11 +247,26 @@ class Adapter:
                     )
                     for key in ["total", "ready", "active"]
                 }
-            if all(
-                value["total"] == len(fixture.products)
-                and value["ready"] == len(fixture.products)
-                for value in counts.values()
-            ):
+            expected = len(fixture.products)
+            if os.environ.get("MODE") == "sharded":
+                values = list(counts.values())
+                partial_nodes = all(
+                    isinstance(row[key], (int, float)) and 0 < row[key] < expected
+                    for row in values
+                    for key in ["total", "ready"]
+                )
+                converged = partial_nodes and all(
+                    sum(row[key] for row in values[group * 3 : group * 3 + 3])
+                    == expected
+                    for group in range(3)
+                    for key in ["total", "ready"]
+                )
+            else:
+                converged = all(
+                    value["total"] == expected and value["ready"] == expected
+                    for value in counts.values()
+                )
+            if converged:
                 return {
                     "physical_document_counts": counts,
                     "logical_payload_oracle": oracle(
@@ -257,7 +278,7 @@ class Adapter:
                 raise RuntimeError("replica counts not converged: " + str(counts))
             time.sleep(3)
 
-    def verify_copy(self):
+    def expected_versions(self):
         versions = {}
         attempted = {}
         if os.environ["NATIVE_PHASE"] == "fault":
@@ -268,6 +289,52 @@ class Adapter:
                 for row in record["rows"]:
                     i = int(row["id"])
                     target[i] = max(target.get(i, 0), int(row["version"]))
+        return versions, attempted
+
+    def verify_sharded_copies(self):
+        versions, attempted = self.expected_versions()
+        phase = os.environ["NATIVE_PHASE"]
+        n = len(self.fixture.products)
+        counts = {}
+        groups = {}
+        parent = self
+
+        class Group:
+            def __init__(self, group):
+                self.group = group
+
+            def rows(self):
+                for node in range(self.group * 3, self.group * 3 + 3):
+                    documents = read_copy(
+                        Path(f"/results/.native-{phase}-{node}.json"), n
+                    )
+                    counts[str(node)] = sum(
+                        document is not None for document in documents
+                    )
+                    if not 0 < counts[str(node)] < n:
+                        raise RuntimeError("node does not hold a proper catalog subset")
+                    for document in documents:
+                        if document is not None:
+                            yield parent.normalize(document["fields"])
+
+        for group in range(3):
+            groups[str(group)] = oracle(Group(group), self.fixture, versions, attempted)
+        save(
+            "copy-" + phase + "-placement",
+            {
+                "groups": groups,
+                "rows_per_node": counts,
+                "stored_rows": sum(counts.values()),
+                "directed_gets": n * len(counts),
+                "absent_copies": n * len(counts) - sum(counts.values()),
+                "logical_rows": n,
+                "copies_per_document": 3,
+                "scope": "native replica-directed get for every ID on all 9 content nodes; each group contains exactly one full metadata copy, vectors excluded",
+            },
+        )
+
+    def verify_copy(self):
+        versions, attempted = self.expected_versions()
         documents = json.loads(
             (Path("/results") / os.environ["NATIVE_FILE"]).read_text()
         )
@@ -303,7 +370,17 @@ class Adapter:
 
 
 if __name__ == "__main__":
-    if sys.argv[1] == "reset-fault":
+    if sys.argv[1] == "copy-contract-test":
+        import unittest
+
+        suite = unittest.defaultTestLoader.discover("/app", pattern="test_native.py")
+        if not unittest.TextTestRunner(verbosity=2).run(suite).wasSuccessful():
+            raise SystemExit(1)
+    elif sys.argv[1] == "deploy":
+        Adapter(Fixture()).deploy()
+    elif sys.argv[1] == "verify-sharded-copies":
+        Adapter(Fixture()).verify_sharded_copies()
+    elif sys.argv[1] == "reset-fault":
         fixture = Fixture()
         adapter = Adapter(fixture)
         ids = sorted(

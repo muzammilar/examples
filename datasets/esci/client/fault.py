@@ -9,8 +9,8 @@ import time
 
 engine = os.environ["ENGINE"]
 mode = os.environ.get("MODE", "cluster")
-if mode != "cluster" and not (engine == "typesense" and mode == "sharded"):
-    raise SystemExit("failover requires MODE=cluster (or Typesense MODE=sharded)")
+if mode != "cluster" and not (engine in ("typesense", "vespa") and mode == "sharded"):
+    raise SystemExit("failover requires MODE=cluster (or Typesense/Vespa MODE=sharded)")
 projects = {
     "typesense": "typesense-product-search",
     "pgvector": "pgvector-product-search",
@@ -61,6 +61,10 @@ elif engine == "lancedb":
         raise ValueError("FAULT_SERVICE must be writer or reader1")
 else:
     service = "node0"
+    if mode == "sharded":
+        service = os.environ.get("FAULT_SERVICE", "content0")
+        if service not in [f"content{i}" for i in range(9)]:
+            raise ValueError("FAULT_SERVICE must be content0..content8")
 
 
 def survivors():

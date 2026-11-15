@@ -4,5 +4,5 @@ WORKDIR /app
 COPY datasets/esci/client/requirements.txt /tmp/requirements.txt
 RUN pip install --no-cache-dir -r /tmp/requirements.txt
 COPY datasets/esci/client/workload.py /app/workload.py
-COPY vespa/phased-product-search/app/client.py /app/client.py
+COPY vespa/phased-product-search/app/*.py /app/
 ENTRYPOINT ["python", "/app/client.py"]

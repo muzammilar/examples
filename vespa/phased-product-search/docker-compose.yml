@@ -3,8 +3,11 @@ x-node: &node
   image: vespaengine/vespa:8.781.11
   command: configserver,services
   cpus: 2
-  mem_limit: 4g
+  mem_limit: ${CONTROL_MEMORY:-4g}
   environment:
+    # The image defaults to a 4 GiB startup floor. Sharded mode separates
+    # roles into small lab hosts; keep cgroup limits and feed guards enabled.
+    VESPA_IGNORE_NOT_ENOUGH_MEMORY: ${IGNORE_MEMORY_FLOOR:-false}
     VESPA_CONFIGSERVERS: ${CONFIGSERVERS:-vespa-products-node0.vespa-product-search-net,vespa-products-node1.vespa-product-search-net,vespa-products-node2.vespa-product-search-net}
     VESPA_CONFIGSERVER_JVMARGS: -Xms32M -Xmx256M
     VESPA_CONFIGPROXY_JVMARGS: -Xms32M -Xmx64M
@@ -14,6 +17,20 @@ x-node: &node
     timeout: 3s
     retries: 90
     start_period: 30s
+# Content-only hosts do not run a config server. The native RPC ping works
+# before application deployment; the client separately waits for query coverage.
+x-content: &content
+  <<: *node
+  command: services
+  cpus: 1
+  mem_limit: 1536m
+  profiles: [sharded]
+  healthcheck:
+    test: [CMD, /opt/vespa/bin/vespa-ping-configproxy, -w, '2']
+    interval: 5s
+    timeout: 3s
+    retries: 90
+    start_period: 20s
 services:
   node0:
     <<: *node
@@ -24,14 +41,59 @@ services:
     <<: *node
     container_name: vespa-products-node1
     hostname: vespa-products-node1.vespa-product-search-net
-    profiles: [cluster]
+    profiles: [cluster, sharded]
     volumes: [node1:/opt/vespa/var]
   node2:
     <<: *node
     container_name: vespa-products-node2
     hostname: vespa-products-node2.vespa-product-search-net
-    profiles: [cluster]
+    profiles: [cluster, sharded]
     volumes: [node2:/opt/vespa/var]
+  content0:
+    <<: *content
+    container_name: vespa-products-content0
+    hostname: vespa-products-content0.vespa-product-search-net
+    volumes: [content0:/opt/vespa/var]
+  content1:
+    <<: *content
+    container_name: vespa-products-content1
+    hostname: vespa-products-content1.vespa-product-search-net
+    volumes: [content1:/opt/vespa/var]
+  content2:
+    <<: *content
+    container_name: vespa-products-content2
+    hostname: vespa-products-content2.vespa-product-search-net
+    volumes: [content2:/opt/vespa/var]
+  content3:
+    <<: *content
+    container_name: vespa-products-content3
+    hostname: vespa-products-content3.vespa-product-search-net
+    volumes: [content3:/opt/vespa/var]
+  content4:
+    <<: *content
+    container_name: vespa-products-content4
+    hostname: vespa-products-content4.vespa-product-search-net
+    volumes: [content4:/opt/vespa/var]
+  content5:
+    <<: *content
+    container_name: vespa-products-content5
+    hostname: vespa-products-content5.vespa-product-search-net
+    volumes: [content5:/opt/vespa/var]
+  content6:
+    <<: *content
+    container_name: vespa-products-content6
+    hostname: vespa-products-content6.vespa-product-search-net
+    volumes: [content6:/opt/vespa/var]
+  content7:
+    <<: *content
+    container_name: vespa-products-content7
+    hostname: vespa-products-content7.vespa-product-search-net
+    volumes: [content7:/opt/vespa/var]
+  content8:
+    <<: *content
+    container_name: vespa-products-content8
+    hostname: vespa-products-content8.vespa-product-search-net
+    volumes: [content8:/opt/vespa/var]
   tools:
     image: vespa-product-tools:dev
     build:
@@ -55,6 +117,15 @@ volumes:
   node0:
   node1:
   node2:
+  content0:
+  content1:
+  content2:
+  content3:
+  content4:
+  content5:
+  content6:
+  content7:
+  content8:
 
 networks:
   default:

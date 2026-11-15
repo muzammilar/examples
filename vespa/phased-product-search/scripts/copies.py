@@ -15,8 +15,14 @@ root = Path(os.environ.get("CORPUS_DIR", "../../datasets/esci/prepared"))
 results = Path(os.environ["RESULTS_DIR"])
 results.mkdir(parents=True, exist_ok=True)
 n = json.loads((root / "manifest.json").read_text())["parameters"]["documents"]
-count = 1 if os.environ.get("MODE") == "single" else 3
-compose = ["docker", "compose", "--profile", "cluster"]
+mode = os.environ.get("MODE", "cluster")
+count = 1 if mode == "single" else 9 if mode == "sharded" else 3
+compose = [
+    "docker",
+    "compose",
+    "--profile",
+    "sharded" if mode == "sharded" else "cluster",
+]
 fields = (
     "pid,source_id,locale,name,description,brand,color,tenant,stock,price_cents,version"
 )
@@ -39,8 +45,8 @@ def export(node):
                 "LC_ALL=C.UTF-8",
                 "-e",
                 # The image default can render Unicode as ? through Java PrintStream.
-                "JAVA_TOOL_OPTIONS=-Dfile.encoding=UTF-8 -Dsun.stdout.encoding=UTF-8 -Dstdout.encoding=UTF-8",
-                f"node{node}",
+                "JAVA_TOOL_OPTIONS=-Xmx128m -Dfile.encoding=UTF-8 -Dsun.stdout.encoding=UTF-8 -Dstdout.encoding=UTF-8",
+                f"content{node}" if mode == "sharded" else f"node{node}",
                 "vespa-get",
                 "--cluster",
                 "catalog",
@@ -64,8 +70,24 @@ def export(node):
 
 
 try:
-    with concurrent.futures.ThreadPoolExecutor(max_workers=count) as pool:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=min(3, count)) as pool:
         exports = list(pool.map(export, range(count)))
+    if mode == "sharded":
+        subprocess.run(
+            compose
+            + [
+                "run",
+                "--rm",
+                "--user",
+                f"{os.getuid()}:{os.getgid()}",
+                "-e",
+                "NATIVE_PHASE=" + phase,
+                "tools",
+                "verify-sharded-copies",
+            ],
+            check=True,
+        )
+        exports = []
     for node, filename in exports:
         subprocess.run(
             compose
