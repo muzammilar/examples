@@ -1,0 +1,334 @@
+name: ${COMPOSE_PROJECT_NAME:-greptime-telemetry}
+include:
+- path: ./dependencies/garage-compose.yml
+  project_directory: .
+services:
+  meta-store0:
+    image: quay.io/coreos/etcd:v3.6.16
+    hostname: meta-store0
+    command:
+    - etcd
+    - --name=meta-store0
+    - --data-dir=/data
+    - --listen-client-urls=http://0.0.0.0:2379
+    - --advertise-client-urls=http://meta-store0:2379
+    - --listen-peer-urls=http://0.0.0.0:2380
+    - --initial-advertise-peer-urls=http://meta-store0:2380
+    - --initial-cluster=meta-store0=http://meta-store0:2380,meta-store1=http://meta-store1:2380,meta-store2=http://meta-store2:2380
+    cpus: 0.5
+    mem_limit: 256m
+    healthcheck:
+      test:
+      - CMD
+      - etcdctl
+      - endpoint
+      - health
+      interval: 5s
+      timeout: 5s
+      retries: 90
+      start_period: 10s
+    volumes:
+    - meta-store0:/data
+  wal0:
+    image: docker.redpanda.com/redpandadata/redpanda:v26.2.3
+    hostname: wal0
+    command:
+    - redpanda
+    - start
+    - --mode=dev-container
+    - --smp=1
+    - --memory=768M
+    - --node-id=0
+    - --kafka-addr=0.0.0.0:9092
+    - --advertise-kafka-addr=wal0:9092
+    - --rpc-addr=0.0.0.0:33145
+    - --advertise-rpc-addr=wal0:33145
+    cpus: 1
+    mem_limit: 1g
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - rpk cluster health -X brokers=localhost:9092 | grep -Eq "Healthy:.+true"
+      interval: 5s
+      timeout: 5s
+      retries: 90
+      start_period: 10s
+    volumes:
+    - wal0:/var/lib/redpanda/data
+  meta-store1:
+    image: quay.io/coreos/etcd:v3.6.16
+    hostname: meta-store1
+    command:
+    - etcd
+    - --name=meta-store1
+    - --data-dir=/data
+    - --listen-client-urls=http://0.0.0.0:2379
+    - --advertise-client-urls=http://meta-store1:2379
+    - --listen-peer-urls=http://0.0.0.0:2380
+    - --initial-advertise-peer-urls=http://meta-store1:2380
+    - --initial-cluster=meta-store0=http://meta-store0:2380,meta-store1=http://meta-store1:2380,meta-store2=http://meta-store2:2380
+    cpus: 0.5
+    mem_limit: 256m
+    healthcheck:
+      test:
+      - CMD
+      - etcdctl
+      - endpoint
+      - health
+      interval: 5s
+      timeout: 5s
+      retries: 90
+      start_period: 10s
+    volumes:
+    - meta-store1:/data
+  wal1:
+    image: docker.redpanda.com/redpandadata/redpanda:v26.2.3
+    hostname: wal1
+    command:
+    - redpanda
+    - start
+    - --mode=dev-container
+    - --smp=1
+    - --memory=768M
+    - --node-id=1
+    - --kafka-addr=0.0.0.0:9092
+    - --advertise-kafka-addr=wal1:9092
+    - --rpc-addr=0.0.0.0:33145
+    - --advertise-rpc-addr=wal1:33145
+    - --seeds=wal0:33145
+    cpus: 1
+    mem_limit: 1g
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - rpk cluster health -X brokers=localhost:9092 | grep -Eq "Healthy:.+true"
+      interval: 5s
+      timeout: 5s
+      retries: 90
+      start_period: 10s
+    volumes:
+    - wal1:/var/lib/redpanda/data
+  meta-store2:
+    image: quay.io/coreos/etcd:v3.6.16
+    hostname: meta-store2
+    command:
+    - etcd
+    - --name=meta-store2
+    - --data-dir=/data
+    - --listen-client-urls=http://0.0.0.0:2379
+    - --advertise-client-urls=http://meta-store2:2379
+    - --listen-peer-urls=http://0.0.0.0:2380
+    - --initial-advertise-peer-urls=http://meta-store2:2380
+    - --initial-cluster=meta-store0=http://meta-store0:2380,meta-store1=http://meta-store1:2380,meta-store2=http://meta-store2:2380
+    cpus: 0.5
+    mem_limit: 256m
+    healthcheck:
+      test:
+      - CMD
+      - etcdctl
+      - endpoint
+      - health
+      interval: 5s
+      timeout: 5s
+      retries: 90
+      start_period: 10s
+    volumes:
+    - meta-store2:/data
+  wal2:
+    image: docker.redpanda.com/redpandadata/redpanda:v26.2.3
+    hostname: wal2
+    command:
+    - redpanda
+    - start
+    - --mode=dev-container
+    - --smp=1
+    - --memory=768M
+    - --node-id=2
+    - --kafka-addr=0.0.0.0:9092
+    - --advertise-kafka-addr=wal2:9092
+    - --rpc-addr=0.0.0.0:33145
+    - --advertise-rpc-addr=wal2:33145
+    - --seeds=wal0:33145
+    cpus: 1
+    mem_limit: 1g
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - rpk cluster health -X brokers=localhost:9092 | grep -Eq "Healthy:.+true"
+      interval: 5s
+      timeout: 5s
+      retries: 90
+      start_period: 10s
+    volumes:
+    - wal2:/var/lib/redpanda/data
+  vmstore0:
+    image: victoriametrics/vmstorage:v1.156.0-cluster
+    hostname: vmstore0
+    command:
+    - -storageDataPath=/data
+    - -retentionPeriod=1
+    - -memory.allowedBytes=384MiB
+    cpus: 0.5
+    mem_limit: 512m
+    healthcheck:
+      test:
+      - CMD
+      - wget
+      - -q
+      - -O
+      - /dev/null
+      - http://127.0.0.1:8482/health
+      interval: 5s
+      timeout: 5s
+      retries: 90
+      start_period: 10s
+    volumes:
+    - vmstore0:/data
+  vmstore1:
+    image: victoriametrics/vmstorage:v1.156.0-cluster
+    hostname: vmstore1
+    command:
+    - -storageDataPath=/data
+    - -retentionPeriod=1
+    - -memory.allowedBytes=384MiB
+    cpus: 0.5
+    mem_limit: 512m
+    healthcheck:
+      test:
+      - CMD
+      - wget
+      - -q
+      - -O
+      - /dev/null
+      - http://127.0.0.1:8482/health
+      interval: 5s
+      timeout: 5s
+      retries: 90
+      start_period: 10s
+    volumes:
+    - vmstore1:/data
+  vmstore2:
+    image: victoriametrics/vmstorage:v1.156.0-cluster
+    hostname: vmstore2
+    command:
+    - -storageDataPath=/data
+    - -retentionPeriod=1
+    - -memory.allowedBytes=384MiB
+    cpus: 0.5
+    mem_limit: 512m
+    healthcheck:
+      test:
+      - CMD
+      - wget
+      - -q
+      - -O
+      - /dev/null
+      - http://127.0.0.1:8482/health
+      interval: 5s
+      timeout: 5s
+      retries: 90
+      start_period: 10s
+    volumes:
+    - vmstore2:/data
+  vminsert:
+    image: victoriametrics/vminsert:v1.156.0-cluster
+    hostname: vminsert
+    command:
+    - -replicationFactor=3
+    - -storageNode=vmstore0:8400
+    - -storageNode=vmstore1:8400
+    - -storageNode=vmstore2:8400
+    cpus: 1
+    mem_limit: 384m
+    healthcheck:
+      test:
+      - CMD
+      - wget
+      - -q
+      - -O
+      - /dev/null
+      - http://127.0.0.1:8480/health
+      interval: 5s
+      timeout: 5s
+      retries: 90
+      start_period: 10s
+  vmselect:
+    image: victoriametrics/vmselect:v1.156.0-cluster
+    hostname: vmselect
+    command:
+    - -replicationFactor=3
+    - -dedup.minScrapeInterval=1ms
+    - -search.maxSamplesPerQuery=4000000
+    - -storageNode=vmstore0:8401
+    - -storageNode=vmstore1:8401
+    - -storageNode=vmstore2:8401
+    cpus: 1
+    mem_limit: 512m
+    healthcheck:
+      test:
+      - CMD
+      - wget
+      - -q
+      - -O
+      - /dev/null
+      - http://127.0.0.1:8481/health
+      interval: 5s
+      timeout: 5s
+      retries: 90
+      start_period: 10s
+  vlogs:
+    image: ${COMPOSE_PROJECT_NAME}-vlogs:dev
+    hostname: vlogs
+    command:
+    - -storageDataPath=/data
+    - -retentionPeriod=7d
+    - -delete.enable
+    cpus: 1
+    mem_limit: 768m
+    healthcheck:
+      test:
+      - CMD
+      - /probe
+      - health
+      - http://127.0.0.1:9428/health
+      interval: 5s
+      timeout: 5s
+      retries: 90
+      start_period: 10s
+    volumes:
+    - vlogs:/data
+    build:
+      context: ../.build/telemetry-workload
+      target: service
+      args:
+        BASE_IMAGE: victoriametrics/victoria-logs:v1.54.0
+  client:
+    image: ${COMPOSE_PROJECT_NAME:-greptime-telemetry}-client:dev
+    build:
+      context: ../.build/telemetry-workload
+      target: client
+    profiles:
+    - tools
+    cpus: 2
+    mem_limit: 2g
+    environment:
+      GREPTIME: http://front0:4000
+      VM_WRITE: http://vminsert:8480/insert/0/prometheus/api/v1/write
+      VM_QUERY: http://vmselect:8481/select/0/prometheus
+      VLOGS: http://vlogs:9428
+      SERIES: ${SERIES:-10000}
+      POINTS: ${POINTS:-100}
+      LOGS: ${LOGS:-1000000}
+    volumes:
+    - ./results:/results
+volumes:
+  meta-store0: {}
+  wal0: {}
+  meta-store1: {}
+  wal1: {}
+  meta-store2: {}
+  wal2: {}
+  vmstore0: {}
+  vmstore1: {}
+  vmstore2: {}
+  vlogs: {}

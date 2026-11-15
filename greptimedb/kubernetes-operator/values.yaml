@@ -1,0 +1,56 @@
+image:
+  tag: v1.3.1
+initializer:
+  tag: v1.3.0
+frontend:
+  replicas: 2
+  podTemplate:
+    main:
+      resources:
+        requests: {cpu: 100m, memory: 256Mi}
+        limits: {cpu: "1", memory: 768Mi}
+meta:
+  replicas: 3
+  enableRegionFailover: true
+  backendStorage:
+    etcd:
+      endpoints: ["meta-store0:2379", "meta-store1:2379", "meta-store2:2379"]
+  configData: |
+    store_key_prefix = "kind-telemetry/"
+    enable_region_failover = true
+    allow_region_failover_on_local_wal = false
+    region_failure_detector_initialization_delay = "30s"
+    [wal]
+    num_topics = 12
+    replication_factor = 3
+    topic_name_prefix = "kind_telemetry_wal"
+  podTemplate:
+    main:
+      resources:
+        requests: {cpu: 100m, memory: 256Mi}
+        limits: {cpu: "1", memory: 512Mi}
+datanode:
+  replicas: 3
+  storage:
+    storageSize: 2Gi
+  podTemplate:
+    main:
+      resources:
+        requests: {cpu: 200m, memory: 512Mi}
+        limits: {cpu: "1", memory: 1Gi}
+flownode:
+  replicas: 0
+objectStorage:
+  credentials:
+    accessKeyId: GK0123456789abcdef01234567
+    secretAccessKey: local-only-object-storage-secret-key
+  s3:
+    bucket: lab-objects
+    region: us-east-1
+    root: greptime-kind/
+    endpoint: http://s3:9000
+    enableVirtualHostStyle: false
+remoteWal:
+  enabled: true
+  kafka:
+    brokerEndpoints: ["wal0:9092", "wal1:9092", "wal2:9092"]
