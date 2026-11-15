@@ -59,6 +59,14 @@ Examples commonly use Docker Compose for single-node and local cluster setups, a
 - Prefer concise, factual descriptions and tables for setup, targets, and measured results. Avoid unsupported performance or capability claims.
 - Include concrete numeric outcomes in each runnable example README: workload size, observed input/output counts, and any meaningful totals or state changes. Label smoke-test counts as correctness checks, not throughput benchmarks; only report performance rates, durations, latency percentiles, or resource usage when they were measured with units and a stated setup.
 
+For distributed storage examples, treat process crashes and permanent disk loss as
+separate tests. Keep a workload running through recovery, record acknowledged
+operations outside the failed system, reconcile complete data afterwards, and
+verify native repair/placement completion. A successful read from a survivor does
+not establish rebuilt redundancy. Document actual failure symptoms, recovery
+commands, gotchas and untested limits; never turn an interrupted or failed run
+into a passing result.
+
 ## Technology research
 
 Before adding or materially changing an example for a technology, and before describing what it is good or bad at, read the relevant official manpages and inspect the corresponding source code. Use the documentation and source for the version actually used by the example when possible. Follow the execution path relevant to the example (configuration, query or API behavior, storage, replication, scheduling, or failure handling) rather than relying only on a project overview or benchmark headline. Use this research to choose representative workloads and explain tradeoffs; distinguish behavior confirmed in source from behavior measured by this repository's example, and cite useful upstream references in the README.
