@@ -285,10 +285,22 @@ During election/rejoin, 21 unresolved/failed batches included HTTP 503 and
 `illegal status line: bytearray(b'HTTP/1.1 0 ')`. They were journaled as ambiguous
 and were not blindly replayed. Full reconciliation checked all
 **300,000 stored metadata rows** and ACKed
-versions after rejoin. This tests one shard-0 leader process crash, not an entire
-shard losing quorum, a disk failure, or a network partition. Shard-1/shard-2 leader
-crashes are selectable with `FAULT_SHARD` but were not separately run.
+versions after rejoin. The table above covers shard 0. Independent leader
+crashes were also run on shards 1 and 2, each after
+reloading and verifying the 100,000-product catalog. All nine physical copies
+were reconciled after every crash; the eight surviving server containers kept
+the same container IDs and start times.
 
+| Shard | Killed elected leader | ACKed unique IDs | Lost ACK versions | Batches ACKed while absent | Global searches while absent | Failed searches while absent | Failed-attempt to resumed ACK, s |
+|---|---|---:|---:|---:|---:|---:|---:|
+| 0 | ts3 | 2,070 | 0 | 154 | 175 | 0 | 6.40 |
+| 1 | ts6 | 4,800 | 0 | 139 | 142 | 0 | 8.34 |
+| 2 | ts7 | 4,190 | 0 | 164 | 166 | 0 | 4.16 |
+
+
+Ambiguous/failed update batches (shard 0: **21**; shard 1: **3**; shard 2: **71**) were journaled
+without blind replay. Quorum loss, disk failure and network partitions were not
+simulated.
 
 ## Directory structure
 

@@ -22,5 +22,7 @@ are local workload measurements, not a normalized performance ranking.
 Raft replicas each store their group's complete dataset. `MODE=sharded` uses three
 independent groups and application-managed tenant routing, not native Typesense
 sharding. Migration/rebalancing and global text/hybrid ranking are not implemented.
+Leader crashes were independently run on all three application shards with
+full metadata/ACK reconciliation across all nine servers.
 Follower collection/document visibility can lag imports; the focused test waits
 for every replica. The example adds curl to the official image for readiness.
