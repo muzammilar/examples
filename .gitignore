@@ -2,3 +2,5 @@ go/clickhouse-multitable-bulk-ingest/clickhouse-multitable-bulk-ingest.exe
 *.exe
 **/.vagrant/*
 .direnv/
+# Materialized source links and local Docker build contexts; never commit these.
+**/.build/

@@ -1,0 +1,7 @@
+FROM starrocks/fe-ubuntu:4.1.7
+# Small lab heap; upstream ships -Xmx8192m. Preserve its JVM/security flags.
+RUN sed -i 's/-Xmx8192m/-Xmx640m/g' /opt/starrocks/fe/conf/fe.conf \
+ && printf '\nmeta_dir = /data\nmaster_sync_policy = SYNC\nreplica_sync_policy = SYNC\nreplica_ack_policy = SIMPLE_MAJORITY\n' >> /opt/starrocks/fe/conf/fe.conf \
+ && mkdir -p /data
+ENV HOST_TYPE=FQDN LOG_CONSOLE=1
+CMD ["/bin/bash", "/opt/starrocks/fe_entrypoint.sh", "sr-fe-0"]

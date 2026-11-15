@@ -1,0 +1,7 @@
+**/results/
+**/config/generated/
+**/__pycache__/
+**/docker-compose.json
+kubernetes-operator/kind-config.json
+kubernetes-operator/cluster.json
+kubernetes-operator/workload.json
