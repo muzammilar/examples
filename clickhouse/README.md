@@ -2,6 +2,10 @@
 
 Website: https://clickhouse.com/
 
+## Native S3 storage
+
+- [Hot/cold MergeTree on Garage](s3-tiered-storage/): three replicas, native TTL movement, cache benchmarks and separate process, metadata-disk and backend-node failure tests.
+
 ## Iceberg examples
 
 - [ClickHouse with Iceberg](iceberg/README.md): direct catalog writes, Spark compaction, retained snapshots and verified archive handoff before TTL deletion, with restart and failure/resume tests.

@@ -1,0 +1,161 @@
+name: ${COMPOSE_PROJECT_NAME:-clickhouse-s3-tiered-storage}
+include:
+- path: ../../garage/s3-cluster/docker-compose.yml
+  project_directory: ../../garage/s3-cluster
+services:
+  ch0:
+    image: clickhouse/clickhouse-server:26.10.2.103
+    hostname: ch0
+    cpus: 2
+    mem_limit: 2g
+    volumes:
+    - ./config/generated/ch0.xml:/etc/clickhouse-server/config.d/lab.xml:ro
+    - ch0:/var/lib/clickhouse
+    healthcheck:
+      test:
+      - CMD
+      - clickhouse-client
+      - --password
+      - local-only-clickhouse
+      - --query
+      - SELECT 1
+      interval: 5s
+      timeout: 5s
+      retries: 90
+      start_period: 15s
+    environment:
+      CLICKHOUSE_PASSWORD: local-only-clickhouse
+      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: '1'
+  keeper0:
+    image: clickhouse/clickhouse-keeper:26.10.2.103
+    hostname: keeper0
+    cpus: 0.5
+    mem_limit: 384m
+    volumes:
+    - ./config/generated/keeper0.xml:/etc/clickhouse-keeper/keeper_config.xml:ro
+    - keeper0:/var/lib/clickhouse-keeper
+    healthcheck:
+      test:
+      - CMD
+      - clickhouse-keeper-client
+      - --host
+      - 127.0.0.1
+      - --port
+      - '9181'
+      - --query
+      - ruok
+      interval: 5s
+      timeout: 5s
+      retries: 90
+      start_period: 15s
+  ch1:
+    image: clickhouse/clickhouse-server:26.10.2.103
+    hostname: ch1
+    cpus: 2
+    mem_limit: 2g
+    volumes:
+    - ./config/generated/ch1.xml:/etc/clickhouse-server/config.d/lab.xml:ro
+    - ch1:/var/lib/clickhouse
+    healthcheck:
+      test:
+      - CMD
+      - clickhouse-client
+      - --password
+      - local-only-clickhouse
+      - --query
+      - SELECT 1
+      interval: 5s
+      timeout: 5s
+      retries: 90
+      start_period: 15s
+    environment:
+      CLICKHOUSE_PASSWORD: local-only-clickhouse
+      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: '1'
+  keeper1:
+    image: clickhouse/clickhouse-keeper:26.10.2.103
+    hostname: keeper1
+    cpus: 0.5
+    mem_limit: 384m
+    volumes:
+    - ./config/generated/keeper1.xml:/etc/clickhouse-keeper/keeper_config.xml:ro
+    - keeper1:/var/lib/clickhouse-keeper
+    healthcheck:
+      test:
+      - CMD
+      - clickhouse-keeper-client
+      - --host
+      - 127.0.0.1
+      - --port
+      - '9181'
+      - --query
+      - ruok
+      interval: 5s
+      timeout: 5s
+      retries: 90
+      start_period: 15s
+  ch2:
+    image: clickhouse/clickhouse-server:26.10.2.103
+    hostname: ch2
+    cpus: 2
+    mem_limit: 2g
+    volumes:
+    - ./config/generated/ch2.xml:/etc/clickhouse-server/config.d/lab.xml:ro
+    - ch2:/var/lib/clickhouse
+    healthcheck:
+      test:
+      - CMD
+      - clickhouse-client
+      - --password
+      - local-only-clickhouse
+      - --query
+      - SELECT 1
+      interval: 5s
+      timeout: 5s
+      retries: 90
+      start_period: 15s
+    environment:
+      CLICKHOUSE_PASSWORD: local-only-clickhouse
+      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: '1'
+  keeper2:
+    image: clickhouse/clickhouse-keeper:26.10.2.103
+    hostname: keeper2
+    cpus: 0.5
+    mem_limit: 384m
+    volumes:
+    - ./config/generated/keeper2.xml:/etc/clickhouse-keeper/keeper_config.xml:ro
+    - keeper2:/var/lib/clickhouse-keeper
+    healthcheck:
+      test:
+      - CMD
+      - clickhouse-keeper-client
+      - --host
+      - 127.0.0.1
+      - --port
+      - '9181'
+      - --query
+      - ruok
+      interval: 5s
+      timeout: 5s
+      retries: 90
+      start_period: 15s
+  runner:
+    image: ${COMPOSE_PROJECT_NAME:-clickhouse-s3-tiered-storage}-runner:dev
+    build:
+      context: ../..
+      dockerfile: clickhouse/s3-tiered-storage/app/Dockerfile
+    profiles:
+    - tools
+    cpus: 2
+    mem_limit: 1g
+    environment:
+      ROWS: ${ROWS:-2000000}
+      QUERY_RUNS: ${QUERY_RUNS:-20}
+    volumes:
+    - ${RESULTS_DIR:-./results/verified}:/results
+volumes:
+  ch0: {}
+  keeper0: {}
+  ch1: {}
+  keeper1: {}
+  ch2: {}
+  keeper2: {}

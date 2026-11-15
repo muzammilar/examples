@@ -1,0 +1,9 @@
+**
+!object-storage
+!object-storage/client
+!object-storage/client/run_state.py
+!clickhouse
+!clickhouse/s3-tiered-storage
+!clickhouse/s3-tiered-storage/app
+!clickhouse/s3-tiered-storage/app/*.py
+**/__pycache__
