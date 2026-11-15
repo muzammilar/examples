@@ -1,0 +1,54 @@
+schema product {
+ document product {
+  field pid type long { indexing: attribute | summary }
+  field source_id type string { indexing: attribute | summary }
+  field locale type string { indexing: attribute | summary }
+  field name type string { indexing: index | summary
+   index: enable-bm25 }
+  field description type string { indexing: index | summary
+   index: enable-bm25 }
+  field brand type string { indexing: attribute | summary }
+  field color type string { indexing: attribute | summary }
+  field tenant type int { indexing: attribute | summary }
+  field stock type int { indexing: attribute | summary }
+  field price_cents type int { indexing: attribute | summary }
+  field version type int { indexing: attribute | summary }
+  field embedding type tensor<float>(x[384]) {
+   indexing: attribute | index
+   attribute { distance-metric: angular }
+   index { hnsw { max-links-per-node: 16 neighbors-to-explore-at-insert: 128 } }
+  }
+ }
+ fieldset default { fields: name, description }
+ document-summary metadata {
+  summary pid {}
+  summary source_id {}
+  summary locale {}
+  summary name {}
+  summary description {}
+  summary brand {}
+  summary color {}
+  summary tenant {}
+  summary stock {}
+  summary price_cents {}
+  summary version {}
+ }
+ rank-profile dense {
+  inputs { query(q) tensor<float>(x[384]) }
+  first-phase { expression: closeness(field, embedding) }
+ }
+ rank-profile lexical {
+  first-phase { expression: bm25(name) + 0.2 * bm25(description) }
+ }
+ rank-profile hybrid inherits dense {
+  function lexical_score() { expression: bm25(name) + 0.2 * bm25(description) }
+  first-phase { expression: closeness(field, embedding) + lexical_score / (1 + lexical_score) }
+  match-features { closeness(field, embedding) lexical_score }
+ }
+ rank-profile rerank inherits hybrid {
+  global-phase {
+   expression: reciprocal_rank_fusion(closeness(field, embedding), lexical_score)
+   rerank-count: 100
+  }
+ }
+}

@@ -1,0 +1,61 @@
+name: vespa-phased-product-search
+x-node: &node
+  image: vespaengine/vespa:8.781.11
+  command: configserver,services
+  cpus: 2
+  mem_limit: 4g
+  environment:
+    VESPA_CONFIGSERVERS: ${CONFIGSERVERS:-vespa-products-node0.vespa-product-search-net,vespa-products-node1.vespa-product-search-net,vespa-products-node2.vespa-product-search-net}
+    VESPA_CONFIGSERVER_JVMARGS: -Xms32M -Xmx256M
+    VESPA_CONFIGPROXY_JVMARGS: -Xms32M -Xmx64M
+  healthcheck:
+    test: [CMD, curl, -fsS, http://localhost:19071/state/v1/health]
+    interval: 5s
+    timeout: 3s
+    retries: 90
+    start_period: 30s
+services:
+  node0:
+    <<: *node
+    container_name: vespa-products-node0
+    hostname: vespa-products-node0.vespa-product-search-net
+    volumes: [node0:/opt/vespa/var]
+  node1:
+    <<: *node
+    container_name: vespa-products-node1
+    hostname: vespa-products-node1.vespa-product-search-net
+    profiles: [cluster]
+    volumes: [node1:/opt/vespa/var]
+  node2:
+    <<: *node
+    container_name: vespa-products-node2
+    hostname: vespa-products-node2.vespa-product-search-net
+    profiles: [cluster]
+    volumes: [node2:/opt/vespa/var]
+  tools:
+    image: vespa-product-tools:dev
+    build:
+      context: ../..
+      dockerfile: vespa/phased-product-search/app/Dockerfile
+    profiles: [tools]
+    cpus: 2
+    mem_limit: 3g
+    environment:
+      MODE: ${MODE:-cluster}
+      URLS: ${URLS:-http://node0:8080,http://node1:8080,http://node2:8080}
+      BENCH_QUERIES: ${BENCH_QUERIES:-1000}
+      QUALITY_QUERIES: ${QUALITY_QUERIES:-100}
+      CHECK_QUERIES: ${CHECK_QUERIES:-50}
+      DURATION: ${DURATION:-300}
+    volumes:
+      - ${CORPUS_DIR:-../../datasets/esci/prepared}:/corpus:ro
+      - ./application/generated:/application:ro
+      - ./${RESULTS_DIR:-results/cluster}:/results
+volumes:
+  node0:
+  node1:
+  node2:
+
+networks:
+  default:
+    name: vespa-product-search-net
