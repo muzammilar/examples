@@ -1,0 +1,77 @@
+name: ${COMPOSE_PROJECT_NAME:-ceph-s3-cluster}
+services:
+  guests:
+    image: ${COMPOSE_PROJECT_NAME:-ceph-s3-cluster}-guests:dev
+    build:
+      context: .
+      dockerfile: vm/Dockerfile
+    cpus: 8
+    mem_limit: 16g
+    stop_grace_period: 45s
+    volumes:
+    - state:/state
+    healthcheck:
+      test:
+      - CMD
+      - python3
+      - /opt/lab/app/control.py
+      - ssh
+      - '0'
+      - test -f /var/lib/cephlab-ready
+      interval: 15s
+      timeout: 10s
+      retries: 120
+      start_period: 60s
+  control:
+    image: ${COMPOSE_PROJECT_NAME:-ceph-s3-cluster}-guests:dev
+    profiles:
+    - tools
+    network_mode: service:guests
+    entrypoint:
+    - python3
+    volumes:
+    - state:/state
+    - ./app:/opt/lab/app:ro
+    - ./${RESULTS_DIR:-results/verified}:/results
+    cpus: 1
+    mem_limit: 512m
+  s3:
+    image: haproxy:3.2.8-alpine
+    cpus: 0.5
+    mem_limit: 128m
+    volumes:
+    - ./config/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+    healthcheck:
+      test:
+      - CMD
+      - wget
+      - -q
+      - -O
+      - /dev/null
+      - http://127.0.0.1:8404/health
+      interval: 3s
+      timeout: 3s
+      retries: 30
+  tools:
+    image: ${COMPOSE_PROJECT_NAME:-ceph-s3-cluster}-tools:dev
+    build:
+      context: ../..
+      dockerfile: object-storage/client/Dockerfile
+    profiles:
+    - tools
+    cpus: 2
+    mem_limit: 2g
+    environment:
+      S3_ENDPOINT: http://s3:9000
+      AWS_ACCESS_KEY_ID: ${S3_ACCESS_KEY:-GK0123456789abcdef01234567}
+      AWS_SECRET_ACCESS_KEY: ${S3_SECRET_KEY:-local-only-object-storage-secret-key}
+      OBJECTS: ${OBJECTS:-1000}
+      LARGE_OBJECTS: ${LARGE_OBJECTS:-64}
+      DURATION: ${DURATION:-120}
+      BENCH_SMALL_REQUESTS: ${BENCH_SMALL_REQUESTS:-1000}
+      BENCH_REQUESTS: ${BENCH_REQUESTS:-64}
+      BENCH_LARGE_REQUESTS: ${BENCH_LARGE_REQUESTS:-32}
+    volumes:
+    - ./${RESULTS_DIR:-results/verified}:/results
+volumes:
+  state: {}

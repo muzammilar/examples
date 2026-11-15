@@ -1,0 +1,6 @@
+**
+!vm/
+!vm/Dockerfile
+!vm/boot.py
+!app/
+!app/*.py
