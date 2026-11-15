@@ -35,7 +35,7 @@ Fastest in class, free, runnable locally (see the sections below for the example
 - [x] `questdb-single-node`: ILP ingest and `SAMPLE BY` queries.
 - [ ] `victoriametrics-docker-compose-cluster`: vminsert/vmselect/vmstorage as Prometheus long-term storage.
 - [x] `influxdb3-core-single-node`: Arrow/Parquet engine with SQL.
-- [ ] `greptimedb-single-node`: unified metrics, logs and traces.
+- [ ] `greptimedb`: Rust telemetry engine; single-node, Compose cluster, Kubernetes operator and clustered fleet metrics/logs workload. Compare metrics with VictoriaMetrics / Mimir / Cortex; compare logs with VictoriaLogs. Use matching ingestion/query semantics and separate correctness oracles.
 - [ ] `tdengine-docker-compose-cluster`: IoT time-series (AGPL); one table per device with super tables, vnodes sharding; rerun TSBS against TimescaleDB/QuestDB/InfluxDB.
 - [ ] `iotdb-docker-compose-cluster`: Apache IoTDB (Apache 2.0) ConfigNode/DataNode cluster, TsFile columnar storage; same TSBS run.
 - [ ] `dolphindb-single-node`: free Community Edition (memory/core caps); columnar time-series engine with its own scripting language, used for tick data; compare with kdb+ on the same market data.
@@ -139,19 +139,19 @@ Planned as a `mysql/` folder, mirroring the Postgres section with the same `orde
 ## In-memory OLTP
 
 - [ ] `volt-active-data`: partitioned single-threaded in-memory SQL with stored procedures (H-Store lineage); Developer Edition is a free 100-day license, arm64 unknown.
-- [ ] `spacetimedb-single-node`: SpacetimeDB (BSL) in-memory relational DB with WASM modules (Rust/C#) as stored procedures and client subscriptions; multiplayer-game state workload.
+- [ ] `spacetimedb-single-node`: transactional Rust modules and client subscriptions for multiplayer world state; reconnect/replay and crash recovery versus PostgreSQL + an application/WebSocket service. Qualify current license and native replication support; deferred until the current batch finishes.
 
 ## Real-time OLAP
 
-- [ ] `starrocks-docker-compose-cluster`: FE/BE, primary-key upserts, joins.
-- [ ] `doris-docker-compose-cluster`: side-by-side with StarRocks.
-- [ ] `pinot-docker-compose-cluster`: real-time ingest from Kafka, star-tree index.
+- [ ] `starrocks`: single-node, replicated Compose cluster, Kubernetes operator and clustered mutable orders/inventory joins. Compare ClickHouse; add shared-data/S3 compute-loss and cache experiments where supported.
+- [ ] `doris-docker-compose-cluster`: mutable orders/inventory joins, replicated tablets versus storage/compute separation, compute isolation and disk rebuild; compare StarRocks / ClickHouse on identical data.
+- [ ] `pinot-docker-compose-cluster`: Kafka delivery-status upserts, duplicate/out-of-order events, segment recovery, star-tree-compatible aggregates and server loss; compare StarRocks / ClickHouse with equivalent visibility rules.
 - [ ] `druid-docker-compose-cluster`: segments, ingestion specs.
 - [ ] `databend-single-node`: Rust cloud warehouse on object storage.
 - [ ] `firebolt-core-single-node`: free self-hosted Firebolt engine; compare with ClickHouse and StarRocks.
 - [ ] `exasol-personal`: free single-user in-memory MPP; Docker image is x86-only and capped at 10 GiB.
 - [ ] `vertica-community`: free Community Edition (3 nodes, 1 TB); MPP column store with projections; compare with ClickHouse and StarRocks.
-- [ ] `cratedb-docker-compose-cluster`: CrateDB (Apache 2.0) distributed SQL on Lucene; time-series and full-text in one table, shard allocation and `failover`.
+- [ ] `cratedb-docker-compose-cluster`: industrial telemetry plus text filters, tenant skew, three shards with three copies, relocation and disk loss; compare GreptimeDB / TimescaleDB / Elasticsearch on matching query subsets.
 - [ ] `heavydb-single-node`: HeavyDB (formerly OmniSciDB/MapD, Apache 2.0) GPU-accelerated SQL; CPU mode on a Mac, GPU numbers only with an NVIDIA box.
 
 ## Embedded analytics
@@ -201,7 +201,7 @@ Planned as a `mysql/` folder, mirroring the Postgres section with the same `orde
 - [ ] `opensearch-docker-compose-cluster`
 - [ ] `meilisearch-single-node`: Rust, typo-tolerant app search.
 - [x] [`typesense/product-search`](typesense/product-search/): consolidated single/three-Raft-replica storefront workload and three application-managed customer shards with three replicas each, 100,000 products, typo/facet/filter tests, hybrid ranking, leader-loss reconciliation and measured benchmarks.
-- [ ] `quickwit-single-node`: Rust log search on object storage.
+- [ ] `quickwit/`: Rust log search on object storage; supported single/Compose/Kubernetes deployments plus a clustered Kafka-to-S3 immutable-log workload, split/index recovery and indexer/searcher loss. Compare matching log queries with Loki / OpenObserve / GreptimeDB; qualify release health and current licensing.
 - [x] [`vespa/phased-product-search`](vespa/phased-product-search/): single/three-content-node profiles, 100,000 products, four ranking modes, controller/node failure under load, native metadata/version verification on every physical copy and measured benchmarks.
 - [x] [Vespa storage sharding](vespa/phased-product-search/#native-storage-sharding): 3 groups × 3 content nodes plus separate control/query hosts, 900,000 replica-directed gets per phase, content-node failure with 0 acknowledged loss and four-mode benchmarks.
 - [x] `manticore-single-node` (top priority): columnar storage + secondary indexes; rerun db-benchmarks.com against the Elasticsearch example.
@@ -218,7 +218,8 @@ Planned as a `mysql/` folder, mirroring the Postgres section with the same `orde
 - [ ] `memcached-extstore`: pure-cache latency baseline; extstore for large values on flash.
 - [ ] Comparison example: same workload (GET/SET, pipelines, large values, persistence on) across Valkey, Redis 8, Dragonfly, Garnet, KeyDB, Kvrocks, Pika, Tarantool, ocache and Memcached.
 - [ ] `etcd-docker-compose-cluster`: Raft, watches, leases.
-- [ ] `ignite-docker-compose-cluster`: Apache Ignite 3 in-memory distributed SQL + KV with Raft-replicated partitions and colocated compute; compare with Hazelcast and Tarantool.
+- [ ] `ignite2-docker-compose-cluster`: partitioned inventory reservations, colocated computation, transactions, persistent restart and rebalance under load; compare Hazelcast / PostgreSQL / Tarantool. Include single-node and supported Kubernetes deployment.
+- [ ] `ignite3-docker-compose-cluster`: distribution zones, colocated transactions, majority loss and replica rebuild; compare Ignite 2. Research lab only: official October 2026 status has no next Ignite 3 release planned and recommends Ignite 2.x for new production deployments.
 - [ ] `infinispan-docker-compose-cluster`: Red Hat Infinispan (Apache 2.0) data grid; distributed caches, RESP endpoint, cross-site replication; same grid comparison.
 - [ ] `oxia-docker-compose-cluster`: StreamNative Oxia (Apache 2.0) sharded metadata store, ZooKeeper/etcd alternative; compare watches, sessions and write throughput with etcd.
 
@@ -236,7 +237,7 @@ Planned as a `mysql/` folder, mirroring the Postgres section with the same `orde
 
 ## Embedded and edge SQL
 
-- [ ] `turso-single-node`: SQLite rewrite in Rust with MVCC `BEGIN CONCURRENT`.
+- [ ] `turso-single-node`: Rust SQLite-compatible engine; inventory transactions, writer conflicts, crash/reopen and compatibility checks against SQLite. Qualify concurrent-write/replication features for the selected release; deferred until the current database batch finishes.
 - [ ] `rqlite-docker-compose-cluster`: SQLite replicated over Raft.
 - [ ] `litefs-litestream`: SQLite replication and backup to S3.
 - [x] [`lancedb/versioned-product-search`](lancedb/versioned-product-search/): 100,000-product embedded/versioned retrieval, single and three-reader serving profiles, pinned snapshots, unindexed-tail visibility, compaction, isolated writer/reader crashes and measured benchmarks. Shared-volume serving is not replicated database HA.
@@ -246,7 +247,7 @@ Planned as a `mysql/` folder, mirroring the Postgres section with the same `orde
 
 - [ ] `cassandra-docker-compose-cluster`: baseline to compare with ScyllaDB.
 - [ ] `hbase-docker-compose-cluster`: HBase on HDFS with ZooKeeper; region splits, compare with ScyllaDB/Cassandra on wide rows.
-- [ ] `kudu-impala`: Apache Kudu columnar storage with fast upserts, queried from Impala or Trino.
+- [ ] `kudu-impala`: mutable historical sensor data, scans during updates, tablet-leader loss and replica rebuild; compare ClickHouse / TimescaleDB with mutation semantics stated. Kudu supplies storage; Impala supplies SQL.
 
 ## Identity and access
 
@@ -257,7 +258,36 @@ Planned as a `mysql/` folder, mirroring the Postgres section with the same `orde
 
 ## Observability pipeline
 
+Plan and source links: [`observability/README.md`](observability/README.md), including
+[the requested ClickHouse comparison article](https://clickhouse.com/resources/engineering/top-infrastructure-monitoring-tools-comparison).
+
+- [ ] Self-hosted stack matrix: ClickStack vs Victoria stack vs GreptimeDB vs OpenObserve vs SigNoz vs Grafana (Prometheus baseline; named Loki/Mimir/Tempo scale-out profile). Reuse the shared corpus and independent completeness/recovery oracle.
+- [ ] Optional hosted free-tier checks: Honeycomb and Better Stack; Chronosphere only after no-cost access is confirmed. These are not self-hosted OSS editions. **Remind Muzammil to set up a Honeycomb free account before that comparison.**
+- [ ] `nagios/`: GPLv2 Nagios Core host/service checks, plugin-based fleet monitoring, detection/recovery and alert accounting under injected failures; exclude commercial XI features.
+- [ ] `zabbix/`: agents/proxies, discovery, supported server HA and database recovery; compare the same host/service fault schedule with Nagios Core and the modern stacks.
+
+- [ ] Main three-stack comparison: **GreptimeDB vs VictoriaMetrics + VictoriaLogs + VictoriaTraces vs Prometheus + Loki + Tempo**. One instrumented application/corpus, matching event times/IDs/tenants/retention/sampling, independent sample/log/span-body oracle, supported common queries, and sequential whole-stack resource budgets. Measure ingestion admission versus durable post-crash visibility, warm/cold query latency, storage, compaction/backpressure and recovery. Keep standalone/HA/distributed differences explicit; Prometheus HA is not native database sharding. Cortex/Mimir extensions remain separate. Full three-signal comparison is future work beyond the current metrics/logs baseline.
+
+- [ ] Standalone system examples for VictoriaMetrics, VictoriaLogs and VictoriaTraces: supported single-node, Compose cluster and Kubernetes deployments; clustered high-cardinality metrics, structured logs and deterministic traces respectively. Replication/dedup, out-of-order ingestion, storage replacement and completeness checks; compare GreptimeDB on each matching signal, plus Prometheus/Loki/Tempo. The current Greptime comparison baselines are not full independent system qualification.
+- [ ] `mimir/`: multi-tenant remote write and historical S3 queries, ingester/ingestion-path failure and compaction/store recovery; compare Cortex / VictoriaMetrics / GreptimeDB on identical samples. Pin the selected ingestion architecture.
+- [ ] `cortex/`: same multi-tenant samples and PromQL oracle as Mimir; ingester quorum loss, WAL replay and historical-block recovery.
+- [ ] `thanos/`: deduplicate HA Prometheus scrapes, query historical S3 blocks, test compactor/store-gateway loss; distinguish scrape HA from database sharding.
+- [ ] `victoriatraces/` and `jaeger/`: trace-ID and supported query comparisons with Tempo, deterministic OTLP spans, collector/storage failure and explicit sampling/completeness accounting. Qualify Jaeger's chosen persistent backend; do not assume experimental backends are production-ready.
+- [ ] `openobserve/`: Rust unified observability engine; single-node, supported Compose/kind cluster and application telemetry workload with SQL/log search and metrics/trace correlation. Native compaction, ingester/querier loss and object-store outage; compare GreptimeDB / Victoria stack / Grafana stack. Check license/edition and release stability before implementation.
+- [ ] `signoz/`: ClickHouse-backed OTel application monitoring, correlated telemetry, collector/ClickHouse recovery and comparison with OpenObserve / GreptimeDB / Grafana stack.
+
+- [ ] `prometheus/`: single-node baseline, supported Compose/kind monitoring deployments and a clustered fleet-metrics workload. Compare matched PromQL/range queries and ingestion/visibility with GreptimeDB and VictoriaMetrics; separate native Prometheus HA scraping from Cortex/Mimir-backed distributed long-term storage. Do not claim native database sharding from multiple independent scrapers.
+- [ ] `loki/`: standalone, distributed Compose and supported Helm/operator deployment; clustered application-log workload with ingestion, tenant/text filters, retention/compaction and ingester/storage recovery. Compare GreptimeDB and VictoriaLogs on identical events, time ranges and durability settings.
+- [ ] `tempo/`: standalone and distributed Compose/kind deployment; clustered traces from an instrumented app, trace-ID lookup, TraceQL and ingester/object-store recovery. Compare GreptimeDB tracing only where the chosen release supports matching ingest/query semantics; document sampling and unmatched features.
+
+- [ ] `observability/prometheus-loki-tempo`: a Rust or Go application and worker instrumented through OpenTelemetry Collector, Prometheus metrics, Loki logs, Tempo traces and Grafana correlation by trace ID. Use Garage or SeaweedFS for Loki/Tempo object storage; supported Compose/kind cluster deployments, collector/backend crashes and storage outage/recovery. Track missing/duplicate telemetry against an external request oracle, accounting for sampling and scrape semantics. Compare matched metrics/log queries with the GreptimeDB/Victoria examples; multi-signal correlation is a separate capability. Future example, after the current database batch.
+
 - [ ] `otel-collector-clickhouse`: OpenTelemetry Collector into ClickHouse, visualised in Grafana.
 - [ ] `vector-pipeline`: Vector (Rust) log shipping into ClickHouse/Quickwit.
 - [ ] `clickstack-otel`: ClickStack (HyperDX) or SigNoz; logs, traces and metrics in ClickHouse via OpenTelemetry.
 - [ ] `akvorado-flows`: NetFlow/sFlow/IPFIX collection into ClickHouse through Kafka.
+
+## Rust embedded database backlog
+
+- [ ] Future `rust/embedded-databases` Cargo project: Fjall LSM ingestion/compaction and redb transactional catalogs, snapshot readers, kill/reopen recovery, matched durable commits and external ACK reconciliation; compare SQLite / RocksDB. In-process engines, not invented cluster deployments.
+- [ ] Qdrant extensions: existing single/cluster examples remain covered; add matched-corpus comparisons with Milvus / Weaviate / pgvector plus skew, shard relocation and permanent disk replacement after the current batch.

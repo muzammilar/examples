@@ -39,6 +39,18 @@ The typical system has a root README and focused subdirectories such as:
 - `kubernetes-operator/`, `kubernetes-helm/`, or `kubernetes-statefulset/` for Kubernetes deployment;
 - a workload-named example showing the system's intended strength, when practical.
 
+Every new system should cover its supported deployment shapes: single node,
+Docker Compose cluster, Kubernetes operator (or Helm/StatefulSet when no suitable
+operator exists), and a representative workload **IN A CLUSTER WHERE POSSIBLE**.
+The workload may live in an existing cluster example instead of duplicating its
+infrastructure. Explain unsupported modes with upstream sources.
+
+Compare that workload with relevant competing systems on the same input data,
+queries, correctness rules, durability settings and stated resource budgets.
+Report measured throughput, latency, recovery and acknowledged data loss; identify
+semantic differences and unrun comparisons. A language preference, including Rust,
+is a reason to investigate a system, not evidence of performance or reliability.
+
 Do not create every scenario mechanically. Follow the system's capabilities and explain unsupported or unavailable deployment modes in its README. Some systems and older examples use different but established layouts; maintain those unless the task is to migrate them.
 
 ## Makefiles and local workflows
@@ -47,7 +59,7 @@ Prefer a small Makefile as the documented entry point for a runnable deployment 
 
 Every runnable example README must begin its Quick start with a numbered, copy-pasteable lifecycle sequence. For a kind example, use `make kind-up`, `make up`, `make test`, `make down`, then `make kind-down`. For a Docker Compose example, use `make docker-up`, `make up`, `make test`, `make down`, then `make docker-down`. Put one command per numbered step and briefly say what it does. `kind-up`/`docker-up` prepares the cluster or service infrastructure; `up` installs or configures the example; `down` removes the example from that infrastructure; `kind-down`/`docker-down` destroys the infrastructure and its example-owned state. Keep additional scenario commands in a separate section.
 
-For kind examples, name the cluster `<system>-<example>` and always pass its full context, `kind-<system>-<example>`, to every `kubectl` command (for example, `kubectl --context kind-kafka-strimzi-jbod ...`). Put the explicit context in the shared `KUBECTL` Make variable and use it in every recipe; direct `kubectl` calls must also include `--context`. Helm commands must use `--kube-context kind-<system>-<example>`. Never rely on or change the user's current Kubernetes context.
+For kind examples, name the cluster `<system>-<example>` and always pass its full context, `kind-<system>-<example>`, to every `kubectl` command (for example, `kubectl --context kind-kafka-strimzi-jbod ...`). Put the explicit context in the shared `KUBECTL` Make variable and use it in every recipe; direct `kubectl` calls must also include `--context`. Helm commands must use `--kube-context kind-<system>-<example>`. Never rely on or change the user's current Kubernetes context. Export a lab-specific `KUBECONFIG` before creating kind, so kind itself cannot overwrite the user's default context; retain explicit contexts on every kubectl/Helm command.
 
 Examples commonly use Docker Compose for single-node and local cluster setups, and kind plus an operator, Helm chart, or StatefulSet for Kubernetes scenarios. Keep deployment files and scripts beside the example that uses them. Give Compose projects and resources clear, example-specific names, document ports and prerequisites, and make cleanup limited to resources created by that example. See `FORMAT.md` for the detailed requirements.
 

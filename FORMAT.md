@@ -116,6 +116,10 @@ cleanup from infrastructure teardown:
 
 ## kind (Kubernetes)
 
+Export a lab-specific `KUBECONFIG` before invoking kind; cluster creation otherwise
+changes the default context in the user's kubeconfig. Keep the explicit context on
+every kubectl/Helm command even with this isolated file.
+
 ```make
 CLUSTER_NAME := <system>-operator
 KUBECTL := kubectl --context kind-$(CLUSTER_NAME)
@@ -139,14 +143,19 @@ kind-cluster:
 
 Every system gets at least one example of the workload it was purpose-built for and is fastest at
 (TigerBeetle: payments ledger; QuestDB: market-data ticks; RonDB: online feature store; OceanBase:
-HTAP orders). This is the example that shows why someone would pick the system.
+HTAP orders). Run this workload **IN A CLUSTER WHERE POSSIBLE**, using Docker Compose or Kubernetes.
+It may share an existing cluster example rather than duplicate deployment files.
+Explain any single-node-only boundary. This is the example that shows why someone
+would pick the system.
 
 - Folder named after the workload (`payments-ledger/`, `market-data/`), program in `app/` or `client/`
   (Go, Rust or C++; official client library where one exists), built by a Dockerfile so the host needs
   only Docker. `make up`, `make run`, `make down`.
 - Model a realistic workload, not a microbenchmark: real schema, mixed operations, concurrency.
-- Compare against the naive approach or a system already in the repo on the same data (one query per
-  round trip vs batched; row store vs column store; Kafka vs Redpanda).
+- Compare with a relevant competing system on the same data and workload, with
+  explicit resource budgets, durability settings and correctness checks. Explain
+  semantic differences; distinguish measured comparisons from proposed ones. A
+  naive baseline can supplement the competing system.
 - Check correctness at the end (counts, sums, invariants) and exit non-zero if it fails.
 - Print throughput and p50/p99 per phase; the README gets the table and a short "Design notes" list of
   the technical reasons (no sales pitch).

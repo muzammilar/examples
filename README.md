@@ -1,6 +1,6 @@
 # examples
 
-Example code in different languages and technologies, for fun.
+Initial experiments before 2026, including early ClickHouse setups, were done manually; later experiments use Claude, Codex and other AI tools, since the goal is to benchmark systems, identify their failure and recovery scenarios, and uncover potential bugs in the applications.
 
 ## Language Examples
 
@@ -20,6 +20,11 @@ Some Go modules still declare `github.com/muzammilar/examples-go/...` module pat
 ## Systems
 
 Databases, pub/sub, streaming and infrastructure examples, one folder per system.
+
+New systems cover supported single-node, Docker Compose cluster and Kubernetes
+operator deployments, plus a representative workload **IN A CLUSTER WHERE POSSIBLE**.
+Workload examples compare relevant competitors using the same data and correctness
+checks; measurements and unsupported deployment modes belong in each README.
 
 To add or test a system, follow [`FORMAT.md`](FORMAT.md): folder layout, Make targets, Compose and kind conventions, scaling, failover, benchmarks and README format.
 
@@ -80,6 +85,55 @@ To add or test a system, follow [`FORMAT.md`](FORMAT.md): folder layout, Make ta
 
 See [S3 object-storage comparisons](object-storage/) for clustered S3 workloads,
 disk-replacement tests, acknowledged-loss accounting and benchmark limitations.
+
+## Planned distributed database workloads
+
+These are documentation backlog entries, except Qdrant which already has examples.
+Proposed extensions have not been run. See
+[`TODO.md`](TODO.md) for the broader backlog.
+
+| System | Potential cluster example | Comparison |
+|---|---|---|
+| [Apache Pinot](https://docs.pinot.apache.org/) | Kafka-fed delivery status, ingestion upserts, out-of-order events, segment recovery and server failure | StarRocks / ClickHouse on identical event history |
+| [Apache Doris](https://doris.apache.org/docs/4.x/features-architecture/system-architecture/) | Mutable orders/inventory joins; replicated tablets versus disaggregated storage, compute isolation and disk recovery | StarRocks / ClickHouse |
+| [Apache Kudu](https://kudu.apache.org/docs/index.html) | Update historical sensor readings while scanning; tablet-leader failure and replica rebuild, SQL through Impala | ClickHouse / TimescaleDB, with mutation semantics stated |
+| [Apache Ignite 2](https://ignite.apache.org/download/) | Partitioned inventory reservations, colocated compute, transactional conflicts, rebalance and persistence recovery | Hazelcast / PostgreSQL; in-memory and durable modes separately |
+| [Apache Ignite 3](https://ignite.apache.org/docs/ignite3/latest/) | Distribution zones, colocated transactions, majority loss and replica rebuild; compare with Ignite 2 | Ignite 2 / PostgreSQL; research lab, maintenance caveat below |
+| [CrateDB](https://docs.cratedb.com/projects/crate-reference/en/latest/general/ddl/sharding.html) | Industrial telemetry and text filters, tenant skew, three shards with three copies, shard relocation and disk loss | GreptimeDB / TimescaleDB / Elasticsearch on matching query subsets |
+
+| [Turso Database](https://github.com/tursodatabase/turso) | Embedded Rust SQL: concurrent inventory updates, transaction conflicts, crash/reopen and SQLite compatibility | SQLite / PostgreSQL; qualify preview features separately |
+| [Qdrant](qdrant/) (existing examples) | Extend clustered filtered/hybrid product retrieval with skew, shard movement and permanent disk replacement | Milvus / Weaviate / pgvector on the same corpus; existing tests are not new results |
+| [SpacetimeDB](https://github.com/clockworklabs/SpacetimeDB) | Multiplayer world state, transactional Rust modules, subscriptions, reconnect/replay and server restart | PostgreSQL + application/WebSocket service; document the selected release's real replication support |
+| [Fjall](https://github.com/fjall-rs/fjall) — future `rust/embedded-databases` project | In-process LSM ingestion, scans during compaction, atomic batches and kill/reopen recovery | redb / RocksDB with matching sync/ACK rules |
+| [redb](https://github.com/cberner/redb) — same Rust project | Embedded transactional catalog, snapshot readers during writes and crash/reopen recovery | Fjall / SQLite with matching transaction boundaries |
+
+Future separate system examples: **Prometheus**, **Loki** and **Tempo**, each with
+supported deployment shapes and a representative workload in a cluster where
+possible. Compare matching metrics/logs/tracing capabilities with GreptimeDB;
+keep sampling, durability and unsupported query differences explicit.
+
+Future integrated observability example: **Prometheus + Loki + Tempo + Grafana**, with an
+OpenTelemetry-instrumented application, trace-linked metrics/logs, S3-backed
+Loki/Tempo storage and collector/backend recovery tests. Compare matching queries
+with the telemetry database examples while accounting for sampling and scrape
+semantics. This is a [backlog item](TODO.md#observability-pipeline), not implemented
+in the current database batch.
+
+Ignite's official October 2026 status says no next Ignite 3 release is planned and
+recommends maintained Ignite 2.x for new production deployments. Keep both in the
+research backlog and qualify them independently; see the [upstream status](https://ignite.apache.org/download/).
+
+## Observability
+
+See [`observability/README.md`](observability/README.md) for the planned comparison:
+**ClickStack vs Victoria stack vs GreptimeDB vs OpenObserve vs SigNoz vs Grafana
+(Loki/Mimir/Tempo, with a Prometheus baseline)**, optional free hosted checks for
+Honeycomb / Better Stack / Chronosphere where available, and Nagios Core / Zabbix
+infrastructure monitoring. It includes separate system examples, potential
+workloads, shared correctness/recovery rules and the Honeycomb account reminder.
+
+Starting reference: [ClickHouse infrastructure monitoring tools comparison](https://clickhouse.com/resources/engineering/top-infrastructure-monitoring-tools-comparison).
+This is future work, not a set of benchmark results.
 
 ## External Projects (Git Submodules)
 
