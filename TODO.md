@@ -156,6 +156,8 @@ Planned as a `mysql/` folder, mirroring the Postgres section with the same `orde
 
 ## Embedded analytics
 
+- [x] `duckdb-zfs-recovery`: four Quack clients, real ZFS snapshot replication, interrupted receive/resume, read-only clones and fenced-primary promotion with measured asynchronous loss.
+
 - [ ] `hyper-api-embedded`: Salesforce/Tableau Hyper (Umbra lineage, compiled queries) via `pip install tableauhyperapi`; free, closed source. macOS arm64 wheels stop after 0.0.26479 (newer releases: Linux x86_64 and Windows only), so pin that on a Mac. Compare with DuckDB on the same data.
 - [ ] `polars-datafusion`: Polars and DataFusion on the same Parquet files as the DuckDB example.
 - [ ] `monetdb-single-node`: MonetDB (MPL 2.0), the original column store (vectorized execution lineage of DuckDB); same queries as the DuckDB example.
@@ -164,7 +166,10 @@ Planned as a `mysql/` folder, mirroring the Postgres section with the same `orde
 
 - [ ] `hoglake-local`: [PostHog Hoglake](https://github.com/PostHog/hoglake), a Postgres-native lakehouse catalog; investigate its native Trino connector and catalog recovery. Documentation backlog only; no implementation in the current Iceberg + Trino + MinIO work.
 - [x] `iceberg-trino-minio`: persistent Iceberg REST fixture + 4 MinIO nodes + Trino 484 coordinator/3 workers; million-row reconciliation, worker task retry, storage-node failure and catalog restart.
-- [ ] Extend Iceberg REST examples to Polaris/Nessie and readers in DuckDB and ClickHouse.
+- [x] `iceberg/multi-system`: five SeaweedFS-backed DuckDB/ClickHouse data paths, Spark compaction, safe archive handoffs and a three-shard/three-copy native serving cache with replica recovery.
+- [x] `clickhouse/iceberg`: single-server catalog writes, retained snapshots, verified export before TTL deletion, compaction and recovery checks.
+- [ ] Extend the Iceberg REST catalog coverage to Polaris/Nessie; DuckDB and ClickHouse readers are covered with SeaweedFS.
+- [ ] `ducklake-multi-writer`: independent DuckDB writers coordinated through a PostgreSQL DuckLake catalog; deferred at the user's request.
 - [ ] `delta-lake-duckdb`: Delta tables read from DuckDB and Spark.
 - [ ] `paimon-flink-minio`: Apache Paimon (LSM-based primary-key tables, changelog for streaming) written by Flink to MinIO; read from Spark/StarRocks/Trino; compare upsert throughput and freshness with Iceberg.
 - [ ] `garage-docker-compose-cluster`: self-hosted S3-compatible storage.
@@ -172,6 +177,8 @@ Planned as a `mysql/` folder, mirroring the Postgres section with the same `orde
 - [ ] Comparison example: 1-4 MB blob put/update/delete latency in SeaweedFS vs Aerospike (`write-block-size 8M`) vs ScyllaDB (large-cell threshold, 16 MB mutation cap); plus metadata-in-Scylla + blob-in-SeaweedFS pattern.
 
 ## Low-latency and HPC storage
+
+- [x] `zfs-storage-lab`: dedicated mirror, RAIDZ2 and resumable snapshot-replication setups with fio verification and bounded benchmarks.
 
 - [ ] `daos-single-node`: DAOS (`daos-stack/daos`) over `ofi+tcp` in MD-on-SSD mode (no RDMA/PMem); `daos_server` + `daos_engine` + `daos_agent`, `dmg` pool setup, containers, `pydaos` KV API, `dfuse` POSIX mount, replication vs EC object classes.
 - [ ] `tidehunter-embedded`: Mysten Labs' WAL-as-storage KV engine (Rust, used by Sui validators); compare write amplification and point reads with RocksDB.
@@ -189,7 +196,9 @@ Planned as a `mysql/` folder, mirroring the Postgres section with the same `orde
 
 - [ ] `opensearch-docker-compose-cluster`
 - [ ] `meilisearch-single-node`: Rust, typo-tolerant app search.
-- [ ] `typesense-single-node`
+- [ ] `typesense-single-node`: deterministic import/search correctness, indexing/query benchmarks.
+- [ ] `typesense-docker-compose-cluster`: replicated search under load, node/leader failover, acknowledged-document reconciliation and rejoin.
+- [ ] `typesense-product-catalog`: typo tolerance, facets, filtering and ranking with expected-result assertions.
 - [ ] `quickwit-single-node`: Rust log search on object storage.
 - [ ] `vespa-single-node`: hybrid search and vector ranking.
 - [x] `manticore-single-node` (top priority): columnar storage + secondary indexes; rerun db-benchmarks.com against the Elasticsearch example.
