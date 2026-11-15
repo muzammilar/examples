@@ -7,6 +7,8 @@ OWNED = {
     "manifest",
     "cases-manifest",
     "benchmark-manifest",
+    "benchmark-attempts",
+    "proxy-audit",
     "benchmark",
     "benchmark-failures",
     "seed",

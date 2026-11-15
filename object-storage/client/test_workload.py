@@ -103,3 +103,16 @@ class Integrity(unittest.TestCase):
             )
             self.assertEqual((root / "unrelated.json").read_text(), "user data")
             self.assertTrue((root / "active.log").exists())
+
+    def test_unacknowledged_benchmark_attempt_is_optional(self):
+        from unittest.mock import patch
+
+        ack = w.record("bench/ack", b"ack")
+        unknown = w.record("bench/unknown", b"maybe-committed")
+        manifests = {"benchmark-manifest": [ack], "benchmark-attempts": [ack, unknown]}
+        with patch.object(
+            w, "load", side_effect=lambda name, default: manifests.get(name, default)
+        ):
+            expected, required = self.store.expected()
+        self.assertEqual(set(expected), {ack["key"], unknown["key"]})
+        self.assertEqual(required, {ack["key"]})

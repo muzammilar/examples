@@ -45,7 +45,13 @@ case = base / case_name
 if case.exists():
     raise RuntimeError("fault case already exists; use a clean lifecycle")
 case.mkdir(parents=True)
-for name in ["manifest", "cases-manifest", "benchmark-manifest", "fault-history"]:
+for name in [
+    "manifest",
+    "cases-manifest",
+    "benchmark-manifest",
+    "benchmark-attempts",
+    "fault-history",
+]:
     p = base / (name + ".json")
     if p.exists():
         shutil.copy2(p, case / p.name)

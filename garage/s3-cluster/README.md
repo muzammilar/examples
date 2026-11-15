@@ -38,7 +38,7 @@ credential rotation and independently powered disks are separate deployment work
 Make variables. The base suite verifies 10,133 final objects / 210,833,408 bytes,
 including a 32 MiB multipart object. It also checks HEAD, a 100-byte range,
 Unicode keys, copy, four overwrite versions with immediate reads, delete,
-multipart abort, pagination, and invalid Content-MD5 rejection. Ten negative
+multipart abort, pagination, and invalid Content-MD5 rejection. Eleven shared negative
 client controls reject corrupted/truncated/stale data, unavailable responses,
 missing acknowledgements and malformed pagination.
 

@@ -304,6 +304,8 @@ class Store:
             for v in load(name, [])
         }
         required = set(entries)
+        for entry in load("benchmark-attempts", []):
+            entries[entry["key"]] = entry
         for value in load("fault-history", []):
             entry = value["object"]
             entries[entry["key"]] = entry
@@ -348,6 +350,7 @@ class Store:
                 "benchmark keys already exist; use the full clean lifecycle to avoid dedup/cache-biased rewrites"
             )
         entries = load("benchmark-manifest", [])
+        attempts = load("benchmark-attempts", [])
         results = {}
         for size, count in [
             (4096, number("BENCH_SMALL_REQUESTS", "10000")),
@@ -363,6 +366,9 @@ class Store:
                 prepared = [
                     (prefix + str(i), body(prefix + str(i), size)) for i in range(count)
                 ]
+
+                attempts.extend(record(key, data) for key, data in prepared)
+                save("benchmark-attempts", attempts)
 
                 # Preparation is outside the timer. Every key has distinct content,
                 # so content-addressed stores cannot turn this into a dedup test.
@@ -538,6 +544,9 @@ def main():
             if e.response["ResponseMetadata"]["HTTPStatusCode"] != 404:
                 raise
             store.s3.create_bucket(Bucket=BUCKET)
+    elif action == "probe":
+        store.s3.head_bucket(Bucket=BUCKET)
+        store.get(load("manifest")[0])
     elif action == "seed":
         store.seed()
     elif action == "test":

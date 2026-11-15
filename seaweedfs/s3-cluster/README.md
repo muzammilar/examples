@@ -21,7 +21,7 @@ Defaults `OBJECTS=10000`, `LARGE_OBJECTS=128`: 10,133 final objects /
 210,833,408 bytes after the API suite. Objects are incompressible, unique and
 externally checksummed. The suite checks full PUT/GET/HEAD, pagination, 100-byte
 ranges, Unicode keys, copy, four overwrite versions, delete, 32 MiB multipart
-completion, multipart abort and invalid Content-MD5 rejection. Ten negative
+completion, multipart abort and invalid Content-MD5 rejection. Eleven shared negative
 controls test corruption, truncation, stale data, unavailable responses, missing
 ACKs, pagination, partial cleanup errors and preserving the historical oracle.
 
