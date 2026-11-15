@@ -1,0 +1,335 @@
+name: ${COMPOSE_PROJECT_NAME:-neon-branching}
+include:
+- path: ./dependencies/garage-compose.yml
+  project_directory: .
+services:
+  broker:
+    image: ghcr.io/neondatabase/neon@sha256:7a4f124917bb929964b2d696d710f19584f80bb9bd51b2af4a6e2425434c761f
+    command:
+    - storage_broker
+    - --listen-addr=0.0.0.0:50051
+    cpus: 0.5
+    mem_limit: 256m
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - bash -c 'echo >/dev/tcp/127.0.0.1/50051'
+      interval: 5s
+      timeout: 5s
+      retries: 60
+  pageserver:
+    image: ghcr.io/neondatabase/neon@sha256:7a4f124917bb929964b2d696d710f19584f80bb9bd51b2af4a6e2425434c761f
+    environment: &id001
+      AWS_ACCESS_KEY_ID: GK0123456789abcdef01234567
+      AWS_SECRET_ACCESS_KEY: local-only-object-storage-secret-key
+    entrypoint:
+    - /bin/sh
+    - -ec
+    command:
+    - mkdir -p /data/.neon; cp /config/*.toml /data/.neon/; exec pageserver -D /data/.neon
+    volumes:
+    - ./config/pageserver.toml:/config/pageserver.toml:ro
+    - ./config/identity.toml:/config/identity.toml:ro
+    - pageserver:/data
+    cpus: 2
+    mem_limit: 2g
+    healthcheck:
+      test:
+      - CMD
+      - curl
+      - -fsS
+      - http://127.0.0.1:9898/v1/status
+      interval: 5s
+      timeout: 5s
+      retries: 90
+  sk0:
+    image: ghcr.io/neondatabase/neon@sha256:7a4f124917bb929964b2d696d710f19584f80bb9bd51b2af4a6e2425434c761f
+    environment: *id001
+    entrypoint:
+    - safekeeper
+    command:
+    - --listen-pg=sk0:5454
+    - --listen-http=0.0.0.0:7676
+    - --id=1
+    - --peer-recovery=true
+    - --broker-endpoint=http://broker:50051
+    - -D
+    - /data
+    - --remote-storage={endpoint='http://s3:9000',bucket_name='lab-objects',bucket_region='us-east-1',prefix_in_bucket='neon/safekeeper/'}
+    volumes:
+    - sk0:/data
+    cpus: 1
+    mem_limit: 512m
+    healthcheck:
+      test:
+      - CMD
+      - curl
+      - -fsS
+      - http://127.0.0.1:7676/v1/status
+      interval: 5s
+      timeout: 5s
+      retries: 60
+  sk1:
+    image: ghcr.io/neondatabase/neon@sha256:7a4f124917bb929964b2d696d710f19584f80bb9bd51b2af4a6e2425434c761f
+    environment: *id001
+    entrypoint:
+    - safekeeper
+    command:
+    - --listen-pg=sk1:5454
+    - --listen-http=0.0.0.0:7676
+    - --id=2
+    - --peer-recovery=true
+    - --broker-endpoint=http://broker:50051
+    - -D
+    - /data
+    - --remote-storage={endpoint='http://s3:9000',bucket_name='lab-objects',bucket_region='us-east-1',prefix_in_bucket='neon/safekeeper/'}
+    volumes:
+    - sk1:/data
+    cpus: 1
+    mem_limit: 512m
+    healthcheck:
+      test:
+      - CMD
+      - curl
+      - -fsS
+      - http://127.0.0.1:7676/v1/status
+      interval: 5s
+      timeout: 5s
+      retries: 60
+  sk2:
+    image: ghcr.io/neondatabase/neon@sha256:7a4f124917bb929964b2d696d710f19584f80bb9bd51b2af4a6e2425434c761f
+    environment: *id001
+    entrypoint:
+    - safekeeper
+    command:
+    - --listen-pg=sk2:5454
+    - --listen-http=0.0.0.0:7676
+    - --id=3
+    - --peer-recovery=true
+    - --broker-endpoint=http://broker:50051
+    - -D
+    - /data
+    - --remote-storage={endpoint='http://s3:9000',bucket_name='lab-objects',bucket_region='us-east-1',prefix_in_bucket='neon/safekeeper/'}
+    volumes:
+    - sk2:/data
+    cpus: 1
+    mem_limit: 512m
+    healthcheck:
+      test:
+      - CMD
+      - curl
+      - -fsS
+      - http://127.0.0.1:7676/v1/status
+      interval: 5s
+      timeout: 5s
+      retries: 60
+  compute:
+    image: ghcr.io/neondatabase/compute-node-v17@sha256:13ab146d3e7bbabb25a8532f315ac443e7512351d1ede0bab586def5c70e26c3
+    entrypoint:
+    - compute_ctl
+    command:
+    - --pgdata
+    - /var/db/postgres/compute
+    - -C
+    - postgresql://cloud_admin@localhost:55433/postgres
+    - -b
+    - /usr/local/bin/postgres
+    - --compute-id
+    - compute
+    - --config
+    - /config/config.json
+    - --dev
+    volumes:
+    - ./results/generated/compute.json:/config/config.json:ro
+    - compute:/var/db/postgres
+    cpus: 2
+    mem_limit: 2g
+    tmpfs:
+    - /tmp:size=64m,mode=1777
+    healthcheck:
+      test:
+      - CMD
+      - pg_isready
+      - -h
+      - 127.0.0.1
+      - -p
+      - '55433'
+      - -U
+      - cloud_admin
+      interval: 5s
+      timeout: 5s
+      retries: 90
+    profiles:
+    - workload
+  branch:
+    image: ghcr.io/neondatabase/compute-node-v17@sha256:13ab146d3e7bbabb25a8532f315ac443e7512351d1ede0bab586def5c70e26c3
+    entrypoint:
+    - compute_ctl
+    command:
+    - --pgdata
+    - /var/db/postgres/compute
+    - -C
+    - postgresql://cloud_admin@localhost:55433/postgres
+    - -b
+    - /usr/local/bin/postgres
+    - --compute-id
+    - branch
+    - --config
+    - /config/config.json
+    - --dev
+    volumes:
+    - ./results/generated/branch.json:/config/config.json:ro
+    - branch:/var/db/postgres
+    cpus: 2
+    mem_limit: 2g
+    tmpfs:
+    - /tmp:size=64m,mode=1777
+    healthcheck:
+      test:
+      - CMD
+      - pg_isready
+      - -h
+      - 127.0.0.1
+      - -p
+      - '55433'
+      - -U
+      - cloud_admin
+      interval: 5s
+      timeout: 5s
+      retries: 90
+    profiles:
+    - workload
+  pg0:
+    image: postgres:17.6-bookworm
+    environment:
+      POSTGRES_PASSWORD: local-only-postgres
+    cpus: 2
+    mem_limit: 2g
+    volumes:
+    - pg0:/var/lib/postgresql/data
+    - ./config/pg-init.sql:/docker-entrypoint-initdb.d/pg-init.sql:ro
+    - ./config/pg_hba.conf:/config/pg_hba.conf:ro
+    healthcheck:
+      test:
+      - CMD
+      - pg_isready
+      - -U
+      - postgres
+      interval: 5s
+      timeout: 5s
+      retries: 60
+    command:
+    - postgres
+    - -c
+    - wal_level=replica
+    - -c
+    - max_wal_senders=10
+    - -c
+    - wal_keep_size=256MB
+    - -c
+    - synchronous_commit=on
+    - -c
+    - hba_file=/config/pg_hba.conf
+  pg1:
+    image: postgres:17.6-bookworm
+    environment:
+      POSTGRES_PASSWORD: local-only-postgres
+    cpus: 1
+    mem_limit: 1g
+    volumes:
+    - pg1:/var/lib/postgresql/data
+    healthcheck:
+      test:
+      - CMD
+      - pg_isready
+      - -U
+      - postgres
+      interval: 5s
+      timeout: 5s
+      retries: 60
+    entrypoint:
+    - /bin/bash
+    - -ec
+    command:
+    - 'if ! test -f /var/lib/postgresql/data/PG_VERSION; then
+
+      until PGPASSWORD=local-only-replica pg_basebackup -h pg0 -U replica -D /var/lib/postgresql/data
+      -X stream --slot=pg1 --checkpoint=fast -R; do sleep 2; done
+
+      printf "primary_conninfo = ''host=pg0 user=replica password=local-only-replica
+      application_name=pg1''\n" >> /var/lib/postgresql/data/postgresql.auto.conf
+
+      chown -R postgres:postgres /var/lib/postgresql/data
+
+      fi
+
+      chmod 700 /var/lib/postgresql/data
+
+      exec gosu postgres postgres'
+  pg2:
+    image: postgres:17.6-bookworm
+    environment:
+      POSTGRES_PASSWORD: local-only-postgres
+    cpus: 1
+    mem_limit: 1g
+    volumes:
+    - pg2:/var/lib/postgresql/data
+    healthcheck:
+      test:
+      - CMD
+      - pg_isready
+      - -U
+      - postgres
+      interval: 5s
+      timeout: 5s
+      retries: 60
+    entrypoint:
+    - /bin/bash
+    - -ec
+    command:
+    - 'if ! test -f /var/lib/postgresql/data/PG_VERSION; then
+
+      until PGPASSWORD=local-only-replica pg_basebackup -h pg0 -U replica -D /var/lib/postgresql/data
+      -X stream --slot=pg2 --checkpoint=fast -R; do sleep 2; done
+
+      printf "primary_conninfo = ''host=pg0 user=replica password=local-only-replica
+      application_name=pg2''\n" >> /var/lib/postgresql/data/postgresql.auto.conf
+
+      chown -R postgres:postgres /var/lib/postgresql/data
+
+      fi
+
+      chmod 700 /var/lib/postgresql/data
+
+      exec gosu postgres postgres'
+  runner:
+    image: ${COMPOSE_PROJECT_NAME:-neon-branching}-runner:dev
+    build:
+      context: ./.build/orders-workload
+    profiles:
+    - tools
+    environment:
+      ROWS: ${ROWS:-1000000}
+      NEON_DSN: postgresql://cloud_admin:cloud_admin@compute:55433/postgres
+      BRANCH_DSN: postgresql://cloud_admin:cloud_admin@branch:55433/postgres
+      PG_DSN: postgresql://postgres:local-only-postgres@pg0:5432/postgres
+    volumes:
+    - ./results:/results
+    - ./config/compute-template.json:/config/compute-template.json:ro
+    cpus: 2
+    mem_limit: 2g
+  observer:
+    extends: runner
+    cpus: 0.5
+    mem_limit: 256m
+
+volumes:
+  pageserver: {}
+  sk0: {}
+  sk1: {}
+  sk2: {}
+  compute: {}
+  branch: {}
+  pg0: {}
+  pg1: {}
+  pg2: {}
