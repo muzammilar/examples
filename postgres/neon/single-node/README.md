@@ -44,16 +44,9 @@ different stages. Checkpoint/archive completion is not independently timed here.
 All copies share the same physical Docker host; there is no host-power-loss proof.
 Whole-stack resource/dependency costs differ, so this is not an equal-cost ranking.
 
-## Validation status
+## Measured results
 
-The measurements below are from the earlier passing deployment. The latest
-source-materialization and live-reader changes have not completed a fresh
-end-to-end lifecycle for this shape. Compilation/static checks do not replace
-that pending runtime validation.
-
-## Historical measured results
-
-2026-11-15, Apple M4 Pro, shared Docker VM aarch64 (11 CPUs / 24.42 GiB).
+2026-11-16, Apple M4 Pro, shared Docker VM aarch64 (11 CPUs / 24.42 GiB).
 One run per baseline/query; limits are above. Each backend retained and verified
 **1,000,000 rows and 32,000,000 SHA-256 payload bytes**, with **0 missing, duplicate
 or incorrect rows**. No failover capability is claimed for this shape.
@@ -64,18 +57,18 @@ fsynced witness. This is a short backfill with warm caches, not steady-state cap
 
 | Backend | COPY elapsed (s) | Rows/s | 10,000-row batch p50 / p99 (ms) |
 |---|---:|---:|---:|
-| neon | 2.807 | 356,233 | 21.647 / 107.300 |
-| postgres | 1.812 | 551,829 | 13.990 / 154.096 |
+| neon | 2.927 | 341,647 | 22.291 / 108.281 |
+| postgres | 1.908 | 524,060 | 14.376 / 34.896 |
 
-Plain PostgreSQL's observed COPY rate was 1.55× Neon's in this run; the stacks have different resource budgets and durability paths.
+Plain PostgreSQL’s observed COPY rate was 1.53× Neon’s in this run; the stacks have different resource budgets and durability paths. COPY p99 uses the nearest-rank 99th percentile of 100 batches.
 
 One warmup + 20 measured queries; every count/sum is checked independently.
 The reported p99 is the largest of only 20 observations.
 
 | Query | Neon p50 / p99 (ms) | PostgreSQL p50 / p99 (ms) | Neon/PostgreSQL p99 ratio |
 |---|---:|---:|---:|
-| customer-orders | 0.117 / 0.347 | 0.095 / 0.265 | 1.31× |
-| all-orders | 30.683 / 52.627 | 15.662 / 45.706 | 1.15× |
+| customer-orders | 0.114 / 0.271 | 0.117 / 0.193 | 1.41× |
+| all-orders | 31.877 / 46.985 | 15.656 / 46.806 | 1.00× |
 
 ## Gotchas and limits
 
@@ -99,10 +92,10 @@ The reported p99 is the largest of only 20 observations.
   failover, network partition, TLS/authentication, upgrades, resource exhaustion,
   sustained load or recovery from an independent backup. The minimal shape has no redundant WAL/storage copy.
 
-The full five-command cleanup passed. Results and failed attempts remain under
-ignored `results/`; bootstrap-only evidence was archived separately before the
-fresh measured clustered fixture. Local credentials/plaintext endpoints are lab
-configuration, not a security qualification.
+The final five-command lifecycle and cleanup passed. Previous completed runs are
+preserved under ignored `results/archive-*/`; current raw measurements remain in
+`results/`. Local credentials/plaintext endpoints are lab configuration, not a
+security qualification.
 
 ## Sources
 
