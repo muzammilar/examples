@@ -78,6 +78,11 @@ missing/unexpected rows and atomic COPY outcomes. Phase reports separate failure
 and successful-request latencies; immutable reader samples do not establish
 fresh-write visibility lag.
 
+The November 15 Kubernetes results predate the later COPY percentile correction
+and explicit application-side write deadline in the shared Go workload. Those
+follow-ups were revalidated in both Compose shapes on November 16; this Kubernetes
+fault matrix was not repeated for that follow-up.
+
 ## Measured results
 
 2026-11-15, Apple M4 Pro, native ARM64 Docker, shared 11-CPU / 24.42 GiB VM.

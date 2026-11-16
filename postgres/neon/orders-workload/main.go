@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"math"
 	"os"
 	"path/filepath"
 	"sort"
@@ -107,7 +108,7 @@ func seed() {
 		}
 		elapsed := time.Since(start).Seconds()
 		sort.Float64s(lat)
-		out[system.name] = map[string]any{"rows": n, "seconds": elapsed, "rows_per_second": float64(n) / elapsed, "batch_rows": 10000, "batch_p50_ms": median(lat), "batch_p99_ms": lat[min(len(lat)-1, int(float64(len(lat))*.99))], "acknowledged_rows": n, "errors": 0}
+		out[system.name] = map[string]any{"rows": n, "seconds": elapsed, "rows_per_second": float64(n) / elapsed, "batch_rows": 10000, "batch_p50_ms": median(lat), "batch_p99_ms": lat[int(math.Ceil(float64(len(lat))*.99))-1], "acknowledged_rows": n, "errors": 0}
 		check(conn.Close(ctx))
 	}
 	save("seed", out)
@@ -194,13 +195,14 @@ func churn() {
 		first := firstKey + int64(batch)*100
 		record(journal, map[string]any{"stage": "attempt", "first": first, "count": 100, "at": float64(time.Now().UnixNano()) / 1e9})
 		begin := time.Now()
+		writeCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
 		if conn == nil || conn.IsClosed() {
 			conn, err = connect(dsn)
 		}
 		var flushLSN string
 		if err == nil {
 			var copied int64
-			copied, err = conn.CopyFrom(ctx, pgx.Identifier{"recovery_events"}, []string{"event_id", "customer_id", "amount", "payload"}, pgx.CopyFromSlice(100, func(index int) ([]any, error) {
+			copied, err = conn.CopyFrom(writeCtx, pgx.Identifier{"recovery_events"}, []string{"event_id", "customer_id", "amount", "payload"}, pgx.CopyFromSlice(100, func(index int) ([]any, error) {
 				key := first + int64(index)
 				body := sha256.Sum256([]byte(fmt.Sprintf("recovery:%d", key)))
 				return []any{key, int32(key % 10000), key * 3, body[:]}, nil
@@ -209,9 +211,10 @@ func churn() {
 				err = fmt.Errorf("short COPY: %d", copied)
 			}
 			if err == nil {
-				err = conn.QueryRow(ctx, "SELECT pg_current_wal_flush_lsn()::text").Scan(&flushLSN)
+				err = conn.QueryRow(writeCtx, "SELECT pg_current_wal_flush_lsn()::text").Scan(&flushLSN)
 			}
 		}
+		cancel()
 		entry := map[string]any{"stage": "ack", "first": first, "count": 100, "at": float64(time.Now().UnixNano()) / 1e9, "flush_lsn": flushLSN, "latency_ms": float64(time.Since(begin)) / float64(time.Millisecond)}
 		if err != nil {
 			entry["stage"], entry["error"] = "ambiguous", err.Error()
