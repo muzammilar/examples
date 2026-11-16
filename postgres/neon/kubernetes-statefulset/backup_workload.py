@@ -134,6 +134,23 @@ elif action == "restore":
         db.execute("SELECT pg_reload_conf()")
     if seen != expected:
         raise RuntimeError("restored snapshot is incomplete")
+    deadline = time.monotonic() + 5
+    while True:
+        with psycopg.connect(dsn, autocommit=True) as db:
+            read_only = db.execute("SHOW default_transaction_read_only").fetchone()[0]
+        if read_only == "on":
+            break
+        if time.monotonic() >= deadline:
+            raise RuntimeError("restored instance did not become read-only")
+        time.sleep(0.1)
+    with psycopg.connect(dsn) as db:
+        try:
+            db.execute("UPDATE orders SET amount=amount WHERE false")
+        except psycopg.Error as error:
+            if error.sqlstate != "25006":
+                raise
+        else:
+            raise RuntimeError("restored instance accepted a write command")
     acknowledged = set()
     for path in root.glob("fault-*.jsonl"):
         for line in path.read_text().split("\n")[:-1]:
@@ -152,6 +169,8 @@ elif action == "restore":
             "acknowledged_rows_after_snapshot_not_restored": len(excluded_tail),
             "missing_snapshot_rows": 0,
             "wrong_or_duplicate": 0,
+            "effective_default_read_only": True,
+            "rejected_write_sqlstate": "25006",
             "dump_bytes": state["dump_bytes"],
             "sha256": state["sha256"],
             "scope": "logical Neon SQL backup restored into an independent read-only PostgreSQL instance; not physical Neon control-plane recovery",

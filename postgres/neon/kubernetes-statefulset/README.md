@@ -87,111 +87,110 @@ processes, restores into separate PostgreSQL storage, validates every snapshot
 body, quantifies the excluded post-snapshot ACK tail and restores the source.
 It does not restore the Neon control plane or promote a replacement Neon tenant.
 
-## Latest qualification: November 16
+## Measured results: November 16
 
-The latest shared Go workload (corrected COPY percentiles and explicit write
-context deadline) was rebuilt and tested on a fresh kind lifecycle. Both million-row
-backends, PostgreSQL replicas and the million-row branch passed complete body
-checks. The five core production cases and five dependency/backup cases passed.
-All cases below kept independent writers/readers running. Elapsed times include
-native recovery and full reconciliation; outage cases include their deliberate
-30-second hold. The reader observes immutable known rows, not fresh-write lag.
+Apple M4 Pro, native ARM64 Docker, shared **11 CPUs / 24.42 GiB**; budgets are
+listed above. The latest shared Go workload includes corrected COPY percentiles
+and an explicit write deadline. Three separate fixtures below retain their own
+histories; their ACK counts are not summed across lifecycles. Both million-row
+primaries, both PostgreSQL replicas and the million-row branch passed full body
+verification. This is local architecture/recovery qualification, not independent-host
+HA or a saturation benchmark.
 
-| Case | Elapsed s | ACK rows | Ambiguous requests | Read errors |
+### Final core fixture
+
+A fresh full `test-production` invocation passed all five cases after the strict
+fencing helper was applied to every process/PVC path. Six positive/negative fencing
+controls also passed. Native exited-container states were recorded after process
+kills; PVC deletion required absence from a healthy CRI. The subsequent worker
+outage required the rebuilt safekeeper plus the other survivor to form quorum.
+
+| Case | Recovery + full verification s | ACK rows | Ambiguous requests | Read errors |
 |---|---:|---:|---:|---:|
-| Safekeeper process | 8.442 | 5,500 | 0 | 0 |
-| Safekeeper empty PVC | 42.282 | 36,900 | 0 | 0 |
-| Worker outage | 102.246 | 89,500 | 0 | 0 |
-| Compute process | 8.438 | 3,300 | 11 | 11 |
-| Compute empty cache | 45.498 | 2,600 | 12 | 12 |
-| Pageserver retained-cache outage | 142.726 | 3,200 | 13 | 3 |
-| Pageserver empty-cache replacement | 144.734 | 9,500 | 13 | 0 |
+| Safekeeper process | 8.846 | 5,600 | 0 | 0 |
+| Safekeeper empty PVC | 45.028 | 37,800 | 0 | 0 |
+| Worker outage | 95.556 | 84,500 | 0 | 0 |
+| Compute process | 7.434 | 2,900 | 5 | 5 |
+| Compute empty cache | 45.081 | 3,000 | 12 | 12 |
+
+Final reconciliation: **133,800 ACK rows across five histories**, **0 missing ACKs,
+0 wrong/duplicate bodies, 0 partial COPY transactions**. All three native WAL copies
+passed fixed ACK-LSN barriers. Known-read bodies remained correct. PVC/node times
+include deliberate 30-second holds; node time also includes heartbeat detection.
+
+### Independent dependency/backup fixture
+
+A separate fresh lifecycle validated pageserver/cache fencing, the persistent kind
+worker address and actual read-only restore behavior, with independent writers and
+readers throughout recovery.
+
+| Case | Recovery + full verification s | ACK rows | Ambiguous requests | Read errors |
+|---|---:|---:|---:|---:|
+| Pageserver retained-cache outage | 43.866 | 3,100 | 3 | 3 |
+| Pageserver empty-cache replacement | 141.411 | 14,500 | 13 | 3 |
+| Worker restart with persistent kind IP | 104.009 | 89,800 | 0 | 0 |
+| Independent logical restore, original source fenced | 24.461 | 6,700 | 6 | 6 |
+
+Reconciliation: **114,100 ACK rows across four histories**, zero missing,
+wrong/duplicate or partial results. Both pageserver cases proved native absence
+from a healthy CRI. Empty-cache recovery retained the original tenant/timelines,
+used a new PVC UID and higher attachment generation, and passed uploaded-LSN
+barriers before removal and after recovery.
+
+The independent restore verified **1,000,000 baseline + 110,300 snapshot recovery
+rows**, including **108,700 ACKed recovery rows**. Its **51,969,627-byte** checksummed
+backup excluded **3,900 ACK rows between snapshot and source fencing**; later ACKs
+after source recovery are outside this RPO measurement. Snapshot rows also include
+committed requests without a witnessed ACK. A new session reported read-only
+defaults, and an UPDATE was rejected with SQLSTATE **25006**. The retained source
+then rejoined and passed full historical verification. This is application-table
+recovery into plain PostgreSQL, not physical Neon control-plane disaster recovery.
+
+### Earlier dependency coverage
+
+The earlier broader fixture also qualified the unchanged S3-gateway and WAL-quorum
+branches. It reconciled **410,700 ACK rows across 17 journals**, including failed
+controller/checkpoint attempts, without missing/wrong/duplicate/partial results.
+Those failed attempts remain failed experiments. The two cases below plus the
+final core, pageserver and backup cases cover **10 distinct operational scenarios**.
+
+| Case | Recovery + full verification s | ACK rows | Ambiguous requests | Read errors |
+|---|---:|---:|---:|---:|
 | Two-of-three safekeeper outage | 42.866 | 5,700 | 3 | 0 |
 | S3 gateway outage | 48.707 | 10,100 | 3 | 0 |
-| Logical backup with original source fenced | 25.655 | 8,800 | 6 | 7 |
 
-Final historical reconciliation covered **410,700 ACKed rows across 17 journals**:
-**0 missing ACKs, 0 wrong/duplicate bodies and 0 partial COPY transactions**.
-This includes failed controller/checkpoint attempts; they remain failed experiments,
-not extra passing cases. Minority WAL acknowledged **0 rows after the 10-second
-in-flight grace period**. Every successful case restored all three safekeepers
-past its fixed ACK LSN barrier and verified unrelated surviving container identities.
-Empty-cache recovery used the original tenant and timeline IDs, a new PVC UID,
-native uploaded-LSN barriers and a higher attachment generation.
+The minority acknowledged **0 rows after a 10-second in-flight grace period**.
+S3 recovery required native uploaded-LSN convergence, not just a reachable gateway.
 
-The independent logical restore read **1,000,000 baseline rows plus 406,800
-snapshot recovery rows**, with zero missing/wrong/duplicate values. Its
-**66,230,061-byte** checksummed backup included 403,200 ACKed recovery rows and
-excluded **5,200 ACKed rows after the snapshot**, the measured logical-backup RPO.
-The snapshot also contains committed rows without an observed ACK. Source SQL was
-fully reconciled after rejoining the retained storage. This is application-table
-recovery into plain PostgreSQL, not a physical Neon disaster-recovery claim.
+### Ingestion, branch and recovered-state queries
 
-Final query benchmark (one warmup, 20 samples, no errors) after all recovery cases:
+Final core fixture: **100 × 10,000-row COPY transactions per backend**, with
+indexes, body generation and fsynced witness writes inside the measured load
+interval; schema/connection setup excluded. Both acknowledged **1,000,000 rows**,
+with zero ingestion errors. These are single-run ingestion results.
+
+| Backend | COPY rows/s | Batch p50 / p99 ms |
+|---|---:|---:|
+| Neon | 260,100.8 | 29.789 / 155.107 |
+| PostgreSQL | 372,839.4 | 18.143 / 89.999 |
+
+Native branch API creation took **85.723 ms**; usable branch SQL, including
+creation, deployment/startup and readiness polling, took **8.462 s**. Complete
+ancestor-LSN contents and parent isolation passed. A branch is not a backup, and
+these timings are not a like-for-like COW speed ratio against logical copying.
+
+Recovered-state query benchmark: one warmup then **20 validated executions per
+query/backend**, **80/80 successful requests**. P99 is the maximum of this small
+sample. Limits were restored; shared-host contention and warm caches apply.
 
 | Query | Neon p50 / p99 ms | PostgreSQL p50 / p99 ms |
 |---|---:|---:|
-| customer-orders | 0.102 / 0.304 | 0.096 / 0.133 |
-| all-orders | 111.868 / 144.923 | 14.022 / 44.434 |
+| customer-orders | 0.102 / 0.352 | 0.102 / 0.125 |
+| all-orders | 129.206 / 167.469 | 14.436 / 47.727 |
 
-These are recovered-state single-run query measurements, not saturation capacity.
-Raw reports, original failures and the external witness remain in ignored `results/`.
-The earlier measurements below are retained as dated history.
-
-
-## Measured results
-
-2026-11-15, Apple M4 Pro, native ARM64 Docker, shared 11-CPU / 24.42 GiB VM.
-The full lifecycle and owned cleanup passed. One million order bodies were checked
-on both primaries, both PostgreSQL replicas and the Neon branch. Query samples
-use one warmup then 20 timed executions; p99 is the maximum of this small sample.
-The Go producer uses 100 × 10,000-row COPY transactions per backend, with index
-maintenance, body generation and fsynced witness records inside the elapsed load
-interval; connection/schema creation is excluded. There were zero ingestion errors.
-
-| Backend | COPY rows/s | Batch p50 / p99 ms | Acknowledged rows |
-|---|---:|---:|---:|
-| neon | 247,848.5 | 30.375 / 314.055 | 1,000,000 |
-| postgres | 411,838.8 | 18.277 / 85.385 | 1,000,000 |
-
-| Query | Neon p50 / p99 ms | PostgreSQL p50 / p99 ms |
-|---|---:|---:|
-| customer-orders | 0.096 / 0.395 | 0.098 / 0.146 |
-| all-orders | 27.300 / 38.434 | 17.150 / 48.677 |
-
-Branch API creation took **4.917 ms**; usable branch SQL,
-including deployment, endpoint startup and readiness polling, took
-**6.291 s**. Full PostgreSQL pg_dump/pg_restore
-took **3.503 s**, excluding database creation, with a
-**46,663,913-byte** dump. These are different operations, not a COW
-speed ratio. Full branch bodies and parent isolation passed, and the final test
-read all one million branch bodies again after the storage faults.
-
-The five passing cases below retain live writers and independent readers through
-native recovery. Elapsed time includes final full SQL/history reconciliation;
-node/PVC cases additionally include their deliberate 30-second holds. Node time
-also includes waiting for Kubernetes to observe the missing heartbeat. Per-phase
-request counts and separate success/failure p50/p99 are in each observation file.
-
-| Case | Elapsed s | ACK rows in case | Ambiguous requests | Read errors | Missing/wrong known reads |
-|---|---:|---:|---:|---:|---|
-| compute-cache | 42.974 | 3,300 | 11 | 11 | 0 / 0 |
-| compute-process | 7.877 | 3,100 | 3 | 2 | 0 / 0 |
-| node | 99.556 | 89,600 | 0 | 0 | 0 / 0 |
-| wal-disk | 42.876 | 37,400 | 0 | 0 | 0 / 0 |
-| wal-process | 21.221 | 17,600 | 0 | 0 | 0 / 0 |
-
-Final reconciliation covers **300,400 acknowledged rows across eight journals**,
-including the three failed controller attempts: **zero missing ACKs, wrong or
-duplicate values, and partial COPY transactions**. Failed attempts remain failures;
-their surviving data does not turn them into successful operational tests. The
-following worker outage required writes through the rebuilt safekeeper plus the
-other survivor, demonstrating the replacement was usable. Native flush/commit LSNs
-passed fixed external-ACK barriers on all three safekeepers before injection and
-after repair in the corrected controller. Raw evidence is preserved under `results/archive-20261115T231528.620208/`.
-Raw LSNs are not an independent hash of
-every WAL byte. Existing successful process reports predate the added pre-injection
-barrier, while the disk/node/compute reruns exercise it.
+Raw phase events, native status, original failed runs and prior dated measurements
+remain in ignored `results/` archives. All fresh fixtures used the full lifecycle
+and owned cleanup; no failed dataset was reset to obtain a pass.
 
 ## Gotchas and recovery limits
 
@@ -227,6 +226,15 @@ barrier, while the disk/node/compute reruns exercise it.
 - Run branch creation once per fresh lifecycle. After a failed aggregate, resume
   the individual fault targets; branch creation deliberately refuses to replace an
   existing branch/copy. `make test` rechecks an existing branch without recreating it.
+- Multi-network kind restart uses hostname DNS to rewrite kubeadm's node IP;
+  gateway priority alone cannot guarantee the selected bridge. Setup now preserves
+  a kind-network `--node-ip` override in `/etc/default/kubelet`, checks the effective
+  process arguments, and leaves the kind entrypoint unchanged. The override is
+  scoped to each owned container's current kind address; rerun setup if that address
+  allocation changes. This is a lab networking workaround.
+- `make test-fencing` exercises six native-exit/error-path controls. PVC replacement
+  requires an exited old container, or NotFound plus a healthy CRI listing proving
+  absence. Docker/transport errors and unknown states cannot authorize replacement.
 - The pinned snapshot/emergency control plane and one pageserver do not reproduce
   managed Neon HA. Storage-controller upcall warnings are expected in this limited
   topology; layer-GC/storage reclamation and managed control-plane behavior are not
@@ -263,3 +271,5 @@ Sources: [Neon architecture](https://neon.com/docs/introduction/architecture-ove
 [pinned upstream source](https://github.com/neondatabase/neon/tree/77e22e4bf09d88b70b4a83a38c2f6de6301816b4),
 [upstream self-hosted Compose](https://github.com/neondatabase/neon/tree/main/docker-compose),
 [pinned idempotent timeline recovery](https://github.com/neondatabase/neon/blob/77e22e4bf09d88b70b4a83a38c2f6de6301816b4/safekeeper/src/pull_timeline.rs).
+
+Kubelet override reference: [kubeadm kubelet integration](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/kubelet-integration/).

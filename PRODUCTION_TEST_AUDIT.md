@@ -14,6 +14,10 @@ READMEs retain dated execution results and limitations.
   missing/corrupt/duplicate/partial results. Independent logical restore verified
   **1,000,000 baseline + 406,800 snapshot rows**, with **5,200 post-snapshot ACKs**
   excluded as measured RPO. Failed controller attempts remain failed reports.
+  Final strict-fencing follow-ups passed the complete five-case core aggregate
+  (133,800 ACK rows) and a separate four-case dependency/restore fixture (114,100
+  ACK rows); both reconcile without loss/corruption/partial transactions. The
+  restore also rejects writes with native SQLSTATE 25006.
 - [Greptime WAL reproducer](greptimedb/wal-bootstrap-reproducer/): failed metadata
   bootstrap lost **100/100 ACK rows** after datanode SIGKILL. Explicit deterministic
   repair restored them. An independent healthy-bootstrap control retained **100/100**

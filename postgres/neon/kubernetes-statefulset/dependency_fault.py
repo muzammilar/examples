@@ -10,6 +10,7 @@ import sys
 import time
 
 from production_observations import summarize, timestamp
+from fencing import prove_stopped
 
 root = Path("results")
 os.environ["KUBECONFIG"] = str((root / "kubeconfig").resolve())
@@ -297,31 +298,6 @@ def snapshot():
     }
 
 
-def prove_stopped(original):
-    node = original["spec"]["nodeName"]
-    owner = json.loads(run(["docker", "inspect", node], capture=True))[0]
-    if owner["Config"]["Labels"].get("io.x-k8s.kind.cluster") != "neon-storage":
-        raise RuntimeError("refusing foreign node")
-    cid = original["status"]["containerStatuses"][0]["containerID"].removeprefix(
-        "containerd://"
-    )
-    deadline = time.monotonic() + 60
-    while time.monotonic() < deadline:
-        result = subprocess.run(
-            ["docker", "exec", node, "crictl", "inspect", cid],
-            text=True,
-            capture_output=True,
-            timeout=15,
-        )
-        if (
-            result.returncode
-            or json.loads(result.stdout)["status"]["state"] != "CONTAINER_RUNNING"
-        ):
-            return {"old_container_id": cid, "node": node, "old_process_stopped": True}
-        time.sleep(1)
-    raise RuntimeError("old pageserver still running; refusing cache replacement")
-
-
 def scale(name, replicas):
     k("scale", "statefulset/" + name, "--replicas=" + str(replicas))
     if replicas:
@@ -594,15 +570,18 @@ except Exception as error:
     )
     raise
 finally:
-    if restore_created:
-        k(
-            "delete",
-            "statefulset/restore",
-            "service/restore",
-            "--ignore-not-found",
-            "--wait=true",
-        )
     cleanup_errors = []
+    if restore_created:
+        try:
+            k(
+                "delete",
+                "statefulset/restore",
+                "service/restore",
+                "--ignore-not-found",
+                "--wait=true",
+            )
+        except Exception as error:
+            cleanup_errors.append(str(error))
     # Submit all restores even if one fails; wait in storage dependency order.
     for name in ("sk0", "sk1", "sk2", "pageserver", "compute", "branch"):
         if name in scaled:

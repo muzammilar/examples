@@ -9,6 +9,7 @@ import sys
 import time
 
 from production_observations import summarize, timestamp
+from fencing import prove_stopped
 
 ROOT = Path("results")
 os.environ["KUBECONFIG"] = str(ROOT.resolve() / "kubeconfig")
@@ -203,6 +204,7 @@ try:
         kube("scale", "statefulset/" + target, "--replicas=0")
         scaled_down = True
         kube("wait", "--for=delete", "pod/" + target + "-0", "--timeout=120s")
+        fault_evidence["process_fencing"] = prove_stopped(original)
         claim = "data-" + target + "-0"
         volume = json.loads(kube("get", "pvc", claim, "-o", "json", capture=True))
         old_claim_uid = volume["metadata"]["uid"]
@@ -251,23 +253,7 @@ try:
             "SIGKILL",
             cid,
         )
-        # The old runtime container must leave RUNNING; a Ready pod alone is not proof.
-        deadline = time.monotonic() + 60
-        while time.monotonic() < deadline:
-            result = subprocess.run(
-                ["docker", "exec", node, "crictl", "inspect", cid],
-                capture_output=True,
-                text=True,
-                timeout=15,
-            )
-            if (
-                result.returncode != 0
-                or json.loads(result.stdout)["status"]["state"] != "CONTAINER_RUNNING"
-            ):
-                break
-            time.sleep(0.5)
-        else:
-            raise RuntimeError("old process remained running")
+        fault_evidence["process_fencing"] = prove_stopped(original)
         markers.append(("recovery", now()))
     kube("rollout", "status", "statefulset/" + target, "--timeout=300s")
     progress(markers[-1][1])

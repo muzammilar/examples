@@ -18,6 +18,7 @@ kind-up:
 	python3 import_images.py
 	@kind get clusters | rg -qx '$(CLUSTER_NAME)' || kind create cluster --name $(CLUSTER_NAME) --image kindest/node:v1.34.0 --config kind-config.json
 	@for node in $$(kind get nodes --name $(CLUSTER_NAME)); do docker network connect --gw-priority -1 neon-kind-support_default $$node || docker network inspect neon-kind-support_default --format '{{range .Containers}}{{println .Name}}{{end}}' | rg -qx "$$node"; done
+	python3 pin_node_ips.py
 	python3 load_images.py
 up:
 	python3 config.py objects
@@ -100,3 +101,7 @@ test-dependencies:
 .PHONY: backup-restore
 backup-restore:
 	python3 dependency_fault.py backup
+
+.PHONY: test-fencing
+test-fencing:
+	python3 -m unittest discover -s . -p test_fencing.py
