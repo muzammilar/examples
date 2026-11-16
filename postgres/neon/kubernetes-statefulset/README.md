@@ -78,10 +78,66 @@ missing/unexpected rows and atomic COPY outcomes. Phase reports separate failure
 and successful-request latencies; immutable reader samples do not establish
 fresh-write visibility lag.
 
-The November 15 Kubernetes results predate the later COPY percentile correction
-and explicit application-side write deadline in the shared Go workload. Those
-follow-ups were revalidated in both Compose shapes on November 16; this Kubernetes
-fault matrix was not repeated for that follow-up.
+`make test-dependencies` runs retained-cache pageserver outage, empty-cache
+replacement, WAL-quorum loss and S3-gateway outage, followed by full verification.
+`make backup-restore` is a separate logical application backup experiment; run
+branch setup once (`make test-production`) first. It exports a consistent native
+pg_dump snapshot while load continues, fences all original compute/storage
+processes, restores into separate PostgreSQL storage, validates every snapshot
+body, quantifies the excluded post-snapshot ACK tail and restores the source.
+It does not restore the Neon control plane or promote a replacement Neon tenant.
+
+## Latest qualification: November 16
+
+The latest shared Go workload (corrected COPY percentiles and explicit write
+context deadline) was rebuilt and tested on a fresh kind lifecycle. Both million-row
+backends, PostgreSQL replicas and the million-row branch passed complete body
+checks. The five core production cases and five dependency/backup cases passed.
+All cases below kept independent writers/readers running. Elapsed times include
+native recovery and full reconciliation; outage cases include their deliberate
+30-second hold. The reader observes immutable known rows, not fresh-write lag.
+
+| Case | Elapsed s | ACK rows | Ambiguous requests | Read errors |
+|---|---:|---:|---:|---:|
+| Safekeeper process | 8.442 | 5,500 | 0 | 0 |
+| Safekeeper empty PVC | 42.282 | 36,900 | 0 | 0 |
+| Worker outage | 102.246 | 89,500 | 0 | 0 |
+| Compute process | 8.438 | 3,300 | 11 | 11 |
+| Compute empty cache | 45.498 | 2,600 | 12 | 12 |
+| Pageserver retained-cache outage | 142.726 | 3,200 | 13 | 3 |
+| Pageserver empty-cache replacement | 144.734 | 9,500 | 13 | 0 |
+| Two-of-three safekeeper outage | 42.866 | 5,700 | 3 | 0 |
+| S3 gateway outage | 48.707 | 10,100 | 3 | 0 |
+| Logical backup with original source fenced | 25.655 | 8,800 | 6 | 7 |
+
+Final historical reconciliation covered **410,700 ACKed rows across 17 journals**:
+**0 missing ACKs, 0 wrong/duplicate bodies and 0 partial COPY transactions**.
+This includes failed controller/checkpoint attempts; they remain failed experiments,
+not extra passing cases. Minority WAL acknowledged **0 rows after the 10-second
+in-flight grace period**. Every successful case restored all three safekeepers
+past its fixed ACK LSN barrier and verified unrelated surviving container identities.
+Empty-cache recovery used the original tenant and timeline IDs, a new PVC UID,
+native uploaded-LSN barriers and a higher attachment generation.
+
+The independent logical restore read **1,000,000 baseline rows plus 406,800
+snapshot recovery rows**, with zero missing/wrong/duplicate values. Its
+**66,230,061-byte** checksummed backup included 403,200 ACKed recovery rows and
+excluded **5,200 ACKed rows after the snapshot**, the measured logical-backup RPO.
+The snapshot also contains committed rows without an observed ACK. Source SQL was
+fully reconciled after rejoining the retained storage. This is application-table
+recovery into plain PostgreSQL, not a physical Neon disaster-recovery claim.
+
+Final query benchmark (one warmup, 20 samples, no errors) after all recovery cases:
+
+| Query | Neon p50 / p99 ms | PostgreSQL p50 / p99 ms |
+|---|---:|---:|
+| customer-orders | 0.102 / 0.304 | 0.096 / 0.133 |
+| all-orders | 111.868 / 144.923 | 14.022 / 44.434 |
+
+These are recovered-state single-run query measurements, not saturation capacity.
+Raw reports, original failures and the external witness remain in ignored `results/`.
+The earlier measurements below are retained as dated history.
+
 
 ## Measured results
 
@@ -175,9 +231,23 @@ barrier, while the disk/node/compute reruns exercise it.
   managed Neon HA. Storage-controller upcall warnings are expected in this limited
   topology; layer-GC/storage reclamation and managed control-plane behavior are not
   qualified. A branch is not an independent backup. All logical zones share a host.
-- Unrun: pageserver/S3/broker outages, network partition, WAL-quorum loss, permanent
-  worker rescheduling, scaling/PDB/drain tests, version upgrades, independent backup
-  restore, pressure/soak and production authentication/TLS. Operator reconciliation
+- The pinned production pageserver rejects its testing-only checkpoint endpoint.
+  Cache replacement instead temporarily shortens only `checkpoint_timeout` to 5s,
+  preserves ordinary checkpoint distance, waits for native uploaded LSNs and restores
+  original tenant overrides. An idle restarted timeline can expose projected LSN 0
+  while its previously validated visible remote LSN remains durable; the barrier
+  checks these native remote fields, not local disk consistency alone.
+- An experimental 16 KiB checkpoint distance caused a proven pageserver
+  `OOMKilled` at its 2 GiB limit. That failed attempt preceded cache deletion;
+  original settings were restored and all historical ACKs reconciled. An initial
+  empty-cache reattach also hit transient Service/API readiness; the corrected
+  controller retries the same idempotent tenant/generation attachment only.
+- The first logical restore fixture rejected remote SQL in pg_hba.conf. It remains
+  a failed report; the rerun allows the exact workload Pod address and passes full
+  readback. Backup cleanup restores storage dependencies before compute readiness.
+- Unrun: broker outage, peer partitions, permanent worker rescheduling,
+  scaling/PDB/drain tests, version upgrades, physical Neon backup/control-plane
+  recovery, systematic pressure/soak and production authentication/TLS. Operator reconciliation
   cases are unsupported for this direct StatefulSet deployment. Volume replacement
   is not physical EIO or independent-host power-loss testing.
 

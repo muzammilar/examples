@@ -17,7 +17,7 @@ kind-up:
 	docker build -f Dockerfile.safekeeper -t neon-kind-safekeeper:dev .
 	python3 import_images.py
 	@kind get clusters | rg -qx '$(CLUSTER_NAME)' || kind create cluster --name $(CLUSTER_NAME) --image kindest/node:v1.34.0 --config kind-config.json
-	@for node in $$(kind get nodes --name $(CLUSTER_NAME)); do docker network connect neon-kind-support_default $$node || docker network inspect neon-kind-support_default --format '{{range .Containers}}{{println .Name}}{{end}}' | rg -qx "$$node"; done
+	@for node in $$(kind get nodes --name $(CLUSTER_NAME)); do docker network connect --gw-priority -1 neon-kind-support_default $$node || docker network inspect neon-kind-support_default --format '{{range .Containers}}{{println .Name}}{{end}}' | rg -qx "$$node"; done
 	python3 load_images.py
 up:
 	python3 config.py objects
@@ -81,3 +81,22 @@ kind-down:
 # Local build context is generated from the tracked source link.
 clean-build:
 	rm -rf .build
+
+# Separate dependency/storage cases; the core five-case rerun stays independent.
+.PHONY: pageserver-outage pageserver-cache chaos-s3 chaos-wal-quorum test-dependencies
+pageserver-outage pageserver-cache:
+	python3 dependency_fault.py $@
+chaos-s3:
+	python3 dependency_fault.py s3
+chaos-wal-quorum:
+	python3 dependency_fault.py wal-quorum
+test-dependencies:
+	$(MAKE) pageserver-outage
+	$(MAKE) pageserver-cache
+	$(MAKE) chaos-wal-quorum
+	$(MAKE) chaos-s3
+	$(MAKE) test
+
+.PHONY: backup-restore
+backup-restore:
+	python3 dependency_fault.py backup
