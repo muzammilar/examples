@@ -4,3 +4,6 @@ go/clickhouse-multitable-bulk-ingest/clickhouse-multitable-bulk-ingest.exe
 .direnv/
 # Materialized source links and local Docker build contexts; never commit these.
 **/.build/
+
+# Example-local evidence and private kubeconfigs are generated, never committed.
+**/results/

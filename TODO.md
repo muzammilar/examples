@@ -31,6 +31,23 @@ healthy pods alone do not qualify an example as production ready.
 - [ ] Run correctness/recovery before performance; retain raw evidence and
   document actual limits. Apply the same requirements to every future example.
 
+## Current production-test backfill: last-month distributed examples
+
+Scope this batch to deployments first added since **2026-10-16**; skip legacy
+ClickHouse and other older examples. See [the source audit](PRODUCTION_TEST_AUDIT.md)
+for the 33-directory cohort, evidence and concrete gaps. This narrower batch does
+not remove the longer-term requirements above.
+
+- [x] Rerun latest shared Neon workload on Kubernetes; five core plus five
+  dependency/backup cases passed, 410,700 ACK rows reconciled without loss.
+- [x] Isolate Greptime WAL initialization loss: failed bootstrap loses 100/100 ACK
+  rows after restart; healthy control retains 100/100. Preserve the failed report.
+- [ ] Qualify additional Greptime operator drain/PDB, partitions, upgrade and pressure.
+- [ ] Close independent-reader and preserved-history gaps in the recent relational,
+  search, object-storage, messaging and archive examples identified by the audit.
+- [ ] Extend applicable native repair, scaling, rolling changes, dependency/quorum
+  loss and independent restore tests; publish only actually executed outcomes.
+
 ## Already covered
 
 On `main`: Aerospike, Airflow, ArangoDB, CedarDB, ClickHouse, CockroachDB, Dragonfly, DuckDB, Elasticsearch, FoundationDB, Garnet/Valkey (Go comparison), InfluxDB, Kafka, kdb+, Manticore Search, Memgraph, Milvus, NATS, NebulaGraph, Neo4j, OceanBase, Postgres (k8s/vagrant), MySQL and SQLite clients, Qdrant, QuestDB, Redpanda, RisingWave, RonDB, ScyllaDB, SingleStore, Skytable, TiDB, Tarantool, TigerBeetle, TiKV, TimescaleDB, Valkey, Weaviate, YDB, YugabyteDB.
@@ -47,7 +64,7 @@ Fastest in class, free, runnable locally (see the sections below for the example
 
 ## Priority
 
-- [x] [Neon Kubernetes storage/recovery](postgres/neon/kubernetes-statefulset/): million-row parent/branch checks and five live recovery cases; bootstrap/controller gotchas documented.
+- [x] [Neon Kubernetes storage/recovery](postgres/neon/kubernetes-statefulset/): latest-workload million-row parent/branch checks, five core and five dependency/backup cases; 410,700 historical ACK rows retained and logical snapshot RPO quantified.
 
 - [x] Qdrant [`turboquant/`](qdrant/turboquant/) (pinned v1.18.3): clustered float32 vs scalar int8 vs TurboQuant;
   exact recall@10, filtered/unfiltered p50/p99 and QPS, indexing and native
