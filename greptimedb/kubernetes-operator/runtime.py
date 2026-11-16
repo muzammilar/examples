@@ -83,6 +83,10 @@ def desired_pods_match(cr, current):
         template = desired.get("template", {})
         resources = template.get("main", {}).get("resources")
         for member in members:
+            if not member["spec"]["containers"][0]["image"].endswith(
+                ":" + cr["spec"]["version"]
+            ):
+                return False
             if (
                 resources
                 and member["spec"]["containers"][0].get("resources") != resources

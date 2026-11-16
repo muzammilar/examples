@@ -42,7 +42,9 @@ not remove the longer-term requirements above.
   dependency/backup cases passed, 410,700 ACK rows reconciled without loss.
 - [x] Isolate Greptime WAL initialization loss: failed bootstrap loses 100/100 ACK
   rows after restart; healthy control retains 100/100. Preserve the failed report.
-- [ ] Qualify additional Greptime operator drain/PDB, partitions, upgrade and pressure.
+- [x] Qualify additional Greptime operator drain/PDB, partitions, upgrade and pressure:
+  all 15 distinct cases passed across the initial run/resumed targets; 627,200 ACK
+  rows reconciled, four failed attempts preserved and node-IP recovery fixed.
 - [ ] Close independent-reader and preserved-history gaps in the recent relational,
   search, object-storage, messaging and archive examples identified by the audit.
 - [ ] Extend applicable native repair, scaling, rolling changes, dependency/quorum

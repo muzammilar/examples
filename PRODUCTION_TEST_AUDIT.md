@@ -19,8 +19,10 @@ READMEs retain dated execution results and limitations.
   repair restored them. An independent healthy-bootstrap control retained **100/100**
   after the same crash. The loss case deliberately exits nonzero.
 - [Greptime operator](greptimedb/kubernetes-operator/): additional forward patch
-  upgrade, drain/PDB, partition and bounded pressure cases are under qualification.
-  Existing ten-case results are historical; do not infer passes for new targets.
+  upgrade, drain/PDB, partition and bounded pressure cases passed alongside the ten
+  existing cases (15 distinct cases, including resumed targets after the failed
+  node-address aggregate). Final 627,200 ACK rows across 23 journals reconcile
+  without loss/corruption/duplicates; all four failed attempts remain failures.
 - Kafka [Strimzi JBOD](kafka/strimzi-jbod/) and
   [mirroring](kafka/cross-cluster-mirroring/): private kubeconfig export/cleanup
   corrected; evaluated Make recipes prove the exported example-local path. This

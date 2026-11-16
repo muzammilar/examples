@@ -6,6 +6,7 @@ from pathlib import Path
 import shlex
 import subprocess
 import sys
+import time
 
 cluster = "greptime-operator"
 nodes = subprocess.check_output(
@@ -24,18 +25,21 @@ for node in selected:
     address = str(
         ipaddress.ip_address(info["NetworkSettings"]["Networks"]["kind"]["IPAddress"])
     )
-    path = "/var/lib/kubelet/kubeadm-flags.env"
+    # kind's restart entrypoint rewrites kubeadm-flags.env using hostname DNS,
+    # which may select either bridge independently of gateway priority. The
+    # supported kubeadm extra-args file is loaded last and is not rewritten.
+    path = "/etc/default/kubelet"
     before = subprocess.check_output(["docker", "exec", node, "cat", path], text=True)
     lines = before.splitlines()
-    entries = [line for line in lines if line.startswith("KUBELET_KUBEADM_ARGS=")]
+    entries = [line for line in lines if line.startswith("KUBELET_EXTRA_ARGS=")]
     if len(entries) != 1:
-        raise RuntimeError("unexpected kubelet argument file")
+        raise RuntimeError("unexpected kubelet extra-argument file")
     (value,) = shlex.split(entries[0].split("=", 1)[1])
     flags = [flag for flag in shlex.split(value) if not flag.startswith("--node-ip=")]
     flags.append("--node-ip=" + address)
     after = (
         "\n".join(
-            "KUBELET_KUBEADM_ARGS=" + shlex.quote(" ".join(flags))
+            "KUBELET_EXTRA_ARGS=" + shlex.quote(" ".join(flags))
             if line == entries[0]
             else line
             for line in lines
@@ -53,6 +57,31 @@ for node in selected:
         subprocess.run(
             ["docker", "exec", node, "systemctl", "restart", "kubelet"], check=True
         )
+    pid = int(
+        subprocess.check_output(
+            [
+                "docker",
+                "exec",
+                node,
+                "systemctl",
+                "show",
+                "kubelet",
+                "--property=MainPID",
+                "--value",
+            ],
+            text=True,
+        )
+    )
+    command = subprocess.check_output(
+        ["docker", "exec", node, "cat", f"/proc/{pid}/cmdline"], text=True
+    ).split("\0")
+    addresses = [
+        arg.removeprefix("--node-ip=")
+        for arg in command
+        if arg.startswith("--node-ip=")
+    ]
+    if not addresses or addresses[-1] != address:
+        raise RuntimeError("effective kubelet node-ip override not applied")
     proof.append(
         {
             "node": node,
@@ -60,10 +89,11 @@ for node in selected:
             "changed": after != before,
             "before": before,
             "after": after,
+            "effective_node_ip_flags": addresses,
         }
     )
 Path("results").mkdir(exist_ok=True)
-Path("results/pinned-node-addresses.json").write_text(
+Path(f"results/pinned-node-addresses-{time.time_ns()}.json").write_text(
     json.dumps(proof, indent=2) + "\n"
 )
 print(json.dumps(proof, indent=2))
