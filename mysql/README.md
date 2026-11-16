@@ -6,13 +6,13 @@ GitHub: [mysql/mysql-server](https://github.com/mysql/mysql-server), [vitessio/v
 
 | Example | Demonstrates |
 |---|---|
-| [Vitess deployment](vitess-docker-compose-cluster/) | One unsharded keyspace, 1 primary + 2 replicas, semi-sync durability, VTGate and VTOrc recovery |
+| [Vitess deployment](vitess-docker-compose-cluster/) | One unsharded keyspace, 1 primary + 2 replicas, retained histories, independent reads, full-copy oracle and VTGate/VTOrc recovery |
 | [Customer sharding](customer-sharding/) | Vitess 23.0.0, 3 customer shards × 3 copies, preserved ACK histories, independent reads, every-shard primary/pause tests and full-body native-copy verification |
 | [NDB Cluster](ndb-cluster-docker-compose-cluster/) | Community 8.4.11, 3 partitions with 3 copies each, active-write data/SQL/management failures, acknowledged-data reconciliation and comparison with Vitess |
 
 | Example | Date / setup | Observed result |
 |---|---|---|
-| [Vitess recovery](vitess-docker-compose-cluster/#measured-results) | 2026-11-14, Apple M4 Pro, amd64 emulated on shared aarch64 Docker | 1,000,000 orders in 269.770 s; 3,707 orders/s; batch p99 1,592.595 ms; promotion 4 s; 0 acknowledged loss |
+| [Vitess recovery](vitess-docker-compose-cluster/#measured-results) | 2026-11-16, Apple M4 Pro, amd64 emulated on capped shared aarch64 Docker | Four live fault cases + baseline/benchmark retain 6,184,600 ACK orders on all three copies; post-recovery million: 60.363 s, 16,567 orders/s, successful-attempt p99 191.590 ms; promotion 3.551 s, native repair barrier 69.302 s; 0 acknowledged loss |
 | [Customer sharding recovery](customer-sharding/#measured-results) | 2026-11-16, Apple M4 Pro, amd64 emulated on capped shared aarch64 Docker | Eight live fault cases + baseline/benchmark retain 10,252,200 ACK orders on all nine copies; post-recovery million: 33.171 s, 30,147 orders/s, successful-attempt p99 93.086 ms; promotions 3.452–4.826 s; 0 acknowledged loss |
 | [NDB recovery](ndb-cluster-docker-compose-cluster/#measured-results) | 2026-11-14, Apple M4 Pro, amd64 emulated on shared aarch64 Docker | Baseline: 1,000,000 orders in 76.834 s, 13,015 orders/s, p99 99.077 ms; isolated faults lost 0 acknowledged IDs; full-disk crash lost 6,800 of 449,100 |
 

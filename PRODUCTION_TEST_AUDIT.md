@@ -79,6 +79,18 @@ READMEs retain dated execution results and limitations.
   setup passed. A second empty-volume five-command lifecycle reconciled another million ACK orders on all nine copies;
   both cleanup passes left zero owned resources/build tags. Remaining extended
   cases are listed below.
+- [Vitess unsharded](mysql/vitess-docker-compose-cluster/): retained ACK histories,
+  independent primary reader and full body checks through VTGate and on all three
+  MySQL copies. Million-order baseline, primary crash, replica pause, replica crash
+  and VTGate crash passed: **6,184,600 cumulative ACK orders across six histories**,
+  zero loss/corruption/duplicates/partial or unresolved rows. Native GTID, source/
+  thread, query-service and semi-sync barriers passed; all eight unrelated service
+  identities were preserved per fault. An incomplete initial bootstrap witness was
+  rejected before order allocation, preserved and extended only after full native
+  seed/ownership checks. Post-recovery benchmark and retained-state setup passed.
+  A fresh-volume five-command lifecycle recorded all three identities from creation and verified
+  another million ACK orders on all copies; both cleanups left zero owned
+  resources/build tags. Extended cases remain below.
 - Kafka [Strimzi JBOD](kafka/strimzi-jbod/) and
   [mirroring](kafka/cross-cluster-mirroring/): private kubeconfig export/cleanup
   corrected; evaluated Make recipes prove the exported example-local path. This
@@ -91,7 +103,8 @@ Closing one fault case does not close the entire deployment matrix.
 
 | Cohort | Inspected source | Remaining concrete gap |
 |---|---|---|
-| Vitess unsharded, NDB | Example Makefiles, Go `app/main.go`, `scripts/run-fault.sh`, native placement/replica scripts | Fault prerequisites truncate orders between cases. Preserve unique scenario IDs and reconcile older ACK histories; add independent live readers. Exercise each shard/failure domain, while retaining existing native placement checks. |
+| NDB | Example Makefiles, Go `app/main.go`, `scripts/run-fault.sh`, native placement/replica scripts | Fault prerequisites truncate orders between cases. Preserve unique scenario IDs and reconcile older ACK histories; add independent live readers. Exercise each shard/failure domain, while retaining existing native placement checks. |
+| Vitess unsharded | `control.py`, independent `orders-workload/` observer and three-copy body oracle | Core history/reader backfill and four live role fault cases qualified above; post-recovery benchmark, retained-state setup, fresh million-order lifecycle and scoped cleanup passed. Resharding/tablet changes, planned/rolling maintenance/upgrades, resource changes, topology/quorum loss, partitions/stale-primary rejection, permanent disk loss, pressure, independent restore and controlled cold/single-record benchmarks remain unrun. |
 | MySQL customer sharding | `control.py`, independent `orders-workload/` writer/reader, native vindex/range oracle and all-nine-copy verifier | Core reader/history/placement backfill and eight live fault cases qualified above; post-recovery benchmark, repeated setup, fresh million-order lifecycle and scoped cleanup passed. Online resharding, tablet expansion/shrink, rolling maintenance/upgrades, topology/quorum loss, peer partitions, stale-primary rejection, permanent disk loss, pressure, independent restore and controlled cold/single-record benchmarks remain unrun. |
 | Postgres customer sharding | `control.py`, independent `orders-workload/` writer/reader, native hash oracle and all-copy verifier | Core reader/history/placement backfill qualified above. Partitions, DCS/quorum loss, stale-primary rejection, physical disk loss, router outage, rolling upgrades, pressure, backup/restore and online resharding remain unrun. |
 | PgDog pooling | `control.py`, independent `orders-workload/` observers and all-copy verifier | Core reader/history backfill and five live role/configuration cases qualified above. DCS/quorum loss, partitions/stale-primary fencing, permanent disk loss, rolling upgrades, pressure and independent restore remain unrun. |
@@ -141,7 +154,7 @@ inventory with `python3 tools/audit-production-tests.py`; output is ignored unde
 | [lancedb/versioned-product-search](lancedb/versioned-product-search/) | Compose | crash | suite, disk, scale-out, scale-in, rolling, partition, pressure, restore, drain | declaration inventory only |
 | [mysql/customer-sharding](mysql/customer-sharding/) | Compose | suite, crash | disk, scale-out, scale-in, rolling, partition, pressure, restore, drain | eight live fault cases qualified above; other categories require separate work |
 | [mysql/ndb-cluster-docker-compose-cluster](mysql/ndb-cluster-docker-compose-cluster/) | Compose | crash | suite, disk, scale-out, scale-in, rolling, partition, pressure, restore, drain | declaration inventory only |
-| [mysql/vitess-docker-compose-cluster](mysql/vitess-docker-compose-cluster/) | Compose | crash | suite, disk, scale-out, scale-in, rolling, partition, pressure, restore, drain | declaration inventory only |
+| [mysql/vitess-docker-compose-cluster](mysql/vitess-docker-compose-cluster/) | Compose | suite, crash | disk, scale-out, scale-in, rolling, partition, pressure, restore, drain | four live fault cases qualified above; extended categories require separate work |
 | [postgres/citus-docker-compose-cluster](postgres/citus-docker-compose-cluster/) | Compose | suite, crash, scale-out, scale-in | disk, rolling, partition, pressure, restore, drain | ten live operations and placement-negative recovery qualified above; other categories require separate work |
 | [postgres/customer-sharding](postgres/customer-sharding/) | Compose | suite, crash | disk, scale-out, scale-in, rolling, partition, pressure, restore, drain | six live fault cases qualified above; other categories require separate work |
 | [postgres/neon/branching-recovery](postgres/neon/branching-recovery/) | Compose | suite, crash, disk | scale-out, scale-in, rolling, partition, pressure, restore, drain | declaration inventory only |
