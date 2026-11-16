@@ -1,0 +1,14 @@
+node_id = 0
+[http]
+addr = "0.0.0.0:4000"
+[grpc]
+bind_addr = "0.0.0.0:3001"
+server_addr = "data:3001"
+[meta_client]
+metasrv_addrs = ["meta:3002"]
+[wal]
+provider = "kafka"
+broker_endpoints = ["wal:9092"]
+[storage]
+type = "File"
+data_home = "/data"

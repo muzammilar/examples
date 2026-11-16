@@ -1,0 +1,70 @@
+name: greptime-wal-bootstrap
+services:
+  etcd:
+    image: quay.io/coreos/etcd:v3.6.16
+    command: [etcd, --data-dir=/data, --listen-client-urls=http://0.0.0.0:2379, --advertise-client-urls=http://etcd:2379]
+    volumes: [etcd:/data]
+    cpus: 0.5
+    mem_limit: 256m
+    healthcheck:
+      test: [CMD, etcdctl, endpoint, health]
+      interval: 2s
+      timeout: 3s
+      retries: 60
+  wal:
+    image: docker.redpanda.com/redpandadata/redpanda:v26.2.3
+    command: [redpanda, start, --mode=dev-container, --smp=1, --memory=512M, --node-id=0, --kafka-addr=0.0.0.0:9092, --advertise-kafka-addr=wal:9092]
+    volumes: [wal:/var/lib/redpanda/data]
+    cpus: 1
+    mem_limit: 768m
+    healthcheck:
+      test: [CMD-SHELL, 'rpk cluster health -X brokers=localhost:9092 | grep -Eq "Healthy:.+true"']
+      interval: 2s
+      timeout: 3s
+      retries: 60
+  meta:
+    image: greptime/greptimedb:v1.3.1
+    command: [metasrv, start, -c, /config/meta.toml]
+    volumes: [./config/meta.toml:/config/meta.toml:ro]
+    cpus: 1
+    mem_limit: 512m
+    healthcheck:
+      test: [CMD-SHELL, 'curl -fsS http://localhost:4000/health']
+      interval: 2s
+      timeout: 3s
+      retries: 60
+  data:
+    image: greptime/greptimedb:v1.3.1
+    command: [datanode, start, -c, /config/data.toml]
+    volumes: [./config/data.toml:/config/data.toml:ro, data:/data]
+    cpus: 1
+    mem_limit: 1g
+    healthcheck:
+      test: [CMD-SHELL, 'curl -fsS http://localhost:4000/health']
+      interval: 2s
+      timeout: 3s
+      retries: 60
+  front:
+    image: greptime/greptimedb:v1.3.1
+    command: [frontend, start, -c, /config/front.toml]
+    volumes: [./config/front.toml:/config/front.toml:ro]
+    cpus: 1
+    mem_limit: 768m
+    healthcheck:
+      test: [CMD-SHELL, 'curl -fsS http://localhost:4000/health']
+      interval: 2s
+      timeout: 3s
+      retries: 60
+  wal-workload:
+    image: greptime-wal-bootstrap-workload:dev
+    build: ./wal-workload
+    profiles: [tools]
+    environment:
+      ROWS: ${ROWS:-100}
+    volumes: [./results:/results]
+    cpus: 1
+    mem_limit: 256m
+volumes:
+  etcd: {}
+  wal: {}
+  data: {}

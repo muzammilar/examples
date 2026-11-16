@@ -19,6 +19,12 @@ the example; no sibling example needs to be run first.
 | [Clustered telemetry](docker-compose-cluster/) | Three regions, three WAL brokers, three metadata stores and replicated S3; native failover, empty local-disk replacement and 3 → 5 → 3 region migration under writes | Full corpus and 102,500 acknowledged recovery rows passed |
 | [Kubernetes operator](kubernetes-operator/) | Official operator on a private kind cluster; native scaling, worker/controller outages and WAL quorum loss | Fresh four-million-record baseline and ten recovery cases passed; 207,000 historical ACKs retained without loss. Earlier 3,400-sample loss, manual repair and bootstrap fix documented |
 
+The isolated [WAL bootstrap reproducer](wal-bootstrap-reproducer/) demonstrates
+100/100 acknowledged rows disappearing after restart when metadata continues after
+failed topic preparation; the healthy bootstrap control retains 100/100. It also
+verifies guard rejection and explicit application repair. This is a failing
+correctness reproducer, not another performance ranking.
+
 The [cluster README](docker-compose-cluster/#measured-results) and
 [single-node README](single-node/#results) and
 [operator README](kubernetes-operator/#measured-results) give measured numbers, exact caps,

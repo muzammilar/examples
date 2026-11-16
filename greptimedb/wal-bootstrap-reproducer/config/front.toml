@@ -1,0 +1,4 @@
+[http]
+addr = "0.0.0.0:4000"
+[meta_client]
+metasrv_addrs = ["meta:3002"]
