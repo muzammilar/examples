@@ -20,6 +20,38 @@ results from this repository.
   variables or ignored local files, and stay within the selected free allowance.
   Do not sign up for paid plans or assume a trial is an ongoing free tier.
 
+## GreptimeDB vs Victoria: after the recovery backfills
+
+The requested next comparison is **GreptimeDB vs the Victoria stack**, after the
+current production-test backfills. The existing Greptime examples benchmark
+VictoriaMetrics and VictoriaLogs as baselines; they do not qualify a complete
+Victoria stack or establish a fair whole-stack winner.
+
+- Run single-node against single-node and supported HA/cluster against comparable
+  HA/cluster topologies. Match the promised durability/failure tolerance, then
+  compare at equal **total** CPU, RAM and storage budgets, including every WAL,
+  metadata, object-store, collector and routing dependency. Report architectures
+  that cannot meet the same durability contract separately.
+- Replay identical metric samples and log bodies, tenant/cardinality/skew and
+  out-of-order distributions, batch sizes, retention and query time ranges.
+  Include traces only where the pinned engines support equivalent ingestion and
+  queries; keep unmatched capabilities visible rather than scoring them as zero.
+- Test both engines serially on an otherwise idle host, alternate execution order,
+  use at least three independent repetitions, and publish every run plus the
+  median/range. Freeze tuning before measurement and show both configurations.
+- Measure sustainable ingestion at a stated latency/error target, API admission,
+  end-to-end visibility and post-crash durability separately. Run matched warm
+  and cold queries with correctness checks and enough samples to interpret p99;
+  the earlier 20-query samples are not a capacity benchmark.
+- Compare storage after equivalent compaction/quiescence and include all replicated
+  data/WAL/metadata copies. Exercise live readers/writers during equivalent
+  process, owned-disk and dependency failures, preserve ACK histories, and report
+  outage, repair, data loss, operational steps and resource cost.
+
+Publish workload-specific results and tradeoffs, not an overall winner inferred
+from the earlier synthetic backfill numbers. This focused comparison precedes the
+broader multi-vendor matrix below.
+
 ## Main stack comparison
 
 Compare **ClickStack vs Victoria stack vs GreptimeDB vs OpenObserve vs SigNoz vs

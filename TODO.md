@@ -319,6 +319,12 @@ Plan and source links: [`observability/README.md`](observability/README.md), inc
 - [ ] `nagios/`: GPLv2 Nagios Core host/service checks, plugin-based fleet monitoring, detection/recovery and alert accounting under injected failures; exclude commercial XI features.
 - [ ] `zabbix/`: agents/proxies, discovery, supported server HA and database recovery; compare the same host/service fault schedule with Nagios Core and the modern stacks.
 
+- [ ] **After the current recovery backfills:** fair GreptimeDB vs Victoria stack
+  comparison using [the comparison contract](observability/README.md#greptimedb-vs-victoria-after-the-recovery-backfills).
+  Match whole-stack budgets and durability, replay identical input/queries, run
+  at least three repetitions in alternating order, and compare sustained load,
+  cold/warm latency, visibility, storage and live-fault recovery. Existing
+  VictoriaMetrics/VictoriaLogs baselines are not a complete stack qualification.
 - [ ] Main three-stack comparison: **GreptimeDB vs VictoriaMetrics + VictoriaLogs + VictoriaTraces vs Prometheus + Loki + Tempo**. One instrumented application/corpus, matching event times/IDs/tenants/retention/sampling, independent sample/log/span-body oracle, supported common queries, and sequential whole-stack resource budgets. Measure ingestion admission versus durable post-crash visibility, warm/cold query latency, storage, compaction/backpressure and recovery. Keep standalone/HA/distributed differences explicit; Prometheus HA is not native database sharding. Cortex/Mimir extensions remain separate. Full three-signal comparison is future work beyond the current metrics/logs baseline.
 
 - [ ] Standalone system examples for VictoriaMetrics, VictoriaLogs and VictoriaTraces: supported single-node, Compose cluster and Kubernetes deployments; clustered high-cardinality metrics, structured logs and deterministic traces respectively. Replication/dedup, out-of-order ingestion, storage replacement and completeness checks; compare GreptimeDB on each matching signal, plus Prometheus/Loki/Tempo. The current Greptime comparison baselines are not full independent system qualification.
