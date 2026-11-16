@@ -58,6 +58,36 @@ def lsn(value):
     return (int(hi, 16) << 32) + int(lo, 16)
 
 
+def wal_barrier():
+    frozen = max(
+        (row["flush_lsn"] for row in journal() if row["stage"] == "ack"), key=lsn
+    )
+    expected = lsn(frozen)
+    deadline = time.monotonic() + 180
+    last_error = None
+    while time.monotonic() < deadline:
+        if load.poll() is not None or observer.process.poll() is not None:
+            raise RuntimeError("writer/reader exited before WAL recovery")
+        try:
+            statuses = json.loads(tool("wal-status", capture=True))
+        except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as error:
+            # Read-only polling: an open HTTP port does not mean this timeline
+            # has finished native recovery. Keep the independent load running.
+            last_error = str(error)
+            time.sleep(2)
+            continue
+        if len(statuses) == 3 and all(
+            lsn(status["flush_lsn"]) >= expected
+            and lsn(status["commit_lsn"]) >= expected
+            for status in statuses.values()
+        ):
+            return frozen, statuses
+        time.sleep(2)
+    raise RuntimeError(
+        "three WAL copies did not reach frozen ACK barrier: " + str(last_error)
+    )
+
+
 container = run(*compose, "ps", "-q", target, capture=True).strip()
 info = json.loads(run("docker", "inspect", container, capture=True))[0]
 if info["Config"]["Labels"].get("com.docker.compose.project") != project:
@@ -71,6 +101,22 @@ if mode in ("disk", "cache"):
         or value["Labels"].get("com.docker.compose.volume") != target
     ):
         raise RuntimeError("refusing foreign disk")
+before_ids = run(*compose, "ps", "-q", capture=True).split()
+before_containers = json.loads(run("docker", "inspect", *before_ids, capture=True))
+survivors = {
+    container["Id"]: {
+        "name": container["Name"],
+        "started_at": container["State"]["StartedAt"],
+    }
+    for container in before_containers
+    if container["Config"]["Labels"].get("com.docker.compose.service") != target
+}
+if not survivors or any(
+    container["Config"]["Labels"].get("com.docker.compose.project") != project
+    for container in before_containers
+):
+    raise RuntimeError("unexpected project membership before fault")
+
 observer = LiveObserver(
     case, [*compose, "run", "--rm", "-e", "FAULT_CASE=" + case, "observer", "watch"]
 )
@@ -95,6 +141,7 @@ load = subprocess.Popen(
 try:
     progress()
     observer.progress()
+    before_lsn, before_wal = wal_barrier()
     observer.mark("outage")
     began = time.monotonic()
     injected = time.time()
@@ -110,20 +157,7 @@ try:
     if mode == "disk":
         tool("recover-wal")
     progress(after=time.time())
-    # The recovered third WAL copy must reach the last externally witnessed LSN.
-    end = time.monotonic() + 180
-    while time.monotonic() < end:
-        acks = [r for r in journal() if r["stage"] == "ack"]
-        expected = max(lsn(r["flush_lsn"]) for r in acks)
-        statuses = json.loads(tool("wal-status", capture=True))
-        if len(statuses) == 3 and all(
-            lsn(s["flush_lsn"]) >= expected and lsn(s["commit_lsn"]) >= expected
-            for s in statuses.values()
-        ):
-            break
-        time.sleep(2)
-    else:
-        raise RuntimeError("all three safekeepers did not catch up to acknowledged WAL")
+    frozen_lsn, statuses = wal_barrier()
     recovered = time.monotonic() - began
     progress(after=time.time())
     observer.mark("after")
@@ -134,11 +168,22 @@ try:
     observations = observer.finish()
     tool("verify-recovery")
     tool("verify")
+    after_survivors = json.loads(run("docker", "inspect", *survivors, capture=True))
+    for survivor in after_survivors:
+        expected = survivors[survivor["Id"]]
+        if (
+            not survivor["State"]["Running"]
+            or survivor["State"]["StartedAt"] != expected["started_at"]
+        ):
+            raise RuntimeError(
+                "unrelated member restarted or stopped: " + expected["name"]
+            )
     rows = journal()
     result = {
         "case": case,
         "observations": observations,
         "target": target,
+        "unchanged_survivors": survivors,
         "scope": "empty owned volume replacement"
         if volume
         else "SIGKILL with retained volume",
@@ -148,6 +193,9 @@ try:
         "acknowledged_rows": sum(r["count"] for r in rows if r["stage"] == "ack"),
         "ambiguous_batches": sum(r["stage"] == "ambiguous" for r in rows),
         "wal_status": statuses,
+        "before_wal_status": before_wal,
+        "before_frozen_ack_lsn": before_lsn,
+        "frozen_ack_lsn": frozen_lsn,
         "reconciliation": json.loads((root / "recovery-history.json").read_text()),
     }
     (root / (case + "-result.json")).write_text(json.dumps(result, indent=2) + "\n")

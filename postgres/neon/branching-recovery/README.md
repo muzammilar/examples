@@ -46,16 +46,9 @@ different stages. Checkpoint/archive completion is not independently timed here.
 All copies share the same physical Docker host; there is no host-power-loss proof.
 Whole-stack resource/dependency costs differ, so this is not an equal-cost ranking.
 
-## Validation status
+## Measured results
 
-The measurements below are from the earlier passing deployment. The latest
-source-materialization and live-reader changes have not completed a fresh
-end-to-end lifecycle for this shape. Compilation/static checks do not replace
-that pending runtime validation.
-
-## Historical measured results
-
-2026-11-15, Apple M4 Pro, shared Docker VM aarch64 (11 CPUs / 24.42 GiB).
+2026-11-16, Apple M4 Pro, shared Docker VM aarch64 (11 CPUs / 24.42 GiB).
 One run per baseline/query; limits are above. Each backend retained and verified
 **1,000,000 rows and 32,000,000 SHA-256 payload bytes**, with **0 missing, duplicate
 or incorrect rows**. Both PostgreSQL replicas were also fully read after replay reached the primary LSN.
@@ -66,18 +59,19 @@ fsynced witness. This is a short backfill with warm caches, not steady-state cap
 
 | Backend | COPY elapsed (s) | Rows/s | 10,000-row batch p50 / p99 (ms) |
 |---|---:|---:|---:|
-| neon | 3.664 | 272,889 | 27.285 / 135.195 |
-| postgres | 2.420 | 413,229 | 17.124 / 103.332 |
+| neon | 3.312 | 301,935 | 27.010 / 108.644 |
+| postgres | 2.663 | 375,534 | 18.861 / 107.208 |
 
-Plain PostgreSQL's observed COPY rate was 1.51× Neon's in this run; the stacks have different resource budgets and durability paths.
+Plain PostgreSQL’s observed COPY rate was 1.24× Neon’s in this run; the stacks have different resource budgets and durability paths. COPY p99 uses the nearest-rank 99th percentile of 100 batches.
 
-One warmup + 20 measured queries; every count/sum is checked independently.
+Queries were measured after the recovery matrix, including empty compute-cache
+replacement. One warmup + 20 measured queries; every count/sum is checked independently.
 The reported p99 is the largest of only 20 observations.
 
 | Query | Neon p50 / p99 (ms) | PostgreSQL p50 / p99 (ms) | Neon/PostgreSQL p99 ratio |
 |---|---:|---:|---:|
-| customer-orders | 0.089 / 0.253 | 0.124 / 0.264 | 0.96× |
-| all-orders | 33.881 / 56.293 | 15.348 / 44.101 | 1.28× |
+| customer-orders | 0.094 / 0.312 | 0.097 / 0.132 | 2.37× |
+| all-orders | 124.609 / 176.158 | 13.387 / 53.097 | 3.32× |
 
 ## What Neon demonstrates: native copy-on-write branching
 
@@ -88,9 +82,9 @@ another database provides a full logical-copy baseline; it is not copy-on-write.
 
 | Operation | Measured |
 |---|---:|
-| Neon timeline-create API only | 5.853 ms |
-| Native branch through first verified SQL row, including compute startup | 6.445 s |
-| PostgreSQL full logical dump + restore, database creation excluded | 5.197 s |
+| Neon timeline-create API only | 118.083 ms |
+| Native branch through first verified SQL row, including compute startup | 6.601 s |
+| PostgreSQL full logical dump + restore, database creation excluded | 4.064 s |
 | Logical dump bytes | 46,663,913 bytes |
 
 Metadata creation was cheap, but startup dominated usable-branch time; this run
@@ -120,20 +114,32 @@ Independent verification checks every payload and historical ACK and rejects par
 COPY transactions, including partially visible ambiguous transactions. This bounded
 fault load is not a throughput benchmark.
 
-| Latest case | Recovery incl. 30 s hold (s) | ACK rows | Ambiguous transactions |
-|---|---:|---:|---:|
-| process / sk0 | 37.624 | 34,800 | 0 |
-| disk / sk0 | 39.447 | 37,900 | 0 |
-| process / sk1 | 37.579 | 35,200 | 0 |
-| compute / compute | 37.972 | 6,000 | 280 |
-| cache / compute | 38.595 | 5,800 | 303 |
+| Latest case | Recovery incl. 30 s hold (s) | ACK rows | Ambiguous transactions | Read errors | Missing/wrong known reads |
+|---|---:|---:|---:|---:|---:|
+| process / sk0 | 37.624 | 37,900 | 0 | 0 | 0 |
+| disk / sk0 | 38.981 | 38,700 | 0 | 0 | 0 |
+| process / sk1 | 37.496 | 37,500 | 0 | 0 | 0 |
+| compute / compute | 37.590 | 9,700 | 244 | 244 | 0 |
+| cache / compute | 37.712 | 9,800 | 244 | 244 | 0 |
 
-Full historical verification checked **120,500 acknowledged rows across 6 journals**,
-with **0 missing ACKs, 0 wrong/duplicate rows and 0 partial transactions**.
-The history includes the failed compute attempt; it is not a passing recovery run.
-The empty-WAL case’s `pull_timeline` returned `safekeeper_host=null`: the active
-proposer/native peer path had already created the timeline. Its final WAL LSNs
-and the later sk1-outage writes establish recovery, not the API return alone.
+Full historical verification checked **133,600 acknowledged rows across five
+journals**, with **zero missing ACKs, wrong/duplicate rows or partial COPY
+transactions**. All attempted ambiguous compute transactions were absent in this
+run; this is an observation, not a guarantee that failed responses never commit.
+Independent readers remained live throughout outages and native recovery. Each
+case also proved **19 unrelated containers** retained their IDs and start times.
+
+Before and after injection, all three safekeepers had to pass a frozen externally
+witnessed ACK LSN barrier, including native flush and commit positions. Read-only
+polling tolerates a not-yet-ready timeline until its bounded deadline while the
+load remains live. The Go writer has an explicit ten-second COPY/LSN deadline.
+The disk case invoked native `pull_timeline`; a null response can mean native
+peer recovery had already created the timeline, not a measured manual download.
+The subsequent sk1 outage demonstrates the repaired sk0 is usable.
+
+The full million-row branch was independently read again after all five recovery
+cases without creating another logical copy. Original failed restart evidence
+remains in archived earlier results; it is not counted as a passing case here.
 
 ## Gotchas and limits
 
@@ -157,10 +163,10 @@ and the later sk1-outage writes establish recovery, not the API return alone.
   failover, network partition, TLS/authentication, upgrades, resource exhaustion,
   sustained load or recovery from an independent backup. One failed multi-component host is outside this lab’s redundancy boundary.
 
-The full five-command cleanup passed. Results and failed attempts remain under
-ignored `results/`; bootstrap-only evidence was archived separately before the
-fresh measured clustered fixture. Local credentials/plaintext endpoints are lab
-configuration, not a security qualification.
+The final five-command lifecycle and cleanup passed. Raw reports and previous
+completed/failed runs remain under ignored `results/`. No owned containers or
+volumes remained. Local credentials/plaintext endpoints are lab configuration,
+not a security qualification.
 
 ## Sources
 
