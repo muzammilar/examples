@@ -287,6 +287,24 @@ These extend both deployment matrices instead of creating duplicate examples.
   end-to-end latency. State cold/warm caches, compression, retry policy, emulation,
   shared-host contention and run count; do not call a rate-limited fault workload
   or a tiny correctness fixture a capacity benchmark.
+- Compare systems on the same machine class: CPU model/architecture and count,
+  RAM, storage type/capacity/IOPS limits and network settings. Match per-node
+  resources for comparable roles and report the whole-stack budget, including
+  WAL, metadata, routers, collectors and object storage. Use the same workload
+  generator budget; state topology/durability differences instead of hiding costs.
+- Exercise **different insert/query approaches** where supported. Compare
+  **single-record inserts versus batched inserts**, plus appropriate native bulk
+  APIs, prepared/pipelined requests or alternative query forms. Sweep matching
+  batch row/byte sizes, concurrency and compression; keep data, results,
+  transaction/durability semantics and retry rules equivalent. Report each path
+  separately with per-record and per-request rates; do not select one approach
+  for one system and a different approach for its competitor without labeling it.
+- Measure **cold versus warm queries separately** on the same dataset and query
+  semantics. Document warmup count and which caches are cold/warm: result, plan,
+  engine block and OS page caches where applicable. Restarting an application does
+  not establish a cold OS cache. Use supported cache controls or an isolated
+  owned VM for cold runs, never clear a shared host's caches. Validate returned
+  bodies/results in both modes and report cache preparation separately.
 - Verify the health/metrics/logs used to diagnose each test expose the injected
   failure, lag and recovery. Save native status, controller events and relevant
   logs alongside client measurements; a dashboard alone does not validate data.

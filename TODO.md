@@ -321,9 +321,11 @@ Plan and source links: [`observability/README.md`](observability/README.md), inc
 
 - [ ] **After the current recovery backfills:** fair GreptimeDB vs Victoria stack
   comparison using [the comparison contract](observability/README.md#greptimedb-vs-victoria-after-the-recovery-backfills).
-  Match whole-stack budgets and durability, replay identical input/queries, run
-  at least three repetitions in alternating order, and compare sustained load,
-  cold/warm latency, visibility, storage and live-fault recovery. Existing
+  Match machine class, per-node and whole-stack budgets and durability. Replay
+  identical input/queries; compare single versus batched ingestion and supported
+  native/protocol/query approaches, with separate cold/warm cache measurements.
+  Run at least three repetitions in alternating order; compare sustained load,
+  visibility, storage and live-fault recovery. Existing
   VictoriaMetrics/VictoriaLogs baselines are not a complete stack qualification.
 - [ ] Main three-stack comparison: **GreptimeDB vs VictoriaMetrics + VictoriaLogs + VictoriaTraces vs Prometheus + Loki + Tempo**. One instrumented application/corpus, matching event times/IDs/tenants/retention/sampling, independent sample/log/span-body oracle, supported common queries, and sequential whole-stack resource budgets. Measure ingestion admission versus durable post-crash visibility, warm/cold query latency, storage, compaction/backpressure and recovery. Keep standalone/HA/distributed differences explicit; Prometheus HA is not native database sharding. Cortex/Mimir extensions remain separate. Full three-signal comparison is future work beyond the current metrics/logs baseline.
 

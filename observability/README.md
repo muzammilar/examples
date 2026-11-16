@@ -32,6 +32,21 @@ Victoria stack or establish a fair whole-stack winner.
   compare at equal **total** CPU, RAM and storage budgets, including every WAL,
   metadata, object-store, collector and routing dependency. Report architectures
   that cannot meet the same durability contract separately.
+- Use the same machine class, CPU architecture/model/count, RAM, disk type and
+  capacity/IOPS limits, and network configuration. Match per-node sizes for
+  comparable roles as well as the whole-stack budget above. Use identically sized
+  generators and record every dependency; larger hidden WAL/storage machines
+  would invalidate the comparison.
+- Compare single-record ingestion with batches (initial sweep: **1, 100, 1,000,
+  10,000 records/request**, recording payload bytes too), matched concurrency and
+  compression. Exercise a common supported protocol and each engine's recommended
+  native/bulk path separately. Include encoding/collector costs in end-to-end
+  measurements; keep API-active throughput as a separately labeled metric.
+- Test equivalent query approaches where supported, with independent result
+  validation. Measure cold and warm execution separately, recording warmups and
+  result/plan/engine/OS cache state. Do not label a process restart as a fully cold
+  storage-cache run; use supported controls or an isolated owned VM. Precomputed
+  aggregates and other unequal work belong in separate profiles.
 - Replay identical metric samples and log bodies, tenant/cardinality/skew and
   out-of-order distributions, batch sizes, retention and query time ranges.
   Include traces only where the pinned engines support equivalent ingestion and
