@@ -5,6 +5,6 @@ CREATE TABLE IF NOT EXISTS orders (
  customer_id bigint NOT NULL, op_id bigint NOT NULL, amount bigint NOT NULL,
  PRIMARY KEY(customer_id, op_id)
 );
-SET citus.shard_count = 30;
-SELECT create_distributed_table('customers', 'customer_id');
-SELECT create_distributed_table('orders', 'customer_id', colocate_with => 'customers');
+CREATE TABLE IF NOT EXISTS customer_profiles (
+ customer_id bigint PRIMARY KEY, version bigint NOT NULL, display_name text NOT NULL
+);

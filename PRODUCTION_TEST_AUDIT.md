@@ -51,6 +51,20 @@ READMEs retain dated execution results and limitations.
   comparisons passed. A fresh five-command lifecycle passed another million
   orders and the burst test; final cleanup left no owned resources or build tags.
   Remaining operational cases are listed below.
+- [Citus](postgres/citus-docker-compose-cluster/): preserved order/profile witnesses,
+  independent reader, native logical-shard/owner mapping, physical body checks on
+  every worker copy and coordinator metadata-copy checks. Primary crashes and
+  synchronous-standby pauses on groups 0–3 plus live 3 → 5 → 3 scaling passed:
+  **14,318,300 cumulative ACK orders across 12 histories**, 120 ACK profile updates
+  across three versions, zero loss/corruption/misplacement/duplicates/partial rows.
+  Scale-out used 15 worker copies; scale-in restored nine and proved all six removed
+  members empty/stopped after cleanup replay. A same-owner wrong-logical-shard
+  negative control produced exactly one placement error, then restored that exact
+  ACK body without resetting history. Citus hides physical shards from `pg_class`
+  by default; inventory/drain audits now explicitly expose them in their session.
+  Fresh-volume lifecycle passed another million orders and 40 witnessed profile
+  transactions with final-source nearest-rank percentiles/raw samples; cleanup
+  left no owned containers, volumes, networks or build tags.
 - Kafka [Strimzi JBOD](kafka/strimzi-jbod/) and
   [mirroring](kafka/cross-cluster-mirroring/): private kubeconfig export/cleanup
   corrected; evaluated Make recipes prove the exported example-local path. This
@@ -63,9 +77,10 @@ Closing one fault case does not close the entire deployment matrix.
 
 | Cohort | Inspected source | Remaining concrete gap |
 |---|---|---|
-| Citus; MySQL customer sharding, Vitess, NDB | Example Makefiles, Go `app/main.go`, `scripts/run-fault.sh`, native placement/replica scripts | Fault prerequisites truncate orders between cases. Preserve unique scenario IDs and reconcile older ACK histories; add independent live readers. Exercise each shard/failure domain, while retaining existing native placement checks. |
+| MySQL customer sharding, Vitess, NDB | Example Makefiles, Go `app/main.go`, `scripts/run-fault.sh`, native placement/replica scripts | Fault prerequisites truncate orders between cases. Preserve unique scenario IDs and reconcile older ACK histories; add independent live readers. Exercise each shard/failure domain, while retaining existing native placement checks. |
 | Postgres customer sharding | `control.py`, independent `orders-workload/` writer/reader, native hash oracle and all-copy verifier | Core reader/history/placement backfill qualified above. Partitions, DCS/quorum loss, stale-primary rejection, physical disk loss, router outage, rolling upgrades, pressure, backup/restore and online resharding remain unrun. |
 | PgDog pooling | `control.py`, independent `orders-workload/` observers and all-copy verifier | Core reader/history backfill and five live role/configuration cases qualified above. DCS/quorum loss, partitions/stale-primary fencing, permanent disk loss, rolling upgrades, pressure and independent restore remain unrun. |
+| Citus | `control.py`, native physical-table queries, independent `orders-workload/` observer, monotonic profile witness and `placement_guard.py` | Core reader/history/physical-placement backfill, all group-primary/standby-pause cases and live scale cycle qualified above. DCS/quorum loss, peer partitions, stale-primary rejection, permanent disk loss, rolling upgrades, pressure, independent restore and controlled cold/single-record benchmarks remain unrun. |
 | Typesense, Vespa, pgvector, LanceDB | `datasets/esci/client/fault.py`, `workload.py`, engine adapters | Update and search share one churn loop, so blocked writes stop read observation. The prior witness-overwrite path now fails closed before Docker; 16 negative preflight cases passed. Cross-run version histories, independent searches and per-phase success/failure latency remain gaps. Typesense application sharding and LanceDB shared-file clients must not be called native database sharding/replication. |
 | SeaweedFS, Garage, RustFS, Ceph | `object-storage/fault.py`, `object-storage/client/workload.py`, native adapters/auditors; Ceph `scripts/fault.py` and `app/recovery.py` | Existing external ACK/byte and physical repair checks are useful. GET follows PUT in one loop: add independent read observation. Restore injected faults on every error; compare survivor start identity as well as container ID. Add role/dependency/quorum and pressure cases beyond data-disk loss. |
 | Kafka Strimzi JBOD | Make chaos recipes, C++ producer/Rust consumer | Consumer starts after producer/fault, so continuous read availability and lag are unobserved. Topics reset per case. Add live consumer, durable external delivery/offset history and native ISR/rebuild barriers. |
@@ -112,7 +127,7 @@ inventory with `python3 tools/audit-production-tests.py`; output is ignored unde
 | [mysql/customer-sharding](mysql/customer-sharding/) | Compose | crash | suite, disk, scale-out, scale-in, rolling, partition, pressure, restore, drain | declaration inventory only |
 | [mysql/ndb-cluster-docker-compose-cluster](mysql/ndb-cluster-docker-compose-cluster/) | Compose | crash | suite, disk, scale-out, scale-in, rolling, partition, pressure, restore, drain | declaration inventory only |
 | [mysql/vitess-docker-compose-cluster](mysql/vitess-docker-compose-cluster/) | Compose | crash | suite, disk, scale-out, scale-in, rolling, partition, pressure, restore, drain | declaration inventory only |
-| [postgres/citus-docker-compose-cluster](postgres/citus-docker-compose-cluster/) | Compose | crash, scale-out, scale-in | suite, disk, rolling, partition, pressure, restore, drain | declaration inventory only |
+| [postgres/citus-docker-compose-cluster](postgres/citus-docker-compose-cluster/) | Compose | suite, crash, scale-out, scale-in | disk, rolling, partition, pressure, restore, drain | ten live operations and placement-negative recovery qualified above; other categories require separate work |
 | [postgres/customer-sharding](postgres/customer-sharding/) | Compose | suite, crash | disk, scale-out, scale-in, rolling, partition, pressure, restore, drain | six live fault cases qualified above; other categories require separate work |
 | [postgres/neon/branching-recovery](postgres/neon/branching-recovery/) | Compose | suite, crash, disk | scale-out, scale-in, rolling, partition, pressure, restore, drain | declaration inventory only |
 | [postgres/neon/kubernetes-statefulset](postgres/neon/kubernetes-statefulset/) | Kubernetes | suite, crash, disk, restore | scale-out, scale-in, rolling, partition, pressure, drain | declaration inventory only |

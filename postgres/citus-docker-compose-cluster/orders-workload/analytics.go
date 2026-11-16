@@ -5,7 +5,8 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"os"
+	"math"
+
 	"sort"
 	"sync"
 	"time"
@@ -14,37 +15,62 @@ import (
 const dashboardSQL = "SELECT c.customer_id,count(*),sum(o.amount) FROM customers c JOIN orders o USING(customer_id)"
 
 type analyticsPhase struct {
-	Operations int     `json:"operations"`
-	Elapsed    float64 `json:"elapsed_seconds"`
-	Rate       float64 `json:"operations_per_second"`
-	P50        float64 `json:"p50_ms"`
-	P99        float64 `json:"p99_ms"`
-	Max        float64 `json:"max_ms"`
+	Operations int       `json:"operations"`
+	Elapsed    float64   `json:"elapsed_seconds"`
+	Rate       float64   `json:"operations_per_second"`
+	P50        float64   `json:"p50_ms"`
+	P99        float64   `json:"p99_ms"`
+	Max        float64   `json:"max_ms"`
+	Samples    []float64 `json:"latency_samples_ms"`
 }
 
 func analyticsStats(samples []float64, elapsed time.Duration) analyticsPhase {
+	raw := append([]float64(nil), samples...)
 	sort.Float64s(samples)
 	n := len(samples)
-	return analyticsPhase{n, elapsed.Seconds(), float64(n) / elapsed.Seconds(), samples[(n-1)/2], samples[(n-1)*99/100], samples[n-1]}
+	return analyticsPhase{Operations: n, Elapsed: elapsed.Seconds(), Rate: float64(n) / elapsed.Seconds(), P50: samples[int(math.Ceil(float64(n)*.50))-1], P99: samples[int(math.Ceil(float64(n)*.99))-1], Max: samples[n-1], Samples: raw}
 }
 
-func analytics(db *sql.DB, count, customers, batch, workers int) error {
+func analytics(db *sql.DB, f fixture, route []int) error {
+	customers, workers := f.Customers, number("WORKERS", 8)
+	var config profileConfig
+	if err := readJSON("/results/analytics.json", &config); err != nil {
+		return err
+	}
+	journal, err := openJournal("profiles.jsonl")
+	if err != nil {
+		return err
+	}
+	defer journal.file.Close()
 	queries := number("ANALYTICS_QUERIES", 25)
 	requests := number("ANALYTICS_REQUESTS", 200)
-	if count < customers*batch {
-		return fmt.Errorf("tenant analytics requires COUNT >= CUSTOMERS * BATCH")
-	}
 	if requests > customers || queries > customers {
 		return fmt.Errorf("analytics queries and requests must not exceed CUSTOMERS")
 	}
 	expectedCount := make([]int, customers)
 	expectedSum := make([]int64, customers)
 	var totalSum int64
-	for id := 0; id < count; id++ {
-		c := (id / batch) % customers
-		expectedCount[c]++
-		expectedSum[c] += int64(id%10000 + 1)
-		totalSum += int64(id%10000 + 1)
+	ledger, err := history("/witness", route)
+	if err != nil {
+		return err
+	}
+	count := 0
+	for _, run := range ledger.runs {
+		for offset, flags := range run.flags {
+			if flags&acknowledged != 0 {
+				id := run.config.Base + int64(offset)
+				c := (offset / run.config.Batch) % customers
+				expectedCount[c]++
+				expectedSum[c] += id%10000 + 1
+				totalSum += id%10000 + 1
+				count++
+			}
+		}
+	}
+	for c, n := range expectedCount {
+		if n == 0 {
+			return fmt.Errorf("customer %d has no acknowledged orders", c)
+		}
 	}
 	global := dashboardSQL + " GROUP BY c.customer_id"
 	local := dashboardSQL + " WHERE c.customer_id=$1 GROUP BY c.customer_id"
@@ -149,9 +175,6 @@ func analytics(db *sql.DB, count, customers, batch, workers int) error {
 		phases[mode] = analyticsStats(samples, time.Since(phaseStart))
 	}
 	// A tenant-scoped transaction changes the profile and reads its colocated orders.
-	if _, err := db.Exec("UPDATE customers SET name='inactive'"); err != nil {
-		return err
-	}
 	jobs := make(chan int)
 	samples := make(chan float64, requests)
 	errs := make(chan error, workers)
@@ -169,11 +192,19 @@ func analytics(db *sql.DB, count, customers, batch, workers int) error {
 				var gotC, n int
 				var sum int64
 				var err error
+				uncertain := false
+				mutation := event{Stage: "attempt", First: config.Version, Count: 1, Customer: c, Shard: route[c], Started: time.Now().UTC()}
 				if c%5 == 0 {
+					if err = journal.append(mutation); err != nil {
+						errs <- err
+						cancel()
+						qcancel()
+						return
+					}
 					var tx *sql.Tx
 					tx, err = db.BeginTx(qctx, nil)
 					if err == nil {
-						_, err = tx.ExecContext(qctx, "UPDATE customers SET name=$1 WHERE customer_id=$2", fmt.Sprintf("active-%d", c), c)
+						_, err = tx.ExecContext(qctx, "INSERT INTO customer_profiles(customer_id,version,display_name) VALUES($1,$2,$3) ON CONFLICT(customer_id) DO UPDATE SET version=excluded.version,display_name=excluded.display_name WHERE customer_profiles.version<excluded.version", c, config.Version, profileName(config.Version, c))
 						if err == nil {
 							err = tx.QueryRowContext(qctx, local, c).Scan(&gotC, &n, &sum)
 						}
@@ -182,6 +213,7 @@ func analytics(db *sql.DB, count, customers, batch, workers int) error {
 						}
 						if err == nil {
 							err = tx.Commit()
+							uncertain = err != nil
 						} else {
 							_ = tx.Rollback()
 						}
@@ -193,6 +225,21 @@ func analytics(db *sql.DB, count, customers, batch, workers int) error {
 					}
 				}
 				qcancel()
+				if c%5 == 0 {
+					mutation.At = time.Now().UTC()
+					mutation.Latency = float64(time.Since(started)) / float64(time.Millisecond)
+					mutation.Stage = "ack"
+					if err != nil {
+						mutation.Stage = "error"
+						mutation.Error = err.Error()
+						mutation.Ambiguous = uncertain
+					}
+					if e := journal.append(mutation); e != nil {
+						errs <- e
+						cancel()
+						return
+					}
+				}
 				if err != nil {
 					errs <- err
 					cancel()
@@ -227,18 +274,18 @@ func analytics(db *sql.DB, count, customers, batch, workers int) error {
 		return fmt.Errorf("incomplete mixed workload")
 	}
 	phases["mixed_tenant_transactions"] = analyticsStats(durations, time.Since(start))
-	var changed int
-	if err := db.QueryRow("SELECT count(*) FROM customers WHERE name LIKE 'active-%'").Scan(&changed); err != nil {
-		return err
-	}
-	if changed != (requests+4)/5 {
-		return fmt.Errorf("profile changes %d", changed)
+	changed := 0
+	for c := 0; c < requests; c += 5 {
+		var version int64
+		var name string
+		if err := db.QueryRow("SELECT version,display_name FROM customer_profiles WHERE customer_id=$1", c).Scan(&version, &name); err != nil {
+			return err
+		}
+		if version != config.Version || name != profileName(config.Version, c) {
+			return fmt.Errorf("profile %d mismatch", c)
+		}
+		changed++
 	}
 	result := map[string]any{"orders": count, "customers": customers, "profile_updates": changed, "task_counts": taskCounts, "phases": phases, "plans": plans}
-	data, err := json.MarshalIndent(result, "", "  ")
-	if err != nil {
-		return err
-	}
-	fmt.Println(string(data))
-	return os.WriteFile("/results/tenant-analytics.json", append(data, '\n'), 0644)
+	return save("/results/tenant-analytics.json", result)
 }

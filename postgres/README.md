@@ -14,18 +14,20 @@ GitHub: [postgres/postgres](https://github.com/postgres/postgres), [citusdata/ci
 
 | Example | Date / setup | Observed result |
 |---|---|---|
-| [Citus recovery](citus-docker-compose-cluster/#measured-results) | 2026-11-14, Apple M4 Pro, shared native aarch64 Docker | 1,000,000 orders in 4.735 s; 211,185 orders/s; batch p99 16.857 ms; promotions 21 s; 0 acknowledged loss |
+| [Citus recovery](citus-docker-compose-cluster/#measured-results) | 2026-11-16, Apple M4 Pro, native aarch64 Docker; each PostgreSQL copy 1 CPU / 1 GiB | Final million-order append: 7.283 s, 137,309 orders/s, batch p99 16.304 ms; group promotions 18.990–21.450 s; live 3 → 5 → 3 moves, 14,318,300 retained ACK orders and witnessed profiles, 0 loss/corruption/misplacement |
 | [PgDog pooling and recovery](pgdog-docker-compose-cluster/#measured-results) | 2026-11-16, Apple M4 Pro, native aarch64 Docker; PostgreSQL/PgDog each 1 CPU / 1 GiB | Final million-order append: 6.375 s, 156,865 orders/s, batch p99 16.540 ms; five live fault/config cases, 12 million historical ACKs retained on all three copies with no loss/corruption/duplicates; promotion 20.624 s |
 | [Customer sharding](customer-sharding/#results), 2026-11-16 | 8,030,000 retained ACK orders across 11 histories, 10,000 customers, 3 × 3 database copies | Post-recovery million-order append: 6.062 s, 164,973 orders/s, batch p99 15.010 ms. Primary failures and synchronous-standby pauses on every shard; native promotion 17.866–19.354 s, 0 missing/corrupt/duplicate/misplaced rows on all nine copies. |
 | [pgvector retrieval](pgvector-product-search/#benchmark) | 2026-11-15, Apple M4 Pro / native aarch64 Docker; 100,000 products, primary 2 CPUs / 2 GiB | 8-client dense 290.82 QPS, p99 86.29 ms, recall@10 0.9919; 20.61 s client-observed write recovery, 0 acknowledged loss |
 
+These dated per-example runs use different datasets and resource budgets; they are not a normalized cross-engine comparison.
+
 ## Representative workloads
 
-[Colocated tenant dashboards](citus-docker-compose-cluster/#representative-workload-tenant-dashboards) run in the cluster example's `make test`: 1,000,000 orders, 10,000 tenants, one routed task versus 30 distributed tasks, and 40 committed profile transactions. Measured tenant-query p50 was 0.438 ms versus 73.078 ms when fetching every tenant's aggregate for a single customer's answer. This is the Citus workload example; no duplicate deployment is needed.
+[Colocated tenant dashboards](citus-docker-compose-cluster/#witnessed-tenant-dashboards-and-profiles) run in `make test`: native plans show one routed task versus 30 global tasks, and 200 mixed requests include 40 witnessed profile transactions. On the final 14,318,300-order dataset, tenant-filtered query p50 was 1.327 ms versus 790.540 ms when fetching every tenant's aggregate to answer one tenant. These short cache-affected observations illustrate avoided fan-out; the profile/order histories are also verified after failover and shard moves.
 
 [Short-lived connection bursts](pgdog-docker-compose-cluster/#representative-workload-connection-bursts) run automatically in `make test`. On the retained 12-million-order dataset, 256 clients opened 4,000 fresh connections per path: PgDog served all 4,000, while direct PostgreSQL served 3,537 with 463 capacity errors. Successful throughput was 1,965 versus 180 requests/s in this capped, fixed-order local burst. Full successful/failed latencies, backend samples and limits are in the example; these are admission observations, not cold-query or capacity rankings.
 
-The existing customer-orders example covers tenant-scoped PostgreSQL transactions and joins through PgDog across three replicated shards. Its million-order runs exercise the customer-local SQL model and recovery; a separate [PgDog pooling scenario](pgdog-docker-compose-cluster/) covers short-lived connection bursts, and [Citus tenant analytics](citus-docker-compose-cluster/) covers native distributed-query planning. Those workloads are kept distinct rather than copying the same order writer into another directory.
+The existing customer-orders example covers tenant-scoped PostgreSQL transactions and joins through PgDog across three replicated shards. Its million-order runs exercise the customer-local SQL model and recovery; a separate [PgDog pooling scenario](pgdog-docker-compose-cluster/) covers short-lived connection bursts, and [Citus tenant analytics](citus-docker-compose-cluster/#witnessed-tenant-dashboards-and-profiles) covers native distributed-query planning. Those workloads are kept distinct rather than copying the same order writer into another directory.
 
 ## Known issues
 

@@ -1,4 +1,4 @@
-module examples/customer-sharding
+module examples/citus-orders
 
 go 1.24.0
 

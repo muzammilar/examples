@@ -1,6 +1,8 @@
-name: postgres-citus-cluster
+name: postgres-citus-orders
 services:
   etcd0:
+    cpus: "0.25"
+    mem_limit: 256m
     image: quay.io/coreos/etcd:v3.5.21
     hostname: etcd0
     command:
@@ -21,6 +23,8 @@ services:
       timeout: 3s
       retries: 40
   etcd1:
+    cpus: "0.25"
+    mem_limit: 256m
     image: quay.io/coreos/etcd:v3.5.21
     hostname: etcd1
     command:
@@ -41,6 +45,8 @@ services:
       timeout: 3s
       retries: 40
   etcd2:
+    cpus: "0.25"
+    mem_limit: 256m
     image: quay.io/coreos/etcd:v3.5.21
     hostname: etcd2
     command:
@@ -61,6 +67,8 @@ services:
       timeout: 3s
       retries: 40
   s0n0:
+    cpus: "1"
+    mem_limit: 1g
     build: ./patroni
     image: postgres-citus-patroni:dev
     environment:
@@ -83,6 +91,8 @@ services:
       retries: 60
       start_period: 30s
   s0n1:
+    cpus: "1"
+    mem_limit: 1g
     build: ./patroni
     image: postgres-citus-patroni:dev
     environment:
@@ -105,6 +115,8 @@ services:
       retries: 60
       start_period: 30s
   s0n2:
+    cpus: "1"
+    mem_limit: 1g
     build: ./patroni
     image: postgres-citus-patroni:dev
     environment:
@@ -127,6 +139,8 @@ services:
       retries: 60
       start_period: 30s
   s1n0:
+    cpus: "1"
+    mem_limit: 1g
     build: ./patroni
     image: postgres-citus-patroni:dev
     environment:
@@ -149,6 +163,8 @@ services:
       retries: 60
       start_period: 30s
   s1n1:
+    cpus: "1"
+    mem_limit: 1g
     build: ./patroni
     image: postgres-citus-patroni:dev
     environment:
@@ -171,6 +187,8 @@ services:
       retries: 60
       start_period: 30s
   s1n2:
+    cpus: "1"
+    mem_limit: 1g
     build: ./patroni
     image: postgres-citus-patroni:dev
     environment:
@@ -193,6 +211,8 @@ services:
       retries: 60
       start_period: 30s
   s2n0:
+    cpus: "1"
+    mem_limit: 1g
     build: ./patroni
     image: postgres-citus-patroni:dev
     environment:
@@ -215,6 +235,8 @@ services:
       retries: 60
       start_period: 30s
   s2n1:
+    cpus: "1"
+    mem_limit: 1g
     build: ./patroni
     image: postgres-citus-patroni:dev
     environment:
@@ -237,6 +259,8 @@ services:
       retries: 60
       start_period: 30s
   s2n2:
+    cpus: "1"
+    mem_limit: 1g
     build: ./patroni
     image: postgres-citus-patroni:dev
     environment:
@@ -259,6 +283,8 @@ services:
       retries: 60
       start_period: 30s
   s3n0:
+    cpus: "1"
+    mem_limit: 1g
     build: ./patroni
     image: postgres-citus-patroni:dev
     environment:
@@ -281,6 +307,8 @@ services:
       retries: 60
       start_period: 30s
   s3n1:
+    cpus: "1"
+    mem_limit: 1g
     build: ./patroni
     image: postgres-citus-patroni:dev
     environment:
@@ -303,6 +331,8 @@ services:
       retries: 60
       start_period: 30s
   s3n2:
+    cpus: "1"
+    mem_limit: 1g
     build: ./patroni
     image: postgres-citus-patroni:dev
     environment:
@@ -325,6 +355,8 @@ services:
       retries: 60
       start_period: 30s
   s4n0:
+    cpus: "1"
+    mem_limit: 1g
     profiles: [scale]
     build: ./patroni
     image: postgres-citus-patroni:dev
@@ -348,6 +380,8 @@ services:
       retries: 60
       start_period: 30s
   s4n1:
+    cpus: "1"
+    mem_limit: 1g
     profiles: [scale]
     build: ./patroni
     image: postgres-citus-patroni:dev
@@ -371,6 +405,8 @@ services:
       retries: 60
       start_period: 30s
   s4n2:
+    cpus: "1"
+    mem_limit: 1g
     profiles: [scale]
     build: ./patroni
     image: postgres-citus-patroni:dev
@@ -394,6 +430,8 @@ services:
       retries: 60
       start_period: 30s
   s5n0:
+    cpus: "1"
+    mem_limit: 1g
     profiles: [scale]
     build: ./patroni
     image: postgres-citus-patroni:dev
@@ -417,6 +455,8 @@ services:
       retries: 60
       start_period: 30s
   s5n1:
+    cpus: "1"
+    mem_limit: 1g
     profiles: [scale]
     build: ./patroni
     image: postgres-citus-patroni:dev
@@ -440,6 +480,8 @@ services:
       retries: 60
       start_period: 30s
   s5n2:
+    cpus: "1"
+    mem_limit: 1g
     profiles: [scale]
     build: ./patroni
     image: postgres-citus-patroni:dev
@@ -463,6 +505,8 @@ services:
       retries: 60
       start_period: 30s
   router:
+    cpus: "0.5"
+    mem_limit: 256m
     image: haproxy:3.2.4-alpine
     ports:
       - "127.0.0.1:${CITUS_PORT:-5433}:5432"
@@ -478,6 +522,8 @@ services:
       s0n1: {condition: service_healthy}
       s0n2: {condition: service_healthy}
   client:
+    cpus: "0.5"
+    mem_limit: 128m
     profiles: [tools]
     image: postgres:18.0-bookworm
     environment:
@@ -485,11 +531,12 @@ services:
     volumes:
       - ./sql:/sql:ro
   workload:
+    cpus: "2"
+    mem_limit: 1g
     image: postgres-citus-workload:dev
     profiles: [tools]
-    build: ./app
+    build: ./orders-workload
     environment:
-      DRIVER: pgx
       DSN: postgres://postgres:local-postgres@router:5432/postgres?sslmode=disable
       COUNT: ${COUNT:-1000000}
       ANALYTICS_QUERIES: ${ANALYTICS_QUERIES:-25}
@@ -497,10 +544,10 @@ services:
       CUSTOMERS: ${CUSTOMERS:-10000}
       WORKERS: ${WORKERS:-8}
       BATCH: ${BATCH:-100}
-      BULK: ${BULK:-1}
       RATE: ${RATE:-0}
     volumes:
-      - ./${RESULTS_DIR:-results/manual}:/results
+      - ${RESULTS_DIR:-./results/manual}:/results
+      - ${WITNESS_DIR:-./results/uninitialized}:/witness:ro
 volumes:
   etcd0:
   etcd1:

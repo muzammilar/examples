@@ -1,123 +1,232 @@
-# Citus colocated orders, recovery and rebalancing
+# Citus — colocated tenant orders, recovery and shard moves
 
-Citus 14.2.0 with three worker groups and a coordinator group. Each group has one PostgreSQL primary and two physical replicas managed by Patroni. A customer-local workload continues through promotion, replica stalls and worker-group rebalancing.
+Citus with **three worker groups plus a coordinator group**, each with **one primary + two physical replicas**. The workload models tenant-local orders, dashboard reads and profile transactions. It keeps independent reads/writes active through primary failure, replica pause and **3 → 5 → 3** worker-group scaling.
 
 ## Quick start
 
-1. `make docker-up` — compile Citus and wait for 12 PostgreSQL instances, etcd and the coordinator router.
-2. `make up` — provision distributed tables, build the Go client and seed 10,000 customers.
-3. `make test` — write and reconcile 1,000,000 orders, run tenant dashboards/profile transactions and wait for every replica to catch up.
-4. `make down` — drop the distributed tables.
-5. `make docker-down` — remove this project's services, named volumes and locally built images, including scale-profile workers.
+1. `make docker-up` — build Citus/Patroni and start 12 PostgreSQL instances, three etcd members and HAProxy.
+2. `make up` — identify the dataset, provision three colocated distributed tables and seed 10,000 customers.
+3. `make test` — append 1,000,000 orders, verify retained ACKs and every physical worker shard, then run tenant dashboards/profile transactions.
+4. `make down` — verify retained orders/profiles, then drop this example's tables.
+5. `make docker-down` — remove only this project's containers, volumes, network and built image tags, including scale-profile workers.
 
-Requires Docker Compose v2 and Make. Build tools and PostgreSQL clients run in Docker. Allow 12 GiB RAM and at least 15 GiB free Docker disk space for the expanded topology. The first Citus build takes several minutes. SQL binds `127.0.0.1:5433`, overridable with `CITUS_PORT`; credentials are local example values in Compose.
+Requires Docker Compose v2, Make and **Python 3.11+** (standard library only). Build tools, Go and PostgreSQL clients run in Docker. Allow at least 15 GiB Docker disk headroom; the expanded topology contains 18 PostgreSQL processes. SQL binds `127.0.0.1:5433`, overridable with `CITUS_PORT`. Credentials are local demonstration values. Compose project: `postgres-citus-orders`.
 
-## Placement and configuration
+`orders-workload/` contains the Go writer, independent reader, historical/body verifier and tenant workload, with its own Dockerfile and pinned dependencies. No sibling example or generated state is required. Repeated setup and tests retain data; **no test truncates or drops the previous case's orders**. `down` is the explicit cleanup boundary. Keep ignored `results/`, including unsuccessful attempts. An example-local lock rejects concurrent controllers.
 
-| Component | Configuration |
+## Topology and settings
+
+| Component / variable | Configuration |
 |---|---|
 | Citus | 14.2.0 source archive, SHA-256 checked, compiled natively |
-| PostgreSQL | Server and development headers both pinned to Debian package `18.7-1.pgdg12+2` |
-| Coordinator | Group 0, 1 primary + 2 replicas, health-checked HAProxy 3.2.4 endpoint |
-| Workers | Groups 1–3, 1 primary + 2 replicas each: 9 data-serving copies |
-| Distributed tables | 30 logical shards per table; `customer_id` distribution key; customers/orders colocated |
-| HA | Patroni 4.0.6 native Citus integration, 3 etcd 3.5.21 members |
-| Commit | Strict synchronous mode, 1 synchronous standby, synchronous commit on; third copy asynchronous |
-| Storage / recovery | Checksums, logical WAL for shard moves, pg_rewind, 512 MiB retained WAL per instance, rebuild on failed rewind |
+| PostgreSQL | Runtime and development package both `18.7-1.pgdg12+2` |
+| Patroni / etcd / router | 4.0.6 / 3.5.21, three DCS members / HAProxy 3.2.4 |
+| Coordinator | Group 0, one primary + two physical standbys; HAProxy follows `/primary` |
+| Workers | Groups 1–3 initially; add 4–5 during scale-out; three physical copies each |
+| Placement | 30 logical shards **per table**; `customers`, `orders`, `customer_profiles` colocated by `customer_id` |
+| Durability | Strict synchronous mode, one synchronous standby and synchronous commit; third copy asynchronous |
+| Recovery | Checksums, logical WAL for moves, pg_rewind/rebuild, 512 MiB retained WAL per instance |
+| Application | Go 1.25.1, `database/sql` + pgx 5.7.6, nonroot distroless runtime; Docker formatting/vet/unit gates |
+| `COUNT` / `CUSTOMERS` | 1,000,000 new orders per finite case / 10,000 customers fixed at setup |
+| `WORKERS` / `BATCH` | 8 writers / 100 orders for one customer per transaction |
+| `CHAOS_RATE` | 25,000 offered rows/s during faults/moves; backpressure can reduce it |
+| `MAX_ROWS` | `10 * COUNT` reserved IDs per live case; exhaustion before recovery fails |
+| `FAULT_SHARD` | 1 by default; **worker/coordinator group**, not a logical shard ID; 0 targets the coordinator |
+| `RUN_ID` | Unique timestamp/random suffix unless supplied; failed reservations cannot be reused |
+| `ANALYTICS_QUERIES` / `ANALYTICS_REQUESTS` | 25 serial requests per query approach / 200 mixed tenant requests |
 
-Logical Citus shards are different from PostgreSQL copies. There are 30 order shards and 30 colocated customer shards across three worker groups. Physical streaming replication supplies the three copies within each group; this example does not use three independent Citus shard placements. The coordinator's three additional copies make **12 PostgreSQL instances** at baseline. Five worker groups require **18 instances** including the coordinator group.
+Thirty logical order shards are not thirty physical replicas. Citus owns placement/moves and colocated query planning; Patroni promotes PostgreSQL copies and updates Citus membership. The baseline has **12 PostgreSQL instances**: nine data-serving worker copies and three coordinator copies. Five worker groups make **18 instances**. A commit waits for the primary and **one** eligible synchronous standby, not all three. Retained WAL is not an archive or backup policy.
 
-Patroni owns promotion and updates Citus membership through its native integration. The router follows the coordinator primary; worker metadata follows promoted worker primaries. Customer-local transactions and joins remain colocated. Queries without the distribution key can require scatter work. Cross-shard transactions and full-host loss have additional failure modes beyond the process faults measured here.
+## Independent production tests
 
-The Docker-built Go client uses `database/sql` and pgx 5.7.6. It writes deterministic IDs and integer cents, retries uncertain commits with the same keys, and fsyncs every successful batch to a fresh host-mounted `results/<RUN_ID>/acknowledged.jsonl`. Reconciliation streams every joined row, checking IDs, customers, amounts, duplicates, missing acknowledged IDs and committed rows without a client witness. An incomplete load fails. Replica checks capture each active group's primary WAL position and wait for both standbys to replay through it.
+Run serially after setup:
 
-## Experiments
-
-| Command | Action |
+| Command | Native operation and validation |
 |---|---|
-| `make failover` | Kill the primary of worker group 1 during active traffic; restore and verify rejoin |
-| `make failover FAULT_SHARD=2` | Target another worker group |
-| `make failover-coordinator` | Kill the coordinator primary and verify the router follows promotion |
-| `make chaos-replica-lag` | Pause a synchronous worker replica for 10 s; observe commit stalls and reconcile after recovery |
-| `make scale-out` | Add worker groups 4 and 5 with three copies each; run `citus_rebalance_start()` / `citus_rebalance_wait()` under load |
-| `make scale-in` | Drain groups 4 and 5 under load, finish deferred cleanup, disable metadata synchronization while reachable, stop and remove them |
-| `make test COUNT=2000000` | Two-million-order correctness run |
-| `make test BULK=0` | Row-at-a-time INSERT comparison inside each transaction |
-| `make status` / `make cli` | Membership, placement and totals / coordinator SQL shell |
+| `make failover FAULT_SHARD=1` | Discover and SIGKILL the actual group primary; prove exit 137, elect a different primary, require affected-group read/write progress while the old primary stays stopped, restore it and verify native rejoin. Repeat with groups 2 and 3. |
+| `make failover-coordinator` | Same process-loss experiment on group 0; require HAProxy/client recovery and correct Citus metadata. |
+| `make chaos-replica-lag FAULT_SHARD=1` | Discover and pause the current synchronous standby for 10 s under load, prove paused state, unpause and verify recovery. Groups 0–3 are separate cases. |
+| `make scale-out` | Start owned groups 4–5 during live traffic, record their physical identities, run native background rebalance/wait and cleanup; require actual placement across all five workers. |
+| `make scale-in` | Drain groups 4–5 under live traffic; finish native deferred cleanup, prove every removed physical copy has no shard tables, disable metadata sync while reachable, stop the group and remove its node entries. |
+| `make test-production` | Baseline/dashboard; primary failure on each group 0–3; synchronous pause on each group; scale-out, expanded-topology dashboards, scale-in and full verification. At least **11 million new orders** by default. |
+| `make benchmark` | Append another million orders without injection; keep the independent reader active. |
+| `make tenant-analytics` | Compare global versus routed dashboards and run witnessed profile transactions against **all retained order history**. |
+| `make verify` | Native roles, replication, placement, physical shard inventory and full order/profile body reconciliation. |
+| `make test-placement-guard` | Negative control: misplace one witnessed order within its owner group, require physical verifier rejection, then restore its exact body and verify every copy. |
+| `make unit-test` | Docker Go formatting/vet/oracle checks and Python controller/report guards. |
+| `make status` / `make cli` | Owned services and native placement / coordinator SQL shell. |
 
-Defaults are `COUNT=1000000 CUSTOMERS=10000 WORKERS=8 BATCH=100 BULK=1 RATE=0`. Fault and scaling targets use `CHAOS_RATE=25000` records/s as an offered-rate ceiling. They do not pause the producer. Each test resets orders and creates an exclusive journal; use a fresh `RUN_ID` if setting it explicitly. The scaling sequence is `make scale-out` followed by `make scale-in` after normal provisioning.
+The scale sequence is `scale-out` then `scale-in`. It never resets data. If a move fails partway, retain the expanded topology and diagnostics; stopping a worker that still owns data is not recovery. Repeated scale cycles reuse the recorded physical identities of their retained volumes.
 
-## Representative workload: tenant dashboards
+## Observation and correctness
 
-`make test` now runs the Go tenant-dashboard scenario automatically. Run `make tenant-analytics` separately after loading the order data. This models a SaaS customer's dashboard and profile changes over colocated customers/orders, using the existing million-order dataset.
+- A separate reader samples immutable acknowledged order bodies, one per known logical shard, or seeded customers on the first run. Probes run independently of the writer, every 100 ms with a 3 s deadline. Missing/wrong known bodies fail. This measures historical availability, **not fresh-write visibility lag**; serial probes and timeouts affect gap resolution.
+- The writer journals and fsyncs each attempt/ACK/error outside the database containers. Each case reserves disjoint IDs, including failed cases. Retry uses the same composite keys with `ON CONFLICT DO NOTHING`; partial transactions fail. Live cases continue until native recovery and the minimum `COUNT` are both satisfied.
+- Routing comes from Citus's native `get_shard_id_for_distribution_column`. Its logical shard IDs remain stable during rebalancing; owner groups can change. No client hash implementation decides ownership.
+- Native recovery needs exactly one primary per active group, two expected streaming peers, a synchronous peer, matching physical system IDs and replay beyond frozen primary WAL flush positions. Citus must name the promoted primaries. Unrelated container/process identities must remain unchanged.
+- Full verification reads customers and orders **separately** through the coordinator. Then it reads the assigned physical `*_shardid` tables on every worker primary and standby, tagging rows with their actual table's logical shard. It checks full bodies and placement **inside the correct group as well as across groups**; a JOIN or group total alone could hide misplaced rows.
+- The physical inventory must exactly match native colocated placements, including profiles; leftover unassigned shard tables fail. Coordinator copies are checked for matching placement metadata. They are not counted as extra worker data copies.
 
-The comparison requests the same customer's answer in two ways: aggregate all tenants and select the customer in Go, or include the customer key in SQL. Saved JSON EXPLAIN plans must show **30 distributed tasks versus 1 routed task**. A mixed phase then executes 200 tenant requests with 8 clients: 160 dashboard reads and 40 transactions that update a customer profile and read its joined orders. It verifies all 40 profile updates, every dashboard result and the original million-order acknowledgement journal after the changes.
+## Witnessed tenant dashboards and profiles
 
-2026-11-14, Apple M4 Pro, shared native aarch64 Docker VM, 11 vCPUs / 24.4 GiB RAM, 128 MiB shared buffers per PostgreSQL instance, no CPU caps. Run `20261114T191429Z`, 1,000,000 orders / 10,000 customers. Each read comparison has 25 sequential client requests; these are short, cache-affected observations, not capacity estimates.
+The dashboard comparison requests the same tenant's answer either by fetching aggregates for every tenant or by putting the tenant key in SQL. Saved JSON plans must show **30 tasks versus one routed task**. Every result is checked against deterministic sums/counts folded from **all historical ACK journals**, not the last `COUNT`.
 
-| Phase | Requests | Operations/s | Batch/request p50 / p99 / max |
-|---|---:|---:|---:|
-| All tenants, then select one | 25 | 7.21 | 73.078 / 513.123 / 842.412 ms |
-| Tenant key in SQL | 25 | 1,913.43 | 0.438 / 0.888 / 1.264 ms |
-| Mixed tenant reads/profile transactions | 200 | 4,346.58 | 0.510 / 13.399 / 16.096 ms |
+The mixed phase uses eight workers for 200 requests: **160 dashboard reads + 40 profile-upsert/read transactions**. Profiles live in their own colocated table; immutable customer names are never reset. Each analytics case reserves a monotonic profile version and journals/fsyncs mutation attempts and ACKs before/after the transaction. UPSERT cannot regress a newer version. The verifier folds the full profile history: no acknowledged version may regress/disappear, and an unacknowledged newer version must match an actual attempted body. These are mutable current profiles, not retained copies of every historical profile value.
 
-The tenant-filtered p50 was 166.84× lower in this run. A global dashboard genuinely requesting every tenant still needs its distributed aggregate; the comparison measures unnecessary fan-out when the application needs only one tenant. A hot tenant remains confined to one worker group. One local run does not establish scale-out capacity or predict production latency.
+Query timings are short, cache-affected observations with fixed execution order; no controlled cold-query profile or saturation claim. A genuine global dashboard still needs its aggregate. This comparison measures unnecessary fan-out when only one tenant's answer is needed. Profile transaction/query correctness is checked again after failure and rebalancing.
 
-`ANALYTICS_QUERIES=25` and `ANALYTICS_REQUESTS=200` are Make variables; both must fit within `CUSTOMERS`, and `COUNT >= CUSTOMERS * BATCH` gives every customer orders. `results/<run-id>/tenant-analytics.json` contains phase timings and the complete plans. A distributed UPDATE using an implicit stable text conversion failed during development; profile values are now supplied as parameters, and setup uses a constant assignment. The full test and cleanup lifecycle passed after that fix.
+## Evidence and timing
 
-Sources: [Citus distribution-column and colocation guide](https://docs.citusdata.com/en/stable/sharding/data_modeling.html), [14.2.0 router planner](https://github.com/citusdata/citus/blob/v14.2.0/src/backend/distributed/planner/multi_router_planner.c). The plan and operation counts above were measured locally.
+`results/<dataset-UUID>/fixture.json` binds the native identity table to its external witness and initial group system identifiers. `groups/` records identities of later workers; `routing.json` holds native customer-to-order-shard mapping. Legacy tables without this identity are rejected instead of silently adopted/reset.
 
-## Verified test coverage
+Each unique `runs/<RUN_ID>/` retains allocation, fsynced writes, independent reads, workload logs, writer statistics and success/failure proof. `checks/` keeps full native/physical verification. `analytics/<UUID>/` keeps version reservation, profile journal, plans, timings and full verification. Failed reports and ID reservations remain immutable.
 
-The following runs completed live against Docker deployments. Each reconciled **1,000,000 acknowledged and observed orders**, **0 missing acknowledged IDs**, **0 duplicate IDs**, **0 committed rows without a witness**, and **5,000,500,000 cents**. All configured replicas passed the example's catch-up checks.
-
-| Executed scenario | Local run ID |
-|---|---|
-| Baseline | `20261114T174314Z` |
-| Worker-primary failure | `20261114T174323Z` |
-| Coordinator-primary failure | `20261114T174431Z` |
-| Scale-out | `20261114T182637Z` |
-| Scale-in | `20261114T182733Z` |
-| Synchronous-replica pause | `20261114T182820Z` |
-
-Other worker-group failure targets and the two-million-order variant were not run.
-
-Audit the raw evidence in `results/<run-id>/`: `load.json`, `check.json`, `acknowledged.jsonl` and, for fault/scaling runs, `failover.json`. Journals and raw reports remain local and are ignored by Git. Timing, phase latency, offered-rate limits and shared-VM conditions are detailed below; these runs do not provide a controlled cross-system ranking.
-
-Batch latency includes transaction attempts and retries; it excludes the subsequent journal fsync, which is included in overall elapsed time and throughput.
+Successful/failed request latencies are separate; successful batch completion also includes retries/backoff. Writer throughput includes witness fsync and excludes later full scans. Completion timestamps assign phases, while raw events keep request starts. Native-barrier timing starts after the restored container's health wait; markers and repair completion record the wider interval. Sampled read gaps are not exact outage durations. Fault traffic is paced and is not a capacity benchmark.
 
 ## Measured results
 
-2026-11-14, Apple M4 Pro, shared native aarch64 Docker VM with 11 vCPUs / 24.4 GiB RAM; no per-container CPU cap, 128 MiB PostgreSQL shared buffers per instance. One million orders / 10,000 customers / 8 clients / 100 rows per transaction, one run per scenario. Other examples and builds shared the VM. Latencies include retries and use transaction completion phase.
+2026-11-16, Apple M4 Pro, native ARM64 Docker VM: **11 CPUs / 24.42 GiB**.
+Every PostgreSQL copy: **1 CPU / 1 GiB**, etcd: **0.25 CPU / 256 MiB** each,
+HAProxy: **0.5 CPU / 256 MiB**, each workload container: **2 CPUs / 1 GiB**.
+Actual limits were inspected. CPU caps collectively exceed the VM's 11 CPUs;
+this is one shared host, one run per case, not a saturation or cross-system ranking.
+10,000 customers, eight writers, 100-row transactions. Fault/scaling traffic is
+paced; baseline and final benchmark are unthrottled. Writer time excludes later
+full-copy scans; successful batch latency includes retries/backoff.
 
-| Final retained-WAL configuration | Elapsed | Orders/s | Retries | Promotion | Batch p50 / p99 / max |
-|---|---:|---:|---:|---:|---:|
-| Baseline | 4.735 s | 211,185 | 0 | — | 2.693 / 16.857 / 103.664 ms |
-| Worker primary failure | 62.750 s | 15,936 | 1,245 | 21 s | failure 1.876 / 36.301 / 22,639.259 ms |
-| Coordinator primary failure | 64.149 s | 15,589 | 1,407 | 21 s | failure 2.772 / 220.725 / 21,203.656 ms |
+| Case | New ACK orders | Writer s | Orders/s | Retries / ambiguous commit responses | Promotion / native operation s | Successful batch p50 / p99 / max ms |
+|---|---:|---:|---:|---:|---:|---:|
+| Baseline | 1,000,000 | 6.781 | 147,479 | 0 / 0 | — | 3.063 / 15.913 / 104.778 |
+| Coordinator primary killed | 1,000,000 | 61.258 | 16,324 | 1342 / 1 | 21.450 | 1.907 / 12.349 / 21275.124 |
+| Worker 1 primary killed | 1,000,000 | 61.580 | 16,239 | 1129 / 0 | 18.990 | 1.969 / 12.234 / 21493.912 |
+| Worker 2 primary killed | 1,000,000 | 62.700 | 15,949 | 827 / 0 | 20.203 | 1.942 / 13.132 / 22639.499 |
+| Worker 3 primary killed | 1,000,000 | 63.579 | 15,728 | 1142 / 0 | 20.099 | 1.893 / 13.301 / 23455.780 |
+| Coordinator sync replica paused | 1,000,000 | 40.080 | 24,950 | 0 / 0 | 10 s hold | 1.981 / 11.400 / 105.755 |
+| Worker 1 sync replica paused | 1,000,000 | 50.224 | 19,911 | 0 / 0 | 10 s hold | 1.974 / 14.154 / 10153.396 |
+| Worker 2 sync replica paused | 1,000,000 | 50.192 | 19,924 | 0 / 0 | 10 s hold | 1.990 / 12.523 / 10157.759 |
+| Worker 3 sync replica paused | 1,000,000 | 50.247 | 19,902 | 0 / 0 | 10 s hold | 2.018 / 10.526 / 10141.089 |
+| Workers 3 → 5 | 3,093,300 | 126.658 | 24,422 | 0 / 0 | 107.527 | 2.028 / 37.729 / 496.985 |
+| Workers 5 → 3 | 1,225,000 | 53.847 | 22,750 | 0 / 0 | 38.064 | 2.186 / 89.451 / 2046.857 |
+| Final benchmark | 1,000,000 | 7.283 | 137,309 | 0 / 0 | — | 3.313 / 16.304 / 70.568 |
 
-All three completed runs acknowledged and observed **1,000,000 orders**, with **0 missing acknowledged IDs**, **0 duplicates**, **0 rows without a client witness** and **5,000,500,000 cents**. Both failure runs had 0 uncertain commit responses. Every active group's replicas caught up through the captured WAL positions.
+The native rebalance job reported **finished**. Order shard ownership changed
+**10/10/10** across three workers to **6/6/6/6/6** across five; after drain it was
+**10/9/11** across the original three groups. Each order shard retained its colocated
+customer/profile shard. Scale-out verified **15 physical worker copies**; baseline
+and scale-in verified nine, plus the coordinator's three metadata copies.
+All **16 unrelated baseline services/process identities** survived each scaling
+operation unchanged. Scale-in proved cleanup replay and empty/stopped state on
+all six removed members before completing node removal.
 
-| Final repeated-cycle tests | Load elapsed | Orders/s | Operation duration | Operation-phase p50 / p99 / max |
+The live generator exceeded its one-million minimum during both moves instead of
+ending before native repair: **3,093,300 new ACKs** on scale-out and **1,225,000**
+on scale-in. Each operation had **0 retries, ambiguous commits or read errors**.
+
+| Case | Successful / failed reads | Successful read p50 / p99 ms | Failed read p99 ms | Longest per-shard successful-read completion gap s |
 |---|---:|---:|---:|---:|
-| Scale 3 → 5 worker groups | 41.653 s | 24,008 | rebalance 21 s | 1.930 / 50.391 / 389.697 ms |
-| Scale 5 → 3 worker groups | 41.458 s | 24,121 | drain/removal 23 s | 1.972 / 37.491 / 193.078 ms |
-| Synchronous replica pause | 50.863 s | 19,661 | pause 10 s | 8.404 / 10,038.534 / 10,517.808 ms |
+| Baseline | 255 / 0 | 0.626 / 7.281 | — | 3.102 |
+| Coordinator primary killed | 596 / 174 | 0.492 / 6.255 | 79.259 | 24.926 |
+| Worker 1 primary killed | 745 / 66 | 0.561 / 3.033 | 25.245 | 25.165 |
+| Worker 2 primary killed | 764 / 70 | 0.554 / 4.487 | 24.929 | 25.297 |
+| Worker 3 primary killed | 780 / 73 | 0.557 / 5.802 | 26.843 | 28.395 |
+| Coordinator sync replica paused | 669 / 0 | 0.498 / 2.343 | — | 3.107 |
+| Worker 1 sync replica paused | 756 / 0 | 0.529 / 3.111 | — | 3.163 |
+| Worker 2 sync replica paused | 768 / 0 | 0.546 / 3.306 | — | 3.168 |
+| Worker 3 sync replica paused | 805 / 0 | 0.572 / 3.166 | — | 3.157 |
+| Workers 3 → 5 | 1682 / 0 | 0.462 / 1.110 | — | 3.315 |
+| Workers 5 → 3 | 897 / 0 | 0.558 / 2.271 | — | 3.467 |
+| Final benchmark | 463 / 0 | 0.634 / 2.732 | — | 3.101 |
 
-These three final runs each acknowledged and observed **1,000,000 orders**, with **0 missing acknowledged IDs**, **0 duplicates**, **0 rows without a client witness**, **0 retries**, **0 uncertain commit responses** and **5,000,500,000 cents**. All active replicas replayed through their captured WAL positions. Scaling results are paced at an offered ceiling of 25,000 records/s, not maximum-throughput measurements. Another corrected scale-in before the repeated full cycle completed in 26 s with the same million-order invariants.
+All read probes returned **0 missing/wrong known bodies**. Gaps include the
+30-shard probe rotation and query deadlines; they are not exact outage durations.
+Final full reconciliation: **14,318,300 cumulative ACK orders across 12 histories**,
+**120 acknowledged profile mutations across three versions**, and **40 current
+profiles**. **0 missing ACKs, wrong values, misplaced rows, unknown rows, duplicate
+IDs, partial batches or unresolved unacknowledged commits**. Every active physical
+copy replayed and matched its native ownership/body expectations.
 
-## Issues found during testing
+### Tenant query approaches
 
-- Mixing PostgreSQL 18.0 runtime binaries with 18.7 development headers caused `undefined symbol: heap_datum_check`. Both runtime and headers are now pinned to the same package version before compiling Citus.
-- An old primary initially could not rejoin because its requested WAL had already been removed. The final topology retains 512 MiB of WAL and enables Patroni's rewind/rebuild paths; worker and coordinator promotion were retested from fresh volumes. This retention window is not a backup or WAL archive.
-- Stopping a drained worker before disabling metadata synchronization caused requests to its unavailable hostname. Scale-in disables it while reachable.
-- Repeated scale-in exposed `orphaned shard ... leftover from the previous move could not be cleaned up`. Citus's cleaner skips records whose node group has been removed. Scale-in now explicitly cleans and verifies `pg_dist_cleanup` for each group **before removing it**. Removal checks current metadata because Patroni can concurrently remove a departed member. The failed initial repeat observed 343,000 orders against 341,900 witnessed acknowledgements: 0 acknowledged IDs missing, but 1,100 committed rows without a witness after the old harness stopped its producer, and an incomplete requested load. Reconciliation failed as intended. The harness now lets the producer finish even when a scaling operation fails, then verifies data and returns the scaling error. The corrected repeated scale cycle passed above.
-- The shared Docker filesystem filled during an earlier extra-worker startup; that run failed and is not a passing scale result. All copies here share the same storage failure domain. Run examples sequentially and retain the documented disk headroom.
-- Docker Desktop briefly exposed truncated phase labels across a host-file rename. The client now accepts complete phase names and retries a transient incomplete read. Original JSON reports are retained under ignored `results/`.
+Twenty-five serial queries per approach; 200 mixed requests (160 reads + 40
+witnessed profile transactions). Task counts were **30 global versus one routed**
+on both topologies. The mixed timings include profile-witness fsync. Query p99 uses
+nearest-rank indexing; with 25 samples p99 equals the maximum. Legacy 25-query
+JSON reports used floor indexing: the table corrects their p99 exactly from the
+recorded maximum. New reports also retain every latency sample. No controlled cold-cache run
+or capacity claim.
+
+| Dataset / workers | Approach | Requests | Operations/s | p50 / p99 / max ms |
+|---|---|---:|---:|---:|
+| 1,000,000 orders / 3 workers | all_tenants_then_select | 25 | 16.50 | 60.245 / 81.419 / 81.419 |
+| 1,000,000 orders / 3 workers | mixed_tenant_transactions | 200 | 3,900.43 | 0.406 / 25.549 / 27.443 |
+| 1,000,000 orders / 3 workers | tenant_filter | 25 | 3,272.89 | 0.276 / 0.707 / 0.707 |
+| 12,093,300 orders / 5 workers | all_tenants_then_select | 25 | 3.15 | 306.227 / 387.737 / 387.737 |
+| 12,093,300 orders / 5 workers | mixed_tenant_transactions | 200 | 2,463.40 | 0.982 / 21.685 / 24.778 |
+| 12,093,300 orders / 5 workers | tenant_filter | 25 | 1,617.84 | 0.514 / 2.552 / 2.552 |
+| 14,318,300 orders / 3 workers | all_tenants_then_select | 25 | 1.30 | 790.540 / 804.760 / 804.760 |
+| 14,318,300 orders / 3 workers | mixed_tenant_transactions | 200 | 2,906.74 | 1.486 / 14.046 / 17.912 |
+| 14,318,300 orders / 3 workers | tenant_filter | 25 | 250.89 | 1.327 / 68.249 / 68.249 |
+
+The final tenant-filtered p50 was **1.327 ms** versus **790.540 ms** for fetching
+all tenant aggregates. These answer the same single-tenant request with different
+amounts of work; a true global request still needs the global aggregate.
+
+### Placement negative control and exact recovery
+
+`make test-placement-guard` deliberately moved one already acknowledged order into
+the **wrong logical shard on the correct worker group**, preserving its ID/body
+and total count. The physical verifier rejected it with **exactly 1 wrong-shard
+row**, **0 missing ACKs, corrupt bodies, duplicates, partial batches or unknown
+rows**. The fsynced row backup and failed `check.json` remain under
+`checks/placement-negative-1794812514356637000/`. Idempotent repair moved only that
+exact body back to its canonical physical table; the coordinator/all-copy verifier
+again reconciled all **14,318,300** ACKs and profiles. No replay, truncation or reset
+was used. This is deliberate placement corruption, not a disk-failure claim.
+
+Repeated `make up` then preserved the whole dataset and all profile versions.
+Go race/oracle checks, Docker formatting/vet/tests and four Python guard/report
+tests passed. Failed initial formatting/catalog-audit attempts were diagnosed
+without resetting their fixture; the catalog visibility setting is explained below.
+
+| Case | Retained run ID in dataset `9ed8d49a-1b84-42aa-a5bc-f3d6a824bc5b` |
+|---|---|
+| Baseline | `20261116T063239-303b253d` |
+| Coordinator primary killed | `20261116T063405-60ba4f7a` |
+| Worker 1 primary killed | `20261116T063549-0f0a8bb4` |
+| Worker 2 primary killed | `20261116T063735-e29a94e2` |
+| Worker 3 primary killed | `20261116T063926-c08d777c` |
+| Coordinator sync replica paused | `20261116T064119-fce29ade` |
+| Worker 1 sync replica paused | `20261116T064255-e9f58a71` |
+| Worker 2 sync replica paused | `20261116T064441-9019cc87` |
+| Worker 3 sync replica paused | `20261116T064630-e8091148` |
+| Workers 3 → 5 | `20261116T064824-6b518234` |
+| Workers 5 → 3 | `20261116T065345-ae37b3b7` |
+| Final benchmark | `20261116T065637-dcb69230` |
+
+The final-source five-command lifecycle passed from **fresh volumes** with
+another **1,000,000 ACK orders + 40 witnessed profile transactions**, all worker
+copies/placements correct and **0 retries, ambiguous commits or data defects**.
+Writer time was **6.614 s (151,184 orders/s)**. Evidence:
+`results/fc8851fc-b2e1-438e-b530-f4c5c26001c1/runs/20261116T071935-c3c8f60d/`.
+All raw query samples were retained and checked: **25/25 per serial approach**,
+**200/200 mixed**, with nearest-rank p99 equal to max for the 25-query phases.
+Both the earlier fresh lifecycle and this final statistics-corrected lifecycle
+passed. Every dataset was verified before explicit cleanup. Final inspection found
+**0 owned containers, volumes, networks or built image tags** remaining.
+
+## Gotchas and remaining limits
+
+- Physical shards are hidden from `pg_class` by default in this pinned Citus release. The first inventory attempt therefore saw zero tables despite successful direct physical reads. Audit/drain queries now use the **session-only** `citus.show_shards_for_app_name_prefixes='psql'` setting; hiding tables must never count as proof that a worker is empty.
+- Runtime/development package mismatch previously produced `undefined symbol: heap_datum_check`; both packages are pinned identically before compilation.
+- Patroni can rebuild a divergent old primary; 512 MiB WAL retention does not promise indefinite rewind or independent recovery after correlated storage loss.
+- Deferred shard cleanup must finish before removing a group. Earlier reset-based tests hit `orphaned shard ... leftover from the previous move could not be cleaned up`; the cleaner skips removed groups. Disable metadata synchronization while the worker remains reachable, then stop/remove it.
+- Every local copy shares one Docker host/disk. Process failure, pause and shard moves do not qualify physical disk loss, peer partitions, DCS/quorum loss, stale-primary rejection, independent backup/restore, rolling upgrades or bounded pressure. Those remain separate cases.
+- Single-record throughput (`BATCH=1`), two-million minimum cases, hot tenants and controlled cold/warm query comparisons are not qualified by this run. Report them separately when added. Prior reset-based, JOIN-only, uncapped results are superseded by this qualification.
 
 ## Sources
 
-- [Citus 14 utility functions](https://learn.microsoft.com/en-us/postgresql/citus/api-udf?view=citus-14): rebalance, drain, disable and remove operations.
-- [Citus 14.2 shard transfer source](https://github.com/citusdata/citus/blob/v14.2.0/src/backend/distributed/operations/shard_transfer.c).
-- [Citus 14.2 deferred cleanup source](https://github.com/citusdata/citus/blob/v14.2.0/src/backend/distributed/operations/shard_cleaner.c): cleanup registration and skipping removed node groups.
-- [Patroni 4.0.6 Citus integration](https://github.com/patroni/patroni/blob/v4.0.6/patroni/postgresql/citus.py) and [upstream Citus Compose example](https://github.com/patroni/patroni/blob/v4.0.6/docker-compose-citus.yml).
+- [Citus 14 utility functions](https://learn.microsoft.com/en-us/postgresql/citus/api-udf?view=citus-14): distribution lookup, rebalance, drain and node removal.
+- [Pinned shard transfer](https://github.com/citusdata/citus/blob/v14.2.0/src/backend/distributed/operations/shard_transfer.c) and [deferred cleanup](https://github.com/citusdata/citus/blob/v14.2.0/src/backend/distributed/operations/shard_cleaner.c).
+- [Pinned shard-visibility configuration](https://github.com/citusdata/citus/blob/v14.2.0/src/backend/distributed/shared_library_init.c).
+- [Patroni 4.0.6 Citus integration](https://github.com/patroni/patroni/blob/v4.0.6/patroni/postgresql/mpp/citus.py).
+- [Citus router planner](https://github.com/citusdata/citus/blob/v14.2.0/src/backend/distributed/planner/multi_router_planner.c).
