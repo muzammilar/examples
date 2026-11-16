@@ -4,6 +4,8 @@ x-ndb: &ndb
   platform: linux/amd64
 services:
   mgm0:
+    cpus: "0.25"
+    mem_limit: 256m
     <<: *ndb
     command: [ndb_mgmd, --ndb-nodeid=49, --reload]
     volumes:
@@ -15,6 +17,8 @@ services:
       timeout: 5s
       retries: 60
   mgm1:
+    cpus: "0.25"
+    mem_limit: 256m
     <<: *ndb
     command: [ndb_mgmd, --ndb-nodeid=50, --reload]
     volumes:
@@ -26,6 +30,8 @@ services:
       timeout: 5s
       retries: 60
   data1:
+    cpus: "1"
+    mem_limit: 2g
     <<: *ndb
     command:
       - sh
@@ -44,6 +50,8 @@ services:
       retries: 90
       start_period: 30s
   data2:
+    cpus: "1"
+    mem_limit: 2g
     <<: *ndb
     command:
       - sh
@@ -62,6 +70,8 @@ services:
       retries: 90
       start_period: 30s
   data3:
+    cpus: "1"
+    mem_limit: 2g
     <<: *ndb
     command:
       - sh
@@ -80,6 +90,8 @@ services:
       retries: 90
       start_period: 30s
   data4:
+    cpus: "1"
+    mem_limit: 2g
     <<: *ndb
     command:
       - sh
@@ -98,6 +110,8 @@ services:
       retries: 90
       start_period: 30s
   data5:
+    cpus: "1"
+    mem_limit: 2g
     <<: *ndb
     command:
       - sh
@@ -116,6 +130,8 @@ services:
       retries: 90
       start_period: 30s
   data6:
+    cpus: "1"
+    mem_limit: 2g
     <<: *ndb
     command:
       - sh
@@ -134,6 +150,8 @@ services:
       retries: 90
       start_period: 30s
   data7:
+    cpus: "1"
+    mem_limit: 2g
     <<: *ndb
     command:
       - sh
@@ -152,6 +170,8 @@ services:
       retries: 90
       start_period: 30s
   data8:
+    cpus: "1"
+    mem_limit: 2g
     <<: *ndb
     command:
       - sh
@@ -170,6 +190,8 @@ services:
       retries: 90
       start_period: 30s
   data9:
+    cpus: "1"
+    mem_limit: 2g
     <<: *ndb
     command:
       - sh
@@ -188,6 +210,8 @@ services:
       retries: 90
       start_period: 30s
   sql0:
+    cpus: "1"
+    mem_limit: 1g
     <<: *ndb
     command: [mysqld, --ndb-nodeid=51]
     environment:
@@ -219,6 +243,8 @@ services:
       retries: 60
       start_period: 30s
   sql1:
+    cpus: "1"
+    mem_limit: 1g
     <<: *ndb
     command: [mysqld, --ndb-nodeid=52]
     environment:
@@ -250,6 +276,8 @@ services:
       retries: 60
       start_period: 30s
   router:
+    cpus: "0.25"
+    mem_limit: 256m
     image: haproxy:3.2.4-alpine
     ports:
       - "127.0.0.1:${NDB_PORT:-13306}:3306"
@@ -263,12 +291,21 @@ services:
       interval: 3s
       timeout: 3s
       retries: 30
+  fragment-scan:
+    <<: *ndb
+    cpus: "1"
+    mem_limit: 512m
+    profiles: [tools]
+    entrypoint: [ndb_select_all]
   workload:
+    cpus: "2"
+    mem_limit: 1g
     profiles: [tools]
     image: mysql-ndb-workload:dev
-    build: ./app
+    build: ./orders-workload
     environment:
       DSN: "app:local-app@tcp(router:3306)/orders?interpolateParams=true&timeout=2s&readTimeout=15s&writeTimeout=15s"
+      VITESS: "0"
       COUNT: ${COUNT:-1000000}
       SUBSCRIBER_LOOKUPS: ${SUBSCRIBER_LOOKUPS:-10000}
       SUBSCRIBER_SCANS: ${SUBSCRIBER_SCANS:-20}
@@ -276,10 +313,10 @@ services:
       CUSTOMERS: ${CUSTOMERS:-10000}
       WORKERS: ${WORKERS:-8}
       BATCH: ${BATCH:-100}
-      BULK: ${BULK:-1}
       RATE: ${RATE:-0}
     volumes:
-      - ./${RESULTS_DIR:-results/manual}:/results
+      - ${RESULTS_DIR:-./results/manual}:/results
+      - ${WITNESS_DIR:-./results/uninitialized}:/witness:ro
 volumes:
   mgm0:
   mgm1:

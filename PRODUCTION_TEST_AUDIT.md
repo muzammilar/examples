@@ -88,9 +88,25 @@ READMEs retain dated execution results and limitations.
   identities were preserved per fault. An incomplete initial bootstrap witness was
   rejected before order allocation, preserved and extended only after full native
   seed/ownership checks. Post-recovery benchmark and retained-state setup passed.
-  A fresh-volume five-command lifecycle recorded all three identities from creation and verified
+  A fresh-volume five-command lifecycle recorded all three identities from
+  creation and verified
   another million ACK orders on all copies; both cleanups left zero owned
   resources/build tags. Extended cases remain below.
+- [NDB](mysql/ndb-cluster-docker-compose-cluster/): preserved order/profile
+  histories, independent partition reader and full bodies through both SQL
+  frontends. Native NDB scan FRAGMENT values verify order/customer placement;
+  native inventories verify three live replicas per partition on all nine data
+  nodes. Initial baselines and all eight live data/SQL/management/router faults
+  passed:
+  **11,721,100 cumulative ACK orders across 12 histories**, plus one million
+  profiles and **6,000 ACK quota mutations across three versions**, zero missing/
+  corrupt/misplaced/duplicate/partial/unresolved bodies. All 13 unrelated process
+  identities were preserved per fault. Post-recovery benchmark, retained-state
+  setup and fresh five-command lifecycle
+  passed. Fresh-volume checks verified another million ACK orders, one million
+  profile bodies and 2,000 quota ACKs; both cleanups left zero owned resources/
+  build tags. The old correlated disk-full ACK loss remains documented. Failed bootstrap/controller
+  attempts and the interrupted seed remain evidence; none reset application data.
 - Kafka [Strimzi JBOD](kafka/strimzi-jbod/) and
   [mirroring](kafka/cross-cluster-mirroring/): private kubeconfig export/cleanup
   corrected; evaluated Make recipes prove the exported example-local path. This
@@ -103,7 +119,7 @@ Closing one fault case does not close the entire deployment matrix.
 
 | Cohort | Inspected source | Remaining concrete gap |
 |---|---|---|
-| NDB | Example Makefiles, Go `app/main.go`, `scripts/run-fault.sh`, native placement/replica scripts | Fault prerequisites truncate orders between cases. Preserve unique scenario IDs and reconcile older ACK histories; add independent live readers. Exercise each shard/failure domain, while retaining existing native placement checks. |
+| NDB | `control.py`, independent `orders-workload/`, mutable quota witnesses and official native scan tool | Order/profile history, independent reads, native fragment placement and eight live role cases qualified above; post-recovery benchmark, retained-state setup, fresh million-order/profile lifecycle and scoped cleanup passed. Native SQL readback is not independent physical-replica byte verification. Expansion/reorganization, partitions/quorum, physical disk loss, pressure, upgrades and independent restore remain unrun. |
 | Vitess unsharded | `control.py`, independent `orders-workload/` observer and three-copy body oracle | Core history/reader backfill and four live role fault cases qualified above; post-recovery benchmark, retained-state setup, fresh million-order lifecycle and scoped cleanup passed. Resharding/tablet changes, planned/rolling maintenance/upgrades, resource changes, topology/quorum loss, partitions/stale-primary rejection, permanent disk loss, pressure, independent restore and controlled cold/single-record benchmarks remain unrun. |
 | MySQL customer sharding | `control.py`, independent `orders-workload/` writer/reader, native vindex/range oracle and all-nine-copy verifier | Core reader/history/placement backfill and eight live fault cases qualified above; post-recovery benchmark, repeated setup, fresh million-order lifecycle and scoped cleanup passed. Online resharding, tablet expansion/shrink, rolling maintenance/upgrades, topology/quorum loss, peer partitions, stale-primary rejection, permanent disk loss, pressure, independent restore and controlled cold/single-record benchmarks remain unrun. |
 | Postgres customer sharding | `control.py`, independent `orders-workload/` writer/reader, native hash oracle and all-copy verifier | Core reader/history/placement backfill qualified above. Partitions, DCS/quorum loss, stale-primary rejection, physical disk loss, router outage, rolling upgrades, pressure, backup/restore and online resharding remain unrun. |
@@ -153,7 +169,7 @@ inventory with `python3 tools/audit-production-tests.py`; output is ignored unde
 | [kafka/strimzi-jbod](kafka/strimzi-jbod/) | Kubernetes | none | suite, crash, disk, scale-out, scale-in, rolling, partition, pressure, restore, drain | declaration inventory only |
 | [lancedb/versioned-product-search](lancedb/versioned-product-search/) | Compose | crash | suite, disk, scale-out, scale-in, rolling, partition, pressure, restore, drain | declaration inventory only |
 | [mysql/customer-sharding](mysql/customer-sharding/) | Compose | suite, crash | disk, scale-out, scale-in, rolling, partition, pressure, restore, drain | eight live fault cases qualified above; other categories require separate work |
-| [mysql/ndb-cluster-docker-compose-cluster](mysql/ndb-cluster-docker-compose-cluster/) | Compose | crash | suite, disk, scale-out, scale-in, rolling, partition, pressure, restore, drain | declaration inventory only |
+| [mysql/ndb-cluster-docker-compose-cluster](mysql/ndb-cluster-docker-compose-cluster/) | Compose | suite, crash | disk, scale-out, scale-in, rolling, partition, pressure, restore, drain | eight live role cases qualified above; extended categories require separate work |
 | [mysql/vitess-docker-compose-cluster](mysql/vitess-docker-compose-cluster/) | Compose | suite, crash | disk, scale-out, scale-in, rolling, partition, pressure, restore, drain | four live fault cases qualified above; extended categories require separate work |
 | [postgres/citus-docker-compose-cluster](postgres/citus-docker-compose-cluster/) | Compose | suite, crash, scale-out, scale-in | disk, rolling, partition, pressure, restore, drain | ten live operations and placement-negative recovery qualified above; other categories require separate work |
 | [postgres/customer-sharding](postgres/customer-sharding/) | Compose | suite, crash | disk, scale-out, scale-in, rolling, partition, pressure, restore, drain | six live fault cases qualified above; other categories require separate work |

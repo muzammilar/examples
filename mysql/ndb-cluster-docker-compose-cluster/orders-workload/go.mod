@@ -1,4 +1,4 @@
-module examples/mysql-customer-sharding
+module examples/mysql-ndb
 
 go 1.24.0
 
