@@ -1,4 +1,4 @@
-module examples/customer-sharding
+module examples/pgdog-pooling
 
 go 1.24.0
 

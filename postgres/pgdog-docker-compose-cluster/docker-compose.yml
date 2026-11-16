@@ -1,6 +1,8 @@
 name: postgres-pgdog-pooling
 services:
   etcd0:
+    cpus: "0.25"
+    mem_limit: 256m
     image: quay.io/coreos/etcd:v3.5.21
     hostname: etcd0
     command:
@@ -12,7 +14,7 @@ services:
       - --listen-peer-urls=http://0.0.0.0:2380
       - --initial-advertise-peer-urls=http://etcd0:2380
       - --initial-cluster=etcd0=http://etcd0:2380,etcd1=http://etcd1:2380,etcd2=http://etcd2:2380
-      - --initial-cluster-token=customer-sharding
+      - --initial-cluster-token=pgdog-pooling
     volumes:
       - etcd0:/etcd-data
     healthcheck:
@@ -21,6 +23,8 @@ services:
       timeout: 3s
       retries: 40
   etcd1:
+    cpus: "0.25"
+    mem_limit: 256m
     image: quay.io/coreos/etcd:v3.5.21
     hostname: etcd1
     command:
@@ -32,7 +36,7 @@ services:
       - --listen-peer-urls=http://0.0.0.0:2380
       - --initial-advertise-peer-urls=http://etcd1:2380
       - --initial-cluster=etcd0=http://etcd0:2380,etcd1=http://etcd1:2380,etcd2=http://etcd2:2380
-      - --initial-cluster-token=customer-sharding
+      - --initial-cluster-token=pgdog-pooling
     volumes:
       - etcd1:/etcd-data
     healthcheck:
@@ -41,6 +45,8 @@ services:
       timeout: 3s
       retries: 40
   etcd2:
+    cpus: "0.25"
+    mem_limit: 256m
     image: quay.io/coreos/etcd:v3.5.21
     hostname: etcd2
     command:
@@ -52,7 +58,7 @@ services:
       - --listen-peer-urls=http://0.0.0.0:2380
       - --initial-advertise-peer-urls=http://etcd2:2380
       - --initial-cluster=etcd0=http://etcd0:2380,etcd1=http://etcd1:2380,etcd2=http://etcd2:2380
-      - --initial-cluster-token=customer-sharding
+      - --initial-cluster-token=pgdog-pooling
     volumes:
       - etcd2:/etcd-data
     healthcheck:
@@ -61,6 +67,8 @@ services:
       timeout: 3s
       retries: 40
   s0n0:
+    cpus: "1"
+    mem_limit: 1g
     build: ./patroni
     image: postgres-pgdog-patroni:dev
     environment:
@@ -81,6 +89,8 @@ services:
       retries: 60
       start_period: 30s
   s0n1:
+    cpus: "1"
+    mem_limit: 1g
     build: ./patroni
     image: postgres-pgdog-patroni:dev
     environment:
@@ -101,6 +111,8 @@ services:
       retries: 60
       start_period: 30s
   s0n2:
+    cpus: "1"
+    mem_limit: 1g
     build: ./patroni
     image: postgres-pgdog-patroni:dev
     environment:
@@ -121,6 +133,8 @@ services:
       retries: 60
       start_period: 30s
   pgdog:
+    cpus: "1"
+    mem_limit: 1g
     image: ghcr.io/pgdogdev/pgdog:v0.1.62
     environment:
       PGPASSWORD: local-postgres
@@ -141,6 +155,8 @@ services:
       s0n1: {condition: service_healthy}
       s0n2: {condition: service_healthy}
   client:
+    cpus: "0.5"
+    mem_limit: 128m
     profiles: [tools]
     image: postgres:17.6-bookworm
     environment:
@@ -148,20 +164,21 @@ services:
     volumes:
       - ./sql:/sql:ro
   workload:
+    cpus: "2"
+    mem_limit: 1g
     profiles: [tools]
     image: postgres-pgdog-workload:dev
-    build: ./app
+    build: ./orders-workload
     environment:
-      DRIVER: pgx
       DSN: postgres://postgres:local-postgres@pgdog:6432/orders?sslmode=disable
       COUNT: ${COUNT:-1000000}
       CUSTOMERS: ${CUSTOMERS:-10000}
       WORKERS: ${WORKERS:-8}
       BATCH: ${BATCH:-100}
-      BULK: ${BULK:-1}
       RATE: ${RATE:-0}
     volumes:
-      - ./${RESULTS_DIR:-results/manual}:/results
+      - ${RESULTS_DIR:-./results/manual}:/results
+      - ${WITNESS_DIR:-./results/uninitialized}:/witness:ro
 volumes:
   etcd0:
   etcd1:

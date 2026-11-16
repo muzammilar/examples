@@ -1,2 +1,3 @@
 results/
 config/pgdog.toml
+__pycache__/

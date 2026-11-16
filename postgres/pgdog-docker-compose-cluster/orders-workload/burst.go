@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"math"
 	"os"
 	"sort"
 	"sync"
@@ -17,27 +18,34 @@ type burstSample struct {
 	err     error
 }
 type burstResult struct {
-	Requests     int            `json:"requests"`
-	Success      int            `json:"success"`
-	Errors       map[string]int `json:"errors_by_sqlstate"`
-	Elapsed      float64        `json:"elapsed_seconds"`
-	SuccessRate  float64        `json:"successful_requests_per_second"`
-	P50          float64        `json:"successful_p50_ms"`
-	P99          float64        `json:"successful_p99_ms"`
-	Max          float64        `json:"successful_max_ms"`
-	PeakBackends int            `json:"peak_primary_client_backends"`
+	Requests       int            `json:"requests"`
+	Success        int            `json:"success"`
+	Errors         map[string]int `json:"errors_by_sqlstate"`
+	Elapsed        float64        `json:"elapsed_seconds"`
+	SuccessRate    float64        `json:"successful_requests_per_second"`
+	P50            float64        `json:"successful_p50_ms"`
+	P99            float64        `json:"successful_p99_ms"`
+	Max            float64        `json:"successful_max_ms"`
+	PeakBackends   int            `json:"peak_primary_client_backends"`
+	BackendSamples int            `json:"backend_samples"`
+	MonitorErrors  int            `json:"monitor_errors"`
+	FailedP50      float64        `json:"failed_p50_ms"`
+	FailedP99      float64        `json:"failed_p99_ms"`
+	FailedMax      float64        `json:"failed_max_ms"`
 }
 
-func burst(count, customers, batch int) error {
+func burst(f fixture, route []int) error {
+	customers := f.Customers
 	requests, concurrency := number("BURST_REQUESTS", 4000), number("BURST_CLIENTS", 256)
 	direct := os.Getenv("DIRECT_DSN")
 	if direct == "" {
 		return errors.New("DIRECT_DSN must identify the current primary")
 	}
-	expected := make([]int64, customers)
-	for id := 0; id < count; id++ {
-		expected[(id/batch)%customers] += int64(id%10000 + 1)
+	ledger, err := history("/witness", route)
+	if err != nil {
+		return err
 	}
+	expected := customerTotals(ledger, customers)
 	monitorDB, err := sql.Open("pgx", direct)
 	if err != nil {
 		return err
@@ -52,6 +60,7 @@ func burst(count, customers, batch int) error {
 	}
 	defer monitor.Close()
 	results := map[string]burstResult{}
+	var unexpected error
 	for _, mode := range []string{"direct_postgres", "pgdog_transaction_pool"} {
 		dsn := direct
 		if mode != "direct_postgres" {
@@ -60,23 +69,27 @@ func burst(count, customers, batch int) error {
 		jobs := make(chan int)
 		samples := make(chan burstSample, requests)
 		stopMonitor := make(chan struct{})
-		peakDone := make(chan int, 1)
+		type observation struct{ peak, samples, errors int }
+		peakDone := make(chan observation, 1)
 		go func() {
-			peak := 0
+			observed := observation{}
 			ticker := time.NewTicker(20 * time.Millisecond)
 			defer ticker.Stop()
 			for {
 				select {
 				case <-stopMonitor:
-					peakDone <- peak
+					peakDone <- observed
 					return
 				case <-ticker.C:
 					ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 					var n int
 					e := monitor.QueryRowContext(ctx, "SELECT count(*) FROM pg_stat_activity WHERE backend_type='client backend' AND datname='postgres'").Scan(&n)
 					cancel()
-					if e == nil && n > peak {
-						peak = n
+					if e != nil {
+						observed.errors++
+					} else {
+						observed.samples++
+						observed.peak = max(observed.peak, n)
 					}
 				}
 			}
@@ -117,13 +130,19 @@ func burst(count, customers, batch int) error {
 		elapsed := time.Since(started)
 		close(samples)
 		close(stopMonitor)
-		result := burstResult{Requests: requests, Errors: map[string]int{}, Elapsed: elapsed.Seconds(), PeakBackends: <-peakDone}
+		observed := <-peakDone
+		result := burstResult{Requests: requests, Errors: map[string]int{}, Elapsed: elapsed.Seconds(), PeakBackends: observed.peak, BackendSamples: observed.samples, MonitorErrors: observed.errors}
+		if observed.samples == 0 || observed.errors != 0 {
+			unexpected = errors.New("backend monitor incomplete; inspect samples/errors")
+		}
 		latencies := []float64{}
+		failed := []float64{}
 		for sample := range samples {
 			if sample.err == nil {
 				result.Success++
 				latencies = append(latencies, sample.latency)
 			} else {
+				failed = append(failed, sample.latency)
 				code := "other"
 				var state interface{ SQLState() string }
 				if errors.As(sample.err, &state) {
@@ -131,18 +150,15 @@ func burst(count, customers, batch int) error {
 				}
 				result.Errors[code]++
 				if code != "53300" {
-					return fmt.Errorf("%s unexpected request failure: %w", mode, sample.err)
+					unexpected = fmt.Errorf("%s unexpected request failure: %w", mode, sample.err)
 				}
 			}
 		}
-		if len(latencies) == 0 {
-			return fmt.Errorf("%s served zero requests", mode)
+		result.P50, result.P99, result.Max = burstPercentiles(latencies)
+		result.FailedP50, result.FailedP99, result.FailedMax = burstPercentiles(failed)
+		if result.Success == 0 {
+			unexpected = fmt.Errorf("%s served zero requests", mode)
 		}
-		sort.Float64s(latencies)
-		n := len(latencies)
-		result.P50 = latencies[(n-1)/2]
-		result.P99 = latencies[(n-1)*99/100]
-		result.Max = latencies[n-1]
 		result.SuccessRate = float64(result.Success) / elapsed.Seconds()
 		results[mode] = result
 	}
@@ -151,11 +167,35 @@ func burst(count, customers, batch int) error {
 		return err
 	}
 	fmt.Println(string(data))
-	if err = os.WriteFile("/results/connection-burst.json", append(data, '\n'), 0644); err != nil {
+	if err = save("/results/connection-burst.json", map[string]any{"concurrent_clients": concurrency, "new_connection_per_request": true, "phases": results}); err != nil {
 		return err
+	}
+	if unexpected != nil {
+		return unexpected
 	}
 	if results["pgdog_transaction_pool"].Success != requests {
 		return errors.New("PgDog did not serve every request")
 	}
 	return nil
+}
+
+// The oracle covers every retained acknowledged allocation, not just the latest COUNT.
+func customerTotals(l *ledger, customers int) []int64 {
+	totals := make([]int64, customers)
+	for _, run := range l.runs {
+		for offset, flags := range run.flags {
+			if flags&acknowledged != 0 {
+				id := run.config.Base + int64(offset)
+				totals[(offset/run.config.Batch)%customers] += id%10000 + 1
+			}
+		}
+	}
+	return totals
+}
+func burstPercentiles(values []float64) (float64, float64, float64) {
+	if len(values) == 0 {
+		return 0, 0, 0
+	}
+	sort.Float64s(values)
+	return values[int(math.Ceil(float64(len(values))*.50))-1], values[int(math.Ceil(float64(len(values))*.99))-1], values[len(values)-1]
 }
