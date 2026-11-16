@@ -399,3 +399,9 @@ Makefile
 README.md
 results/
 ```
+
+The fault runner refuses an existing `churn.jsonl`, `churn.json`, `fault.json` or
+`reconciliation.json`; it never deletes an earlier ACK witness. Preserve and
+diagnose a failed fixture before archiving its evidence and starting a separate
+clean lifecycle. This guard does not add cross-run version reconciliation or an
+independent reader to the existing churn loop.

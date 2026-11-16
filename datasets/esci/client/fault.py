@@ -20,6 +20,14 @@ projects = {
 project = projects[engine]
 results = Path(os.environ.get("RESULTS_DIR", "results/cluster"))
 results.mkdir(parents=True, exist_ok=True)
+# Never erase an earlier failure's ACK oracle just to start another case.
+if any(
+    (results / file).exists()
+    for file in ("churn.jsonl", "churn.json", "fault.json", "reconciliation.json")
+):
+    raise RuntimeError(
+        "prior fault evidence exists; preserve and diagnose it before a new isolated lifecycle"
+    )
 compose = ["docker", "compose", "--profile", mode]
 
 
@@ -93,8 +101,6 @@ if (
     == 0
 ):
     raise RuntimeError("existing fault client; inspect it before rerunning")
-for file in ["churn.jsonl", "churn.json", "fault.json", "reconciliation.json"]:
-    (results / file).unlink(missing_ok=True)
 client = (
     run(
         compose
