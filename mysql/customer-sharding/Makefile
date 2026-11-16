@@ -1,69 +1,52 @@
-COMPOSE := docker compose
+SHELL := /bin/sh
+COMPOSE := docker compose --project-name mysql-customer-sharding
 COUNT ?= 1000000
 CUSTOMERS ?= 10000
 WORKERS ?= 8
 BATCH ?= 100
-BULK ?= 1
-RATE ?= 0
 CHAOS_RATE ?= 25000
 FAULT_SHARD ?= -55
-RUN_ID ?= $(shell date -u +%Y%m%dT%H%M%SZ)
-RUN_ID := $(RUN_ID)
-RESULTS_DIR := results/$(RUN_ID)
-export COUNT CUSTOMERS WORKERS BATCH BULK RATE FAULT_SHARD RUN_ID RESULTS_DIR
+export COUNT CUSTOMERS WORKERS BATCH CHAOS_RATE FAULT_SHARD
 .NOTPARALLEL:
-.PHONY: docker-up up test failover status cli down docker-down reset clean-results
+.PHONY: docker-up images up test verify failover replica-pause replica-crash router-failure benchmark test-production unit-test status cli down docker-down
 
 docker-up:
 	$(COMPOSE) up -d --wait --wait-timeout 300
-
-up:
-	sh scripts/provision.sh
-	$(COMPOSE) --profile recovery up -d --wait vtorc
-	$(COMPOSE) build workload
-	$(COMPOSE) run --rm -T workload seed
-
-clean-results:
-	@mkdir -p $(RESULTS_DIR); chmod 777 $(RESULTS_DIR)
-	@test ! -f $(RESULTS_DIR)/acknowledged.jsonl || { echo 'Use a fresh RUN_ID' >&2; exit 1; }
-	sh scripts/phase.sh baseline
-
-reset:
-	@set -eu; for shard in -55 55-aa aa-; do \
-	  primary=$$(sh scripts/primary.sh $$shard); \
-	  sh scripts/sql.sh $$primary -Dvt_orders -e 'TRUNCATE TABLE orders'; \
-	done
-
-test: images clean-results reset
-	$(COMPOSE) run --rm -T workload load
-	$(COMPOSE) run --rm -T workload check
-	sh scripts/replicas.sh
-	sh scripts/placement.sh
-	$(MAKE) status
-
-failover: RATE = $(CHAOS_RATE)
-failover: images clean-results reset
-	@fault_status=0; sh scripts/run-fault.sh primary || fault_status=$$?; \
-	$(COMPOSE) run --rm -T workload check || exit 1; \
-	[ $$fault_status -eq 0 ]
-	sh scripts/replicas.sh
-	sh scripts/placement.sh
-	@cat $(RESULTS_DIR)/load.json $(RESULTS_DIR)/failover.json
-	$(MAKE) status
-
-status:
-	$(COMPOSE) --profile recovery ps
-	sh scripts/ctl.sh GetTablets
-
-cli:
-	$(COMPOSE) exec vtgate mysql -h127.0.0.1 -P15306 -uroot orders
-
-down:
-	$(COMPOSE) exec -T vtgate mysql -h127.0.0.1 -P15306 -uroot orders -e 'DROP TABLE IF EXISTS orders, customers'
-
-docker-down:
-	$(COMPOSE) --profile recovery --profile tools down --volumes --remove-orphans --rmi local
-
-.PHONY: images
 images:
 	$(COMPOSE) build workload
+up: images
+	python3 control.py up
+test:
+	python3 control.py test
+verify:
+	python3 control.py verify
+failover:
+	python3 control.py failover
+replica-pause:
+	python3 control.py replica-lag
+replica-crash:
+	python3 control.py replica-crash
+router-failure:
+	python3 control.py router
+benchmark:
+	python3 control.py benchmark
+test-production:
+	$(MAKE) test
+	@for shard in -55 55-aa aa-; do $(MAKE) failover FAULT_SHARD=$$shard || exit 1; done
+	@for shard in -55 55-aa aa-; do $(MAKE) replica-pause FAULT_SHARD=$$shard || exit 1; done
+	$(MAKE) replica-crash
+	$(MAKE) router-failure
+	$(MAKE) verify
+unit-test:
+	$(COMPOSE) build workload
+	python3 -m unittest discover -s . -p 'test_*.py'
+status:
+	$(COMPOSE) --profile recovery ps
+	python3 control.py status
+cli:
+	$(COMPOSE) exec vtgate mysql -h127.0.0.1 -P15306 -uroot orders@primary
+down:
+	python3 control.py down
+docker-down:
+	$(COMPOSE) --profile recovery --profile tools down --volumes --remove-orphans --rmi local
+	@if docker image inspect mysql-customer-workload:dev >/dev/null 2>&1; then docker image rm mysql-customer-workload:dev; fi
