@@ -14,6 +14,10 @@ Prerequisites: Docker, `make`, `kind`, `kubectl`, Helm, `envsubst`, `grep`, and 
 
 Every run uses a unique topic such as `orders-20261114070120` and run ID, so it does not need to erase existing topic data. Override `COUNT`, `TOPIC`, or `RUN_ID` with Make variables. The C++ producer accepts counts up to 2,000,000. The default test validates 4,000,000 unique orders across the initial source batch and producer cutover batch, and also validates the mirrored copy of the initial batch.
 
+Make exports the example-owned `results/kubeconfig` before kind creation and
+removes it at `kind-down`; kubectl and Helm always specify the full kind context.
+The default user context is not changed.
+
 ## Failure exercises
 
 Run these after `make up`. Each one starts MM2, continuously produces the full configured workload while injecting the fault, then validates the replica and consumer offset checkpoint.

@@ -1,4 +1,6 @@
 CLUSTER_NAME := kafka-cross-cluster-mirroring
+KUBECONFIG := $(CURDIR)/results/kubeconfig
+export KUBECONFIG
 NAMESPACE := kafka
 KUBECTL := kubectl --context kind-$(CLUSTER_NAME) -n $(NAMESPACE)
 HELM := helm --kube-context kind-$(CLUSTER_NAME)
@@ -41,6 +43,7 @@ endif
 kind-up: kind-cluster
 
 kind-cluster:
+	@mkdir -p $(dir $(KUBECONFIG))
 	$(KIND) get clusters | grep -qx $(CLUSTER_NAME) || $(KIND) create cluster --config kind-config.yaml
 
 namespace:
@@ -180,4 +183,5 @@ down:
 
 kind-down:
 	$(KIND) delete cluster --name $(CLUSTER_NAME)
+	rm -f "$(KUBECONFIG)"
 	-docker image rm $(PRODUCER_IMAGE) $(CONSUMER_IMAGE)

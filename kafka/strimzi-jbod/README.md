@@ -14,6 +14,10 @@ This is a development example. Its ephemeral JBOD volumes model separate Kafka l
 
 Prerequisites: Docker, `make`, `kind`, `kubectl`, Helm, `envsubst`, `grep`, and `awk`. The images build inside Docker, so host C++ and Rust toolchains are not required.
 
+Make exports the example-owned `results/kubeconfig` before kind creation and
+removes it at `kind-down`; kubectl and Helm always specify the full kind context.
+The default user context is not changed.
+
 ## JBOD disk exercise
 
 Run these after `make up` and before cleanup. Inspect each `ProposalReady` plan before approving it.

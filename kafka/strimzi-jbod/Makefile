@@ -1,3 +1,7 @@
+# Keep kind lifecycle writes inside this example.
+KUBECONFIG := $(CURDIR)/results/kubeconfig
+export KUBECONFIG
+
 CLUSTER_NAME := kafka-strimzi-jbod
 NAMESPACE := kafka
 KUBECTL := kubectl --context kind-$(CLUSTER_NAME) -n $(NAMESPACE)
@@ -21,6 +25,7 @@ RUN_ID ?= $(shell date -u +%Y%m%dT%H%M%SZ)
 kind-up: kind-cluster
 
 kind-cluster:
+	@mkdir -p $(dir $(KUBECONFIG))
 	kind get clusters | grep -qx $(CLUSTER_NAME) || kind create cluster --config kind-config.yaml
 
 up: kind-up
@@ -169,4 +174,5 @@ down:
 
 kind-down:
 	kind delete cluster --name $(CLUSTER_NAME)
+	rm -f "$(KUBECONFIG)"
 	-docker image rm $(PRODUCER_IMAGE) $(CONSUMER_IMAGE)
