@@ -81,3 +81,8 @@ role = "auto"
 database = "orders"
 column = "customer_id"
 data_type = "bigint"
+
+# Multi-tuple INSERTs must be split/routed natively, never broadcast unchanged.
+[rewrite]
+enabled = true
+split_inserts = "rewrite"

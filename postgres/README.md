@@ -16,7 +16,7 @@ GitHub: [postgres/postgres](https://github.com/postgres/postgres), [citusdata/ci
 |---|---|---|
 | [Citus recovery](citus-docker-compose-cluster/#measured-results) | 2026-11-14, Apple M4 Pro, shared native aarch64 Docker | 1,000,000 orders in 4.735 s; 211,185 orders/s; batch p99 16.857 ms; promotions 21 s; 0 acknowledged loss |
 | [PgDog pooling and recovery](pgdog-docker-compose-cluster/#measured-results) | 2026-11-14, Apple M4 Pro, shared native aarch64 Docker | Final 8-client baseline: 1,000,000 orders in 27.267 s, 36,675 orders/s, p99 207.830 ms; promotion 21 s, 0 acknowledged loss |
-| [Customer sharding](customer-sharding/#results), 2026-11-14 | 1,000,000 orders, 10,000 customers, 3 × 3 database copies | Bulk baseline: 21.477 s, 46,562 orders/s, batch p99 139.453 ms. Primary failures on every shard promoted in 19–21 s; 0 missing acknowledged IDs and 0 duplicates. |
+| [Customer sharding](customer-sharding/#results), 2026-11-16 | 8,030,000 retained ACK orders across 11 histories, 10,000 customers, 3 × 3 database copies | Post-recovery million-order append: 6.062 s, 164,973 orders/s, batch p99 15.010 ms. Primary failures and synchronous-standby pauses on every shard; native promotion 17.866–19.354 s, 0 missing/corrupt/duplicate/misplaced rows on all nine copies. |
 | [pgvector retrieval](pgvector-product-search/#benchmark) | 2026-11-15, Apple M4 Pro / native aarch64 Docker; 100,000 products, primary 2 CPUs / 2 GiB | 8-client dense 290.82 QPS, p99 86.29 ms, recall@10 0.9919; 20.61 s client-observed write recovery, 0 acknowledged loss |
 
 ## Representative workloads
