@@ -238,6 +238,24 @@ try:
         wait_progress(case, load, after=now())
         subprocess.run(["docker", "start", worker], check=True, timeout=60)
         kubectl("wait", "node/" + worker, "--for=condition=Ready", "--timeout=120s")
+        restored_node = json.loads(
+            kubectl("get", "node", worker, "-o", "json", capture=True)
+        )
+        internal = next(
+            address["address"]
+            for address in restored_node["status"]["addresses"]
+            if address["type"] == "InternalIP"
+        )
+        expected_ip = owned_node(worker)["NetworkSettings"]["Networks"]["kind"][
+            "IPAddress"
+        ]
+        details["restored_worker_internal_ip"] = internal
+        details["expected_kind_network_ip"] = expected_ip
+        if internal != expected_ip:
+            raise RuntimeError(
+                "worker restarted on its secondary network; refusing a false node-recovery pass"
+            )
+
         after_node = owned_node(worker)
         if (
             after_node["Id"] != node_info["Id"]
@@ -303,6 +321,14 @@ try:
                 if mode == "scale-up"
                 else {"cpu": "1", "memory": "1Gi"},
             }
+            if all(
+                p["spec"]["containers"][0].get("resources") == resources
+                for p in before
+                if p["metadata"]["name"].startswith("telemetry-datanode-")
+            ):
+                raise RuntimeError(
+                    "datanodes already have target resources; run the opposite resize first"
+                )
             patch({"datanode": {"template": {"main": {"resources": resources}}}})
             details["requested_resources"] = resources
     wait_cluster()

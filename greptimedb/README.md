@@ -17,7 +17,7 @@ the example; no sibling example needs to be run first.
 |---|---|---|
 | [Single-node](single-node/) | Durable local WAL; same metrics/logs corpus in GreptimeDB and standalone Victoria backends | Million samples + million logs per backend, full values/body/time readback, query timings and cleanup passed |
 | [Clustered telemetry](docker-compose-cluster/) | Three regions, three WAL brokers, three metadata stores and replicated S3; native failover, empty local-disk replacement and 3 → 5 → 3 region migration under writes | Full corpus and 102,500 acknowledged recovery rows passed |
-| [Kubernetes operator](kubernetes-operator/) | Official operator on its own kind cluster; owned external durable dependencies, native scaling, rolling resizing, node/controller outages and WAL quorum loss | Latest scale-out/in passed; vertical scale-up failed full readback with 666,600 missing metric samples; cause unresolved and remaining cases pending. Earlier results are explicitly historical |
+| [Kubernetes operator](kubernetes-operator/) | Official operator on a private kind cluster; native scaling, worker/controller outages and WAL quorum loss | Fresh four-million-record baseline and ten recovery cases passed; 207,000 historical ACKs retained without loss. Earlier 3,400-sample loss, manual repair and bootstrap fix documented |
 
 The [cluster README](docker-compose-cluster/#measured-results) and
 [single-node README](single-node/#results) and

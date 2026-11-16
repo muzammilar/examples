@@ -69,7 +69,7 @@ Fastest in class, free, runnable locally (see the sections below for the example
 - [x] `questdb-single-node`: ILP ingest and `SAMPLE BY` queries.
 - [ ] `victoriametrics-docker-compose-cluster`: vminsert/vmselect/vmstorage as Prometheus long-term storage.
 - [x] `influxdb3-core-single-node`: Arrow/Parquet engine with SQL.
-- [ ] [`greptimedb`](greptimedb/): single-node and Compose full lifecycles passed. Operator latest scale-out/in passed, but vertical scale-up failed readback with 666,600 missing metric samples; investigate without resetting data, then finish the remaining matrix and teardown. Mimir/Cortex and tracing comparisons remain future work.
+- [x] [`greptimedb`](greptimedb/): single-node/Compose lifecycles and fresh operator recovery matrix passed; million samples + million logs per backend, ten operator cases and 207,000 ACK rows reconciled. Found and documented failed WAL initialization causing 3,400 lost samples; explicit repair, bootstrap guard and dual-network restart fix tested. Mimir/Cortex and tracing comparisons remain future work.
 - [ ] `tdengine-docker-compose-cluster`: IoT time-series (AGPL); one table per device with super tables, vnodes sharding; rerun TSBS against TimescaleDB/QuestDB/InfluxDB.
 - [ ] `iotdb-docker-compose-cluster`: Apache IoTDB (Apache 2.0) ConfigNode/DataNode cluster, TsFile columnar storage; same TSBS run.
 - [ ] `dolphindb-single-node`: free Community Edition (memory/core caps); columnar time-series engine with its own scripting language, used for tick data; compare with kdb+ on the same market data.

@@ -72,81 +72,122 @@ historical journals, including earlier experiments; reads from a survivor alone
 do not count as recovery. The fault workload sleeps 100 ms between 100-row batches;
 its offered rate is deliberately bounded and is not a capacity benchmark.
 
-## Current validation status
+## Failures found and recovery
 
-The latest final-source run passed bootstrap, full baseline correctness, query
-benchmarks and horizontal scale-out/in. The next vertical scale-up failed full
-readback: the verifier reported **666,600 missing metric samples**. The cause is
-unresolved; this observation does not yet establish permanent data loss. The
-cluster and journals are preserved, with no data reset. Remaining production
-cases and teardown have not completed on this revision.
+The fresh fixture passed bootstrap, full baseline readback, benchmarks and
+horizontal scale-out/in. Vertical scale-up then failed full readback. The old
+message `missing 666600` identified the **first missing sample index**, not a
+missing count. Subsequent queries through both frontends found **996,600 / 1,000,000
+samples**: hosts `h006666` through `h006699` were absent (3,400 samples). Logs
+remained complete. Ready pods and ALIVE region metadata did not detect this loss.
 
-The numbers below describe an **earlier revision**, before the final live-reader
-and build-layout changes. They are historical evidence, not qualification of the
-current source. Current failures are retained in ignored `results/`.
+The affected region's restart log replayed 330,000 rows; its prior in-memory
+sequence represented 333,400. Kafka topic `kind_telemetry_wal_4` had that region's
+136,082-byte application entry at **offset zero**. The pinned opener replays from
+`flushed_entry_id + 1`; the empty manifest starts at zero. Source topic preparation
+normally reserves offset zero with a no-op. The metadata leader logged `Failed to notify listener: WalProvider` after its
+three-second partition-client deadline expired with `LeaderNotAvailable` during
+topic preparation. It then continued serving requests without a successful topic
+pool activation. This establishes the failed bootstrap path in this run; a small
+independent upstream reproducer is still outstanding.
 
-## Historical measured results
+Bootstrap now precreates the 12 owned topics and waits for broker health before
+Helm installation, gives metadata WAL connections a 30-second timeout, and rejects
+ingestion unless every topic has the native no-op at offset zero. The guard was
+verified to reject the preserved failed initialization. This prevents silently
+admitting writes after that initialization failure; it does not repair existing
+unsafe WAL entries or patch the upstream listener error handling.
 
-2026-11-15, Apple M4 Pro, shared Docker VM aarch64, 11 CPUs / 24.42 GiB.
-One baseline backfill and one 20-request warm-query series per query/backend;
-one or more operational attempts per case. Limits are listed above and in Compose.
-All four million baseline records passed complete value/body/timestamp readback.
+`python3 repair_boundary_batch.py` explicitly replayed only the 34 absent hosts
+from the external deterministic fixture, without dropping tables or resetting
+storage. It refuses a different fixture/count, a populated target range or a
+previous repair attempt. Its fsynced report is separate from the original failed
+case. Full readback then passed all four million baseline records plus **29,400
+historical ACK rows across three journals**. This is manual application repair,
+not proof of automatic recovery or survival of those original 3,400 ACKed samples.
+Do not run this fixture-specific repair automatically in production tests.
 
-Ingest rates below divide records by **active API-request time only**. Generation,
-encoding and journal fsync are excluded from that denominator. These are bounded
-historical backfill/admission measurements, not sustained capacity, equal-durability
-rankings or end-to-end throughput. Request timing includes transport and the server
-response; it does not independently establish storage visibility/durable-commit latency.
+The worker restart also exposed a dual-network kind gotcha: its entrypoint
+rediscovered the secondary Docker address and rewrote kubelet's `--node-ip`.
+The worker became Ready with the wrong InternalIP; two database members could not
+reconnect. `python3 pin_node_ips.py greptime-operator-worker3` restored its kind
+address and restarted kubelet, with volumes retained. That case is **manually
+recovered**, not an automatic node-recovery pass. The next clean setup connects
+the support network with Docker `--gw-priority -1`, retaining kind as the primary
+network; the fresh worker restart retained the correct kind InternalIP without intervention.
 
-| Backend / signal | Records | API-active records/s | Batch p50 / p99 (ms) | Request errors |
-|---|---:|---:|---:|---:|
-| greptime/logs | 1,000,000 | 296,509 | 3.195 / 6.017 | 0 |
-| greptime/metrics | 1,000,000 | 911,364 | 10.022 / 28.656 | 0 |
-| victoria/logs | 1,000,000 | 543,777 | 0.870 / 18.843 | 0 |
-| victoria/metrics | 1,000,000 | 5,005,213 | 0.560 / 14.806 | 0 |
+The recovery controllers now wait for full baseline counts through both
+frontends while readers/writers remain live, then perform complete body/value
+reconciliation. A clean recreated fixture passed every implemented case without
+manual data repair. Its WAL initialization guard accepted all 12 native no-ops.
+The guard separately rejected the earlier unsafe fixture.
 
-Each metric vector was checked independently against deterministic expected results.
-One warmup precedes 20 measured queries; p99 is the largest of only 20 observations.
+Operator 1.3.0 updates CR `observedGeneration` only when its phase changes. A fast
+scale-in left that field stale despite converged children. The first resize
+precheck was interrupted without injection; both actual resize directions were
+then run explicitly. Readiness now checks desired counts/resources/annotations,
+child-controller generations/rollouts, native regions and complete frontend
+visibility. A resize already at its target limits is rejected as a no-op.
 
-| PromQL | Greptime p50 / p99 (ms) | Victoria p50 / p99 (ms) | Greptime/Victoria p99 ratio |
+Original failed/manual-recovery evidence is preserved in
+`results/archive-20261116T000220.294680/`, including the affected original WAL
+entry, metadata startup error and explicit application-repair journal.
+
+## Measured results
+
+2026-11-16, Apple M4 Pro, shared aarch64 Docker VM, 11 CPUs / 24.42 GiB.
+The final fixture verified 1,000,000 metric samples and 1,000,000 logs per backend
+(all four million records), with zero missing, duplicate or wrong values.
+Budgets are listed above; unrelated host workloads were not isolated. Resize tests
+change datanodes to 1.5 CPUs / 1.5 GiB and restore 1 CPU / 1 GiB before benchmarking.
+
+Ingestion rates use **active API-request time**, excluding generation, encoding
+and witness fsync. They measure bounded synthetic backfill admission, not sustained
+capacity or equivalent durable-commit latency. All 2,200 requests succeeded.
+
+| Backend / signal | Records | API-active records/s | Batch p50 / p99 ms |
 |---|---:|---:|---:|
-| `max_over_time(fleet_load[60s])` | 192.150 / 208.327 | 50.270 / 59.286 | 3.51× |
-| `sum by (tenant) (fleet_load)` | 69.397 / 80.878 | 28.742 / 33.205 | 2.44× |
-| `sum(fleet_load)` | 63.630 / 69.412 | 27.431 / 33.103 | 2.10× |
+| greptime/logs | 1,000,000 | 286,734 | 3.373 / 6.045 |
+| greptime/metrics | 1,000,000 | 902,867 | 10.748 / 17.500 |
+| victoria/logs | 1,000,000 | 527,035 | 0.838 / 20.791 |
+| victoria/metrics | 1,000,000 | 5,334,672 | 0.644 / 13.279 |
 
-Latest completed operational run per case:
+One warmup precedes 20 measured serial queries per backend. Every returned vector
+is checked against an independent oracle; p99 is the maximum of this small sample.
 
-| Case | Transition (s) | ACK rows in case | Ambiguous batches | Longest inter-ACK gap (s) | Missing ACK / wrong / duplicate |
-|---|---:|---:|---:|---:|---|
-| scale-out | 7.007 | 8,200 | 0 | 0.120 | 0 / 0 / 0 |
-| scale-in | 3.822 | 5,400 | 0 | 0.117 | 0 / 0 / 0 |
-| scale-up | 21.540 | 13,700 | 1 | 18.714 | 0 / 0 / 0 |
-| scale-down | 21.595 | 7,900 | 1 | 16.033 | 0 / 0 / 0 |
-| rolling | 21.514 | 21,600 | 0 | 0.122 | 0 / 0 / 0 |
-| process | 6.330 | 7,800 | 0 | 0.129 | 0 / 0 / 0 |
-| disk | 41.237 | 39,300 | 0 | 0.220 | 0 / 0 / 0 |
-| node | 86.735 | 80,700 | 0 | 0.121 | 0 / 0 / 0 |
-| operator | 42.292 | 40,500 | 0 | 0.127 | 0 / 0 / 0 |
-| wal-quorum | 54.057 | 19,900 | 5 | 34.224 | 0 / 0 / 0 |
+| PromQL | Greptime p50 / p99 ms | VictoriaMetrics p50 / p99 ms |
+|---|---:|---:|
+| `sum(fleet_load)` | 55.666 / 58.905 | 26.306 / 32.445 |
+| `sum by (tenant) (fleet_load)` | 61.776 / 67.250 | 27.592 / 33.149 |
+| `max_over_time(fleet_load[60s])` | 152.601 / 169.400 | 49.816 / 51.954 |
 
-Transition times cover command/rollout or region-migration convergence, not exact
-election instants; disk and WAL cases include deliberate 30-second holds. First
-post-injection ACK may complete an operation started before injection. Each passing
-case additionally required three fresh ACKs **after** convergence. Inter-ACK gaps
-come from the external journal; ambiguity counts cover the entire case.
+| Case | Native transition/recovery s | ACK rows | Ambiguous write requests | Read errors | Missing/wrong known reads |
+|---|---:|---:|---:|---:|---:|
+| scale-out | 13.271 | 15,600 | 0 | 0 | 0 |
+| scale-in | 3.779 | 6,700 | 0 | 0 | 0 |
+| scale-up | 22.393 | 14,100 | 1 | 4 | 0 |
+| scale-down | 22.314 | 14,200 | 1 | 3 | 0 |
+| rolling | 22.432 | 14,200 | 1 | 5 | 0 |
+| process | 6.365 | 9,200 | 0 | 3 | 0 |
+| disk | 41.166 | 32,100 | 1 | 13 | 0 |
+| node | 108.746 | 42,000 | 8 | 52 | 0 |
+| operator | 43.313 | 40,900 | 1 | 0 | 0 |
+| wal-quorum | 48.756 | 14,600 | 3 | 0 | 0 |
 
-The WAL-quorum rerun includes an initial wait for recovery from the previous failed
-attempt, so its full-case ambiguity count must not be attributed solely to the
-new injection. Its enforced minority window had **0 acknowledged rows after the
-10-second grace interval**. Native recovery took 54.057 s including the 30-second
-hold; final full verification took 71.078 s. These timings exclude that initial wait.
+These include deliberate 30-second holds where configured, native catch-up and
+polling; they are not exact election timestamps or capacity benchmarks. Native
+WAL minority loss produced **zero ACKs after the ten-second grace window**.
+Readers sample immutable known baseline values, not newly written row freshness.
+Raw phase reports separate successful/failed read and write latencies.
 
-Full historical reconciliation checked **375,600 acknowledged rows across 18 journals**,
-with **0 missing ACKs, 0 wrong values and 0 unexpected/duplicate rows**.
-This includes journals from failed/incomplete attempts; retaining their data does
-not turn those attempts into passing recovery tests. The full five-command lifecycle and cleanup passed; no owned kind nodes, support
-containers/volumes or private kubeconfig remained. Raw results live in ignored
-`results/`, including `*-failure.json`, request journals and native health output.
+Full reconciliation retained **207,000 ACK rows across 11 journals**, with zero
+missing ACKs, wrong values or unexpected/duplicate rows. Of these, 3,400 rows came
+from the initial no-op scale-down attempt; that attempt is not a qualifying resize.
+The table uses the subsequent actual downsize. An additional 67 attempted but
+unacknowledged rows were present; failed responses do not imply absent writes.
+`fresh-matrix-validation.json` records all ten completed case reports and no manual
+data repair. The final benchmark and full five-command teardown passed. No owned kind nodes,
+support containers/volumes, generated identities or private kubeconfig remained.
 
 ## Gotchas and remaining coverage
 
@@ -187,7 +228,10 @@ containers/volumes or private kubeconfig remained. Raw results live in ignored
 
 - [Official operator configuration](https://docs.greptime.com/user-guide/deployments-administration/deploy-on-kubernetes/common-helm-chart-configurations/).
 - [Pinned operator API](https://github.com/GreptimeTeam/greptimedb-operator/blob/v1.3.0/apis/v1alpha1/greptimedbcluster_types.go).
+- [Pinned controller phase/generation updates](https://github.com/GreptimeTeam/greptimedb-operator/blob/v1.3.0/controllers/greptimedbcluster/controller.go).
+- [Docker gateway priorities](https://docs.docker.com/engine/network/#connecting-to-multiple-networks).
 - [Pinned datanode reconciliation and maintenance](https://github.com/GreptimeTeam/greptimedb-operator/blob/v1.3.0/controllers/greptimedbcluster/deployers/datanode.go).
+- [Pinned WAL replay opener](https://github.com/GreptimeTeam/greptimedb/blob/v1.3.1/src/mito2/src/region/opener.rs), [topic initialization](https://github.com/GreptimeTeam/greptimedb/blob/v1.3.1/src/common/meta/src/wal_provider/topic_creator.rs) and [Kafka offset mapping](https://github.com/GreptimeTeam/greptimedb/blob/v1.3.1/src/log-store/src/kafka/log_store.rs).
 - [Pinned database configuration](https://github.com/GreptimeTeam/greptimedb/tree/v1.3.1/config).
 
 ## Source and build

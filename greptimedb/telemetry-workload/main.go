@@ -369,13 +369,21 @@ func verify(f fixture) {
 	}
 }
 func complete(seen []bool, name string) {
-	for i, v := range seen {
-		if !v {
-			panic(fmt.Sprintf("%s missing %d", name, i))
+	missing, first := 0, -1
+	for i, present := range seen {
+		if !present {
+			if first == -1 {
+				first = i
+			}
+			missing++
 		}
+	}
+	if missing != 0 {
+		panic(fmt.Sprintf("%s missing %d of %d records; first missing index %d", name, missing, len(seen), first))
 	}
 	fmt.Println(name, len(seen), "verified")
 }
+
 func validateQuery(body []byte, q string, f fixture) {
 	var v struct {
 		Status string `json:"status"`

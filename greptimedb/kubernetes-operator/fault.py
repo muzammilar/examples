@@ -9,7 +9,7 @@ import time
 
 from live_observer import LiveObserver
 
-from runtime import wait_progress
+from runtime import wait_baseline, wait_progress
 
 KUBE = ["kubectl", "--context", "kind-greptime-operator", "--namespace", "greptime-lab"]
 ROOT = Path("results")
@@ -206,6 +206,7 @@ try:
         query(f"ADMIN migrate_region({region},{source},{new_peer},120)")
         wait_owner(region, new_peer)
     recovered = time.monotonic() - begin
+    wait_baseline()
     wait_progress(case, load, after=datetime.now(timezone.utc))
     observer.mark("after")
     observer.progress()

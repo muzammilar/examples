@@ -20,15 +20,17 @@ kind-up:
 	python3 config.py
 	$(SUPPORT) dependencies
 	@kind get clusters | rg -qx '$(CLUSTER_NAME)' || kind create cluster --name $(CLUSTER_NAME) --image kindest/node:v1.34.0 --config kind-config.json
-	@for node in $$(kind get nodes --name $(CLUSTER_NAME)); do docker network connect $(SUPPORT_PROJECT)_default $$node || docker network inspect $(SUPPORT_PROJECT)_default --format '{{range .Containers}}{{println .Name}}{{end}}' | rg -qx "$$node"; done
+	@for node in $$(kind get nodes --name $(CLUSTER_NAME)); do docker network connect --gw-priority -1 $(SUPPORT_PROJECT)_default $$node || docker network inspect $(SUPPORT_PROJECT)_default --format '{{range .Containers}}{{println .Name}}{{end}}' | rg -qx "$$node"; done
 	python3 load_image.py
 up:
+	python3 wal_ready.py prepare
 	python3 config.py endpoints
 	$(HELM) upgrade --install greptime-operator https://github.com/GreptimeTeam/helm-charts/releases/download/greptimedb-operator-1.3.0/greptimedb-operator-1.3.0.tgz --namespace $(NAMESPACE) --values operator-values.yaml --wait --timeout 5m
 	$(HELM) upgrade --install telemetry https://github.com/GreptimeTeam/helm-charts/releases/download/greptimedb-cluster-1.3.3/greptimedb-cluster-1.3.3.tgz --namespace $(NAMESPACE) --values values.yaml --wait --timeout 10m
 	$(KUBECTL) -n $(NAMESPACE) wait --for=condition=Ready greptimedbcluster/telemetry --timeout=600s
 	$(KUBECTL) apply -f client.json
 	$(KUBECTL) -n $(NAMESPACE) wait --for=condition=Ready pod/client --timeout=120s
+	python3 wal_ready.py check
 	$(RUN) seed
 test:
 	python3 -c 'from pathlib import Path; import time; r=Path("results"); [(p.rename(p.with_name(p.stem+"-before-"+str(time.time_ns())+".json"))) for n in ("correctness.json", "recovery-history.json") if (p:=r/n).exists()]'

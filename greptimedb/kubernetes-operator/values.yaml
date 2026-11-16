@@ -21,6 +21,8 @@ meta:
     allow_region_failover_on_local_wal = false
     region_failure_detector_initialization_delay = "30s"
     [wal]
+    connect_timeout = "30s"
+    timeout = "30s"
     num_topics = 12
     replication_factor = 3
     topic_name_prefix = "kind_telemetry_wal"

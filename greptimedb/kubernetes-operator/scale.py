@@ -8,7 +8,7 @@ import time
 
 from live_observer import LiveObserver
 
-from runtime import now, wait_progress
+from runtime import now, wait_baseline, wait_progress
 
 KUBE = ["kubectl", "--context", "kind-greptime-operator", "--namespace", "greptime-lab"]
 root = Path("results")
@@ -160,6 +160,7 @@ try:
             raise RuntimeError("new nodes still own regions")
         patch(3)
     elapsed = time.monotonic() - begin
+    wait_baseline()
     wait_progress(case, load, after=now())
     observer.mark("after")
     observer.progress()
