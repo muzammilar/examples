@@ -195,6 +195,10 @@ observations during the operation.
   or Pod UID, device removal, failed I/O, or rejected network traffic. Check that
   unrelated survivors did not restart. A pod deletion, read-only directory, lost
   volume and physical power failure are different experiments; name them precisely.
+  Failed inspection is unknown state, not proof of process exit. Before replacing
+  storage, fail closed on Docker/CRI/transport errors. If old container metadata is
+  gone, require a healthy native runtime listing that proves its exact ID is absent;
+  never interpret a nonzero inspection command as successful fencing.
 - Wait for native catch-up, log replay, repair, rebalancing and restored redundancy,
   as applicable. A Ready pod, successful survivor read or desired replica count is
   not enough. Verify the repaired member serves data; where supported, fail a
