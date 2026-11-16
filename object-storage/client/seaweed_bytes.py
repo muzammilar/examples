@@ -24,7 +24,7 @@ def get(url):
 locations = {}
 for node in range(9):
     status = json.loads(get(f"http://volume{node}:8080/status?pretty=y"))
-    for v in status.get("Volumes", []):
+    for v in status.get("Volumes") or []:
         locations.setdefault(str(v["Id"]), []).append(node)
 store = w.Store.__new__(w.Store)
 expected, required = store.expected(fault=(w.ROOT / "churn.jsonl").exists())

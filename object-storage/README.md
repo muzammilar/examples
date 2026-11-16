@@ -57,6 +57,14 @@ README; zero acknowledged data loss does not imply uninterrupted availability.
 All physical zones/drives are logical on one machine. Local passes do not certify
 production hardware durability, correlated power-loss behavior or disaster recovery.
 
+The [SeaweedFS 2026-11-16 follow-up](../seaweedfs/s3-cluster/) separately qualified
+independent read observation, elected-role faults, preserved ACK histories,
+rebuilt-member restart and cold reopen: 36,893 final objects with zero lost ACKs
+or corrupt bodies. One gateway GET failed with HTTP 503; its successful-read
+completion gap reached 10.123 s. Another 41,536-request warm benchmark had zero
+failures (4 KiB / one client: 172.58 PUT ops/s, 8.35 ms p99). Its results do not
+qualify the other stores' older combined read/write fault loops.
+
 ## Common test contract
 
 - Byte-for-byte SHA-256 verification of complete object bodies; ETag is not used

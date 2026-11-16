@@ -16,7 +16,7 @@ while True:
             f"http://volume{node}:8080/status?pretty=y", timeout=15
         ) as response:
             status = json.load(response)
-        for volume in status.get("Volumes", []):
+        for volume in status.get("Volumes") or []:
             replicas.setdefault(str(volume["Id"]), []).append(
                 {
                     "node": node,
