@@ -88,8 +88,19 @@ creation times and to anonymous volumes mounted by inspected owned containers.
 The pinned upstream image creates anonymous `/data` mounts even for stateless
 filers/gateways. Repeating `make up` against the same fixture verifies retained
 data instead of overwriting it. Changing a fixture's storage without an explicit
-recovery proof fails closed. Use the complete cleanup sequence for a fresh run;
-old `results/` evidence remains outside the removed storage.
+recovery proof fails closed. `make docker-down` records a fixture-ID/project proof
+only after verifying zero owned containers, labelled volumes, exact witnessed
+anonymous volumes, networks and build tags. The next `up` requires that matching
+proof before archiving the old fixture, manifests, reconciliation and fault
+histories under ignored `previous-runs/`; unrelated JSON/log files stay in place.
+A mismatched proof or residual witnessed volume fails closed. Cleanup never prunes
+unrelated anonymous volumes. Use the complete five commands for a fresh run;
+`down` alone removes only the bucket/workload.
+
+The host controller's local `witness_archive.py` symlink exposes the tracked
+`../../object-storage/client/run_state.py` helper. It uses no sibling service,
+Makefile or generated state; materialized Docker source and raw evidence remain
+ignored.
 
 Scaling/draining, peer partitions, quorum loss, memory/isolated-disk pressure,
 version upgrades, metadata disk destruction, physical EIO/power loss and an
@@ -103,6 +114,34 @@ the rebuilt member was qualified separately below.
 
 All zones and witnesses still share this host; external-to-container journals
 do not survive loss of the host itself.
+
+## Repeatable default lifecycle (2026-11-16)
+
+Two complete five-command cycles used the unchanged default `results/recovery`,
+with an additional `make verify` before teardown. Apple M4 Pro, Docker 29.5.3
+Linux aarch64, 11 CPUs / 24.42 GiB RAM; the same service caps below. No other
+storage SUT ran. These are lifecycle timings, not capacity benchmarks.
+
+| Cycle | docker-up | up | test | verify | down | docker-down |
+|---|---:|---:|---:|---:|---:|---:|
+| 1 | 20.691 s | 18.675 s | 9.591 s | 22.985 s | 10.391 s | 3.454 s |
+| 2 | 21.553 s | 18.771 s | 9.507 s | 22.944 s | 10.230 s | 3.511 s |
+
+Each cycle verified **10,133 objects / 210,833,408 bytes**, zero missing/corrupt/
+stale/unknown results, **30,417 direct replica chunk reads / 632,500,224 physical
+body bytes**, and current-revision agreement on all three etcd members. Native
+placement reported **six logical volumes / 18 zone copies**, zero missing zone
+replicas. Both cleanups left **zero owned containers, named/anonymous volumes,
+networks or build tags**; the same **ten unrelated volumes** remained untouched.
+The second fixture has a new UUID and preserves the first oracle/reconciliation
+and successful teardown proof in `previous-runs/`.
+
+**26 SDK/controller controls passed**, including four teardown/archive controls
+for wrong fixture IDs, residual anonymous mounts, preservation of failed histories
+and unrelated files, and exclusion of unrelated volumes from cleanup. Ruff passed.
+Raw lifecycle logs and proofs are in ignored `results/recovery/`. This change
+qualifies repeatable teardown/recreation; the earlier live faults, cold reopen
+and throughput measurements below were not rerun for this lifecycle-only fix.
 
 ## Measured independent-reader recovery (2026-11-16)
 
@@ -300,6 +339,8 @@ s3-cluster/
   Makefile
   docker-compose.yml
   control.py                # example-owned fault/lifecycle controller
+  test_teardown.py
+  witness_archive.py -> ../../object-storage/client/run_state.py
   traffic.py                # independent writer and reader
   cold_reopen.py            # retained-storage full-shutdown persistence
   witness.py                # strict attempt/outcome journal parsing

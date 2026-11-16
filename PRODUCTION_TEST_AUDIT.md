@@ -124,7 +124,12 @@ READMEs retain dated execution results and limitations.
   errors/loss; both cleanup passes left zero owned resources/build tags. Fresh
   verification exposed native `Volumes: null` on an empty server; both SeaweedFS
   auditors were fixed and tested without resetting the fixture. The failed log
-  remains. Extended cases remain explicitly unrun below.
+  remains. A subsequent default-path lifecycle fix passed two complete fresh
+  cycles with native replica bytes/metadata checks: 10,133 objects / 30,417 direct
+  chunk reads per cycle, 26 controls, preserved retired witnesses and zero owned
+  resources after each cleanup. All ten unrelated anonymous volumes stayed
+  unchanged. This lifecycle-only follow-up did not rerun the live fault/benchmark
+  matrix. Extended cases remain explicitly unrun below.
 - [Garage](garage/s3-cluster/): separate Compose writer/reader, preserved fsynced
   attempt/outcome histories and exact native ring/block-byte checks. Controller-managed
   process crash, empty owned data disk, router crash and re-crash of the rebuilt

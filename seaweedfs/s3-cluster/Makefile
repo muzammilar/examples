@@ -40,8 +40,7 @@ cli:
 down:
 	$(RUN) drop
 docker-down:
-	$(COMPOSE) --profile tools down --volumes --remove-orphans
-	@if docker image inspect '$(COMPOSE_PROJECT_NAME)-tools:dev' >/dev/null 2>&1; then docker image rm '$(COMPOSE_PROJECT_NAME)-tools:dev'; fi
+	python3 control.py docker-down
 
 .PHONY: metadata-failure control-failure filer-failure gateway-failure role-failures
 metadata-failure:
@@ -65,7 +64,7 @@ verify:
 unit-test:
 	$(RUN) unit
 	$(COMPOSE) run --rm --entrypoint python tools -m unittest -v test_traffic
-	python3 -m unittest -v test_control test_metadata test_native
+	python3 -m unittest -v test_control test_metadata test_native test_teardown
 test-production:
 	$(MAKE) test
 	$(MAKE) failover

@@ -13,6 +13,7 @@ from itertools import pairwise
 from pathlib import Path
 
 from witness import attempted_objects, records
+from witness_archive import archive_oracles
 
 ROOT = Path(__file__).resolve().parent
 BASE = Path(os.environ.get("RESULTS_DIR", "results/recovery")).resolve()
@@ -607,11 +608,76 @@ def fault(mode):
                 raise RuntimeError("cleanup failed: " + "; ".join(cleanup_errors))
 
 
+def teardown():
+    fixture_path = BASE / "fixture.json"
+    fixture = json.loads(fixture_path.read_text()) if fixture_path.exists() else None
+    if fixture and fixture["project"] != PROJECT:
+        raise RuntimeError("teardown witness belongs to another project")
+    compose("--profile", "tools", "down", "--volumes", "--remove-orphans")
+    tag = PROJECT + "-tools:dev"
+    if run(["docker", "image", "ls", "-q", tag]).strip():
+        run(["docker", "image", "rm", tag])
+    label = "label=com.docker.compose.project=" + PROJECT
+    current = set(run(["docker", "volume", "ls", "-q"]).split())
+    remaining = {
+        "containers": run(["docker", "ps", "-aq", "--filter", label]).split(),
+        "volumes": run(["docker", "volume", "ls", "-q", "--filter", label]).split(),
+        "networks": run(["docker", "network", "ls", "-q", "--filter", label]).split(),
+        "build_tag": run(["docker", "image", "ls", "-q", tag]).split(),
+        "witnessed_volumes": sorted(
+            current & set(fixture["volumes"] if fixture else [])
+        ),
+    }
+    if any(remaining.values()):
+        raise RuntimeError("teardown left owned resources: " + str(remaining))
+    save(
+        BASE / "teardown.json",
+        {
+            "fixture_id": fixture["id"] if fixture else None,
+            "project": PROJECT,
+            "remaining": remaining,
+            "finished": True,
+        },
+    )
+
+
+def retire_removed_fixture():
+    marker = BASE / "teardown.json"
+    if not marker.exists():
+        return
+    value = json.loads(marker.read_text())
+    fixture_path = BASE / "fixture.json"
+    fixture = json.loads(fixture_path.read_text()) if fixture_path.exists() else None
+    expected_id = fixture["id"] if fixture else None
+    if (
+        value["fixture_id"] != expected_id
+        or value["project"] != PROJECT
+        or value.get("finished") is not True
+        or set(value["remaining"])
+        != {"containers", "volumes", "networks", "build_tag", "witnessed_volumes"}
+        or any(value["remaining"].values())
+    ):
+        raise RuntimeError("invalid teardown proof; preserving the old witness")
+    archive_oracles(
+        BASE,
+        extra={
+            "fixture",
+            "bootstrap",
+            "teardown",
+            "reconciliation",
+        },
+    )
+
+
 def main():
     os.chdir(ROOT)
     BASE.mkdir(parents=True, exist_ok=True)
     action = sys.argv[1]
+    if action == "docker-down":
+        teardown()
+        return
     if action == "up":
+        retire_removed_fixture()
         if (BASE / "fixture.json").exists():
             fixture_check()
             history()
