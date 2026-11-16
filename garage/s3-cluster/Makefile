@@ -1,6 +1,6 @@
 SHELL := /bin/sh
 COMPOSE_PROJECT_NAME ?= garage-s3-cluster
-RESULTS_DIR ?= results/verified
+RESULTS_DIR ?= results/recovery
 OBJECTS ?= 10000
 LARGE_OBJECTS ?= 128
 S3_ACCESS_KEY ?= GK0123456789abcdef01234567
@@ -8,10 +8,10 @@ S3_SECRET_KEY ?= local-only-object-storage-secret-key
 BENCH_SMALL_REQUESTS ?= 10000
 BENCH_REQUESTS ?= 256
 BENCH_LARGE_REQUESTS ?= 128
-FAULT_DURATION ?= 600
+FAULT_DURATION ?= 900
 export BENCH_SMALL_REQUESTS BENCH_REQUESTS BENCH_LARGE_REQUESTS FAULT_DURATION
 export COMPOSE_PROJECT_NAME RESULTS_DIR OBJECTS LARGE_OBJECTS S3_ACCESS_KEY S3_SECRET_KEY
-COMPOSE := docker compose
+COMPOSE := docker compose --project-name $(COMPOSE_PROJECT_NAME)
 RUN := $(COMPOSE) run --rm --user $(shell id -u):$(shell id -g) tools
 SERVICES := garage0 garage1 garage2 garage3 garage4 garage5 garage6 garage7 garage8 s3
 .NOTPARALLEL:
@@ -21,25 +21,26 @@ config:
 docker-up: config
 	$(COMPOSE) up -d --wait $(SERVICES)
 build:
+	python3 prepare_build.py
 	$(COMPOSE) build tools
 up: config build
-	python3 scripts/runtime_config.py
 	python3 scripts/bootstrap.py
-	$(RUN) create
-	$(RUN) seed
+	$(MAKE) config
+	python3 scripts/runtime_config.py
+	python3 control.py up
 test:
 	$(RUN) unit
 	$(RUN) test
 benchmark:
-	python3 ../../object-storage/benchmark.py
+	python3 benchmark.py
 failover:
 	python3 scripts/runtime_config.py
-	STORE=garage python3 ../../object-storage/fault.py process
+	python3 control.py process
 disk-failure:
 	python3 scripts/runtime_config.py
-	STORE=garage python3 ../../object-storage/fault.py disk
+	python3 control.py disk
 repair:
-	$(COMPOSE) exec -T garage0 /garage repair --yes --all-nodes blocks
+	python3 control.py repair
 status:
 	$(COMPOSE) ps
 	$(COMPOSE) exec -T garage0 /garage status
@@ -48,6 +49,33 @@ cli:
 down:
 	$(RUN) drop
 docker-down:
-	$(COMPOSE) --profile tools down --volumes --remove-orphans
-	@if docker image inspect '$(COMPOSE_PROJECT_NAME)-tools:dev' >/dev/null 2>&1; then docker image rm '$(COMPOSE_PROJECT_NAME)-tools:dev'; fi
+	python3 control.py docker-down
 	rm -rf config/generated
+
+.PHONY: verify test-production unit-test gateway-failure
+verify:
+	python3 control.py verify
+gateway-failure:
+	FAULT_TARGET=s3 python3 control.py process
+unit-test:
+	$(RUN) unit
+	$(COMPOSE) run --rm --entrypoint python tools -m unittest -v test_traffic test_placement test_reader
+	python3 -m unittest -v test_control test_teardown test_config
+test-production:
+	$(MAKE) test
+	$(MAKE) failover
+	$(MAKE) disk-failure
+	$(MAKE) gateway-failure
+	$(MAKE) verify
+
+.PHONY: cold-reopen
+cold-reopen:
+	python3 cold_reopen.py
+
+.PHONY: report
+report:
+	python3 report.py
+
+.PHONY: recover-bootstrap
+recover-bootstrap:
+	python3 control.py recover-bootstrap

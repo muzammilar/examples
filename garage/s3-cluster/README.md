@@ -12,7 +12,7 @@ observable. SQLite metadata, consistent quorum mode and data fsync are explicit.
 4. `make down` — delete the example bucket and its objects; keep the cluster running.
 5. `make docker-down` — destroy its network/volumes and remove its client image.
 
-Requires Docker Compose, Python 3 and approximately 10 GiB available Docker disk
+Requires Docker Compose, Python 3.11+ and approximately 10 GiB available Docker disk
 space. S3 is internal at `s3:9000`; the test credentials are local fixtures, not
 production secrets. No host ports or host devices are needed.
 
@@ -24,10 +24,14 @@ production secrets. No host ports or host devices are needed.
 | HAProxy `3.2.8-alpine` | 1 | 0.5 CPU, 128 MiB; nine S3 frontends |
 | Docker-built Boto3 client | 1 | 2 CPUs, 2 GiB; SDK 1.44.3, SigV4/path addressing |
 | Metadata/data disks | 18 | Separate named volumes; shared physical Docker filesystem |
-| Replication | 3 | Consistent mode, read/write quorum 2; one copy per logical zone |
+| Data/sharded metadata | 3 | Consistent mode, sharded-metadata quorum 2; block writes acknowledge 2; one copy per logical zone |
 | Data durability | — | `data_fsync=true`, uncompressed native blocks |
 | Metadata | — | SQLite WAL, `metadata_fsync=true`; native hourly snapshots |
 | Native RPC timeout | — | 5 s for this local LAN; upstream default is 300 s |
+
+Small full-copy metadata uses all nine members; its consistent-mode majority
+quorum is five. Immutable block reads need one valid content-hash copy. The
+three-copy/factor-two quorum description does not apply to every metadata table.
 
 Logical capacity is 4 decimal GB per node. This is placement capacity, **not** a
 Docker disk quota. The containers and zones share one physical computer. The
@@ -42,7 +46,263 @@ multipart abort, pagination, and invalid Content-MD5 rejection. Eleven shared ne
 client controls reject corrupted/truncated/stale data, unavailable responses,
 missing acknowledgements and malformed pagination.
 
-## Recovery experiments
+## Live production tests
+
+`make test-production` serially runs the API suite, an actual data-owner crash,
+permanent owned data-volume replacement, an S3-router crash and full verification.
+Use `make failover`, `make disk-failure`, `make gateway-failure`, `make verify`,
+`make repair`, `make cold-reopen` and `make report` separately when investigating. The default
+`RESULTS_DIR=results/recovery` contains a unique directory for every fault run.
+`FAULT_DURATION=900` is a safety ceiling (60–1,800 s allowed), not a load duration
+or a substitute for native recovery. A traffic process exhausting that ceiling
+fails the test.
+
+Two **separate Compose containers** generate paced PUTs and independent GETs.
+Each sends one request at a time with a 50 ms pause. PUTs have unique keys and
+32 KiB bodies, one SDK attempt and fsynced attempt/outcome records. GETs alternate
+historical ACK bodies and current ACK bodies; a blocked PUT cannot stop read
+observation. Full SHA-256, length and application version are checked. Wrong
+successful reads fail immediately. A 404 for an immutable ACK also fails the
+consistent-read contract; transport errors/503 remain availability observations. SDK write errors are conservatively treated
+as possibly committed, including definite connection failures; raw errors and
+latencies distinguish them. This is an upper bound on ambiguous commits, not a
+claim every failed request reached the server. No mutation is blindly replayed.
+
+The existing maintained Boto3 compatibility/checksum harness is retained, so this
+Python SDK workload is an explicit exception to the usual Go/Rust/C++ application
+preference. Controllers and native filesystem audits use Python's standard
+library; a pinned MessagePack decoder handles the native layout format instead
+of implementing a codec.
+
+The controller selects a node that owns a required live block; `FAULT_TARGET`
+may select another allowlisted owner. Native SIGKILL exit 137 proves the crash.
+For permanent data loss it stops/removes the exact owner, proves its old ID absent
+in a healthy runtime listing, deletes only the labelled data volume, and removes
+only the documented `/meta/data_layout` marker on its retained metadata disk.
+The SQLite database and node identity remain intact. All nine unrelated
+container/main-process IDs, start times, PIDs and restart counts must be unchanged.
+The single HAProxy router is a deliberately tested availability boundary; nine
+native S3 frontends do not make this one routing process redundant.
+
+### Recovery barrier
+
+Membership is checked on all nine nodes: all 256 partitions must have their native
+quorum and every configured peer connected. The controller then captures a
+**fixed prefix of live acknowledged writes**, with writers/readers still running.
+It waits for metadata insert/Merkle work, launches native metadata full sync,
+waits for sync/index workers, launches native block repair and checks every
+required block of the old history and live prefix on **all exact native owners**.
+The writer continues throughout those operations and must make further progress
+after the all-copy barrier. It stops only afterward; a separately labelled final
+reconciliation also repairs and verifies the subsequent write tail while the
+independent reader remains live.
+
+Native full-sync success is a quorum result. An idle worker, zero foreground
+queue or a healthy membership API does **not** establish all-copy completion.
+If the fixed prefix still lacks copies, the controller may launch another native
+metadata sweep, at most eight, no more often than every 30 s and only after prior
+sync/index workers become idle. Each sweep is recorded with timestamps and live
+roles. These are explicit native recovery assists, not application PUT retries
+or a claim of completely automatic recovery. The finite prefix prevents new
+traffic from moving the recovery goal indefinitely.
+
+Garage also keeps legitimate delayed garbage collection in its resync queue
+(`BLOCK_GC_DELAY + 10 s = 610 s`). The final gate requires metadata work to finish,
+no current resync errors and every live expected physical copy; it records queued
+GC instead of pretending a future GC timer is missing acknowledged data. Native
+repair launches run locally on each node with checked exits, because an aggregate
+RPC can print a peer error while returning success. The server logs, worker and
+queue snapshots, raw request events and separate live/final repair journals are
+retained. Latency and error rates are separated by actual operation phase;
+`reconcile` runs with the reader and a stopped writer, so its PUT rate is not a
+steady-state throughput number.
+
+### Exact placement and bytes
+
+The read-only auditor decodes the pinned native `G010lh` layout on **all nine
+metadata disks** and requires agreement. It uses Garage's stored
+`ring_assignment_data` / `node_id_vec` table and the native top-eight-hash-bit
+partition lookup; it does not recompute placement. Unknown markers, changed
+membership, transitional multi-version layouts or a non-three-copy ring fail
+closed. This private, version-pinned format is not a stable public API; an upgrade
+requires requalification of the decoder.
+
+For each acknowledged object's required blocks, the auditor requires the exact
+native storage nodes, correct `/data/<hash[0:2]>/<hash[2:4]>/<hash>` path and full
+BLAKE2b-512/32-byte identity. One wrong node in the right zone fails even if there
+are still three zone copies; that case has a negative unit control. The suite
+also verifies complete S3 bodies against the external SHA-256 witness. Native
+metadata worker/queue checks are not independent byte-for-byte verification of
+every SQLite metadata row. The auditor is deliberately scoped to uncompressed,
+single-data-directory Garage 2.5.0, with the fixed nine-node layout used here.
+
+### Lifecycle and remaining boundaries
+
+After initial node identities are discovered, configuration includes the eight
+other `bootstrap_peers` on every node. The initialization applies that native
+configuration before seeding application data; later whole-stack starts can
+reconnect without manually rebuilding membership.
+
+The example's local `s3-workload` and `benchmark.py` links point to tracked source;
+`witness_archive.py` links to the shared evidence-preservation helper. `make build`
+materializes regular files in ignored `.build/tools` using hard links where
+possible, copies local modules and builds the Docker image from that local
+context. Nothing depends on another example's running services or generated
+state. Materialized files and all raw results remain untracked.
+
+Initial seeding also runs explicit native metadata/block repair and an exact-copy
+barrier before marking the fixture ready. The first fresh seed exposed 239 blocks
+without their third native copy despite idle/error-free native queues. Its startup
+remains failed; `make recover-bootstrap` resumes only a diagnosed, fully seeded
+`initializing` fixture, repairs/verifies it without replaying PUTs, and keeps the
+original manifest. Partial seeds fail closed and require diagnosis.
+
+Repeated `make up` verifies retained state. `make docker-down` records a matching
+fixture-ID proof after confirming zero owned containers/volumes/networks/build
+tags. On the next complete lifecycle, `up` archives the retired witness and failed
+histories under ignored `previous-runs/` before creating a new fixture. Unexplained
+storage loss or an unmatched teardown proof fails closed. Use the complete five
+commands for a fresh dataset; `down` alone intentionally removes the workload.
+`make cold-reopen` separately stops/starts the whole retained stack and checks
+persistence without a live-workload/availability claim. Docker VM filesystem
+caches remain warm; this is not a cold-query benchmark.
+
+Peer partitions, native quorum loss, topology expansion/shrink, live resource
+changes, rolling upgrades, metadata-disk loss, bounded pressure, physical EIO or
+power loss and independent backup restore remain **unrun**. Bootstrap configuration
+restarts are not live rolling-maintenance tests. The nine logical failure domains
+and external journals still share one physical host. Local correctness and fault
+passes do not establish independent-host durability or production certification.
+
+## Recovery follow-up (2026-11-16)
+
+Apple M4 Pro, native ARM64 Docker VM with 11 CPUs / 24.42 GiB RAM; the
+nine-node storage/router budget is 9.5 CPUs / 6.875 GiB. During faults, two
+independent traffic containers add up to 4 CPUs / 4 GiB and the read-only auditor
+adds 2 CPUs / 2 GiB; CPU limits therefore oversubscribe this one VM. These are
+local observations, not independent-host durability or normalized comparisons.
+
+The retained main fixture reconciled **13,817 ACK objects across eight histories**
+from 14,666 attempts, including failed and externally assisted investigations.
+The 849 non-ACK attempts were all absent at final reconciliation; none is silently
+counted as a successful write.
+Full S3 readback verified **44,718 objects / 2,356,121,600 bytes**; the exact-owner
+audit verified **139,248 required native block copies across all 256 partitions**.
+No missing ACKs, corrupt bodies, stale versions, unknown keys, missing required
+copies or wrong native owners remained. Nine unrelated container/main-process
+identities were unchanged in every qualified fault.
+
+| Controller-managed case | PUT ACK / non-ACK | GET success / error | ACK / GET during 30 s outage | Longest successful-GET gap | Fixed live-prefix copy wait |
+|---|---:|---:|---:|---:|---:|
+| Native process crash | 1,209 / 2 | 1,652 / 0 | 194 / 36 | 5.097 s | 50.360 s |
+| Empty owned data disk | 3,783 / 1 | 4,878 / 1 | 202 / 36 | 12.130 s | 54.530 s |
+| Single S3 router crash | 338 / 442 | 1,091 / 442 | 0 / 0 | 30.478 s | 3.833 s |
+| Re-crash rebuilt native member | 1,209 / 1 | 1,765 / 1 | 185 / 44 | 12.179 s | 47.949 s |
+
+The native process/disk cases needed an additional recorded metadata sweep while
+both traffic roles remained live. Prefix wait starts after the initial native
+repair launch and is not total fault recovery time. SDK timeouts were about
+12 s; successful-read gaps and non-ACK counts disclose the availability cost.
+The router is a single point of failure: zero useful progress during its outage
+is an observed limitation, not continuous availability.
+
+An earlier process test remains **failed**: successful S3 readback and idle native
+workers coexisted with 41 required blocks missing on one native owner. A checked
+metadata/block sweep restored the copies without replaying PUTs. Two subsequent
+investigations used explicit outside-controller repair assists and remain labelled
+assisted; neither qualifies unattended controller recovery. The table above uses
+later controller-managed runs. No failed history was discarded or reseeded.
+
+A complete stop/start first exposed missing native bootstrap peers: each node
+knew only itself despite retained storage. Applying the peer configuration to the
+same dataset restored membership and every required body/copy. That cold attempt
+remains failed, as does a later evidence-collector filename failure after the
+storage checks passed. The corrected full-stack cold reopen passed in **72.320 s**,
+retaining all ten container IDs and restarting every process. Retained `make up`
+then verified the same dataset in **67.847 s**.
+
+The first follow-up benchmark completed **41,536 requests, zero failures** before
+the peer-discovery fix: 1 MiB / 16 clients achieved **151.27 PUT MiB/s / 513.72 warm
+GET MiB/s**. It uses the 5 s RPC profile but is not a measurement of the final
+bootstrap configuration. Its raw output remains under
+`results/production-20261116/`; failed statuses, manual assists, native worker
+snapshots and request journals remain alongside it. `make report` reads these
+saved witnesses after cleanup and keeps failed/assisted labels.
+
+The corrected fresh setup passed in **112.421 s**, followed by the API suite
+(**12.585 s**) and full S3/native verification (**16.497 s**). A matching fixture-ID
+teardown proof allowed the next `up` to archive the previous 10,133-object oracle,
+and reconciliation without overwriting them; the failed-startup log remains
+alongside the archive. The final
+`make unit-test` passed **29 controls** (20 Docker SDK/witness/placement/read tests
+and nine host bootstrap/recovery/teardown/configuration tests).
+
+### Final-configuration live matrix
+
+The corrected fresh fixture completed `make test-production` in **438.736 s**.
+All three cases used the final controller source and peer configuration; neither
+manual repair nor PUT replay was used outside the controller.
+
+| Case | PUT ACK / non-ACK | GET success / error | Outage ACK / GET | Longest successful-GET gap | Fixed-prefix native-copy wait |
+|---|---:|---:|---:|---:|---:|
+| Native process | 1,217 / 1 | 1,410 / 1 | 194 / 11 | 15.136 s | 48.286 s |
+| Empty owned data disk | 1,530 / 1 | 1,958 / 0 | 197 / 69 | 5.084 s | 2.064 s |
+| Single router | 288 / 400 | 795 / 449 | 0 / 0 | 30.473 s | 2.166 s |
+
+Before the benchmark, all **3,035 ACK objects across three histories** survived;
+all 402 non-ACK attempts were absent. Full readback verified **13,168 objects /
+310,284,288 bytes**, and all **39,990 required native copies** matched their native
+owners. All 256 partitions were represented and all nine unrelated process
+identities stayed unchanged per case. The process case used one additional
+recorded live metadata sweep; the disk and router prefix audits needed none.
+`make cold-reopen` separately checks persistence of the rebuilt disk.
+
+## Benchmark
+
+Measured 2026-11-16 on the final bootstrap/recovery configuration: Apple M4 Pro,
+Docker 29.5.3 aarch64, 11 CPUs / 24.42 GiB RAM. Store/router caps total 9.5 CPUs /
+6.875 GiB; the benchmark client adds 2 CPUs / 2 GiB. No other SUT ran. This is one
+post-recovery run; GET immediately follows PUT with warm caches. Signing, transfer
+and full GET hashing are timed; body generation is excluded. No mutation retries.
+
+| Object | Clients | PUT ops/s | PUT MiB/s | PUT p50/p99 ms | GET ops/s | GET MiB/s | GET p50/p99 ms |
+|---|---:|---:|---:|---|---:|---:|---|
+| 4 KiB | 1 | 29.63 | 0.12 | 43.57 / 93.90 | 140.09 | 0.55 | 1.82 / 43.82 |
+| 4 KiB | 16 | 230.38 | 0.90 | 53.07 / 580.70 | 1234.81 | 4.82 | 9.34 / 50.11 |
+| 1 MiB | 1 | 21.93 | 21.93 | 46.15 / 132.61 | 68.96 | 68.96 | 6.71 / 49.12 |
+| 1 MiB | 16 | 155.14 | 155.14 | 96.26 / 181.56 | 458.55 | 458.55 | 25.65 / 92.45 |
+| 4 MiB | 1 | 11.51 | 46.04 | 86.26 / 164.02 | 35.52 | 142.06 | 16.75 / 98.45 |
+| 4 MiB | 16 | 57.62 | 230.46 | 267.84 / 445.17 | 220.48 | 881.92 | 54.75 / 147.94 |
+
+**41,536 timed requests, zero request failures; 499.815 s total command time.**
+The read-only audit immediately after the benchmark found all three native copies
+of every required block: **35,634 required block hashes, zero missing, misplaced
+or corrupt blocks**, before the explicit post-benchmark repair.
+Raw latency distributions, resource inventory and externally witnessed bodies are
+under `results/lifecycle-20261116/`; the next fresh lifecycle preserves their
+oracles under `previous-runs/`. These caps/topology differ from other stores;
+this is not a normalized product ranking.
+
+Post-benchmark full readback checked **33,936 objects / 2,002,817,024 bytes**;
+all four reconciliation counters stayed zero. The native audit verified
+**106,902 required block copies**, zero missing/misplaced/corrupt blocks. The
+subsequent full-stack stop/start passed in **57.673 s**, retaining all ten
+container IDs and checking every process restarted, all retained volume births,
+all object bodies and the same required native copies. This includes the rebuilt
+data disk. The offline saved-evidence report also passed before cleanup.
+
+Both corrected fresh-volume lifecycles passed on the same results path. The
+second clean startup took **112.937 s**, its API suite **12.520 s**, full native/S3
+verification **16.018 s**, and bucket cleanup **47.215 s**. It checked another
+**10,133 objects / 210,833,408 bytes** and **30,885 required native block copies**.
+The two retired fixture UUIDs retain their respective 10,133-object and
+33,936-object manifests/reconciliations plus teardown proofs; the archived
+benchmark/fault dataset also passed `make report` after recreation. All **four**
+cleanup passes (retained main, diagnosed first fresh fixture and both corrected
+fresh fixtures) left **zero owned containers, volumes, networks or build tags**.
+The first failed seed and both earlier failed cold attempts remain failures.
+
+## Previous recovery experiments (2026-11-15)
 
 Run after `make test`, optionally after `make benchmark`:
 
@@ -50,7 +310,7 @@ Run after `make test`, optionally after `make benchmark`:
 |---|---|
 | `make failover` | SIGKILL one native process for about 30 s; persistent disks retained |
 | `make disk-failure` | Kill `garage0`, remove its owned data volume, attach an empty replacement; metadata and node identity retained |
-| `make repair` | Launch native block repair; this command alone is not proof of completion |
+| `make repair` | Current target: checked metadata/block repair followed by full S3/native verification |
 | `make status` | Native membership and Compose health |
 
 The producer does not pause for recovery. Each PUT has a unique body/key, an
@@ -86,7 +346,7 @@ objects, the bucket, then all owned containers/volumes/network and the client im
 A separate fresh lifecycle also passed two complete 10,133-object suites, including
 `down` → `up` bucket recreation on the same running storage cluster.
 
-## Benchmark
+## Previous benchmark (2026-11-15)
 
 Measured 2026-11-15, Apple M4 Pro, Docker VM aarch64, 11 CPUs / 24.42 GiB RAM.
 One native-container run; caps above. No other SUT ran during this benchmark.
@@ -151,13 +411,24 @@ Raw manifests, latency distributions, resource limits and fault journals are in
 garage/s3-cluster/
   Makefile
   docker-compose.yml
-  scripts/{config,bootstrap,runtime_config,adapter}.py
-  config/generated/                  # ignored native TOML and bootstrap marker
-  results/                           # ignored raw evidence
-object-storage/
-  client/                            # Dockerfile, SDK client, negative controls/audits
-  benchmark.py
-  fault.py
+  control.py                         # native controller / durable history
+  traffic.py                         # independent paced writer and reader
+  placement.py                       # read native replica assignment table
+  replica_audit.py                   # read-only exact-owner/block-byte audit
+  witness.py
+  cold_reopen.py
+  report.py                          # saved evidence; no live storage required
+  test_{config,control,placement,teardown,traffic,reader}.py
+  prepare_build.py
+  docker/Dockerfile.tools
+  audit-requirements.txt
+  s3-workload -> ../../object-storage/client
+  benchmark.py -> ../../object-storage/benchmark.py
+  witness_archive.py -> ../../object-storage/client/run_state.py
+  scripts/{config,bootstrap,runtime_config}.py
+  config/generated/                  # ignored TOML / bootstrap identity
+  .build/tools/                      # ignored regular-file Docker context
+  results/                           # ignored raw evidence / archived histories
 ```
 
 [Production guide](https://garagehq.deuxfleurs.fr/documentation/cookbook/real-world/),
@@ -173,3 +444,16 @@ Pinned 2.5.0 source paths inspected:
 (BLAKE2b-512 truncated to 32 bytes), and
 [`src/api/admin/repair.rs`](https://github.com/deuxfleurs-org/garage/blob/v2.5.0/src/api/admin/repair.rs)
 (native repair launch semantics).
+
+The stricter audit also inspected pinned native
+[`LayoutVersion` lookup](https://github.com/deuxfleurs-org/garage/blob/v2.5.0/src/rpc/layout/version.rs),
+[`G010lh` layout schema](https://github.com/deuxfleurs-org/garage/blob/v2.5.0/src/rpc/layout/mod.rs),
+[`MessagePack migration codec`](https://github.com/deuxfleurs-org/garage/blob/v2.5.0/src/util/migrate.rs),
+[`metadata synchronization/quorum`](https://github.com/deuxfleurs-org/garage/blob/v2.5.0/src/table/sync.rs)
+and [structured node statistics](https://github.com/deuxfleurs-org/garage/blob/v2.5.0/src/api/admin/node.rs),
+[native bootstrap configuration](https://github.com/deuxfleurs-org/garage/blob/v2.5.0/src/util/config.rs)
+and [full-copy metadata quorum](https://github.com/deuxfleurs-org/garage/blob/v2.5.0/src/table/replication/fullcopy.rs).
+The actual 2.5.0 CLI help and admin API schema are saved with the run evidence.
+The CLI JSON request encoding uses `null` for unit requests and
+`{"node":"*","body":null}` for all-node statistics; the public HTTP schema's
+query parameters are not the CLI's complete serialized request body.

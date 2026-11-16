@@ -88,8 +88,8 @@ services:
   tools:
     image: ${COMPOSE_PROJECT_NAME:-garage-s3-cluster}-tools:dev
     build:
-      context: ../..
-      dockerfile: object-storage/client/Dockerfile
+      context: ./.build/tools
+      dockerfile: Dockerfile
     profiles: [tools]
     cpus: 2
     mem_limit: 2g
@@ -101,16 +101,16 @@ services:
       OBJECTS: ${OBJECTS:-10000}
       LARGE_OBJECTS: ${LARGE_OBJECTS:-128}
       CONCURRENCY: ${CONCURRENCY:-16}
-      DURATION: ${DURATION:-120}
+      DURATION: ${DURATION:-900}
       BENCH_SMALL_REQUESTS: ${BENCH_SMALL_REQUESTS:-10000}
       BENCH_REQUESTS: ${BENCH_REQUESTS:-256}
       BENCH_LARGE_REQUESTS: ${BENCH_LARGE_REQUESTS:-128}
     volumes:
-      - ./${RESULTS_DIR:-results/manual}:/results
+      - ./${RESULTS_DIR:-results/recovery}:/results
   audit:
     extends: tools
     profiles: [tools]
-    entrypoint: [python, /app/garage_audit.py]
+    entrypoint: [python, /app/replica_audit.py]
     volumes:
       - data0:/disks/0:ro
       - data1:/disks/1:ro
@@ -121,6 +121,15 @@ services:
       - data6:/disks/6:ro
       - data7:/disks/7:ro
       - data8:/disks/8:ro
+      - meta0:/metadata/0:ro
+      - meta1:/metadata/1:ro
+      - meta2:/metadata/2:ro
+      - meta3:/metadata/3:ro
+      - meta4:/metadata/4:ro
+      - meta5:/metadata/5:ro
+      - meta6:/metadata/6:ro
+      - meta7:/metadata/7:ro
+      - meta8:/metadata/8:ro
 volumes:
   meta0:
   data0:

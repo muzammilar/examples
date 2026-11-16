@@ -65,6 +65,20 @@ completion gap reached 10.123 s. Another 41,536-request warm benchmark had zero
 failures (4 KiB / one client: 172.58 PUT ops/s, 8.35 ms p99). Its results do not
 qualify the other stores' older combined read/write fault loops.
 
+The [Garage 2026-11-16 follow-up](../garage/s3-cluster/) also uses independent
+read/write containers, retained histories and the exact native assignment table.
+It reconciled 13,817 ACK objects across eight histories and 139,248 required native
+block copies without loss/corruption. Native metadata sweeps are explicit recovery
+assists; idle workers alone did not prove all-copy repair. Failed and manually
+assisted investigations remain labelled. The single router caused 442 GET errors
+and a 30.478 s successful-read gap. Its follow-up results are separate from the
+2026-11-15 benchmark table above. The final peer/recovery configuration passed
+another three-case live aggregate (3,035 ACK objects / 39,990 required native
+copies) and a 41,536-request warm benchmark with zero request failures:
+1 MiB / 16 clients measured 155.14 PUT MiB/s / 458.55 GET MiB/s. These remain
+separate, non-normalized observations. Final full readback verified 33,936 objects
+and 106,902 required native copies; retained whole-stack reopen passed in 57.673 s.
+
 ## Common test contract
 
 - Byte-for-byte SHA-256 verification of complete object bodies; ETag is not used

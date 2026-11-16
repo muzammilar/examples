@@ -1,8 +1,21 @@
+import json
 import os
+import re
 from pathlib import Path
 
 out = Path(os.environ.get("GARAGE_CONFIG_DIR", "config/generated"))
 out.mkdir(parents=True, exist_ok=True)
+marker = out / "bootstrap.json"
+peers = json.loads(marker.read_text())["peers"] if marker.exists() else []
+if peers and (
+    len(peers) != 9
+    or len({p.split("@")[0] for p in peers}) != 9
+    or any(
+        not re.fullmatch(r"[0-9a-f]{64}@garage" + str(i) + r":3901", p)
+        for i, p in enumerate(peers)
+    )
+):
+    raise RuntimeError("bootstrap peer identities/addresses do not match this example")
 for i in range(9):
     (out / f"garage{i}.toml").write_text(f'''metadata_dir = "/meta"
 data_dir = "/data"
@@ -20,6 +33,7 @@ rpc_secret = "{"a1" * 32}"
 rpc_timeout_msec = 5000
 rpc_bind_addr = "0.0.0.0:3901"
 rpc_public_addr = "garage{i}:3901"
+bootstrap_peers = {json.dumps([p for n, p in enumerate(peers) if n != i])}
 [s3_api]
 api_bind_addr = "0.0.0.0:3900"
 s3_region = "us-east-1"
