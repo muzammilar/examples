@@ -305,6 +305,36 @@ These extend both deployment matrices instead of creating duplicate examples.
   not establish a cold OS cache. Use supported cache controls or an isolated
   owned VM for cold runs, never clear a shared host's caches. Validate returned
   bodies/results in both modes and report cache preparation separately.
+- Publish the **dataset shape**, not only a row count: exact input bytes with
+  explicit MB/MiB units, columns/types, distinct keys/tenants/groups, nulls and
+  skew, generation seed or corpus revision, and artifact checksums. Separate input
+  size, native persisted size, process memory and whole-stack memory; a small
+  numeric synthetic fixture does not qualify string-heavy or skewed workloads.
+- For **cross-language comparisons**, keep the native engine version/build and
+  query/output semantics identical; inspect bindings for bundled engine revisions.
+  State whether each driver uses an official binding, a common C ABI adapter or
+  RPC. Identify the timed boundary: parsing/planning, execution, fetching/conversion,
+  language-side validation and logging. An FFI benchmark does not compare native
+  language implementations or establish that one language makes an engine faster.
+- Record **CPU and memory on both competitors**. Measure wall time and process
+  user+system CPU across all engine threads, stating CPU core-seconds versus
+  utilization percentages. Record process peak RSS and container/cgroup peak
+  memory where available; distinguish heap from charged file cache/kernel memory.
+  Include import/setup as well as query/recovery costs. Save the sampling cadence
+  and exact counters: fast operations can finish between sampled observations.
+- Use at least **three fresh-process trials** for comparative performance claims,
+  alternate or randomize system order, and retain per-trial counts and samples.
+  State warmup count and whether a summary is pooled or a median of trial summaries.
+  Report percentile sample sizes; a p99 from a handful of requests is effectively
+  a maximum, not established tail behavior. State benchmark rates' actual timed
+  scope; reciprocal latency is not measured end-to-end throughput. Report winners
+  per workload and resource cost rather than declaring a universal winner.
+- Validate complete query outputs against an **independent oracle**, including
+  group keys, ordering, joins and numeric/null semantics; matching totals alone
+  can conceal wrong groups or misplaced data. Add focused negative controls for
+  false-success risks such as malformed replies, incorrect expected results and
+  invalid/null values. Document adapter restrictions and prove numeric casts fit
+  their target range instead of silently accepting truncation or overflow.
 - Verify the health/metrics/logs used to diagnose each test expose the injected
   failure, lag and recovery. Save native status, controller events and relevant
   logs alongside client measurements; a dashboard alone does not validate data.
@@ -332,6 +362,11 @@ verify native repair/placement completion. A successful read from a survivor doe
 not establish rebuilt redundancy. Document actual failure symptoms, recovery
 commands, gotchas and untested limits; never turn an interrupted or failed run
 into a passing result.
+
+Keep durable conventions in this guide, measured results in each example's README,
+and current gaps/next steps in `TODO.md` or `PRODUCTION_TEST_AUDIT.md`. Distinguish
+unfinished implementation, compiled/unit-tested code and actually executed live
+experiments; preserve failed outcomes and identify the tested revision/run.
 
 ## Technology research
 
