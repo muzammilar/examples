@@ -79,6 +79,21 @@ copies) and a 41,536-request warm benchmark with zero request failures:
 separate, non-normalized observations. Final full readback verified 33,936 objects
 and 106,902 required native copies; retained whole-stack reopen passed in 57.673 s.
 
+The [RustFS 2026-11-17 follow-up](../rustfs/s3-cluster/) qualified independent
+live writer/reader roles, retained ACK histories and native EC2+2 recovery.
+The larger fixture retained **15,910 ACK objects across eight histories**, including
+two failed cases recovered without application replay; both remain labelled failed.
+Post-benchmark readback checked **46,811 objects / 2,424,705,024 bytes**, 187,244
+metadata paths and 3,584 immutable payload fingerprints without reconciliation
+errors. A separate final-source fresh aggregate passed four live faults with
+**6,227 ACKs**, zero lost/corrupt bodies, and a corrected 86.971 s whole-stack
+reopen comparing pre-stop fingerprints. Both fresh lifecycles and all three
+cleanups passed. Four metadata paths do not independently prove four inline
+payloads; native protected deep scan and full external GETs retain separate roles.
+Its new 41,536-request warm benchmark had zero failures: 1 MiB / 16 clients
+measured **177.52 PUT MiB/s / 673.80 GET MiB/s**. These are separate observations
+from the older table, with the example's stated budgets and no normalized ranking.
+
 ## Common test contract
 
 - Byte-for-byte SHA-256 verification of complete object bodies; ETag is not used

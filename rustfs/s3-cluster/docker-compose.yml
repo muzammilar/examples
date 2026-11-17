@@ -17,7 +17,12 @@ services:
       RUSTFS_SHARD_INTEGRITY_FLEET_CONFIRMED: 'true'
       RUSTFS_DURABILITY_MODE: strict
     volumes:
-    - data00:/data/disk0
+    - data00:/data
+    - type: volume
+      source: data00
+      target: /data/disk0
+      volume:
+        subpath: disk0
     healthcheck:
       test:
       - CMD
@@ -48,7 +53,12 @@ services:
       RUSTFS_SHARD_INTEGRITY_FLEET_CONFIRMED: 'true'
       RUSTFS_DURABILITY_MODE: strict
     volumes:
-    - data10:/data/disk0
+    - data10:/data
+    - type: volume
+      source: data10
+      target: /data/disk0
+      volume:
+        subpath: disk0
     healthcheck:
       test:
       - CMD
@@ -79,7 +89,12 @@ services:
       RUSTFS_SHARD_INTEGRITY_FLEET_CONFIRMED: 'true'
       RUSTFS_DURABILITY_MODE: strict
     volumes:
-    - data20:/data/disk0
+    - data20:/data
+    - type: volume
+      source: data20
+      target: /data/disk0
+      volume:
+        subpath: disk0
     healthcheck:
       test:
       - CMD
@@ -110,7 +125,12 @@ services:
       RUSTFS_SHARD_INTEGRITY_FLEET_CONFIRMED: 'true'
       RUSTFS_DURABILITY_MODE: strict
     volumes:
-    - data30:/data/disk0
+    - data30:/data
+    - type: volume
+      source: data30
+      target: /data/disk0
+      volume:
+        subpath: disk0
     healthcheck:
       test:
       - CMD
@@ -153,8 +173,8 @@ services:
   tools:
     image: ${COMPOSE_PROJECT_NAME:-rustfs-s3-cluster}-tools:dev
     build:
-      context: ../..
-      dockerfile: object-storage/client/Dockerfile
+      context: ./.build/tools
+      dockerfile: Dockerfile
     profiles:
     - tools
     cpus: 2
@@ -165,18 +185,17 @@ services:
       AWS_SECRET_ACCESS_KEY: ${S3_SECRET_KEY:-local-only-object-storage-secret-key}
       OBJECTS: ${OBJECTS:-10000}
       LARGE_OBJECTS: ${LARGE_OBJECTS:-128}
-      DURATION: ${DURATION:-120}
+      DURATION: ${DURATION:-900}
       BENCH_SMALL_REQUESTS: ${BENCH_SMALL_REQUESTS:-10000}
       BENCH_REQUESTS: ${BENCH_REQUESTS:-256}
       BENCH_LARGE_REQUESTS: ${BENCH_LARGE_REQUESTS:-128}
     volumes:
-    - ./${RESULTS_DIR:-results/verified}:/results
+    - ./${RESULTS_DIR:-results/recovery}:/results
   init:
     image: ${COMPOSE_PROJECT_NAME:-rustfs-s3-cluster}-tools:dev
     entrypoint:
     - python
-    - -c
-    - import os; [os.chown("/disks/"+str(i),10001,10001) for i in range(4)]
+    - /app/init_storage.py
     volumes:
     - data00:/disks/0
     - data10:/disks/1
@@ -187,12 +206,18 @@ services:
     mem_limit: 128m
   audit:
     extends: tools
+    user: '0:0'
+    network_mode: none
+    read_only: true
+    cap_drop: [ALL]
+    cap_add: [DAC_READ_SEARCH]
     profiles:
     - tools
     entrypoint:
     - python
-    - /app/rustfs_audit.py
+    - /app/physical.py
     volumes:
+    - ./${RESULTS_DIR:-results/recovery}:/results:ro
     - data00:/disks/0:ro
     - data10:/disks/1:ro
     - data20:/disks/2:ro
