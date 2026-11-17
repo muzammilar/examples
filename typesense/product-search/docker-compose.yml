@@ -4,7 +4,7 @@ services:
     image: typesense-products-server:dev
     build: ./server
     hostname: ts1
-    command: ["--data-dir=/data", "--api-key=local-search-key", "--nodes=/etc/typesense/nodes", "--peering-address=${NETWORK_PREFIX:-172.30.61}.11", "--api-port=8108", "--peering-port=8107"]
+    command: ["--data-dir=/data", "--api-key=local-search-key", "--nodes=/etc/typesense/nodes", "--peering-address=${NETWORK_PREFIX:-172.30.61}.11", "--api-port=8108", "--peering-port=8107", "--healthy-read-lag=${HEALTHY_READ_LAG:-10}"]
     volumes: [ts1:/data, ./config/generated/nodes:/etc/typesense/nodes:ro]
     mem_limit: 2g
     cpus: 2
@@ -21,7 +21,7 @@ services:
     build: ./server
     hostname: ts2
     profiles: [cluster, sharded]
-    command: ["--data-dir=/data", "--api-key=local-search-key", "--nodes=/etc/typesense/nodes", "--peering-address=${NETWORK_PREFIX:-172.30.61}.12", "--api-port=8108", "--peering-port=8107"]
+    command: ["--data-dir=/data", "--api-key=local-search-key", "--nodes=/etc/typesense/nodes", "--peering-address=${NETWORK_PREFIX:-172.30.61}.12", "--api-port=8108", "--peering-port=8107", "--healthy-read-lag=${HEALTHY_READ_LAG:-10}"]
     volumes: [ts2:/data, ./config/generated/nodes:/etc/typesense/nodes:ro]
     mem_limit: 2g
     cpus: 2
@@ -38,7 +38,7 @@ services:
     build: ./server
     hostname: ts3
     profiles: [cluster, sharded]
-    command: ["--data-dir=/data", "--api-key=local-search-key", "--nodes=/etc/typesense/nodes", "--peering-address=${NETWORK_PREFIX:-172.30.61}.13", "--api-port=8108", "--peering-port=8107"]
+    command: ["--data-dir=/data", "--api-key=local-search-key", "--nodes=/etc/typesense/nodes", "--peering-address=${NETWORK_PREFIX:-172.30.61}.13", "--api-port=8108", "--peering-port=8107", "--healthy-read-lag=${HEALTHY_READ_LAG:-10}"]
     volumes: [ts3:/data, ./config/generated/nodes:/etc/typesense/nodes:ro]
     mem_limit: 2g
     cpus: 2
@@ -55,7 +55,7 @@ services:
     build: ./server
     hostname: ts4
     profiles: [sharded]
-    command: ["--data-dir=/data", "--api-key=local-search-key", "--nodes=/etc/typesense/nodes", "--peering-address=${NETWORK_PREFIX:-172.30.61}.14", "--api-port=8108", "--peering-port=8107"]
+    command: ["--data-dir=/data", "--api-key=local-search-key", "--nodes=/etc/typesense/nodes", "--peering-address=${NETWORK_PREFIX:-172.30.61}.14", "--api-port=8108", "--peering-port=8107", "--healthy-read-lag=${HEALTHY_READ_LAG:-10}"]
     volumes: [ts4:/data, ./config/generated/nodes1:/etc/typesense/nodes:ro]
     mem_limit: 2g
     cpus: 2
@@ -72,7 +72,7 @@ services:
     build: ./server
     hostname: ts5
     profiles: [sharded]
-    command: ["--data-dir=/data", "--api-key=local-search-key", "--nodes=/etc/typesense/nodes", "--peering-address=${NETWORK_PREFIX:-172.30.61}.15", "--api-port=8108", "--peering-port=8107"]
+    command: ["--data-dir=/data", "--api-key=local-search-key", "--nodes=/etc/typesense/nodes", "--peering-address=${NETWORK_PREFIX:-172.30.61}.15", "--api-port=8108", "--peering-port=8107", "--healthy-read-lag=${HEALTHY_READ_LAG:-10}"]
     volumes: [ts5:/data, ./config/generated/nodes1:/etc/typesense/nodes:ro]
     mem_limit: 2g
     cpus: 2
@@ -89,7 +89,7 @@ services:
     build: ./server
     hostname: ts6
     profiles: [sharded]
-    command: ["--data-dir=/data", "--api-key=local-search-key", "--nodes=/etc/typesense/nodes", "--peering-address=${NETWORK_PREFIX:-172.30.61}.16", "--api-port=8108", "--peering-port=8107"]
+    command: ["--data-dir=/data", "--api-key=local-search-key", "--nodes=/etc/typesense/nodes", "--peering-address=${NETWORK_PREFIX:-172.30.61}.16", "--api-port=8108", "--peering-port=8107", "--healthy-read-lag=${HEALTHY_READ_LAG:-10}"]
     volumes: [ts6:/data, ./config/generated/nodes1:/etc/typesense/nodes:ro]
     mem_limit: 2g
     cpus: 2
@@ -106,7 +106,7 @@ services:
     build: ./server
     hostname: ts7
     profiles: [sharded]
-    command: ["--data-dir=/data", "--api-key=local-search-key", "--nodes=/etc/typesense/nodes", "--peering-address=${NETWORK_PREFIX:-172.30.61}.17", "--api-port=8108", "--peering-port=8107"]
+    command: ["--data-dir=/data", "--api-key=local-search-key", "--nodes=/etc/typesense/nodes", "--peering-address=${NETWORK_PREFIX:-172.30.61}.17", "--api-port=8108", "--peering-port=8107", "--healthy-read-lag=${HEALTHY_READ_LAG:-10}"]
     volumes: [ts7:/data, ./config/generated/nodes2:/etc/typesense/nodes:ro]
     mem_limit: 2g
     cpus: 2
@@ -123,7 +123,7 @@ services:
     build: ./server
     hostname: ts8
     profiles: [sharded]
-    command: ["--data-dir=/data", "--api-key=local-search-key", "--nodes=/etc/typesense/nodes", "--peering-address=${NETWORK_PREFIX:-172.30.61}.18", "--api-port=8108", "--peering-port=8107"]
+    command: ["--data-dir=/data", "--api-key=local-search-key", "--nodes=/etc/typesense/nodes", "--peering-address=${NETWORK_PREFIX:-172.30.61}.18", "--api-port=8108", "--peering-port=8107", "--healthy-read-lag=${HEALTHY_READ_LAG:-10}"]
     volumes: [ts8:/data, ./config/generated/nodes2:/etc/typesense/nodes:ro]
     mem_limit: 2g
     cpus: 2
@@ -140,7 +140,7 @@ services:
     build: ./server
     hostname: ts9
     profiles: [sharded]
-    command: ["--data-dir=/data", "--api-key=local-search-key", "--nodes=/etc/typesense/nodes", "--peering-address=${NETWORK_PREFIX:-172.30.61}.19", "--api-port=8108", "--peering-port=8107"]
+    command: ["--data-dir=/data", "--api-key=local-search-key", "--nodes=/etc/typesense/nodes", "--peering-address=${NETWORK_PREFIX:-172.30.61}.19", "--api-port=8108", "--peering-port=8107", "--healthy-read-lag=${HEALTHY_READ_LAG:-10}"]
     volumes: [ts9:/data, ./config/generated/nodes2:/etc/typesense/nodes:ro]
     mem_limit: 2g
     cpus: 2
@@ -152,10 +152,37 @@ services:
       timeout: 5s
       retries: 120
       start_period: 20s
+  corpus:
+    profiles: [tools]
+    image: typesense-products-corpus:dev
+    build: ./.build/corpus
+    environment:
+      HOME: /cache
+      DOCUMENTS: ${DOCUMENTS:-100000}
+      QUERIES: ${QUERIES:-1000}
+      SEED: ${SEED:-20261115}
+    volumes:
+      - ./results/corpus/cache:/cache
+      - ./results/corpus/prepared:/prepared
+    mem_limit: 8g
+    cpus: 4
+  inventory-workload:
+    profiles: [tools]
+    image: typesense-products-inventory:dev
+    build: ./inventory-workload
+    cpus: 1
+    mem_limit: 512m
+    environment:
+      MODE: ${MODE:-cluster}
+      DURATION_SECONDS: ${DURATION_SECONDS:-1800}
+      UPDATE_BATCH: ${UPDATE_BATCH:-10}
+    volumes:
+      - ./results/corpus/prepared:/corpus:ro
+      - ./${RESULTS_DIR:-results/manual}:/results
   tools:
     profiles: [tools]
     image: typesense-product-tools:dev
-    build: {context: ../.., dockerfile: typesense/product-search/app/Dockerfile}
+    build: ./.build/tools
     environment:
       MODE: ${MODE:-cluster}
       URLS: ${URLS:-http://ts1:8108,http://ts2:8108,http://ts3:8108}
@@ -164,7 +191,7 @@ services:
       CHECK_QUERIES: ${CHECK_QUERIES:-50}
       DURATION: ${DURATION:-75}
     volumes:
-      - ${CORPUS_DIR:-../../datasets/esci/prepared}:/corpus:ro
+      - ./results/corpus/prepared:/corpus:ro
       - ./${RESULTS_DIR:-results/manual}:/results
     mem_limit: 3g
     cpus: 2

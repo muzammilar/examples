@@ -207,6 +207,38 @@ READMEs retain dated execution results and limitations.
   the check kept full coverage rather than treating `HEALTH_OK` as proof. Extended
   cases remain unrun below.
 
+- **Typesense:** independent Go writer/reader and cross-run history qualified on
+  the same 100,000-product corpus. Four three-node role/disk cases at read lag 10
+  passed; aggregate verification retained **187,010 ACKs / 218,900 attempted
+  updates** across seven runs. The earlier default-readiness short-search failure
+  and aborted journal-ordering harness run stay failed. Every local copy's full
+  metadata and all float32 coordinates matched: **300,000 documents / 115.2M
+  coordinates**. Whole-stack reopen failed its Compose probe budget after
+  **383.55 s**; later no-replay reconciliation verified all original volumes,
+  images and containers. Final proof finished 619.78 s after captured before-state,
+  including diagnosis/wait/readback, not isolated RTO. Native snapshot interval
+  3,600 s plus frequent process restarts caused full growing-log replay.
+  Retained setup/test/report passed. A fresh default lifecycle passed, with
+  **158 archived evidence hashes unchanged**, zero owned resources/tags and all
+  ten unrelated volume identities unchanged. Warm dense search, eight clients:
+  **1,085.56 QPS / 12.24 ms p99 / 0.9879 recall**; all 6,000 timed requests passed.
+  The nine-node application-managed sharded profile passed all **12 core cases**:
+  **88,496 ACK / 5,944 ambiguous updates**, zero whole-operation read failures,
+  one stale GET and correct placement/full vectors on all nine copies. An extra
+  different-member failure kept rebuilt ts3 online, with **405 affected-shard
+  ACKs while ts2 was absent**. Final 13-case report reconciled **95,659 ACKs /
+  102,090 attempted updates**. Its 8,000-request warm benchmark had zero failures:
+  global dense eight-client **359.11 QPS / 37.76 ms p99 / 0.9957 recall**;
+  customer dense **440.97 QPS / 30.14 ms p99 / sampled recall 1.0**. Budgets differ
+  from the three-node profile; these are not normalized scaling rankings.
+  Sixteen controller controls, four routing controls and Go race tests/vet passed.
+  Fresh sharded lifecycle and cleanup passed with **296 archived evidence hashes
+  unchanged**, zero owned resources/tags and the same ten unrelated volumes.
+  The updated single-node lifecycle, correctness, retained reopen (**106.85 s**),
+  benchmark (6,000 requests / zero failures) and cleanup also passed: dense
+  eight-client **794.44 QPS / 42.39 ms p99 / 0.989 recall**. Extended matrix
+  items below remain unrun; API copy proof is not independent RocksDB decoding.
+
 ## Controller/workload findings and required backfills
 
 These findings come from the actual execution paths, not just target names.
@@ -220,7 +252,8 @@ Closing one fault case does not close the entire deployment matrix.
 | Postgres customer sharding | `control.py`, independent `orders-workload/` writer/reader, native hash oracle and all-copy verifier | Core reader/history/placement backfill qualified above. Partitions, DCS/quorum loss, stale-primary rejection, physical disk loss, router outage, rolling upgrades, pressure, backup/restore and online resharding remain unrun. |
 | PgDog pooling | `control.py`, independent `orders-workload/` observers and all-copy verifier | Core reader/history backfill and five live role/configuration cases qualified above. DCS/quorum loss, partitions/stale-primary fencing, permanent disk loss, rolling upgrades, pressure and independent restore remain unrun. |
 | Citus | `control.py`, native physical-table queries, independent `orders-workload/` observer, monotonic profile witness and `placement_guard.py` | Core reader/history/physical-placement backfill, all group-primary/standby-pause cases and live scale cycle qualified above. DCS/quorum loss, peer partitions, stale-primary rejection, permanent disk loss, rolling upgrades, pressure, independent restore and controlled cold/single-record benchmarks remain unrun. |
-| Typesense, Vespa, pgvector, LanceDB | `datasets/esci/client/fault.py`, `workload.py`, engine adapters | Update and search share one churn loop, so blocked writes stop read observation. The prior witness-overwrite path now fails closed before Docker; 16 negative preflight cases passed. Cross-run version histories, independent searches and per-phase success/failure latency remain gaps. Typesense application sharding and LanceDB shared-file clients must not be called native database sharding/replication. |
+| Typesense | Example-owned controller, independent Go inventory writer/reader, retained witnesses, direct local metadata/vector proof | Three-node core role/disk cases, nine-node 12-case suite and an extra post-rebuild peer-loss case qualified above. Fresh sharded archival/lifecycle cleanup passed, preserving 296 evidence hashes. Single-node lifecycle, reopen, correctness and benchmark also passed. Whole-stack reopen exceeded its probe budget; later same-volume persistence verified. Partitions/minority behavior, membership scaling, bounded pressure/I/O errors, upgrades, independent restore and snapshot-cadence experiments remain unrun. |
+| Vespa, pgvector, LanceDB | `datasets/esci/client/fault.py`, `workload.py`, engine adapters | Update and search share one churn loop, so blocked writes stop read observation. The prior witness-overwrite path now fails closed before Docker; 16 negative preflight cases passed. Cross-run version histories, independent searches and per-phase success/failure latency remain gaps. Typesense application sharding and LanceDB shared-file clients must not be called native database sharding/replication. |
 | SeaweedFS | Example-owned `control.py`, independent `traffic.py`, preserved journals, native placement/bytes and current-revision metadata audit | Reader/history/survivor backfill, seven live faults, rebuilt-member restart, benchmark, cold reopen and fresh lifecycle/two more live faults qualified above. Scaling/drain, peer partitions, quorum loss, bounded pressure, upgrades, metadata disk destruction, physical EIO/power loss and independent restore remain unrun. |
 | Garage | Example-owned `control.py`, independent `traffic.py`, preserved histories and native ring/block auditor | Core reader/history/survivor backfill and four controller-managed fault cases qualified above. Peer partitions, native quorum loss, topology/resource changes, rolling upgrades, metadata-disk loss, pressure, physical EIO/power loss and independent restore remain unrun. |
 | RustFS | Example-owned `control.py`, independent `traffic.py`, preserved histories, native canonical heal and read-only slot/fingerprint auditor | Core reader/history/survivor backfill, full four-case fresh fault aggregate, benchmark, corrected cold reopen and two fresh lifecycles qualified above. Peer partitions, quorum loss, pool/resource changes, upgrades/rollback, pressure, physical EIO/bitrot/power loss and independent restore remain unrun. |

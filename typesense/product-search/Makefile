@@ -3,10 +3,12 @@ MODE ?= cluster
 ifeq ($(filter $(MODE),single cluster sharded),)
 $(error MODE must be single, cluster or sharded)
 endif
-RESULTS_DIR ?= results/$(MODE)
+RESULTS_DIR ?= results/production/$(MODE)
 DOCUMENTS ?= 100000
 QUERIES ?= 1000
 export MODE RESULTS_DIR DOCUMENTS QUERIES
+SEED ?= 20261115
+export SEED
 ifeq ($(MODE),single)
 URLS := http://ts1:8108
 PROFILE :=
@@ -21,40 +23,72 @@ PROFILE := --profile cluster
 SERVICES := ts1 ts2 ts3
 endif
 export URLS
-COMPOSE := docker compose $(PROFILE)
-RUN := $(COMPOSE) run --rm --user $(shell id -u):$(shell id -g) tools
+COMPOSE := docker compose --project-name typesense-product-search $(PROFILE)
+CONTROL := python3 control.py
+HEALTHY_READ_LAG ?= 10
+UPDATE_BATCH ?= 10
+DURATION_SECONDS ?= 1800
+FAULT_SHARD ?= 0
+export HEALTHY_READ_LAG UPDATE_BATCH DURATION_SECONDS FAULT_SHARD
 .NOTPARALLEL:
-.PHONY: build run config corpus docker-up up test benchmark failover status cli down docker-down
+.PHONY: build run config corpus docker-up up test verify benchmark failover follower-crash disk-failure rebuilt-crash recover-disk cold-reopen report check-controls test-production status cli down docker-down
 config:
 	python3 scripts/config.py
 	@mkdir -p "$(RESULTS_DIR)"
 corpus:
-	$(MAKE) -C ../../datasets/esci download prepare
-docker-up: config
-	$(COMPOSE) build ts1
-	$(COMPOSE) up -d --wait $(SERVICES)
+	python3 corpus.py
 build:
-	$(COMPOSE) build tools
-run:
-	$(RUN) load
-up: config corpus build
-	$(RUN) load
+	python3 prepare_build.py
+	$(COMPOSE) build ts1 tools inventory-workload
+docker-up:
+	$(CONTROL) docker-up
+up run:
+	$(CONTROL) up
 test:
-ifeq ($(MODE),sharded)
-	$(RUN) routing-test
-endif
-	$(RUN) test
+	$(CONTROL) test
+verify:
+	$(CONTROL) verify
 benchmark:
-	python3 ../../datasets/esci/client/bench.py
+	$(CONTROL) benchmark
 failover:
-	ENGINE=typesense python3 ../../datasets/esci/client/fault.py
+	$(CONTROL) leader
+follower-crash:
+	$(CONTROL) follower
+disk-failure:
+	$(CONTROL) disk
+rebuilt-crash:
+	$(CONTROL) rebuilt
+recover-disk:
+	$(CONTROL) recover-disk
+cold-reopen:
+	$(CONTROL) cold-reopen
+test-production:
+	$(MAKE) test
+ifeq ($(MODE),single)
+	$(MAKE) cold-reopen
+else ifeq ($(MODE),sharded)
+	@for shard in 0 1 2; do \
+		$(MAKE) FAULT_SHARD=$$shard failover && \
+		$(MAKE) FAULT_SHARD=$$shard follower-crash && \
+		$(MAKE) FAULT_SHARD=$$shard disk-failure && \
+		$(MAKE) FAULT_SHARD=$$shard rebuilt-crash || exit $$?; \
+	done
+else
+	$(MAKE) failover
+	$(MAKE) follower-crash
+	$(MAKE) disk-failure
+	$(MAKE) rebuilt-crash
+endif
+	$(MAKE) test
+report:
+	python3 report.py
+check-controls:
+	python3 -m unittest test_controls.py
 status:
 	$(COMPOSE) ps --all
-	$(RUN) stats
 cli:
 	$(COMPOSE) run --rm --entrypoint /bin/sh tools
 down:
-	$(COMPOSE) rm -sfv $(SERVICES)
+	$(CONTROL) down
 docker-down:
-	docker compose --profile cluster --profile sharded --profile tools down --volumes --remove-orphans
-	@for image in typesense-product-tools:dev typesense-products-server:dev; do if docker image inspect "$$image" >/dev/null 2>&1; then docker image rm "$$image"; fi; done
+	$(CONTROL) docker-down

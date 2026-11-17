@@ -3,12 +3,13 @@
 import concurrent.futures
 import hashlib
 import json
+import os
 from pathlib import Path
 import urllib.request
 
 ROOT = Path(__file__).resolve().parents[1]
 MANIFEST = json.loads((ROOT / "manifest.json").read_text())
-CACHE = ROOT / "cache"
+CACHE = Path(os.environ.get("ESCI_CACHE", ROOT / "cache"))
 
 
 def verify(path, artifact):
