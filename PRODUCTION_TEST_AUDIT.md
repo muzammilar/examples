@@ -185,6 +185,28 @@ READMEs retain dated execution results and limitations.
   corrected; evaluated Make recipes prove the exported example-local path. This
   configuration check does not claim a fresh broker/fault lifecycle.
 
+- [Ceph RGW](ceph/s3-cluster/): independent Compose writer/reader, fsynced
+  attempt/outcome histories and native guest/17-daemon survivor witnesses.
+  Separate whole-guest crash, serial-fenced empty-disk replacement, rebuilt-member
+  crash and single-router SIGKILL passed: **10,319 ACKs / 10,823 attempts across
+  four histories**, zero lost/corrupt/stale objects. Full readback after the warm
+  benchmark verified **13,583 objects / 855,937,024 bytes**, including three exact
+  optional ambiguous outcomes. All **321 PGs** completed fresh deep scrubs with
+  three copies on three distinct logical guest hosts. Proxy loss caused 501 GET
+  errors and a 30.349 s successful-read gap. The new 4,384-request benchmark had
+  zero failures; 1 MiB / 16 clients measured 19.11 PUT / 40.91 GET MiB/s under
+  QEMU TCG, excluded from native-container rankings. Whole-stack cold reopen
+  passed in 347.914 s with three new kernel boot IDs and unchanged cluster/OSD
+  UUIDs. Retained-state setup/report and direct SDK reads through all three RGWs
+  passed. Twenty-seven controls include stale benchmark-proof rejection. A fresh
+  default five-command lifecycle, native/body verification and report passed:
+  **1,069 objects / 106,860,544 bytes**, 321 fresh PG scrubs and unchanged archived
+  witness/status hashes. All 39 recorded code/configuration hashes stayed unchanged.
+  Both cleanups left zero owned resources/build tags and all ten unrelated volume
+  identities unchanged. Initial PG autoscaling required explicit scrub rescheduling;
+  the check kept full coverage rather than treating `HEALTH_OK` as proof. Extended
+  cases remain unrun below.
+
 ## Controller/workload findings and required backfills
 
 These findings come from the actual execution paths, not just target names.
@@ -202,7 +224,7 @@ Closing one fault case does not close the entire deployment matrix.
 | SeaweedFS | Example-owned `control.py`, independent `traffic.py`, preserved journals, native placement/bytes and current-revision metadata audit | Reader/history/survivor backfill, seven live faults, rebuilt-member restart, benchmark, cold reopen and fresh lifecycle/two more live faults qualified above. Scaling/drain, peer partitions, quorum loss, bounded pressure, upgrades, metadata disk destruction, physical EIO/power loss and independent restore remain unrun. |
 | Garage | Example-owned `control.py`, independent `traffic.py`, preserved histories and native ring/block auditor | Core reader/history/survivor backfill and four controller-managed fault cases qualified above. Peer partitions, native quorum loss, topology/resource changes, rolling upgrades, metadata-disk loss, pressure, physical EIO/power loss and independent restore remain unrun. |
 | RustFS | Example-owned `control.py`, independent `traffic.py`, preserved histories, native canonical heal and read-only slot/fingerprint auditor | Core reader/history/survivor backfill, full four-case fresh fault aggregate, benchmark, corrected cold reopen and two fresh lifecycles qualified above. Peer partitions, quorum loss, pool/resource changes, upgrades/rollback, pressure, physical EIO/bitrot/power loss and independent restore remain unrun. |
-| Ceph | `scripts/fault.py`, `app/recovery.py`, shared S3 SDK workload and native PG/deep-scrub auditor | Existing external ACK/byte and native repair checks are useful. GET follows PUT in one loop: add independent read observation. Restore injected faults on every error; compare survivor guest boot/process identity as well as the host container. Add role/dependency/quorum and pressure cases beyond data-disk loss. |
+| Ceph | Example-owned `control.py`, independent `traffic.py`, preserved SDK histories and `native/` PG/deep-scrub/process auditor | All four core faults and warm benchmark qualified with independent live readers, preserved histories, native OSD UUID/serial fencing and all 17 daemon process witnesses. Cold reopen, retained-state setup, fresh default lifecycle, archived witness integrity and scoped cleanup also qualified above. Isolated daemon faults, quorum/partitions, pressure, topology changes, upgrades and independent restore remain unrun. |
 | Kafka Strimzi JBOD | Make chaos recipes, C++ producer/Rust consumer | Consumer starts after producer/fault, so continuous read availability and lag are unobserved. Topics reset per case. Add live consumer, durable external delivery/offset history and native ISR/rebuild barriers. |
 | Kafka mirroring | Make orchestration, MirrorMaker manifests, producer/consumer | Existing migration and worker/disk cases need preserved cross-phase witnesses, native ISR/offset translation/backlog repair proof and survivor stability. |
 | Kafka PostgreSQL enrichment | Make demo, producer/consumer and Go processor | Two-million-message pipeline correctness is not a fault matrix. Add broker, Connect worker/task, processor and PostgreSQL outages with live traffic; quantify duplicate delivery, CDC/cache freshness and backlog. |
@@ -230,7 +252,7 @@ inventory with `python3 tools/audit-production-tests.py`; output is ignored unde
 
 | Example | Shape | Declared categories | No recognized target; review applicability | Evidence status |
 |---|---|---|---|---|
-| [ceph/s3-cluster](ceph/s3-cluster/) | Compose | crash, disk | suite, scale-out, scale-in, rolling, partition, pressure, restore, drain | declaration inventory only |
+| [ceph/s3-cluster](ceph/s3-cluster/) | Compose | suite, crash, disk | scale-out, scale-in, rolling, partition, pressure, restore, drain | four live faults, benchmark, cold reopen and fresh lifecycle/cleanup qualified above; extended categories remain unrun |
 | [clickhouse/iceberg](clickhouse/iceberg/) | Compose | none | suite, crash, disk, scale-out, scale-in, rolling, partition, pressure, restore, drain | declaration inventory only |
 | [clickhouse/s3-tiered-storage](clickhouse/s3-tiered-storage/) | Compose | crash, disk | suite, scale-out, scale-in, rolling, partition, pressure, restore, drain | declaration inventory only |
 | [duckdb/zfs-recovery](duckdb/zfs-recovery/) | Compose | none | suite, crash, disk, scale-out, scale-in, rolling, partition, pressure, restore, drain | declaration inventory only |

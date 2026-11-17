@@ -94,6 +94,21 @@ Its new 41,536-request warm benchmark had zero failures: 1 MiB / 16 clients
 measured **177.52 PUT MiB/s / 673.80 GET MiB/s**. These are separate observations
 from the older table, with the example's stated budgets and no normalized ranking.
 
+The [Ceph 2026-11-17 follow-up](../ceph/s3-cluster/) passed separate guest,
+empty-disk replacement, rebuilt-member and proxy faults with independent live
+writer/reader roles: **10,319 ACKs across four histories**, 11,391 complete objects
+and all 321 PGs freshly deep-scrubbed on three distinct guest hosts, without data
+loss/corruption. The proxy outage recorded 501 GET errors and a 30.349 s successful
+read gap. Its separate 4,384-request warm benchmark had zero failures: 1 MiB /
+16 clients measured **19.11 PUT MiB/s / 40.91 GET MiB/s**. These QEMU TCG results
+remain outside any native-container ranking; resource caps and sample sizes are
+listed in the example. Full-stack cold reopen passed in 347.914 s with all three
+guest boot IDs changed and native cluster/OSD UUIDs unchanged; full bodies and
+fresh all-PG scrubs passed. A fresh default five-command lifecycle also passed:
+1,069 complete objects / 106,860,544 bytes, preserved archived witness hashes,
+and zero owned resources/build tags after both cleanups. All ten unrelated
+volume identities stayed unchanged.
+
 ## Common test contract
 
 - Byte-for-byte SHA-256 verification of complete object bodies; ETag is not used

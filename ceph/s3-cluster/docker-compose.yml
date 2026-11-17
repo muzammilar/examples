@@ -14,7 +14,7 @@ services:
       test:
       - CMD
       - python3
-      - /opt/lab/app/control.py
+      - /opt/lab/native/guest.py
       - ssh
       - '0'
       - test -f /var/lib/cephlab-ready
@@ -31,8 +31,8 @@ services:
     - python3
     volumes:
     - state:/state
-    - ./app:/opt/lab/app:ro
-    - ./${RESULTS_DIR:-results/verified}:/results
+    - ./native:/opt/lab/native:ro
+    - ./${RESULTS_DIR:-results/recovery}:/results
     cpus: 1
     mem_limit: 512m
   s3:
@@ -55,8 +55,8 @@ services:
   tools:
     image: ${COMPOSE_PROJECT_NAME:-ceph-s3-cluster}-tools:dev
     build:
-      context: ../..
-      dockerfile: object-storage/client/Dockerfile
+      context: ./.build/tools
+      dockerfile: Dockerfile
     profiles:
     - tools
     cpus: 2
@@ -72,6 +72,6 @@ services:
       BENCH_REQUESTS: ${BENCH_REQUESTS:-64}
       BENCH_LARGE_REQUESTS: ${BENCH_LARGE_REQUESTS:-32}
     volumes:
-    - ./${RESULTS_DIR:-results/verified}:/results
+    - ./${RESULTS_DIR:-results/recovery}:/results
 volumes:
   state: {}

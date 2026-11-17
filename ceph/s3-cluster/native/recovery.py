@@ -1,13 +1,11 @@
-"""Native Ceph checks and fault injection on the example's owned guests only."""
+"""Native placement and checksum checks on the example's owned guests only."""
 
 import json
 from pathlib import Path
 import socket
-import subprocess
 import sys
 import time
-import uuid
-from control import ssh
+from guest import ssh
 
 ROOT = Path("/results")
 STATE = Path("/state")
@@ -193,185 +191,34 @@ def audit(deep=True):
         "copies_per_pg": 3,
         "distinct_hosts_per_pg": 3,
         "deep_scrub": deep,
+        "deep_scrub_before": previous if deep else None,
+        "pg_reports": pgs,
+        "osd_metadata": osds,
+        "quorum": quorum,
+        "crush_rule": rule,
         "status": ceph("status"),
     }
     ROOT.mkdir(exist_ok=True)
     (ROOT / "native-audit.json").write_text(json.dumps(result, indent=2) + "\n")
-    print(json.dumps(result, indent=2), flush=True)
-
-
-def inject(mode):
-    ROOT.mkdir(exist_ok=True)
-    (ROOT / "surviving-guests.json").write_text(
+    print(
         json.dumps(
             {
-                str(i): ssh(i, "cat /proc/sys/kernel/random/boot_id", True).strip()
-                for i in (1, 2)
+                key: result[key]
+                for key in [
+                    "osds",
+                    "hosts",
+                    "pgs",
+                    "copies_per_pg",
+                    "distinct_hosts_per_pg",
+                    "deep_scrub",
+                ]
             }
-        )
-        + "\n"
+        ),
+        flush=True,
     )
-    if mode == "process":
-        (STATE / "pause0").touch()
-        qmp(0, "quit")
-    elif mode == "disk":
-        if (STATE / "replacement.json").exists():
-            raise RuntimeError("disk already replaced; clean lifecycle required")
-        devices = json.loads(ssh(0, "lsblk -J -d -o PATH,SERIAL,TYPE", True))[
-            "blockdevices"
-        ]
-        matched = [
-            d["path"]
-            for d in devices
-            if d.get("serial") == "cephlab-ceph0-d0" and d["type"] == "disk"
-        ]
-        if len(matched) != 1:
-            raise RuntimeError("disk serial allowlist mismatch")
-        lvs = json.loads(ssh(0, "ceph-volume lvm list --format json", True))
-        matches = [
-            (int(k), v)
-            for k, values in lvs.items()
-            for v in values
-            if matched[0] in v.get("devices", [])
-        ]
-        if len(matches) != 1:
-            raise RuntimeError("could not uniquely map owned device to OSD")
-        osd, claim = matches[0]
-        old_fsid = str(uuid.UUID(claim["tags"]["ceph.osd_fsid"]))
-        (STATE / "replacement.json").write_text(
-            json.dumps({"osd": osd, "osd_fsid": old_fsid, "disk": 0, "spare": 3}) + "\n"
-        )
-        qmp(0, "device_del", {"id": "data0"})
-    else:
-        raise ValueError(mode)
-
-
-def recover(mode):
-    if mode == "process":
-        (STATE / "pause0").unlink()
-        start = time.monotonic()
-        while time.monotonic() - start < 600:
-            try:
-                ssh(0, "ceph -s")
-                break
-            except subprocess.CalledProcessError:
-                time.sleep(5)
-        else:
-            raise RuntimeError("guest failed to return")
-    else:
-        info = json.loads((STATE / "replacement.json").read_text())
-        osd = int(info["osd"])
-        old_fsid = str(uuid.UUID(info["osd_fsid"]))
-        ssh(
-            0,
-            f"systemctl stop ceph-osd@{osd}; systemctl disable ceph-volume@lvm-{osd}-{old_fsid}",
-        )
-        ssh(1, f"ceph osd out {osd}")
-        wait_clean(8)
-        ssh(1, f"ceph osd safe-to-destroy {osd}")
-        ssh(1, f"ceph osd destroy {osd} --yes-i-really-mean-it")
-        ssh(
-            0,
-            f"if mountpoint -q /var/lib/ceph/osd/ceph-{osd}; then umount /var/lib/ceph/osd/ceph-{osd}; fi; rmdir /var/lib/ceph/osd/ceph-{osd}",
-        )
-        qmp(
-            0,
-            "blockdev-add",
-            {
-                "driver": "qcow2",
-                "node-name": "spare",
-                "file": {"driver": "file", "filename": "/state/ceph0/disk3.qcow2"},
-                "cache": {"direct": True, "no-flush": False},
-            },
-        )
-        qmp(
-            0,
-            "device_add",
-            {
-                "driver": "scsi-hd",
-                "drive": "spare",
-                "bus": "scsi.0",
-                "id": "data0",
-                "serial": "cephlab-ceph0-r0",
-            },
-        )
-        ssh(0, "udevadm settle")
-        devices = json.loads(ssh(0, "lsblk -J -d -o PATH,SERIAL,TYPE", True))[
-            "blockdevices"
-        ]
-        paths = [
-            d["path"]
-            for d in devices
-            if d.get("serial") == "cephlab-ceph0-r0" and d["type"] == "disk"
-        ]
-        if len(paths) != 1:
-            raise RuntimeError("replacement serial allowlist mismatch")
-        # Persist the replacement mapping so a later guest restart cannot
-        # accidentally resurrect the removed disk's old data.
-        (STATE / "ceph0/replacements.json").write_text(json.dumps({"0": 3}) + "\n")
-        ssh(
-            0,
-            f"systemctl reset-failed ceph-osd@{osd}; ceph-volume lvm create --bluestore --osd-id {osd} --data {paths[0]}",
-        )
-        ssh(1, f"ceph osd in {osd}")
-    wait_clean()
-    if mode == "disk":
-        # Verify the empty replacement's persistent attachment and native LVM
-        # activation survive a graceful power cycle, with the producer live.
-        old_boot = ssh(0, "cat /proc/sys/kernel/random/boot_id", True).strip()
-        try:
-            ssh(0, "systemctl poweroff --no-block")
-        except subprocess.CalledProcessError as error:
-            if error.returncode != 255:
-                raise
-            # SSH may close before reporting command success. The boot-ID
-            # barrier below must still prove an actual completed power cycle.
-        end = time.monotonic() + 600
-        while time.monotonic() < end:
-            try:
-                new_boot = ssh(0, "cat /proc/sys/kernel/random/boot_id", True).strip()
-                if new_boot != old_boot:
-                    break
-            except subprocess.CalledProcessError:
-                pass
-            time.sleep(5)
-        else:
-            raise RuntimeError("replacement guest did not power-cycle")
-        wait_clean()
-        devices = json.loads(ssh(0, "lsblk -J -d -o PATH,SERIAL,TYPE", True))[
-            "blockdevices"
-        ]
-        if not any(d.get("serial") == "cephlab-ceph0-r0" for d in devices) or any(
-            d.get("serial") == "cephlab-ceph0-d0" for d in devices
-        ):
-            raise RuntimeError("replacement attachment did not persist across reboot")
-        (ROOT / "replacement-restart.json").write_text(
-            json.dumps(
-                {
-                    "old_boot_id": old_boot,
-                    "new_boot_id": new_boot,
-                    "replacement_serial": "cephlab-ceph0-r0",
-                    "old_serial_absent": True,
-                }
-            )
-            + "\n"
-        )
-    before = json.loads((ROOT / "surviving-guests.json").read_text())
-    after = {
-        str(i): ssh(i, "cat /proc/sys/kernel/random/boot_id", True).strip()
-        for i in (1, 2)
-    }
-    if before != after:
-        raise RuntimeError("a surviving guest unexpectedly rebooted")
 
 
 if __name__ == "__main__":
-    action = sys.argv[1]
-    if action == "audit":
-        audit()
-    elif action == "inject":
-        inject(sys.argv[2])
-    elif action == "recover":
-        recover(sys.argv[2])
-    else:
-        raise ValueError(action)
+    if sys.argv[1:] != ["audit"]:
+        raise ValueError("expected audit")
+    audit()

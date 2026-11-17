@@ -6,6 +6,8 @@ import signal
 import subprocess
 import time
 
+from capacity import RUNTIME_FLOOR, measure, require_free
+
 state = Path("/state")
 state.mkdir(exist_ok=True)
 key = state / "id_ed25519"
@@ -161,6 +163,7 @@ def command(i):
 children = {}
 logs = {}
 stop = False
+capacity_failure = None
 
 
 def stopping(*_):
@@ -171,6 +174,18 @@ def stopping(*_):
 signal.signal(signal.SIGTERM, stopping)
 signal.signal(signal.SIGINT, stopping)
 while not stop:
+    try:
+        require_free(measure(state), RUNTIME_FLOOR)
+    except RuntimeError as error:
+        capacity_failure = str(error)
+        (state / "capacity-guard.json").write_text(
+            json.dumps(
+                {"error": capacity_failure, "time": time.time(), **measure(state)}
+            )
+            + "\n"
+        )
+        print(capacity_failure, flush=True)
+        break
     for i in range(3):
         p = children.get(i)
         if p and p.poll() is not None:
@@ -192,3 +207,5 @@ for p in children.values():
     p.terminate()
 for p in children.values():
     p.wait(timeout=30)
+if capacity_failure:
+    raise SystemExit(capacity_failure)

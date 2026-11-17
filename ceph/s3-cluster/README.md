@@ -15,8 +15,155 @@ BlueStore data; no host disk, privileged container, or host loop device is used.
 
 Requires an **ARM64 Docker engine**, Docker Compose and Python 3. The pinned
 guest/package architecture is ARM64; x86 package mixing is rejected. Allow at
-least 20 GiB Docker RAM and 35 GiB free host/Docker disk for this example alone.
+least 11 Docker CPUs and 22 GiB Docker RAM for independent traffic observers.
+Recommend 35 GiB free disk; the bounded fixture enforces a 25 GiB pre-boot minimum
+and a 10 GiB runtime floor. The follow-up started with 28.59 GiB after image
+builds; it is not a full-device capacity test.
 QCOW2 disks are sparse and can grow well beyond initial usage.
+
+## Preserved-history production workflow
+
+The 2026-11-15 results below describe the earlier combined read/write harness.
+The independent writer/reader follow-up is recorded separately below; do not
+interpret the historical numbers as execution evidence for the new paths.
+
+`make test-production` runs the API suite and four separate operations:
+
+- `make failover`: crash guest 0's Linux kernel through QMP, affecting its three
+  OSDs, MON, MGR and RGW; recover the retained disks.
+- `make disk-failure`: detach the serial-allowlisted SCSI data disk, fence its old
+  activation, mark its OSD out, require native backfill and `safe-to-destroy`, then
+  create the replacement with a pre-recorded new OSD UUID. The numeric OSD ID stays
+  the same. Existing replacement claims are activated instead of destroyed again.
+- `make rebuilt-member-failure`: a separate kernel crash after disk replacement;
+  require the spare's persistent mapping, new LVM/OSD UUID and old serial's absence.
+- `make gateway-failure`: kill the single HAProxy process. The three RGWs do not
+  remove this routing SPOF; errors and recovery gaps must remain visible.
+
+Two example-owned Compose containers independently issue PUTs and GETs. PUTs
+use unique 32 KiB bodies, one SDK attempt and a fsynced intent/outcome journal
+outside the guest disks. Reads alternate historical and current ACKs and check
+complete SHA-256, length and application version. Missing acknowledged immutable
+objects and wrong bytes fail immediately; transport failures are recorded as
+availability observations. No ambiguous PUT is replayed.
+
+Both roles run through a frozen ACK-prefix native repair/deep-scrub barrier and
+complete prefix readback. Only then does the writer stop; the reader continues
+through the final tail reconciliation. Each later test rechecks all earlier
+attempt/ACK journals. Seventeen systemd PID/start/restart-count witnesses and three
+kernel boot IDs distinguish an unaffected guest from an unaffected daemon.
+
+Native proof requires every RGW pool at `size=3,min_size=2`, settled PG/PGP
+placement, three distinct CRUSH hosts per PG, MON quorum, active/standby MGRs,
+all nine OSDs up/in, and fresh completed deep-scrub stamps without checksum errors.
+Full external S3 bodies remain a separate oracle. This uses the native BlueStore
+scrub implementation, not an independent on-disk decoder or a count of filenames.
+The maintained Boto3 S3 harness is an explicit Python-workload exception; controllers
+and identity/failure checks use the standard library and native Ceph/systemd/QMP tools.
+
+`FAULT_DURATION=1800` is a safety ceiling. The generators use one outstanding
+request and a 50 ms delay; these fault rates are not capacity benchmarks. Each
+traffic container has 2 CPUs / 2 GiB and the native control container 1 CPU /
+512 MiB, in addition to the store caps below. Fault-phase CPU caps can oversubscribe
+the shared 11-CPU Docker VM. Benchmarks run one workload and no fault traffic.
+
+`make up` binds a fresh fixture or verifies the same retained identity; it never
+truncates existing witnesses. `make verify`, `make report`, `make cold-reopen`,
+`make unit-test` and diagnosed `make recover-bootstrap` are additional commands.
+`make recover-replacement RECOVERY_CASE=<failed-disk-case>` uses native recovery
+and verifies all histories before rebinding the declared new OSD. Failed cases
+retain their original failed status. Whole-stack reopen stops all guest kernels;
+it tests persistence, with warm host caches and no availability claim.
+
+If the initial package installation was interrupted before any cluster provisioning,
+`make recover-guest-init` completes `dpkg`/the pinned local ISO installation in place.
+It refuses once a cluster bootstrap plan exists. The resumed fixture exercised this
+path: all three guests had unpacked/unconfigured packages, then passed dependency
+checks and the exact 20.2.5 package check without recreating their disks. Original
+package logs and separate recovery logs remain available.
+
+Local `s3-workload`, `benchmark.py` and `witness_archive.py` symlinks point to
+tracked repository source. `prepare_build.py` materializes regular files into
+ignored `.build/tools` before Docker builds. The example does not execute a
+sibling Makefile or use its generated state. `results/recovery` preserves the new
+witnesses separately from historical `results/verified` measurements.
+
+## Independent traffic follow-up (2026-11-17)
+
+All four separate core fault cases passed with the default 32 KiB
+immutable writes. Each row is a separate fault; readback includes all previous
+acknowledgements and the API fixture. All 321 current PGs completed fresh native
+deep scrubs with three copies on three distinct guest hosts after each recovery.
+
+| Fault | PUT ACK / ambiguous | Successful GET / transport errors | Longest successful-read gap | Complete final readback |
+|---|---:|---:|---:|---:|
+| Guest 0 kernel crash | 2,905 / 1 | 6,033 / 2 | 21.656 s | 3,975 objects / 202,084,352 bytes |
+| One SCSI disk removed; empty spare rebuilt | 2,945 / 0 | 6,312 / 0 | 2.898 s | 6,920 objects / 298,586,112 bytes |
+| Rebuilt member kernel crash | 2,977 / 3 | 6,556 / 1 | 24.826 s | 9,899 objects / 396,201,984 bytes |
+| Single HAProxy SIGKILL | 1,492 / 500 | 4,408 / 501 | 30.349 s | 11,391 objects / 445,091,840 bytes |
+
+All four cases had **zero missing acknowledged objects, wrong bodies, stale versions
+or unknown keys**. The guest crash's one ambiguous PUT was present with the exact
+attempted body; lack of an ACK does not imply absence. None of the cases replayed
+an ambiguous operation. The disk case retained the numeric OSD ID and changed its
+native/LVM UUID; the other eight OSD identities and unaffected daemon processes
+remained unchanged. Guest crash moved the active MGR to its surviving standby.
+
+The complete aggregate and offline report passed: **10,319 ACKs / 10,823
+attempts**, four retained histories and three exact optional ambiguous outcomes
+present. Post-benchmark readback verified **13,583 objects / 855,937,024 bytes**
+without data errors. Full-stack cold reopen passed in **347.914 s**: all three
+kernel boot IDs changed, both containers and the guest volume were retained, and
+cluster/OSD UUIDs and full bodies survived. The stricter offline report passed.
+This is shutdown persistence with warm host caches, not an availability or cold-cache
+benchmark. Retained-state `make up` and the subsequent report passed without
+reseeding. Direct SDK bucket/body probes passed on all three RGWs after reopen,
+and all three proxy backends were healthy. The fresh default five-command
+lifecycle, final verification/report and both scoped cleanup checks passed.
+The fresh fixture verified **1,069 objects / 106,860,544 bytes** and all **321 PGs**,
+with zero reconciliation errors. The earlier manifest, attempt/ACK histories,
+writer/reader journals and case-status hashes were archived unchanged; the new
+fixture and cluster UUIDs differed. All 39 recorded source/configuration hashes,
+including linked SDK source, remained unchanged during fresh qualification.
+Both cleanups left **zero owned containers, volumes, networks or build tags**;
+all ten unrelated volume identities stayed unchanged.
+Twenty-seven focused SDK, journal, reader, capacity, native-identity, teardown and
+report-freshness controls passed, along with five offline probes of the actual native scrub proof.
+These are correctness controls, not extra live fault experiments.
+
+### Fresh default lifecycle timings
+
+Measured once with new guest disks and the final code/configuration. The slow
+initial PG scrub/rescheduling dominates `up`; these include controller overhead
+and are not database capacity or recovery benchmarks. Extra `verify` (131.325 s)
+and `report` checks ran before cleanup.
+
+| Command | Wall time |
+|---|---:|
+| `make docker-up` | 419.276 s |
+| `make up` | 1077.236 s |
+| `make test` | 105.326 s |
+| `make down` | 11.872 s |
+| `make docker-down` | 1.444 s |
+
+### Follow-up warm benchmark
+
+`make benchmark` completed in **108.585 s wall time**, including preparation and
+tool startup: **4,384 timed requests, zero failures**, one run on the same M4 Pro
+and guest/container caps documented below. The 12 cells use 1 and 16 clients;
+1,000 requests per 4 KiB cell, 64 per 1 MiB cell and 32 per 4 MiB cell.
+Each GET cell follows its PUT cell with full hashing and warm caches. This is a
+bounded software-emulation result, not native Ceph capacity or a cold-query test.
+The prior core repair proof covered 321 PGs; autoscaling remains enabled.
+
+| Object | Clients | PUT ops/s | PUT MiB/s | PUT p50/p99 ms | GET ops/s | GET MiB/s | GET p50/p99 ms |
+|---|---:|---:|---:|---|---:|---:|---|
+| 4 KiB | 1 | 26.11 | 0.10 | 35.91 / 74.19 | 87.48 | 0.34 | 10.87 / 20.20 |
+| 4 KiB | 16 | 66.41 | 0.26 | 236.20 / 386.39 | 384.67 | 1.50 | 39.15 / 83.66 |
+| 1 MiB | 1 | 8.03 | 8.03 | 113.74 / 237.80 | 20.20 | 20.20 | 47.18 / 123.07 |
+| 1 MiB | 16 | 19.11 | 19.11 | 713.18 / 1345.37 | 40.91 | 40.91 | 348.41 / 886.86 |
+| 4 MiB | 1 | 2.76 | 11.02 | 354.95 / 524.56 | 8.42 | 33.67 | 101.34 / 200.18 |
+| 4 MiB | 16 | 5.57 | 22.28 | 2246.45 / 5277.02 | 12.09 | 48.35 | 1071.64 / 2584.13 |
 
 ## Architecture
 
@@ -50,10 +197,12 @@ small. These settings are not production sizing guidance.
 | An RGW zone is not a CRUSH host | Three gateways in one RGW zone serve one object namespace. This does not demonstrate multisite replication or disaster recovery. |
 | `down`, `out`, `destroy`, `purge` differ | A temporary guest outage should not trigger immediate destructive replacement. For a permanently lost OSD: mark out, wait for backfill, check `safe-to-destroy`, then replace. Never zap a disk identified only by an unstable `/dev/sdX` name. |
 | Fullness limits stop writes and recovery | Spare capacity must exist in the surviving CRUSH failure domains. Replacing a disk at the full ratio is not a guaranteed recovery plan. Sparse QCOW2 apparent size also does not equal host free space. |
+| PG autoscaling can invalidate a scrub coverage snapshot | Fresh setup changed PG membership and initially completed only 177/289 new scrub stamps, despite `HEALTH_OK`. The checker restarted coverage and rescheduled unscheduled PGs, including a final `7.77`; all 289 then completed. Sequential native CLI checks are slow under TCG. Health alone did not qualify the new copies. |
 | Recovery is not just `ceph -s` returning | Require all expected OSDs up/in, PGs `active+clean`, completed deep scrubs without inconsistent PGs, and full external S3 checksum reconciliation. |
 | Health is not a backup | Replication copies deletion and operator mistakes. Backups and multisite RPO are separate concerns. |
 | A process kill is not a power cut | Guest crash drops a whole Linux kernel. QMP device removal exercises a disappearing block device. Neither proves physical power-loss protection of the host drive/controller. |
 | Small PG/pool and memory choices distort benchmarks | Report the exact pools, PG counts, copies and caps; do not present these as default production capacity. |
+| Emulated guest clocks can delay health recovery | A rebuilt-member restart briefly reported MON clock skew while OSDs caught up. The check waited for `HEALTH_OK`; it did not relax the clock-skew or durability thresholds. |
 | Emulation distorts throughput | QEMU TCG is software emulation even on ARM64-on-ARM64. Compare recovery semantics with the native S3 examples; do not rank these throughput numbers against native containers. |
 
 ## Initial API correctness
@@ -66,7 +215,7 @@ client controls and direct SDK probes through each of the three RGW endpoints
 passed. Native placement, completed deep scrubs and full reconciliation were
 checked again after recovery.
 
-## Benchmark (software-emulated guests)
+## Historical benchmark (2026-11-15, software-emulated guests)
 
 Measured 2026-11-15, Apple M4 Pro, Docker Linux aarch64, 11 CPUs / 24.42 GiB RAM,
 Compose 5.1.4. Only this storage SUT was active. Three QEMU TCG guests each have
@@ -155,7 +304,12 @@ fixture credentials, logical host failure domains on one physical computer,
 small disks/OSD memory and emulated guests. TLS/identity hardening, independent
 host power loss, two-host failure, network partitions, full disks, backup restore,
 multisite disaster recovery and the complete AWS S3 feature surface were not
-qualified here. Production capacity and recovery times require real hardware,
+qualified here. Interrupted replacement/bootstrap re-entry helpers have not been
+fault-injection qualified in this follow-up; package-init repair was exercised
+before provisioning. Separate isolated MON, MGR, RGW and OSD daemon crashes, quorum
+loss, scale changes, upgrades/rollback and bounded resource-pressure cases remain
+unrun; a whole-guest crash does not qualify those independently. Production
+capacity and recovery times require real hardware,
 representative occupancy and independent failure domains.
 
 ## Sources inspected
@@ -279,8 +433,30 @@ ceph/s3-cluster/
   Makefile
   docker-compose.yml
   vm/{Dockerfile,boot.py}    # pinned packages, cloud image and owned virtual disks
-  app/{control,bootstrap,recovery}.py
-  scripts/fault.py
+  native/{guest,bootstrap,observe,recovery,fault}.py
+  control.py                # live traffic, native barriers, histories and teardown
+  native_state.py           # cluster/OSD and survivor-process identity checks
+  capacity.py
+  traffic.py                # separate PUT and GET roles
+  witness.py
+  prefix_readback.py
+  cold_reopen.py
+  report.py                 # saved evidence only
+  test_{capacity,native_state,reader,traffic,teardown,report}.py
+  prepare_build.py
+  docker/Dockerfile.tools
+  s3-workload -> ../../object-storage/client
+  benchmark.py -> ../../object-storage/benchmark.py
+  witness_archive.py -> ../../object-storage/client/run_state.py
   config/haproxy.cfg
+  .build/tools/             # ignored materialized regular-file Docker context
   results/                  # ignored native logs and external journals
 ```
+
+Native references: [Tentacle administration manual](https://docs.ceph.com/en/tentacle/man/8/ceph/),
+[OSD replacement](https://docs.ceph.com/en/tentacle/rados/operations/add-or-rm-osds/),
+[ceph-volume create](https://docs.ceph.com/en/tentacle/ceph-volume/lvm/create/),
+[activation and persistent UUIDs](https://docs.ceph.com/en/tentacle/ceph-volume/lvm/activate/)
+and [native LVM inventory](https://docs.ceph.com/en/tentacle/ceph-volume/lvm/list/).
+Pinned daemon/configuration source was also inspected; native CLI help confirmed
+the planned `--osd-fsid` option before disk injection.

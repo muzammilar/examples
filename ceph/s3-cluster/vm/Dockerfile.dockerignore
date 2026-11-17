@@ -1,6 +1,7 @@
 **
+!capacity.py
 !vm/
 !vm/Dockerfile
 !vm/boot.py
-!app/
-!app/*.py
+!native/
+!native/*.py

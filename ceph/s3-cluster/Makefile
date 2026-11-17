@@ -1,6 +1,6 @@
 SHELL := /bin/sh
 COMPOSE_PROJECT_NAME ?= ceph-s3-cluster
-RESULTS_DIR ?= results/verified
+RESULTS_DIR ?= results/recovery
 OBJECTS ?= 1000
 LARGE_OBJECTS ?= 64
 BENCH_SMALL_REQUESTS ?= 1000
@@ -9,42 +9,76 @@ BENCH_LARGE_REQUESTS ?= 32
 FAULT_DURATION ?= 1800
 export BENCH_SMALL_REQUESTS BENCH_REQUESTS BENCH_LARGE_REQUESTS FAULT_DURATION
 export COMPOSE_PROJECT_NAME RESULTS_DIR OBJECTS LARGE_OBJECTS
-COMPOSE := docker compose
+COMPOSE := docker compose --project-name $(COMPOSE_PROJECT_NAME)
 RUN := $(COMPOSE) run --rm --user $(shell id -u):$(shell id -g) tools
 CTL := $(COMPOSE) run --rm control
 .NOTPARALLEL:
 .PHONY: build docker-up up test benchmark failover disk-failure status cli down docker-down
 build:
 	@test "$$(docker info --format '{{.Architecture}}')" = aarch64 || { echo 'This pinned Ceph guest/package lab requires an ARM64 Docker engine.'; exit 1; }
+	python3 prepare_build.py
 	$(COMPOSE) build guests tools
 docker-up: build
 	mkdir -p $(RESULTS_DIR)
+	python3 capacity.py
 	$(COMPOSE) up -d guests
-	$(CTL) /opt/lab/app/control.py ready
+	$(CTL) /opt/lab/native/guest.py ready
 up:
-	$(CTL) /opt/lab/app/bootstrap.py
-	$(COMPOSE) up -d --wait s3
-	$(RUN) create
-	$(RUN) seed
+	python3 control.py up
 test:
 	$(RUN) unit
 	$(RUN) test
 	@for port in 9001 9002 9003; do $(COMPOSE) run --rm --user $(shell id -u):$(shell id -g) -e S3_ENDPOINT=http://guests:$$port tools probe || exit $$?; done
-	$(CTL) /opt/lab/app/recovery.py audit
+	$(CTL) /opt/lab/native/recovery.py audit
 	$(COMPOSE) run --rm --user $(shell id -u):$(shell id -g) --entrypoint python tools /app/proxy_audit.py rgw rgw0 rgw1 rgw2
 benchmark:
-	python3 ../../object-storage/benchmark.py
+	python3 benchmark.py
 failover:
-	python3 scripts/fault.py process
+	python3 control.py guest
 disk-failure:
-	python3 scripts/fault.py disk
+	python3 control.py disk
 status:
 	$(COMPOSE) ps
-	$(CTL) /opt/lab/app/control.py ssh 1 'ceph -s'
+	$(CTL) /opt/lab/native/guest.py ssh 1 'ceph -s'
 cli:
 	$(COMPOSE) run --rm --entrypoint /bin/sh control
+.PHONY: recover-guest-init
+recover-guest-init:
+	$(CTL) /opt/lab/native/guest.py repair-init
 down:
 	$(RUN) drop
 docker-down:
-	$(COMPOSE) --profile tools down --volumes --remove-orphans
-	@for image in '$(COMPOSE_PROJECT_NAME)-guests:dev' '$(COMPOSE_PROJECT_NAME)-tools:dev'; do if docker image inspect "$$image" >/dev/null 2>&1; then docker image rm "$$image"; fi; done
+	python3 control.py docker-down
+
+.PHONY: verify repair recover-bootstrap rebuilt-member-failure gateway-failure test-production unit-test
+verify:
+	python3 control.py verify
+.PHONY: cold-reopen report
+cold-reopen:
+	python3 cold_reopen.py
+report:
+	python3 report.py
+repair:
+	python3 control.py repair
+recover-bootstrap:
+	python3 control.py recover-bootstrap
+RECOVERY_CASE ?=
+export RECOVERY_CASE
+.PHONY: recover-replacement
+recover-replacement:
+	python3 control.py recover-replacement
+rebuilt-member-failure:
+	python3 control.py rebuilt
+gateway-failure:
+	python3 control.py router
+test-production:
+	$(MAKE) test
+	$(MAKE) failover
+	$(MAKE) disk-failure
+	$(MAKE) rebuilt-member-failure
+	$(MAKE) gateway-failure
+	$(MAKE) verify
+unit-test:
+	$(RUN) unit
+	$(COMPOSE) run --rm --entrypoint python tools -m unittest -v test_traffic test_reader
+	python3 -m unittest -v test_capacity test_native_state test_teardown test_report

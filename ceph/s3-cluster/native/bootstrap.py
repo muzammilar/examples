@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 import time
 import uuid
-from control import ssh, ready
+from guest import ssh, ready
 
 
 def write(node, path, data, mode="600"):
