@@ -72,6 +72,29 @@ spill watermark. Both have the same 4 GiB **whole-process/container** limit; the
 measured peaks are well below either internal threshold. This test does not
 exercise spilling, out-of-memory recovery or larger-than-memory datasets.
 
+## Dataset size and shape
+
+Measured directly from the fixture used by both engines and all three languages:
+
+| Property | Value |
+|---|---|
+| Trade rows / unique trade IDs | 2,000,000 / 2,000,000 |
+| Trade columns | six I64 columns: `id`, `customer`, `symbol`, `day`, `qty`, `price` |
+| Customer rows / distinct referenced customers | 10,000 / 10,000 |
+| Customer columns | three I64 columns: `customer`, `region`, `factor` |
+| Distinct symbols | 256, IDs 0–255 |
+| Distinct day buckets | 30, indices 0–29; synthetic indices, not dated event timestamps |
+| Distinct customer regions | 16 |
+| Trade CSV | 52,801,261 bytes (**50.36 MiB**) |
+| Customer CSV | 92,663 bytes (**0.08837 MiB**) |
+| Combined CSV input | 52,893,924 bytes (**50.44 MiB**) |
+| Generator seed | 20261117 |
+
+Sizes include CSV headers and LF record delimiters, exclude the oracle, plans and
+result logs, and are **input-file sizes**, not database storage or RAM footprints.
+Artifact SHA-256 hashes are retained in the fixture manifest and copied into
+each run's setup evidence.
+
 ## Workload and correctness
 
 | Query | Exact result compared |
