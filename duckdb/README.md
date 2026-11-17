@@ -23,3 +23,13 @@ absent on the standby. Post-promotion writes lost zero new acknowledgements.
 Measurements use software-emulated Linux guests; they are separate from the
 native analytical benchmark above. Full timings, warm-query performance and
 failure boundaries are in the example README.
+
+## RayforceDB comparison
+
+[`rayforce/duckdb-comparison/`](../rayforce/duckdb-comparison/README.md) compares
+both embedded engines through Python, C++ and Rust over 2 million numeric trades
+and 10,000 customers, at equal 1/4-CPU and 4-GiB container limits. It includes
+exact output checks, repeated warm-query measurements, first-query observations,
+CPU time and peak RSS/cgroup memory. DuckDB wins the scans and join in this
+workload; Rayforce wins the two group aggregations and bulk CSV loading. Full
+numbers and the unrun persistence/cold-cache scenarios are in that README.

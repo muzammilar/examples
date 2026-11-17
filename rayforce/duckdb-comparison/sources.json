@@ -1,0 +1,14 @@
+{
+  "rayforce.tar.gz": {
+    "url": "https://codeload.github.com/RayforceDB/rayforce/tar.gz/38fd4be3560d63a5514c1e6883685fe496d45e1a",
+    "sha256": "6c6d08467bef24d372ae076bc4abfba7d09fc1658d15e0b8ca992e64509bb1d6"
+  },
+  "duckdb-arm64.tar.gz": {
+    "url": "https://github.com/duckdb/duckdb/releases/download/v2.0.0/duckdb-shared-libs-linux-arm64.tar.gz",
+    "sha256": "c60eecf91143ca6bbac55c4f4d40dc22520488b0ac257c86e0fe9a2b451cf2b7"
+  },
+  "duckdb-amd64.tar.gz": {
+    "url": "https://github.com/duckdb/duckdb/releases/download/v2.0.0/duckdb-shared-libs-linux-amd64.tar.gz",
+    "sha256": "993ad89e7dfca66cd6da994c2cad090c2fc160ddf9f550498a098ab4bb13cfb1"
+  }
+}

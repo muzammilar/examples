@@ -1,0 +1,15 @@
+name: rayforce-duckdb-comparison
+services:
+  analytics:
+    image: rayforce-duckdb-analytics:dev
+    build: ./.build
+    cpus: ${CPUS:-1}
+    mem_limit: 4g
+    network_mode: none
+    read_only: true
+    tmpfs:
+      - /tmp:size=512m
+    volumes:
+      - ./results/data:/data:ro
+      - ./results/plans:/plans:ro
+    profiles: [tools]
