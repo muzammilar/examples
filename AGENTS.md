@@ -186,6 +186,10 @@ observations during the operation.
   outside the failed storage/domain. Fsync the witness; preserve earlier test
   histories. Retry mutations only with a justified idempotency contract, and report
   retry masking separately from first-attempt errors.
+  An error status, including a conditional-write failure, does not by itself
+  prove no replica applied the operation. Retain its intent and reconcile possible
+  effects against the system's actual contract; an observed applied body does not
+  turn a failed/ambiguous response into an acknowledged write.
 - Reconcile every acknowledged key and its expected body/version after recovery,
   including earlier phases. Check missing, duplicate, corrupt, stale and unexpected
   records; totals alone are insufficient. For sharding, verify routing and native

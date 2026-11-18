@@ -94,6 +94,11 @@ These are documentation backlog entries, except Qdrant which already has example
 Proposed extensions have not been run. See
 [`TODO.md`](TODO.md) for the broader backlog.
 
+**High priority, next after the current work is complete:**
+
+- **CedarDB**
+- **RayforceDB vs DuckDB** — [initial Python/C++/Rust comparison](rayforce/duckdb-comparison/README.md) now measures bulk CSV loading, analytical queries, CPU and memory at equal 1/4-CPU budgets. Follow up with single/batch mutation, genuinely cold persisted queries, disk use and persistence/recovery paths; document semantic differences and unsupported cases.
+
 | System | Potential cluster example | Comparison |
 |---|---|---|
 | [Apache Pinot](https://docs.pinot.apache.org/) | Kafka-fed delivery status, ingestion upserts, out-of-order events, segment recovery and server failure | StarRocks / ClickHouse on identical event history |
