@@ -39,6 +39,66 @@ class TinyFixture:
 
 
 class CopyProofTests(unittest.TestCase):
+    def test_grouped_audit_rejects_wrong_coverage_with_matching_totals(self):
+        class GroupFixture(TinyFixture):
+            products = [TinyFixture.products[0] | {"id": str(i)} for i in range(6)]
+            vectors = np.full((6, 384), 0.25, dtype=np.float32)
+
+        for duplicate in [False, True]:
+            with (
+                self.subTest(duplicate=duplicate),
+                tempfile.TemporaryDirectory() as directory,
+            ):
+                root = Path(directory)
+                for name in ["history.json", "floor.json"]:
+                    (root / name).write_text(json.dumps(empty()))
+                for node in range(9):
+                    owned = {2 * (node % 3), 2 * (node % 3) + 1}
+                    if duplicate and node == 1:
+                        owned = {
+                            0,
+                            3,
+                        }  # Still two rows; group zero duplicates 0 and loses 2.
+                    replies = []
+                    for index in range(6):
+                        if index not in owned:
+                            replies.append("Document not found.")
+                            continue
+                        fields = GroupFixture().row(index)
+                        fields.pop("id")
+                        fields.pop("description")
+                        fields.update(
+                            pid=index,
+                            embedding={
+                                "type": "tensor<float>(x[384])",
+                                "values": [0.25] * 384,
+                            },
+                        )
+                        replies.append(
+                            json.dumps(
+                                {"id": f"id:catalog:product::{index}", "fields": fields}
+                            )
+                        )
+                    with gzip.open(root / f"final-{node}.json.gz", "wt") as stream:
+                        stream.write("[\n" + "\n,\n".join(replies) + "\n]")
+                with (
+                    patch.object(replica_audit, "ROOT", root),
+                    patch.object(replica_audit, "COUNT", 9),
+                    patch.object(replica_audit, "MODE", "sharded"),
+                    patch.object(replica_audit, "Fixture", GroupFixture),
+                ):
+                    if duplicate:
+                        with self.assertRaisesRegex(
+                            RuntimeError, "duplicate native copy within group"
+                        ):
+                            replica_audit.check("final")
+                    else:
+                        replica_audit.check("final")
+                        proof = json.loads((root / "final-proof.json").read_text())
+                        self.assertEqual(proof["rows_checked"], 18)
+                        self.assertEqual(proof["vector_coordinates_checked"], 6912)
+                        self.assertEqual(proof["directed_gets"], 54)
+
     def audit(self, fault=None):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

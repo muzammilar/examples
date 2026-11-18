@@ -18,6 +18,10 @@ Requires Docker Compose and host Python 3.11+. Native images are pinned to Vespa
 controller uses the standard library. The Python scientific corpus/ANN verifier
 is a deliberate exception to the Go/Rust/C++ application preference; live traffic
 is Go with standard-library HTTP/JSON, built and tested in Docker.
+Resource-counter collection requires a Linux Docker daemon with readable cgroup
+v2 `cpu.stat`, `memory.current`, `memory.peak` and `memory.stat` files inside the
+native containers. The measured Docker Engine **29.5.3** setup provides these interfaces;
+counter collection fails closed when these interfaces are unavailable.
 
 The first corpus preparation downloads public ESCI data and the pinned embedding
 model, then builds 100,000 products, 1,000 queries and 384-dimensional float32
@@ -70,11 +74,13 @@ corpus encoding concurrently. A mode owns its infrastructure until full teardown
 
 ```sh
 make failover                           # discover/crash the active controller host in flat mode
-make replica-crash                      # crash a different owned content host
+make controller-crash                   # native active controller; 180-second default hold
+make replica-crash                      # another content host; group 2 in sharded mode
 make disk-failure                       # fence one owner; replace its entire named /opt/vespa/var volume
 make rebuilt-crash                      # fail a different member and read a fresh ACK from the rebuilt member
 make test-production                    # serial applicable matrix; not yet fully qualified
 make cold-reopen                        # stop/start the complete stack with retained volumes
+make crash-reopen                       # SIGKILL the complete stack; restart retained storage
 make benchmark                          # only after a passing recovery/correctness report
 make status
 ```
@@ -85,6 +91,21 @@ make status
 batch is a bounded client group of per-document requests, not a native bulk API.
 `FAULT_SERVICE=node1` or an owned content host selects an explicit target; native
 role discovery is the default. Single-node mode rejects HA/disk-loss claims.
+
+`CONTROLLER_DOWN_SECONDS=180` controls the separate controller-host hold. Sharded
+mode defaults to content0 for `failover`, content8 for `replica-crash` and content3
+for `disk-failure`, exercising all three replica groups across the matrix. Its
+serial suite also crashes the active control/query/config host. A rebuilt-member
+read checks a bounded set of fresh ACKs for a key physically stored on that
+member; it never assumes an arbitrary ACK belongs to that member's shard. The
+other failed peer must remain positively fenced throughout this directed read.
+
+`crash-reopen` tests an explicit whole-stack process crash, with expected
+unavailability while every native host is stopped. It requires exit 137 without
+an OOM flag, retains the exact containers/images/volumes and reconciles all prior
+ACKs after restart. This differs from `cold-reopen`'s bounded graceful stop and
+from physical power loss or EIO. The single-node production sequence includes
+both reopen paths; a one-copy database has no HA or empty-disk recovery claim.
 
 Each case gets exclusive fsynced writer and reader journals, immutable starting
 history and timestamped phases. New cases extend all earlier intents/ACKs,
@@ -299,10 +320,196 @@ short peaks can be missed. No sampling errors occurred. Raw latency samples,
 resource samples and benchmark source are preserved under
 `results/production/cluster/previous-runs/94bb0099a92d4636bfebe6231e95437b/benchmarks/d5abf5b4a848463e8d0584fe8a89ffa8/`.
 
-Remaining qualification: the complete serial `test-production` target, repeated
-retained `make up`, and reruns of single/sharded profiles with the new controller. Partitions/quorum loss, scaling/resource changes, upgrades, bounded
-pressure/EIO and independent backup restore remain unrun in this backfill.
+Remaining qualification: the complete flat-cluster serial `test-production`
+target/retained setup and the expanded single-node aggregate invocation (all its
+individual cases ran). The sharded core matrix and retained setup passed as
+recorded below. Partitions/quorum loss, scaling/resource changes, upgrades,
+bounded pressure/EIO and independent backup restore remain unrun.
 Historical results below apply to their original harness, not these new gates.
+
+### Single-node follow-up — 2026-11-18
+
+Executed serially: fresh baseline, correctness, bounded graceful reopen,
+correctness, whole-stack SIGKILL reopen, then retained `make up`. The latter
+verified the existing fixture without deployment/feed/reset. **Six cases passed**:
+**37,308 ACKs / 44,280 attempts**, **6,972 ambiguous outcomes**, zero detected
+acknowledged loss. Each live/final proof checked **100,000 bodies / 38.4 million
+float32 coordinates**. All final versions matched their retained witnesses.
+The later Makefile update includes SIGKILL in the single-node `test-production`
+sequence; that expanded command was not replayed as one invocation in this run.
+
+| Case | ACKs | Attempts | Ambiguous | Failed search / GET | Longest ACK / search / GET gap, seconds |
+|---|---:|---:|---:|---:|---:|
+| Baseline | 5,320 | 5,320 | 0 | 0 / 0 | 0.52 / 0.53 / 0.53 |
+| Correctness | 5,230 | 5,230 | 0 | 0 / 0 | 0.50 / 0.49 / 0.49 |
+| Graceful reopen | 8,138 | 11,380 | 3,242 | 777 / 778 | 44.98 / 44.66 / 44.89 |
+| Correctness | 5,280 | 5,280 | 0 | 0 / 0 | 0.53 / 0.53 / 0.54 |
+| SIGKILL reopen | 8,070 | 11,800 | 3,730 | 566 / 566 | 41.59 / 41.22 / 41.49 |
+| Retained setup | 5,270 | 5,270 | 0 | 0 / 0 | 0.52 / 0.53 / 0.53 |
+
+The graceful stop exited **0**, the SIGKILL stop **137**; neither had an OOM flag.
+No wrong/stale GETs or stale/partial search hits were observed in these cases.
+Unavailability during complete shutdown is expected; these are one-copy process
+recovery tests, not HA, independent-host or physical power-loss guarantees.
+Initial deploy/feed/index/logical verification took **365.95 s / 273.26 docs/s**;
+its CPU cost was not measured. All five lifecycle commands completed. Teardown
+hash-verified **323 files**, left zero owned infrastructure/built tags and retained
+the identities of all ten recorded foreign volumes.
+
+One post-recovery warm benchmark used the same host/corpus as the flat results,
+one native host at **2 CPUs / 4 GiB**, tools at **2 CPUs / 3 GiB**, 16 warmups and
+1,000 timed requests per row. All **8,000 requests succeeded**; dense recall@10
+was **0.9918**. This is one trial with different topology, durability and budgets,
+not a normalized cross-profile scaling comparison or a cold-cache result.
+
+| Search | Clients | Queries/s | p50 ms | p99 ms |
+|---|---:|---:|---:|---:|
+| Lexical | 1 | 612.78 | 1.57 | 3.19 |
+| Lexical | 8 | 1,137.87 | 4.56 | 46.79 |
+| Dense | 1 | 331.56 | 2.80 | 4.14 |
+| Dense | 8 | 602.85 | 7.34 | 59.11 |
+| Hybrid | 1 | 278.58 | 3.43 | 7.25 |
+| Hybrid | 8 | 460.41 | 7.06 | 74.34 |
+| Global rerank | 1 | 274.89 | 3.41 | 7.41 |
+| Global rerank | 8 | 451.06 | 7.04 | 77.00 |
+
+Native cgroup CPU delta was **29.52 core-seconds** (**27.52 user / 2.00 system**)
+over **22.78 s** around the entire benchmark command, including warmups, quality,
+setup and native housekeeping. It is not a sum of the timed-query windows; the
+workload container's CPU is excluded. Afterward, charged memory was
+**3,549,163,520 bytes** and the current cgroup's lifetime peak
+**3,701,084,160 bytes**, including recovery/retained setup before the benchmark.
+These include file cache/kernel charges and are neither process RSS nor a
+benchmark-only memory peak. Raw CPU/memory counters, Docker samples, stable
+native process/container checks and measurement source are retained alongside
+the query samples. Nonzero request failures make the benchmark target fail.
+The [kernel cgroup v2 interfaces](https://www.kernel.org/doc/html/latest/admin-guide/cgroup-v2.html)
+define cumulative CPU microseconds and cgroup-lifetime memory peaks. Docker's
+[stats CLI subtracts inactive file cache](https://docs.docker.com/reference/cli/docker/container/stats/)
+on cgroup v2, so its displayed memory differs from the charged `memory.current`.
+
+Evidence: `results/production/single/previous-runs/04afaa079eab4b388223143ce9869e3f/`;
+benchmark `benchmarks/2e39b61832004f4280154102694f7443/` inside that archive.
+
+Profile controls now isolate their topology from the caller's `MODE` and check
+single-copy readiness, per-group sharded coverage, cgroup counter resets and
+physical rebuilt-member ACK identity/body/version. **17 host controls** pass;
+**10 container-side controls** include duplicate/missing IDs with matching shard
+totals. These synthetic controls do not qualify a live sharded deployment.
+
+### Sharded follow-up — 2026-11-18
+
+The fresh 3-control / 9-content deployment completed its full serial
+`test-production`, retained `make up`, benchmark and five-command lifecycle.
+**Ten cases passed**, reconciling **139,501 ACK updates / 149,030 attempts** across
+**99,969 distinct acknowledged IDs**, with **zero detected acknowledged loss**.
+The **9,524 ambiguous outcomes / five HTTP 412 responses** remain non-ACK outcomes;
+they are not assumed to have had no effect. No mutations were retried.
+
+Each live/final audit performed **900,000 directed gets**: **300,000 present copies /
+600,000 expected absences**, all metadata and **115.2 million float32 coordinates**.
+Every replica group contained the complete 100,000-ID catalog exactly once; final
+versions agreed across all three groups. Per-node baseline counts match the
+historical placement table below. No wrong/stale GETs or stale/partial search hits
+were observed. Read endpoint failover made **5,008 additional attempts** across the
+run; successful operations must not be mistaken for zero first-attempt failures.
+
+| Case | ACKs / attempts | Ambiguous / HTTP 412 | Failed search / GET | Longest ACK / search / GET gap, seconds |
+|---|---:|---:|---:|---:|
+| Baseline | 10,160 / 10,160 | 0 / 0 | 0 / 0 | 0.60 / 0.60 / 0.62 |
+| Correctness | 10,170 / 10,170 | 0 / 0 | 0 / 0 | 0.54 / 0.54 / 0.54 |
+| Control-host crash | 17,161 / 21,190 | 4,028 / 1 | 0 / 0 | 1.12 / 0.57 / 0.57 |
+| Content0 crash | 17,199 / 17,210 | 11 / 0 | 0 / 0 | 3.13 / 15.22 / 15.22 |
+| Content8 crash | 17,220 / 17,230 | 10 / 0 | 3 / 0 | 3.09 / 10.07 / 10.06 |
+| Content3 disk replacement | 16,809 / 16,820 | 10 / 1 | 0 / 0 | 3.13 / 11.81 / 11.81 |
+| Rebuilt-member peer loss | 17,430 / 17,440 | 7 / 3 | 0 / 0 | 3.10 / 9.24 / 9.24 |
+| Whole-stack reopen | 12,762 / 18,220 | 5,458 / 0 | 695 / 696 | 63.42 / 63.15 / 63.43 |
+| Correctness | 10,330 / 10,330 | 0 / 0 | 0 / 0 | 0.57 / 0.65 / 0.65 |
+| Retained setup | 10,260 / 10,260 | 0 / 0 | 0 / 0 | 0.57 / 0.66 / 0.66 |
+
+The control-host test fenced active node0; native controller node1 was observed
+active during the 180-second hold, with **7,260 fresh post-fence ACKs** and a first
+new ACK **0.96 s** after fencing. This observation does not isolate election time.
+All **94 unrelated native daemon/supervisor identities** remained unchanged.
+Content0/content8 crashes and content3 disk replacement exercised all three
+replica groups. Data-worker cases preserved all **99 unrelated identities**.
+
+Content3's owned volume was replaced after positive fencing; its creation time
+changed from **03:13:51 to 04:04:57 UTC** and an independent empty-volume check
+passed. After native rebuild/full-copy verification, a different member,
+content0, was fenced. A directed read from content3 then returned fresh ACK
+**ID 96288 / version 9629**, including the exact tenant/stock/price body, before
+content0 returned. The bounded 256-candidate read verified actual physical
+ownership instead of assuming that an arbitrary ACK belonged to content3.
+
+Whole-stack stop retained all container/image/volume identities: eleven hosts
+exited **0**, node1 exited **137** at the 20-second deadline, and none had an OOM
+flag. This is mixed graceful/forced process shutdown with retained storage,
+not physical power loss. Reads/writes stayed live through native repair and the
+live-copy audit; the independent reader continued through final reconciliation.
+
+The following rate-limited observations use **successful-request p50 / p99 ms**;
+raw reports retain failed-request distributions/counts separately. Before/after
+windows are roughly 15 seconds; outage + repair ends at the native repair gate,
+before the live-copy audit. These are not capacity measurements or stable tail
+estimates from long trials. API latency excludes local witness fsync.
+
+| Case | Phase | ACK/s | Write ms | Search ms | GET ms |
+|---|---|---:|---:|---:|---:|
+| Controller | Before | 51.20 | 27.90 / 45.31 | 3.92 / 8.30 | 1.91 / 2.83 |
+| Controller | Outage + repair | 40.18 | 26.69 / 44.52 | 4.31 / 12.38 | 1.88 / 9.58 |
+| Controller | After | 52.27 | 29.03 / 45.18 | 3.72 / 9.30 | 1.81 / 3.25 |
+| Disk | Before | 51.55 | 27.19 / 45.16 | 3.57 / 8.67 | 1.81 / 2.84 |
+| Disk | Outage + repair | 45.29 | 25.31 / 186.38 | 3.22 / 7.72 | 1.56 / 22.68 |
+| Disk | After | 52.66 | 27.16 / 45.43 | 3.41 / 8.67 | 1.62 / 12.48 |
+| Reopen | Before | 51.73 | 27.13 / 44.80 | 3.38 / 7.61 | 1.77 / 3.45 |
+| Reopen | Outage + repair | 22.21 | 29.88 / 53.05 | 4.57 / 17.03 | 2.15 / 6.37 |
+| Reopen | After | 52.95 | 28.13 / 44.53 | 3.99 / 8.28 | 1.78 / 3.30 |
+
+Initial deploy/feed/index/logical verification took **470.32 s / 212.62 docs/s**.
+Twelve native cgroups used **915.86 core-seconds** (**817.20 user / 98.67 system**)
+around that load command, excluding image builds and earlier server bootstrap.
+Raw `load-resource-*.json` files preserve per-host elapsed times, charged memory
+and cgroup-lifetime peaks. Server ceilings are **15 CPUs / 19.5 GiB**, with tools
+at **2 CPUs / 3 GiB**, on the same **11-vCPU / 24.42-GiB** Docker VM: CPU ceilings
+are oversubscribed, not dedicated machine resources.
+
+One post-recovery warm run timed **1,000 requests per row** after **16 warmups**;
+all **8,000 requests succeeded**. Dense recall@10 was **0.9963 at one client /
+0.9962 at eight clients**. Different budgets, replication, per-shard ANN effort
+and recall prevent interpreting these numbers as normalized scaling or a universal
+winner. Three-trial comparative, saturation/soak and cold-cache claims remain unrun.
+
+| Search | Clients | Queries/s | p50 ms | p99 ms |
+|---|---:|---:|---:|---:|
+| lexical | 1 | 458.94 | 2.12 | 3.65 |
+| lexical | 8 | 1,213.03 | 6.33 | 12.80 |
+| dense | 1 | 217.16 | 4.35 | 5.91 |
+| dense | 8 | 660.00 | 11.20 | 19.74 |
+| hybrid | 1 | 200.57 | 4.93 | 6.83 |
+| hybrid | 8 | 631.67 | 12.20 | 22.57 |
+| rerank | 1 | 192.78 | 5.10 | 7.41 |
+| rerank | 8 | 607.50 | 12.74 | 23.78 |
+
+The native cgroups used **85.20 CPU core-seconds** (**79.41 user / 5.79 system**)
+across **28.33–28.35 seconds** per host around the entire benchmark command,
+including warmups/quality/housekeeping and counter inspection. Workload CPU is
+excluded. Afterward, summed charged memory was **13,273,427,968 bytes**. Summed
+member lifetime peaks were **14,389,010,432 bytes**; this is not a simultaneous
+whole-stack peak or benchmark-only peak, and includes earlier recovery/testing.
+Neither measure is process RSS. Native container and daemon identities stayed
+unchanged during measurement; raw counters and measurement source are saved.
+
+Cleanup hash-verified **887 files**, left **zero owned containers, volumes,
+networks or built tags**, and preserved all ten recorded foreign-volume identities.
+Evidence: `results/production/sharded/previous-runs/8d57a56a3eb542d7b9d9b781d6382747/`;
+benchmark `benchmarks/88fad3c8d7e7495b8695a27693d271f8/` inside that archive.
+Teardown proof: `results/teardown-check-8d57a56a3eb542d7b9d9b781d6382747.json`.
+
+Partitions/quorum loss, membership/resource scaling, upgrades, pressure/EIO,
+independent backup restore and whole-sharded-stack SIGKILL remain unrun. These
+Compose replicas share one Docker VM and do not establish independent-host
+durability. Native per-node API readback is not independent on-disk decoding.
 
 ## Directory structure
 

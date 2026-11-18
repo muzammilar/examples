@@ -7,6 +7,39 @@ from pathlib import Path
 from version_history import records
 
 
+def cgroup_counters(text):
+    """Parse concatenated cpu.stat, memory.current, memory.peak and memory.stat."""
+    values = {}
+    gauges = []
+    for line in text.splitlines():
+        parts = line.split()
+        if len(parts) == 1:
+            gauges.append(int(parts[0]))
+        elif len(parts) == 2 and parts[0] not in values:
+            values[parts[0]] = int(parts[1])
+        else:
+            raise ValueError("invalid or duplicate cgroup counter")
+    required = {"usage_usec", "user_usec", "system_usec", "anon", "file", "kernel"}
+    if len(gauges) != 2 or not required.issubset(values):
+        raise ValueError("missing required cgroup CPU/memory counters")
+    if any(value < 0 for value in [*gauges, *values.values()]):
+        raise ValueError("negative cgroup counter")
+    return values | {
+        "memory_current_bytes": gauges[0],
+        "memory_lifetime_peak_bytes": gauges[1],
+    }
+
+
+def cgroup_cpu_seconds(before, after):
+    result = {}
+    for key in ["usage_usec", "user_usec", "system_usec"]:
+        delta = after[key] - before[key]
+        if delta < 0:
+            raise ValueError("cgroup CPU counter reset during benchmark")
+        result[key.removesuffix("_usec") + "_core_seconds"] = delta / 1_000_000
+    return result
+
+
 def distribution(events):
     result = {"count": len(events)}
     if events:

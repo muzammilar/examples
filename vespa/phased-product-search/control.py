@@ -16,7 +16,7 @@ import time
 import uuid
 from urllib.parse import urlparse
 
-from metrics import summarize
+from metrics import cgroup_counters, cgroup_cpu_seconds, summarize
 from version_history import History, digest, empty, records
 
 ROOT = Path(__file__).resolve().parent
@@ -176,6 +176,31 @@ def process_witness():
         if any(pid not in processes for pid in roles.values()):
             raise RuntimeError("native daemon changed during process snapshot")
         result[service] = {role: processes[pid] for role, pid in roles.items()}
+    return result
+
+
+def resource_counters():
+    result = {}
+    for service in SERVICES:
+        started = time.monotonic()
+        values = cgroup_counters(
+            compose(
+                "exec",
+                "-T",
+                service,
+                "cat",
+                "/sys/fs/cgroup/cpu.stat",
+                "/sys/fs/cgroup/memory.current",
+                "/sys/fs/cgroup/memory.peak",
+                "/sys/fs/cgroup/memory.stat",
+            )
+        )
+        result[service] = {
+            "time": time.time(),
+            "monotonic": time.monotonic(),
+            "inspection_seconds": time.monotonic() - started,
+            "counters": values,
+        }
     return result
 
 
@@ -572,20 +597,61 @@ def replace_disk(directory, target, before):
     save(BASE / "fixture.json", fixture)
 
 
+def rebuilt_ack_reply(data, required, attempts):
+    # The pinned CLI prints absence as a whole unquoted line, outside JSON.
+    replies = json.loads(
+        "".join(
+            "null\n" if line.strip() == "Document not found." else line
+            for line in data.splitlines(keepends=True)
+        )
+    )
+    if not isinstance(replies, list) or len(replies) != len(required):
+        raise RuntimeError("wrong rebuilt-member reply count/type")
+    selected = None
+    for reply, row in zip(replies, required):
+        if reply is None:
+            continue
+        if (
+            not isinstance(reply, dict)
+            or reply.get("id") != "id:catalog:product::" + row["id"]
+        ):
+            raise RuntimeError("wrong rebuilt-member reply identity")
+        fields = reply.get("fields", {})
+        if set(fields) != {"pid", "tenant", "stock", "price_cents", "version"} or any(
+            type(v) is not int for v in fields.values()
+        ):
+            raise RuntimeError("incomplete or invalid rebuilt-member reply")
+        actual = {
+            "id": str(fields["pid"]),
+            **{k: fields[k] for k in ["tenant", "stock", "price_cents", "version"]},
+        }
+        if (
+            actual["id"] != row["id"]
+            or actual["version"] < row["version"]
+            or attempts.get((actual["id"], actual["version"])) != actual
+        ):
+            raise RuntimeError("rebuilt member cannot serve the post-fence ACK")
+        selected = selected or (row, actual)
+    if selected is None:
+        raise RuntimeError("no fresh ACK candidate stored on rebuilt physical member")
+    return selected
+
+
 def prove_rebuilt_read(directory, service, acknowledged):
-    row = acknowledged[-1]["rows"][0]
+    # A sharded member owns a subset: discover a real fresh owned key instead of
+    # assuming the last ACK belongs to this physical node.
+    required = {}
+    for event in reversed(acknowledged):
+        for row in reversed(event["rows"]):
+            required.setdefault(row["id"], row)
+        if len(required) >= (256 if MODE == "sharded" else 1):
+            break
+    required = list(required.values())
     number = CONTENT.index(service)
-    data = compose(
-        "exec",
-        "-T",
-        "-e",
-        "LANG=C.UTF-8",
-        "-e",
-        "JAVA_TOOL_OPTIONS=-Xmx128m -Dfile.encoding=UTF-8",
-        service,
+    args = [
         "timeout",
         "--signal=KILL",
-        "20",
+        "45",
         "vespa-get",
         "--cluster",
         "catalog",
@@ -595,30 +661,37 @@ def prove_rebuilt_read(directory, service, acknowledged):
         "product:pid,tenant,stock,price_cents,version",
         "--timeout",
         "5",
-        "id:catalog:product::" + row["id"],
+    ]
+    command = (
+        "printf '%s\\n' "
+        + shlex.join(["id:catalog:product::" + row["id"] for row in required])
+        + " | "
+        + shlex.join(args)
     )
-    save(directory / "rebuilt-native-reply.json", json.loads(data))
-    replies = json.loads(data)
-    if len(replies) != 1 or replies[0]["id"] != "id:catalog:product::" + row["id"]:
-        raise RuntimeError("wrong rebuilt-member reply identity")
-    fields = replies[0]["fields"]
-    if set(fields) != {"pid", "tenant", "stock", "price_cents", "version"}:
-        raise RuntimeError("incomplete rebuilt-member reply")
-    actual = {
-        "id": str(fields["pid"]),
-        **{k: fields[k] for k in ["tenant", "stock", "price_cents", "version"]},
-    }
+    data = compose(
+        "exec",
+        "-T",
+        "-e",
+        "LANG=C.UTF-8",
+        "-e",
+        "JAVA_TOOL_OPTIONS=-Xmx128m -Dfile.encoding=UTF-8",
+        service,
+        "/bin/bash",
+        "-o",
+        "pipefail",
+        "-c",
+        command,
+        timeout=60,
+    )
+    (directory / "rebuilt-native-reply.txt").write_text(data)
+    save(directory / "rebuilt-read-candidates.json", required)
     attempts = {
         (r["id"], r["version"]): r
         for event in records(directory / "writer.jsonl", live=True)
         if event["stage"] == "attempt"
         for r in event["rows"]
     }
-    if (
-        actual["version"] < row["version"]
-        or attempts.get((actual["id"], actual["version"])) != actual
-    ):
-        raise RuntimeError("rebuilt member cannot serve the post-fence ACK")
+    row, actual = rebuilt_ack_reply(data, required, attempts)
     save(
         directory / "rebuilt-read-proof.json",
         {
@@ -626,6 +699,7 @@ def prove_rebuilt_read(directory, service, acknowledged):
             "replica": number,
             "required_ack": row,
             "actual": actual,
+            "candidate_count": len(required),
             "time": time.time(),
             "scope": "physical directed get of a newly attempted/ACKed mutation while a different member remains stopped",
         },
@@ -676,10 +750,29 @@ def failed_report(directory, error):
     save(directory / "report.json", value)
 
 
+def stop_stack(crash):
+    if crash:
+        compose("kill", "-s", "SIGKILL", *SERVICES)
+    else:
+        compose("stop", "-t", "20", *SERVICES)
+    stopped = inspect()
+    if set(stopped) != set(SERVICES) or any(
+        v["State"]["Running"] for v in stopped.values()
+    ):
+        raise RuntimeError("whole-stack stop not proved")
+    if crash and any(
+        v["State"]["ExitCode"] != 137 or v["State"]["OOMKilled"]
+        for v in stopped.values()
+    ):
+        raise RuntimeError("whole-stack SIGKILL not proved")
+    return stopped
+
+
 def case(action, target=None, rebuilt=None):
     fixture = binding()
     prior = history()
-    if action in {"crash", "disk", "rebuilt-crash", "cold-reopen"}:
+    whole_stack = action in {"cold-reopen", "crash-reopen"}
+    if action in {"crash", "disk", "rebuilt-crash"} or whole_stack:
         require_reconciled_witness(prior)
     start = (
         max(
@@ -728,7 +821,11 @@ def case(action, target=None, rebuilt=None):
         if target == "controller":
             target = controller
         elif target == "replica":
-            target = next(service for service in CONTENT if service != controller)
+            target = (
+                CONTENT[-1]
+                if MODE == "sharded"
+                else next(service for service in CONTENT if service != controller)
+            )
         if target is not None and target not in SERVICES:
             raise ValueError("fault target is not owned")
         save(
@@ -764,6 +861,20 @@ def case(action, target=None, rebuilt=None):
                 time.sleep(0.5)
             job(directory, ["/app/replica_audit.py", "cluster"], processes)
             degraded = read(directory / "cluster-state.json")
+            if target == controller:
+                elected = active_controller({"native": degraded})
+                if elected == target:
+                    raise RuntimeError("controller role did not leave the fenced host")
+                save(
+                    directory / "controller-failover.json",
+                    {
+                        "old": controller,
+                        "observed_active": elected,
+                        "time": time.time(),
+                        "seconds_since_fence": time.time() - fault_time,
+                        "scope": "observed after deliberate hold, not election duration",
+                    },
+                )
             if target in CONTENT:
                 index = CONTENT.index(target)
                 node = degraded["state"]["service"]["storage"]["node"][str(index)]
@@ -803,21 +914,34 @@ def case(action, target=None, rebuilt=None):
             ):
                 raise RuntimeError("no successful searches while one member was absent")
             if rebuilt is not None:
-                prove_rebuilt_read(directory, rebuilt, fresh_acks)
+                for phase in ["before", "after"]:
+                    owner = inspect()[target]
+                    if owner["Id"] != before[target]["Id"] or owner["State"]["Running"]:
+                        raise RuntimeError(
+                            "failed peer is not still fenced during rebuilt read"
+                        )
+                    save(directory / ("rebuilt-peer-" + phase + ".json"), owner)
+                    if phase == "before":
+                        prove_rebuilt_read(directory, rebuilt, fresh_acks)
             marker(directory, "restart")
             if action == "disk":
                 replace_disk(directory, target, before)
             else:
                 compose("start", target)
             restored = True
-        if action == "cold-reopen":
+        if whole_stack:
             marker(directory, "fault")
             faulted = True
-            compose("stop", "-t", "20", *SERVICES)
-            stopped = inspect()
-            if any(v["State"]["Running"] for v in stopped.values()):
-                raise RuntimeError("whole-stack stop not proved")
-            save(directory / "cold-stopped.json", stopped)
+            stopped = stop_stack(action == "crash-reopen")
+            save(
+                directory
+                / (
+                    "crash-stopped.json"
+                    if action == "crash-reopen"
+                    else "cold-stopped.json"
+                ),
+                stopped,
+            )
             until = time.monotonic() + 15
             while time.monotonic() < until:
                 live(processes)
@@ -861,7 +985,7 @@ def case(action, target=None, rebuilt=None):
             raise RuntimeError("native daemon restarted during copy verification")
         for service in SERVICES:
             if (
-                action != "cold-reopen"
+                not whole_stack
                 and service != target
                 and native_before[service] != native_after[service]
             ):
@@ -869,17 +993,17 @@ def case(action, target=None, rebuilt=None):
                     "unrelated supervised native daemon changed: " + service
                 )
         for name in SERVICES:
-            if action == "cold-reopen":
+            if whole_stack:
                 old = identity({name: before[name]})[name]
                 new = identity({name: after[name]})[name]
                 old.pop("started")
                 new.pop("started")
                 if old != new:
                     raise RuntimeError(
-                        "cold reopen replaced a native container/image/volume"
+                        "retained reopen replaced a native container/image/volume"
                     )
             if (
-                action != "cold-reopen"
+                not whole_stack
                 and name != target
                 and identity({name: before[name]}) != identity({name: after[name]})
             ):
@@ -898,7 +1022,7 @@ def case(action, target=None, rebuilt=None):
         failed_report(directory, error)
         raise
     finally:
-        if action == "cold-reopen" and faulted and not restored:
+        if whole_stack and faulted and not restored:
             compose("start", *SERVICES)
         if faulted and target in SERVICES and not restored:
             if target in inspect():
@@ -1126,7 +1250,30 @@ def main():
         )
         if json.loads(existing):
             raise RuntimeError("unbound native application already exists")
+        load_before = resource_counters()
+        save(BASE / "load-resource-before.json", load_before)
         job(BASE, ["/app/client.py", "load"])
+        load_after = resource_counters()
+        save(BASE / "load-resource-after.json", load_after)
+        if identity(state) != identity(inspect()):
+            raise RuntimeError("native container changed during initial load")
+        save(
+            BASE / "load-resource-counters.json",
+            {
+                "per_service": {
+                    service: cgroup_cpu_seconds(
+                        load_before[service]["counters"],
+                        load_after[service]["counters"],
+                    )
+                    | {
+                        "elapsed_seconds": load_after[service]["monotonic"]
+                        - load_before[service]["monotonic"],
+                    }
+                    for service in SERVICES
+                },
+                "scope": "Native SUT cgroups around initial deploy/feed/index/logical verification; excludes image builds and pre-load server bootstrap. Raw before/after files include cgroup-lifetime memory peaks and anon/file/kernel counters; these are not process RSS or synchronized whole-stack peaks.",
+            },
+        )
         fixture = read(BASE / "fixture.json")
         fixture["status"] = "ready"
         fixture["corpus_sha256"] = read(ROOT / "results/corpus/prepared/manifest.json")[
@@ -1154,7 +1301,8 @@ def main():
         if MODE == "single":
             raise RuntimeError("empty disk loss has no redundant source in single mode")
         target = os.environ.get(
-            "FAULT_SERVICE", "replica" if MODE == "cluster" else CONTENT[0]
+            "FAULT_SERVICE",
+            "replica" if MODE == "cluster" else CONTENT[len(CONTENT) // 3],
         )
         case("disk", target)
     elif action == "rebuilt-crash":
@@ -1167,8 +1315,8 @@ def main():
         rebuilt = read(previous / "target.json")["service"]
         target = next(service for service in CONTENT if service != rebuilt)
         case("rebuilt-crash", target, rebuilt)
-    elif action == "cold-reopen":
-        case("cold-reopen")
+    elif action in {"cold-reopen", "crash-reopen"}:
+        case(action)
     elif action == "benchmark":
         binding()
         cases = sorted(
@@ -1187,7 +1335,15 @@ def main():
         (directory / "benchmark-controller.py").write_bytes(
             (ROOT / "benchmark.py").read_bytes()
         )
+        (directory / "control-source.py").write_bytes(CONTROLLER_SOURCE)
+        (directory / "metrics-source.py").write_bytes(
+            (ROOT / "metrics.py").read_bytes()
+        )
         log = directory / "benchmark.log"
+        native_before = process_witness()
+        owners_before = identity(inspect())
+        counters_before = resource_counters()
+        save(directory / "resource-counters-before.json", counters_before)
         with log.open("x") as stream:
             subprocess.run(
                 [sys.executable, "benchmark.py"],
@@ -1196,6 +1352,42 @@ def main():
                 stderr=subprocess.STDOUT,
                 check=True,
                 timeout=1200,
+            )
+        counters_after = resource_counters()
+        save(directory / "resource-counters-after.json", counters_after)
+        if owners_before != identity(inspect()) or native_before != process_witness():
+            raise RuntimeError("native container or daemon changed during benchmark")
+        save(
+            directory / "resource-counters.json",
+            {
+                "per_service": {
+                    service: cgroup_cpu_seconds(
+                        counters_before[service]["counters"],
+                        counters_after[service]["counters"],
+                    )
+                    | {
+                        "elapsed_seconds": counters_after[service]["monotonic"]
+                        - counters_before[service]["monotonic"],
+                        "before": counters_before[service]["counters"],
+                        "after": counters_after[service]["counters"],
+                    }
+                    for service in SERVICES
+                },
+                "scope": "Native SUT cgroups, including housekeeping and read-only counter inspection; entire benchmark command including warmups/quality/setup, not individual timed-query windows. Memory includes charged file cache/kernel; lifetime peak is since cgroup creation/start and may include setup/recovery, not benchmark-only peak or process RSS. Sum of member peaks is not a simultaneous stack peak. Workload container is excluded; its 2-CPU/3-GiB budget is declared in Compose. benchmark.py samples native SUT containers only.",
+            },
+        )
+        results = read(directory / "benchmark.json")["results"]
+        failures = {name: result["failures"] for name, result in results.items()}
+        passed = bool(failures) and all(
+            type(count) is int and count == 0 for count in failures.values()
+        )
+        save(
+            directory / "validation.json",
+            {"status": "passed" if passed else "failed", "request_failures": failures},
+        )
+        if not passed:
+            raise RuntimeError(
+                "benchmark contains failed requests; raw evidence retained"
             )
         print("Benchmark evidence:", directory, flush=True)
     elif action == "state":
