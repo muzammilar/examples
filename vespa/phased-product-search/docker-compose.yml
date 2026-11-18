@@ -94,11 +94,23 @@ services:
     container_name: vespa-products-content8
     hostname: vespa-products-content8.vespa-product-search-net
     volumes: [content8:/opt/vespa/var]
+  corpus:
+    profiles: [tools]
+    image: vespa-products-corpus:dev
+    build: ./.build/corpus
+    environment:
+      HOME: /cache
+      DOCUMENTS: ${DOCUMENTS:-100000}
+      QUERIES: ${QUERIES:-1000}
+      SEED: ${SEED:-20261115}
+    volumes:
+      - ./results/corpus/cache:/cache
+      - ./results/corpus/prepared:/prepared
+    mem_limit: 8g
+    cpus: 4
   tools:
     image: vespa-product-tools:dev
-    build:
-      context: ../..
-      dockerfile: vespa/phased-product-search/app/Dockerfile
+    build: ./.build/tools
     profiles: [tools]
     cpus: 2
     mem_limit: 3g
@@ -110,9 +122,23 @@ services:
       CHECK_QUERIES: ${CHECK_QUERIES:-50}
       DURATION: ${DURATION:-300}
     volumes:
-      - ${CORPUS_DIR:-../../datasets/esci/prepared}:/corpus:ro
+      - ./results/corpus/prepared:/corpus:ro
       - ./application/generated:/application:ro
       - ./${RESULTS_DIR:-results/cluster}:/results
+  inventory-workload:
+    image: vespa-inventory-workload:dev
+    build: ./.build/inventory-workload
+    profiles: [tools]
+    cpus: 1
+    mem_limit: 512m
+    environment:
+      MODE: ${MODE:-cluster}
+      DURATION_SECONDS: ${DURATION_SECONDS:-1800}
+      UPDATE_BATCH: ${UPDATE_BATCH:-10}
+      UPDATE_CONCURRENCY: ${UPDATE_CONCURRENCY:-4}
+    volumes:
+      - ./results/corpus/prepared:/corpus:ro
+      - ./${RESULTS_DIR:-results/production/cluster}:/results
 volumes:
   node0:
   node1:

@@ -1,0 +1,1 @@
+../../../typesense/product-search/inventory-workload/main.go

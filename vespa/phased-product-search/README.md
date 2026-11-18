@@ -1,200 +1,332 @@
-# Vespa phased product retrieval
+# Vespa phased product search and recovery
+
+ESCI product search with lexical, dense, hybrid and global reranking profiles.
+The production-test backfill adds independent Go inventory writers/readers,
+preserved version histories, native replica-directed full metadata/vector checks
+and separate crash, disk-replacement and cold-reopen cases.
 
 ## Quick start
 
-Run from this directory with Docker Compose v2, Make and Python 3.11+ available. Corpus
-preparation downloads 1.16 GB of verified Parquet plus the pinned ONNX model;
-encoding is a separate first-run cost shared by all four examples.
+1. `make docker-up` — verify this example's own corpus, build local workload images and start Vespa hosts.
+2. `make up` — deploy/feed a fresh application, or verify an already-bound retained fixture without reloading it.
+3. `make test` — run controller controls and independent traffic through full replica/correctness checks.
+4. `make down` — remove the native application after a passing reconciliation; keep supporting hosts.
+5. `make docker-down` — remove only this project's hosts, volumes and built image tags; archive evidence.
 
-1. `make docker-up` — start the local infrastructure and wait for readiness.
-2. `make up` — prepare the shared corpus, build the client and load/index products.
-3. `make test` — check complete rows, filters, retrieval and the system-specific behavior.
-4. `make down` — stop/remove the example services, preserving owned persistent storage.
-5. `make docker-down` — remove this Compose project, volumes and its locally built images.
+Requires Docker Compose and host Python 3.11+. Native images are pinned to Vespa
+**8.781.11**; no host Go/Python application dependencies are required. The host
+controller uses the standard library. The Python scientific corpus/ANN verifier
+is a deliberate exception to the Go/Rust/C++ application preference; live traffic
+is Go with standard-library HTTP/JSON, built and tested in Docker.
 
-Default `MODE=cluster`. To run a single-node baseline, complete teardown first,
-then use `MODE=single make docker-up`, `MODE=single make up`, and the same
-`MODE=single` prefix for subsequent commands. Persistent cluster membership and
-storage must not be reused across topology changes.
+The first corpus preparation downloads public ESCI data and the pinned embedding
+model, then builds 100,000 products, 1,000 queries and 384-dimensional float32
+vectors. Inputs, model cache and generated outputs live under this example's own
+ignored `results/corpus/`; no sibling Makefile or generated fixture is used.
+`retrieval-corpus/`, `benchmark.py`, `version_history.py` and three generic Go
+source files are repository-tracked source links. `prepare_build.py` materializes
+regular hard links/copies into ignored `.build/` contexts before Docker builds.
 
-## Sharded storage profile
+The fixture has **100,000 distinct product IDs / 100 synthetic tenants**;
+string metadata includes source ID, locale, name, description, brand and color,
+with integer tenant, stock, price and version fields. It is seeded at **20261115**,
+with **912–1,078 products per tenant**, **47,043 empty descriptions** and
+description text capped at 4,000 characters. Prepared product JSONL is
+**75,379,504 bytes (71.89 MiB)** and product float32 vectors are
+**153,600,000 bytes (146.48 MiB)**. The 1,000-query JSONL and vectors occupy
+**343,768 / 1,536,000 bytes**. These are input sizes, excluding model/cache,
+indexes, journals and native exports; artifact/model hashes live in the corpus
+manifest. See the [corpus selection and labels](../../datasets/esci/README.md)
+for sampling limits and the lack of exhaustive relevance judgments.
 
-`MODE=sharded` uses native Vespa grouped distribution: **3 replica groups × 3
-content nodes**, plus **3 separate control/query nodes**. Each group stores one
-complete copy of the catalog, partitioned by native document buckets across its
-three content nodes. Every document has **3 copies total**, one in each group;
-no content node should store the entire catalog. Bucket ownership is managed by
-Vespa, not a customer-modulo router. A customer's products may span content nodes.
+Full three-copy proof exports currently occupy roughly **2.4 GiB per case**
+across its live/final audits. Evidence accumulates across failed and successful
+runs and survives teardown. Provision space for the intended case count;
+the controller also requires an **8-GiB reserve plus its conservative next-export
+estimate** and refuses to delete old evidence to fit a new test.
 
-Complete teardown of another profile before changing modes. Use the same mode
-throughout the lifecycle:
+## Deployment profiles
 
-1. `MODE=sharded make docker-up` — start 3 control/query and 9 content hosts.
-2. `MODE=sharded make up` — deploy the grouped application and feed/index products.
-3. `MODE=sharded make test` — check full values, coverage, filters and physical copies.
-4. `MODE=sharded make down` — remove all 12 services, retaining named volumes.
-5. `MODE=sharded make docker-down` — remove this project's state and built image.
-
-| Role | Hosts | Cap per host | Application role |
+| MODE | Native layout | Per-host limits | Whole-SUT ceilings |
 |---|---|---|---|
-| Control/query | node0–node2 | 2 CPUs / 2 GiB | Config servers, controllers, query/feed API |
-| Replica group 0 | content0–content2 | 1 CPU / 1.5 GiB | One full catalog split across 3 content nodes |
-| Replica group 1 | content3–content5 | 1 CPU / 1.5 GiB | A second full catalog split across 3 content nodes |
-| Replica group 2 | content6–content8 | 1 CPU / 1.5 GiB | A third full catalog split across 3 content nodes |
-| Test client | tools | 2 CPUs / 3 GiB | Fixture, correctness, benchmark, ACK journal |
+| `single` | one combined host, one copy | 2 CPUs / 4 GiB | 2 CPUs / 4 GiB |
+| `cluster` (default) | three combined config/controller/query/content hosts; three copies | 2 CPUs / 4 GiB | 6 CPUs / 12 GiB |
+| `sharded` | three config/controller/query hosts; nine content hosts in three groups of three | controls: 2 CPUs / 2 GiB; content: 1 CPU / 1.5 GiB | 15 CPUs / 19.5 GiB |
 
-The image normally enforces a **4 GiB startup floor**. Only the sharded lab
-profile sets `VESPA_IGNORE_NOT_ENOUGH_MEMORY=true` to allow the smaller role-specific
-host limits above. Cgroup memory limits and native disk/memory feed guards remain
-enabled; these small heaps are not production sizing guidance.
+Sharded mode uses **native bucket distribution**, one copy per replica group:
+each group splits the complete catalog across its three content hosts. It is not
+customer-modulo routing. Flat three-node mode stores every document on every
+content host. Grouped mode sets `min-node-ratio-per-group=1` so an incomplete
+query group leaves service. Hostnames/network are private, with no published
+ports. All replicas share one Docker VM; these are not independent failure domains.
 
-The content cluster sets `min-redundancy=3`, `searchable-copies=3`, and root
-`distribution partitions="1|1|*"`. `min-node-ratio-per-group=1` takes an
-incomplete group out of service instead of forcing its two surviving nodes to
-absorb the missing node's storage. With three groups, two complete groups can
-continue serving. Queries use Vespa's dispatcher across a complete
-group. Control/query hosts have no content role. The content-host infrastructure
-healthcheck uses native `vespa-ping-configproxy`; `make up` separately waits for
-query coverage. Config-proxy health alone does not establish search readiness.
+The tools service has 2 CPUs / 3 GiB, and each independent traffic role has 1 CPU /
+512 MiB. Sharded content hosts explicitly bypass the image's 4-GiB startup floor;
+cgroup limits and native feed memory/disk guards remain enabled. These are lab
+heaps, not production sizing guidance. Never run another database benchmark or
+corpus encoding concurrently. A mode owns its infrastructure until full teardown.
 
-`MODE=sharded make benchmark` measures all four ranking profiles at 1 and 8
-clients against the same 100,000-product / 1,000-query corpus. Run benchmarks
-before a destructive fault run. `MODE=sharded make failover` kills **content0**
-while updates and searches continue, leaves it absent for **60 seconds**, then
-restores it and reconciles acknowledged versions. Default client duration is
-**120 seconds**. Set `FAULT_SERVICE=content0` through `content8` to choose another
-data host. Controllers remain alive during this test; the existing `MODE=cluster`
-test separately covers losing a host that also runs a controller.
+## Operational targets and evidence
 
-Native copy verification sends every catalog ID through `vespa-get
---replica-override` for every content node, checks the request/reply ID ordering,
-and combines each group's three physical exports. Each group must contain all
-IDs exactly once with matching metadata/ACK versions; each node must contain a
-proper subset. The native CLI prints `Document not found.` outside JSON for an
-absent copy; only that exact protocol line is decoded as an absent reply. Bad
-reply counts, malformed JSON, wrong IDs and wrong payloads fail the check.
-Vectors are excluded from physical exports; dimension validation and independent
-exact-reference searches cover vector retrieval. The tests use native routing
-and do not independently reimplement Vespa's bucket-placement hash.
+```sh
+make failover                           # discover/crash the active controller host in flat mode
+make replica-crash                      # crash a different owned content host
+make disk-failure                       # fence one owner; replace its entire named /opt/vespa/var volume
+make rebuilt-crash                      # fail a different member and read a fresh ACK from the rebuilt member
+make test-production                    # serial applicable matrix; not yet fully qualified
+make cold-reopen                        # stop/start the complete stack with retained volumes
+make benchmark                          # only after a passing recovery/correctness report
+make status
+```
 
-Limits: this is one Docker VM, with oversubscribed CPU ceilings and small lab
-heaps. It does not test independent-host failure, disk corruption, network
-partition or online topology changes. A 12-container topology is not an
-equal-resource comparison with the existing three-container profile. Failure
-checks distinguish infrastructure health, search coverage and final physical
-copy reconciliation. Reload before another fault run to reset inventory versions.
+`MODE=single|cluster|sharded`, `DOCUMENTS=100000`, `QUERIES=1000`,
+`DURATION_SECONDS=1800`, `UPDATE_BATCH=10`, `UPDATE_CONCURRENCY=4` and
+`NODE_DOWN_SECONDS=180` (flat) / `60` (sharded) are Make variables. The update
+batch is a bounded client group of per-document requests, not a native bulk API.
+`FAULT_SERVICE=node1` or an owned content host selects an explicit target; native
+role discovery is the default. Single-node mode rejects HA/disk-loss claims.
 
-`MODE=sharded make deploy` applies application configuration without reloading
-products; `make up` remains the complete deploy/feed entry point.
+Each case gets exclusive fsynced writer and reader journals, immutable starting
+history and timestamped phases. New cases extend all earlier intents/ACKs,
+including failed attempts; no update replay, table reset or journal overwrite is
+used to pass reconciliation. The writer has conditional identity/version guards,
+3-second server deadlines, bounded concurrency and **no mutation retry**. Timeout
+outcomes remain ambiguous. The journal's `rejected` stage means an HTTP 412
+conditional response, **not proof that no replica applied the update**; all
+attempted versions remain eligible non-ACK outcomes during reconciliation.
+Read endpoint failover is recorded separately from
+whole-operation errors. The generator stays live through fault injection,
+native repair and a complete copy audit. The writer then stops, the independent
+reader stays live through a second all-ACK audit and query correctness check.
 
-Upstream: [grouped distribution and searchable copies](https://docs.vespa.ai/en/reference/applications/services/content.html),
-[topology tradeoffs](https://docs.vespa.ai/en/performance/topology-and-resizing),
-[group availability threshold](https://docs.vespa.ai/en/reference/applications/services/content.html#min-node-ratio-per-group),
-[Docker startup memory floor](https://docs.vespa.ai/en/operations/self-managed/docker-containers.html#memory),
-[pinned group/redundancy validation](https://github.com/vespa-engine/vespa/blob/v8.781.11/config-model/src/main/java/com/yahoo/vespa/model/content/IndexedHierarchicDistributionValidator.java),
-[pinned native-get reply formatting](https://github.com/vespa-engine/vespa/blob/v8.781.11/vespaclient-java/src/main/java/com/yahoo/vespaget/DocumentRetriever.java),
-[pinned config-proxy probe](https://github.com/vespa-engine/vespa/blob/v8.781.11/config/src/apps/vespa-ping-configproxy/pingproxy.cpp).
+Native recovery requires every storage/distributor up, each content copy's
+expected total/ready count, empty reported merge queues and a zero cluster
+out-of-sync ratio. A missing metric is **unknown**, not zero. The pinned controller
+omits its ratio until all distributors have reported. Infrastructure health alone
+is insufficient. The full audit reads every ID directly from every content node
+using `vespa-get --replica-override`, verifies each replica group's coverage,
+all metadata and **all 384 float32 coordinates**. It is native API readback, not
+an independent decoder of on-disk files.
 
-## Workload and measurements
+The native audit CLI retains its supported **read-only routing retries**: a new
+session can initially receive WRONG_DISTRIBUTION before learning the current
+routing state. The CLI does not expose an internal retry count; exports are not
+first-attempt availability measurements. Per-request/overall timeouts and strict
+reply count/identity parsing remain enforced. UTF-8 output is explicit. Compressed
+exports, stderr, fixed ACK floors and proof summaries remain in `results/production/<mode>/cases/`.
 
-The common [ESCI fixture](../../datasets/esci/README.md) defaults to **100,000
-products**, **1,000 held-out queries**, **384-dimensional** normalized real text
-embeddings, **100 synthetic tenants**, and top **10** results. Stock/price/tenant
-attributes are deterministic synthetic data. Each engine receives identical
-vectors and products. These are product-text retrieval tests, not LLM/RAG tests.
+Vespa omits empty-string fields from document JSON. Only an omission whose
+expected fixture value is exactly an empty string is canonicalized; missing
+nonempty/numeric fields fail. Search can overlap attribute updates under Vespa's
+best-effort semantics. Mixed search fields are recorded only when their known
+values correspond to an overlapping attempted update; atomic document GETs and
+post-repair complete copy audits retain strict full-value checks. Stale and
+partial observations remain separate counters, not successful linearizability claims.
 
-`make benchmark` measures lexical, dense, hybrid and global-RRF reranked searches
-at **1 and 8 clients**: **16 warmup requests**, then **1,000 timed queries per case**. Set
-`BENCH_QUERIES`, `QUALITY_QUERIES` (default 100), `CHECK_QUERIES` (default 50).
-Requests use precomputed vectors; tokenization/encoding is excluded. Candidate
-nDCG uses graded ESCI judgments with E=1, S=0.1, C=0.01, I=0; zero-IDCG queries
-are excluded and counted. Dense recall uses an independent exhaustive NumPy
-reference with boundary ties accepted. Quality and ANN recall measure different
-things. Lexical tokenization and native hybrid ranking differ between engines.
+Disk replacement verifies exact project labels, the stopped old container's
+identity and successful daemon-level absence before removing the owned volume.
+It records changed volume birth identity, independently checks the replacement
+is empty, and verifies the rebuilt copy. This is **permanent empty-volume loss**,
+not physical EIO, bit rot or power failure; a combined host also loses one local
+config-server/ZooKeeper copy. Unknown Docker state blocks destruction. Failed
+repair may require manual continuation from `disk-transition.json`; no automatic
+reset makes the failed report pass.
 
-`make failover` sends updates and searches while killing a process with SIGKILL.
-It fsyncs attempted/acknowledged versions outside the database, leaves the process
-down for **180 seconds** in `MODE=cluster` (**60 seconds** in `MODE=sharded`),
-restarts it, then checks every row and accepted version.
-A request with an unknown commit outcome is recorded as ambiguous and is never
-blindly replayed. Run `make up` again to reset data before baseline tests or
-benchmarks after this destructive workload. The default fault workload lasts
-**300 seconds** in `MODE=cluster` and **120 seconds** in `MODE=sharded`;
-`DURATION` and `NODE_DOWN_SECONDS` are Make variables. Updates use a **3-second
-server deadline / 5-second client deadline**, so a stalled request does not stop
-new attempts for the entire test. Raw JSON/journals stay in gitignored
-`results/<mode>/`. Do not run benchmark loads concurrently with corpus encoding
-or other examples. One local Docker VM does not model independent hosts/zones.
+## Observed conditional-update gotcha
 
-No ports are published on the host; `make cli` opens a shell on the private
-Compose network. Credentials are local development constants. `make status`
-shows service roles and row counts. The shared corpus/cache are intentionally
-retained for reuse; example cleanup does not delete another example's inputs.
+During node1's outage, two single-submission conditional updates returned HTTP
+**412 / TEST_AND_SET_CONDITION_FAILED**. Final native exports nevertheless
+contained both exact attempted bodies at version **4256** (IDs **42551, 42552**),
+and all three physical copies agreed. Neither operation is counted as an ACK.
+The pinned persistence tracker explicitly handles partial test-and-set failures
+and changes the overall result to success only when its majority-success rule is
+met. This is evidence that an error response cannot be treated as proof of no
+side effects; it does not establish the exact internal sequence for these two
+requests. The controller never retried these mutations or reset their state.
 
-Full-row checks cover every ID and metadata field. Vector coverage uses input
-checksums, server dimension validation and exact-reference retrieval queries;
-the harness does not read back every stored float from every copy.
+[Inspected partial-TaS reply handling](https://github.com/vespa-engine/vespa/blob/v8.781.11/storage/src/vespa/storage/distributor/persistencemessagetracker.cpp).
+The strict version-less-than guard is not a general idempotency mechanism for
+caller retries. A same-version/body idempotent conditional form is a future
+experiment, not a tested guarantee in this example.
 
-## Architecture and limitations
+## Current backfill status — 2026-11-18
 
-The default `MODE=cluster` runs Vespa **8.781.11**, native ARM64, with
-**three content nodes**, redundancy
-3 and three searchable copies. Each container also hosts a configuration server,
-cluster controller and query/feed container. Three configuration servers retain
-quorum across a single node loss. Each is capped at **2 CPUs / 4 GiB**; the Java
-query heap is 512 MiB, configuration heap 256 MiB, controller heap 128 MiB and
-configuration-proxy heap 64 MiB. These are small local-lab heaps, not production
-sizing guidance. Single mode generates one of each role and redundancy 1.
+**Flat core/lifecycle verified; not a complete production matrix.**
+Fresh flat-cluster loading took **397.09 s** for **100,000 documents**
+(**251.83 documents/s**, deployment/feed/index/initial logical verification).
+This was setup timing, not an isolated ingestion capacity benchmark.
 
-The schema combines BM25 text and 384-dimensional angular HNSW vectors with
-M=16 / insertion exploration=128. Queries request 100 nearest-neighbor
-candidates with 256 additional exploration hits. Four ranking profiles expose
-lexical, dense, hybrid and global RRF reranking of at most 100 candidates. Hybrid
-scores combine bounded BM25 and closeness. Reranking reuses match features;
-no external model/service runs in the timed request.
+- Native-format/shared contract/corruption controls: **9 tests passed**, including
+  wrong vector coordinates, metadata, missing copies and unknown versions.
+- Host controller controls: **11 tests passed**, including unknown runtime/owner
+  fencing, active-controller discovery, missing/lagging repair metrics and rejection
+  of benchmarking after an incomplete newest case.
+- Go workload `go test -race` and image-build tests/vet passed.
+- A retained-fixture correctness case passed **7,090 new ACK updates**, **4,454
+  searches and 4,454 document GETs**, zero observed stale/wrong/failed operations;
+  both native audits checked **300,000 copies / 115.2 million coordinates**.
+- The initial native export used `--noretry` and omitted one failed routing reply
+  per node. Strict parsing rejected it. Its **3,800 ACKs** remain in the cross-case
+  history; the original case stays failed. Corrected native read-only retry
+  behavior was verified without resetting the fixture.
+- The first controller-crash attempt restarted the host but failed its harness
+  gate on an optional missing metric. Corrected-gate reconciliation passed without
+  reset. A second crash attempt completed native audits and replica version
+  agreement, then failed report generation on a latency-free partial-search
+  diagnostic. Both remain failed runs with their ACKs/proofs preserved; the
+  reporter now separates diagnostic counts from API latency samples.
+- Before the next destructive case, the strict final proof covered **38,106 ACK
+  updates / 41,710 attempted updates**, with **3,604 ambiguous outcomes** across
+  five histories. Final native versions agreed on every copy; **414 physical
+  copies** had an allowed version above their ACK floor (138 document IDs,
+  three copies each). Those are ambiguous outcomes, not acknowledged data loss.
+- Empty node1 volume replacement passed: **15,443 new ACKs / 17,860 attempts**,
+  2,415 ambiguous and two HTTP 412 outcomes; **7,680 searches / 7,680 GETs**,
+  six failed read operations and no observed wrong/stale bodies. Both full-copy
+  audits passed; final versions agreed on all three copies.
+- The next case kept rebuilt node1 online while active-controller host node0 was
+  absent. A directed native read from node1 verified a fresh ACK at **version
+  6417**, before node0 returned. The case passed **14,542 new ACKs / 16,470
+  attempts**, 1,928 ambiguous outcomes, 7,084 searches and 7,081 GETs. Seven
+  read operations failed; one stale search hit was observed, with no stale/wrong
+  document GETs. All **26 unrelated native daemon/supervisor identities** stayed
+  unchanged. Final copy versions agreed after complete metadata/vector checks.
+- Native survivor witnesses capture **41 daemon/supervisor identities** across
+  the three hosts.
+- Whole-stack retained reopen passed **9,134 ACK updates / 13,160 attempts**,
+  with 4,026 ambiguous outcomes; **4,964 searches / 4,963 GETs** included 790
+  search errors and 791 GET errors during the outage, with no observed wrong or
+  stale bodies. All three container/image/volume identities were retained and
+  final native copy versions agreed. The 20-second stop deadline produced exit
+  **137** on node1 (not OOM), versus exit **0** on node0/node2: this is a mixed
+  graceful/forced process stop, not a clean shutdown or physical power failure.
+- Across the eight preserved histories: **77,225 ACK updates / 89,200 attempts**,
+  **11,973 ambiguous outcomes / two conditional responses**, five passed cases
+  and three failed cases. The final full native audit reconciled all acknowledged
+  bodies/vectors with **zero detected acknowledged loss**. Failed runs retain
+  their original status; their successful native recovery does not make their
+  harness failures pass.
+- A separate fresh-volume recreation loaded the same corpus in **385.98 s**
+  (**259.08 documents/s**, setup scope above). Its baseline passed **6,420 ACKs**,
+  **3,988 searches / 3,988 GETs**, zero observed errors/stale/wrong values, and
+  both full 300,000-copy / 115.2M-coordinate audits.
+- The fresh fixture's non-controller node1 crash passed **18,877 ACKs / 22,590
+  attempts**, with **3,713 ambiguous outcomes**. It kept **8,821 searches / 8,821
+  GETs** running with zero failed operations or wrong/stale document GETs; **nine
+  stale search hits** were observed. Read endpoint failover made **1,973 additional
+  attempts**, all in ultimately successful operations: zero failed operations
+  does not mean zero failed attempts. There were **6,553 new post-fence ACKs** while
+  node1 remained absent; the first arrived **12.15 s** after fencing. Longest ACK /
+  search / GET completion gaps were **12.38 / 7.90 / 7.90 s**. All **28 unrelated
+  daemon/supervisor identities** stayed unchanged. Final full-copy versions agreed;
+  24 physical copies (eight IDs) held allowed non-ACK versions above the ACK floor.
+  The retained-proof guard was exercised before injection. The separate final
+  `make test` passed another **6,860 ACKs**, **4,207 searches / 4,207 GETs**, with
+  zero failed/stale/wrong observations and both full-copy audits. Across this
+  fresh fixture's three cases: **32,157 ACKs / 35,870 attempts**, 3,713 ambiguous
+  outcomes, all final copies agreeing and **zero detected acknowledged loss**.
+- Application teardown and infrastructure teardown passed. Archiving verified
+  **526 files** against their pre-move SHA-256 digests, preserving failed evidence
+  and journals. The fresh fixture completed the full five-command lifecycle plus
+  the replica-crash case; its archive verified another **191 files**. Cleanup left
+  **zero owned containers, volumes, networks or built image tags**, and all **ten
+  recorded foreign volumes** retained their birth identities. Raw teardown proof:
+  `results/teardown-check-aa51ed0921f94eb4b8bf6e9d4f027245.json`.
 
-Vespa distributes native document buckets and copies. With three nodes and
-redundancy 3, **each node stores all 100,000 products**. This profile does not
-partition storage across nodes; the separate `MODE=sharded` profile partitions
-storage across nine content nodes. This is not tenant-modulo sharding. The row
-visitor verifies the entire logical catalog. Native `vespa-get --replica-override`
-reads every ID and metadata field from each physical copy,
-including accepted versions after node loss. Node metrics also expose
-stored/ready/active document counts. Query profiles fail the check on
-incomplete coverage instead of silently returning partial results.
+### Live fault observations
 
-Limits: all roles share three containers on one Docker VM. Bucket redundancy,
-ready copies and active search ownership differ; counts must be interpreted with
-Vespa's native model. Full searchable replicas cost three vector/text indexes. This flat group exposes
-native bucket ownership and query fan-out; upstream recommends grouped
-distribution for ANN read scaling. The `MODE=sharded` profile implements grouped distribution with separate control/query hosts.
-SIGKILL is process loss, not disk loss or simultaneous power loss. Feed blocking
-is preserved: a nearly full Docker filesystem returns HTTP 507 and must be fixed
-before ingestion. Neither a deployment ACK nor config-server health alone means
-the search application is ready; the client waits for each query endpoint.
+Rate-limited traffic used four concurrent conditional-write workers, groups of
+ten individual updates and a 100-ms think interval. These are fault observations,
+not capacity measurements. Latency cells are **successful-request p50 / p99 ms**;
+failed requests are counted separately so fast rejection cannot improve them.
+“Outage + repair” spans the fault marker through native repair completion, before
+the live full-copy audit. Before/after windows are approximately 15 seconds each.
 
-[Hybrid search tutorial](https://docs.vespa.ai/en/learn/tutorials/hybrid-search),
-[phased ranking](https://docs.vespa.ai/en/ranking/phased-ranking.html),
-[content configuration](https://docs.vespa.ai/en/reference/applications/services/content.html),
-[native replica-selection source](https://github.com/vespa-engine/vespa/blob/v8.781.11/storage/src/vespa/storage/distributor/operations/external/getoperation.cpp),
-[inspected global ranker](https://github.com/vespa-engine/vespa/blob/v8.781.11/container-search/src/main/java/com/yahoo/search/ranking/GlobalPhaseRanker.java).
+| Case | Phase | ACK/s | Write ms | Search ms | GET ms | Non-ACK writes / failed reads |
+|---|---|---:|---:|---:|---:|---:|
+| Disk | Before | 46.46 | 33.77 / 46.54 | 4.71 / 19.45 | 1.83 / 3.06 | 0 / 0 |
+| Disk | Outage + repair | 28.58 | 32.75 / 208.04 | 5.40 / 51.55 | 1.69 / 28.70 | 2417 / 6 |
+| Disk | After | 48.85 | 33.08 / 47.18 | 4.19 / 10.84 | 1.38 / 4.10 | 0 / 0 |
+| Rebuilt peer | Before | 46.61 | 35.18 / 45.98 | 4.58 / 13.64 | 1.49 / 3.09 | 0 / 0 |
+| Rebuilt peer | Outage + repair | 25.79 | 32.74 / 98.00 | 4.92 / 52.29 | 1.76 / 45.91 | 1928 / 7 |
+| Rebuilt peer | After | 48.61 | 33.06 / 45.18 | 4.35 / 13.61 | 1.72 / 7.88 | 0 / 0 |
+| Cold reopen | Before | 47.49 | 33.11 / 45.31 | 4.20 / 19.98 | 1.80 / 3.06 | 0 / 0 |
+| Cold reopen | Outage + repair | 23.38 | 34.20 / 53.02 | 5.29 / 18.96 | 2.13 / 10.38 | 4026 / 1581 |
+| Cold reopen | After | 48.03 | 33.21 / 44.52 | 4.29 / 12.70 | 1.72 / 3.84 | 0 / 0 |
 
-The pinned controller source defaults to a **30-second ZooKeeper session timeout**,
-a **60-second master cooldown**, and a **30-second initial state-broadcast
-wait**. Losing the node that also hosts the active
-controller can therefore block writes until that safety delay and state gathering
-complete. The crash test leaves it down for 180 seconds to observe a new leader,
-rather than restoring it before the election can finish. Initial 30/75/120-second
-experiments observed read availability but no write ACKs during the absence;
-those are retained as diagnostics, not successful failover results.
-Native CLI verification explicitly sets UTF-8 output: the image's default CLI
-charset rendered non-ASCII product text as `?` even though stored text was intact.
+Longest successful-completion gaps (ACK / search / GET) were **81.97 / 20.37 /
+40.24 seconds** for disk replacement, **118.09 / 20.24 / 40.25 seconds** for
+rebuilt-peer loss, and **55.41 / 55.34 / 55.49 seconds** for cold reopen.
+These include in-flight and client routing delays, not just native election time.
+From the restart marker, the native repair gate was satisfied after **128.48 /
+128.09 / 77.31 seconds**, respectively; the complete live-copy proof finished
+after **233.65 / 231.75 / 180.23 seconds**. These are observed detection times,
+including Docker start, two-second polling plus inspection time and native metric
+publication delay; they do not isolate election or internal catch-up duration.
+Raw reports retain phase durations, operation counts, successful/failed latency
+distributions and additional read attempts. Samples from short windows do not
+establish stable tail behavior. API latency excludes local witness fsync.
 
-[Inspected election safety checks](https://github.com/vespa-engine/vespa/blob/v8.781.11/clustercontroller-core/src/main/java/com/yahoo/vespa/clustercontroller/core/MasterElectionHandler.java),
-[pinned timeout defaults](https://github.com/vespa-engine/vespa/blob/v8.781.11/configdefinitions/src/vespa/fleetcontroller.def).
+### Post-recovery warm-query benchmark
 
+One run on an **Apple M4 Pro / ARM64**, Docker VM **11 CPUs / 24.42 GiB**,
+three native Vespa hosts at **2 CPUs / 4 GiB each**; tools at **2 CPUs / 3 GiB**.
+Each row timed **1,000 requests** after **16 warmups** using precomputed vectors;
+all **8,000 requests succeeded**. This measures warm HTTP request throughput and
+latency, excluding embedding generation and setup; it is neither a cold-cache
+measurement nor a three-trial comparative claim.
+Dense recall@10 was **0.9977** against the exact-vector reference in both client
+configurations. Candidate-only nDCG@10 on 100 labeled queries was **0.5485 /
+0.5702 / 0.5918 / 0.5892** for lexical/dense/hybrid/rerank; the global reranker
+again provided no quality gain over hybrid on this sample.
 
-## Benchmark
+| Search | Clients | Queries/s | p50 ms | p99 ms |
+|---|---:|---:|---:|---:|
+| Lexical | 1 | 378.63 | 2.51 | 4.82 |
+| Lexical | 8 | 1,056.68 | 6.37 | 30.84 |
+| Dense | 1 | 124.48 | 7.76 | 10.22 |
+| Dense | 8 | 303.41 | 21.16 | 61.77 |
+| Hybrid | 1 | 114.53 | 8.64 | 12.23 |
+| Hybrid | 8 | 264.54 | 23.46 | 70.78 |
+| Global rerank | 1 | 114.28 | 8.67 | 12.10 |
+| Global rerank | 8 | 263.76 | 22.77 | 67.70 |
+
+Nine Docker-stat samples at roughly **5.04 seconds** observed per-host maximum
+CPU utilization **207.14% / 196.50% / 205.32%** (100% denotes one core), and
+memory usage **2.227 / 2.119 / 2.052 GiB**. These are sampled Docker counters,
+not integrated process CPU core-seconds, peak RSS or cgroup peak measurements;
+short peaks can be missed. No sampling errors occurred. Raw latency samples,
+resource samples and benchmark source are preserved under
+`results/production/cluster/previous-runs/94bb0099a92d4636bfebe6231e95437b/benchmarks/d5abf5b4a848463e8d0584fe8a89ffa8/`.
+
+Remaining qualification: the complete serial `test-production` target, repeated
+retained `make up`, and reruns of single/sharded profiles with the new controller. Partitions/quorum loss, scaling/resource changes, upgrades, bounded
+pressure/EIO and independent backup restore remain unrun in this backfill.
+Historical results below apply to their original harness, not these new gates.
+
+## Directory structure
+
+```text
+application/{schemas/product.sd,generated/}
+inventory-workload/{Dockerfile,go.mod,*.go}
+app/{Dockerfile,client.py,native.py,test_native.py,test_replica_audit.py,requirements.txt}
+{control.py,corpus.py,prepare_build.py,replica_audit.py,search_checks.py,metrics.py,test_controls.py}
+{retrieval-corpus,benchmark.py,version_history.py}   # tracked source links
+{Makefile,docker-compose.yml}
+.build/                                           # ignored local build contexts
+results/{corpus,production/<mode>}/                # ignored inputs/evidence
+```
+
+## Native contracts inspected
+
+[Document JSON empty-string representation](https://docs.vespa.ai/en/reference/schemas/document-json-format.html),
+[best-effort consistency](https://docs.vespa.ai/en/content/consistency.html),
+[pinned node-directed get filtering](https://github.com/vespa-engine/vespa/blob/v8.781.11/storage/src/vespa/storage/distributor/operations/external/getoperation.cpp),
+[native CLI synchronous replies and routing](https://github.com/vespa-engine/vespa/blob/v8.781.11/vespaclient-java/src/main/java/com/yahoo/vespaget/DocumentRetriever.java),
+[pinned optional controller metric](https://github.com/vespa-engine/vespa/blob/v8.781.11/clustercontroller-core/src/main/java/com/yahoo/vespa/clustercontroller/core/restapiv2/requests/ClusterStateRequest.java),
+[native merge metrics](https://docs.vespa.ai/en/reference/operations/metrics/vespa-metric-set.html).
+
+## Historical 2026-11-15 benchmarks
 
 Measured **2026-11-15, Apple M4 Pro, Docker VM aarch64 (11 CPUs / 24.42 GiB)**.
 Server caps are listed above; the load/benchmark client has **2 CPUs / 3 GiB**.
@@ -386,22 +518,3 @@ delays exercise a different failure path. Config-proxy health does not establish
 copy catch-up: the final native readback verified every stored metadata copy and
 accepted version separately. This crash targeted content0; the other selectable
 content hosts were not individually killed.
-
-## Directory structure
-
-```text
-application/schemas/product.sd
-application/generated/{hosts.xml,services.xml,schemas/product.sd}
-scripts/{config.py,copies.py}
-app/{Dockerfile,client.py,native.py,test_native.py}
-docker-compose.yml
-Makefile
-README.md
-results/
-```
-
-The fault runner refuses an existing `churn.jsonl`, `churn.json`, `fault.json` or
-`reconciliation.json`; it never deletes an earlier ACK witness. Preserve and
-diagnose a failed fixture before archiving its evidence and starting a separate
-clean lifecycle. This guard does not add cross-run version reconciliation or an
-independent reader to the existing churn loop.
