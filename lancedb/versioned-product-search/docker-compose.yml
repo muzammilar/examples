@@ -1,10 +1,9 @@
 name: lancedb-versioned-product-search
 x-server: &server
   image: lancedb-product-tools:dev
-  build:
-    context: ../..
-    dockerfile: lancedb/versioned-product-search/app/Dockerfile
+  build: ./.build/tools
   entrypoint: [python, /app/server.py]
+  stop_signal: SIGTERM
   cpus: 2
   mem_limit: 3g
   healthcheck:
@@ -13,7 +12,7 @@ x-server: &server
     timeout: 3s
     retries: 60
   volumes:
-    - ${CORPUS_DIR:-../../datasets/esci/prepared}:/corpus:ro
+    - ./results/corpus/prepared:/corpus:ro
     - catalog:/data
 services:
   writer:
@@ -25,7 +24,7 @@ services:
     depends_on:
       writer: {condition: service_healthy}
     volumes:
-      - ${CORPUS_DIR:-../../datasets/esci/prepared}:/corpus:ro
+      - ./results/corpus/prepared:/corpus:ro
       - catalog:/data:ro
   reader2:
     <<: *reader
@@ -33,21 +32,47 @@ services:
     <<: *reader
   tools:
     image: lancedb-product-tools:dev
-    build:
-      context: ../..
-      dockerfile: lancedb/versioned-product-search/app/Dockerfile
+    build: ./.build/tools
     profiles: [tools]
     cpus: 2
     mem_limit: 3g
     environment:
+      DOCUMENTS: ${DOCUMENTS:-100000}
       MODE: ${MODE:-cluster}
       URLS: ${URLS:-http://reader1:8080,http://reader2:8080,http://reader3:8080}
       BENCH_QUERIES: ${BENCH_QUERIES:-1000}
       QUALITY_QUERIES: ${QUALITY_QUERIES:-100}
       CHECK_QUERIES: ${CHECK_QUERIES:-50}
-      DURATION: ${DURATION:-75}
     volumes:
-      - ${CORPUS_DIR:-../../datasets/esci/prepared}:/corpus:ro
-      - ./${RESULTS_DIR:-results/cluster}:/results
+      - ./results/corpus/prepared:/corpus:ro
+      - ./${RESULTS_DIR:-results/production/cluster}:/results
+  inventory-workload:
+    profiles: [tools]
+    image: lancedb-inventory-workload:dev
+    build: ./.build/inventory-workload
+    cpus: 2
+    mem_limit: 512m
+    environment:
+      URLS: ${URLS:-http://reader1:8080,http://reader2:8080,http://reader3:8080}
+      DURATION_SECONDS: ${DURATION_SECONDS:-1800}
+      UPDATE_BATCH: ${UPDATE_BATCH:-10}
+    volumes:
+      - ./results/corpus/prepared:/corpus:ro
+      - ./${CASE_DIR:-results/production/manual}:/results
+      - ./${RESULTS_DIR:-results/production/cluster}:/history:ro
+  corpus:
+    profiles: [tools]
+    image: lancedb-product-corpus:dev
+    build: ./.build/corpus
+    cpus: 4
+    mem_limit: 4g
+    environment:
+      DOCUMENTS: ${DOCUMENTS:-100000}
+      QUERIES: ${QUERIES:-1000}
+      SEED: ${SEED:-20261115}
+      HF_HOME: /cache/huggingface
+    volumes:
+      - ./results/corpus/cache:/cache
+      - ./results/corpus/prepared:/prepared
 volumes:
   catalog:
