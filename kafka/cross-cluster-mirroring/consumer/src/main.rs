@@ -1,4 +1,5 @@
 use std::{
+    collections::BTreeMap,
     env,
     error::Error,
     thread,
@@ -7,10 +8,12 @@ use std::{
 
 use prost::Message;
 use rdkafka::{
-    ClientConfig,
+    ClientConfig, Offset, TopicPartitionList,
     consumer::{BaseConsumer, CommitMode, Consumer},
     message::Message as KafkaMessage,
 };
+
+mod checkpoint;
 
 mod schema {
     pub mod kafka {
@@ -26,7 +29,46 @@ fn env_or(name: &str, fallback: &str) -> String {
     env::var(name).unwrap_or_else(|_| fallback.to_owned())
 }
 
+fn validate_order(
+    order: &schema::kafka::demo::v1::Order,
+    key: Option<&[u8]>,
+    prefix: &str,
+    expected: usize,
+) -> Result<(usize, i64), Box<dyn Error>> {
+    let index: usize = order
+        .order_id
+        .strip_prefix(prefix)
+        .ok_or("order ID does not match this run")?
+        .parse()?;
+    if index >= expected
+        || order.order_id != format!("{prefix}{index}")
+        || key != Some(order.order_id.as_bytes())
+        || order.customer_id != format!("customer-{}", index % 10)
+        || order.amount_cents != 1000 + (index % 5000) as i64
+        || order.created_at_unix_ms <= index as i64
+    {
+        return Err(format!("incorrect order body or key: {}", order.order_id).into());
+    }
+    Ok((index, order.created_at_unix_ms - index as i64))
+}
+
+fn commit_offsets(
+    consumer: &BaseConsumer,
+    topic: &str,
+    offsets: &BTreeMap<i32, i64>,
+) -> Result<(), Box<dyn Error>> {
+    let mut positions = TopicPartitionList::new();
+    for (&partition, &offset) in offsets {
+        positions.add_partition_offset(topic, partition, Offset::Offset(offset))?;
+    }
+    consumer.commit(&positions, CommitMode::Sync)?;
+    Ok(())
+}
+
 fn main() -> Result<(), Box<dyn Error>> {
+    if env_or("MODE", "validate") == "checkpoint-proof" {
+        return checkpoint::run();
+    }
     let bootstrap = env_or("BOOTSTRAP_SERVERS", "kafka-kafka-bootstrap.kafka.svc:9092");
     let topic = env_or("TOPIC", "orders");
     let group_id = env_or("GROUP_ID", "kafka-jbod-demo");
@@ -38,6 +80,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         .set("bootstrap.servers", bootstrap)
         .set("group.id", group_id)
         .set("enable.auto.commit", "false")
+        .set("enable.auto.offset.store", "false")
         .set("enable.partition.eof", "false")
         .set("isolation.level", "read_committed")
         .set("auto.offset.reset", "earliest")
@@ -48,25 +91,35 @@ fn main() -> Result<(), Box<dyn Error>> {
     let mut seen = vec![false; expected];
     let mut received = 0;
     let mut total_cents = 0_i64;
+    let mut created_base = None;
+    let mut offsets = BTreeMap::new();
 
     while received < expected && Instant::now() < deadline {
         match consumer.poll(Duration::from_millis(500)) {
             Some(Ok(message)) => {
                 let payload = message.payload().ok_or("record has no value")?;
                 let order = schema::kafka::demo::v1::Order::decode(payload)?;
-                if order.order_id.is_empty() || order.customer_id.is_empty() {
-                    return Err("order is missing an id or customer id".into());
+                let (index, base) = validate_order(&order, message.key(), &run_prefix, expected)?;
+                if seen[index] || created_base.is_some_and(|known| known != base) {
+                    return Err(format!(
+                        "duplicate order or inconsistent creation timestamp: {}",
+                        order.order_id
+                    )
+                    .into());
                 }
-                let index: usize = order.order_id.strip_prefix(&run_prefix)
-                    .ok_or("order ID does not match this run")?.parse()?;
-                if index >= expected || seen[index] {
-                    return Err(format!("duplicate or out-of-range order ID: {}", order.order_id).into());
+                created_base = Some(base);
+                if offsets
+                    .get(&message.partition())
+                    .is_some_and(|&previous| message.offset() < previous)
+                {
+                    return Err("partition offsets moved backwards".into());
                 }
+                offsets.insert(message.partition(), message.offset() + 1);
                 seen[index] = true;
                 received += 1;
                 total_cents += order.amount_cents;
                 if received % 1000 == 0 {
-                    consumer.commit_message(&message, CommitMode::Async)?;
+                    commit_offsets(&consumer, &topic, &offsets)?;
                 }
             }
             Some(Err(error)) => return Err(error.into()),
@@ -81,11 +134,86 @@ fn main() -> Result<(), Box<dyn Error>> {
         )
         .into());
     }
-    consumer.commit_consumer_state(CommitMode::Sync)?;
+    commit_offsets(&consumer, &topic, &offsets)?;
     println!(
         "consumed {} unique protobuf orders; amount sum={} cents",
-        received,
-        total_cents
+        received, total_cents
     );
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn valid() -> schema::kafka::demo::v1::Order {
+        schema::kafka::demo::v1::Order {
+            order_id: "trial-order-5001".to_owned(),
+            customer_id: "customer-1".to_owned(),
+            amount_cents: 1001,
+            created_at_unix_ms: 1_800_000_005_001,
+        }
+    }
+
+    #[test]
+    fn validates_complete_body_and_key() {
+        let order = valid();
+        assert_eq!(
+            validate_order(
+                &order,
+                Some(order.order_id.as_bytes()),
+                "trial-order-",
+                10000
+            )
+            .unwrap(),
+            (5001, 1_800_000_000_000)
+        );
+        assert!(validate_order(&order, None, "trial-order-", 10000).is_err());
+        assert!(validate_order(&order, Some(b"wrong-key"), "trial-order-", 10000).is_err());
+        assert!(
+            validate_order(
+                &order,
+                Some(order.order_id.as_bytes()),
+                "trial-order-",
+                5001
+            )
+            .is_err()
+        );
+    }
+
+    #[test]
+    fn rejects_noncanonical_order_ids() {
+        let mut order = valid();
+        order.order_id = "trial-order-05001".to_owned();
+        assert!(
+            validate_order(
+                &order,
+                Some(order.order_id.as_bytes()),
+                "trial-order-",
+                10000
+            )
+            .is_err()
+        );
+    }
+
+    #[test]
+    fn rejects_correct_id_with_wrong_values() {
+        for field in 0..3 {
+            let mut order = valid();
+            match field {
+                0 => order.customer_id = "customer-2".to_owned(),
+                1 => order.amount_cents = 1002,
+                _ => order.created_at_unix_ms = 0,
+            }
+            assert!(
+                validate_order(
+                    &order,
+                    Some(order.order_id.as_bytes()),
+                    "trial-order-",
+                    10000
+                )
+                .is_err()
+            );
+        }
+    }
 }

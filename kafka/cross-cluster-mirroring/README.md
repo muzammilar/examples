@@ -10,7 +10,7 @@ Two independent Strimzi-managed KRaft Kafka clusters run in one local kind clust
 4. `make down` — remove both Kafka clusters, MirrorMaker 2, the operator, and the namespace.
 5. `make kind-down` — delete kind and the example's local client images.
 
-Prerequisites: Docker, `make`, `kind`, `kubectl`, Helm, `envsubst`, `grep`, and `awk`. Producer and consumer images build with Docker; host C++, protobuf, and Rust toolchains are not required.
+Prerequisites: Docker, `make`, `kind`, `kubectl`, Helm, Python 3, `envsubst`, and `grep`. Producer and consumer images build with Docker; host C++, protobuf, and Rust toolchains are not required.
 
 Every run uses a unique topic such as `orders-20261114070120` and run ID, so it does not need to erase existing topic data. Override `COUNT`, `TOPIC`, or `RUN_ID` with Make variables. The C++ producer accepts counts up to 2,000,000. The default test validates 4,000,000 unique orders across the initial source batch and producer cutover batch, and also validates the mirrored copy of the initial batch.
 
@@ -25,7 +25,91 @@ Run these after `make up`. Each one starts MM2, continuously produces the full c
 - `make chaos-mm2-worker` — delete one of the two MM2 worker pods after production starts. Kafka Connect rebalances the connector tasks; the other worker keeps the Connect cluster available. The test checks the producer, waits for both workers to return, checks synced group offsets, and validates every mirrored order.
 - `make chaos-broker-disk-loss` — delete broker 3 on `west` while the source is producing and MM2 is writing to the target. Because the example uses ephemeral storage, replacing the pod also loses that broker's local Kafka data. Strimzi recreates the broker and Kafka restores replicas from the other brokers; the test checks offsets and validates the full mirrored workload. `make chaos-target-broker` is an alias.
 
-The workload uses idempotent `acks=all` producer writes. MM2's source connector is configured for exactly-once source support and reads only committed records; the Rust validator uses `read_committed`. Group offsets are checkpointed every 5 seconds and applied on the target only while that target group is inactive. This is asynchronous: failover between checkpoints can replay records from the previous checkpoint. The test waits for the checkpoint before checking the target offsets.
+The workload uses idempotent `acks=all` producer writes. MM2's source connector is configured for exactly-once source support and reads only committed records; the Rust validator uses `read_committed`. Group offsets are checkpointed every 5 seconds and applied on the target only while that target group is inactive. This is asynchronous: failover between checkpoints can replay records from the previous checkpoint. The test waits for a native checkpoint proof before promoting the target consumer.
+
+## Checkpoint verification
+
+`make checkpoint-proof TOPIC=orders-... RUN_ID=...` is a barrier for an idle
+source/target DR group **before** producer promotion. Kafka's supplied
+`CheckpointFormatter` decodes MM2 records; no custom Java or Kafka wire decoder is
+included. An example-owned Rust Pod then requires:
+
+- six current upstream offsets exactly matching the native checkpoints;
+- target commits exactly matching the translated downstream offsets;
+- both groups natively `Empty`, before and after inspection;
+- all six source and target partitions at RF=3/ISR=3 with a live leader;
+- read-committed EOF on every target partition, with **zero application records**
+  returned after seeking to its translated commit.
+
+Raw offsets can include transaction control records. The check reads the actual
+visible tail instead of accepting a numeric lag of one. A checkpoint produced
+while mirroring is behind can cover the source commit yet translate to an earlier
+target position; that snapshot must wait. The barrier does not reset offsets,
+start a subscribed consumer, or mutate group commits. A replay-free barrier is a
+stricter condition than MM2's general asynchronous failover contract, which permits
+replay. After target production begins, this idle-source promotion barrier no
+longer applies.
+
+The Rust application also checks the Kafka key, unique order index, canonical order ID, deterministic
+customer/amount and the producer's timestamp progression. Explicit partition
+commits occur only after validation; automatic offset storage is disabled. The
+initial timestamp is inferred from the input, not independently witnessed.
+`make check-controls` checks malformed/incomplete checkpoint output. Docker runs
+Rust formatting, Clippy with warnings denied, and four negative-control test
+groups during compilation. Controller samples, native formatter output, Pod/image
+identities, offsets and failures are fsynced under ignored `results/checkpoints/`.
+Failed probe Pods remain available for diagnosis until example teardown.
+
+### Measured checkpoint run — 2026-11-19
+
+`make test COUNT=2000000 TOPIC=orders-2026111901 RUN_ID=checkpoint-20261119-01`
+passed on the dedicated kind cluster. The source and mirrored validators each
+checked **2,000,000 unique orders / 6,999,000,000 cents**. After consumer then
+producer cutover, west validated **2,000,000 additional orders** with the same sum:
+**4,000,000 unique orders / 13,998,000,000 cents** across the two producer phases.
+These are correctness counts, not a capacity benchmark.
+
+The checkpoint barrier took **48.203 seconds across four attempts**. The first
+three Rust probes rejected visible application replay while MM2 caught up; their
+raw failures remain preserved. The fourth verified all six partitions and zero
+visible replay. This wait includes inspection/polling and Pod startup, not a
+measured outage or election time. Checkpoint record sampling ends after a
+2-second native consumer idle timeout; retry delay is 5 seconds and Pod observation
+is every 2 seconds.
+
+| Partition | Source commit | Translated / target commit | Observed read-committed EOF |
+|---|---:|---:|---:|
+| 0 | 332581 | 333253 | 333254 |
+| 1 | 333899 | 334569 | 334570 |
+| 2 | 333721 | 334392 | 334393 |
+| 3 | 334144 | 334814 | 334815 |
+| 4 | 333698 | 334372 | 334373 |
+| 5 | 331957 | 332625 | 332626 |
+
+The one-offset differences above yielded no application records; the Rust EOF
+observations establish that result for this run. Evidence directory:
+`results/checkpoints/20261119T143754Z-35542a264c854713bc1fa18ea749a6d3/`.
+A final-source rerun with `TOPIC=orders-2026111902 RUN_ID=checkpoint-20261119-02`
+also passed the complete 2,000,000 + 2,000,000-order workflow after adding the
+canonical-ID rejection check. Its six-partition barrier passed on the first
+attempt in **9.613 seconds**, under
+`results/checkpoints/20261119T144459Z-39b07948ecf443fc8f936a8a899f0a85/`.
+This retained-cluster rerun is not an independent fresh-cluster performance trial;
+image/build timing and prior warm state differ.
+
+Platform: Apple M4 Pro host, Docker 29.5.3 aarch64 VM with 11 CPUs and
+26,216,296,448 bytes RAM; one control plane/three kind workers. The existing Kafka
+pools request 250m CPU/512Mi per Pod with 256Mi heaps and do not impose per-Pod
+limits; each MM2 worker is limited to 1 CPU/1Gi and the Rust probe to 1 CPU/256Mi.
+This run does not establish a fixed whole-stack performance budget.
+
+**Still unqualified:** independent live readers throughout fault/recovery,
+external per-ID fsynced producer acknowledgement histories, continuous error/
+latency reports, native process fencing/survivor stability and complete
+post-fault replica repair. The November 14 Pod deletion results below remain
+historical and were not rerun as production proofs here. The alternate-policy
+failures remain failed. No new throughput, availability or acknowledged-loss
+claim is made from this checkpoint-only backfill.
 
 ## What it demonstrates
 
@@ -88,6 +172,7 @@ The two clusters run on the same kind nodes with ephemeral storage. They model s
 | `producer/` | C++ producer and protobuf schema; `protoc` runs in the Docker build |
 | `consumer/` | Rust read-committed consumer and protobuf generation |
 | `jobs/` | Kubernetes Jobs for producer and consumer |
+| `checkpoint_probe.py`, `consumer/src/checkpoint.rs` | Native checkpoint sampling and Rust cutover barrier |
 
 Use `make status`, `make logs`, and `make logs-mm2` to inspect the two clusters and replication workers. The kind context is always `kind-kafka-cross-cluster-mirroring`.
 
@@ -99,3 +184,8 @@ Use `make status`, `make logs`, and `make logs-mm2` to inspect the two clusters 
 - [Apache Kafka 4.3.2 MirrorSourceConnector](https://github.com/apache/kafka/blob/4.3.2/connect/mirror/src/main/java/org/apache/kafka/connect/mirror/MirrorSourceConnector.java)
 - [Apache Kafka 4.3.2 MirrorCheckpointTask](https://github.com/apache/kafka/blob/4.3.2/connect/mirror/src/main/java/org/apache/kafka/connect/mirror/MirrorCheckpointTask.java)
 - [Confluent Cluster Linking](https://docs.confluent.io/platform/current/multi-dc-deployments/cluster-linking/index.html)
+
+Checkpoint implementation references: [Kafka 4.3.2 native formatter](https://github.com/apache/kafka/blob/4.3.2/connect/mirror/src/main/java/org/apache/kafka/connect/mirror/formatters/CheckpointFormatter.java),
+[native checkpoint schema](https://github.com/apache/kafka/blob/4.3.2/connect/mirror-client/src/main/java/org/apache/kafka/connect/mirror/Checkpoint.java),
+[checkpoint freshness and group synchronization](https://github.com/apache/kafka/blob/4.3.2/connect/mirror/src/main/java/org/apache/kafka/connect/mirror/MirrorCheckpointTask.java),
+and [console consumer error/idle-timeout handling](https://github.com/apache/kafka/blob/4.3.2/tools/src/main/java/org/apache/kafka/tools/consumer/ConsoleConsumer.java).

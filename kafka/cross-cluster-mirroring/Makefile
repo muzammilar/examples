@@ -38,7 +38,8 @@ else
 $(error MM2_REPLICATION_POLICY must be identity or default)
 endif
 
-.PHONY: kind-up kind-cluster namespace operator clusters mirror up images topic test verify-mirror chaos-mm2-worker chaos-broker-disk-loss chaos-target-broker status logs logs-mm2 cli down kind-down
+.NOTPARALLEL:
+.PHONY: check-controls checkpoint-proof kind-up kind-cluster namespace operator clusters mirror up images topic test verify-mirror chaos-mm2-worker chaos-broker-disk-loss chaos-target-broker status logs logs-mm2 cli down kind-down
 
 kind-up: kind-cluster
 
@@ -112,15 +113,17 @@ verify-mirror:
 	RUN_ID=$(RUN_ID) COUNT=$(COUNT) TOPIC=$(TOPIC) GROUP_ID=dr-$(RUN_ID) BOOTSTRAP_SERVERS=$(SOURCE_ALIAS)-kafka-bootstrap:9092 envsubst < jobs/consumer.yaml | $(KUBECTL) apply -f -
 	$(KUBECTL) wait job/kafka-consumer --for=condition=complete --timeout=30m
 	$(KUBECTL) logs job/kafka-consumer
-	@for i in $$(seq 600); do \
-		offsets=$$($(KUBECTL) exec $(TARGET_ALIAS)-$(TARGET_ALIAS)-brokers-3 -c kafka -- /opt/kafka/bin/kafka-consumer-groups.sh --bootstrap-server $(TARGET_ALIAS)-kafka-bootstrap:9092 --describe --group dr-$(RUN_ID) 2>/dev/null || true); \
-		echo "$$offsets" | awk -v topic='$(TARGET_TOPIC)' '$$2 == topic && $$4 ~ /^[0-9]+$$/ && $$6 ~ /^[0-9]+$$/ { partitions++; if ($$6 > 1) behind = 1 } END { exit !(partitions == 6 && !behind) }' && { echo 'MirrorMaker 2 synchronized all six consumer partition offsets to the target tail'; exit 0; }; \
-		sleep 1; \
-	done; echo 'MirrorMaker 2 consumer offset checkpoints did not reach the expected offsets' >&2; exit 1
+	$(MAKE) checkpoint-proof TOPIC=$(TOPIC) RUN_ID=$(RUN_ID)
 	-$(KUBECTL) delete job kafka-consumer --ignore-not-found
 	RUN_ID=$(RUN_ID) COUNT=$(COUNT) TOPIC=$(TARGET_TOPIC) GROUP_ID=validate-$(RUN_ID) BOOTSTRAP_SERVERS=$(TARGET_ALIAS)-kafka-bootstrap:9092 envsubst < jobs/consumer.yaml | $(KUBECTL) apply -f -
 	$(KUBECTL) wait job/kafka-consumer --for=condition=complete --timeout=30m
 	$(KUBECTL) logs job/kafka-consumer
+
+check-controls:
+	PYTHONPYCACHEPREFIX=$(CURDIR)/results/pycache python3 -m unittest test_checkpoint_probe.py
+
+checkpoint-proof: images check-controls
+	python3 checkpoint_probe.py --topic "$(TOPIC)" --target-topic "$(TARGET_TOPIC)" --group "dr-$(RUN_ID)" --image "$(CONSUMER_IMAGE)"
 
 chaos-mm2-worker: mirror images topic
 	-$(KUBECTL) delete job kafka-consumer kafka-producer --ignore-not-found

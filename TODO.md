@@ -59,6 +59,9 @@ not remove the longer-term requirements above.
   failed with 10,427 extra ambiguous physical copies and zero ACK loss; full
   binary evidence and exact failed-state fingerprints are preserved. Extended
   operator tests and isolated root-cause reproduction remain in the audit.
+- [x] Replace MirrorMaker's numeric lag tolerance with native checkpoint decoding
+  and Rust exact-offset/idle-group/ISR/EOF checks; fresh cutover checked 4,000,000
+  unique orders. Live chaos and per-ID ACK-history work remains below.
 - [ ] Close independent-reader and preserved-history gaps in the recent relational,
   search, object-storage, messaging and archive examples identified by the audit.
 - [ ] Extend applicable native repair, scaling, rolling changes, dependency/quorum

@@ -1,3 +1,6 @@
 .git
 **/build
 **/target
+results/
+.build/
+__pycache__/
