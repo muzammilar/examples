@@ -402,6 +402,10 @@ Before adding or materially changing an example for a technology, and before des
   includes producers, consumers and database clients that model the application
   and generate the measured workload. Pick the language and maintained client
   library that fit the system; explain any necessary exception in the README.
+- Avoid writing Java unless the integration requires it (for example, a Kafka
+  Connect extension). Prefer the languages above for application code and suitable
+  non-Java languages for test/inspection tools. Using a system's existing JVM-based
+  command-line tools does not require writing custom Java.
 - Management and controller/testing code may use Go, Rust, C++, Python or any
   other suitable language. Python is optional, not the default requirement.
   Choose the language that fits the example and its existing tooling; this covers
