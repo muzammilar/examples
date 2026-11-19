@@ -45,6 +45,13 @@ not remove the longer-term requirements above.
 - [x] Qualify additional Greptime operator drain/PDB, partitions, upgrade and pressure:
   all 15 distinct cases passed across the initial run/resumed targets; 627,200 ACK
   rows reconciled, four failed attempts preserved and node-IP recovery fixed.
+- [x] Qualify the pgvector and LanceDB independent-reader/history backfills with
+  native full-body/vector proofs, live process/reopen recovery, retained setup and
+  archived evidence. pgvector also proves synchronous-standby crash, empty-disk
+  clone and rebuilt-copy service. Extended cases remain in the audit; LanceDB's
+  shared query workers are not independent database replicas.
+- [x] Complete the exact Vespa single-node serial recovery aggregate and scoped
+  cleanup; the flat aggregate and extended matrices remain in the audit.
 - [ ] Close independent-reader and preserved-history gaps in the recent relational,
   search, object-storage, messaging and archive examples identified by the audit.
 - [ ] Extend applicable native repair, scaling, rolling changes, dependency/quorum

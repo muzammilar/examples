@@ -34,6 +34,8 @@ recorded with per-file SHA-256 hashes in the manifest. Text fields include sourc
 ID, locale, name, description, brand and color; mutable integer fields are tenant,
 stock, price in cents and version. Full vector SHA-256 is
 `de5d75f052a2449a282e8683088caf3d8d232a5fc1d920ac7e902b6a6e9f64a3`.
+Prepared metadata contains **zero NULLs**, **47,043 empty descriptions**, and
+**912–1,078 products per tenant** across the 100 tenants.
 Input bytes exclude cache/downloads, duplicate NumPy files and database/index/WAL
 storage. ESCI product/tenant distributions are not a general skew benchmark.
 

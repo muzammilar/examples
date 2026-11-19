@@ -96,6 +96,11 @@ Prefer a small Makefile as the documented entry point for a runnable deployment 
 
 Every runnable example README must begin its Quick start with a numbered, copy-pasteable lifecycle sequence. For a kind example, use `make kind-up`, `make up`, `make test`, `make down`, then `make kind-down`. For a Docker Compose example, use `make docker-up`, `make up`, `make test`, `make down`, then `make docker-down`. Put one command per numbered step and briefly say what it does. `kind-up`/`docker-up` prepares the cluster or service infrastructure; `up` installs or configures the example; `down` removes the example from that infrastructure; `kind-down`/`docker-down` destroys the infrastructure and its example-owned state. Keep additional scenario commands in a separate section.
 
+When testing repeated setup or retained-state recovery, invoke repeated Make
+commands separately. Make executes a target only once per invocation:
+`make up test up` does not run setup twice. Preserve evidence of the second
+invocation and verify existing acknowledged state instead of reloading it.
+
 Each Kubernetes example owns a separate kind cluster and context. Never share a
 kind cluster between different systems or examples, and never use an unrelated
 existing cluster. `make kind-up` creates that example's cluster/context in its own
@@ -203,6 +208,10 @@ observations during the operation.
   storage, fail closed on Docker/CRI/transport errors. If old container metadata is
   gone, require a healthy native runtime listing that proves its exact ID is absent;
   never interpret a nonzero inspection command as successful fencing.
+- For graceful shutdown, verify the effective image/Compose stop signal matches
+  the actual PID 1. Replacing an image's entry point can change the required signal.
+  Require a clean exit without timeout escalation; save stopped/recovered process
+  inspection before assertions so a failed shutdown keeps its diagnostic evidence.
 - Wait for native catch-up, log replay, repair, rebalancing and restored redundancy,
   as applicable. A Ready pod, successful survivor read or desired replica count is
   not enough. Verify the repaired member serves data; where supported, fail a
