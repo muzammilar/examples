@@ -222,7 +222,7 @@ class Adapter:
         budget = 50100
         eligible = {
             int(row["id"])
-            for row in self.fixture.products
+            for row in self.rows()
             if row["tenant"] == tenant
             and row["stock"] > 0
             and row["price_cents"] <= budget

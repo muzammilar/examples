@@ -5,5 +5,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends python3-venv cu
  && rm -rf /var/lib/apt/lists/* \
  && install -d -o postgres -g postgres /var/lib/postgresql/patroni
 COPY patroni.yml /etc/patroni.yml
+STOPSIGNAL SIGTERM
 USER postgres
 ENTRYPOINT ["/opt/patroni/bin/patroni", "/etc/patroni.yml"]
