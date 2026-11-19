@@ -73,6 +73,7 @@ To add or test a system, follow [`FORMAT.md`](FORMAT.md): folder layout, Make ta
 | StarRocks | [`starrocks/`](starrocks) | Mutable analytics | [starrocks.io](https://www.starrocks.io/) | [StarRocks/starrocks](https://github.com/StarRocks/starrocks) |
 | Tarantool | [`tarantool/`](tarantool) | In-memory DB + Lua | [tarantool.io](https://www.tarantool.io/) | [tarantool/tarantool](https://github.com/tarantool/tarantool) |
 | TiDB | [`tidb/`](tidb) | Distributed SQL | [pingcap.com](https://www.pingcap.com/tidb/) | [pingcap/tidb](https://github.com/pingcap/tidb) |
+| Tigris (planned) | [`tigris/`](tigris) | Managed S3 resilience / object-storage comparison | [tigrisdata.com](https://www.tigrisdata.com/) | [SDKs](https://github.com/tigrisdata/storage) |
 | TigerBeetle | [`tigerbeetle/`](tigerbeetle) | Ledger / OLTP | [tigerbeetle.com](https://tigerbeetle.com/) | [tigerbeetle/tigerbeetle](https://github.com/tigerbeetle/tigerbeetle) |
 | TiKV | [`tikv/`](tikv) | Key-value | [tikv.org](https://tikv.org/) | [tikv/tikv](https://github.com/tikv/tikv) |
 | TimescaleDB | [`timescaledb/`](timescaledb) | Time-series | [tigerdata.com](https://www.tigerdata.com/timescaledb) | [timescale/timescaledb](https://github.com/timescale/timescaledb) |

@@ -224,6 +224,15 @@ Planned as a `mysql/` folder, mirroring the Postgres section with the same `orde
 
 ## Lakehouse and object storage
 
+- [ ] [`tigris/`](tigris/): resilient S3 application example and comparison with
+  Garage, SeaweedFS, RustFS and Ceph RGW; optional managed baselines S3/R2.
+  Use identical bodies, checksums, request mixes and client budgets; measure
+  single/multipart upload, range reads, conditional writes, visibility and
+  interrupted-upload recovery under independent live writers/readers. Account
+  and isolated bucket required. Distinguish managed-service observations from
+  local disk/node repair proofs; verify deployment availability before promising
+  self-hosted Tigris or provider-internal fault injection. Planned, not run.
+
 - [ ] `hoglake-local`: [PostHog Hoglake](https://github.com/PostHog/hoglake), a Postgres-native lakehouse catalog; investigate its native Trino connector and catalog recovery. Documentation backlog only; no implementation in the current Iceberg + Trino + MinIO work.
 - [x] `iceberg-trino-minio`: persistent Iceberg REST fixture + 4 MinIO nodes + Trino 484 coordinator/3 workers; million-row reconciliation, worker task retry, storage-node failure and catalog restart.
 - [x] `iceberg/multi-system`: five SeaweedFS-backed DuckDB/ClickHouse data paths, Spark compaction, safe archive handoffs and a three-shard/three-copy native serving cache with replica recovery.

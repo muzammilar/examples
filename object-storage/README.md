@@ -147,3 +147,10 @@ checksums/scrubbing, disk replacement, replication RPO and recovery cost.
 - [Garage production guide](https://garagehq.deuxfleurs.fr/documentation/cookbook/real-world/), [S3 compatibility](https://garagehq.deuxfleurs.fr/documentation/reference-manual/s3-compatibility/).
 - [RustFS 1.0.5](https://github.com/rustfs/rustfs/releases/tag/1.0.5), [reported legacy repair issue](https://github.com/rustfs/rustfs/issues/9370), [reported single-disk stalls](https://github.com/rustfs/rustfs/issues/9365).
 - [Ceph maintained releases](https://docs.ceph.com/en/latest/releases/), [S3 API](https://docs.ceph.com/en/tentacle/radosgw/s3/).
+
+## Planned managed S3 comparison
+
+[Tigris resilient-application experiments](../tigris/) will compare identical
+S3 data and request mixes with the four stores above. Keep managed WAN/API
+measurements separate from local disk-loss/native-repair results and disclose
+unknown provider resource budgets. This comparison is planned, not measured.
