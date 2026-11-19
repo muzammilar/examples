@@ -4,9 +4,20 @@ name: kafka-strimzi-jbod
 nodes:
   - role: control-plane
     image: kindest/node:v1.34.0
+    extraMounts:
+      - hostPath: ${WITNESS_ROOT}
+        containerPath: /var/lab/witness
+      - hostPath: ${CONTROL_ROOT}
+        containerPath: /var/lab/control
   - role: worker
     image: kindest/node:v1.34.0
+    labels:
+      lab.example/role: data
   - role: worker
     image: kindest/node:v1.34.0
+    labels:
+      lab.example/role: data
   - role: worker
     image: kindest/node:v1.34.0
+    labels:
+      lab.example/role: data

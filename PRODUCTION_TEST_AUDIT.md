@@ -180,8 +180,24 @@ READMEs retain dated execution results and limitations.
   left zero owned resources/build tags. Inline decoding remains native; metadata
   filenames alone do not prove independent inline bytes. Extended cases remain
   explicitly unrun below.
-- Kafka [Strimzi JBOD](kafka/strimzi-jbod/) and
-  [mirroring](kafka/cross-cluster-mirroring/): private kubeconfig export/cleanup
+- Kafka [Strimzi JBOD](kafka/strimzi-jbod/): independent live C++/Rust actors,
+  fsynced intent/ACK/offset witnesses and retained histories; native role discovery,
+  positive CRI process fencing, ISR/directory-lag barriers and repaired-broker
+  preferred-leader full replay. The serial million-ACK correctness/broker/controller/
+  write-denied-directory aggregate passed with a 300-second delivery budget:
+  **4,004,096 new ACKs**, zero ACK loss/corruption. Three fresh workload-process
+  trials checked **6,004,096 ACKs**, median **33,352.06 ACKs/s**; bounded warm-client
+  diagnostics, not Kafka capacity or a competitor ranking. A 10-second-budget
+  disk test remains **FAILED**: 10,427 extra physical copies among ambiguous sends,
+  zero lost/corrupt/duplicated acknowledged orders. All 593,266 failed-topic binary
+  records agree with independent Java/Rust fingerprints; later tests compare its
+  exact failed physical state, never relabel the original run as passing. Three
+  earlier harness failures remain recorded. Retained setup preserved all six
+  Kafka processes and both directories, followed by full history readback. Full
+  cleanup/hash-verified evidence: 1,535 files under ignored
+  `kafka/strimzi-jbod/results/archives/45ac3389ca4f4b4bb9822a096685bf3d/`.
+  Extended operator/failure cases and an isolated short-timeout reproducer remain.
+- Kafka [mirroring](kafka/cross-cluster-mirroring/): private kubeconfig export/cleanup
   corrected; evaluated Make recipes prove the exported example-local path. This
   configuration check does not claim a fresh broker/fault lifecycle.
 
@@ -260,7 +276,7 @@ Closing one fault case does not close the entire deployment matrix.
 | Garage | Example-owned `control.py`, independent `traffic.py`, preserved histories and native ring/block auditor | Core reader/history/survivor backfill and four controller-managed fault cases qualified above. Peer partitions, native quorum loss, topology/resource changes, rolling upgrades, metadata-disk loss, pressure, physical EIO/power loss and independent restore remain unrun. |
 | RustFS | Example-owned `control.py`, independent `traffic.py`, preserved histories, native canonical heal and read-only slot/fingerprint auditor | Core reader/history/survivor backfill, full four-case fresh fault aggregate, benchmark, corrected cold reopen and two fresh lifecycles qualified above. Peer partitions, quorum loss, pool/resource changes, upgrades/rollback, pressure, physical EIO/bitrot/power loss and independent restore remain unrun. |
 | Ceph | Example-owned `control.py`, independent `traffic.py`, preserved SDK histories and `native/` PG/deep-scrub/process auditor | All four core faults and warm benchmark qualified with independent live readers, preserved histories, native OSD UUID/serial fencing and all 17 daemon process witnesses. Cold reopen, retained-state setup, fresh default lifecycle, archived witness integrity and scoped cleanup also qualified above. Isolated daemon faults, quorum/partitions, pressure, topology changes, upgrades and independent restore remain unrun. |
-| Kafka Strimzi JBOD | Make chaos recipes, C++ producer/Rust consumer | Consumer starts after producer/fault, so continuous read availability and lag are unobserved. Topics reset per case. Add live consumer, durable external delivery/offset history and native ISR/rebuild barriers. |
+| Kafka Strimzi JBOD | Independent live C++/Rust actors, external histories, native CRI/ISR/directory proof and repaired-leader replay | Core and three fresh-process benchmark trials qualified above; short-deadline ambiguity/duplicate run remains failed with exact retained state. Still add scaling/vertical changes, operator reconciliation/outage, rolling/node/drain/PDB, partitions/quorum, upgrades, pressure, persistent PVC replacement and independent restore; isolate the duplicate reproducer. |
 | Kafka mirroring | Make orchestration, MirrorMaker manifests, producer/consumer | Existing migration and worker/disk cases need preserved cross-phase witnesses, native ISR/offset translation/backlog repair proof and survivor stability. |
 | Kafka PostgreSQL enrichment | Make demo, producer/consumer and Go processor | Two-million-message pipeline correctness is not a fault matrix. Add broker, Connect worker/task, processor and PostgreSQL outages with live traffic; quantify duplicate delivery, CDC/cache freshness and backlog. |
 | StarRocks operator/Compose, Qdrant TurboQuant | Operator `operations.py`, Compose/Qdrant `fault.py`, independent live observers and reconciler | Existing role/disk/operator cases already have stronger observation paths. Do not duplicate them mechanically. Qualify pinned upgrades, independent restore, pressure and remaining topology/partition cases separately; no fresh rerun in this audit. |

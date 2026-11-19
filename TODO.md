@@ -52,6 +52,13 @@ not remove the longer-term requirements above.
   shared query workers are not independent database replicas.
 - [x] Complete the exact Vespa single-node serial recovery aggregate and scoped
   cleanup; the flat aggregate and extended matrices remain in the audit.
+- [x] Qualify Kafka Strimzi independent readers/preserved ACK histories, native
+  process and directory recovery, repeated setup and full cleanup. The default
+  serial aggregate checked 4,004,096 new ACKs; three workload trials checked
+  6,004,096 ACKs (median 33,352.06 ACKs/s). The short-deadline disk run remains
+  failed with 10,427 extra ambiguous physical copies and zero ACK loss; full
+  binary evidence and exact failed-state fingerprints are preserved. Extended
+  operator tests and isolated root-cause reproduction remain in the audit.
 - [ ] Close independent-reader and preserved-history gaps in the recent relational,
   search, object-storage, messaging and archive examples identified by the audit.
 - [ ] Extend applicable native repair, scaling, rolling changes, dependency/quorum

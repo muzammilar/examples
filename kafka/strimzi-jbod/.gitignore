@@ -1,2 +1,3 @@
 /producer/build/
 /consumer/target/
+/__pycache__/

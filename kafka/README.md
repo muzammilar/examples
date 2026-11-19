@@ -13,10 +13,19 @@ Website: [kafka.apache.org](https://kafka.apache.org/) | GitHub: [apache/kafka](
 
 ## Benchmarks
 
-No Kafka throughput benchmark has been run in this repository.
+| Example | Date / scope | Result |
+|---|---|---|
+| [Strimzi JBOD](strimzi-jbod/#benchmark) | 2026-11-19, one-host kind, 3 fresh C++/Rust workload processes, at least 2 million ACKs/trial | Median 33,352.06 ACKs/s, 2.209 MiB/s; witness/validation costs included, warm retained Kafka, not a saturation or competing-product comparison |
+
+The Strimzi serial correctness/broker/controller/directory-write-failure aggregate
+reconciled 4,004,096 new ACKs without loss/corruption at a 300-second delivery
+budget. A separate 10-second-deadline disk run remains failed: 10,427 extra physical
+copies among ambiguous sends, with zero lost/corrupt/duplicated ACKs. Its complete
+binary records and independent fingerprints are preserved. See the example for
+resource budgets, latency boundaries and unrun operator cases.
 
 ## Known issues
 
-- The Strimzi JBOD walkthrough uses ephemeral volumes and demonstrates disk reassignment, not persistence or production disk performance.
+- Strimzi uses ephemeral EmptyDir volumes: Pod recreation loses local copies, container restart retains them. Directory write denial is not physical device failure. The short-deadline duplicate boundary above remains a failed experiment with an unisolated root cause.
 - The Kafka Connect pipeline runs without TLS or SASL on a local Compose network and uses demo-only PostgreSQL credentials.
 - Kafka Connect connector plugins use JVM APIs. The application join runs in a separate Go service; PostgreSQL CDC itself is handled by the Debezium connector.

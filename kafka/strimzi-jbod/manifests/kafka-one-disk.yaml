@@ -10,10 +10,30 @@ spec:
   replicas: 3
   roles:
     - controller
+  template:
+    pod:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: lab.example/role
+                    operator: In
+                    values: [data]
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  strimzi.io/cluster: kafka
+                  strimzi.io/pool-name: controllers
+              topologyKey: kubernetes.io/hostname
   resources:
     requests:
       cpu: 500m
       memory: 1Gi
+    limits:
+      cpu: "1"
+      memory: 1536Mi
   jvmOptions:
     -Xms: 512m
     -Xmx: 512m
@@ -32,10 +52,30 @@ spec:
   replicas: 3
   roles:
     - broker
+  template:
+    pod:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: lab.example/role
+                    operator: In
+                    values: [data]
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  strimzi.io/cluster: kafka
+                  strimzi.io/pool-name: brokers
+              topologyKey: kubernetes.io/hostname
   resources:
     requests:
       cpu: 500m
       memory: 1Gi
+    limits:
+      cpu: "1"
+      memory: 1536Mi
   jvmOptions:
     -Xms: 512m
     -Xmx: 512m
@@ -65,6 +105,7 @@ spec:
       transaction.state.log.replication.factor: 3
       transaction.state.log.min.isr: 2
       auto.create.topics.enable: false
+      unclean.leader.election.enable: false
     template:
       pod:
         metadata:
@@ -75,6 +116,9 @@ spec:
       requests:
         cpu: 250m
         memory: 768Mi
+      limits:
+        cpu: "1"
+        memory: 1536Mi
   entityOperator:
     topicOperator: {}
     userOperator: {}

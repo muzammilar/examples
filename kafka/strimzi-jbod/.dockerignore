@@ -1,0 +1,6 @@
+results/
+.build/
+producer/build/
+consumer/target/
+**/__pycache__/
+.git/
