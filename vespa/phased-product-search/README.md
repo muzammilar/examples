@@ -321,9 +321,9 @@ resource samples and benchmark source are preserved under
 `results/production/cluster/previous-runs/94bb0099a92d4636bfebe6231e95437b/benchmarks/d5abf5b4a848463e8d0584fe8a89ffa8/`.
 
 Remaining qualification: the complete flat-cluster serial `test-production`
-target/retained setup and the expanded single-node aggregate invocation (all its
-individual cases ran). The sharded core matrix and retained setup passed as
-recorded below. Partitions/quorum loss, scaling/resource changes, upgrades,
+target/retained setup. The expanded single-node aggregate subsequently passed
+on 2026-11-19, as recorded below. The sharded core matrix and retained setup
+also passed. Partitions/quorum loss, scaling/resource changes, upgrades,
 bounded pressure/EIO and independent backup restore remain unrun.
 Historical results below apply to their original harness, not these new gates.
 
@@ -336,7 +336,8 @@ verified the existing fixture without deployment/feed/reset. **Six cases passed*
 acknowledged loss. Each live/final proof checked **100,000 bodies / 38.4 million
 float32 coordinates**. All final versions matched their retained witnesses.
 The later Makefile update includes SIGKILL in the single-node `test-production`
-sequence; that expanded command was not replayed as one invocation in this run.
+sequence; it was not replayed as one invocation in the 2026-11-18 run.
+The 2026-11-19 follow-up below closes that invocation gap.
 
 | Case | ACKs | Attempts | Ambiguous | Failed search / GET | Longest ACK / search / GET gap, seconds |
 |---|---:|---:|---:|---:|---:|
@@ -396,6 +397,36 @@ single-copy readiness, per-group sharded coverage, cgroup counter resets and
 physical rebuilt-member ACK identity/body/version. **17 host controls** pass;
 **10 container-side controls** include duplicate/missing IDs with matching shard
 totals. These synthetic controls do not qualify a live sharded deployment.
+
+### Single-node aggregate follow-up — 2026-11-19
+
+Executed the exact `MODE=single make docker-up up test-production` invocation,
+then `MODE=single make down docker-down`. All **five histories passed**:
+**35,144 ACKs / 43,530 attempted rows**, **8,386 ambiguous attempts**, no rejected
+updates and no detected acknowledged-version loss. Live and final native proofs
+checked every one of the **100,000 metadata bodies and 38.4 million float32
+coordinates** per export. No stale/wrong GETs, stale search hits or partial search
+bodies were observed. Ambiguous responses remain non-ACKs even if their bodies
+later appear.
+
+| Case | ACKs | Attempts | Ambiguous | Failed search / GET | Longest ACK / search / GET gap, seconds |
+|---|---:|---:|---:|---:|---:|
+| Baseline | 6,380 | 6,380 | 0 | 0 / 0 | 0.54 / 0.55 / 0.56 |
+| Correctness | 5,970 | 5,970 | 0 | 0 / 0 | 0.55 / 0.54 / 0.54 |
+| Retained-volume whole-stack reopen | 9,044 | 13,690 | 4,646 | 741 / 742 | 50.87 / 50.86 / 50.99 |
+| Whole-stack SIGKILL reopen | 8,260 | 12,000 | 3,740 | 723 / 723 | 41.80 / 41.82 / 41.89 |
+| Final correctness | 5,490 | 5,490 | 0 | 0 / 0 | 0.52 / 0.53 / 0.53 |
+
+These are offered-load recovery observations. ESCI encoding and later idle
+PostgreSQL infrastructure shared the Docker VM during this follow-up; no new
+capacity/comparative benchmark is claimed. Completion gaps include deliberate
+outage holds and client pacing, not an isolated native election measurement.
+
+Teardown archived and hash-verified **258 evidence files**, removed all owned
+Vespa containers/volumes/networks and preserved all **23 pre-existing volume
+identities**. The PostgreSQL project was left running. Earlier archives and failed
+reports remain intact. Evidence:
+`results/production/single/previous-runs/ec869129161548cb9d97c253955ec0d8/`.
 
 ### Sharded follow-up — 2026-11-18
 
