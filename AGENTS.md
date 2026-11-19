@@ -402,10 +402,12 @@ Before adding or materially changing an example for a technology, and before des
   includes producers, consumers and database clients that model the application
   and generate the measured workload. Pick the language and maintained client
   library that fit the system; explain any necessary exception in the README.
-- Controller/testing code may use any suitable language, including Go or Python:
+- Management and controller/testing code may use Go, Rust, C++, Python or any
+  other suitable language. Python is optional, not the default requirement.
+  Choose the language that fits the example and its existing tooling; this covers
   infrastructure orchestration, fault injection, recovery coordination, test
-  assertions, result collection and report generation need not use the same
-  language as the application. Keep this boundary clear; a workload generator is
+  assertions, result collection and report generation. These tools need not use
+  the application's language. Keep this boundary clear; a workload generator is
   application code even when invoked by `make test`.
 - Follow the language's established idioms, standard library, and ecosystem conventions. Prefer standard-library facilities for common tasks; use a focused, mature library when the standard library does not provide the needed capability.
 - Apply the database/system's own best practices as well as the language's. Read
