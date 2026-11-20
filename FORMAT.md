@@ -210,6 +210,10 @@ not become qualified merely because these requirements were added.
   disk baseline/peak/settled bytes, I/O and network alongside operation metrics.
   Include workload and dependencies as well as database roles; distinguish limits
   from measured use and whole-stack space amplification from compression ratio.
+- Performance benchmarks must explicitly report disk read/write bytes and rates,
+  read/write IOPS and I/O latency/queue depth where available. Distinguish disk
+  space from disk activity and logical/cached I/O from physical/device I/O; state
+  counter scope, sampling interval and unavailable measurements.
 - `bench/limits.sh apply CPUS MEM SERVICE…` caps containers with `docker update`; `restore` undoes it.
   Put the cap in every result.
 - Short/single runs are diagnostics, labeled as such. Comparative claims require
@@ -232,6 +236,10 @@ not become qualified merely because these requirements were added.
   recover, records lost), in a table. A claim without a number behind it ("fast", "scales well",
   "low latency") does not go in. Comparisons state both numbers and the ratio (e.g. "p99 8.1 ms
   vs 39.5 ms, 4.9x"). Every number carries its unit, including the first one in a pair or range.
+- Include measured time per operation in ms, µs or ns, not only throughput: state
+  operation type, timing scope, mean/percentiles, sample count and timer precision.
+  Separate batch duration and amortized per-record cost from actual record latency;
+  reciprocal concurrent throughput is not an operation-latency measurement.
 
 ## Licensed systems
 

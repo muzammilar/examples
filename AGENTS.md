@@ -421,6 +421,12 @@ gap rather than inventing estimates or retroactively claiming coverage.
 
 ### Performance and other production properties
 
+- Measure **disk read bytes, disk write bytes and disk I/O** in every performance
+  benchmark, separately from disk space usage. Report cumulative bytes and read/write
+  rates (bytes/s or MiB/s), read/write IOPS and I/O latency/queue depth where exposed,
+  per role and for the whole stack during each phase. State counter scope and
+  sampling interval; distinguish logical engine I/O, cache hits and physical/device
+  I/O. Record unavailable counters explicitly rather than treating them as zero.
 - Run correctness and recovery checks before performance tests. Measure baseline,
   degraded operation, repair/rebalance and recovered state at stated offered load,
   concurrency, batch sizes, data sizes and resource caps. Include saturation and
@@ -430,6 +436,14 @@ gap rather than inventing estimates or retroactively claiming coverage.
   end-to-end latency. State cold/warm caches, compression, retry policy, emulation,
   shared-host contention and run count; do not call a rate-limited fault workload
   or a tiny correctness fixture a capacity benchmark.
+- Measure **time per operation**, not just operations per second. Report elapsed
+  latency for each operation type in explicit **ms, µs or ns**, with mean and
+  supported percentiles, sample counts and timing scope. Use a monotonic clock and
+  state timer resolution/measurement overhead; nanosecond units do not imply
+  nanosecond accuracy. For batches, report request/batch duration and batch size;
+  any duration divided by record count is an amortized cost, not measured
+  individual-record latency. Do not infer latency from reciprocal throughput under
+  concurrency. Keep successful, failed and retried-operation timings distinct.
 - Compare systems on the same machine class: CPU model/architecture and count,
   RAM, storage type/capacity/IOPS limits and network settings. Match per-node
   resources for comparable roles and report the whole-stack budget, including
