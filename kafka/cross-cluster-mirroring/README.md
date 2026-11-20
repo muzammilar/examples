@@ -10,7 +10,7 @@ Two independent Strimzi-managed KRaft Kafka clusters run in one local kind clust
 4. `make down` — remove both Kafka clusters, MirrorMaker 2, the operator, and the namespace.
 5. `make kind-down` — delete kind and the example's local client images.
 
-Prerequisites: Docker, `make`, `kind`, `kubectl`, Helm, Python 3, `envsubst`, and `grep`. Producer and consumer images build with Docker; host C++, protobuf, and Rust toolchains are not required.
+Prerequisites: Docker, `make`, `kind`, `kubectl`, Helm, Python 3.9+, `envsubst`, and `grep`. Producer and consumer images build with Docker; host C++, protobuf, and Rust toolchains are not required.
 
 Every run uses a unique topic such as `orders-20261114070120` and run ID, so it does not need to erase existing topic data. Override `COUNT`, `TOPIC`, or `RUN_ID` with Make variables. The C++ producer accepts counts up to 2,000,000. The default test validates 4,000,000 unique orders across the initial source batch and producer cutover batch, and also validates the mirrored copy of the initial batch.
 
@@ -18,14 +18,151 @@ Make exports the example-owned `results/kubeconfig` before kind creation and
 removes it at `kind-down`; kubectl and Helm always specify the full kind context.
 The default user context is not changed.
 
-## Failure exercises
+## Live recovery tests
 
-Run these after `make up`. Each one starts MM2, continuously produces the full configured workload while injecting the fault, then validates the replica and consumer offset checkpoint.
+Run these after `make up`; the source writer and **independent east and west Rust
+readers** remain live before injection, throughout native recovery and afterward.
+`COUNT` is a minimum acknowledged count, default **2,000,000**; the supported range
+is 1,000,000–2,000,000. A final in-flight batch can exceed it by 1,024 records.
+`LIVE_RATE=1000` is the post-warmup offered upper bound, not measured capacity.
+The producer first bursts 100,000 orders, continues at that bound without pausing,
+then finishes the minimum only after recovery and renewed reader progress.
 
-- `make chaos-mm2-worker` — delete one of the two MM2 worker pods after production starts. Kafka Connect rebalances the connector tasks; the other worker keeps the Connect cluster available. The test checks the producer, waits for both workers to return, checks synced group offsets, and validates every mirrored order.
-- `make chaos-broker-disk-loss` — delete broker 3 on `west` while the source is producing and MM2 is writing to the target. Because the example uses ephemeral storage, replacing the pod also loses that broker's local Kafka data. Strimzi recreates the broker and Kafka restores replicas from the other brokers; the test checks offsets and validates the full mirrored workload. `make chaos-target-broker` is an alias.
+| Target | Operation |
+|---|---|
+| `make test-live-mirror` | Establish the witnessed two-cluster correctness baseline. |
+| `make chaos-mm2-worker` | Discover a running source-task owner and SIGKILL its real container process. Prove old-process exit, replacement identity, restored tasks and stable unrelated containers. |
+| `make chaos-target-broker` | Discover the actual west partition-zero leader, SIGKILL it, retain its Pod/data volume, then verify native catch-up. Reorder preferred replicas and elect the recovered broker leader for all six new-topic partitions before complete replay. |
+| `make test-production` | Serial baseline → worker crash → retained-volume broker crash; stop on any failure. The three component targets were executed individually in that order; the aggregate invocation has not been rerun. |
+| `make chaos-broker-disk-loss` | Currently exits nonzero: the replacement run was interrupted and remains unqualified. Its unfinished implementation stays off main. |
 
-The workload uses idempotent `acks=all` producer writes. MM2's source connector is configured for exactly-once source support and reads only committed records; the Rust validator uses `read_committed`. Group offsets are checkpointed every 5 seconds and applied on the target only while that target group is inactive. This is asynchronous: failover between checkpoints can replay records from the previous checkpoint. The test waits for a native checkpoint proof before promoting the target consumer.
+Live qualification currently requires identity replication policy, two MM2 workers
+and three source tasks. The separate cutover/configuration experiments below keep
+their existing knobs. The recovery tests validate all six partitions, RF=3/ISR=3,
+every native log directory's replica lag, distinct metadata cluster IDs, three
+caught-up voters per cluster and running Connect tasks. A Ready Pod alone cannot
+pass. Source ACK partition/offset/body witnesses are checked against replay; west
+must preserve the partition and exact bytes while using its own physical offsets.
+Duplicate logical records at different offsets fail. Application mutation retries
+are disabled; SDK admission retries, ambiguous responses and read errors remain
+separate recorded outcomes.
+
+The C++ producer fsyncs intents before admission and records ACK/rejected/ambiguous
+outcomes. Readers fsync observed IDs, hashes, timestamps, positions and errors
+before committing explicit offsets. Their journals and phase markers live under
+ignored **host-backed** `results/production/`, mounted only into the owned kind
+control plane; broker/worker process failures cannot delete them. They are not an
+independent backup against host/disk loss. Every successful case replays earlier
+histories on both clusters instead of resetting their data. Cleanup refuses an
+unqualified history. Preserve the witness and diagnose failed cases before retrying.
+
+`kind-config.json` is the tracked topology template. `make kind-up` substitutes the
+owned host witness path into ignored `results/kind-replication.json`; it records
+and checks exact Docker node identities and the mount. It refuses to adopt an
+existing cluster without that receipt. Retire a pre-witness cluster through its
+previous lifecycle before upgrading; do not delete receipts to bypass ownership.
+
+### Executed recovery results — 2026-11-19
+
+All three completed cases used **2,001,024 distinct orders / 138,960,570 serialized
+protobuf bytes (132.523 MiB)** each: **6,003,072 acknowledged orders** cumulatively.
+Both clusters' complete readbacks found **zero missing/corrupt orders**, zero
+ambiguous producer outcomes and zero duplicate live deliveries. All earlier ACK
+histories were reconciled after each completed operation.
+
+| Case | Source ACKs | Source ACK callback p50 / p99 (ms) | Process-restart barrier (s) | Native recovery barrier (s) |
+|---|---:|---:|---:|---:|
+| Baseline `b007c649907a4b2ab4b606aec58d5157` | 2,001,024 | 13.541 / 905.372 | — | — |
+| MM2 worker `ca829246c516404081f37645b9bebe8e` | 2,001,024 | 12.500 / 753.505 | 63.396 | 76.415 |
+| West broker `8d56f48ba3484710b85700cd5b439d60` | 2,001,024 | 15.880 / 898.947 | 24.264 | 37.303 |
+
+Times begin at the controller's fault marker. Broker recovery was followed by
+preferred-leader promotion; the recovered copy served all six partitions at
+**72.569 s**. These are observed barriers, including CLI startup/polling, not exact
+election instants. Progress polling is approximately 1 second; a full native sweep
+also runs six JVM inspection commands. Election and catch-up were not independently
+timed. Buffered completions can arrive after injection; they do not prove an endpoint
+remained available.
+
+| Case | East creation→observation p50 / p99 (ms) | West creation→observation p50 / p99 (ms) | West poll / watermark errors |
+|---|---:|---:|---:|
+| Baseline | 14912.411 / 31789.825 | 17532.912 / 30370.457 | 0 / 0 |
+| MM2 worker | 9271.098 / 27063.035 | 11208.931 / 29074.734 | 0 / 0 |
+| West broker | 18929.488 / 38064.607 | 20256.985 / 32668.115 | 2 / 5 |
+
+Each message percentile uses 2,001,024 successful observations. Creation→observation
+includes intent fsync, producer/SDK queues, replication and observer backlog; it is
+not isolated MM2/server execution latency. SDK message polls can return prefetched
+records and are not network query latency. The broker case's two failed polls had
+p50/p99 **61.664/62.191 ms**; five failed watermark requests had **1000.880/1001.073 ms**.
+Those tiny error samples describe the observed requests, not established tail
+percentiles. The largest west completion gap was **9.392 s**; per-partition gaps and
+before/during/recovery histograms remain in each case's raw report. Successful
+watermark-request p50/p99 were **2.307/476.024 ms** in that case (179 samples).
+
+The mixed warmup/steady/final-burst source ACK windows measured **18,216.11**,
+**13,359.08** and **12,562.60 ACK/s**, respectively, between each first and last ACK.
+These include deliberate rate limits and application/witness costs; they are
+recovery-workload diagnostics, not Kafka capacity, cold-cache measurements or a
+three-trial comparative benchmark. No competitor ranking is established.
+
+Dataset: four non-null protobuf fields; unique run-scoped order IDs (also Kafka
+keys), ten round-robin customers, integer amounts from 1,000–5,999 cents, and actual
+creation timestamps. The run UUID and every intended body's SHA-256/byte length
+are retained. No external corpus or probabilistic generator is used. Physical
+compressed Kafka size, peak CPU/RSS and whole-stack peak memory were not measured
+in these runs; do not infer them from serialized payload bytes or configured caps.
+
+Platform: Apple M4 Pro (14 cores, 48 GiB host RAM), Docker 29.5.3 aarch64 VM with
+11 CPUs and 26,216,296,448 bytes RAM. Shared virtual disk/kind bridge, no IOPS or WAN
+limits, one control plane/three workers. Each controller is capped at 1 CPU/1 GiB,
+each broker at 1 CPU/1536 MiB, each MM2 worker at 1 CPU/1 GiB; Kafka heaps stay
+256 MiB. Producer: 1 CPU/512 MiB; each live reader: 1 CPU/1 GiB; replay verifier:
+2 CPUs/2 GiB, serial across sides/histories. These are shared-host limits, not
+independent machines or dedicated reserved cores; operator/entity services and
+Kubernetes overhead are additional costs.
+
+### Failed and pending runs
+
+- Setup `bc11fbef4c9a4a3f874fd140b494898b` remains **failed**: Connect status inspection
+  through the Kubernetes service proxy timed out before any workload started.
+  A separate read-only receipt proves no workload Jobs/start gates/journals and
+  all six source/target low/high offsets zero. Later cases recheck that exact empty
+  state without converting the failed experiment into a pass. Strimzi's REST
+  NetworkPolicy permits MM2 peers and the operator; inspection now uses the actual
+  MM2 container's loopback endpoint without broadening its policy.
+- Empty-storage run `45ec30c4317447b19c9fc35798b08bc6` remains **failed/unqualified**:
+  after native rebuild and preferred-leader promotion, a `kafka-log-dirs.sh`
+  inspection exited **139**, followed by the reported Docker crash. Full final
+  reconciliation did not complete; acknowledged loss is **unknown** for this run.
+  Preserve its host journals and diagnose after Docker returns. It is not evidence
+  of a Kafka root cause, successful disk recovery or a physical-device failure.
+- The witness-backed full teardown/recreation sequence and new image-ownership
+  cleanup have not been live-qualified after the interruption. Cleanup's image
+  identity/refusal behavior has offline unit coverage. The prior completed
+  cutover fixture was normally removed before adding the host witness mount.
+- Further fault domains remain unrun: source-cluster loss/unplanned promotion,
+  quorum/partitions, node outage, drain/PDB, operator outage/reconciliation, scaling,
+  upgrades, pressure, independent restore, saturation/soak and fair comparisons.
+
+### Local workload source
+
+`replication-producer` is a repository-tracked symlink to
+`../strimzi-jbod/producer`. `prepare_replication.py` materializes its tracked files
+and this example's local `replication-observer/` into ignored `.build/replication/`
+using hard links, with copies when unsupported. Docker builds that local context;
+no sibling Makefile, generated file or previous lab state is used. Both languages
+use **librdkafka 2.12.1**. The C++ application uses C++20/CMake/protobuf and the Rust
+observer uses Cargo/prost/serde/flate2/SHA-256. Protobuf is compiled in Docker.
+Docker builds executed C++ CTest (one test group) and seven Rust test groups plus
+format/Clippy checks. `make check-controls` runs checkpoint, native-health,
+source-versus-mirror position and scoped-cleanup negative controls without Docker.
+
+The separate `make test` cutover uses idempotent `acks=all` writes. MM2 requires
+exactly-once source support and `read_committed`; this is not a transaction across
+both Kafka clusters. DR offsets are checkpointed every five seconds and applied
+only while the destination group is inactive. The cutover barrier below requires
+an already caught-up idle group; it does not establish live unplanned failover.
 
 ## Checkpoint verification
 
@@ -103,13 +240,9 @@ pools request 250m CPU/512Mi per Pod with 256Mi heaps and do not impose per-Pod
 limits; each MM2 worker is limited to 1 CPU/1Gi and the Rust probe to 1 CPU/256Mi.
 This run does not establish a fixed whole-stack performance budget.
 
-**Still unqualified:** independent live readers throughout fault/recovery,
-external per-ID fsynced producer acknowledgement histories, continuous error/
-latency reports, native process fencing/survivor stability and complete
-post-fault replica repair. The November 14 Pod deletion results below remain
-historical and were not rerun as production proofs here. The alternate-policy
-failures remain failed. No new throughput, availability or acknowledged-loss
-claim is made from this checkpoint-only backfill.
+The live recovery qualification above adds independent readers and per-ID ACK
+histories. It does not retroactively qualify the historical Pod deletions or the
+interrupted empty-storage case.
 
 ## What it demonstrates
 
@@ -144,7 +277,7 @@ This example uses MM2 because it is part of Apache Kafka and Strimzi manages it 
 
 Confluent Cluster Linking is a broker-side alternative available in Confluent Platform and Confluent Cloud. It does not run Connect workers and preserves source topic offsets and compression in mirror topics. It is not included here because this example stays on Apache Kafka OSS. A custom consumer/producer relay is possible, but then the application owns replay, ordering, offset tracking, topic configuration, and loop prevention that MM2 already addresses.
 
-## Verified run
+## Historical run — 2026-11-14
 
 `make test COUNT=2000000` passed on kind on 2026-11-14. The East consumer validated 2,000,000 unique protobuf orders with a sum of 6,999,000,000 cents. MM2 replicated the same 2,000,000 orders to West, where the validator confirmed the count and sum. MM2 synchronized the `dr-cutover-final-20261114` group offsets for all six partitions to the West topic tail (within one Kafka control offset). The consumer then resumed on West and validated 2,000,000 new orders from the West producer with a sum of 6,999,000,000 cents. The run checked 4,000,000 unique orders across both producer phases, or 13,998,000,000 cents in total, with the first batch also validated in its mirrored copy.
 
@@ -171,7 +304,10 @@ The two clusters run on the same kind nodes with ephemeral storage. They model s
 | `manifests/mirrormaker2.yaml` | One-way MM2 flow, Connect state, checkpoint, and exactly-once settings |
 | `producer/` | C++ producer and protobuf schema; `protoc` runs in the Docker build |
 | `consumer/` | Rust read-committed consumer and protobuf generation |
-| `jobs/` | Kubernetes Jobs for producer and consumer |
+| `jobs/` | Kubernetes Jobs for the cutover producer and consumer |
+| `replication-producer`, `replication-observer/` | Witnessed C++ source and local Rust live/replay observer |
+| `replication_control.py`, `replication_lab.py`, `replication_report.py` | Serial faults, owned lifecycle/Jobs and full-body/phase reports |
+| `kind-config.json`, `prepare_replication.py` | Tracked kind template and ignored local build materialization |
 | `checkpoint_probe.py`, `consumer/src/checkpoint.rs` | Native checkpoint sampling and Rust cutover barrier |
 
 Use `make status`, `make logs`, and `make logs-mm2` to inspect the two clusters and replication workers. The kind context is always `kind-kafka-cross-cluster-mirroring`.

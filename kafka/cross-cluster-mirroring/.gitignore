@@ -1,2 +1,6 @@
 /producer/build/
 /consumer/target/
+
+/.build/
+/replication-observer/target/
+/__pycache__/

@@ -208,6 +208,16 @@ READMEs retain dated execution results and limitations.
   validated-offset commits were tightened.
   This is a correctness/cutover qualification, not a fresh live fault lifecycle;
   external per-ID ACK histories and independent live failure observations remain.
+  Additional live baseline, actual MM2 source-worker SIGKILL and retained-volume
+  west-leader SIGKILL passed with **6,003,072 cumulative source ACK orders**.
+  Independent source/target readers, host-fsynced intents/outcomes and complete
+  body/partition replay found zero ACK loss/corruption/duplicate logical records.
+  Recovered west broker served all six new-topic partitions for replay. The
+  original empty setup failure remains failed with explicit zero-write evidence.
+  Empty-storage replacement remains **failed/unqualified** after an inspection
+  exit 139/Docker crash; final reconciliation and witness-backed lifecycle cleanup
+  remain pending. No fault/capacity comparison or physical-disk qualification is claimed.
+
 
 - [Ceph RGW](ceph/s3-cluster/): independent Compose writer/reader, fsynced
   attempt/outcome histories and native guest/17-daemon survivor witnesses.
@@ -285,7 +295,7 @@ Closing one fault case does not close the entire deployment matrix.
 | RustFS | Example-owned `control.py`, independent `traffic.py`, preserved histories, native canonical heal and read-only slot/fingerprint auditor | Core reader/history/survivor backfill, full four-case fresh fault aggregate, benchmark, corrected cold reopen and two fresh lifecycles qualified above. Peer partitions, quorum loss, pool/resource changes, upgrades/rollback, pressure, physical EIO/bitrot/power loss and independent restore remain unrun. |
 | Ceph | Example-owned `control.py`, independent `traffic.py`, preserved SDK histories and `native/` PG/deep-scrub/process auditor | All four core faults and warm benchmark qualified with independent live readers, preserved histories, native OSD UUID/serial fencing and all 17 daemon process witnesses. Cold reopen, retained-state setup, fresh default lifecycle, archived witness integrity and scoped cleanup also qualified above. Isolated daemon faults, quorum/partitions, pressure, topology changes, upgrades and independent restore remain unrun. |
 | Kafka Strimzi JBOD | Independent live C++/Rust actors, external histories, native CRI/ISR/directory proof and repaired-leader replay | Core and three fresh-process benchmark trials qualified above; short-deadline ambiguity/duplicate run remains failed with exact retained state. Still add scaling/vertical changes, operator reconciliation/outage, rolling/node/drain/PDB, partitions/quorum, upgrades, pressure, persistent PVC replacement and independent restore; isolate the duplicate reproducer. |
-| Kafka mirroring | Make orchestration, native checkpoint formatter and Rust offset/ISR/EOF inspection | Fresh four-million-order cutover and six-partition native checkpoint barrier passed. Still add preserved cross-phase ACK witnesses, independent live fault readers, backlog/repair timing, process fencing and survivor stability; historical Pod deletions do not establish these. |
+| Kafka mirroring | Make orchestration, native checkpoint formatter and Rust offset/ISR/EOF inspection | Cutover/checkpoint proof plus live baseline, source-worker crash and retained-volume west-leader crash passed with preserved ACK histories and full replay. Empty-storage failure, post-crash reconciliation, lifecycle closure and extended operator/failure cases remain pending; historical Pod deletions do not qualify them. |
 | Kafka PostgreSQL enrichment | Make demo, producer/consumer and Go processor | Two-million-message pipeline correctness is not a fault matrix. Add broker, Connect worker/task, processor and PostgreSQL outages with live traffic; quantify duplicate delivery, CDC/cache freshness and backlog. |
 | StarRocks operator/Compose, Qdrant TurboQuant | Operator `operations.py`, Compose/Qdrant `fault.py`, independent live observers and reconciler | Existing role/disk/operator cases already have stronger observation paths. Do not duplicate them mechanically. Qualify pinned upgrades, independent restore, pressure and remaining topology/partition cases separately; no fresh rerun in this audit. |
 | Neon Compose and Greptime Compose | Local fault/scale controllers and independent observers | Bring the newly qualified Kubernetes dependency cases to supported Compose paths, then extend rolling changes, partitions, pressure and restore. Kubernetes results do not qualify Compose configuration. |

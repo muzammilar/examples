@@ -9,15 +9,16 @@ STRIMZI_VERSION := 1.3.1
 SOURCE_ALIAS := east
 TARGET_ALIAS := west
 MM2_NAME := replication
-CHAOS_TARGET_BROKER ?= west-west-brokers-3
 PRODUCER_IMAGE := kafka-mirror-producer:dev
 CONSUMER_IMAGE := kafka-mirror-consumer:dev
 COUNT ?= 2000000
 PROGRESS_EVERY ?= 10000
+LIVE_RATE ?= 1000
 MM2_REPLICAS ?= 2
 MM2_TASKS_MAX ?= 3
 MM2_REBALANCE_MAX_DELAY_MS ?= 300000
 MM2_REPLICATION_POLICY ?= identity
+export MM2_REPLICATION_POLICY MM2_REPLICAS MM2_TASKS_MAX
 MM2_OFFSET_SYNC_LOCATION ?= source
 MM2_TOPIC_REFRESH_INTERVAL_SECONDS ?= 5
 MM2_GROUP_REFRESH_INTERVAL_SECONDS ?= 5
@@ -39,13 +40,12 @@ $(error MM2_REPLICATION_POLICY must be identity or default)
 endif
 
 .NOTPARALLEL:
-.PHONY: check-controls checkpoint-proof kind-up kind-cluster namespace operator clusters mirror up images topic test verify-mirror chaos-mm2-worker chaos-broker-disk-loss chaos-target-broker status logs logs-mm2 cli down kind-down
+.PHONY: build-replication-images replication-images test-live-mirror test-production check-controls checkpoint-proof kind-up kind-cluster namespace operator clusters mirror up images topic test verify-mirror chaos-mm2-worker chaos-broker-disk-loss chaos-target-broker status logs logs-mm2 cli down kind-down
 
 kind-up: kind-cluster
 
 kind-cluster:
-	@mkdir -p $(dir $(KUBECONFIG))
-	$(KIND) get clusters | grep -qx $(CLUSTER_NAME) || $(KIND) create cluster --config kind-config.yaml
+	python3 replication_control.py kind-up
 
 namespace:
 	$(KUBECTL) get namespace $(NAMESPACE) >/dev/null 2>&1 || kubectl --context kind-$(CLUSTER_NAME) create namespace $(NAMESPACE)
@@ -83,8 +83,9 @@ mirror:
 up: kind-up clusters
 
 images:
-	docker build -t $(PRODUCER_IMAGE) producer
-	docker build -f consumer/Dockerfile -t $(CONSUMER_IMAGE) .
+	docker build --label lab.example.system=$(CLUSTER_NAME) -t $(PRODUCER_IMAGE) producer
+	docker build --label lab.example.system=$(CLUSTER_NAME) -f consumer/Dockerfile -t $(CONSUMER_IMAGE) .
+	python3 replication_control.py record-images $(PRODUCER_IMAGE) $(CONSUMER_IMAGE)
 	$(KIND) load docker-image --name $(CLUSTER_NAME) $(PRODUCER_IMAGE) $(CONSUMER_IMAGE)
 
 topic:
@@ -120,52 +121,35 @@ verify-mirror:
 	$(KUBECTL) logs job/kafka-consumer
 
 check-controls:
-	PYTHONPYCACHEPREFIX=$(CURDIR)/results/pycache python3 -m unittest test_checkpoint_probe.py
+	PYTHONPYCACHEPREFIX=$(CURDIR)/results/pycache python3 -m unittest test_checkpoint_probe.py test_replication.py
 
 checkpoint-proof: images check-controls
 	python3 checkpoint_probe.py --topic "$(TOPIC)" --target-topic "$(TARGET_TOPIC)" --group "dr-$(RUN_ID)" --image "$(CONSUMER_IMAGE)"
 
-chaos-mm2-worker: mirror images topic
-	-$(KUBECTL) delete job kafka-consumer kafka-producer --ignore-not-found
-	RUN_ID=$(RUN_ID) COUNT=$(COUNT) TOPIC=$(TOPIC) PROGRESS_EVERY=$(PROGRESS_EVERY) BOOTSTRAP_SERVERS=$(SOURCE_ALIAS)-kafka-bootstrap:9092 envsubst < jobs/producer.yaml | $(KUBECTL) apply -f -
-	$(KUBECTL) wait pod -l app=kafka-producer --for=condition=Ready --timeout=2m
-	@$(KUBECTL) logs -f job/kafka-producer | grep -m1 'PRODUCER_PROGRESS'
-	@pod=$$($(KUBECTL) get pod -l strimzi.io/kind=KafkaMirrorMaker2 -o jsonpath='{.items[0].metadata.name}'); \
-	old_uid=$$($(KUBECTL) get pod "$$pod" -o jsonpath='{.metadata.uid}'); \
-	echo "Deleting MirrorMaker 2 worker $$pod during source production"; \
-	$(KUBECTL) delete pod "$$pod" --wait=true --timeout=2m; \
-	for i in $$(seq 300); do \
-		ready=$$($(KUBECTL) get pods -l strimzi.io/kind=KafkaMirrorMaker2 -o jsonpath='{range .items[*]}{.status.containerStatuses[0].ready}{"\n"}{end}' | grep -c '^true$$' || true); \
-		uids=$$($(KUBECTL) get pods -l strimzi.io/kind=KafkaMirrorMaker2 -o jsonpath='{range .items[*]}{.metadata.uid}{"\n"}{end}'); \
-		[ "$$ready" -ge 2 ] && ! echo "$$uids" | grep -q "$$old_uid" && { echo 'MirrorMaker 2 worker recovered'; exit 0; }; \
-		sleep 1; \
-	done; echo 'MirrorMaker 2 worker did not recover' >&2; exit 1
-	$(KUBECTL) wait job/kafka-producer --for=condition=complete --timeout=30m
-	$(KUBECTL) logs job/kafka-producer
-	$(MAKE) verify-mirror COUNT=$(COUNT) TOPIC=$(TOPIC) RUN_ID=$(RUN_ID)
+build-replication-images:
+	python3 prepare_replication.py
+	docker build --label lab.example.system=kafka-cross-cluster-mirroring -t kafka-mirror-witness-producer:dev .build/replication/producer
+	docker build -f replication-observer/Dockerfile -t kafka-mirror-replication-observer:dev .build/replication
+	python3 replication_control.py record-images kafka-mirror-witness-producer:dev kafka-mirror-replication-observer:dev
 
-chaos-target-broker: chaos-broker-disk-loss
+replication-images: build-replication-images kind-up
+	$(KIND) load docker-image --name $(CLUSTER_NAME) --nodes $(CLUSTER_NAME)-control-plane kafka-mirror-witness-producer:dev kafka-mirror-replication-observer:dev
 
-chaos-broker-disk-loss: mirror images topic
-	-$(KUBECTL) delete job kafka-consumer kafka-producer --ignore-not-found
-	RUN_ID=$(RUN_ID) COUNT=$(COUNT) TOPIC=$(TOPIC) PROGRESS_EVERY=$(PROGRESS_EVERY) BOOTSTRAP_SERVERS=$(SOURCE_ALIAS)-kafka-bootstrap:9092 envsubst < jobs/producer.yaml | $(KUBECTL) apply -f -
-	$(KUBECTL) wait pod -l app=kafka-producer --for=condition=Ready --timeout=2m
-	@$(KUBECTL) logs -f job/kafka-producer | grep -m1 'PRODUCER_PROGRESS'
-	@old_uid=$$($(KUBECTL) get pod $(CHAOS_TARGET_BROKER) -o jsonpath='{.metadata.uid}'); \
-	$(KUBECTL) delete pod $(CHAOS_TARGET_BROKER) --wait=true --timeout=2m; \
-	for i in $$(seq 120); do \
-		new_uid=$$($(KUBECTL) get pod $(CHAOS_TARGET_BROKER) -o jsonpath='{.metadata.uid}' 2>/dev/null || true); \
-		[ -n "$$new_uid" ] && [ "$$new_uid" != "$$old_uid" ] && { echo 'Strimzi replaced the west broker'; exit 0; }; \
-		sleep 1; \
-	done; echo 'Strimzi did not replace the west broker' >&2; exit 1
-	@set -e; \
-	$(KUBECTL) wait pod/$(CHAOS_TARGET_BROKER) --for=condition=Ready --timeout=10m & pod_wait=$$!; \
-	$(KUBECTL) wait kafka/$(TARGET_ALIAS) --for=condition=Ready --timeout=10m & kafka_wait=$$!; \
-	$(KUBECTL) wait job/kafka-producer --for=condition=complete --timeout=30m; \
-	wait $$pod_wait; \
-	wait $$kafka_wait
-	$(KUBECTL) logs job/kafka-producer
-	$(MAKE) verify-mirror COUNT=$(COUNT) TOPIC=$(TOPIC) RUN_ID=$(RUN_ID)
+test-live-mirror: replication-images
+	COUNT=$(COUNT) LIVE_RATE=$(LIVE_RATE) python3 replication_control.py correctness
+
+chaos-mm2-worker: replication-images
+	COUNT=$(COUNT) LIVE_RATE=$(LIVE_RATE) python3 replication_control.py mm2-worker-crash
+
+chaos-target-broker: replication-images
+	COUNT=$(COUNT) LIVE_RATE=$(LIVE_RATE) python3 replication_control.py west-broker-crash
+
+chaos-broker-disk-loss:
+	@echo "Empty-disk recovery is pending qualification after the Docker crash; see README."
+	@exit 2
+
+test-production: replication-images
+	COUNT=$(COUNT) LIVE_RATE=$(LIVE_RATE) python3 replication_control.py test-production
 
 status:
 	$(KUBECTL) get kafka,kafkanodepool,kafkamirrormaker2,pods
@@ -181,10 +165,7 @@ cli:
 	$(KUBECTL) exec -it $(SOURCE_ALIAS)-$(SOURCE_ALIAS)-brokers-3 -c kafka -- /opt/kafka/bin/kafka-topics.sh --bootstrap-server $(SOURCE_ALIAS)-kafka-bootstrap:9092 --list
 
 down:
-	-$(HELM) uninstall strimzi-operator --namespace $(NAMESPACE) --wait
-	-kubectl --context kind-$(CLUSTER_NAME) delete namespace $(NAMESPACE) --ignore-not-found --wait=true --timeout=5m
+	python3 replication_control.py down
 
 kind-down:
-	$(KIND) delete cluster --name $(CLUSTER_NAME)
-	rm -f "$(KUBECONFIG)"
-	-docker image rm $(PRODUCER_IMAGE) $(CONSUMER_IMAGE)
+	python3 replication_control.py kind-down

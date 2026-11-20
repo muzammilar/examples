@@ -62,6 +62,11 @@ not remove the longer-term requirements above.
 - [x] Replace MirrorMaker's numeric lag tolerance with native checkpoint decoding
   and Rust exact-offset/idle-group/ISR/EOF checks; fresh cutover checked 4,000,000
   unique orders. Live chaos and per-ID ACK-history work remains below.
+- [x] Qualify MirrorMaker independent source/target readers and host-fsynced ACK
+  histories: baseline, actual source-worker crash and retained-volume target-leader
+  crash checked 6,003,072 acknowledged orders without reconciled loss/corruption.
+- [ ] Finish MirrorMaker empty-storage/post-Docker-crash reconciliation and
+  witness-backed teardown/recreation; preserve the interrupted run as failed.
 - [ ] Close independent-reader and preserved-history gaps in the recent relational,
   search, object-storage, messaging and archive examples identified by the audit.
 - [ ] Extend applicable native repair, scaling, rolling changes, dependency/quorum
