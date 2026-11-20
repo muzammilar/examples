@@ -139,6 +139,97 @@ applicable matrix and exits nonzero on failure. Do not run destructive cases in
 parallel or hide them inside a benchmark. List unsupported, blocked and unrun
 cases explicitly, with version-specific upstream reasons for unsupported cases.
 
+### Evaluation stages and backend contract
+
+Use these stages to decide what evidence is needed, not to build a repository-wide
+harness. Reuse the same logical workload, correctness oracle and metric definitions
+within a comparison; retain each example's self-contained implementation and five
+lifecycle commands. A failed prerequisite blocks qualification downstream; diagnostic
+runs may investigate it but must not be presented as passing benchmarks.
+
+| Stage | Question and required gate |
+|---|---|
+| 0. Declare the contract | Check in supported operations, payload/entity limits, consistency and atomicity boundaries, delete/TTL semantics, idempotency/conflict behavior, replication and durability settings, and safe retry rules. Verify effective settings, not just manifests. |
+| 1. Driver and single-node correctness | Test every declared operation, exact round-trip values, missing/duplicate inputs, concurrent readers/writers and idempotent setup. Use isolated containerized fixtures; keep fast checks suitable for each code change. |
+| 2. Healthy baseline | After functional correctness, measure individual operations and complete lifecycles on a healthy instance or small cluster. Sweep payload size, operation mix, concurrency and batch size; treat this as a baseline, not distributed qualification. |
+| 3. Distributed correctness | Verify the declared consistency/transaction contract using concurrent operation histories, an independent oracle and all-member topology observations. A genuine contract violation blocks performance qualification regardless of speed. |
+| 4. Distributed performance | After correctness passes, run sustained, repeated comparisons across relevant topology, replication, consistency, durability, schema/storage and client configurations at matched budgets. |
+| 5. Chaos and recovery | Declare expected behavior per phase; prove each fault, observe live workload behavior, restore faults and rerun distributed correctness against the preserved history. |
+| 6. Operational lifecycle | Exercise supported upgrades, scaling, repair, configuration changes, backup/restore and teardown under load, using the deployment-specific matrices below. |
+
+Pin and report the reference client configuration: driver version, pool size,
+maximum in-flight requests, connect/operation deadlines, retries, backoff and
+idempotency-key reuse. Treat variations as explicit benchmark axes. Do not weaken
+the declared contract after observing failures or compare weaker durability as if
+it provided the same guarantees.
+
+Verify each system's actual model. Snapshot isolation can permit write skew;
+serializable transactions must prevent it. Quorum overlap alone is not proof of
+linearizability. Eventual convergence and permitted stale reads must be measured
+against declared bounds, rather than universally rejected or silently ignored.
+
+### Workload and correctness test types
+
+Select applicable cases and explain omissions. Uniform tiny records and independent
+single-key operations alone do not represent a production workload.
+
+| Test type | What to exercise and verify |
+|---|---|
+| Operation and lifecycle coverage | Individual create/read/update/delete/list operations and chains such as create → mutate repeatedly → read all → delete. Verify all fields, derived counters/indexes, pagination and cross-operation agreement, not only row totals. |
+| Parallel mutation and isolation | Same-key contention, different-key updates within one entity, concurrent creation/deletion, readers during writes and independent tenants. Verify lost updates, partial visibility and isolation anomalies against the declared contract. |
+| Atomic operations and ambiguous outcomes | Cancel requests or lose responses during a declared atomic mutation. Reconcile whether the complete mutation committed; an error does not prove absence of effects. Partial visibility of a committed atomic operation fails. |
+| Idempotency and retries | Replay the same logical operation with the same key after timeouts/reconnects, including concurrent replays. Test key reuse with different content against the documented conflict policy; distinguish dedup rejection, retry execution and duplicate side effects. |
+| Payload and entity growth | Small/medium/large values, boundary sizes and rejected oversized inputs; cumulative state growth per entity as well as per-request limits. Include binary/string-heavy data, skew and varying compressibility. Report results per size class. |
+| Access locality and load shape | Uniform baseline, hot-key/Zipfian skew, recent-key reads and sliding working sets. Include read-only/write-only and mixed ratios, bursts and sustained traffic. Separate successful existing-key reads from deliberate missing-key tests. |
+| Saturation and backpressure | Sweep concurrency (for example 1/4/16/64 within budget), single/batch/bulk requests and offered load. Compare closed-loop workers with open-loop arrivals; record offered, admitted and completed rates, queue depth, deadlines and dropped work so client throttling cannot hide overload. |
+| Delete, TTL and reclamation | Mixed expiry times, overwrite/expiry races, deletion during migration, restart and restore. Verify logical deletion/expiry separately from physical space reclamation, tombstone/metadata growth and compaction. Observe clock-dependent behavior without changing the shared host clock. |
+| Application invariants | Check the advertised workload: queue loss/duplicates/order/leases and redelivery; transaction balances; search recall/version visibility; metric timestamp/value fidelity; or full object bodies and versions. Storage readback alone does not prove application correctness. |
+
+Use deterministic seeds and record the actual size/key distributions. Where useful,
+fit a sanitized distribution to observed percentiles; otherwise label synthetic
+assumptions. Include rare large values and per-entity caps. Seed and verify baseline
+state separately from timed steady-state work. Keep periodic exact write/read
+verification active during benchmarks in addition to the independent readers.
+
+Capture replayable operation histories with invocation/completion timestamps,
+logical operation and attempt IDs, key/version, expected value or checksum, worker
+sequence, payload bytes/class, result and error. Separate successful acknowledgements,
+known failures, ambiguous outcomes and contract violations. Use an appropriate
+offline history checker for linearizability/transaction claims; counters or a final
+snapshot alone cannot establish them. Preserve witnesses and histories across faults.
+
+### Additional resilience boundaries
+
+These cases extend the deployment matrices; do not substitute a passing pod restart
+for a different failure mechanism. Define expected rejection, allowed staleness/loss,
+availability/error budgets and recovery deadlines before injection.
+
+| Boundary | Additional tests and required observations |
+|---|---|
+| Repeated transitions | Repeat primary/replica role swaps, replica-count changes and scale-out/in chains. Verify every transition and cumulative history; one successful cycle can miss stale membership or leaked state. |
+| Interrupted reconciliation | Reverse a scale-out while migration is in flight; crash/restart the controller during bootstrap, rebalance or drain. Verify no member owning data is removed, no ranges are silently recreated empty and the latest valid desired state converges. |
+| Stale or empty member rejoin | Delay a replica, then fail its primary; separately restart an empty former primary at its old address. Verify promotion eligibility, new storage/member identity and fencing so an empty node cannot overwrite surviving good copies. |
+| Compounded failures | After individual cases, fail another member during catch-up, lose a whole shard or all primaries, or lose the only up-to-date copy. Compare a supported healthy-quorum topology with a supported reduced-redundancy/beyond-tolerance case; quantify irreversible loss and backup requirements. |
+| Network fault dimensions | Separately inject peer versus client latency, packet loss, bandwidth caps, one-way/asymmetric partitions, resets and DNS failure. Measure effective reachability and actual delay/loss; verify fault-tool admission/sidecars on running pods where used. |
+| Pause versus crash versus loss | Compare a frozen process/owned worker, a crash loop, graceful eviction, sustained process outage, retained-node restart and permanent owned-node/storage loss. Hold faults beyond native detection deadlines where needed to exercise election rather than a quick restart. |
+| Routing and connection recovery | Keep existing pooled connections and fresh clients active through failover, pod IP changes and Service/endpoint updates. Where advertised, test clients outside the cluster, returned/redirected addresses, DNS TTL/staleness, read-only old primaries and topology refresh. |
+| Placement and blast radius | Check physical worker/failure-domain placement, all-member role/range agreement and restored replica count. Observe unaffected shards and, where applicable, several example-owned clusters during a shared controller/configuration change; detect coordinated rollouts and correlated loss of quorum. |
+| Storage and maintenance pressure | Separate slow I/O, rejected writes, bounded disk-full, empty-disk replacement and background compaction/checkpoint/backup contention. Track write/read amplification, space growth, repair traffic and foreground latency until work settles. |
+| Security/configuration lifecycle | When configured, rotate credentials/certificates under load, check revocation and allowed/denied access, and test invalid/live configuration changes. Verify effective data-plane settings after controller restart and declarative reapply. |
+
+AP systems need not reject every minority write; assert their declared conflict and
+convergence rules. A quorum-loss test may correctly reject operations, but a generic
+95% success threshold must not turn that expected rejection into a failure or hide
+violations in other phases. Declare per-operation success fractions, throughput and
+latency targets separately. Record zero-attempt phases as missing coverage.
+
+If testing client-side injected errors, report their rate separately from native
+server/network errors and first-attempt failures; successful retries must not mask
+them. After healing, verify all earlier acknowledged state, application invariants,
+native repair and convergence. A manual rescue does not pass an automatic-recovery
+requirement. Report integrity, availability, redundancy and manual intervention
+separately; a healthy final cluster can still have lost data or missed its SLA.
+
 ### Core test components
 
 Build the production tests around these reusable responsibilities, using the
@@ -165,6 +256,8 @@ smallest implementation that fits the example:
   Report attempted/successful/failed operation counts and rates, plus p50/p99
   latencies separately for reads and writes and for successful and failed requests;
   fast failures must not make successful-request latency appear better.
+  Collect the [mandatory resource/storage measurements](#mandatory-measurements-for-every-experiment)
+  on the same phase timeline.
 - **Reconciler and report:** compare observed data with the witness, check shard
   placement and restored replication, and report numeric outcomes and limits.
   Account for the configured consistency model: a stale asynchronous read is an
@@ -225,6 +318,10 @@ observations during the operation.
   on timeout. Restore injected faults on failure without deleting the evidence.
   Verify project/cluster labels and exact owned devices before destructive actions;
   never fill the shared Docker disk, reboot the host or touch another example.
+  Honor stop requests during load, repair and verification. Serialize destructive
+  cases per example, terminate owned background actors and flush witnesses before
+  reporting. Recycle fixtures only between explicitly independent, recorded cases;
+  never erase a failed case's acknowledged state to make its recovery check pass.
 - Save dated raw results under ignored `results/`. Report workload and acknowledged
   counts, loss/corruption counts, retries/errors, throughput and p50/p99 before,
   during and after the change. Measure first successful operation, longest outage,
@@ -289,6 +386,39 @@ These extend both deployment matrices instead of creating duplicate examples.
 | Search and vector indexes | Keep updates and searches running through replica/shard failure; verify acknowledged documents and versions, tenant/filter isolation, index visibility lag, query correctness/recall and convergence after repair. Separate native sharding from application-level fan-out. |
 | Metrics, logs and traces | Check timestamp/value/body fidelity and expected cardinality, ingestion backpressure, query freshness, retention and recovery across WAL/object-store outages. Validate each advertised signal; metrics/logs tests do not establish tracing support. |
 
+### Mandatory measurements for every experiment
+
+**Every experiment, including correctness, chaos, recovery and single-system runs,
+must measure CPU utilization, memory usage, data compression and disk usage.**
+Benchmarks are holistic: operation rate alone is insufficient. Collect per-role
+and whole-stack costs, including workload generators, replicas, controllers,
+routers, WAL/metadata and object storage. Separate instrumentation/witness costs
+from the system under test; do not sum the same shared filesystem once per pod.
+
+| Measurement | Required evidence |
+|---|---|
+| CPU | Utilization time series and average/peak, normalization (one core = 100% or fraction of assigned CPUs), user+system core-seconds across threads/processes, effective CPU caps and throttling where available. Include setup/import, steady state and recovery/maintenance costs. |
+| Memory | Average, sampled maximum and native peak RSS/cgroup memory where exposed; distinguish these counters and heap, anonymous memory, charged file cache and kernel memory. Show growth through sustained load and recovery; report OOM events and effective limits. |
+| Compression | Codec/level and measured uncompressed/compressed bytes for the same logical data or snapshot at an identified layer, with ratio `uncompressed / compressed`. Distinguish storage, wire and backup compression. Include compression CPU/time cost and dataset compressibility; a configured codec is not a measured ratio. |
+| Disk and storage | Owned bytes before load, after load, peak during work/repair and settled after cleanup/compaction. Distinguish logical versus allocated bytes, live data, indexes, WAL/AOF, snapshots/backups and temporary files; include all copies/object storage. Report bytes per logical record and whole-stack space amplification separately from compression. |
+| I/O and network | Read/write bytes, IOPS/latency where exposed and network RX/TX, including replication/repair. Relate throughput to bandwidth, write amplification, queue/backlog growth and resource saturation; host filesystem capacity alone is not database disk usage. |
+
+Start collectors before setup/load and retain phase-aligned observations through
+baseline, fault, degraded service, repair and recovered state. Record counters,
+units, scope, sampling cadence and collector overhead. For short operations use
+cumulative CPU/I/O deltas and native high-water counters where possible; sampled
+maxima can miss peaks. Report phase summaries and raw samples under ignored
+`results/`, and put numeric resource/storage results beside latency/throughput in
+each README. Efficiency measures such as CPU-seconds per successful operation,
+bytes per record and completed operations per assigned core help explain tradeoffs.
+
+If a metric cannot be collected, state **unavailable**, why, and the measurement
+gap; never use zero or infer it from a resource limit. Use **not applicable** only
+with a concrete reason (for example, no persisted data or no compression layer).
+A correctness test may pass while its holistic benchmark evidence is incomplete.
+Historical results lacking these measurements remain incomplete; rerun to fill the
+gap rather than inventing estimates or retroactively claiming coverage.
+
 ### Performance and other production properties
 
 - Run correctness and recovery checks before performance tests. Measure baseline,
@@ -329,12 +459,13 @@ These extend both deployment matrices instead of creating duplicate examples.
   RPC. Identify the timed boundary: parsing/planning, execution, fetching/conversion,
   language-side validation and logging. An FFI benchmark does not compare native
   language implementations or establish that one language makes an engine faster.
-- Record **CPU and memory on both competitors**. Measure wall time and process
-  user+system CPU across all engine threads, stating CPU core-seconds versus
-  utilization percentages. Record process peak RSS and container/cgroup peak
-  memory where available; distinguish heap from charged file cache/kernel memory.
-  Include import/setup as well as query/recovery costs. Save the sampling cadence
-  and exact counters: fast operations can finish between sampled observations.
+- Include the [mandatory measurements](#mandatory-measurements-for-every-experiment)
+  in every run, on every competitor and deployment shape, not only comparisons.
+  Begin each run with an environment/configuration record: actual CPU model/count,
+  architecture, RAM/limits, disk class/capacity/limits, kernel and relevant filesystem
+  tunables, Kubernetes/runtime versions, image digests, physical/simulated region/AZ
+  placement, co-tenancy, source revision, seed and client configuration/hash. Record
+  effective settings; redact credentials. No unlabeled cross-environment comparison.
 - Use at least **three fresh-process trials** for comparative performance claims,
   alternate or randomize system order, and retain per-trial counts and samples.
   State warmup count and whether a summary is pooled or a median of trial summaries.
@@ -342,6 +473,20 @@ These extend both deployment matrices instead of creating duplicate examples.
   a maximum, not established tail behavior. State benchmark rates' actual timed
   scope; reciprocal latency is not measured end-to-end throughput. Report winners
   per workload and resource cost rather than declaring a universal winner.
+- For sustained performance comparisons, start with 60 seconds of warmup, at least
+  5 minutes of healthy-baseline measurement or 15 minutes for a distributed matrix,
+  and at least three independent trials per cell. Adjust with an explicit rationale;
+  shorter diagnostics do not establish sustained capacity. Report median, min/max
+  and IQR (or a justified confidence interval), per-operation and size-class counts,
+  p50/p95/p99/p99.9 where sample counts support them, and histogram precision/bucket
+  bounds. Separate setup, warmup and measured work; do not average percentiles across
+  workers as if they were a pooled latency distribution.
+- Retain every trial, including failed, interrupted and discarded runs. Unexpected
+  environment changes invalidate an apples-to-apples cell; planned upgrades/faults
+  belong to labeled phases. Never discard an outage, OOM or correctness failure to
+  improve the winner. Show earlier failing runs alongside later passes, not just
+  the latest result. Check report arithmetic, units, phase durations and histogram
+  bounds against raw data; bucket upper bounds are not exact observed percentiles.
 - Validate complete query outputs against an **independent oracle**, including
   group keys, ordering, joins and numeric/null semantics; matching totals alone
   can conceal wrong groups or misplaced data. Add focused negative controls for

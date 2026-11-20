@@ -6,6 +6,13 @@ comparison fixtures are included; older systems and legacy ClickHouse are exclud
 This is a source audit, not a claim that every example was rerun. The per-example
 READMEs retain dated execution results and limitations.
 
+The [expanded test concepts](AGENTS.md#evaluation-stages-and-backend-contract) and
+[mandatory resource/storage measurements](AGENTS.md#mandatory-measurements-for-every-experiment)
+also apply to this cohort. Earlier correctness/recovery passes do not establish
+coverage for newly listed cases or complete CPU, memory, compression and disk
+measurements. Audit these separately and mark gaps; this document adds no new
+execution evidence.
+
 ## Fresh qualification in this follow-up
 
 - [Neon Kubernetes](postgres/neon/kubernetes-statefulset/): latest shared Go workload

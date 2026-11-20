@@ -26,6 +26,11 @@ operator deployments, plus a representative workload **IN A CLUSTER WHERE POSSIB
 Workload examples compare relevant competitors using the same data and correctness
 checks; measurements and unsupported deployment modes belong in each README.
 
+Every experiment measures CPU utilization, memory, data compression and disk usage,
+alongside correctness, throughput, latency and recovery. Include whole-stack costs,
+I/O/network and measurement gaps; see the [test concepts](AGENTS.md#evaluation-stages-and-backend-contract)
+and [measurement requirements](AGENTS.md#mandatory-measurements-for-every-experiment).
+
 To add or test a system, follow [`FORMAT.md`](FORMAT.md): folder layout, Make targets, Compose and kind conventions, scaling, failover, benchmarks and README format.
 
 | System | Folder | Category | Website | GitHub |

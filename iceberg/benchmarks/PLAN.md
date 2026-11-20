@@ -10,6 +10,12 @@ The current run covers 20 million narrow rows, three aggregate query shapes, seq
 
 ## Priority 1: make the numbers repeatable and explainable
 
+Apply the [mandatory measurements for every experiment](../../AGENTS.md#mandatory-measurements-for-every-experiment),
+including CPU utilization/core-seconds, average/peak memory, measured compression
+and disk baseline/peak/settled usage for engines, driver and dependencies. Include
+I/O/network and avoid double-counting the shared warehouse. These are required
+alongside every benchmark and failure test, not optional follow-up metrics.
+
 1. Add independent benchmark repetitions, separate from `RUNS` (which repeats reads inside one run). Start with five independent runs per configuration; report median and p95 for reads, writes, initial load, and each maintenance operation. Preserve each run's raw JSON.
 2. Rotate the system execution order across repetitions. The controller currently always runs DuckDB, ClickHouse + Iceberg, then native ClickHouse, which can bias results through host page cache and prior activity.
 3. Record the physical work: Iceberg data files, delete files, manifests, snapshots, and bytes before/after writes and maintenance; native ClickHouse active parts, bytes, and merge activity before/after maintenance. DuckDB's Iceberg metadata functions expose file and manifest rows; ClickHouse exposes active parts and merge state through system tables.

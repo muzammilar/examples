@@ -203,14 +203,31 @@ not become qualified merely because these requirements were added.
 
 ## Benchmarks
 
+- Follow the [evaluation stages and test concepts](AGENTS.md#evaluation-stages-and-backend-contract)
+  and [mandatory measurements for every experiment](AGENTS.md#mandatory-measurements-for-every-experiment).
+  These apply to single-system, correctness, fault/recovery and comparative runs.
+  Report CPU utilization/core-seconds, memory average/peak, measured compression,
+  disk baseline/peak/settled bytes, I/O and network alongside operation metrics.
+  Include workload and dependencies as well as database roles; distinguish limits
+  from measured use and whole-stack space amplification from compression ratio.
 - `bench/limits.sh apply CPUS MEM SERVICE…` caps containers with `docker update`; `restore` undoes it.
   Put the cap in every result.
-- Keep runs short (seconds to a few minutes). One run is fine; say so. Note when the Docker VM was shared.
+- Short/single runs are diagnostics, labeled as such. Comparative claims require
+  at least three independent trials, alternating system order and reporting median,
+  min/max and dispersion. Start with 60s warmup and 5-minute baseline / 15-minute
+  distributed measurement windows; explain deviations. Separate cold/warm runs.
 - Use the system's own tool where it exists (`tigerbeetle benchmark`, `sky-bench`, `cassandra-stress`,
   YDB CLI workloads), otherwise sysbench, pgbench, go-tpc, go-ycsb or wrk.
-- Every result line states: date, `Apple M4 Pro, Docker VM aarch64`, caps, data size, threads/clients.
+- Every report states date, actual hardware/architecture, runtime/kernel, image
+  digests, resource/storage/network budgets, topology/co-tenancy, source revision,
+  seed, dataset shape/bytes and pinned client configuration. Do not assume the host
+  matches an earlier experiment. Retain a configuration hash and phase timestamps.
 - Images run under emulation (amd64 on arm64) must be marked as such.
 - Raw output goes to `results/` (gitignored); the README gets the table.
+- Keep raw operation histories, phase-aligned resource samples and every failed or
+  interrupted trial. Missing measurements are unavailable/incomplete, never zero;
+  unsupported measurements need a reason. Historical operation-only results need
+  new measurements before they qualify as holistic benchmarks.
 - Number-centric: report measured values with units (ops/s, rows/s, MiB/s, p50/p99/p99.9 ms, s to
   recover, records lost), in a table. A claim without a number behind it ("fast", "scales well",
   "low latency") does not go in. Comparisons state both numbers and the ratio (e.g. "p99 8.1 ms
@@ -231,11 +248,20 @@ not become qualified merely because these requirements were added.
 One or two lines: what this deploys or measures.
 
 ## Quick start
-make up / make test / make failover / make benchmark / make down   (real targets only)
+1. `make kind-up` — create this example's isolated infrastructure.
+2. `make up` — install/configure the example.
+3. `make test` — run correctness checks.
+4. `make down` — remove the example.
+5. `make kind-down` — destroy its infrastructure/state.
+
+For Compose use `docker-up` and `docker-down` in steps 1 and 5.
+Put fault/scaling/benchmark commands in a separate section (real targets only).
 
 ## Setup              table: service, image:tag, port, role, limits
 ## What it does       table or bullets
-## Results            table; one line with date, hardware, caps
+## Results            dated setup; correctness/availability/recovery verdicts;
+                      operation counts/rates/latencies AND CPU, memory,
+                      compression, disk/IO/network measurements and gaps
 ## Known issues       bullets: error text → cause → workaround
 ## Links
 ```

@@ -12,6 +12,16 @@ healthy pods alone do not qualify an example as production ready.
 
 - [ ] Audit older examples for operational coverage; record missing, failed,
   blocked and unsupported cases without reclassifying them as passing.
+- [ ] Audit and backfill holistic measurements for all experiments: CPU utilization
+  and core-seconds, memory average/peak, measured compression and disk
+  baseline/peak/settled usage, plus I/O/network and whole-stack costs. Preserve
+  historical results and label missing evidence; throughput-only runs are incomplete.
+- [ ] Apply the [evaluation stages and test concepts](AGENTS.md#evaluation-stages-and-backend-contract):
+  declared backend/client contracts, concurrent lifecycle correctness, skewed and
+  large-payload workloads, sustained saturation, replayable histories and explicit
+  phase outcomes. Add applicable interrupted scaling, stale/empty member rejoin,
+  compounded faults and routing/DNS/connection recovery tests. Report integrity,
+  availability, automatic/manual recovery and resource cost separately.
 - [ ] Add independent live writers/readers, an external durable witness,
   timestamped operation phases and numeric behavior reports where missing;
   observe read/write failures and latencies throughout each operation, then

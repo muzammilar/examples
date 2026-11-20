@@ -46,6 +46,13 @@ The generator must be deterministic. Each profile starts from the same logical s
 
 ## Fairness and interpretation
 
+- Follow the repository's [test concepts](../../AGENTS.md#evaluation-stages-and-backend-contract)
+  and [mandatory measurements](../../AGENTS.md#mandatory-measurements-for-every-experiment).
+  Every run needs CPU utilization/core-seconds, memory average/peak, measured
+  compression and disk baseline/peak/settled bytes, plus I/O/network, for the
+  engines, driver and dependencies. Account for shared storage once; distinguish
+  codec compression from file/layout overhead. Existing timings/file counts alone
+  do not establish this coverage; mark missing counters and rerun before claiming it.
 - Run one benchmark engine at a time. Give DuckDB and ClickHouse the same CPU and memory limits. The Go runner records end-to-end operation latency; ClickHouse inserts use its native protocol and batch API. The REST fixture stays idle during table scans; record the storage as a local Docker volume.
 - Separate initial load, warm-up, and timed work. Report warm and cold reads separately where cache state can be controlled. Use several rounds and report medians plus per-operation results.
 - Record engine versions, resource limits, dataset bytes/rows, Iceberg data-file count and sizes, and the exact profile parameters. Do not compare only aggregate elapsed time.
