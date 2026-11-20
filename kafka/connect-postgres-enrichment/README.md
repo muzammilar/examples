@@ -32,6 +32,46 @@ The Compose setup is local development infrastructure. Kafka has three brokers a
 
 On 2026-11-14, the default `make test` built the C++ producer and Rust consumer images, sent 2,000,000 protobuf orders, and validated 2,000,000 unique enriched protobuf orders. PostgreSQL contained 10,000 customer rows; the Go processor log confirmed it loaded all 10,000 from the Debezium CDC topic before processing orders. These counts verify the end-to-end join and republish path; they are not throughput measurements. Set `COUNT` to change the message count and `CUSTOMER_COUNT` to change the PostgreSQL seed size and matching application configuration.
 
+## CDC fix and native qualification — 2026-11-20
+
+The original processor stopped polling customer changes after loading its seed.
+A SQL-acknowledged update was visible in the CDC topic, but a later enriched order
+still used the old name after **7.291 s**. The failed observation is retained.
+The processor now keeps CDC consumption active, safely clones protobuf lookup
+values, bounds transactions to 5,000 input records, preserves input partition IDs,
+and exposes `/status` with CDC positions and committed-order counters. Input and
+output topics must have matching partition counts (six in this example).
+
+The pinned Debezium image has a mixed environment interface: internal topic RF
+settings require `CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR`,
+`CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR` and
+`CONNECT_STATUS_STORAGE_REPLICATION_FACTOR`; advertised identity uses
+`ADVERTISED_HOST_NAME`, and flush timing uses `OFFSET_FLUSH_INTERVAL_MS`.
+The old RF variables were ignored and actual internal topics had **one replica**.
+Existing replicas were expanded natively without resetting state; both generated
+worker configurations and actual RF3/ISR3/zero-lag state were checked. New setups
+request RF3 from creation. The configurable 10-second rebalance grace is a local
+lab setting; it does not weaken replication or durability.
+
+The [recovery branch's independent witness baseline](https://github.com/muzammilar/examples/blob/kafka-connect-live-recovery/kafka/connect-postgres-enrichment/RECOVERY_TEST_STATUS.md)
+verified **2,004,096 ACKs / 10,000 customers**, every source/enriched order body,
+key and partition, and **zero acknowledged loss/corruption**. Serialized input:
+**144,964,788 bytes**; enriched output: **228,691,806 bytes**. Callback p50/p99:
+**18.874/835.920 ms**; enriched creation-to-observation p50/p99:
+**12,410.462/34,828.717 ms** (2,004,096 successful observations each).
+Those include SDK/witness queues and reader backlog. The mixed rate-limited/final
+burst ACK window was **22,921.20 ACK/s**, not a capacity benchmark. Resource
+sampling counted **448.620 CPU core-seconds** across the observed experiment,
+including native inspection and full verification. Largest sampled individual-container charged/anonymous memory was **1,153,605,632 / 881,565,696 bytes** (the replay verifier); these are sample maxima, not process peak RSS or a simultaneous stack peak. Three benchmark trials have
+not run. Docker builds passed Go vet and race tests; the baseline also used C++
+CTest and eight Rust observer tests. Tested HTTP ports were 18083/18080.
+
+The broker recovery experiment was **stopped by the user during final replay**
+and is unqualified. Connect-worker, processor and PostgreSQL fault cases remain
+unrun; so do disk replacement, partitions, scaling, pressure, upgrades and restore.
+The paused harness and its resume instructions remain on `kafka-connect-live-recovery`;
+the normal five-command workflow above remains the simple walkthrough.
+
 ## Setup
 
 | Service | Image / version | Host port | Role |
@@ -42,7 +82,7 @@ On 2026-11-14, the default `make test` built the C++ producer and Rust consumer 
 | Go processor | Go `1.27.4`, `franz-go 1.22.3` | `8080` (override with `PROCESSOR_PORT`) | CDC cache, transactional order enrichment, readiness endpoint |
 | C++ producer / Rust consumer | CMake / Cargo; built from local Dockerfiles | — | Protobuf application clients; started by `make demo` |
 
-The Go service consumes the PostgreSQL CDC topic into memory at startup. Restarting it rebuilds the cache from the compacted topic before processing orders. The default 10,000-row seed exercises a larger in-memory lookup set; it does not implement a general-purpose persistent state store or handle schema evolution. PostgreSQL credentials are demo-only values in Compose and are not suitable for a shared or production environment.
+The Go service rebuilds its in-memory lookup from the compacted CDC topic at startup and continues applying changes after readiness. Restarting it rebuilds the cache before processing orders. Readiness marks the configured seed population, not a transactionally consistent PostgreSQL snapshot. Joins use the latest customer value observed by this process; freshness is asynchronous. Cached joins can continue during source outages. The default 10,000-row seed exercises a larger in-memory lookup set; it does not implement a general-purpose persistent state store or handle schema evolution. PostgreSQL credentials are demo-only values in Compose and are not suitable for a shared or production environment.
 
 ## Layout
 

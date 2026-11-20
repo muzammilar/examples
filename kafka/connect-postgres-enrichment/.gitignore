@@ -1,3 +1,9 @@
 /producer/build/
 /processor/kafka/
 /consumer/target/
+
+/results/
+/.build/
+
+__pycache__/
+*.pyc

@@ -36,6 +36,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             "group.id",
             env_or("GROUP_ID", "kafka-connect-demo-consumer"),
         )
+        .set("isolation.level", "read_committed")
         .set("enable.auto.commit", "false")
         .set("auto.offset.reset", "earliest")
         .create()?;
