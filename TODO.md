@@ -65,8 +65,12 @@ not remove the longer-term requirements above.
 - [x] Qualify MirrorMaker independent source/target readers and host-fsynced ACK
   histories: baseline, actual source-worker crash and retained-volume target-leader
   crash checked 6,003,072 acknowledged orders without reconciled loss/corruption.
-- [ ] Finish MirrorMaker empty-storage/post-Docker-crash reconciliation and
-  witness-backed teardown/recreation; preserve the interrupted run as failed.
+- [x] Qualify fresh MirrorMaker empty-storage replacement and separate post-crash
+  reconciliation: full replay checked 10,005,120 cumulative ACKs per cluster with
+  zero loss/corruption; the interrupted experiment remains failed.
+- [x] Finish MirrorMaker witness-backed teardown/recreation and image cleanup:
+  774 + 280 archived files independently hash-checked, fresh 4,000,000-order
+  cutover and retained readbacks passed; failed attempts remain recorded.
 - [ ] Close independent-reader and preserved-history gaps in the recent relational,
   search, object-storage, messaging and archive examples identified by the audit.
 - [ ] Extend applicable native repair, scaling, rolling changes, dependency/quorum

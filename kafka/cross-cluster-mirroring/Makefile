@@ -29,6 +29,7 @@ TOPIC ?= orders-$(shell date -u +%Y%m%d%H%M%S)
 RUN_ID ?= $(shell date -u +%Y%m%dT%H%M%SZ)
 TOPIC := $(TOPIC)
 RUN_ID := $(RUN_ID)
+export COUNT RUN_ID TOPIC
 ifeq ($(MM2_REPLICATION_POLICY),identity)
 MM2_REPLICATION_POLICY_CLASS := org.apache.kafka.connect.mirror.IdentityReplicationPolicy
 TARGET_TOPIC := $(TOPIC)
@@ -40,7 +41,7 @@ $(error MM2_REPLICATION_POLICY must be identity or default)
 endif
 
 .NOTPARALLEL:
-.PHONY: build-replication-images replication-images test-live-mirror test-production check-controls checkpoint-proof kind-up kind-cluster namespace operator clusters mirror up images topic test verify-mirror chaos-mm2-worker chaos-broker-disk-loss chaos-target-broker status logs logs-mm2 cli down kind-down
+.PHONY: build-replication-images replication-images test-live-mirror test-production check-controls checkpoint-proof kind-up kind-cluster namespace operator clusters mirror up images topic test test-cutover verify-retained verify-mirror chaos-mm2-worker chaos-broker-disk-loss chaos-target-broker status logs logs-mm2 cli down kind-down
 
 kind-up: kind-cluster
 
@@ -89,10 +90,14 @@ images:
 	$(KIND) load docker-image --name $(CLUSTER_NAME) $(PRODUCER_IMAGE) $(CONSUMER_IMAGE)
 
 topic:
+	python3 replication_control.py validate-topic
 	TOPIC=$(TOPIC) envsubst < manifests/topic.yaml | $(KUBECTL) apply -f -
 	$(KUBECTL) wait kafkatopic/$(TOPIC) --for=condition=Ready --timeout=2m
 
-test: images topic
+test:
+	python3 replication_control.py cutover
+
+test-cutover: images topic
 	-$(KUBECTL) delete job kafka-consumer kafka-producer --ignore-not-found
 	RUN_ID=$(RUN_ID) COUNT=$(COUNT) TOPIC=$(TOPIC) PROGRESS_EVERY=$(PROGRESS_EVERY) BOOTSTRAP_SERVERS=$(SOURCE_ALIAS)-kafka-bootstrap:9092 envsubst < jobs/producer.yaml | $(KUBECTL) apply -f -
 	$(KUBECTL) wait job/kafka-producer --for=condition=complete --timeout=30m
@@ -109,6 +114,9 @@ test: images topic
 	$(KUBECTL) wait job/kafka-producer --for=condition=complete --timeout=30m
 	$(KUBECTL) wait job/kafka-consumer --for=condition=complete --timeout=30m
 	$(KUBECTL) logs job/kafka-consumer
+
+verify-retained:
+	python3 replication_control.py verify-retained
 
 verify-mirror:
 	RUN_ID=$(RUN_ID) COUNT=$(COUNT) TOPIC=$(TOPIC) GROUP_ID=dr-$(RUN_ID) BOOTSTRAP_SERVERS=$(SOURCE_ALIAS)-kafka-bootstrap:9092 envsubst < jobs/consumer.yaml | $(KUBECTL) apply -f -
@@ -144,9 +152,8 @@ chaos-mm2-worker: replication-images
 chaos-target-broker: replication-images
 	COUNT=$(COUNT) LIVE_RATE=$(LIVE_RATE) python3 replication_control.py west-broker-crash
 
-chaos-broker-disk-loss:
-	@echo "Empty-disk recovery is pending qualification after the Docker crash; see README."
-	@exit 2
+chaos-broker-disk-loss: replication-images
+	COUNT=$(COUNT) LIVE_RATE=$(LIVE_RATE) python3 replication_control.py west-empty-disk
 
 test-production: replication-images
 	COUNT=$(COUNT) LIVE_RATE=$(LIVE_RATE) python3 replication_control.py test-production

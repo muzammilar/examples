@@ -1,9 +1,11 @@
 """Owned kind lifecycle and local workload Jobs for the mirroring recovery tests."""
 
+import hashlib
 import json
 import os
 from pathlib import Path
 import subprocess
+import sys
 import time
 import uuid
 
@@ -90,9 +92,14 @@ def owner():
         raise RuntimeError("owned kind node identities changed")
     control = node(CLUSTER + "-control-plane")
     mounts = [m for m in control["Mounts"] if m["Destination"] == "/var/lab/mirroring"]
+    sources = {str(DATA.resolve())}
+    if sys.platform == "darwin":
+        # Docker Desktop exposes macOS host paths through its Linux VM.
+        sources.add("/host_mnt" + str(DATA.resolve()))
     if (
         len(mounts) != 1
-        or mounts[0]["Source"] != str(DATA.resolve())
+        or mounts[0]["Type"] != "bind"
+        or mounts[0]["Source"] not in sources
         or not mounts[0]["RW"]
     ):
         raise RuntimeError("external host witness mount is unavailable")
@@ -321,6 +328,28 @@ def record_images(*tags):
     save(path, images, replace=True)
 
 
+def archive_data(receipt):
+    archive = DATA / "archives" / receipt["owner"]
+    archive.mkdir(parents=True, exist_ok=False)
+    for path in list(DATA.iterdir()):
+        if path.name not in {"archives", "cleanups"}:
+            if path.is_symlink():
+                raise RuntimeError("refusing symlinked active lab data")
+            path.rename(archive / path.name)
+    hashes = {}
+    for path in sorted(archive.rglob("*")):
+        if path.is_symlink():
+            raise RuntimeError("archived evidence contains a symlink")
+        if path.is_file():
+            digest = hashlib.sha256()
+            with path.open("rb") as stream:
+                for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+                    digest.update(chunk)
+            hashes[str(path.relative_to(archive))] = digest.hexdigest()
+    save(archive / "manifest.json", {"owner": receipt, "sha256": hashes})
+    return archive
+
+
 def kind_down():
     owner()
     namespaces = kube("get", "namespace", "-o", "json")["items"]
@@ -348,7 +377,11 @@ def kind_down():
     call(["kind", "delete", "cluster", "--name", CLUSTER], timeout=180)
     if CLUSTER in call(["kind", "get", "clusters"]).splitlines():
         raise RuntimeError("kind cluster still exists")
-    save(DATA / "cleanups" / (receipt["owner"] + ".json"), receipt)
+    archive = archive_data(receipt)
+    save(
+        DATA / "cleanups" / (receipt["owner"] + ".json"),
+        {"owner": receipt, "archive": str(archive.relative_to(DATA))},
+    )
     CONFIG.unlink(missing_ok=True)
     (STATE / "replication-owner.json").unlink()
     inventory.unlink(missing_ok=True)

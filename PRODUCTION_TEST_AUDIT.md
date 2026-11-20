@@ -206,17 +206,30 @@ READMEs retain dated execution results and limitations.
   workflow (first-attempt checkpoint gate: 9.613 s); no performance comparison is
   inferred from these differently warmed waits. Body/key validation and explicit
   validated-offset commits were tightened.
-  This is a correctness/cutover qualification, not a fresh live fault lifecycle;
-  external per-ID ACK histories and independent live failure observations remain.
+  This cutover qualification is separate from the live fault cases below.
   Additional live baseline, actual MM2 source-worker SIGKILL and retained-volume
   west-leader SIGKILL passed with **6,003,072 cumulative source ACK orders**.
   Independent source/target readers, host-fsynced intents/outcomes and complete
   body/partition replay found zero ACK loss/corruption/duplicate logical records.
   Recovered west broker served all six new-topic partitions for replay. The
   original empty setup failure remains failed with explicit zero-write evidence.
-  Empty-storage replacement remains **failed/unqualified** after an inspection
-  exit 139/Docker crash; final reconciliation and witness-backed lifecycle cleanup
-  remain pending. No fault/capacity comparison or physical-disk qualification is claimed.
+  The original empty-storage run remains **failed** after exit 139/Docker crash.
+  Separate post-reboot reconciliation verified 8,004,096 ACKs without loss; a
+  failed source task required the supported failed-task-only Connect restart.
+  A fresh empty-storage case passed with 2,001,024 new ACKs and full replay of
+  **10,005,120 cumulative ACKs** on each cluster, zero loss/corruption. Fencing,
+  distinct volume identity, deleted old storage, RF3 native rebuild and service
+  through the rebuilt leader were proved. Fault→rebuilt-copy service: 72.070 s.
+  CRI accounting measured 713.214 observed CPU core-seconds over 505.476 s,
+  including full historical replay; it is not a capacity benchmark. Witness-backed
+  teardown and recreated-lab lifecycle passed, with 774 + 280 files independently
+  hash-verified and six unrelated containers preserved. Fresh cutover checked
+  4,000,000 unique orders; exact checkpoints passed on attempt 3 after 39.125 s.
+  Separate setup retained 15 managed Pod/container identities, followed by fresh
+  source/two-batch-west readbacks. Excluded-topic, overlapping-retry and initial
+  one-run retained-verifier failures remain recorded with separately reconciled
+  source data. Topic preflight, inherited cutover locking and two-run verification
+  now guard those paths. No physical-disk qualification is claimed.
 
 
 - [Ceph RGW](ceph/s3-cluster/): independent Compose writer/reader, fsynced
@@ -295,7 +308,7 @@ Closing one fault case does not close the entire deployment matrix.
 | RustFS | Example-owned `control.py`, independent `traffic.py`, preserved histories, native canonical heal and read-only slot/fingerprint auditor | Core reader/history/survivor backfill, full four-case fresh fault aggregate, benchmark, corrected cold reopen and two fresh lifecycles qualified above. Peer partitions, quorum loss, pool/resource changes, upgrades/rollback, pressure, physical EIO/bitrot/power loss and independent restore remain unrun. |
 | Ceph | Example-owned `control.py`, independent `traffic.py`, preserved SDK histories and `native/` PG/deep-scrub/process auditor | All four core faults and warm benchmark qualified with independent live readers, preserved histories, native OSD UUID/serial fencing and all 17 daemon process witnesses. Cold reopen, retained-state setup, fresh default lifecycle, archived witness integrity and scoped cleanup also qualified above. Isolated daemon faults, quorum/partitions, pressure, topology changes, upgrades and independent restore remain unrun. |
 | Kafka Strimzi JBOD | Independent live C++/Rust actors, external histories, native CRI/ISR/directory proof and repaired-leader replay | Core and three fresh-process benchmark trials qualified above; short-deadline ambiguity/duplicate run remains failed with exact retained state. Still add scaling/vertical changes, operator reconciliation/outage, rolling/node/drain/PDB, partitions/quorum, upgrades, pressure, persistent PVC replacement and independent restore; isolate the duplicate reproducer. |
-| Kafka mirroring | Make orchestration, native checkpoint formatter and Rust offset/ISR/EOF inspection | Cutover/checkpoint proof plus live baseline, source-worker crash and retained-volume west-leader crash passed with preserved ACK histories and full replay. Empty-storage failure, post-crash reconciliation, lifecycle closure and extended operator/failure cases remain pending; historical Pod deletions do not qualify them. |
+| Kafka mirroring | Make orchestration, native checkpoint formatter and Rust offset/ISR/EOF inspection | Cutover/checkpoint proof plus live baseline, source-worker crash and retained-volume west-leader crash passed with preserved ACK histories and full replay. Fresh empty-storage replacement and separate post-crash full reconciliation passed; the original interrupted run stays failed. Recreated lifecycle/retained readback and cleanup passed; extended operator/failure cases remain pending. Historical Pod deletions do not qualify them. |
 | Kafka PostgreSQL enrichment | Make demo, producer/consumer and Go processor | Two-million-message pipeline correctness is not a fault matrix. Add broker, Connect worker/task, processor and PostgreSQL outages with live traffic; quantify duplicate delivery, CDC/cache freshness and backlog. |
 | StarRocks operator/Compose, Qdrant TurboQuant | Operator `operations.py`, Compose/Qdrant `fault.py`, independent live observers and reconciler | Existing role/disk/operator cases already have stronger observation paths. Do not duplicate them mechanically. Qualify pinned upgrades, independent restore, pressure and remaining topology/partition cases separately; no fresh rerun in this audit. |
 | Neon Compose and Greptime Compose | Local fault/scale controllers and independent observers | Bring the newly qualified Kubernetes dependency cases to supported Compose paths, then extend rolling changes, partitions, pressure and restore. Kubernetes results do not qualify Compose configuration. |
@@ -332,7 +345,7 @@ inventory with `python3 tools/audit-production-tests.py`; output is ignored unde
 | [iceberg/multi-system](iceberg/multi-system/) | Compose | none | suite, crash, disk, scale-out, scale-in, rolling, partition, pressure, restore, drain | declaration inventory only |
 | [iceberg/trino-minio](iceberg/trino-minio/) | Compose | crash | suite, disk, scale-out, scale-in, rolling, partition, pressure, restore, drain | declaration inventory only |
 | [kafka/connect-postgres-enrichment](kafka/connect-postgres-enrichment/) | Compose | none | suite, crash, disk, scale-out, scale-in, rolling, partition, pressure, restore, drain | declaration inventory only |
-| [kafka/cross-cluster-mirroring](kafka/cross-cluster-mirroring/) | Kubernetes | none | suite, crash, disk, scale-out, scale-in, rolling, partition, pressure, restore, drain | declaration inventory only; private kubeconfig export not found in Makefile |
+| [kafka/cross-cluster-mirroring](kafka/cross-cluster-mirroring/) | Kubernetes | suite, crash, disk | scale-out, scale-in, rolling, partition, pressure, restore, drain | core live recovery, exact cutover, retained-state replay and scoped lifecycle qualified above; private kubeconfig and explicit contexts verified; four-case aggregate invocation remains unrun |
 | [kafka/strimzi-jbod](kafka/strimzi-jbod/) | Kubernetes | none | suite, crash, disk, scale-out, scale-in, rolling, partition, pressure, restore, drain | declaration inventory only |
 | [lancedb/versioned-product-search](lancedb/versioned-product-search/) | Compose | test-production, writer-crash, reader-crash, maintenance, rolling-restart, cold-reopen, crash-reopen | partition, pressure, restore, SDK upgrade; native replication/sharding unsupported | core execution verified 2026-11-19; extended gaps above |
 | [mysql/customer-sharding](mysql/customer-sharding/) | Compose | suite, crash | disk, scale-out, scale-in, rolling, partition, pressure, restore, drain | eight live fault cases qualified above; other categories require separate work |

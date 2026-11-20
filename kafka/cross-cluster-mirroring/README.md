@@ -12,11 +12,15 @@ Two independent Strimzi-managed KRaft Kafka clusters run in one local kind clust
 
 Prerequisites: Docker, `make`, `kind`, `kubectl`, Helm, Python 3.9+, `envsubst`, and `grep`. Producer and consumer images build with Docker; host C++, protobuf, and Rust toolchains are not required.
 
-Every run uses a unique topic such as `orders-20261114070120` and run ID, so it does not need to erase existing topic data. Override `COUNT`, `TOPIC`, or `RUN_ID` with Make variables. The C++ producer accepts counts up to 2,000,000. The default test validates 4,000,000 unique orders across the initial source batch and producer cutover batch, and also validates the mirrored copy of the initial batch.
+Every run uses a unique topic such as `orders-20261114070120` and run ID, so it does not need to erase existing topic data. Override `COUNT`, `TOPIC`, or `RUN_ID` with Make variables. `TOPIC` must match `^orders-[0-9]+$`, the configured MM2 filter; setup rejects excluded names before creating a topic or producing records. The C++ producer accepts counts up to 2,000,000. The default test validates 4,000,000 unique orders across the initial source batch and producer cutover batch, and also validates the mirrored copy of the initial batch.
 
 Make exports the example-owned `results/kubeconfig` before kind creation and
 removes it at `kind-down`; kubectl and Helm always specify the full kind context.
-The default user context is not changed.
+The default user context is not changed. Docker Desktop may report macOS bind
+sources under `/host_mnt`; ownership accepts that exact translated path only on
+macOS, still requiring a writable bind to this example's witness directory. Fresh
+recreation exposed this path-check failure; after correction, a host-written
+ownership receipt was read back through the actual control-plane mount.
 
 ## Live recovery tests
 
@@ -30,11 +34,16 @@ then finishes the minimum only after recovery and renewed reader progress.
 
 | Target | Operation |
 |---|---|
+| `make verify-retained` | After cutover and repeated setup, use the original `TOPIC`, `RUN_ID` and `COUNT` to validate the source batch on east and both known batches on west through new groups. |
 | `make test-live-mirror` | Establish the witnessed two-cluster correctness baseline. |
 | `make chaos-mm2-worker` | Discover a running source-task owner and SIGKILL its real container process. Prove old-process exit, replacement identity, restored tasks and stable unrelated containers. |
 | `make chaos-target-broker` | Discover the actual west partition-zero leader, SIGKILL it, retain its Pod/data volume, then verify native catch-up. Reorder preferred replicas and elect the recovered broker leader for all six new-topic partitions before complete replay. |
-| `make test-production` | Serial baseline → worker crash → retained-volume broker crash; stop on any failure. The three component targets were executed individually in that order; the aggregate invocation has not been rerun. |
-| `make chaos-broker-disk-loss` | Currently exits nonzero: the replacement run was interrupted and remains unqualified. Its unfinished implementation stays off main. |
+| `make test-production` | Serial baseline → worker crash → retained-volume broker crash → empty-disk replacement; stop on any failure. Component targets were executed separately; this four-case aggregate invocation has not been run. |
+| `make chaos-broker-disk-loss` | Fence the actual west leader, replace its EmptyDir, rebuild RF3 and promote the rebuilt copy under live load; replay every preserved ACK history. |
+
+Cutover and live-fault/teardown controllers reject concurrent runs using local
+file locks. Wait for a stopped controller and its child processes to exit before
+retrying; preserve the interrupted attempt's evidence.
 
 Live qualification currently requires identity replication policy, two MM2 workers
 and three source tasks. The separate cutover/configuration experiments below keep
@@ -55,6 +64,11 @@ control plane; broker/worker process failures cannot delete them. They are not a
 independent backup against host/disk loss. Every successful case replays earlier
 histories on both clusters instead of resetting their data. Cleanup refuses an
 unqualified history. Preserve the witness and diagnose failed cases before retrying.
+After native repair, `python3 replication_control.py reconcile-history` performs
+read-only full-history verification and seals a separate recovery receipt; it does
+not turn failed experiments into passes. `make kind-down` moves the retired lab's
+histories into `results/production/archives/<owner>/`, with a SHA-256 manifest,
+so a recreated cluster cannot accidentally claim to retain its predecessor's data.
 
 `kind-config.json` is the tracked topology template. `make kind-up` substitutes the
 owned host witness path into ignored `results/kind-replication.json`; it records
@@ -122,6 +136,97 @@ each broker at 1 CPU/1536 MiB, each MM2 worker at 1 CPU/1 GiB; Kafka heaps stay
 independent machines or dedicated reserved cores; operator/entity services and
 Kubernetes overhead are additional costs.
 
+### Empty-disk replacement — 2026-11-20
+
+Fresh case `fe14fbcc93ef498f957e480abc04857d` passed with **2,001,024 new
+ACKs / 138,960,570 protobuf bytes**, zero rejected/ambiguous writes, zero ACK
+loss/corruption and zero duplicate live deliveries on either cluster. Full replay
+also checked the four earlier data histories: **10,005,120 ACKs** per cluster.
+The interrupted experiment remains failed even though its data reconciled.
+
+The controller fenced the actual west leader (broker 5), briefly stopped only its
+owned worker's kubelet to prevent an old-volume restart race, normally deleted the
+Pod, and resumed kubelet in cleanup. It positively verified the old UID's storage
+was removed and the replacement had a different UID/data path. Native checks
+required all replicas caught up before promoting the rebuilt broker to leader of
+all six partitions. Unrelated Kafka/MM2 containers retained their identities.
+This is permanent EmptyDir loss on one shared VM, not a physical-device failure.
+
+| Observation | Measured result |
+|---|---:|
+| Fault → positive process fencing | 1.179 s |
+| Fault → replacement Ready | 29.442 s |
+| Fault → native recovery barrier | 42.464 s |
+| Fault → rebuilt copy serving all six partitions | 72.070 s |
+| Source ACK callback p50 / p99 | 11.711 / 994.007 ms |
+| East creation→observation p50 / p99 | 11,572.942 / 26,189.878 ms |
+| West creation→observation p50 / p99 | 13,650.099 / 26,805.402 ms |
+| West failed polls / watermark requests | 6 / 5 |
+| West longest observed completion gap | 9.425 s |
+| Largest west per-partition completion gap | 58.681 s |
+
+The mixed source ACK window was **13,723.43 ACK/s**; rate limiting, fsynced
+witnesses and final burst apply as above. Successful message percentiles each have
+2,001,024 samples. Failed poll p50/p99 were **1.347/49.546 ms** (6 samples);
+failed watermark p50/p99 were **1001.066/1001.958 ms** (5 samples). These small
+error samples do not establish tail latency. Completion gaps include client
+buffering/scheduling and do not establish a continuous endpoint outage.
+
+CRI sampling recorded **408 node samples over 505.476 s**, targeting 5-second
+cadence, and **713.214 observed CPU core-seconds** across sampled containers,
+including Kubernetes, workloads and historical replay verifiers. Largest sampled
+individual-container RSS was **959,320,064 bytes** (MM2 worker 0); largest charged
+memory was **1,610,326,016 bytes** (west broker 5). These are sample maxima, not
+true peaks or simultaneous whole-stack memory. Stopped-container counters may be
+unavailable and short-lived work/tails can be missed. Host controllers and Docker
+VM overhead are excluded. This is experiment accounting, not a capacity comparison.
+
+### Recreated lab and retained state — 2026-11-20
+
+A new four-node kind lab was created after archiving the recovery cohort. Its
+initial ownership check rejected Docker Desktop's translated bind path; the fix
+above and an actual host-file readback qualified the mount before workload setup.
+
+The serial locked cutover (`TOPIC=orders-20261120064000`,
+`RUN_ID=lifecycle-20261120-v3`, `COUNT=2000000`) passed: **2,000,000 initial
+orders**, their validated west copy, then **2,000,000 west-produced orders**.
+There were **4,000,000 unique orders**, each batch totaling **6,999,000,000 cents**.
+The checkpoint gate rejected two premature snapshots, then proved all six exact
+translations and **zero application replay** on attempt 3 after **39.125 s**.
+This polling/CLI barrier is not an isolated replication-latency benchmark.
+
+A separate `make up` invocation retained all **15 managed Pod UIDs/container
+identities**. `make verify-retained` then replayed **2,000,000 east records** and
+**4,000,000 west records** through fresh groups, validating both batches' complete
+expected bodies/keys, unique IDs and separate creation-timestamp bases. The
+consumer's optional `SECOND_RUN_ID` declares the second batch explicitly; unknown
+runs and invalid bodies still fail. West's combined amount was
+**13,998,000,000 cents**. Final native inspection found RF3/ISR3, zero log-directory
+replica lag and zero metadata-follower lag on both clusters.
+
+The deterministic cutover verifier stops at its declared counts. The separate live
+ACK-history tests above provide strict captured-EOF/physical-duplicate accounting.
+
+Normal `make down` and `make kind-down` completed after these checks. All **280
+files** in the recreated lab's archive passed an independent SHA-256 recheck, its
+cluster/private kubeconfig were gone, and all **six unrelated containers** retained
+their identities and running/stopped states. Archive:
+`results/production/archives/8f012e60c7b44f6395261e887a28b933/`.
+
+The first retained readback remains failed: its one-run verifier encountered the
+second valid batch on west. The two-run implementation passed Docker's Rust
+format/Clippy/release checks and **5 Rust tests** before the successful replay;
+controller coverage is **15 Python tests** plus lint/format checks.
+
+Two earlier cutover attempts remain invalidated: an excluded custom topic
+(`orders-lifecycle-20261120`) produced no matching MM2 tasks, and its manual
+cancellation left a Make parent running while a retry reused fixed-name Jobs.
+Both controllers were stopped; neither result qualifies. Topic creation now
+rejects excluded names before producing data, and the full cutover holds a lock
+inherited by its Make child; competing tests/teardown fail closed. Separate source
+readbacks verified those attempts' **4,000,000 source orders** after repeated
+setup. This does not establish successful west replication/cutover for them.
+
 ### Failed and pending runs
 
 - Setup `bc11fbef4c9a4a3f874fd140b494898b` remains **failed**: Connect status inspection
@@ -134,13 +239,20 @@ Kubernetes overhead are additional costs.
 - Empty-storage run `45ec30c4317447b19c9fc35798b08bc6` remains **failed/unqualified**:
   after native rebuild and preferred-leader promotion, a `kafka-log-dirs.sh`
   inspection exited **139**, followed by the reported Docker crash. Full final
-  reconciliation did not complete; acknowledged loss is **unknown** for this run.
-  Preserve its host journals and diagnose after Docker returns. It is not evidence
-  of a Kafka root cause, successful disk recovery or a physical-device failure.
-- The witness-backed full teardown/recreation sequence and new image-ownership
-  cleanup have not been live-qualified after the interruption. Cleanup's image
-  identity/refusal behavior has offline unit coverage. The prior completed
-  cutover fixture was normally removed before adding the host witness mount.
+  reconciliation did not complete in that experiment. A separate post-reboot
+  reconciliation on 2026-11-20 verified all **8,004,096 ACKs** from its four data
+  histories on both clusters, with zero loss/corruption. Its original failure
+  remains unchanged. After reboot, one MirrorSource task reported an invalid
+  internal-request signature despite Ready workers; the supported Connect restart
+  API (`includeTasks=true&onlyFailed=true`) returned HTTP 202 and restored all
+  three tasks. Authentication, source fencing and EOS were retained. The cause of
+  the original exit 139 or the signature failure is not isolated.
+- Witness-backed `make down` and `make kind-down` passed on 2026-11-20:
+  every data history was replayed before deletion, owned image tags and the
+  private kubeconfig were removed, and all **774 archived files** passed an
+  independent SHA-256 recheck. All **six unrelated containers** remained present.
+  Archive: `results/production/archives/9e4449dbe39b4adeab08af334462d376/`.
+  The recreated lab and its corrected retained-state checks are described above.
 - Further fault domains remain unrun: source-cluster loss/unplanned promotion,
   quorum/partitions, node outage, drain/PDB, operator outage/reconciliation, scaling,
   upgrades, pressure, independent restore, saturation/soak and fair comparisons.

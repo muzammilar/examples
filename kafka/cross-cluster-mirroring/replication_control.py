@@ -1,15 +1,19 @@
 """Serial live MirrorMaker failures with external witnesses and native repair barriers."""
 
+import copy
 import fcntl
+import hashlib
 import json
 import os
 import re
+import subprocess
 import sys
 import time
 import uuid
 
 import replication_lab as lab
 import replication_report as report
+import replication_resources as resources
 
 
 def identities():
@@ -331,9 +335,53 @@ def empty_history(case, record=False):
     return proof
 
 
+def recovered_failure(root):
+    receipt_path = root / "post-crash-reconciliation.json"
+    if not (root / "failure.json").exists() or not receipt_path.exists():
+        return False
+    receipt = json.loads(receipt_path.read_text())
+    recovery = (lab.DATA / receipt["recovery"]).resolve()
+    if not recovery.is_relative_to((lab.DATA / "recoveries").resolve()):
+        raise RuntimeError("recovery receipt points outside owned recovery evidence")
+    result = json.loads((recovery / "result.json").read_text())
+    owner = json.loads((lab.STATE / "replication-owner.json").read_text())["owner"]
+    if (
+        receipt["original_status"] != "failed"
+        or result["owner"] != owner
+        or result["proofs"][root.name] != receipt["proofs"]
+    ):
+        raise RuntimeError(
+            "failed-history recovery receipt does not match its sealed proof"
+        )
+    digest = hashlib.sha256(
+        (root / "east" / "producer.jsonl.gz").read_bytes()
+    ).hexdigest()
+    if digest != receipt["producer_witness_sha256"]:
+        raise RuntimeError("recovered producer witness changed")
+    for side in ("east", "west"):
+        proof = receipt["proofs"][side]["result"]
+        if (
+            proof["strict_verification"] is not True
+            or proof["acknowledged_loss"] != 0
+            or proof["corruption"] != 0
+            or proof["observed_acknowledged"] != proof["acknowledged"]
+            or proof["run_id"] != root.name
+            or proof["mirrored_offset_policy"] != (side == "west")
+        ):
+            raise RuntimeError(
+                "recovery did not establish a strict preserved-data baseline"
+            )
+    return True
+
+
 class Experiment:
     def __init__(self, operation):
-        if operation not in {"correctness", "mm2-worker-crash", "west-broker-crash"}:
+        if operation not in {
+            "correctness",
+            "mm2-worker-crash",
+            "west-broker-crash",
+            "west-empty-disk",
+        }:
             raise ValueError("operation is not qualified: " + operation)
         if (
             os.environ.get("MM2_REPLICATION_POLICY", "identity") != "identity"
@@ -352,6 +400,7 @@ class Experiment:
         self.preferred_leader = None
         self.allowed_replacements = set()
         self.original_identities = None
+        self.recorder = None
         count = int(os.environ.get("COUNT", "2000000"))
         if not 1_000_000 <= count <= 2_000_000:
             raise ValueError("COUNT must be between one and two million")
@@ -393,6 +442,8 @@ class Experiment:
         print(json.dumps({"case": self.id, **marker}), flush=True)
 
     def observations(self):
+        if self.recorder is not None:
+            self.recorder.check()
         result = {"time": time.time()}
         for side in ("east", "west"):
             root = self.root / side
@@ -524,7 +575,7 @@ class Experiment:
         self.wait_native()
         self.phase("repaired-copy-serving", broker=broker)
 
-    def crash(self, target):
+    def crash(self, target, empty_disk=False):
         before = identities()
         old = before[target]
         self.allowed_replacements.add(target)
@@ -571,30 +622,129 @@ class Experiment:
         old_volume = (
             data_volume(inspection, old["uid"]) if old["name"] == "kafka" else None
         )
-        self.phase("fault", target=target, container=old["container"], pid=pid)
-        lab.call(["docker", "exec", node["Id"], "kill", "-KILL", str(pid)])
+        paused = False
+        try:
+            if empty_disk:
+                pod = lab.kube("get", "pod", old["pod"], "-o", "json")
+                volume = old_volume.rsplit("/", 1)[1]
+                declared = [v for v in pod["spec"]["volumes"] if v["name"] == volume]
+                if (
+                    pod["metadata"]["uid"] != old["uid"]
+                    or len(declared) != 1
+                    or "emptyDir" not in declared[0]
+                    or declared[0]["emptyDir"].get("medium", "") != ""
+                ):
+                    raise RuntimeError(
+                        "empty-disk test requires a disk-backed EmptyDir"
+                    )
+                # Prevent kubelet from restarting the old writer between fencing and
+                # marking its Pod for normal volume cleanup. Other containers keep running.
+                paused = True
+                lab.call(["docker", "exec", node["Id"], "systemctl", "stop", "kubelet"])
+                if (
+                    lab.call(
+                        [
+                            "docker",
+                            "exec",
+                            node["Id"],
+                            "systemctl",
+                            "show",
+                            "kubelet",
+                            "--property=ActiveState",
+                            "--value",
+                        ]
+                    ).strip()
+                    != "inactive"
+                ):
+                    raise RuntimeError("owned worker kubelet did not stop")
+                self.phase("kubelet-paused-for-fencing", node=old["node"])
+            self.phase("fault", target=target, container=old["container"], pid=pid)
+            lab.call(["docker", "exec", node["Id"], "kill", "-KILL", str(pid)])
 
-        def fenced():
-            records = json.loads(
-                lab.call(
-                    [
-                        "docker",
-                        "exec",
-                        node["Id"],
-                        "crictl",
-                        "ps",
-                        "-a",
-                        "-o",
-                        "json",
-                    ]
+            def fenced():
+                records = json.loads(
+                    lab.call(
+                        [
+                            "docker",
+                            "exec",
+                            node["Id"],
+                            "crictl",
+                            "ps",
+                            "-a",
+                            "-o",
+                            "json",
+                        ]
+                    )
                 )
-            )
-            lab.save(self.root / ("fence-" + str(time.time_ns()) + ".json"), records)
-            matches = [r for r in records["containers"] if r["id"] == old["container"]]
-            return not matches or matches[0]["state"] == "CONTAINER_EXITED"
+                lab.save(
+                    self.root / ("fence-" + str(time.time_ns()) + ".json"), records
+                )
+                matches = [
+                    r for r in records["containers"] if r["id"] == old["container"]
+                ]
+                return not matches or matches[0]["state"] == "CONTAINER_EXITED"
 
-        lab.wait(fenced, "positive old process exit", 60)
-        self.phase("process-fenced")
+            lab.wait(fenced, "positive old process exit", 60)
+            self.phase("process-fenced")
+            if empty_disk:
+                records = json.loads(
+                    lab.call(
+                        [
+                            "docker",
+                            "exec",
+                            node["Id"],
+                            "crictl",
+                            "ps",
+                            "-a",
+                            "-o",
+                            "json",
+                        ]
+                    )
+                )
+                if any(
+                    r.get("labels", {}).get("io.kubernetes.pod.uid") == old["uid"]
+                    and r["state"] == "CONTAINER_RUNNING"
+                    for r in records["containers"]
+                ):
+                    raise RuntimeError(
+                        "an old writer remains alive before volume removal"
+                    )
+                lab.save(self.root / "fenced-before-volume-replacement.json", records)
+                lab.call(lab.KUBE + ["delete", "pod", old["pod"], "--wait=false"])
+                pods = lab.kube("get", "pods", "-o", "json")
+                existing = [
+                    p for p in pods["items"] if p["metadata"]["uid"] == old["uid"]
+                ]
+                if existing and not existing[0]["metadata"].get("deletionTimestamp"):
+                    raise RuntimeError(
+                        "old Pod was not marked for normal kubelet cleanup"
+                    )
+                lab.save(
+                    self.root / "volume-replacement-authorized.json",
+                    {"pods": pods, "old_volume": old_volume, "old_uid": old["uid"]},
+                )
+        finally:
+            if paused:
+                lab.call(
+                    ["docker", "exec", node["Id"], "systemctl", "start", "kubelet"]
+                )
+                if (
+                    lab.call(
+                        [
+                            "docker",
+                            "exec",
+                            node["Id"],
+                            "systemctl",
+                            "show",
+                            "kubelet",
+                            "--property=ActiveState",
+                            "--value",
+                        ]
+                    ).strip()
+                    != "active"
+                ):
+                    raise RuntimeError("owned worker kubelet did not resume")
+                self.phase("kubelet-resumed", node=old["node"])
 
         def restarted():
             self.alive()
@@ -605,7 +755,9 @@ class Experiment:
                 or current[target]["container"] == old["container"]
             ):
                 return None
-            if current[target]["uid"] != old["uid"]:
+            if empty_disk and current[target]["uid"] == old["uid"]:
+                return None
+            if not empty_disk and current[target]["uid"] != old["uid"]:
                 raise RuntimeError(
                     "retained-volume crash unexpectedly replaced Pod storage"
                 )
@@ -618,6 +770,26 @@ class Experiment:
             return current
 
         after = lab.wait(restarted, "replacement process readiness", 300)
+        self.phase(
+            "replacement-ready",
+            pod_uid=after[target]["uid"],
+            container=after[target]["container"],
+        )
+        if empty_disk:
+            records = json.loads(
+                lab.call(
+                    ["docker", "exec", node["Id"], "crictl", "ps", "-a", "-o", "json"]
+                )
+            )
+            lab.save(self.root / "old-pod-fenced.json", records)
+            if any(
+                r.get("labels", {}).get("io.kubernetes.pod.uid") == old["uid"]
+                and r["state"] == "CONTAINER_RUNNING"
+                for r in records["containers"]
+            ):
+                raise RuntimeError(
+                    "an old Pod process remains alive after storage replacement"
+                )
         if old_volume is not None:
             replacement = json.loads(
                 lab.call(
@@ -632,7 +804,7 @@ class Experiment:
                 )
             )
             new_volume = data_volume(replacement, after[target]["uid"])
-            if new_volume != old_volume:
+            if (new_volume != old_volume) != empty_disk:
                 raise RuntimeError(
                     "retained versus replaced data-volume identity is incorrect"
                 )
@@ -640,6 +812,24 @@ class Experiment:
                 self.root / "data-volume-after.json",
                 {"old": old_volume, "new": new_volume, "cri": replacement},
             )
+        if empty_disk:
+
+            def old_directory_removed():
+                entries = lab.call(
+                    ["docker", "exec", node["Id"], "ls", "-1", "/var/lib/kubelet/pods"]
+                ).splitlines()
+                lab.save(
+                    self.root / ("pod-directories-" + str(time.time_ns()) + ".json"),
+                    entries,
+                )
+                return old["uid"] not in entries
+
+            lab.wait(
+                old_directory_removed,
+                "native removal of old UID-owned EmptyDir storage",
+                180,
+            )
+            self.phase("old-storage-removed", old_uid=old["uid"])
         lab.save(self.root / "fault-after.json", after)
         self.phase(
             "process-restarted",
@@ -667,6 +857,8 @@ class Experiment:
 
     def run(self):
         lab.owner()
+        self.recorder = resources.Recorder(self.root)
+        self.recorder.start()
         topic = {
             "apiVersion": "kafka.strimzi.io/v1",
             "kind": "KafkaTopic",
@@ -743,19 +935,19 @@ class Experiment:
             if len(candidates) != 1:
                 raise RuntimeError("source-task worker ownership is ambiguous")
             self.crash(candidates[0])
-        elif self.operation == "west-broker-crash":
+        elif self.operation in {"west-broker-crash", "west-empty-disk"}:
             row = next(
                 r
                 for r in fresh["sides"]["west"]["partitions"]
                 if r["topic"] == self.topic and r["partition"] == 0
             )
             target = f"west-west-brokers-{row['leader']}/kafka"
-            self.crash(target)
+            self.crash(target, self.operation == "west-empty-disk")
         elif self.operation != "correctness":
             raise ValueError("unknown operation")
         self.phase("native-recovery")
         self.wait_native(900)
-        if self.operation == "west-broker-crash":
+        if self.operation in {"west-broker-crash", "west-empty-disk"}:
             self.serve_from_repaired_broker(int(target.split("/")[0].rsplit("-", 1)[1]))
         self.phase("recovered-live")
         deadline = time.monotonic() + 15
@@ -808,13 +1000,19 @@ class Experiment:
             if case.name != self.id and (case / "no-workload-started.json").exists():
                 proofs[case.name] = empty_history(case.name)
                 continue
-            if case.name != self.id and not (case / "result.json").exists():
+            if (
+                case.name != self.id
+                and not (case / "result.json").exists()
+                and not recovered_failure(case)
+            ):
                 raise RuntimeError(
                     "earlier incomplete/failed history requires diagnosis: " + case.name
                 )
             proofs[case.name] = {
                 side: self.verify(case.name, side) for side in ("east", "west")
             }
+            if (case / "failure.json").exists():
+                proofs[case.name]["original_status"] = "failed"
         reports = {
             side: report.reconcile(
                 self.root / side,
@@ -833,6 +1031,9 @@ class Experiment:
             raise RuntimeError(
                 "an unrelated survivor restarted during the experiment or reconciliation"
             )
+        self.recorder.stop()
+        resource_report = resources.summarize(self.root / "resources.jsonl.gz")
+        self.recorder = None
         self.phase("complete")
         lab.save(
             self.root / "result.json",
@@ -843,6 +1044,7 @@ class Experiment:
                 "acknowledged": acknowledged,
                 "proofs": proofs,
                 "reports": reports,
+                "resources": resource_report,
                 "phases": self.phases,
             },
         )
@@ -852,6 +1054,15 @@ class Experiment:
         )
 
     def failed(self, error):
+        if self.recorder is not None:
+            try:
+                self.recorder.stop()
+            except RuntimeError as recorder_error:
+                lab.save(
+                    self.root / "resource-recorder-failure.json",
+                    {"error": str(recorder_error)},
+                )
+            self.recorder = None
         self.phase("failed", error=str(error))
         for side in ("east", "west"):
             for marker in (
@@ -882,6 +1093,70 @@ class Experiment:
                 )
 
 
+def readback(plans, *, second_run=None):
+    """Replay deterministic cutover fixtures with fresh, example-owned groups."""
+    receipt = lab.owner()
+    root = lab.DATA / "lifecycle" / ("readback-" + uuid.uuid4().hex)
+    lab.save(
+        root / "plan.json",
+        {"owner": receipt, "fixtures": plans, "second_west_run": second_run},
+    )
+    template = json.loads(
+        lab.call(
+            lab.KUBE
+            + [
+                "create",
+                "--dry-run=client",
+                "--validate=false",
+                "-f",
+                str(lab.ROOT / "jobs/consumer.yaml"),
+                "-o",
+                "json",
+            ]
+        )
+    )
+    for side, topic, run, count in plans:
+        if side not in {"east", "west"} or not run or not 1 <= count <= 2_000_000:
+            raise ValueError("invalid retained fixture")
+        name = "retained-" + side + "-" + uuid.uuid4().hex[:16]
+        job = copy.deepcopy(template)
+        job["metadata"]["name"] = name
+        job["metadata"]["labels"]["app"] = "kafka-retained-consumer"
+        pod = job["spec"]["template"]
+        pod["metadata"]["labels"]["app"] = "kafka-retained-consumer"
+        values = {
+            "BOOTSTRAP_SERVERS": side + "-kafka-bootstrap:9092",
+            "TOPIC": topic,
+            "GROUP_ID": name,
+            "RUN_ID": run,
+            "EXPECTED_COUNT": str(count),
+            "TIMEOUT_SECONDS": "1800",
+        }
+        if side == "west" and second_run is not None:
+            values["SECOND_RUN_ID"] = second_run
+        pod["spec"]["containers"][0]["env"] = [
+            {"name": key, "value": value} for key, value in values.items()
+        ]
+        lab.save(root / (name + "-expected.json"), job)
+        lab.call(lab.KUBE + ["create", "-f", "-"], stdin=json.dumps(job))
+        try:
+            lab.wait(lambda: lab.completed(name, root), "retained data readback", 1850)
+        except Exception:
+            lab.save(
+                root / (name + "-pods.json"), lab.kube("get", "pods", "-o", "json")
+            )
+            raise
+        lab.save(
+            root / (name + "-pods.json"),
+            lab.kube("get", "pods", "-l", "job-name=" + name, "-o", "json"),
+        )
+    lab.save(
+        root / "result.json",
+        {"passed": True, "fixtures": plans, "second_west_run": second_run},
+    )
+    print(json.dumps({"retained_readback": str(root), "passed": True}), flush=True)
+
+
 def teardown():
     lab.owner()
     cases = list((lab.DATA / "cases").glob("*/experiment.json"))
@@ -896,7 +1171,7 @@ def teardown():
             if (
                 not (path.parent / "result.json").exists()
                 or (path.parent / "failure.json").exists()
-            ):
+            ) and not recovered_failure(path.parent):
                 raise RuntimeError(
                     "refusing teardown with failed/unqualified history: "
                     + path.parent.name
@@ -929,17 +1204,117 @@ def teardown():
     )
 
 
+def reconcile_history():
+    receipt = lab.owner()
+    root = lab.DATA / "recoveries" / uuid.uuid4().hex
+    root.mkdir(parents=True)
+    lab.save(root / "pods-before.json", lab.kube("get", "pods", "-o", "json"))
+    cases = sorted((lab.DATA / "cases").glob("*/experiment.json"))
+    topics = {json.loads(path.read_text())["topic"] for path in cases}
+    snapshot = native(topics)
+    lab.save(root / "native-before.json", snapshot)
+    if not healthy(snapshot, topics):
+        raise RuntimeError(
+            "native repair must complete before post-crash reconciliation"
+        )
+    audit = Experiment.__new__(Experiment)
+    audit.root = root
+    proofs = {}
+    total = 0
+    for path in cases:
+        case = path.parent.name
+        if (path.parent / "no-workload-started.json").exists():
+            proofs[case] = empty_history(case)
+            continue
+        producer = json.loads((path.parent / "east" / "producer.json").read_text())
+        if producer["ambiguous"] or producer["rejected"] or producer["aborted"]:
+            raise RuntimeError("history has unresolved producer outcomes: " + case)
+        proofs[case] = {side: audit.verify(case, side) for side in ("east", "west")}
+        if any(
+            proof["result"]["acknowledged"] != producer["acknowledged"]
+            for proof in proofs[case].values()
+        ):
+            raise RuntimeError(
+                "replay acknowledgement count differs from durable final witness"
+            )
+        total += producer["acknowledged"]
+        print(
+            json.dumps({"reconciled": case, "acknowledged": producer["acknowledged"]}),
+            flush=True,
+        )
+    snapshot = native(topics)
+    lab.save(root / "native-after.json", snapshot)
+    if not healthy(snapshot, topics):
+        raise RuntimeError("native redundancy changed during history readback")
+    lab.save(
+        root / "result.json",
+        {
+            "time": time.time(),
+            "acknowledged": total,
+            "proofs": proofs,
+            "owner": receipt["owner"],
+            "scope": "read-only post-crash history reconciliation; original failed experiments remain failed",
+        },
+    )
+    for path in cases:
+        if (path.parent / "failure.json").exists() and not (
+            path.parent / "no-workload-started.json"
+        ).exists():
+            lab.save(
+                path.parent / "post-crash-reconciliation.json",
+                {
+                    "original_status": "failed",
+                    "recovery": str(root.relative_to(lab.DATA)),
+                    "proofs": proofs[path.parent.name],
+                    "producer_witness_sha256": hashlib.sha256(
+                        (path.parent / "east" / "producer.jsonl.gz").read_bytes()
+                    ).hexdigest(),
+                },
+                replace=True,
+            )
+    print(json.dumps({"recovery": str(root), "acknowledged": total}), flush=True)
+
+
 def main():
     lab.STATE.mkdir(exist_ok=True)
-    with (lab.STATE / "replication.lock").open("a") as lock:
-        fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        action = sys.argv[1]
-        if action == "kind-up":
+    action = sys.argv[1]
+    with (
+        (lab.STATE / "replication.lock").open("a") as lock,
+        (lab.STATE / "cutover.lock").open("a") as cutover_lock,
+    ):
+        if action != "cutover":
+            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        if action not in {"record-images", "validate-topic"}:
+            fcntl.flock(cutover_lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        if action == "cutover":
+            # The inner Make keeps this lock even if its Python launcher exits.
+            subprocess.run(
+                ["make", "test-cutover"],
+                cwd=lab.ROOT,
+                env=lab.ENV,
+                pass_fds=(cutover_lock.fileno(),),
+                check=True,
+            )
+        elif action == "kind-up":
             lab.kind_up()
         elif action == "kind-down":
             lab.kind_down()
         elif action == "down":
             teardown()
+        elif action == "verify-retained":
+            topic, run = os.environ["TOPIC"], os.environ["RUN_ID"]
+            count = int(os.environ["COUNT"])
+            readback(
+                [(side, topic, run, count) for side in ("east", "west")],
+                second_run=run + "-west",
+            )
+        elif action == "reconcile-history":
+            reconcile_history()
+        elif action == "validate-topic":
+            if re.fullmatch(r"orders-[0-9]+", os.environ.get("TOPIC", "")) is None:
+                raise ValueError(
+                    "TOPIC must match ^orders-[0-9]+$ (the MM2 topic filter)"
+                )
         elif action == "record-images":
             lab.record_images(*sys.argv[2:])
         elif action == "seal-empty-setup":
@@ -950,6 +1325,7 @@ def main():
                     "correctness",
                     "mm2-worker-crash",
                     "west-broker-crash",
+                    "west-empty-disk",
                 ]
                 if action == "test-production"
                 else [action]
@@ -958,6 +1334,7 @@ def main():
                 if (
                     not (path.parent / "result.json").exists()
                     and not (path.parent / "no-workload-started.json").exists()
+                    and not recovered_failure(path.parent)
                 ):
                     raise RuntimeError(
                         "earlier unqualified history requires diagnosis before new work: "

@@ -52,6 +52,23 @@ fn validate_order(
     Ok((index, order.created_at_unix_ms - index as i64))
 }
 
+fn validate_runs(
+    order: &schema::kafka::demo::v1::Order,
+    key: Option<&[u8]>,
+    prefixes: &[String],
+    expected: usize,
+) -> Result<(usize, usize, i64), Box<dyn Error>> {
+    prefixes
+        .iter()
+        .enumerate()
+        .find_map(|(run, prefix)| {
+            validate_order(order, key, prefix, expected)
+                .ok()
+                .map(|(index, base)| (run, index, base))
+        })
+        .ok_or_else(|| format!("incorrect body/key or unknown run: {}", order.order_id).into())
+}
+
 fn commit_offsets(
     consumer: &BaseConsumer,
     topic: &str,
@@ -72,8 +89,19 @@ fn main() -> Result<(), Box<dyn Error>> {
     let bootstrap = env_or("BOOTSTRAP_SERVERS", "kafka-kafka-bootstrap.kafka.svc:9092");
     let topic = env_or("TOPIC", "orders");
     let group_id = env_or("GROUP_ID", "kafka-jbod-demo");
-    let run_prefix = format!("{}-order-", env_or("RUN_ID", "strimzi-demo"));
+    let mut prefixes = vec![format!("{}-order-", env_or("RUN_ID", "strimzi-demo"))];
+    if let Ok(second) = env::var("SECOND_RUN_ID") {
+        let prefix = format!("{second}-order-");
+        if second.is_empty() || prefix == prefixes[0] {
+            return Err("SECOND_RUN_ID must be nonempty and distinct".into());
+        }
+        prefixes.push(prefix);
+    }
     let expected: usize = env_or("EXPECTED_COUNT", "1000000").parse()?;
+    if !(1..=2_000_000).contains(&expected) {
+        return Err("EXPECTED_COUNT must be between 1 and 2000000 per run".into());
+    }
+    let total_expected = expected * prefixes.len();
     let timeout = Duration::from_secs(env_or("TIMEOUT_SECONDS", "1200").parse()?);
 
     let consumer: BaseConsumer = ClientConfig::new()
@@ -88,26 +116,26 @@ fn main() -> Result<(), Box<dyn Error>> {
     consumer.subscribe(&[&topic])?;
 
     let deadline = Instant::now() + timeout;
-    let mut seen = vec![false; expected];
+    let mut seen = vec![vec![false; expected]; prefixes.len()];
     let mut received = 0;
     let mut total_cents = 0_i64;
-    let mut created_base = None;
+    let mut created_bases = vec![None; prefixes.len()];
     let mut offsets = BTreeMap::new();
 
-    while received < expected && Instant::now() < deadline {
+    while received < total_expected && Instant::now() < deadline {
         match consumer.poll(Duration::from_millis(500)) {
             Some(Ok(message)) => {
                 let payload = message.payload().ok_or("record has no value")?;
                 let order = schema::kafka::demo::v1::Order::decode(payload)?;
-                let (index, base) = validate_order(&order, message.key(), &run_prefix, expected)?;
-                if seen[index] || created_base.is_some_and(|known| known != base) {
+                let (run, index, base) = validate_runs(&order, message.key(), &prefixes, expected)?;
+                if seen[run][index] || created_bases[run].is_some_and(|known| known != base) {
                     return Err(format!(
                         "duplicate order or inconsistent creation timestamp: {}",
                         order.order_id
                     )
                     .into());
                 }
-                created_base = Some(base);
+                created_bases[run] = Some(base);
                 if offsets
                     .get(&message.partition())
                     .is_some_and(|&previous| message.offset() < previous)
@@ -115,7 +143,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                     return Err("partition offsets moved backwards".into());
                 }
                 offsets.insert(message.partition(), message.offset() + 1);
-                seen[index] = true;
+                seen[run][index] = true;
                 received += 1;
                 total_cents += order.amount_cents;
                 if received % 1000 == 0 {
@@ -127,9 +155,9 @@ fn main() -> Result<(), Box<dyn Error>> {
         }
     }
 
-    if received != expected {
+    if received != total_expected {
         return Err(format!(
-            "timed out after receiving {} of {expected} orders",
+            "timed out after receiving {} of {total_expected} orders",
             received
         )
         .into());
@@ -179,6 +207,30 @@ mod tests {
             )
             .is_err()
         );
+    }
+
+    #[test]
+    fn two_run_validation_accepts_only_declared_bodies() {
+        let prefixes = vec!["trial-order-".to_owned(), "trial-west-order-".to_owned()];
+        let mut order = valid();
+        assert_eq!(
+            validate_runs(&order, Some(order.order_id.as_bytes()), &prefixes, 10000)
+                .unwrap()
+                .0,
+            0
+        );
+        order.order_id = "trial-west-order-5001".to_owned();
+        assert_eq!(
+            validate_runs(&order, Some(order.order_id.as_bytes()), &prefixes, 10000)
+                .unwrap()
+                .0,
+            1
+        );
+        order.amount_cents = 1;
+        assert!(validate_runs(&order, Some(order.order_id.as_bytes()), &prefixes, 10000).is_err());
+        order = valid();
+        order.order_id = "unknown-order-5001".to_owned();
+        assert!(validate_runs(&order, Some(order.order_id.as_bytes()), &prefixes, 10000).is_err());
     }
 
     #[test]

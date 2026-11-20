@@ -8,6 +8,7 @@ import unittest
 import replication_control as control
 import replication_lab as lab
 import replication_report as report
+import replication_resources as resources
 
 
 def healthy_fixture():
@@ -84,7 +85,7 @@ def healthy_fixture():
 class NativeTests(unittest.TestCase):
     def test_unqualified_operation_is_rejected_before_setup(self):
         with self.assertRaises(ValueError):
-            control.Experiment("west-empty-disk")
+            control.Experiment("unsupported-operation")
 
     def test_requires_replicas_log_repair_quorum_and_tasks(self):
         original = healthy_fixture()
@@ -281,13 +282,187 @@ class CleanupTests(unittest.TestCase):
                 patch.object(lab, "call", side_effect=respond) as command,
             ):
                 lab.kind_down()
-            self.assertEqual((data / "journal").read_text(), "preserved")
+            self.assertEqual((data / "archives/test/journal").read_text(), "preserved")
+            self.assertTrue((data / "archives/test/manifest.json").exists())
             self.assertFalse(config.exists())
             calls = [entry.args[0] for entry in command.call_args_list]
             self.assertEqual(
                 [entry for entry in calls if entry[:3] == ["docker", "image", "rm"]],
                 [["docker", "image", "rm", lab.PRODUCER]],
             )
+
+
+class MountOwnershipTests(unittest.TestCase):
+    def test_desktop_translation_keeps_exact_bind_ownership(self):
+        from unittest.mock import patch
+
+        with tempfile.TemporaryDirectory() as temporary:
+            state = Path(temporary)
+            data = state / "production"
+            (state / "replication-owner.json").write_text(
+                json.dumps(
+                    {
+                        "owner": "test",
+                        "nodes": {lab.CLUSTER + "-control-plane": "node-id"},
+                    }
+                )
+            )
+            mount = {
+                "Type": "bind",
+                "Source": "/host_mnt" + str(data.resolve()),
+                "Destination": "/var/lab/mirroring",
+                "RW": True,
+            }
+            node = {"Id": "node-id", "Mounts": [mount]}
+            with (
+                patch.object(lab, "STATE", state),
+                patch.object(lab, "DATA", data),
+                patch.object(lab, "node", return_value=node),
+                patch.object(lab.sys, "platform", "darwin"),
+            ):
+                self.assertEqual(lab.owner()["owner"], "test")
+                for field, wrong in [
+                    ("Source", str(data.resolve()) + "-other"),
+                    ("Type", "volume"),
+                    ("RW", False),
+                ]:
+                    old = mount[field]
+                    mount[field] = wrong
+                    with self.assertRaises(RuntimeError):
+                        lab.owner()
+                    mount[field] = old
+                with patch.object(lab.sys, "platform", "linux"):
+                    with self.assertRaises(RuntimeError):
+                        lab.owner()
+
+
+class CutoverLockTests(unittest.TestCase):
+    def test_active_cutover_rejects_second_test_and_teardown(self):
+        import fcntl
+        from unittest.mock import patch
+
+        with tempfile.TemporaryDirectory() as temporary:
+            state = Path(temporary)
+            with (state / "cutover.lock").open("a") as held:
+                fcntl.flock(held, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                for action in ("cutover", "down"):
+                    with (
+                        patch.object(lab, "STATE", state),
+                        patch.object(control.sys, "argv", ["control", action]),
+                        patch.object(control.subprocess, "run") as execute,
+                        patch.object(control, "teardown") as teardown,
+                    ):
+                        with self.assertRaises(BlockingIOError):
+                            control.main()
+                        execute.assert_not_called()
+                        teardown.assert_not_called()
+
+
+class ResourceTests(unittest.TestCase):
+    def test_missing_cpu_is_unknown_and_counters_cover_all_threads(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            path = Path(temporary) / "resources.jsonl.gz"
+
+            def event(timestamp, counters):
+                return {
+                    "time": timestamp,
+                    "node": "owned-worker",
+                    "stats": {"stats": counters},
+                }
+
+            def counter(identity, cpu):
+                return {
+                    "attributes": {
+                        "id": identity,
+                        "metadata": {"name": "kafka"},
+                        "labels": {},
+                    },
+                    "cpu": {"usageCoreNanoSeconds": {"value": cpu}},
+                    "memory": {
+                        "rssBytes": {"value": 1024},
+                        "usageBytes": {"value": 2048},
+                    },
+                }
+
+            missing = {
+                "attributes": {"id": "stopped", "metadata": {"name": "kafka"}},
+                "writableLayer": {},
+            }
+            with gzip.open(path, "wt") as stream:
+                for row in (
+                    event(1, [counter("existing", 1_000_000_000)]),
+                    event(
+                        6,
+                        [
+                            counter("existing", 3_000_000_000),
+                            counter("new", 500_000_000),
+                            missing,
+                        ],
+                    ),
+                ):
+                    stream.write(json.dumps(row) + "\n")
+            summary = resources.summarize(path)
+            self.assertEqual(summary["observed_total_cpu_core_seconds"], 2.5)
+            self.assertEqual(
+                summary["samples_without_cpu_by_container"], {"stopped": 1}
+            )
+            self.assertEqual(
+                summary["containers"]["existing"]["sampled_max_rssBytes"], 1024
+            )
+
+
+class RecoveryReceiptTests(unittest.TestCase):
+    def test_requires_matching_owner_strict_proofs_and_unchanged_witness(self):
+        import hashlib
+        from unittest.mock import patch
+
+        with tempfile.TemporaryDirectory() as temporary:
+            state = Path(temporary)
+            data = state / "production"
+            case = "a" * 32
+            root = data / "cases" / case
+            (root / "east").mkdir(parents=True)
+            witness = root / "east" / "producer.jsonl.gz"
+            witness.write_bytes(b"immutable-witness")
+            (root / "failure.json").write_text('{"passed":false}')
+            (state / "replication-owner.json").write_text('{"owner":"owned-cluster"}')
+            proofs = {
+                side: {
+                    "result": {
+                        "strict_verification": True,
+                        "acknowledged_loss": 0,
+                        "corruption": 0,
+                        "observed_acknowledged": 1,
+                        "acknowledged": 1,
+                        "run_id": case,
+                        "mirrored_offset_policy": side == "west",
+                    }
+                }
+                for side in ("east", "west")
+            }
+            recovery = data / "recoveries" / "readback"
+            recovery.mkdir(parents=True)
+            result = {"owner": "owned-cluster", "proofs": {case: proofs}}
+            receipt = {
+                "original_status": "failed",
+                "recovery": "recoveries/readback",
+                "proofs": proofs,
+                "producer_witness_sha256": hashlib.sha256(
+                    witness.read_bytes()
+                ).hexdigest(),
+            }
+            (recovery / "result.json").write_text(json.dumps(result))
+            (root / "post-crash-reconciliation.json").write_text(json.dumps(receipt))
+            with patch.object(lab, "DATA", data), patch.object(lab, "STATE", state):
+                self.assertTrue(control.recovered_failure(root))
+                witness.write_bytes(b"changed")
+                with self.assertRaises(RuntimeError):
+                    control.recovered_failure(root)
+                witness.write_bytes(b"immutable-witness")
+                result["owner"] = "different-cluster"
+                (recovery / "result.json").write_text(json.dumps(result))
+                with self.assertRaises(RuntimeError):
+                    control.recovered_failure(root)
 
 
 if __name__ == "__main__":
