@@ -462,6 +462,26 @@ gap rather than inventing estimates or retroactively claiming coverage.
   not establish a cold OS cache. Use supported cache controls or an isolated
   owned VM for cold runs, never clear a shared host's caches. Validate returned
   bodies/results in both modes and report cache preparation separately.
+- Benchmark **data age, access temperature and operation type separately**. Reading
+  a just-written value can hit a client cache, server cache or mutable in-memory
+  state; it does not establish disk-read performance or strong consistency by
+  itself. An older value can still be hot. Define the following applicable cases
+  and report their latency, throughput, correctness and resource/I/O costs separately:
+
+  | Case | Required distinction |
+  |---|---|
+  | Immediate read-after-write | Read the exact acknowledged key/version; state same session versus independent reader, primary versus replica, consistency setting, client-cache behavior and acknowledgement-to-visibility lag. Test the promised read-your-writes contract without equating it to linearizability. |
+  | Older persisted-data reads | Read a separately seeded historical dataset after native flush/checkpoint/persistence where supported. State data age and verify persistence; elapsed time alone does not establish that data reached disk. |
+  | Hot reads | Repeated reads of a small resident working set; distinguish result-cache hits from engine/page-cache hits and report working-set size. |
+  | Warm reads | A partially resident or mixed working set with documented warmup, locality and measured cache-hit/miss counters where exposed. |
+  | Cold reads | First access to controlled uncached data at explicitly identified cache layers; use a working set beyond cache capacity where practical and verify actual I/O. Do not call old data or a fresh client cold without evidence. |
+  | Inserts versus updates | Separate new-key/append writes from overwrites/upserts, repeated updates of hot keys and updates to older resident/nonresident keys. Keep payload, indexes, durability and contention explicit; include read-before-write and partial/full update differences where supported. |
+  | First-write versus sustained writes | Separate startup/allocation/cache-miss costs from warmed steady-state writes and later flush, checkpoint, compaction or eviction pressure. Define what a hot/warm/cold write means for this engine rather than assuming reads and writes share the same cache path. |
+
+  Expose data-age ranges, working-set/cache sizes, access skew, read source and
+  preconditioning as benchmark parameters. Keep query semantics and dataset shape
+  comparable; do not mix these cases into one latency distribution. Include a mixed
+  workload reading both recent writes and historical data while writes continue.
 - Publish the **dataset shape**, not only a row count: exact input bytes with
   explicit MB/MiB units, columns/types, distinct keys/tenants/groups, nulls and
   skew, generation seed or corpus revision, and artifact checksums. Separate input

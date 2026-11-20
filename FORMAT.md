@@ -240,6 +240,14 @@ not become qualified merely because these requirements were added.
   operation type, timing scope, mean/percentiles, sample count and timer precision.
   Separate batch duration and amortized per-record cost from actual record latency;
   reciprocal concurrent throughput is not an operation-latency measurement.
+- Separate immediate read-after-write from historical persisted-data reads, and
+  hot, partially resident/warm and verified cold reads. Report data age, working
+  set, cache layers/hit rates, reader session/primary/replica and visibility lag;
+  old data is not necessarily cold, and a cached read does not prove strong consistency.
+  Separate new inserts/appends, hot-key overwrites and updates of older nonresident
+  keys, plus first-write/startup versus sustained writes under flush/compaction.
+  Define write temperature per engine and report each case's latency and resource/I/O
+  costs separately. Include concurrent reads of both recent and historical data.
 
 ## Licensed systems
 
