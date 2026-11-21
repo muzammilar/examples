@@ -3,17 +3,22 @@
 import argparse
 from collections import defaultdict
 import csv
+from datetime import datetime
 import fcntl
 import hashlib
+import http.client
 import json
 import math
 import os
 from pathlib import Path
 import random
+import resource
+import socket
 import statistics
 import subprocess
 import time
 import uuid
+import urllib.parse
 
 ROOT = Path(__file__).resolve().parent
 RESULTS = ROOT / "results"
@@ -27,6 +32,16 @@ def command(args, **kwargs):
 
 def capture(args, **kwargs):
     return subprocess.check_output(args, timeout=30, **kwargs)
+
+
+def workload_image_exists():
+    # A transport/permission error is unknown state, never an absent image.
+    return (
+        IMAGE
+        in capture(
+            ["docker", "image", "ls", "--format", "{{.Repository}}:{{.Tag}}"], text=True
+        ).splitlines()
+    )
 
 
 def integer(name, default, low, high):
@@ -180,11 +195,149 @@ def runtime_script(language, engine, filename, threads):
     import shlex
 
     return (
-        " ".join(map(shlex.quote, args)) + "; code=$?; "
+        "read before idle < /proc/uptime; echo __START_UPTIME__=$before; "
+        + " ".join(map(shlex.quote, args))
+        + "; code=$?; "
+        "read after idle < /proc/uptime; echo __END_UPTIME__=$after; "
         "echo __EXIT__=$code; cat /sys/fs/cgroup/cpu.stat; "
         "echo __MEMORY_PEAK__; cat /sys/fs/cgroup/memory.peak; "
-        "echo __MEMORY_EVENTS__; cat /sys/fs/cgroup/memory.events; exit $code"
+        "echo __MEMORY_EVENTS__; cat /sys/fs/cgroup/memory.events; "
+        "echo __IO_STAT__; if [ -r /sys/fs/cgroup/io.stat ]; then "
+        "cat /sys/fs/cgroup/io.stat; else echo unavailable; fi; "
+        "echo __END_METRICS__; exit $code"
     )
+
+
+def io_counters(text, seconds):
+    """Kernel io.stat is device-keyed; absent accounting is not zero I/O."""
+    if seconds <= 0:
+        raise ValueError("non-positive workload observation window")
+    if text.strip() == "unavailable":
+        return {"available": False, "reason": "io.stat was not exposed"}
+    devices = {}
+    required = {"rbytes", "wbytes", "rios", "wios"}
+    for line in text.splitlines():
+        fields = line.split()
+        if not fields:
+            continue
+        device = fields[0]
+        major, minor = device.split(":")
+        if not major.isdigit() or not minor.isdigit() or device in devices:
+            raise ValueError("invalid or duplicate io.stat device")
+        pairs = [s.split("=", 1) for s in fields[1:]]
+        raw = dict(pairs)
+        if len(raw) != len(pairs):
+            raise ValueError("duplicate io.stat counter")
+        # Linux 6.12 prints the device alone when all four counters are zero.
+        if not required.intersection(raw):
+            raw.update(dict.fromkeys(required, "0"))
+        if not required <= raw.keys():
+            raise ValueError("incomplete io.stat counters")
+        values = {key: int(raw[key]) for key in required}
+        if any(value < 0 for value in values.values()):
+            raise ValueError("incomplete or negative io.stat counters")
+        devices[device] = values
+    totals = {
+        key: sum(row[key] for row in devices.values()) for key in sorted(required)
+    }
+    return {
+        "available": True,
+        "devices": devices,
+        "raw": text,
+        "totals": totals,
+        "per_second": {key: value / seconds for key, value in totals.items()},
+        "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth.",
+    }
+
+
+def container_seconds(inspection):
+    state = inspection["State"]
+    start, end = (
+        datetime.fromisoformat(state[key].replace("Z", "+00:00"))
+        for key in ("StartedAt", "FinishedAt")
+    )
+    seconds = (end - start).total_seconds()
+    if seconds <= 0 or state["Running"]:
+        raise ValueError("container lifetime is incomplete")
+    return seconds
+
+
+class DockerHTTP(http.client.HTTPConnection):
+    def __init__(self, path):
+        super().__init__("localhost", timeout=10)
+        self.path = path
+
+    def connect(self):
+        self.sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+        self.sock.settimeout(self.timeout)
+        self.sock.connect(self.path)
+
+
+def docker_socket():
+    endpoint = (
+        os.environ.get("DOCKER_HOST")
+        or json.loads(capture(["docker", "context", "inspect"], text=True))[0][
+            "Endpoints"
+        ]["docker"]["Host"]
+    )
+    parsed = urllib.parse.urlparse(endpoint)
+    if parsed.scheme != "unix":
+        raise RuntimeError(
+            "resource sampling requires the active local Unix Docker API"
+        )
+    return urllib.parse.unquote(parsed.path)
+
+
+def resource_sample(path, identity):
+    connection = DockerHTTP(path)
+    try:
+        connection.request(
+            "GET", "/containers/" + identity + "/stats?stream=false&one-shot=true"
+        )
+        response = connection.getresponse()
+        if response.status != 200:
+            raise RuntimeError("Docker resource sampling HTTP " + str(response.status))
+        stats = json.load(response)
+        if not stats.get("memory_stats"):
+            return None  # It may have exited between inspection and this snapshot.
+        memory = stats["memory_stats"]
+        return {
+            "time": time.monotonic(),
+            "cpu_ns": stats["cpu_stats"]["cpu_usage"]["total_usage"],
+            "charged_memory_bytes": memory["usage"],
+            "anonymous_bytes": memory.get("stats", {}).get("anon"),
+            "file_cache_bytes": memory.get("stats", {}).get("file"),
+            "kernel_memory_bytes": memory.get("stats", {}).get("kernel"),
+        }
+    finally:
+        connection.close()
+
+
+def resource_summary(samples):
+    if not samples:
+        return {
+            "available": False,
+            "reason": "workload completed before the first resource snapshot",
+        }
+    cpu = []
+    for before, after in zip(samples, samples[1:]):
+        elapsed = after["time"] - before["time"]
+        delta = after["cpu_ns"] - before["cpu_ns"]
+        if elapsed <= 0 or delta < 0:
+            raise ValueError("resource timestamps/CPU counters moved backward")
+        cpu.append(delta / 1e9 / elapsed * 100)
+    return {
+        "available": True,
+        "sample_count": len(samples),
+        "sampled_mean_charged_memory_bytes": statistics.mean(
+            s["charged_memory_bytes"] for s in samples
+        ),
+        "sampled_max_charged_memory_bytes": max(
+            s["charged_memory_bytes"] for s in samples
+        ),
+        "sampled_peak_cpu_percent_one_core_100": max(cpu) if cpu else None,
+        "scope": "Approximately 100 ms plus API/inspection overhead; arithmetic sample mean, not heap or time-weighted mean. Sampling can miss short peaks; use native cgroup memory.peak and process RSS too. Docker daemon/VM overhead excluded.",
+    }
 
 
 def run_case(language, engine, trial, run, repeats, threads):
@@ -215,6 +368,7 @@ def run_case(language, engine, trial, run, repeats, threads):
     started = time.monotonic()
     samples = []
     inspection = None
+    endpoint = None
     try:
         while True:
             inspection = json.loads(capture(["docker", "inspect", name], text=True))[0]
@@ -225,14 +379,10 @@ def run_case(language, engine, trial, run, repeats, threads):
                 raise RuntimeError("unexpected container owner")
             if not inspection["State"]["Running"]:
                 break
-            stats = capture(
-                ["docker", "stats", "--no-stream", "--format", "{{json .}}", name],
-                text=True,
-            ).strip()
-            if stats:
-                samples.append(
-                    {"seconds": time.monotonic() - started, **json.loads(stats)}
-                )
+            endpoint = endpoint or docker_socket()
+            stats = resource_sample(endpoint, inspection["Id"])
+            if stats is not None:
+                samples.append(stats)
             if time.monotonic() - started > 600:
                 raise TimeoutError("workload exceeded 600 seconds")
             time.sleep(0.1)
@@ -267,6 +417,20 @@ def run_case(language, engine, trial, run, repeats, threads):
                 if line.startswith("usage_usec ")
             )
         )
+        window = {}
+        for label in ("START", "END"):
+            prefix = "__" + label + "_UPTIME__="
+            window[label] = float(
+                next(
+                    line[len(prefix) :]
+                    for line in log.splitlines()
+                    if line.startswith(prefix)
+                )
+            )
+        seconds = container_seconds(inspection)
+        io = io_counters(
+            log.split("__IO_STAT__\n")[1].split("__END_METRICS__\n")[0], seconds
+        )
         result = {
             "language": language,
             "engine": engine,
@@ -274,12 +438,20 @@ def run_case(language, engine, trial, run, repeats, threads):
             "records": records,
             "cgroup_peak_memory_bytes": peak,
             "cgroup_cpu_seconds": cpu / 1e6,
+            "workload_window_seconds": window["END"] - window["START"],
+            "container_lifetime_seconds": seconds,
+            "cpu_utilization_percent_one_core_100": cpu / 1e6 / seconds * 100,
+            "cpu_utilization_scope": "Cgroup CPU includes runtime, wrapper and accounting commands; denominator is Docker StartedAt to FinishedAt, parsed at microsecond resolution. CPU snapshot precedes the final accounting commands/exit, so their final CPU is not included. Driver uptime window has 10 ms resolution; per-query CPU and wall time are separate exact-clock samples.",
+            "block_io": io,
+            "sampled_resources": resource_summary(samples),
             "process_peak_rss_kib": max(r["peak_rss_kib"] for r in records),
             "image": inspection["Image"],
             "cpus": inspection["HostConfig"]["NanoCpus"] / 1e9,
             "memory_limit_bytes": inspection["HostConfig"]["Memory"],
             "wall_with_monitor_seconds": time.monotonic() - started,
-            "memory_events": log.split("__MEMORY_EVENTS__\n")[1],
+            "memory_events": log.split("__MEMORY_EVENTS__\n")[1].split("__IO_STAT__\n")[
+                0
+            ],
         }
         save(run / (name + "-result.json"), result)
         return result
@@ -423,6 +595,9 @@ def negative_controls(run, threads):
 
 
 def experiment(benchmark):
+    controller_before = resource.getrusage(resource.RUSAGE_SELF)
+    children_before = resource.getrusage(resource.RUSAGE_CHILDREN)
+    controller_started = time.monotonic()
     fixture = prepare()
     threads = integer("THREADS", 1, 1, 4)
     repeats = integer("REPEATS", 15, 2, 1000) if benchmark else 2
@@ -451,6 +626,20 @@ def experiment(benchmark):
                 capture(["docker", "info", "--format", "{{json .}}"], text=True)
             ),
             "sources": json.loads((ROOT / "sources.json").read_text()),
+            "storage": {
+                "input_csv_logical_bytes": sum(
+                    (RESULTS / "data" / name).stat().st_size
+                    for name in ("trades.csv", "customers.csv")
+                ),
+                "input_csv_host_allocated_bytes": sum(
+                    (RESULTS / "data" / name).stat().st_blocks * 512
+                    for name in ("trades.csv", "customers.csv")
+                ),
+                "engine_persistent_bytes": 0,
+                "temporary_storage": "512 MiB tmpfs, charged to container memory",
+                "native_compression_ratio": None,
+                "limits": "This profile opens both engines in memory and mounts the same uncompressed CSV read-only. Host st_blocks*512 is allocated input storage, not native engine size or Docker VM disk use. No persisted-engine compression comparison or cold-storage claim.",
+            },
         },
     )
     if not benchmark:
@@ -467,6 +656,22 @@ def experiment(benchmark):
             print("Running", language, engine, "trial", trial + 1, flush=True)
             results.append(run_case(language, engine, trial + 1, run, repeats, threads))
     summarize(results, run)
+    controller = resource.getrusage(resource.RUSAGE_SELF)
+    children = resource.getrusage(resource.RUSAGE_CHILDREN)
+    save(
+        run / "controller-resources.json",
+        {
+            "wall_seconds": time.monotonic() - controller_started,
+            "user_cpu_seconds": controller.ru_utime - controller_before.ru_utime,
+            "system_cpu_seconds": controller.ru_stime - controller_before.ru_stime,
+            "child_cli_user_cpu_seconds": children.ru_utime - children_before.ru_utime,
+            "child_cli_system_cpu_seconds": children.ru_stime
+            - children_before.ru_stime,
+            "process_peak_rss_bytes": controller.ru_maxrss
+            * (1 if os.uname().sysname == "Darwin" else 1024),
+            "scope": "Host controller includes retained-fixture hashing, native API sampling and report generation. CLI subprocess CPU excludes server-side work. Docker daemon/VM excluded; this is separate from engine container costs.",
+        },
+    )
     print("Evidence:", run, flush=True)
 
 
@@ -498,6 +703,18 @@ def main():
             )
         print("No resident application; all evidence retained")
     else:
+        remaining = capture(
+            [
+                "docker",
+                "ps",
+                "-aq",
+                "--filter",
+                "label=com.docker.compose.project=" + PROJECT,
+            ],
+            text=True,
+        ).strip()
+        if remaining:
+            raise RuntimeError("owned workloads remain; inspect them before teardown")
         command(
             [
                 "docker",
@@ -509,13 +726,7 @@ def main():
                 "--remove-orphans",
             ]
         )
-        exists = (
-            subprocess.run(
-                ["docker", "image", "inspect", IMAGE], capture_output=True
-            ).returncode
-            == 0
-        )
-        if exists:
+        if workload_image_exists():
             command(["docker", "image", "rm", IMAGE])
 
 

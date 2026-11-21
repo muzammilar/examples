@@ -1,0 +1,3465 @@
+{
+  "format_version": 1,
+  "profiles": [
+    {
+      "run_id": "929f9709167f481dbcac2545d9950267",
+      "date_utc": "2026-11-21T13:58:53Z",
+      "threads": 1,
+      "repeats": 15,
+      "trials": 3,
+      "fixture": {
+        "rows": 2000000,
+        "customers": 10000,
+        "seed": 20261117,
+        "seconds": 3.2101720420178026,
+        "sha256": {
+          "trades.csv": "c8756870bdbb238b69ef8d563c6d4f176753e3864ffa50f508e707ed94406de0",
+          "customers.csv": "c3a160b85050e71c8ba465e2ca7a72d25bc4fbb076954f6c6f9c22fcaabadc95",
+          "expected.json": "150c8e3d600939b01a5c3af70c563f6b11b22cef4699138b4f4b4a4ba0d15a72"
+        }
+      },
+      "environment": {
+        "Architecture": "aarch64",
+        "NCPU": 11,
+        "MemTotal": 26216296448,
+        "KernelVersion": "6.12.76-linuxkit",
+        "ServerVersion": "29.5.3",
+        "OperatingSystem": "Docker Desktop"
+      },
+      "storage": {
+        "input_csv_logical_bytes": 52893924,
+        "input_csv_host_allocated_bytes": 52895744,
+        "engine_persistent_bytes": 0,
+        "temporary_storage": "512 MiB tmpfs, charged to container memory",
+        "native_compression_ratio": null,
+        "limits": "This profile opens both engines in memory and mounts the same uncompressed CSV read-only. Host st_blocks*512 is allocated input storage, not native engine size or Docker VM disk use. No persisted-engine compression comparison or cold-storage claim."
+      },
+      "sources": {
+        "rayforce.tar.gz": {
+          "url": "https://codeload.github.com/RayforceDB/rayforce/tar.gz/38fd4be3560d63a5514c1e6883685fe496d45e1a",
+          "sha256": "6c6d08467bef24d372ae076bc4abfba7d09fc1658d15e0b8ca992e64509bb1d6"
+        },
+        "duckdb-arm64.tar.gz": {
+          "url": "https://github.com/duckdb/duckdb/releases/download/v2.0.0/duckdb-shared-libs-linux-arm64.tar.gz",
+          "sha256": "c60eecf91143ca6bbac55c4f4d40dc22520488b0ac257c86e0fe9a2b451cf2b7"
+        },
+        "duckdb-amd64.tar.gz": {
+          "url": "https://github.com/duckdb/duckdb/releases/download/v2.0.0/duckdb-shared-libs-linux-amd64.tar.gz",
+          "sha256": "993ad89e7dfca66cd6da994c2cad090c2fc160ddf9f550498a098ab4bb13cfb1"
+        }
+      },
+      "source_sha256": {
+        ".gitignore": "9488301358fdf2e8cf1632f0682dbe7949148aaf7136fd68a599f64fa2a1cba7",
+        ".ruff_cache/.gitignore": "9e3a60f1e6ec4ae60215c11d54b171392745ec25e9dded433d5bd921363af316",
+        ".ruff_cache/0.14.5/6261282176521708771": "66801c1d613989c86b62cb4cc8eab40a988910c8a00fbbcd61ded966fac981c6",
+        ".ruff_cache/CACHEDIR.TAG": "5953156d7e0c564a427251316eaf26f8870e6483ae2197f916b630e4f93e31ae",
+        "Makefile": "20f2ce9ea12ac0e96a7fcec6b734a73ba5fd65c14c8d3f62dfebacc7224f7731",
+        "README.md": "9bb8e6d22217350714b50f7bc0911cdfd6f5001cbbebbde5bcf6ccffdd7da37c",
+        "analytics-workload/CMakeLists.txt": "270618a258b00cc495b4149717d51cb680581657fffa6751e7279efe02f0900b",
+        "analytics-workload/cpp/main.cpp": "ac1b340316bc8627cb0baafad062a392b391cfad5459fbab4e309ffa9947c6de",
+        "analytics-workload/native/bridge.c": "3a8861e23f1bfcb51c53ed3cf40ff423be84ef942b76dc039871b2b12344925e",
+        "analytics-workload/native/bridge.h": "403d81e0a8230148c9b8c4079667f48612bb4491d583f11fe11710bea841cf7f",
+        "analytics-workload/python/main.py": "c55a9def8c79af9db46213c4ca68d0f1c4d6b6fea899ebd1114bb85184ade994",
+        "analytics-workload/rust/Cargo.lock": "23ae011b9f4c88952831b7bccb9a919dc173d7a51dbd58d569c473c036467411",
+        "analytics-workload/rust/Cargo.toml": "af3265a7f111bb5ffdefe5cf577c1bcc826fdc7d636a97011d4bc25ad73c7110",
+        "analytics-workload/rust/build.rs": "d83a5ded270cc1628e7110e23b98e6366aa8c6b3cd71aee774ccdd208b10386f",
+        "analytics-workload/rust/src/main.rs": "b61bb99e61213aef6870e694f045b9b19c25fe618331cf329535eb115492f101",
+        "docker/Dockerfile": "be2075182d8575c773543eb38da54218139cab03bd82b98d2bd79c4126a175f6",
+        "docker-compose.yml": "7ce03d700135f0dea9258bad4486aa320d151b74f9453ac47f3c9a0ebcee689e",
+        "experiment.py": "7037ffef97348897b6322a4d5dc41bdf949064a3d80c3e7807466fc42aad4bcb",
+        "prepare.py": "3704ea3ca09d861d497649c6343d2fbc50caefb5c5639a8c4b716694959ddb0b",
+        "sources.json": "2e07738e6b3f6657351c2c933bfd06a1d13b03a19159792421ecb89ca00f96e1",
+        "test_controller.py": "81db61c3b4cbfd4d6f4b33a2328cfdb597ca3ed65c69e9e94bce958d74f27996",
+        "write_results.py": "38350dfbf63c5dc5ceba96c1cdbdfaa5eb2f120d4dc3643e97ad6f82c1e5e9da"
+      },
+      "cases": [
+        {
+          "language": "cpp",
+          "engine": "duckdb",
+          "trial": 1,
+          "cgroup_peak_memory_bytes": 255197184,
+          "cgroup_cpu_seconds": 1.236104,
+          "workload_window_seconds": 1.2400000000002365,
+          "container_lifetime_seconds": 1.287483,
+          "cpu_utilization_percent_one_core_100": 96.00934536611359,
+          "cpu_utilization_scope": "Cgroup CPU includes runtime, wrapper and accounting commands; denominator is Docker StartedAt to FinishedAt, parsed at microsecond resolution. CPU snapshot precedes the final accounting commands/exit, so their final CPU is not included. Driver uptime window has 10 ms resolution; per-query CPU and wall time are separate exact-clock samples.",
+          "block_io": {
+            "available": true,
+            "devices": {},
+            "raw": "",
+            "totals": {
+              "rbytes": 0,
+              "rios": 0,
+              "wbytes": 0,
+              "wios": 0
+            },
+            "per_second": {
+              "rbytes": 0.0,
+              "rios": 0.0,
+              "wbytes": 0.0,
+              "wios": 0.0
+            },
+            "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth."
+          },
+          "sampled_resources": {
+            "available": true,
+            "sample_count": 10,
+            "sampled_mean_charged_memory_bytes": 216748441.6,
+            "sampled_max_charged_memory_bytes": 252837888,
+            "sampled_peak_cpu_percent_one_core_100": 100.12012753957636,
+            "scope": "Approximately 100 ms plus API/inspection overhead; arithmetic sample mean, not heap or time-weighted mean. Sampling can miss short peaks; use native cgroup memory.peak and process RSS too. Docker daemon/VM overhead excluded."
+          },
+          "process_peak_rss_kib": 238564,
+          "image": "sha256:1fe8d93749f7d9b4edeb4e6a2b80cd1cdd26bdec1df02c65ae33962adf7a7abf",
+          "cpus": 1.0,
+          "memory_limit_bytes": 4294967296,
+          "wall_with_monitor_seconds": 1.3005550829693675,
+          "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n"
+        },
+        {
+          "language": "cpp",
+          "engine": "duckdb",
+          "trial": 2,
+          "cgroup_peak_memory_bytes": 253763584,
+          "cgroup_cpu_seconds": 1.225076,
+          "workload_window_seconds": 1.2300000000000182,
+          "container_lifetime_seconds": 1.286287,
+          "cpu_utilization_percent_one_core_100": 95.24126419687053,
+          "cpu_utilization_scope": "Cgroup CPU includes runtime, wrapper and accounting commands; denominator is Docker StartedAt to FinishedAt, parsed at microsecond resolution. CPU snapshot precedes the final accounting commands/exit, so their final CPU is not included. Driver uptime window has 10 ms resolution; per-query CPU and wall time are separate exact-clock samples.",
+          "block_io": {
+            "available": true,
+            "devices": {},
+            "raw": "",
+            "totals": {
+              "rbytes": 0,
+              "rios": 0,
+              "wbytes": 0,
+              "wios": 0
+            },
+            "per_second": {
+              "rbytes": 0.0,
+              "rios": 0.0,
+              "wbytes": 0.0,
+              "wios": 0.0
+            },
+            "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth."
+          },
+          "sampled_resources": {
+            "available": true,
+            "sample_count": 10,
+            "sampled_mean_charged_memory_bytes": 209450188.8,
+            "sampled_max_charged_memory_bytes": 253501440,
+            "sampled_peak_cpu_percent_one_core_100": 99.86315849014751,
+            "scope": "Approximately 100 ms plus API/inspection overhead; arithmetic sample mean, not heap or time-weighted mean. Sampling can miss short peaks; use native cgroup memory.peak and process RSS too. Docker daemon/VM overhead excluded."
+          },
+          "process_peak_rss_kib": 236408,
+          "image": "sha256:1fe8d93749f7d9b4edeb4e6a2b80cd1cdd26bdec1df02c65ae33962adf7a7abf",
+          "cpus": 1.0,
+          "memory_limit_bytes": 4294967296,
+          "wall_with_monitor_seconds": 1.3038667920045555,
+          "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n"
+        },
+        {
+          "language": "cpp",
+          "engine": "duckdb",
+          "trial": 3,
+          "cgroup_peak_memory_bytes": 252817408,
+          "cgroup_cpu_seconds": 1.256258,
+          "workload_window_seconds": 1.2600000000002183,
+          "container_lifetime_seconds": 1.301551,
+          "cpu_utilization_percent_one_core_100": 96.52007489525958,
+          "cpu_utilization_scope": "Cgroup CPU includes runtime, wrapper and accounting commands; denominator is Docker StartedAt to FinishedAt, parsed at microsecond resolution. CPU snapshot precedes the final accounting commands/exit, so their final CPU is not included. Driver uptime window has 10 ms resolution; per-query CPU and wall time are separate exact-clock samples.",
+          "block_io": {
+            "available": true,
+            "devices": {},
+            "raw": "",
+            "totals": {
+              "rbytes": 0,
+              "rios": 0,
+              "wbytes": 0,
+              "wios": 0
+            },
+            "per_second": {
+              "rbytes": 0.0,
+              "rios": 0.0,
+              "wbytes": 0.0,
+              "wios": 0.0
+            },
+            "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth."
+          },
+          "sampled_resources": {
+            "available": true,
+            "sample_count": 10,
+            "sampled_mean_charged_memory_bytes": 211628851.2,
+            "sampled_max_charged_memory_bytes": 252293120,
+            "sampled_peak_cpu_percent_one_core_100": 100.23081939283642,
+            "scope": "Approximately 100 ms plus API/inspection overhead; arithmetic sample mean, not heap or time-weighted mean. Sampling can miss short peaks; use native cgroup memory.peak and process RSS too. Docker daemon/VM overhead excluded."
+          },
+          "process_peak_rss_kib": 236480,
+          "image": "sha256:1fe8d93749f7d9b4edeb4e6a2b80cd1cdd26bdec1df02c65ae33962adf7a7abf",
+          "cpus": 1.0,
+          "memory_limit_bytes": 4294967296,
+          "wall_with_monitor_seconds": 1.3217538329772651,
+          "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n"
+        },
+        {
+          "language": "cpp",
+          "engine": "rayforce",
+          "trial": 1,
+          "cgroup_peak_memory_bytes": 429633536,
+          "cgroup_cpu_seconds": 2.277404,
+          "workload_window_seconds": 2.2899999999999636,
+          "container_lifetime_seconds": 2.338196,
+          "cpu_utilization_percent_one_core_100": 97.40004687374369,
+          "cpu_utilization_scope": "Cgroup CPU includes runtime, wrapper and accounting commands; denominator is Docker StartedAt to FinishedAt, parsed at microsecond resolution. CPU snapshot precedes the final accounting commands/exit, so their final CPU is not included. Driver uptime window has 10 ms resolution; per-query CPU and wall time are separate exact-clock samples.",
+          "block_io": {
+            "available": true,
+            "devices": {},
+            "raw": "",
+            "totals": {
+              "rbytes": 0,
+              "rios": 0,
+              "wbytes": 0,
+              "wios": 0
+            },
+            "per_second": {
+              "rbytes": 0.0,
+              "rios": 0.0,
+              "wbytes": 0.0,
+              "wios": 0.0
+            },
+            "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth."
+          },
+          "sampled_resources": {
+            "available": true,
+            "sample_count": 18,
+            "sampled_mean_charged_memory_bytes": 402465450.6666667,
+            "sampled_max_charged_memory_bytes": 429633536,
+            "sampled_peak_cpu_percent_one_core_100": 100.24641387579565,
+            "scope": "Approximately 100 ms plus API/inspection overhead; arithmetic sample mean, not heap or time-weighted mean. Sampling can miss short peaks; use native cgroup memory.peak and process RSS too. Docker daemon/VM overhead excluded."
+          },
+          "process_peak_rss_kib": 370568,
+          "image": "sha256:1fe8d93749f7d9b4edeb4e6a2b80cd1cdd26bdec1df02c65ae33962adf7a7abf",
+          "cpus": 1.0,
+          "memory_limit_bytes": 4294967296,
+          "wall_with_monitor_seconds": 2.4501416659913957,
+          "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n"
+        },
+        {
+          "language": "cpp",
+          "engine": "rayforce",
+          "trial": 2,
+          "cgroup_peak_memory_bytes": 429420544,
+          "cgroup_cpu_seconds": 2.308599,
+          "workload_window_seconds": 2.3299999999999272,
+          "container_lifetime_seconds": 2.371801,
+          "cpu_utilization_percent_one_core_100": 97.33527391210308,
+          "cpu_utilization_scope": "Cgroup CPU includes runtime, wrapper and accounting commands; denominator is Docker StartedAt to FinishedAt, parsed at microsecond resolution. CPU snapshot precedes the final accounting commands/exit, so their final CPU is not included. Driver uptime window has 10 ms resolution; per-query CPU and wall time are separate exact-clock samples.",
+          "block_io": {
+            "available": true,
+            "devices": {},
+            "raw": "",
+            "totals": {
+              "rbytes": 0,
+              "rios": 0,
+              "wbytes": 0,
+              "wios": 0
+            },
+            "per_second": {
+              "rbytes": 0.0,
+              "rios": 0.0,
+              "wbytes": 0.0,
+              "wios": 0.0
+            },
+            "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth."
+          },
+          "sampled_resources": {
+            "available": true,
+            "sample_count": 19,
+            "sampled_mean_charged_memory_bytes": 403668129.68421054,
+            "sampled_max_charged_memory_bytes": 429420544,
+            "sampled_peak_cpu_percent_one_core_100": 100.19459585767613,
+            "scope": "Approximately 100 ms plus API/inspection overhead; arithmetic sample mean, not heap or time-weighted mean. Sampling can miss short peaks; use native cgroup memory.peak and process RSS too. Docker daemon/VM overhead excluded."
+          },
+          "process_peak_rss_kib": 370440,
+          "image": "sha256:1fe8d93749f7d9b4edeb4e6a2b80cd1cdd26bdec1df02c65ae33962adf7a7abf",
+          "cpus": 1.0,
+          "memory_limit_bytes": 4294967296,
+          "wall_with_monitor_seconds": 2.4472694580908865,
+          "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n"
+        },
+        {
+          "language": "cpp",
+          "engine": "rayforce",
+          "trial": 3,
+          "cgroup_peak_memory_bytes": 430219264,
+          "cgroup_cpu_seconds": 2.319363,
+          "workload_window_seconds": 2.3400000000001455,
+          "container_lifetime_seconds": 2.379274,
+          "cpu_utilization_percent_one_core_100": 97.48196298534762,
+          "cpu_utilization_scope": "Cgroup CPU includes runtime, wrapper and accounting commands; denominator is Docker StartedAt to FinishedAt, parsed at microsecond resolution. CPU snapshot precedes the final accounting commands/exit, so their final CPU is not included. Driver uptime window has 10 ms resolution; per-query CPU and wall time are separate exact-clock samples.",
+          "block_io": {
+            "available": true,
+            "devices": {},
+            "raw": "",
+            "totals": {
+              "rbytes": 0,
+              "rios": 0,
+              "wbytes": 0,
+              "wios": 0
+            },
+            "per_second": {
+              "rbytes": 0.0,
+              "rios": 0.0,
+              "wbytes": 0.0,
+              "wios": 0.0
+            },
+            "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth."
+          },
+          "sampled_resources": {
+            "available": true,
+            "sample_count": 19,
+            "sampled_mean_charged_memory_bytes": 404287703.57894737,
+            "sampled_max_charged_memory_bytes": 430219264,
+            "sampled_peak_cpu_percent_one_core_100": 100.13387926598041,
+            "scope": "Approximately 100 ms plus API/inspection overhead; arithmetic sample mean, not heap or time-weighted mean. Sampling can miss short peaks; use native cgroup memory.peak and process RSS too. Docker daemon/VM overhead excluded."
+          },
+          "process_peak_rss_kib": 371272,
+          "image": "sha256:1fe8d93749f7d9b4edeb4e6a2b80cd1cdd26bdec1df02c65ae33962adf7a7abf",
+          "cpus": 1.0,
+          "memory_limit_bytes": 4294967296,
+          "wall_with_monitor_seconds": 2.4635612920392305,
+          "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n"
+        },
+        {
+          "language": "python",
+          "engine": "duckdb",
+          "trial": 1,
+          "cgroup_peak_memory_bytes": 257236992,
+          "cgroup_cpu_seconds": 1.216912,
+          "workload_window_seconds": 1.2200000000002547,
+          "container_lifetime_seconds": 1.273859,
+          "cpu_utilization_percent_one_core_100": 95.52956802911467,
+          "cpu_utilization_scope": "Cgroup CPU includes runtime, wrapper and accounting commands; denominator is Docker StartedAt to FinishedAt, parsed at microsecond resolution. CPU snapshot precedes the final accounting commands/exit, so their final CPU is not included. Driver uptime window has 10 ms resolution; per-query CPU and wall time are separate exact-clock samples.",
+          "block_io": {
+            "available": true,
+            "devices": {},
+            "raw": "",
+            "totals": {
+              "rbytes": 0,
+              "rios": 0,
+              "wbytes": 0,
+              "wios": 0
+            },
+            "per_second": {
+              "rbytes": 0.0,
+              "rios": 0.0,
+              "wbytes": 0.0,
+              "wios": 0.0
+            },
+            "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth."
+          },
+          "sampled_resources": {
+            "available": true,
+            "sample_count": 10,
+            "sampled_mean_charged_memory_bytes": 211383910.4,
+            "sampled_max_charged_memory_bytes": 256974848,
+            "sampled_peak_cpu_percent_one_core_100": 100.00440455634303,
+            "scope": "Approximately 100 ms plus API/inspection overhead; arithmetic sample mean, not heap or time-weighted mean. Sampling can miss short peaks; use native cgroup memory.peak and process RSS too. Docker daemon/VM overhead excluded."
+          },
+          "process_peak_rss_kib": 245428,
+          "image": "sha256:1fe8d93749f7d9b4edeb4e6a2b80cd1cdd26bdec1df02c65ae33962adf7a7abf",
+          "cpus": 1.0,
+          "memory_limit_bytes": 4294967296,
+          "wall_with_monitor_seconds": 1.3104359998833388,
+          "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n"
+        },
+        {
+          "language": "python",
+          "engine": "duckdb",
+          "trial": 2,
+          "cgroup_peak_memory_bytes": 260558848,
+          "cgroup_cpu_seconds": 1.217475,
+          "workload_window_seconds": 1.2199999999998,
+          "container_lifetime_seconds": 1.267367,
+          "cpu_utilization_percent_one_core_100": 96.06333445639662,
+          "cpu_utilization_scope": "Cgroup CPU includes runtime, wrapper and accounting commands; denominator is Docker StartedAt to FinishedAt, parsed at microsecond resolution. CPU snapshot precedes the final accounting commands/exit, so their final CPU is not included. Driver uptime window has 10 ms resolution; per-query CPU and wall time are separate exact-clock samples.",
+          "block_io": {
+            "available": true,
+            "devices": {},
+            "raw": "",
+            "totals": {
+              "rbytes": 0,
+              "rios": 0,
+              "wbytes": 0,
+              "wios": 0
+            },
+            "per_second": {
+              "rbytes": 0.0,
+              "rios": 0.0,
+              "wbytes": 0.0,
+              "wios": 0.0
+            },
+            "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth."
+          },
+          "sampled_resources": {
+            "available": true,
+            "sample_count": 10,
+            "sampled_mean_charged_memory_bytes": 226077491.2,
+            "sampled_max_charged_memory_bytes": 260558848,
+            "sampled_peak_cpu_percent_one_core_100": 100.67202437378681,
+            "scope": "Approximately 100 ms plus API/inspection overhead; arithmetic sample mean, not heap or time-weighted mean. Sampling can miss short peaks; use native cgroup memory.peak and process RSS too. Docker daemon/VM overhead excluded."
+          },
+          "process_peak_rss_kib": 245000,
+          "image": "sha256:1fe8d93749f7d9b4edeb4e6a2b80cd1cdd26bdec1df02c65ae33962adf7a7abf",
+          "cpus": 1.0,
+          "memory_limit_bytes": 4294967296,
+          "wall_with_monitor_seconds": 1.313240708783269,
+          "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n"
+        },
+        {
+          "language": "python",
+          "engine": "duckdb",
+          "trial": 3,
+          "cgroup_peak_memory_bytes": 260620288,
+          "cgroup_cpu_seconds": 1.247793,
+          "workload_window_seconds": 1.2600000000002183,
+          "container_lifetime_seconds": 1.301002,
+          "cpu_utilization_percent_one_core_100": 95.91015232874354,
+          "cpu_utilization_scope": "Cgroup CPU includes runtime, wrapper and accounting commands; denominator is Docker StartedAt to FinishedAt, parsed at microsecond resolution. CPU snapshot precedes the final accounting commands/exit, so their final CPU is not included. Driver uptime window has 10 ms resolution; per-query CPU and wall time are separate exact-clock samples.",
+          "block_io": {
+            "available": true,
+            "devices": {},
+            "raw": "",
+            "totals": {
+              "rbytes": 0,
+              "rios": 0,
+              "wbytes": 0,
+              "wios": 0
+            },
+            "per_second": {
+              "rbytes": 0.0,
+              "rios": 0.0,
+              "wbytes": 0.0,
+              "wios": 0.0
+            },
+            "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth."
+          },
+          "sampled_resources": {
+            "available": true,
+            "sample_count": 10,
+            "sampled_mean_charged_memory_bytes": 223684608,
+            "sampled_max_charged_memory_bytes": 260620288,
+            "sampled_peak_cpu_percent_one_core_100": 99.69490245737109,
+            "scope": "Approximately 100 ms plus API/inspection overhead; arithmetic sample mean, not heap or time-weighted mean. Sampling can miss short peaks; use native cgroup memory.peak and process RSS too. Docker daemon/VM overhead excluded."
+          },
+          "process_peak_rss_kib": 247044,
+          "image": "sha256:1fe8d93749f7d9b4edeb4e6a2b80cd1cdd26bdec1df02c65ae33962adf7a7abf",
+          "cpus": 1.0,
+          "memory_limit_bytes": 4294967296,
+          "wall_with_monitor_seconds": 1.290815707994625,
+          "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n"
+        },
+        {
+          "language": "python",
+          "engine": "rayforce",
+          "trial": 1,
+          "cgroup_peak_memory_bytes": 433934336,
+          "cgroup_cpu_seconds": 2.332882,
+          "workload_window_seconds": 2.349999999999909,
+          "container_lifetime_seconds": 2.402544,
+          "cpu_utilization_percent_one_core_100": 97.10049014711075,
+          "cpu_utilization_scope": "Cgroup CPU includes runtime, wrapper and accounting commands; denominator is Docker StartedAt to FinishedAt, parsed at microsecond resolution. CPU snapshot precedes the final accounting commands/exit, so their final CPU is not included. Driver uptime window has 10 ms resolution; per-query CPU and wall time are separate exact-clock samples.",
+          "block_io": {
+            "available": true,
+            "devices": {},
+            "raw": "",
+            "totals": {
+              "rbytes": 0,
+              "rios": 0,
+              "wbytes": 0,
+              "wios": 0
+            },
+            "per_second": {
+              "rbytes": 0.0,
+              "rios": 0.0,
+              "wbytes": 0.0,
+              "wios": 0.0
+            },
+            "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth."
+          },
+          "sampled_resources": {
+            "available": true,
+            "sample_count": 19,
+            "sampled_mean_charged_memory_bytes": 405056026.94736844,
+            "sampled_max_charged_memory_bytes": 433934336,
+            "sampled_peak_cpu_percent_one_core_100": 100.94197731225007,
+            "scope": "Approximately 100 ms plus API/inspection overhead; arithmetic sample mean, not heap or time-weighted mean. Sampling can miss short peaks; use native cgroup memory.peak and process RSS too. Docker daemon/VM overhead excluded."
+          },
+          "process_peak_rss_kib": 377560,
+          "image": "sha256:1fe8d93749f7d9b4edeb4e6a2b80cd1cdd26bdec1df02c65ae33962adf7a7abf",
+          "cpus": 1.0,
+          "memory_limit_bytes": 4294967296,
+          "wall_with_monitor_seconds": 2.4494623749051243,
+          "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n"
+        },
+        {
+          "language": "python",
+          "engine": "rayforce",
+          "trial": 2,
+          "cgroup_peak_memory_bytes": 433815552,
+          "cgroup_cpu_seconds": 2.350685,
+          "workload_window_seconds": 2.3700000000003456,
+          "container_lifetime_seconds": 2.406625,
+          "cpu_utilization_percent_one_core_100": 97.67558302602191,
+          "cpu_utilization_scope": "Cgroup CPU includes runtime, wrapper and accounting commands; denominator is Docker StartedAt to FinishedAt, parsed at microsecond resolution. CPU snapshot precedes the final accounting commands/exit, so their final CPU is not included. Driver uptime window has 10 ms resolution; per-query CPU and wall time are separate exact-clock samples.",
+          "block_io": {
+            "available": true,
+            "devices": {},
+            "raw": "",
+            "totals": {
+              "rbytes": 0,
+              "rios": 0,
+              "wbytes": 0,
+              "wios": 0
+            },
+            "per_second": {
+              "rbytes": 0.0,
+              "rios": 0.0,
+              "wbytes": 0.0,
+              "wios": 0.0
+            },
+            "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth."
+          },
+          "sampled_resources": {
+            "available": true,
+            "sample_count": 19,
+            "sampled_mean_charged_memory_bytes": 405055380.2105263,
+            "sampled_max_charged_memory_bytes": 433815552,
+            "sampled_peak_cpu_percent_one_core_100": 100.28618339946465,
+            "scope": "Approximately 100 ms plus API/inspection overhead; arithmetic sample mean, not heap or time-weighted mean. Sampling can miss short peaks; use native cgroup memory.peak and process RSS too. Docker daemon/VM overhead excluded."
+          },
+          "process_peak_rss_kib": 377544,
+          "image": "sha256:1fe8d93749f7d9b4edeb4e6a2b80cd1cdd26bdec1df02c65ae33962adf7a7abf",
+          "cpus": 1.0,
+          "memory_limit_bytes": 4294967296,
+          "wall_with_monitor_seconds": 2.454825167078525,
+          "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n"
+        },
+        {
+          "language": "python",
+          "engine": "rayforce",
+          "trial": 3,
+          "cgroup_peak_memory_bytes": 435699712,
+          "cgroup_cpu_seconds": 2.347153,
+          "workload_window_seconds": 2.369999999999891,
+          "container_lifetime_seconds": 2.405027,
+          "cpu_utilization_percent_one_core_100": 97.59362368904799,
+          "cpu_utilization_scope": "Cgroup CPU includes runtime, wrapper and accounting commands; denominator is Docker StartedAt to FinishedAt, parsed at microsecond resolution. CPU snapshot precedes the final accounting commands/exit, so their final CPU is not included. Driver uptime window has 10 ms resolution; per-query CPU and wall time are separate exact-clock samples.",
+          "block_io": {
+            "available": true,
+            "devices": {},
+            "raw": "",
+            "totals": {
+              "rbytes": 0,
+              "rios": 0,
+              "wbytes": 0,
+              "wios": 0
+            },
+            "per_second": {
+              "rbytes": 0.0,
+              "rios": 0.0,
+              "wbytes": 0.0,
+              "wios": 0.0
+            },
+            "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth."
+          },
+          "sampled_resources": {
+            "available": true,
+            "sample_count": 19,
+            "sampled_mean_charged_memory_bytes": 406630400,
+            "sampled_max_charged_memory_bytes": 435699712,
+            "sampled_peak_cpu_percent_one_core_100": 100.09863489671487,
+            "scope": "Approximately 100 ms plus API/inspection overhead; arithmetic sample mean, not heap or time-weighted mean. Sampling can miss short peaks; use native cgroup memory.peak and process RSS too. Docker daemon/VM overhead excluded."
+          },
+          "process_peak_rss_kib": 379196,
+          "image": "sha256:1fe8d93749f7d9b4edeb4e6a2b80cd1cdd26bdec1df02c65ae33962adf7a7abf",
+          "cpus": 1.0,
+          "memory_limit_bytes": 4294967296,
+          "wall_with_monitor_seconds": 2.442948583047837,
+          "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n"
+        },
+        {
+          "language": "rust",
+          "engine": "duckdb",
+          "trial": 1,
+          "cgroup_peak_memory_bytes": 248999936,
+          "cgroup_cpu_seconds": 1.223167,
+          "workload_window_seconds": 1.2300000000000182,
+          "container_lifetime_seconds": 1.281809,
+          "cpu_utilization_percent_one_core_100": 95.42505942773064,
+          "cpu_utilization_scope": "Cgroup CPU includes runtime, wrapper and accounting commands; denominator is Docker StartedAt to FinishedAt, parsed at microsecond resolution. CPU snapshot precedes the final accounting commands/exit, so their final CPU is not included. Driver uptime window has 10 ms resolution; per-query CPU and wall time are separate exact-clock samples.",
+          "block_io": {
+            "available": true,
+            "devices": {},
+            "raw": "",
+            "totals": {
+              "rbytes": 0,
+              "rios": 0,
+              "wbytes": 0,
+              "wios": 0
+            },
+            "per_second": {
+              "rbytes": 0.0,
+              "rios": 0.0,
+              "wbytes": 0.0,
+              "wios": 0.0
+            },
+            "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth."
+          },
+          "sampled_resources": {
+            "available": true,
+            "sample_count": 10,
+            "sampled_mean_charged_memory_bytes": 215334912,
+            "sampled_max_charged_memory_bytes": 248999936,
+            "sampled_peak_cpu_percent_one_core_100": 100.02816005784234,
+            "scope": "Approximately 100 ms plus API/inspection overhead; arithmetic sample mean, not heap or time-weighted mean. Sampling can miss short peaks; use native cgroup memory.peak and process RSS too. Docker daemon/VM overhead excluded."
+          },
+          "process_peak_rss_kib": 232636,
+          "image": "sha256:1fe8d93749f7d9b4edeb4e6a2b80cd1cdd26bdec1df02c65ae33962adf7a7abf",
+          "cpus": 1.0,
+          "memory_limit_bytes": 4294967296,
+          "wall_with_monitor_seconds": 1.2975127920508385,
+          "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n"
+        },
+        {
+          "language": "rust",
+          "engine": "duckdb",
+          "trial": 2,
+          "cgroup_peak_memory_bytes": 252919808,
+          "cgroup_cpu_seconds": 1.237567,
+          "workload_window_seconds": 1.25,
+          "container_lifetime_seconds": 1.295841,
+          "cpu_utilization_percent_one_core_100": 95.50299766715207,
+          "cpu_utilization_scope": "Cgroup CPU includes runtime, wrapper and accounting commands; denominator is Docker StartedAt to FinishedAt, parsed at microsecond resolution. CPU snapshot precedes the final accounting commands/exit, so their final CPU is not included. Driver uptime window has 10 ms resolution; per-query CPU and wall time are separate exact-clock samples.",
+          "block_io": {
+            "available": true,
+            "devices": {},
+            "raw": "",
+            "totals": {
+              "rbytes": 0,
+              "rios": 0,
+              "wbytes": 0,
+              "wios": 0
+            },
+            "per_second": {
+              "rbytes": 0.0,
+              "rios": 0.0,
+              "wbytes": 0.0,
+              "wios": 0.0
+            },
+            "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth."
+          },
+          "sampled_resources": {
+            "available": true,
+            "sample_count": 10,
+            "sampled_mean_charged_memory_bytes": 214205644.8,
+            "sampled_max_charged_memory_bytes": 252395520,
+            "sampled_peak_cpu_percent_one_core_100": 99.90588709772891,
+            "scope": "Approximately 100 ms plus API/inspection overhead; arithmetic sample mean, not heap or time-weighted mean. Sampling can miss short peaks; use native cgroup memory.peak and process RSS too. Docker daemon/VM overhead excluded."
+          },
+          "process_peak_rss_kib": 236764,
+          "image": "sha256:1fe8d93749f7d9b4edeb4e6a2b80cd1cdd26bdec1df02c65ae33962adf7a7abf",
+          "cpus": 1.0,
+          "memory_limit_bytes": 4294967296,
+          "wall_with_monitor_seconds": 1.3077734170947224,
+          "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n"
+        },
+        {
+          "language": "rust",
+          "engine": "duckdb",
+          "trial": 3,
+          "cgroup_peak_memory_bytes": 248860672,
+          "cgroup_cpu_seconds": 1.222829,
+          "workload_window_seconds": 1.2199999999998,
+          "container_lifetime_seconds": 1.268735,
+          "cpu_utilization_percent_one_core_100": 96.38175032611223,
+          "cpu_utilization_scope": "Cgroup CPU includes runtime, wrapper and accounting commands; denominator is Docker StartedAt to FinishedAt, parsed at microsecond resolution. CPU snapshot precedes the final accounting commands/exit, so their final CPU is not included. Driver uptime window has 10 ms resolution; per-query CPU and wall time are separate exact-clock samples.",
+          "block_io": {
+            "available": true,
+            "devices": {},
+            "raw": "",
+            "totals": {
+              "rbytes": 0,
+              "rios": 0,
+              "wbytes": 0,
+              "wios": 0
+            },
+            "per_second": {
+              "rbytes": 0.0,
+              "rios": 0.0,
+              "wbytes": 0.0,
+              "wios": 0.0
+            },
+            "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth."
+          },
+          "sampled_resources": {
+            "available": true,
+            "sample_count": 10,
+            "sampled_mean_charged_memory_bytes": 214771302.4,
+            "sampled_max_charged_memory_bytes": 248598528,
+            "sampled_peak_cpu_percent_one_core_100": 100.06860226223404,
+            "scope": "Approximately 100 ms plus API/inspection overhead; arithmetic sample mean, not heap or time-weighted mean. Sampling can miss short peaks; use native cgroup memory.peak and process RSS too. Docker daemon/VM overhead excluded."
+          },
+          "process_peak_rss_kib": 232600,
+          "image": "sha256:1fe8d93749f7d9b4edeb4e6a2b80cd1cdd26bdec1df02c65ae33962adf7a7abf",
+          "cpus": 1.0,
+          "memory_limit_bytes": 4294967296,
+          "wall_with_monitor_seconds": 1.3113407080527395,
+          "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n"
+        },
+        {
+          "language": "rust",
+          "engine": "rayforce",
+          "trial": 1,
+          "cgroup_peak_memory_bytes": 431116288,
+          "cgroup_cpu_seconds": 2.280226,
+          "workload_window_seconds": 2.300000000000182,
+          "container_lifetime_seconds": 2.352087,
+          "cpu_utilization_percent_one_core_100": 96.94479838543386,
+          "cpu_utilization_scope": "Cgroup CPU includes runtime, wrapper and accounting commands; denominator is Docker StartedAt to FinishedAt, parsed at microsecond resolution. CPU snapshot precedes the final accounting commands/exit, so their final CPU is not included. Driver uptime window has 10 ms resolution; per-query CPU and wall time are separate exact-clock samples.",
+          "block_io": {
+            "available": true,
+            "devices": {},
+            "raw": "",
+            "totals": {
+              "rbytes": 0,
+              "rios": 0,
+              "wbytes": 0,
+              "wios": 0
+            },
+            "per_second": {
+              "rbytes": 0.0,
+              "rios": 0.0,
+              "wbytes": 0.0,
+              "wios": 0.0
+            },
+            "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth."
+          },
+          "sampled_resources": {
+            "available": true,
+            "sample_count": 18,
+            "sampled_mean_charged_memory_bytes": 403642595.5555556,
+            "sampled_max_charged_memory_bytes": 431116288,
+            "sampled_peak_cpu_percent_one_core_100": 100.20036575791735,
+            "scope": "Approximately 100 ms plus API/inspection overhead; arithmetic sample mean, not heap or time-weighted mean. Sampling can miss short peaks; use native cgroup memory.peak and process RSS too. Docker daemon/VM overhead excluded."
+          },
+          "process_peak_rss_kib": 370868,
+          "image": "sha256:1fe8d93749f7d9b4edeb4e6a2b80cd1cdd26bdec1df02c65ae33962adf7a7abf",
+          "cpus": 1.0,
+          "memory_limit_bytes": 4294967296,
+          "wall_with_monitor_seconds": 2.33132145809941,
+          "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n"
+        },
+        {
+          "language": "rust",
+          "engine": "rayforce",
+          "trial": 2,
+          "cgroup_peak_memory_bytes": 429109248,
+          "cgroup_cpu_seconds": 2.276899,
+          "workload_window_seconds": 2.299999999999727,
+          "container_lifetime_seconds": 2.343832,
+          "cpu_utilization_percent_one_core_100": 97.14429191170699,
+          "cpu_utilization_scope": "Cgroup CPU includes runtime, wrapper and accounting commands; denominator is Docker StartedAt to FinishedAt, parsed at microsecond resolution. CPU snapshot precedes the final accounting commands/exit, so their final CPU is not included. Driver uptime window has 10 ms resolution; per-query CPU and wall time are separate exact-clock samples.",
+          "block_io": {
+            "available": true,
+            "devices": {},
+            "raw": "",
+            "totals": {
+              "rbytes": 0,
+              "rios": 0,
+              "wbytes": 0,
+              "wios": 0
+            },
+            "per_second": {
+              "rbytes": 0.0,
+              "rios": 0.0,
+              "wbytes": 0.0,
+              "wios": 0.0
+            },
+            "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth."
+          },
+          "sampled_resources": {
+            "available": true,
+            "sample_count": 18,
+            "sampled_mean_charged_memory_bytes": 401854691.5555556,
+            "sampled_max_charged_memory_bytes": 429109248,
+            "sampled_peak_cpu_percent_one_core_100": 100.18688061797312,
+            "scope": "Approximately 100 ms plus API/inspection overhead; arithmetic sample mean, not heap or time-weighted mean. Sampling can miss short peaks; use native cgroup memory.peak and process RSS too. Docker daemon/VM overhead excluded."
+          },
+          "process_peak_rss_kib": 368776,
+          "image": "sha256:1fe8d93749f7d9b4edeb4e6a2b80cd1cdd26bdec1df02c65ae33962adf7a7abf",
+          "cpus": 1.0,
+          "memory_limit_bytes": 4294967296,
+          "wall_with_monitor_seconds": 2.332080207997933,
+          "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n"
+        },
+        {
+          "language": "rust",
+          "engine": "rayforce",
+          "trial": 3,
+          "cgroup_peak_memory_bytes": 431091712,
+          "cgroup_cpu_seconds": 2.322616,
+          "workload_window_seconds": 2.3399999999996908,
+          "container_lifetime_seconds": 2.379478,
+          "cpu_utilization_percent_one_core_100": 97.61031621221125,
+          "cpu_utilization_scope": "Cgroup CPU includes runtime, wrapper and accounting commands; denominator is Docker StartedAt to FinishedAt, parsed at microsecond resolution. CPU snapshot precedes the final accounting commands/exit, so their final CPU is not included. Driver uptime window has 10 ms resolution; per-query CPU and wall time are separate exact-clock samples.",
+          "block_io": {
+            "available": true,
+            "devices": {},
+            "raw": "",
+            "totals": {
+              "rbytes": 0,
+              "rios": 0,
+              "wbytes": 0,
+              "wios": 0
+            },
+            "per_second": {
+              "rbytes": 0.0,
+              "rios": 0.0,
+              "wbytes": 0.0,
+              "wios": 0.0
+            },
+            "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth."
+          },
+          "sampled_resources": {
+            "available": true,
+            "sample_count": 19,
+            "sampled_mean_charged_memory_bytes": 405132773.05263156,
+            "sampled_max_charged_memory_bytes": 431091712,
+            "sampled_peak_cpu_percent_one_core_100": 100.21821161115172,
+            "scope": "Approximately 100 ms plus API/inspection overhead; arithmetic sample mean, not heap or time-weighted mean. Sampling can miss short peaks; use native cgroup memory.peak and process RSS too. Docker daemon/VM overhead excluded."
+          },
+          "process_peak_rss_kib": 370848,
+          "image": "sha256:1fe8d93749f7d9b4edeb4e6a2b80cd1cdd26bdec1df02c65ae33962adf7a7abf",
+          "cpus": 1.0,
+          "memory_limit_bytes": 4294967296,
+          "wall_with_monitor_seconds": 2.436173291876912,
+          "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n"
+        }
+      ],
+      "query_summary": [
+        {
+          "language": "python",
+          "engine": "rayforce",
+          "query": "totals",
+          "median_trial_p50_ms": 23.072167,
+          "trials": [
+            {
+              "trial": 1,
+              "p50_ms": 22.425792,
+              "p99_ms": 25.156125,
+              "mean_cpu_ms": 22.476755533333332
+            },
+            {
+              "trial": 2,
+              "p50_ms": 23.169792,
+              "p99_ms": 24.653625,
+              "mean_cpu_ms": 23.1179
+            },
+            {
+              "trial": 3,
+              "p50_ms": 23.072167,
+              "p99_ms": 25.904417,
+              "mean_cpu_ms": 23.248188533333334
+            }
+          ],
+          "min_trial_p50_ms": 22.425792,
+          "max_trial_p50_ms": 23.169792,
+          "iqr_trial_p50_ms": 0.3719999999999999
+        },
+        {
+          "language": "python",
+          "engine": "rayforce",
+          "query": "filtered",
+          "median_trial_p50_ms": 10.99375,
+          "trials": [
+            {
+              "trial": 1,
+              "p50_ms": 10.868666,
+              "p99_ms": 11.724625,
+              "mean_cpu_ms": 10.966652933333334
+            },
+            {
+              "trial": 2,
+              "p50_ms": 11.021875,
+              "p99_ms": 12.327917,
+              "mean_cpu_ms": 11.076627466666666
+            },
+            {
+              "trial": 3,
+              "p50_ms": 10.99375,
+              "p99_ms": 12.731417,
+              "mean_cpu_ms": 11.151149733333334
+            }
+          ],
+          "min_trial_p50_ms": 10.868666,
+          "max_trial_p50_ms": 11.021875,
+          "iqr_trial_p50_ms": 0.07660450000000019
+        },
+        {
+          "language": "python",
+          "engine": "rayforce",
+          "query": "symbols",
+          "median_trial_p50_ms": 3.268542,
+          "trials": [
+            {
+              "trial": 1,
+              "p50_ms": 3.23875,
+              "p99_ms": 3.787125,
+              "mean_cpu_ms": 3.299875
+            },
+            {
+              "trial": 2,
+              "p50_ms": 3.301917,
+              "p99_ms": 4.475917,
+              "mean_cpu_ms": 3.4013444666666666
+            },
+            {
+              "trial": 3,
+              "p50_ms": 3.268542,
+              "p99_ms": 3.975584,
+              "mean_cpu_ms": 3.3690112
+            }
+          ],
+          "min_trial_p50_ms": 3.23875,
+          "max_trial_p50_ms": 3.301917,
+          "iqr_trial_p50_ms": 0.03158349999999999
+        },
+        {
+          "language": "python",
+          "engine": "rayforce",
+          "query": "customers",
+          "median_trial_p50_ms": 5.496375,
+          "trials": [
+            {
+              "trial": 1,
+              "p50_ms": 5.460791,
+              "p99_ms": 7.162625,
+              "mean_cpu_ms": 5.6334944
+            },
+            {
+              "trial": 2,
+              "p50_ms": 5.537375,
+              "p99_ms": 6.216333,
+              "mean_cpu_ms": 5.635811133333333
+            },
+            {
+              "trial": 3,
+              "p50_ms": 5.496375,
+              "p99_ms": 7.06675,
+              "mean_cpu_ms": 5.580749933333333
+            }
+          ],
+          "min_trial_p50_ms": 5.460791,
+          "max_trial_p50_ms": 5.537375,
+          "iqr_trial_p50_ms": 0.03829199999999933
+        },
+        {
+          "language": "python",
+          "engine": "rayforce",
+          "query": "join",
+          "median_trial_p50_ms": 68.875625,
+          "trials": [
+            {
+              "trial": 1,
+              "p50_ms": 68.875625,
+              "p99_ms": 69.88025,
+              "mean_cpu_ms": 68.45610813333333
+            },
+            {
+              "trial": 2,
+              "p50_ms": 69.6845,
+              "p99_ms": 77.574958,
+              "mean_cpu_ms": 70.25050793333334
+            },
+            {
+              "trial": 3,
+              "p50_ms": 68.843542,
+              "p99_ms": 71.567584,
+              "mean_cpu_ms": 68.9286
+            }
+          ],
+          "min_trial_p50_ms": 68.843542,
+          "max_trial_p50_ms": 69.6845,
+          "iqr_trial_p50_ms": 0.42047900000000027
+        },
+        {
+          "language": "python",
+          "engine": "duckdb",
+          "query": "totals",
+          "median_trial_p50_ms": 2.074792,
+          "trials": [
+            {
+              "trial": 1,
+              "p50_ms": 2.058542,
+              "p99_ms": 2.655334,
+              "mean_cpu_ms": 2.1124610666666666
+            },
+            {
+              "trial": 2,
+              "p50_ms": 2.074792,
+              "p99_ms": 2.970291,
+              "mean_cpu_ms": 2.1621749333333335
+            },
+            {
+              "trial": 3,
+              "p50_ms": 2.095708,
+              "p99_ms": 2.535792,
+              "mean_cpu_ms": 2.1395278666666666
+            }
+          ],
+          "min_trial_p50_ms": 2.058542,
+          "max_trial_p50_ms": 2.095708,
+          "iqr_trial_p50_ms": 0.01858300000000046
+        },
+        {
+          "language": "python",
+          "engine": "duckdb",
+          "query": "filtered",
+          "median_trial_p50_ms": 1.92375,
+          "trials": [
+            {
+              "trial": 1,
+              "p50_ms": 1.92375,
+              "p99_ms": 2.781834,
+              "mean_cpu_ms": 1.9837
+            },
+            {
+              "trial": 2,
+              "p50_ms": 1.899292,
+              "p99_ms": 2.372875,
+              "mean_cpu_ms": 1.9692833333333333
+            },
+            {
+              "trial": 3,
+              "p50_ms": 1.923875,
+              "p99_ms": 2.464334,
+              "mean_cpu_ms": 2.0264472000000002
+            }
+          ],
+          "min_trial_p50_ms": 1.899292,
+          "max_trial_p50_ms": 1.923875,
+          "iqr_trial_p50_ms": 0.0122914999999999
+        },
+        {
+          "language": "python",
+          "engine": "duckdb",
+          "query": "symbols",
+          "median_trial_p50_ms": 10.210959,
+          "trials": [
+            {
+              "trial": 1,
+              "p50_ms": 10.066458,
+              "p99_ms": 12.478667,
+              "mean_cpu_ms": 9.914516666666668
+            },
+            {
+              "trial": 2,
+              "p50_ms": 10.248292,
+              "p99_ms": 12.206,
+              "mean_cpu_ms": 10.3100136
+            },
+            {
+              "trial": 3,
+              "p50_ms": 10.210959,
+              "p99_ms": 12.290209,
+              "mean_cpu_ms": 10.0591054
+            }
+          ],
+          "min_trial_p50_ms": 10.066458,
+          "max_trial_p50_ms": 10.248292,
+          "iqr_trial_p50_ms": 0.09091700000000102
+        },
+        {
+          "language": "python",
+          "engine": "duckdb",
+          "query": "customers",
+          "median_trial_p50_ms": 15.791666,
+          "trials": [
+            {
+              "trial": 1,
+              "p50_ms": 15.773125,
+              "p99_ms": 20.342292,
+              "mean_cpu_ms": 16.208049933333335
+            },
+            {
+              "trial": 2,
+              "p50_ms": 15.791666,
+              "p99_ms": 17.714417,
+              "mean_cpu_ms": 16.057741533333335
+            },
+            {
+              "trial": 3,
+              "p50_ms": 17.338375,
+              "p99_ms": 19.1355,
+              "mean_cpu_ms": 17.136858266666668
+            }
+          ],
+          "min_trial_p50_ms": 15.773125,
+          "max_trial_p50_ms": 17.338375,
+          "iqr_trial_p50_ms": 0.7826249999999995
+        },
+        {
+          "language": "python",
+          "engine": "duckdb",
+          "query": "join",
+          "median_trial_p50_ms": 13.156334,
+          "trials": [
+            {
+              "trial": 1,
+              "p50_ms": 12.991375,
+              "p99_ms": 17.406166,
+              "mean_cpu_ms": 13.8129028
+            },
+            {
+              "trial": 2,
+              "p50_ms": 13.156334,
+              "p99_ms": 16.067042,
+              "mean_cpu_ms": 13.716575066666667
+            },
+            {
+              "trial": 3,
+              "p50_ms": 13.211125,
+              "p99_ms": 17.529041,
+              "mean_cpu_ms": 13.990822133333333
+            }
+          ],
+          "min_trial_p50_ms": 12.991375,
+          "max_trial_p50_ms": 13.211125,
+          "iqr_trial_p50_ms": 0.10987499999999883
+        },
+        {
+          "language": "cpp",
+          "engine": "rayforce",
+          "query": "totals",
+          "median_trial_p50_ms": 23.253125,
+          "trials": [
+            {
+              "trial": 1,
+              "p50_ms": 22.665917,
+              "p99_ms": 24.444542,
+              "mean_cpu_ms": 22.556066666666666
+            },
+            {
+              "trial": 2,
+              "p50_ms": 23.253125,
+              "p99_ms": 26.334167,
+              "mean_cpu_ms": 23.2286
+            },
+            {
+              "trial": 3,
+              "p50_ms": 23.261334,
+              "p99_ms": 26.835959,
+              "mean_cpu_ms": 23.3842
+            }
+          ],
+          "min_trial_p50_ms": 22.665917,
+          "max_trial_p50_ms": 23.261334,
+          "iqr_trial_p50_ms": 0.2977084999999988
+        },
+        {
+          "language": "cpp",
+          "engine": "rayforce",
+          "query": "filtered",
+          "median_trial_p50_ms": 9.108625,
+          "trials": [
+            {
+              "trial": 1,
+              "p50_ms": 8.977292,
+              "p99_ms": 10.878084,
+              "mean_cpu_ms": 9.241
+            },
+            {
+              "trial": 2,
+              "p50_ms": 9.108625,
+              "p99_ms": 10.903,
+              "mean_cpu_ms": 9.2728
+            },
+            {
+              "trial": 3,
+              "p50_ms": 9.156958,
+              "p99_ms": 9.896458,
+              "mean_cpu_ms": 9.187133333333334
+            }
+          ],
+          "min_trial_p50_ms": 8.977292,
+          "max_trial_p50_ms": 9.156958,
+          "iqr_trial_p50_ms": 0.08983299999999872
+        },
+        {
+          "language": "cpp",
+          "engine": "rayforce",
+          "query": "symbols",
+          "median_trial_p50_ms": 3.296458,
+          "trials": [
+            {
+              "trial": 1,
+              "p50_ms": 3.220583,
+              "p99_ms": 3.55225,
+              "mean_cpu_ms": 3.2809333333333335
+            },
+            {
+              "trial": 2,
+              "p50_ms": 3.296458,
+              "p99_ms": 3.9135,
+              "mean_cpu_ms": 3.329066666666667
+            },
+            {
+              "trial": 3,
+              "p50_ms": 3.3855,
+              "p99_ms": 4.33475,
+              "mean_cpu_ms": 3.4854
+            }
+          ],
+          "min_trial_p50_ms": 3.220583,
+          "max_trial_p50_ms": 3.3855,
+          "iqr_trial_p50_ms": 0.08245849999999999
+        },
+        {
+          "language": "cpp",
+          "engine": "rayforce",
+          "query": "customers",
+          "median_trial_p50_ms": 5.54,
+          "trials": [
+            {
+              "trial": 1,
+              "p50_ms": 5.482167,
+              "p99_ms": 7.023584,
+              "mean_cpu_ms": 5.724866666666666
+            },
+            {
+              "trial": 2,
+              "p50_ms": 5.54,
+              "p99_ms": 6.888375,
+              "mean_cpu_ms": 5.649866666666667
+            },
+            {
+              "trial": 3,
+              "p50_ms": 5.555959,
+              "p99_ms": 6.519875,
+              "mean_cpu_ms": 5.6674
+            }
+          ],
+          "min_trial_p50_ms": 5.482167,
+          "max_trial_p50_ms": 5.555959,
+          "iqr_trial_p50_ms": 0.036896000000000484
+        },
+        {
+          "language": "cpp",
+          "engine": "rayforce",
+          "query": "join",
+          "median_trial_p50_ms": 69.952375,
+          "trials": [
+            {
+              "trial": 1,
+              "p50_ms": 68.777916,
+              "p99_ms": 75.48175,
+              "mean_cpu_ms": 69.03466666666667
+            },
+            {
+              "trial": 2,
+              "p50_ms": 69.952375,
+              "p99_ms": 71.225334,
+              "mean_cpu_ms": 69.83633333333333
+            },
+            {
+              "trial": 3,
+              "p50_ms": 70.253708,
+              "p99_ms": 73.098833,
+              "mean_cpu_ms": 70.13013333333333
+            }
+          ],
+          "min_trial_p50_ms": 68.777916,
+          "max_trial_p50_ms": 70.253708,
+          "iqr_trial_p50_ms": 0.7378959999999921
+        },
+        {
+          "language": "cpp",
+          "engine": "duckdb",
+          "query": "totals",
+          "median_trial_p50_ms": 2.056792,
+          "trials": [
+            {
+              "trial": 1,
+              "p50_ms": 2.056792,
+              "p99_ms": 3.122083,
+              "mean_cpu_ms": 2.1449333333333334
+            },
+            {
+              "trial": 2,
+              "p50_ms": 2.019042,
+              "p99_ms": 2.2835,
+              "mean_cpu_ms": 2.0531333333333333
+            },
+            {
+              "trial": 3,
+              "p50_ms": 2.071625,
+              "p99_ms": 2.243166,
+              "mean_cpu_ms": 2.0949333333333335
+            }
+          ],
+          "min_trial_p50_ms": 2.019042,
+          "max_trial_p50_ms": 2.071625,
+          "iqr_trial_p50_ms": 0.026291500000000134
+        },
+        {
+          "language": "cpp",
+          "engine": "duckdb",
+          "query": "filtered",
+          "median_trial_p50_ms": 1.915291,
+          "trials": [
+            {
+              "trial": 1,
+              "p50_ms": 1.915291,
+              "p99_ms": 2.502917,
+              "mean_cpu_ms": 1.9666
+            },
+            {
+              "trial": 2,
+              "p50_ms": 1.913458,
+              "p99_ms": 2.629417,
+              "mean_cpu_ms": 1.9895333333333334
+            },
+            {
+              "trial": 3,
+              "p50_ms": 1.938,
+              "p99_ms": 2.084708,
+              "mean_cpu_ms": 1.9477333333333333
+            }
+          ],
+          "min_trial_p50_ms": 1.913458,
+          "max_trial_p50_ms": 1.938,
+          "iqr_trial_p50_ms": 0.01227099999999992
+        },
+        {
+          "language": "cpp",
+          "engine": "duckdb",
+          "query": "symbols",
+          "median_trial_p50_ms": 10.0345,
+          "trials": [
+            {
+              "trial": 1,
+              "p50_ms": 9.985,
+              "p99_ms": 10.873709,
+              "mean_cpu_ms": 9.9438
+            },
+            {
+              "trial": 2,
+              "p50_ms": 10.0345,
+              "p99_ms": 10.459041,
+              "mean_cpu_ms": 10.113
+            },
+            {
+              "trial": 3,
+              "p50_ms": 10.37425,
+              "p99_ms": 27.217417,
+              "mean_cpu_ms": 11.426333333333334
+            }
+          ],
+          "min_trial_p50_ms": 9.985,
+          "max_trial_p50_ms": 10.37425,
+          "iqr_trial_p50_ms": 0.1946249999999985
+        },
+        {
+          "language": "cpp",
+          "engine": "duckdb",
+          "query": "customers",
+          "median_trial_p50_ms": 17.382375,
+          "trials": [
+            {
+              "trial": 1,
+              "p50_ms": 17.272917,
+              "p99_ms": 20.64425,
+              "mean_cpu_ms": 17.547666666666668
+            },
+            {
+              "trial": 2,
+              "p50_ms": 18.189708,
+              "p99_ms": 20.064833,
+              "mean_cpu_ms": 17.370733333333334
+            },
+            {
+              "trial": 3,
+              "p50_ms": 17.382375,
+              "p99_ms": 20.6515,
+              "mean_cpu_ms": 17.86006666666667
+            }
+          ],
+          "min_trial_p50_ms": 17.272917,
+          "max_trial_p50_ms": 18.189708,
+          "iqr_trial_p50_ms": 0.4583954999999982
+        },
+        {
+          "language": "cpp",
+          "engine": "duckdb",
+          "query": "join",
+          "median_trial_p50_ms": 13.265292,
+          "trials": [
+            {
+              "trial": 1,
+              "p50_ms": 13.312083,
+              "p99_ms": 17.723375,
+              "mean_cpu_ms": 14.041533333333334
+            },
+            {
+              "trial": 2,
+              "p50_ms": 13.121292,
+              "p99_ms": 17.087167,
+              "mean_cpu_ms": 13.702933333333334
+            },
+            {
+              "trial": 3,
+              "p50_ms": 13.265292,
+              "p99_ms": 16.729583,
+              "mean_cpu_ms": 13.959666666666667
+            }
+          ],
+          "min_trial_p50_ms": 13.121292,
+          "max_trial_p50_ms": 13.312083,
+          "iqr_trial_p50_ms": 0.09539550000000041
+        },
+        {
+          "language": "rust",
+          "engine": "rayforce",
+          "query": "totals",
+          "median_trial_p50_ms": 22.90075,
+          "trials": [
+            {
+              "trial": 1,
+              "p50_ms": 22.90075,
+              "p99_ms": 26.566541,
+              "mean_cpu_ms": 23.057133333333333
+            },
+            {
+              "trial": 2,
+              "p50_ms": 22.805916,
+              "p99_ms": 23.824167,
+              "mean_cpu_ms": 22.718666666666667
+            },
+            {
+              "trial": 3,
+              "p50_ms": 23.491125,
+              "p99_ms": 25.621542,
+              "mean_cpu_ms": 23.223
+            }
+          ],
+          "min_trial_p50_ms": 22.805916,
+          "max_trial_p50_ms": 23.491125,
+          "iqr_trial_p50_ms": 0.3426045000000002
+        },
+        {
+          "language": "rust",
+          "engine": "rayforce",
+          "query": "filtered",
+          "median_trial_p50_ms": 9.031292,
+          "trials": [
+            {
+              "trial": 1,
+              "p50_ms": 8.925583,
+              "p99_ms": 10.280334,
+              "mean_cpu_ms": 9.080066666666667
+            },
+            {
+              "trial": 2,
+              "p50_ms": 9.031292,
+              "p99_ms": 12.886667,
+              "mean_cpu_ms": 9.1854
+            },
+            {
+              "trial": 3,
+              "p50_ms": 9.192958,
+              "p99_ms": 10.637834,
+              "mean_cpu_ms": 9.3468
+            }
+          ],
+          "min_trial_p50_ms": 8.925583,
+          "max_trial_p50_ms": 9.192958,
+          "iqr_trial_p50_ms": 0.13368750000000063
+        },
+        {
+          "language": "rust",
+          "engine": "rayforce",
+          "query": "symbols",
+          "median_trial_p50_ms": 3.259916,
+          "trials": [
+            {
+              "trial": 1,
+              "p50_ms": 3.259916,
+              "p99_ms": 3.666792,
+              "mean_cpu_ms": 3.2912
+            },
+            {
+              "trial": 2,
+              "p50_ms": 3.256375,
+              "p99_ms": 3.794,
+              "mean_cpu_ms": 3.319733333333333
+            },
+            {
+              "trial": 3,
+              "p50_ms": 3.343416,
+              "p99_ms": 3.950625,
+              "mean_cpu_ms": 3.3693333333333335
+            }
+          ],
+          "min_trial_p50_ms": 3.256375,
+          "max_trial_p50_ms": 3.343416,
+          "iqr_trial_p50_ms": 0.04352050000000007
+        },
+        {
+          "language": "rust",
+          "engine": "rayforce",
+          "query": "customers",
+          "median_trial_p50_ms": 5.52475,
+          "trials": [
+            {
+              "trial": 1,
+              "p50_ms": 5.52475,
+              "p99_ms": 7.230333,
+              "mean_cpu_ms": 5.724933333333333
+            },
+            {
+              "trial": 2,
+              "p50_ms": 5.481625,
+              "p99_ms": 6.970709,
+              "mean_cpu_ms": 5.6180666666666665
+            },
+            {
+              "trial": 3,
+              "p50_ms": 5.577541,
+              "p99_ms": 6.491583,
+              "mean_cpu_ms": 5.6559333333333335
+            }
+          ],
+          "min_trial_p50_ms": 5.481625,
+          "max_trial_p50_ms": 5.577541,
+          "iqr_trial_p50_ms": 0.04795800000000039
+        },
+        {
+          "language": "rust",
+          "engine": "rayforce",
+          "query": "join",
+          "median_trial_p50_ms": 69.132833,
+          "trials": [
+            {
+              "trial": 1,
+              "p50_ms": 69.094084,
+              "p99_ms": 71.763333,
+              "mean_cpu_ms": 68.8192
+            },
+            {
+              "trial": 2,
+              "p50_ms": 69.132833,
+              "p99_ms": 73.314708,
+              "mean_cpu_ms": 68.75273333333334
+            },
+            {
+              "trial": 3,
+              "p50_ms": 70.121375,
+              "p99_ms": 79.990917,
+              "mean_cpu_ms": 70.5004
+            }
+          ],
+          "min_trial_p50_ms": 69.094084,
+          "max_trial_p50_ms": 70.121375,
+          "iqr_trial_p50_ms": 0.5136454999999955
+        },
+        {
+          "language": "rust",
+          "engine": "duckdb",
+          "query": "totals",
+          "median_trial_p50_ms": 2.094291,
+          "trials": [
+            {
+              "trial": 1,
+              "p50_ms": 2.057166,
+              "p99_ms": 2.5855,
+              "mean_cpu_ms": 2.1170666666666667
+            },
+            {
+              "trial": 2,
+              "p50_ms": 2.094291,
+              "p99_ms": 2.672,
+              "mean_cpu_ms": 2.138333333333333
+            },
+            {
+              "trial": 3,
+              "p50_ms": 2.09975,
+              "p99_ms": 2.591375,
+              "mean_cpu_ms": 2.1410666666666667
+            }
+          ],
+          "min_trial_p50_ms": 2.057166,
+          "max_trial_p50_ms": 2.09975,
+          "iqr_trial_p50_ms": 0.021291999999999867
+        },
+        {
+          "language": "rust",
+          "engine": "duckdb",
+          "query": "filtered",
+          "median_trial_p50_ms": 1.952209,
+          "trials": [
+            {
+              "trial": 1,
+              "p50_ms": 1.913583,
+              "p99_ms": 2.535375,
+              "mean_cpu_ms": 1.9706666666666666
+            },
+            {
+              "trial": 2,
+              "p50_ms": 1.952209,
+              "p99_ms": 2.853625,
+              "mean_cpu_ms": 2.0271333333333335
+            },
+            {
+              "trial": 3,
+              "p50_ms": 1.954542,
+              "p99_ms": 2.132584,
+              "mean_cpu_ms": 1.9621333333333333
+            }
+          ],
+          "min_trial_p50_ms": 1.913583,
+          "max_trial_p50_ms": 1.954542,
+          "iqr_trial_p50_ms": 0.020479499999999984
+        },
+        {
+          "language": "rust",
+          "engine": "duckdb",
+          "query": "symbols",
+          "median_trial_p50_ms": 10.206583,
+          "trials": [
+            {
+              "trial": 1,
+              "p50_ms": 10.165917,
+              "p99_ms": 11.451041,
+              "mean_cpu_ms": 9.8078
+            },
+            {
+              "trial": 2,
+              "p50_ms": 10.206583,
+              "p99_ms": 11.527333,
+              "mean_cpu_ms": 10.2644
+            },
+            {
+              "trial": 3,
+              "p50_ms": 10.222334,
+              "p99_ms": 13.58775,
+              "mean_cpu_ms": 9.246133333333333
+            }
+          ],
+          "min_trial_p50_ms": 10.165917,
+          "max_trial_p50_ms": 10.222334,
+          "iqr_trial_p50_ms": 0.028208499999998082
+        },
+        {
+          "language": "rust",
+          "engine": "duckdb",
+          "query": "customers",
+          "median_trial_p50_ms": 16.918958,
+          "trials": [
+            {
+              "trial": 1,
+              "p50_ms": 16.918958,
+              "p99_ms": 21.755583,
+              "mean_cpu_ms": 17.2588
+            },
+            {
+              "trial": 2,
+              "p50_ms": 16.968917,
+              "p99_ms": 21.563625,
+              "mean_cpu_ms": 17.250799999999998
+            },
+            {
+              "trial": 3,
+              "p50_ms": 16.459708,
+              "p99_ms": 20.442708,
+              "mean_cpu_ms": 17.1682
+            }
+          ],
+          "min_trial_p50_ms": 16.459708,
+          "max_trial_p50_ms": 16.968917,
+          "iqr_trial_p50_ms": 0.2546045000000028
+        },
+        {
+          "language": "rust",
+          "engine": "duckdb",
+          "query": "join",
+          "median_trial_p50_ms": 13.218834,
+          "trials": [
+            {
+              "trial": 1,
+              "p50_ms": 13.15725,
+              "p99_ms": 18.649542,
+              "mean_cpu_ms": 13.8116
+            },
+            {
+              "trial": 2,
+              "p50_ms": 13.218834,
+              "p99_ms": 16.786,
+              "mean_cpu_ms": 13.907399999999999
+            },
+            {
+              "trial": 3,
+              "p50_ms": 13.357625,
+              "p99_ms": 16.86175,
+              "mean_cpu_ms": 14.0562
+            }
+          ],
+          "min_trial_p50_ms": 13.15725,
+          "max_trial_p50_ms": 13.357625,
+          "iqr_trial_p50_ms": 0.10018750000000054
+        }
+      ],
+      "controller": {
+        "wall_seconds": 37.124674041057006,
+        "user_cpu_seconds": 0.335099,
+        "system_cpu_seconds": 0.6799489999999999,
+        "child_cli_user_cpu_seconds": 4.139163,
+        "child_cli_system_cpu_seconds": 2.823428,
+        "process_peak_rss_bytes": 35504128,
+        "scope": "Host controller includes retained-fixture hashing, native API sampling and report generation. CLI subprocess CPU excludes server-side work. Docker daemon/VM excluded; this is separate from engine container costs."
+      }
+    },
+    {
+      "run_id": "369518a6fe0a4bc59a166f3bb6b55c24",
+      "date_utc": "2026-11-21T14:00:55Z",
+      "threads": 4,
+      "repeats": 15,
+      "trials": 3,
+      "fixture": {
+        "rows": 2000000,
+        "customers": 10000,
+        "seed": 20261117,
+        "seconds": 3.2101720420178026,
+        "sha256": {
+          "trades.csv": "c8756870bdbb238b69ef8d563c6d4f176753e3864ffa50f508e707ed94406de0",
+          "customers.csv": "c3a160b85050e71c8ba465e2ca7a72d25bc4fbb076954f6c6f9c22fcaabadc95",
+          "expected.json": "150c8e3d600939b01a5c3af70c563f6b11b22cef4699138b4f4b4a4ba0d15a72"
+        }
+      },
+      "environment": {
+        "Architecture": "aarch64",
+        "NCPU": 11,
+        "MemTotal": 26216296448,
+        "KernelVersion": "6.12.76-linuxkit",
+        "ServerVersion": "29.5.3",
+        "OperatingSystem": "Docker Desktop"
+      },
+      "storage": {
+        "input_csv_logical_bytes": 52893924,
+        "input_csv_host_allocated_bytes": 52895744,
+        "engine_persistent_bytes": 0,
+        "temporary_storage": "512 MiB tmpfs, charged to container memory",
+        "native_compression_ratio": null,
+        "limits": "This profile opens both engines in memory and mounts the same uncompressed CSV read-only. Host st_blocks*512 is allocated input storage, not native engine size or Docker VM disk use. No persisted-engine compression comparison or cold-storage claim."
+      },
+      "sources": {
+        "rayforce.tar.gz": {
+          "url": "https://codeload.github.com/RayforceDB/rayforce/tar.gz/38fd4be3560d63a5514c1e6883685fe496d45e1a",
+          "sha256": "6c6d08467bef24d372ae076bc4abfba7d09fc1658d15e0b8ca992e64509bb1d6"
+        },
+        "duckdb-arm64.tar.gz": {
+          "url": "https://github.com/duckdb/duckdb/releases/download/v2.0.0/duckdb-shared-libs-linux-arm64.tar.gz",
+          "sha256": "c60eecf91143ca6bbac55c4f4d40dc22520488b0ac257c86e0fe9a2b451cf2b7"
+        },
+        "duckdb-amd64.tar.gz": {
+          "url": "https://github.com/duckdb/duckdb/releases/download/v2.0.0/duckdb-shared-libs-linux-amd64.tar.gz",
+          "sha256": "993ad89e7dfca66cd6da994c2cad090c2fc160ddf9f550498a098ab4bb13cfb1"
+        }
+      },
+      "source_sha256": {
+        ".gitignore": "9488301358fdf2e8cf1632f0682dbe7949148aaf7136fd68a599f64fa2a1cba7",
+        ".ruff_cache/.gitignore": "9e3a60f1e6ec4ae60215c11d54b171392745ec25e9dded433d5bd921363af316",
+        ".ruff_cache/0.14.5/6261282176521708771": "9db024ed57fa3b074cbf12a3e766130fb4ea9d5ef85555167458e792f2eb1790",
+        ".ruff_cache/CACHEDIR.TAG": "5953156d7e0c564a427251316eaf26f8870e6483ae2197f916b630e4f93e31ae",
+        "Makefile": "20f2ce9ea12ac0e96a7fcec6b734a73ba5fd65c14c8d3f62dfebacc7224f7731",
+        "README.md": "9bb8e6d22217350714b50f7bc0911cdfd6f5001cbbebbde5bcf6ccffdd7da37c",
+        "analytics-workload/CMakeLists.txt": "270618a258b00cc495b4149717d51cb680581657fffa6751e7279efe02f0900b",
+        "analytics-workload/cpp/main.cpp": "ac1b340316bc8627cb0baafad062a392b391cfad5459fbab4e309ffa9947c6de",
+        "analytics-workload/native/bridge.c": "3a8861e23f1bfcb51c53ed3cf40ff423be84ef942b76dc039871b2b12344925e",
+        "analytics-workload/native/bridge.h": "403d81e0a8230148c9b8c4079667f48612bb4491d583f11fe11710bea841cf7f",
+        "analytics-workload/python/main.py": "c55a9def8c79af9db46213c4ca68d0f1c4d6b6fea899ebd1114bb85184ade994",
+        "analytics-workload/rust/Cargo.lock": "23ae011b9f4c88952831b7bccb9a919dc173d7a51dbd58d569c473c036467411",
+        "analytics-workload/rust/Cargo.toml": "af3265a7f111bb5ffdefe5cf577c1bcc826fdc7d636a97011d4bc25ad73c7110",
+        "analytics-workload/rust/build.rs": "d83a5ded270cc1628e7110e23b98e6366aa8c6b3cd71aee774ccdd208b10386f",
+        "analytics-workload/rust/src/main.rs": "b61bb99e61213aef6870e694f045b9b19c25fe618331cf329535eb115492f101",
+        "docker/Dockerfile": "be2075182d8575c773543eb38da54218139cab03bd82b98d2bd79c4126a175f6",
+        "docker-compose.yml": "7ce03d700135f0dea9258bad4486aa320d151b74f9453ac47f3c9a0ebcee689e",
+        "experiment.py": "7037ffef97348897b6322a4d5dc41bdf949064a3d80c3e7807466fc42aad4bcb",
+        "prepare.py": "3704ea3ca09d861d497649c6343d2fbc50caefb5c5639a8c4b716694959ddb0b",
+        "sources.json": "2e07738e6b3f6657351c2c933bfd06a1d13b03a19159792421ecb89ca00f96e1",
+        "test_controller.py": "81db61c3b4cbfd4d6f4b33a2328cfdb597ca3ed65c69e9e94bce958d74f27996",
+        "write_results.py": "adb6a0892a6ec23c26b159b36d2380b9ed4c51bc60fa4e5b0837d44c85c455a2"
+      },
+      "cases": [
+        {
+          "language": "cpp",
+          "engine": "duckdb",
+          "trial": 1,
+          "cgroup_peak_memory_bytes": 272429056,
+          "cgroup_cpu_seconds": 1.562435,
+          "workload_window_seconds": 0.5499999999997272,
+          "container_lifetime_seconds": 0.591749,
+          "cpu_utilization_percent_one_core_100": 264.03677910735803,
+          "cpu_utilization_scope": "Cgroup CPU includes runtime, wrapper and accounting commands; denominator is Docker StartedAt to FinishedAt, parsed at microsecond resolution. CPU snapshot precedes the final accounting commands/exit, so their final CPU is not included. Driver uptime window has 10 ms resolution; per-query CPU and wall time are separate exact-clock samples.",
+          "block_io": {
+            "available": true,
+            "devices": {},
+            "raw": "",
+            "totals": {
+              "rbytes": 0,
+              "rios": 0,
+              "wbytes": 0,
+              "wios": 0
+            },
+            "per_second": {
+              "rbytes": 0.0,
+              "rios": 0.0,
+              "wbytes": 0.0,
+              "wios": 0.0
+            },
+            "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth."
+          },
+          "sampled_resources": {
+            "available": true,
+            "sample_count": 5,
+            "sampled_mean_charged_memory_bytes": 228626432,
+            "sampled_max_charged_memory_bytes": 270299136,
+            "sampled_peak_cpu_percent_one_core_100": 310.1095713158363,
+            "scope": "Approximately 100 ms plus API/inspection overhead; arithmetic sample mean, not heap or time-weighted mean. Sampling can miss short peaks; use native cgroup memory.peak and process RSS too. Docker daemon/VM overhead excluded."
+          },
+          "process_peak_rss_kib": 253508,
+          "image": "sha256:1fe8d93749f7d9b4edeb4e6a2b80cd1cdd26bdec1df02c65ae33962adf7a7abf",
+          "cpus": 4.0,
+          "memory_limit_bytes": 4294967296,
+          "wall_with_monitor_seconds": 0.6746883329469711,
+          "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n"
+        },
+        {
+          "language": "cpp",
+          "engine": "duckdb",
+          "trial": 2,
+          "cgroup_peak_memory_bytes": 270675968,
+          "cgroup_cpu_seconds": 1.511339,
+          "workload_window_seconds": 0.5399999999999636,
+          "container_lifetime_seconds": 0.582555,
+          "cpu_utilization_percent_one_core_100": 259.4328432508518,
+          "cpu_utilization_scope": "Cgroup CPU includes runtime, wrapper and accounting commands; denominator is Docker StartedAt to FinishedAt, parsed at microsecond resolution. CPU snapshot precedes the final accounting commands/exit, so their final CPU is not included. Driver uptime window has 10 ms resolution; per-query CPU and wall time are separate exact-clock samples.",
+          "block_io": {
+            "available": true,
+            "devices": {},
+            "raw": "",
+            "totals": {
+              "rbytes": 0,
+              "rios": 0,
+              "wbytes": 0,
+              "wios": 0
+            },
+            "per_second": {
+              "rbytes": 0.0,
+              "rios": 0.0,
+              "wbytes": 0.0,
+              "wios": 0.0
+            },
+            "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth."
+          },
+          "sampled_resources": {
+            "available": true,
+            "sample_count": 4,
+            "sampled_mean_charged_memory_bytes": 215346176,
+            "sampled_max_charged_memory_bytes": 269983744,
+            "sampled_peak_cpu_percent_one_core_100": 303.3845348663059,
+            "scope": "Approximately 100 ms plus API/inspection overhead; arithmetic sample mean, not heap or time-weighted mean. Sampling can miss short peaks; use native cgroup memory.peak and process RSS too. Docker daemon/VM overhead excluded."
+          },
+          "process_peak_rss_kib": 253516,
+          "image": "sha256:1fe8d93749f7d9b4edeb4e6a2b80cd1cdd26bdec1df02c65ae33962adf7a7abf",
+          "cpus": 4.0,
+          "memory_limit_bytes": 4294967296,
+          "wall_with_monitor_seconds": 0.6816680000629276,
+          "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n"
+        },
+        {
+          "language": "cpp",
+          "engine": "duckdb",
+          "trial": 3,
+          "cgroup_peak_memory_bytes": 271577088,
+          "cgroup_cpu_seconds": 1.517019,
+          "workload_window_seconds": 0.5399999999999636,
+          "container_lifetime_seconds": 0.575818,
+          "cpu_utilization_percent_one_core_100": 263.45459850160984,
+          "cpu_utilization_scope": "Cgroup CPU includes runtime, wrapper and accounting commands; denominator is Docker StartedAt to FinishedAt, parsed at microsecond resolution. CPU snapshot precedes the final accounting commands/exit, so their final CPU is not included. Driver uptime window has 10 ms resolution; per-query CPU and wall time are separate exact-clock samples.",
+          "block_io": {
+            "available": true,
+            "devices": {},
+            "raw": "",
+            "totals": {
+              "rbytes": 0,
+              "rios": 0,
+              "wbytes": 0,
+              "wios": 0
+            },
+            "per_second": {
+              "rbytes": 0.0,
+              "rios": 0.0,
+              "wbytes": 0.0,
+              "wios": 0.0
+            },
+            "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth."
+          },
+          "sampled_resources": {
+            "available": true,
+            "sample_count": 4,
+            "sampled_mean_charged_memory_bytes": 216371200,
+            "sampled_max_charged_memory_bytes": 271314944,
+            "sampled_peak_cpu_percent_one_core_100": 308.6262353455793,
+            "scope": "Approximately 100 ms plus API/inspection overhead; arithmetic sample mean, not heap or time-weighted mean. Sampling can miss short peaks; use native cgroup memory.peak and process RSS too. Docker daemon/VM overhead excluded."
+          },
+          "process_peak_rss_kib": 254176,
+          "image": "sha256:1fe8d93749f7d9b4edeb4e6a2b80cd1cdd26bdec1df02c65ae33962adf7a7abf",
+          "cpus": 4.0,
+          "memory_limit_bytes": 4294967296,
+          "wall_with_monitor_seconds": 0.5672472920268774,
+          "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n"
+        },
+        {
+          "language": "cpp",
+          "engine": "rayforce",
+          "trial": 1,
+          "cgroup_peak_memory_bytes": 450297856,
+          "cgroup_cpu_seconds": 2.668863,
+          "workload_window_seconds": 0.7600000000002183,
+          "container_lifetime_seconds": 0.801524,
+          "cpu_utilization_percent_one_core_100": 332.97356036749994,
+          "cpu_utilization_scope": "Cgroup CPU includes runtime, wrapper and accounting commands; denominator is Docker StartedAt to FinishedAt, parsed at microsecond resolution. CPU snapshot precedes the final accounting commands/exit, so their final CPU is not included. Driver uptime window has 10 ms resolution; per-query CPU and wall time are separate exact-clock samples.",
+          "block_io": {
+            "available": true,
+            "devices": {},
+            "raw": "",
+            "totals": {
+              "rbytes": 0,
+              "rios": 0,
+              "wbytes": 0,
+              "wios": 0
+            },
+            "per_second": {
+              "rbytes": 0.0,
+              "rios": 0.0,
+              "wbytes": 0.0,
+              "wios": 0.0
+            },
+            "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth."
+          },
+          "sampled_resources": {
+            "available": true,
+            "sample_count": 6,
+            "sampled_mean_charged_memory_bytes": 412905472,
+            "sampled_max_charged_memory_bytes": 450297856,
+            "sampled_peak_cpu_percent_one_core_100": 359.89072145466565,
+            "scope": "Approximately 100 ms plus API/inspection overhead; arithmetic sample mean, not heap or time-weighted mean. Sampling can miss short peaks; use native cgroup memory.peak and process RSS too. Docker daemon/VM overhead excluded."
+          },
+          "process_peak_rss_kib": 389916,
+          "image": "sha256:1fe8d93749f7d9b4edeb4e6a2b80cd1cdd26bdec1df02c65ae33962adf7a7abf",
+          "cpus": 4.0,
+          "memory_limit_bytes": 4294967296,
+          "wall_with_monitor_seconds": 0.821761584142223,
+          "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n"
+        },
+        {
+          "language": "cpp",
+          "engine": "rayforce",
+          "trial": 2,
+          "cgroup_peak_memory_bytes": 450228224,
+          "cgroup_cpu_seconds": 2.648646,
+          "workload_window_seconds": 0.75,
+          "container_lifetime_seconds": 0.801276,
+          "cpu_utilization_percent_one_core_100": 330.55351714016143,
+          "cpu_utilization_scope": "Cgroup CPU includes runtime, wrapper and accounting commands; denominator is Docker StartedAt to FinishedAt, parsed at microsecond resolution. CPU snapshot precedes the final accounting commands/exit, so their final CPU is not included. Driver uptime window has 10 ms resolution; per-query CPU and wall time are separate exact-clock samples.",
+          "block_io": {
+            "available": true,
+            "devices": {},
+            "raw": "",
+            "totals": {
+              "rbytes": 0,
+              "rios": 0,
+              "wbytes": 0,
+              "wios": 0
+            },
+            "per_second": {
+              "rbytes": 0.0,
+              "rios": 0.0,
+              "wbytes": 0.0,
+              "wios": 0.0
+            },
+            "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth."
+          },
+          "sampled_resources": {
+            "available": true,
+            "sample_count": 6,
+            "sampled_mean_charged_memory_bytes": 412598272,
+            "sampled_max_charged_memory_bytes": 449966080,
+            "sampled_peak_cpu_percent_one_core_100": 353.9306057645689,
+            "scope": "Approximately 100 ms plus API/inspection overhead; arithmetic sample mean, not heap or time-weighted mean. Sampling can miss short peaks; use native cgroup memory.peak and process RSS too. Docker daemon/VM overhead excluded."
+          },
+          "process_peak_rss_kib": 390008,
+          "image": "sha256:1fe8d93749f7d9b4edeb4e6a2b80cd1cdd26bdec1df02c65ae33962adf7a7abf",
+          "cpus": 4.0,
+          "memory_limit_bytes": 4294967296,
+          "wall_with_monitor_seconds": 0.7971616662107408,
+          "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n"
+        },
+        {
+          "language": "cpp",
+          "engine": "rayforce",
+          "trial": 3,
+          "cgroup_peak_memory_bytes": 448393216,
+          "cgroup_cpu_seconds": 2.620089,
+          "workload_window_seconds": 0.75,
+          "container_lifetime_seconds": 0.799815,
+          "cpu_utilization_percent_one_core_100": 327.58687946587645,
+          "cpu_utilization_scope": "Cgroup CPU includes runtime, wrapper and accounting commands; denominator is Docker StartedAt to FinishedAt, parsed at microsecond resolution. CPU snapshot precedes the final accounting commands/exit, so their final CPU is not included. Driver uptime window has 10 ms resolution; per-query CPU and wall time are separate exact-clock samples.",
+          "block_io": {
+            "available": true,
+            "devices": {},
+            "raw": "",
+            "totals": {
+              "rbytes": 0,
+              "rios": 0,
+              "wbytes": 0,
+              "wios": 0
+            },
+            "per_second": {
+              "rbytes": 0.0,
+              "rios": 0.0,
+              "wbytes": 0.0,
+              "wios": 0.0
+            },
+            "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth."
+          },
+          "sampled_resources": {
+            "available": true,
+            "sample_count": 6,
+            "sampled_mean_charged_memory_bytes": 411289600,
+            "sampled_max_charged_memory_bytes": 448339968,
+            "sampled_peak_cpu_percent_one_core_100": 361.3781549040516,
+            "scope": "Approximately 100 ms plus API/inspection overhead; arithmetic sample mean, not heap or time-weighted mean. Sampling can miss short peaks; use native cgroup memory.peak and process RSS too. Docker daemon/VM overhead excluded."
+          },
+          "process_peak_rss_kib": 388632,
+          "image": "sha256:1fe8d93749f7d9b4edeb4e6a2b80cd1cdd26bdec1df02c65ae33962adf7a7abf",
+          "cpus": 4.0,
+          "memory_limit_bytes": 4294967296,
+          "wall_with_monitor_seconds": 0.8019999999087304,
+          "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n"
+        },
+        {
+          "language": "python",
+          "engine": "duckdb",
+          "trial": 1,
+          "cgroup_peak_memory_bytes": 275714048,
+          "cgroup_cpu_seconds": 1.594032,
+          "workload_window_seconds": 0.5700000000001637,
+          "container_lifetime_seconds": 0.620353,
+          "cpu_utilization_percent_one_core_100": 256.9556365488681,
+          "cpu_utilization_scope": "Cgroup CPU includes runtime, wrapper and accounting commands; denominator is Docker StartedAt to FinishedAt, parsed at microsecond resolution. CPU snapshot precedes the final accounting commands/exit, so their final CPU is not included. Driver uptime window has 10 ms resolution; per-query CPU and wall time are separate exact-clock samples.",
+          "block_io": {
+            "available": true,
+            "devices": {},
+            "raw": "",
+            "totals": {
+              "rbytes": 0,
+              "rios": 0,
+              "wbytes": 0,
+              "wios": 0
+            },
+            "per_second": {
+              "rbytes": 0.0,
+              "rios": 0.0,
+              "wbytes": 0.0,
+              "wios": 0.0
+            },
+            "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth."
+          },
+          "sampled_resources": {
+            "available": true,
+            "sample_count": 5,
+            "sampled_mean_charged_memory_bytes": 220865331.2,
+            "sampled_max_charged_memory_bytes": 272683008,
+            "sampled_peak_cpu_percent_one_core_100": 299.9503536230664,
+            "scope": "Approximately 100 ms plus API/inspection overhead; arithmetic sample mean, not heap or time-weighted mean. Sampling can miss short peaks; use native cgroup memory.peak and process RSS too. Docker daemon/VM overhead excluded."
+          },
+          "process_peak_rss_kib": 261984,
+          "image": "sha256:1fe8d93749f7d9b4edeb4e6a2b80cd1cdd26bdec1df02c65ae33962adf7a7abf",
+          "cpus": 4.0,
+          "memory_limit_bytes": 4294967296,
+          "wall_with_monitor_seconds": 0.6831332079600543,
+          "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n"
+        },
+        {
+          "language": "python",
+          "engine": "duckdb",
+          "trial": 2,
+          "cgroup_peak_memory_bytes": 280453120,
+          "cgroup_cpu_seconds": 1.554064,
+          "workload_window_seconds": 0.569999999999709,
+          "container_lifetime_seconds": 0.60463,
+          "cpu_utilization_percent_one_core_100": 257.02727287762764,
+          "cpu_utilization_scope": "Cgroup CPU includes runtime, wrapper and accounting commands; denominator is Docker StartedAt to FinishedAt, parsed at microsecond resolution. CPU snapshot precedes the final accounting commands/exit, so their final CPU is not included. Driver uptime window has 10 ms resolution; per-query CPU and wall time are separate exact-clock samples.",
+          "block_io": {
+            "available": true,
+            "devices": {},
+            "raw": "",
+            "totals": {
+              "rbytes": 0,
+              "rios": 0,
+              "wbytes": 0,
+              "wios": 0
+            },
+            "per_second": {
+              "rbytes": 0.0,
+              "rios": 0.0,
+              "wbytes": 0.0,
+              "wios": 0.0
+            },
+            "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth."
+          },
+          "sampled_resources": {
+            "available": true,
+            "sample_count": 5,
+            "sampled_mean_charged_memory_bytes": 222363648,
+            "sampled_max_charged_memory_bytes": 279085056,
+            "sampled_peak_cpu_percent_one_core_100": 298.75726884459897,
+            "scope": "Approximately 100 ms plus API/inspection overhead; arithmetic sample mean, not heap or time-weighted mean. Sampling can miss short peaks; use native cgroup memory.peak and process RSS too. Docker daemon/VM overhead excluded."
+          },
+          "process_peak_rss_kib": 266256,
+          "image": "sha256:1fe8d93749f7d9b4edeb4e6a2b80cd1cdd26bdec1df02c65ae33962adf7a7abf",
+          "cpus": 4.0,
+          "memory_limit_bytes": 4294967296,
+          "wall_with_monitor_seconds": 0.6853240421041846,
+          "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n"
+        },
+        {
+          "language": "python",
+          "engine": "duckdb",
+          "trial": 3,
+          "cgroup_peak_memory_bytes": 280576000,
+          "cgroup_cpu_seconds": 1.557386,
+          "workload_window_seconds": 0.5499999999997272,
+          "container_lifetime_seconds": 0.604387,
+          "cpu_utilization_percent_one_core_100": 257.6802611571725,
+          "cpu_utilization_scope": "Cgroup CPU includes runtime, wrapper and accounting commands; denominator is Docker StartedAt to FinishedAt, parsed at microsecond resolution. CPU snapshot precedes the final accounting commands/exit, so their final CPU is not included. Driver uptime window has 10 ms resolution; per-query CPU and wall time are separate exact-clock samples.",
+          "block_io": {
+            "available": true,
+            "devices": {},
+            "raw": "",
+            "totals": {
+              "rbytes": 0,
+              "rios": 0,
+              "wbytes": 0,
+              "wios": 0
+            },
+            "per_second": {
+              "rbytes": 0.0,
+              "rios": 0.0,
+              "wbytes": 0.0,
+              "wios": 0.0
+            },
+            "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth."
+          },
+          "sampled_resources": {
+            "available": true,
+            "sample_count": 5,
+            "sampled_mean_charged_memory_bytes": 222216192,
+            "sampled_max_charged_memory_bytes": 279293952,
+            "sampled_peak_cpu_percent_one_core_100": 301.89633167899257,
+            "scope": "Approximately 100 ms plus API/inspection overhead; arithmetic sample mean, not heap or time-weighted mean. Sampling can miss short peaks; use native cgroup memory.peak and process RSS too. Docker daemon/VM overhead excluded."
+          },
+          "process_peak_rss_kib": 266572,
+          "image": "sha256:1fe8d93749f7d9b4edeb4e6a2b80cd1cdd26bdec1df02c65ae33962adf7a7abf",
+          "cpus": 4.0,
+          "memory_limit_bytes": 4294967296,
+          "wall_with_monitor_seconds": 0.6685650839935988,
+          "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n"
+        },
+        {
+          "language": "python",
+          "engine": "rayforce",
+          "trial": 1,
+          "cgroup_peak_memory_bytes": 455999488,
+          "cgroup_cpu_seconds": 2.707288,
+          "workload_window_seconds": 0.7800000000002001,
+          "container_lifetime_seconds": 0.833683,
+          "cpu_utilization_percent_one_core_100": 324.7382998094,
+          "cpu_utilization_scope": "Cgroup CPU includes runtime, wrapper and accounting commands; denominator is Docker StartedAt to FinishedAt, parsed at microsecond resolution. CPU snapshot precedes the final accounting commands/exit, so their final CPU is not included. Driver uptime window has 10 ms resolution; per-query CPU and wall time are separate exact-clock samples.",
+          "block_io": {
+            "available": true,
+            "devices": {},
+            "raw": "",
+            "totals": {
+              "rbytes": 0,
+              "rios": 0,
+              "wbytes": 0,
+              "wios": 0
+            },
+            "per_second": {
+              "rbytes": 0.0,
+              "rios": 0.0,
+              "wbytes": 0.0,
+              "wios": 0.0
+            },
+            "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth."
+          },
+          "sampled_resources": {
+            "available": true,
+            "sample_count": 6,
+            "sampled_mean_charged_memory_bytes": 414788949.3333333,
+            "sampled_max_charged_memory_bytes": 454090752,
+            "sampled_peak_cpu_percent_one_core_100": 358.41222841430044,
+            "scope": "Approximately 100 ms plus API/inspection overhead; arithmetic sample mean, not heap or time-weighted mean. Sampling can miss short peaks; use native cgroup memory.peak and process RSS too. Docker daemon/VM overhead excluded."
+          },
+          "process_peak_rss_kib": 396572,
+          "image": "sha256:1fe8d93749f7d9b4edeb4e6a2b80cd1cdd26bdec1df02c65ae33962adf7a7abf",
+          "cpus": 4.0,
+          "memory_limit_bytes": 4294967296,
+          "wall_with_monitor_seconds": 0.9432015409693122,
+          "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n"
+        },
+        {
+          "language": "python",
+          "engine": "rayforce",
+          "trial": 2,
+          "cgroup_peak_memory_bytes": 454397952,
+          "cgroup_cpu_seconds": 2.676838,
+          "workload_window_seconds": 0.7699999999999818,
+          "container_lifetime_seconds": 0.826379,
+          "cpu_utilization_percent_one_core_100": 323.9237686340045,
+          "cpu_utilization_scope": "Cgroup CPU includes runtime, wrapper and accounting commands; denominator is Docker StartedAt to FinishedAt, parsed at microsecond resolution. CPU snapshot precedes the final accounting commands/exit, so their final CPU is not included. Driver uptime window has 10 ms resolution; per-query CPU and wall time are separate exact-clock samples.",
+          "block_io": {
+            "available": true,
+            "devices": {},
+            "raw": "",
+            "totals": {
+              "rbytes": 0,
+              "rios": 0,
+              "wbytes": 0,
+              "wios": 0
+            },
+            "per_second": {
+              "rbytes": 0.0,
+              "rios": 0.0,
+              "wbytes": 0.0,
+              "wios": 0.0
+            },
+            "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth."
+          },
+          "sampled_resources": {
+            "available": true,
+            "sample_count": 6,
+            "sampled_mean_charged_memory_bytes": 414804650.6666667,
+            "sampled_max_charged_memory_bytes": 454135808,
+            "sampled_peak_cpu_percent_one_core_100": 359.9312531655594,
+            "scope": "Approximately 100 ms plus API/inspection overhead; arithmetic sample mean, not heap or time-weighted mean. Sampling can miss short peaks; use native cgroup memory.peak and process RSS too. Docker daemon/VM overhead excluded."
+          },
+          "process_peak_rss_kib": 396592,
+          "image": "sha256:1fe8d93749f7d9b4edeb4e6a2b80cd1cdd26bdec1df02c65ae33962adf7a7abf",
+          "cpus": 4.0,
+          "memory_limit_bytes": 4294967296,
+          "wall_with_monitor_seconds": 0.8038653330877423,
+          "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n"
+        },
+        {
+          "language": "python",
+          "engine": "rayforce",
+          "trial": 3,
+          "cgroup_peak_memory_bytes": 454471680,
+          "cgroup_cpu_seconds": 2.681889,
+          "workload_window_seconds": 0.7699999999999818,
+          "container_lifetime_seconds": 0.821981,
+          "cpu_utilization_percent_one_core_100": 326.271410166415,
+          "cpu_utilization_scope": "Cgroup CPU includes runtime, wrapper and accounting commands; denominator is Docker StartedAt to FinishedAt, parsed at microsecond resolution. CPU snapshot precedes the final accounting commands/exit, so their final CPU is not included. Driver uptime window has 10 ms resolution; per-query CPU and wall time are separate exact-clock samples.",
+          "block_io": {
+            "available": true,
+            "devices": {},
+            "raw": "",
+            "totals": {
+              "rbytes": 0,
+              "rios": 0,
+              "wbytes": 0,
+              "wios": 0
+            },
+            "per_second": {
+              "rbytes": 0.0,
+              "rios": 0.0,
+              "wbytes": 0.0,
+              "wios": 0.0
+            },
+            "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth."
+          },
+          "sampled_resources": {
+            "available": true,
+            "sample_count": 6,
+            "sampled_mean_charged_memory_bytes": 414892032,
+            "sampled_max_charged_memory_bytes": 454209536,
+            "sampled_peak_cpu_percent_one_core_100": 361.83481997327374,
+            "scope": "Approximately 100 ms plus API/inspection overhead; arithmetic sample mean, not heap or time-weighted mean. Sampling can miss short peaks; use native cgroup memory.peak and process RSS too. Docker daemon/VM overhead excluded."
+          },
+          "process_peak_rss_kib": 397156,
+          "image": "sha256:1fe8d93749f7d9b4edeb4e6a2b80cd1cdd26bdec1df02c65ae33962adf7a7abf",
+          "cpus": 4.0,
+          "memory_limit_bytes": 4294967296,
+          "wall_with_monitor_seconds": 0.8095476659946144,
+          "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n"
+        },
+        {
+          "language": "rust",
+          "engine": "duckdb",
+          "trial": 1,
+          "cgroup_peak_memory_bytes": 275292160,
+          "cgroup_cpu_seconds": 1.566007,
+          "workload_window_seconds": 0.5500000000001819,
+          "container_lifetime_seconds": 0.600335,
+          "cpu_utilization_percent_one_core_100": 260.85552233336387,
+          "cpu_utilization_scope": "Cgroup CPU includes runtime, wrapper and accounting commands; denominator is Docker StartedAt to FinishedAt, parsed at microsecond resolution. CPU snapshot precedes the final accounting commands/exit, so their final CPU is not included. Driver uptime window has 10 ms resolution; per-query CPU and wall time are separate exact-clock samples.",
+          "block_io": {
+            "available": true,
+            "devices": {},
+            "raw": "",
+            "totals": {
+              "rbytes": 0,
+              "rios": 0,
+              "wbytes": 0,
+              "wios": 0
+            },
+            "per_second": {
+              "rbytes": 0.0,
+              "rios": 0.0,
+              "wbytes": 0.0,
+              "wios": 0.0
+            },
+            "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth."
+          },
+          "sampled_resources": {
+            "available": true,
+            "sample_count": 5,
+            "sampled_mean_charged_memory_bytes": 225157939.2,
+            "sampled_max_charged_memory_bytes": 272494592,
+            "sampled_peak_cpu_percent_one_core_100": 305.7535112955722,
+            "scope": "Approximately 100 ms plus API/inspection overhead; arithmetic sample mean, not heap or time-weighted mean. Sampling can miss short peaks; use native cgroup memory.peak and process RSS too. Docker daemon/VM overhead excluded."
+          },
+          "process_peak_rss_kib": 258408,
+          "image": "sha256:1fe8d93749f7d9b4edeb4e6a2b80cd1cdd26bdec1df02c65ae33962adf7a7abf",
+          "cpus": 4.0,
+          "memory_limit_bytes": 4294967296,
+          "wall_with_monitor_seconds": 0.663326249923557,
+          "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n"
+        },
+        {
+          "language": "rust",
+          "engine": "duckdb",
+          "trial": 2,
+          "cgroup_peak_memory_bytes": 275021824,
+          "cgroup_cpu_seconds": 1.554157,
+          "workload_window_seconds": 0.5399999999999636,
+          "container_lifetime_seconds": 0.585153,
+          "cpu_utilization_percent_one_core_100": 265.5983990511883,
+          "cpu_utilization_scope": "Cgroup CPU includes runtime, wrapper and accounting commands; denominator is Docker StartedAt to FinishedAt, parsed at microsecond resolution. CPU snapshot precedes the final accounting commands/exit, so their final CPU is not included. Driver uptime window has 10 ms resolution; per-query CPU and wall time are separate exact-clock samples.",
+          "block_io": {
+            "available": true,
+            "devices": {},
+            "raw": "",
+            "totals": {
+              "rbytes": 0,
+              "rios": 0,
+              "wbytes": 0,
+              "wios": 0
+            },
+            "per_second": {
+              "rbytes": 0.0,
+              "rios": 0.0,
+              "wbytes": 0.0,
+              "wios": 0.0
+            },
+            "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth."
+          },
+          "sampled_resources": {
+            "available": true,
+            "sample_count": 5,
+            "sampled_mean_charged_memory_bytes": 223912755.2,
+            "sampled_max_charged_memory_bytes": 274178048,
+            "sampled_peak_cpu_percent_one_core_100": 306.98115894621094,
+            "scope": "Approximately 100 ms plus API/inspection overhead; arithmetic sample mean, not heap or time-weighted mean. Sampling can miss short peaks; use native cgroup memory.peak and process RSS too. Docker daemon/VM overhead excluded."
+          },
+          "process_peak_rss_kib": 257292,
+          "image": "sha256:1fe8d93749f7d9b4edeb4e6a2b80cd1cdd26bdec1df02c65ae33962adf7a7abf",
+          "cpus": 4.0,
+          "memory_limit_bytes": 4294967296,
+          "wall_with_monitor_seconds": 0.6755612920969725,
+          "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n"
+        },
+        {
+          "language": "rust",
+          "engine": "duckdb",
+          "trial": 3,
+          "cgroup_peak_memory_bytes": 275824640,
+          "cgroup_cpu_seconds": 1.565551,
+          "workload_window_seconds": 0.5399999999999636,
+          "container_lifetime_seconds": 0.584039,
+          "cpu_utilization_percent_one_core_100": 268.0559003765159,
+          "cpu_utilization_scope": "Cgroup CPU includes runtime, wrapper and accounting commands; denominator is Docker StartedAt to FinishedAt, parsed at microsecond resolution. CPU snapshot precedes the final accounting commands/exit, so their final CPU is not included. Driver uptime window has 10 ms resolution; per-query CPU and wall time are separate exact-clock samples.",
+          "block_io": {
+            "available": true,
+            "devices": {},
+            "raw": "",
+            "totals": {
+              "rbytes": 0,
+              "rios": 0,
+              "wbytes": 0,
+              "wios": 0
+            },
+            "per_second": {
+              "rbytes": 0.0,
+              "rios": 0.0,
+              "wbytes": 0.0,
+              "wios": 0.0
+            },
+            "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth."
+          },
+          "sampled_resources": {
+            "available": true,
+            "sample_count": 5,
+            "sampled_mean_charged_memory_bytes": 225858355.2,
+            "sampled_max_charged_memory_bytes": 275189760,
+            "sampled_peak_cpu_percent_one_core_100": 314.55628269991627,
+            "scope": "Approximately 100 ms plus API/inspection overhead; arithmetic sample mean, not heap or time-weighted mean. Sampling can miss short peaks; use native cgroup memory.peak and process RSS too. Docker daemon/VM overhead excluded."
+          },
+          "process_peak_rss_kib": 258020,
+          "image": "sha256:1fe8d93749f7d9b4edeb4e6a2b80cd1cdd26bdec1df02c65ae33962adf7a7abf",
+          "cpus": 4.0,
+          "memory_limit_bytes": 4294967296,
+          "wall_with_monitor_seconds": 0.6721727498807013,
+          "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n"
+        },
+        {
+          "language": "rust",
+          "engine": "rayforce",
+          "trial": 1,
+          "cgroup_peak_memory_bytes": 448118784,
+          "cgroup_cpu_seconds": 2.63863,
+          "workload_window_seconds": 0.75,
+          "container_lifetime_seconds": 0.792341,
+          "cpu_utilization_percent_one_core_100": 333.01697122829694,
+          "cpu_utilization_scope": "Cgroup CPU includes runtime, wrapper and accounting commands; denominator is Docker StartedAt to FinishedAt, parsed at microsecond resolution. CPU snapshot precedes the final accounting commands/exit, so their final CPU is not included. Driver uptime window has 10 ms resolution; per-query CPU and wall time are separate exact-clock samples.",
+          "block_io": {
+            "available": true,
+            "devices": {},
+            "raw": "",
+            "totals": {
+              "rbytes": 0,
+              "rios": 0,
+              "wbytes": 0,
+              "wios": 0
+            },
+            "per_second": {
+              "rbytes": 0.0,
+              "rios": 0.0,
+              "wbytes": 0.0,
+              "wios": 0.0
+            },
+            "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth."
+          },
+          "sampled_resources": {
+            "available": true,
+            "sample_count": 6,
+            "sampled_mean_charged_memory_bytes": 410765994.6666667,
+            "sampled_max_charged_memory_bytes": 447856640,
+            "sampled_peak_cpu_percent_one_core_100": 360.37214853029445,
+            "scope": "Approximately 100 ms plus API/inspection overhead; arithmetic sample mean, not heap or time-weighted mean. Sampling can miss short peaks; use native cgroup memory.peak and process RSS too. Docker daemon/VM overhead excluded."
+          },
+          "process_peak_rss_kib": 386668,
+          "image": "sha256:1fe8d93749f7d9b4edeb4e6a2b80cd1cdd26bdec1df02c65ae33962adf7a7abf",
+          "cpus": 4.0,
+          "memory_limit_bytes": 4294967296,
+          "wall_with_monitor_seconds": 0.8031046248506755,
+          "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n"
+        },
+        {
+          "language": "rust",
+          "engine": "rayforce",
+          "trial": 2,
+          "cgroup_peak_memory_bytes": 448086016,
+          "cgroup_cpu_seconds": 2.625708,
+          "workload_window_seconds": 0.75,
+          "container_lifetime_seconds": 0.788569,
+          "cpu_utilization_percent_one_core_100": 332.9712428462189,
+          "cpu_utilization_scope": "Cgroup CPU includes runtime, wrapper and accounting commands; denominator is Docker StartedAt to FinishedAt, parsed at microsecond resolution. CPU snapshot precedes the final accounting commands/exit, so their final CPU is not included. Driver uptime window has 10 ms resolution; per-query CPU and wall time are separate exact-clock samples.",
+          "block_io": {
+            "available": true,
+            "devices": {},
+            "raw": "",
+            "totals": {
+              "rbytes": 0,
+              "rios": 0,
+              "wbytes": 0,
+              "wios": 0
+            },
+            "per_second": {
+              "rbytes": 0.0,
+              "rios": 0.0,
+              "wbytes": 0.0,
+              "wios": 0.0
+            },
+            "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth."
+          },
+          "sampled_resources": {
+            "available": true,
+            "sample_count": 6,
+            "sampled_mean_charged_memory_bytes": 410845184,
+            "sampled_max_charged_memory_bytes": 447823872,
+            "sampled_peak_cpu_percent_one_core_100": 357.69896907668846,
+            "scope": "Approximately 100 ms plus API/inspection overhead; arithmetic sample mean, not heap or time-weighted mean. Sampling can miss short peaks; use native cgroup memory.peak and process RSS too. Docker daemon/VM overhead excluded."
+          },
+          "process_peak_rss_kib": 386792,
+          "image": "sha256:1fe8d93749f7d9b4edeb4e6a2b80cd1cdd26bdec1df02c65ae33962adf7a7abf",
+          "cpus": 4.0,
+          "memory_limit_bytes": 4294967296,
+          "wall_with_monitor_seconds": 0.816627207910642,
+          "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n"
+        },
+        {
+          "language": "rust",
+          "engine": "rayforce",
+          "trial": 3,
+          "cgroup_peak_memory_bytes": 451727360,
+          "cgroup_cpu_seconds": 2.621848,
+          "workload_window_seconds": 0.7400000000002365,
+          "container_lifetime_seconds": 0.798042,
+          "cpu_utilization_percent_one_core_100": 328.535089631874,
+          "cpu_utilization_scope": "Cgroup CPU includes runtime, wrapper and accounting commands; denominator is Docker StartedAt to FinishedAt, parsed at microsecond resolution. CPU snapshot precedes the final accounting commands/exit, so their final CPU is not included. Driver uptime window has 10 ms resolution; per-query CPU and wall time are separate exact-clock samples.",
+          "block_io": {
+            "available": true,
+            "devices": {},
+            "raw": "",
+            "totals": {
+              "rbytes": 0,
+              "rios": 0,
+              "wbytes": 0,
+              "wios": 0
+            },
+            "per_second": {
+              "rbytes": 0.0,
+              "rios": 0.0,
+              "wbytes": 0.0,
+              "wios": 0.0
+            },
+            "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth."
+          },
+          "sampled_resources": {
+            "available": true,
+            "sample_count": 6,
+            "sampled_mean_charged_memory_bytes": 414037333.3333333,
+            "sampled_max_charged_memory_bytes": 451727360,
+            "sampled_peak_cpu_percent_one_core_100": 362.1135788379613,
+            "scope": "Approximately 100 ms plus API/inspection overhead; arithmetic sample mean, not heap or time-weighted mean. Sampling can miss short peaks; use native cgroup memory.peak and process RSS too. Docker daemon/VM overhead excluded."
+          },
+          "process_peak_rss_kib": 390544,
+          "image": "sha256:1fe8d93749f7d9b4edeb4e6a2b80cd1cdd26bdec1df02c65ae33962adf7a7abf",
+          "cpus": 4.0,
+          "memory_limit_bytes": 4294967296,
+          "wall_with_monitor_seconds": 0.8201652078423649,
+          "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n"
+        }
+      ],
+      "query_summary": [
+        {
+          "language": "python",
+          "engine": "rayforce",
+          "query": "totals",
+          "median_trial_p50_ms": 6.663667,
+          "trials": [
+            {
+              "trial": 1,
+              "p50_ms": 6.713916,
+              "p99_ms": 8.831375,
+              "mean_cpu_ms": 26.51486046666667
+            },
+            {
+              "trial": 2,
+              "p50_ms": 6.530333,
+              "p99_ms": 7.1555,
+              "mean_cpu_ms": 26.028844266666667
+            },
+            {
+              "trial": 3,
+              "p50_ms": 6.663667,
+              "p99_ms": 7.482875,
+              "mean_cpu_ms": 25.926733733333332
+            }
+          ],
+          "min_trial_p50_ms": 6.530333,
+          "max_trial_p50_ms": 6.713916,
+          "iqr_trial_p50_ms": 0.09179150000000114
+        },
+        {
+          "language": "python",
+          "engine": "rayforce",
+          "query": "filtered",
+          "median_trial_p50_ms": 3.652292,
+          "trials": [
+            {
+              "trial": 1,
+              "p50_ms": 3.562875,
+              "p99_ms": 3.963708,
+              "mean_cpu_ms": 12.846760666666666
+            },
+            {
+              "trial": 2,
+              "p50_ms": 3.761792,
+              "p99_ms": 4.092584,
+              "mean_cpu_ms": 13.000061733333334
+            },
+            {
+              "trial": 3,
+              "p50_ms": 3.652292,
+              "p99_ms": 4.524083,
+              "mean_cpu_ms": 12.9523414
+            }
+          ],
+          "min_trial_p50_ms": 3.562875,
+          "max_trial_p50_ms": 3.761792,
+          "iqr_trial_p50_ms": 0.0994584999999999
+        },
+        {
+          "language": "python",
+          "engine": "rayforce",
+          "query": "symbols",
+          "median_trial_p50_ms": 1.232084,
+          "trials": [
+            {
+              "trial": 1,
+              "p50_ms": 1.232084,
+              "p99_ms": 1.803834,
+              "mean_cpu_ms": 4.356569333333334
+            },
+            {
+              "trial": 2,
+              "p50_ms": 1.25075,
+              "p99_ms": 1.591791,
+              "mean_cpu_ms": 4.3580804
+            },
+            {
+              "trial": 3,
+              "p50_ms": 1.222125,
+              "p99_ms": 1.643958,
+              "mean_cpu_ms": 4.278694466666667
+            }
+          ],
+          "min_trial_p50_ms": 1.222125,
+          "max_trial_p50_ms": 1.25075,
+          "iqr_trial_p50_ms": 0.014312500000000172
+        },
+        {
+          "language": "python",
+          "engine": "rayforce",
+          "query": "customers",
+          "median_trial_p50_ms": 3.821625,
+          "trials": [
+            {
+              "trial": 1,
+              "p50_ms": 3.352708,
+              "p99_ms": 4.458709,
+              "mean_cpu_ms": 8.9155948
+            },
+            {
+              "trial": 2,
+              "p50_ms": 3.869334,
+              "p99_ms": 5.635,
+              "mean_cpu_ms": 9.4641312
+            },
+            {
+              "trial": 3,
+              "p50_ms": 3.821625,
+              "p99_ms": 4.439917,
+              "mean_cpu_ms": 9.2237116
+            }
+          ],
+          "min_trial_p50_ms": 3.352708,
+          "max_trial_p50_ms": 3.869334,
+          "iqr_trial_p50_ms": 0.2583129999999998
+        },
+        {
+          "language": "python",
+          "engine": "rayforce",
+          "query": "join",
+          "median_trial_p50_ms": 21.059166,
+          "trials": [
+            {
+              "trial": 1,
+              "p50_ms": 21.028791,
+              "p99_ms": 22.905417,
+              "mean_cpu_ms": 77.70436166666667
+            },
+            {
+              "trial": 2,
+              "p50_ms": 21.059166,
+              "p99_ms": 22.457208,
+              "mean_cpu_ms": 78.00219393333333
+            },
+            {
+              "trial": 3,
+              "p50_ms": 21.391292,
+              "p99_ms": 26.190042,
+              "mean_cpu_ms": 78.7652332
+            }
+          ],
+          "min_trial_p50_ms": 21.028791,
+          "max_trial_p50_ms": 21.391292,
+          "iqr_trial_p50_ms": 0.18125049999999732
+        },
+        {
+          "language": "python",
+          "engine": "duckdb",
+          "query": "totals",
+          "median_trial_p50_ms": 1.2005,
+          "trials": [
+            {
+              "trial": 1,
+              "p50_ms": 1.280375,
+              "p99_ms": 1.87825,
+              "mean_cpu_ms": 3.2166193333333335
+            },
+            {
+              "trial": 2,
+              "p50_ms": 1.2005,
+              "p99_ms": 2.042958,
+              "mean_cpu_ms": 3.1434585333333334
+            },
+            {
+              "trial": 3,
+              "p50_ms": 1.178583,
+              "p99_ms": 1.5445,
+              "mean_cpu_ms": 3.104856
+            }
+          ],
+          "min_trial_p50_ms": 1.178583,
+          "max_trial_p50_ms": 1.280375,
+          "iqr_trial_p50_ms": 0.050896000000000274
+        },
+        {
+          "language": "python",
+          "engine": "duckdb",
+          "query": "filtered",
+          "median_trial_p50_ms": 1.234583,
+          "trials": [
+            {
+              "trial": 1,
+              "p50_ms": 1.234583,
+              "p99_ms": 2.777125,
+              "mean_cpu_ms": 3.1941138666666666
+            },
+            {
+              "trial": 2,
+              "p50_ms": 1.124916,
+              "p99_ms": 1.859667,
+              "mean_cpu_ms": 2.9939106
+            },
+            {
+              "trial": 3,
+              "p50_ms": 1.238041,
+              "p99_ms": 1.416959,
+              "mean_cpu_ms": 3.030022
+            }
+          ],
+          "min_trial_p50_ms": 1.124916,
+          "max_trial_p50_ms": 1.238041,
+          "iqr_trial_p50_ms": 0.05656249999999985
+        },
+        {
+          "language": "python",
+          "engine": "duckdb",
+          "query": "symbols",
+          "median_trial_p50_ms": 3.740708,
+          "trials": [
+            {
+              "trial": 1,
+              "p50_ms": 3.696166,
+              "p99_ms": 4.53025,
+              "mean_cpu_ms": 12.573457666666666
+            },
+            {
+              "trial": 2,
+              "p50_ms": 3.740708,
+              "p99_ms": 5.080292,
+              "mean_cpu_ms": 12.682480866666667
+            },
+            {
+              "trial": 3,
+              "p50_ms": 3.800375,
+              "p99_ms": 4.194917,
+              "mean_cpu_ms": 12.0203414
+            }
+          ],
+          "min_trial_p50_ms": 3.696166,
+          "max_trial_p50_ms": 3.800375,
+          "iqr_trial_p50_ms": 0.05210450000000044
+        },
+        {
+          "language": "python",
+          "engine": "duckdb",
+          "query": "customers",
+          "median_trial_p50_ms": 8.431458,
+          "trials": [
+            {
+              "trial": 1,
+              "p50_ms": 8.347625,
+              "p99_ms": 9.83125,
+              "mean_cpu_ms": 24.9107486
+            },
+            {
+              "trial": 2,
+              "p50_ms": 8.431458,
+              "p99_ms": 10.379583,
+              "mean_cpu_ms": 25.563790666666666
+            },
+            {
+              "trial": 3,
+              "p50_ms": 8.678167,
+              "p99_ms": 10.055042,
+              "mean_cpu_ms": 25.74669653333333
+            }
+          ],
+          "min_trial_p50_ms": 8.347625,
+          "max_trial_p50_ms": 8.678167,
+          "iqr_trial_p50_ms": 0.1652710000000006
+        },
+        {
+          "language": "python",
+          "engine": "duckdb",
+          "query": "join",
+          "median_trial_p50_ms": 6.175416,
+          "trials": [
+            {
+              "trial": 1,
+              "p50_ms": 6.345083,
+              "p99_ms": 6.948083,
+              "mean_cpu_ms": 19.998094266666666
+            },
+            {
+              "trial": 2,
+              "p50_ms": 6.128042,
+              "p99_ms": 7.148417,
+              "mean_cpu_ms": 19.775608133333332
+            },
+            {
+              "trial": 3,
+              "p50_ms": 6.175416,
+              "p99_ms": 6.433208,
+              "mean_cpu_ms": 18.709171533333333
+            }
+          ],
+          "min_trial_p50_ms": 6.128042,
+          "max_trial_p50_ms": 6.345083,
+          "iqr_trial_p50_ms": 0.10852050000000091
+        },
+        {
+          "language": "cpp",
+          "engine": "rayforce",
+          "query": "totals",
+          "median_trial_p50_ms": 6.709625,
+          "trials": [
+            {
+              "trial": 1,
+              "p50_ms": 6.709625,
+              "p99_ms": 7.340209,
+              "mean_cpu_ms": 26.659933333333335
+            },
+            {
+              "trial": 2,
+              "p50_ms": 6.766166,
+              "p99_ms": 7.287167,
+              "mean_cpu_ms": 26.401133333333334
+            },
+            {
+              "trial": 3,
+              "p50_ms": 6.544292,
+              "p99_ms": 7.530334,
+              "mean_cpu_ms": 25.6198
+            }
+          ],
+          "min_trial_p50_ms": 6.544292,
+          "max_trial_p50_ms": 6.766166,
+          "iqr_trial_p50_ms": 0.11093699999999984
+        },
+        {
+          "language": "cpp",
+          "engine": "rayforce",
+          "query": "filtered",
+          "median_trial_p50_ms": 3.124709,
+          "trials": [
+            {
+              "trial": 1,
+              "p50_ms": 3.124709,
+              "p99_ms": 4.564,
+              "mean_cpu_ms": 10.996333333333332
+            },
+            {
+              "trial": 2,
+              "p50_ms": 3.082667,
+              "p99_ms": 5.661958,
+              "mean_cpu_ms": 11.551866666666667
+            },
+            {
+              "trial": 3,
+              "p50_ms": 3.167125,
+              "p99_ms": 3.936333,
+              "mean_cpu_ms": 11.1122
+            }
+          ],
+          "min_trial_p50_ms": 3.082667,
+          "max_trial_p50_ms": 3.167125,
+          "iqr_trial_p50_ms": 0.04222899999999985
+        },
+        {
+          "language": "cpp",
+          "engine": "rayforce",
+          "query": "symbols",
+          "median_trial_p50_ms": 1.251208,
+          "trials": [
+            {
+              "trial": 1,
+              "p50_ms": 1.213458,
+              "p99_ms": 1.753625,
+              "mean_cpu_ms": 4.313
+            },
+            {
+              "trial": 2,
+              "p50_ms": 1.298458,
+              "p99_ms": 1.660542,
+              "mean_cpu_ms": 4.342866666666667
+            },
+            {
+              "trial": 3,
+              "p50_ms": 1.251208,
+              "p99_ms": 1.574167,
+              "mean_cpu_ms": 4.326866666666667
+            }
+          ],
+          "min_trial_p50_ms": 1.213458,
+          "max_trial_p50_ms": 1.298458,
+          "iqr_trial_p50_ms": 0.04249999999999998
+        },
+        {
+          "language": "cpp",
+          "engine": "rayforce",
+          "query": "customers",
+          "median_trial_p50_ms": 3.635291,
+          "trials": [
+            {
+              "trial": 1,
+              "p50_ms": 3.635291,
+              "p99_ms": 4.409917,
+              "mean_cpu_ms": 9.116666666666667
+            },
+            {
+              "trial": 2,
+              "p50_ms": 4.270292,
+              "p99_ms": 4.815875,
+              "mean_cpu_ms": 9.702
+            },
+            {
+              "trial": 3,
+              "p50_ms": 3.452041,
+              "p99_ms": 4.008375,
+              "mean_cpu_ms": 8.825666666666667
+            }
+          ],
+          "min_trial_p50_ms": 3.452041,
+          "max_trial_p50_ms": 4.270292,
+          "iqr_trial_p50_ms": 0.40912550000000003
+        },
+        {
+          "language": "cpp",
+          "engine": "rayforce",
+          "query": "join",
+          "median_trial_p50_ms": 21.209709,
+          "trials": [
+            {
+              "trial": 1,
+              "p50_ms": 21.160625,
+              "p99_ms": 23.3815,
+              "mean_cpu_ms": 79.28446666666667
+            },
+            {
+              "trial": 2,
+              "p50_ms": 21.42625,
+              "p99_ms": 23.275375,
+              "mean_cpu_ms": 78.51593333333334
+            },
+            {
+              "trial": 3,
+              "p50_ms": 21.209709,
+              "p99_ms": 22.705583,
+              "mean_cpu_ms": 78.72973333333333
+            }
+          ],
+          "min_trial_p50_ms": 21.160625,
+          "max_trial_p50_ms": 21.42625,
+          "iqr_trial_p50_ms": 0.1328125
+        },
+        {
+          "language": "cpp",
+          "engine": "duckdb",
+          "query": "totals",
+          "median_trial_p50_ms": 1.193,
+          "trials": [
+            {
+              "trial": 1,
+              "p50_ms": 1.13075,
+              "p99_ms": 1.992875,
+              "mean_cpu_ms": 3.0534
+            },
+            {
+              "trial": 2,
+              "p50_ms": 1.199916,
+              "p99_ms": 1.692167,
+              "mean_cpu_ms": 3.1801333333333335
+            },
+            {
+              "trial": 3,
+              "p50_ms": 1.193,
+              "p99_ms": 1.705542,
+              "mean_cpu_ms": 3.1286
+            }
+          ],
+          "min_trial_p50_ms": 1.13075,
+          "max_trial_p50_ms": 1.199916,
+          "iqr_trial_p50_ms": 0.03458300000000003
+        },
+        {
+          "language": "cpp",
+          "engine": "duckdb",
+          "query": "filtered",
+          "median_trial_p50_ms": 1.087583,
+          "trials": [
+            {
+              "trial": 1,
+              "p50_ms": 1.086333,
+              "p99_ms": 1.726,
+              "mean_cpu_ms": 2.9294666666666664
+            },
+            {
+              "trial": 2,
+              "p50_ms": 1.12175,
+              "p99_ms": 1.599833,
+              "mean_cpu_ms": 2.9503333333333335
+            },
+            {
+              "trial": 3,
+              "p50_ms": 1.087583,
+              "p99_ms": 2.076292,
+              "mean_cpu_ms": 3.0322666666666667
+            }
+          ],
+          "min_trial_p50_ms": 1.086333,
+          "max_trial_p50_ms": 1.12175,
+          "iqr_trial_p50_ms": 0.017708499999999905
+        },
+        {
+          "language": "cpp",
+          "engine": "duckdb",
+          "query": "symbols",
+          "median_trial_p50_ms": 3.809167,
+          "trials": [
+            {
+              "trial": 1,
+              "p50_ms": 4.009958,
+              "p99_ms": 5.904584,
+              "mean_cpu_ms": 13.2506
+            },
+            {
+              "trial": 2,
+              "p50_ms": 3.70625,
+              "p99_ms": 4.272625,
+              "mean_cpu_ms": 12.371333333333332
+            },
+            {
+              "trial": 3,
+              "p50_ms": 3.809167,
+              "p99_ms": 5.246042,
+              "mean_cpu_ms": 12.562333333333333
+            }
+          ],
+          "min_trial_p50_ms": 3.70625,
+          "max_trial_p50_ms": 4.009958,
+          "iqr_trial_p50_ms": 0.15185400000000016
+        },
+        {
+          "language": "cpp",
+          "engine": "duckdb",
+          "query": "customers",
+          "median_trial_p50_ms": 8.345291,
+          "trials": [
+            {
+              "trial": 1,
+              "p50_ms": 8.345291,
+              "p99_ms": 9.426708,
+              "mean_cpu_ms": 25.268533333333334
+            },
+            {
+              "trial": 2,
+              "p50_ms": 8.094917,
+              "p99_ms": 9.045667,
+              "mean_cpu_ms": 24.66593333333333
+            },
+            {
+              "trial": 3,
+              "p50_ms": 8.509083,
+              "p99_ms": 8.775,
+              "mean_cpu_ms": 23.953333333333333
+            }
+          ],
+          "min_trial_p50_ms": 8.094917,
+          "max_trial_p50_ms": 8.509083,
+          "iqr_trial_p50_ms": 0.2070830000000008
+        },
+        {
+          "language": "cpp",
+          "engine": "duckdb",
+          "query": "join",
+          "median_trial_p50_ms": 6.217958,
+          "trials": [
+            {
+              "trial": 1,
+              "p50_ms": 6.217958,
+              "p99_ms": 7.136625,
+              "mean_cpu_ms": 19.869
+            },
+            {
+              "trial": 2,
+              "p50_ms": 6.2645,
+              "p99_ms": 6.828458,
+              "mean_cpu_ms": 19.3846
+            },
+            {
+              "trial": 3,
+              "p50_ms": 6.10025,
+              "p99_ms": 7.763375,
+              "mean_cpu_ms": 19.385466666666666
+            }
+          ],
+          "min_trial_p50_ms": 6.10025,
+          "max_trial_p50_ms": 6.2645,
+          "iqr_trial_p50_ms": 0.08212500000000045
+        },
+        {
+          "language": "rust",
+          "engine": "rayforce",
+          "query": "totals",
+          "median_trial_p50_ms": 6.572875,
+          "trials": [
+            {
+              "trial": 1,
+              "p50_ms": 6.697583,
+              "p99_ms": 7.295459,
+              "mean_cpu_ms": 26.516666666666666
+            },
+            {
+              "trial": 2,
+              "p50_ms": 6.572875,
+              "p99_ms": 7.069375,
+              "mean_cpu_ms": 25.874666666666666
+            },
+            {
+              "trial": 3,
+              "p50_ms": 6.343458,
+              "p99_ms": 6.824333,
+              "mean_cpu_ms": 24.96526666666667
+            }
+          ],
+          "min_trial_p50_ms": 6.343458,
+          "max_trial_p50_ms": 6.697583,
+          "iqr_trial_p50_ms": 0.1770624999999999
+        },
+        {
+          "language": "rust",
+          "engine": "rayforce",
+          "query": "filtered",
+          "median_trial_p50_ms": 3.085917,
+          "trials": [
+            {
+              "trial": 1,
+              "p50_ms": 3.269916,
+              "p99_ms": 4.18825,
+              "mean_cpu_ms": 11.202666666666667
+            },
+            {
+              "trial": 2,
+              "p50_ms": 3.042125,
+              "p99_ms": 3.566458,
+              "mean_cpu_ms": 10.899066666666666
+            },
+            {
+              "trial": 3,
+              "p50_ms": 3.085917,
+              "p99_ms": 3.610792,
+              "mean_cpu_ms": 11.0182
+            }
+          ],
+          "min_trial_p50_ms": 3.042125,
+          "max_trial_p50_ms": 3.269916,
+          "iqr_trial_p50_ms": 0.11389549999999993
+        },
+        {
+          "language": "rust",
+          "engine": "rayforce",
+          "query": "symbols",
+          "median_trial_p50_ms": 1.256583,
+          "trials": [
+            {
+              "trial": 1,
+              "p50_ms": 1.223167,
+              "p99_ms": 1.548166,
+              "mean_cpu_ms": 4.317466666666666
+            },
+            {
+              "trial": 2,
+              "p50_ms": 1.256583,
+              "p99_ms": 1.77675,
+              "mean_cpu_ms": 4.390333333333333
+            },
+            {
+              "trial": 3,
+              "p50_ms": 1.257208,
+              "p99_ms": 1.573958,
+              "mean_cpu_ms": 4.285266666666667
+            }
+          ],
+          "min_trial_p50_ms": 1.223167,
+          "max_trial_p50_ms": 1.257208,
+          "iqr_trial_p50_ms": 0.017020500000000105
+        },
+        {
+          "language": "rust",
+          "engine": "rayforce",
+          "query": "customers",
+          "median_trial_p50_ms": 3.654917,
+          "trials": [
+            {
+              "trial": 1,
+              "p50_ms": 3.654917,
+              "p99_ms": 4.678667,
+              "mean_cpu_ms": 9.1664
+            },
+            {
+              "trial": 2,
+              "p50_ms": 3.912959,
+              "p99_ms": 4.833875,
+              "mean_cpu_ms": 9.317
+            },
+            {
+              "trial": 3,
+              "p50_ms": 3.448333,
+              "p99_ms": 4.117375,
+              "mean_cpu_ms": 8.868333333333334
+            }
+          ],
+          "min_trial_p50_ms": 3.448333,
+          "max_trial_p50_ms": 3.912959,
+          "iqr_trial_p50_ms": 0.232313
+        },
+        {
+          "language": "rust",
+          "engine": "rayforce",
+          "query": "join",
+          "median_trial_p50_ms": 21.461333,
+          "trials": [
+            {
+              "trial": 1,
+              "p50_ms": 21.537708,
+              "p99_ms": 25.097209,
+              "mean_cpu_ms": 78.8004
+            },
+            {
+              "trial": 2,
+              "p50_ms": 21.300875,
+              "p99_ms": 22.457125,
+              "mean_cpu_ms": 78.70566666666667
+            },
+            {
+              "trial": 3,
+              "p50_ms": 21.461333,
+              "p99_ms": 23.863958,
+              "mean_cpu_ms": 79.655
+            }
+          ],
+          "min_trial_p50_ms": 21.300875,
+          "max_trial_p50_ms": 21.537708,
+          "iqr_trial_p50_ms": 0.11841649999999859
+        },
+        {
+          "language": "rust",
+          "engine": "duckdb",
+          "query": "totals",
+          "median_trial_p50_ms": 1.170458,
+          "trials": [
+            {
+              "trial": 1,
+              "p50_ms": 1.225167,
+              "p99_ms": 1.6055,
+              "mean_cpu_ms": 3.1872666666666665
+            },
+            {
+              "trial": 2,
+              "p50_ms": 1.170458,
+              "p99_ms": 1.693125,
+              "mean_cpu_ms": 3.0806
+            },
+            {
+              "trial": 3,
+              "p50_ms": 1.156625,
+              "p99_ms": 1.862625,
+              "mean_cpu_ms": 3.0961333333333334
+            }
+          ],
+          "min_trial_p50_ms": 1.156625,
+          "max_trial_p50_ms": 1.225167,
+          "iqr_trial_p50_ms": 0.03427099999999994
+        },
+        {
+          "language": "rust",
+          "engine": "duckdb",
+          "query": "filtered",
+          "median_trial_p50_ms": 1.135209,
+          "trials": [
+            {
+              "trial": 1,
+              "p50_ms": 1.235,
+              "p99_ms": 1.747584,
+              "mean_cpu_ms": 3.1191333333333335
+            },
+            {
+              "trial": 2,
+              "p50_ms": 1.135209,
+              "p99_ms": 1.729583,
+              "mean_cpu_ms": 2.9746
+            },
+            {
+              "trial": 3,
+              "p50_ms": 1.120125,
+              "p99_ms": 1.670333,
+              "mean_cpu_ms": 2.9996
+            }
+          ],
+          "min_trial_p50_ms": 1.120125,
+          "max_trial_p50_ms": 1.235,
+          "iqr_trial_p50_ms": 0.05743750000000003
+        },
+        {
+          "language": "rust",
+          "engine": "duckdb",
+          "query": "symbols",
+          "median_trial_p50_ms": 3.936,
+          "trials": [
+            {
+              "trial": 1,
+              "p50_ms": 3.719667,
+              "p99_ms": 4.851333,
+              "mean_cpu_ms": 12.024733333333334
+            },
+            {
+              "trial": 2,
+              "p50_ms": 3.936,
+              "p99_ms": 4.318959,
+              "mean_cpu_ms": 12.4716
+            },
+            {
+              "trial": 3,
+              "p50_ms": 3.985958,
+              "p99_ms": 4.411209,
+              "mean_cpu_ms": 13.020533333333333
+            }
+          ],
+          "min_trial_p50_ms": 3.719667,
+          "max_trial_p50_ms": 3.985958,
+          "iqr_trial_p50_ms": 0.13314550000000036
+        },
+        {
+          "language": "rust",
+          "engine": "duckdb",
+          "query": "customers",
+          "median_trial_p50_ms": 8.570875,
+          "trials": [
+            {
+              "trial": 1,
+              "p50_ms": 8.570875,
+              "p99_ms": 9.801209,
+              "mean_cpu_ms": 25.510133333333332
+            },
+            {
+              "trial": 2,
+              "p50_ms": 8.796417,
+              "p99_ms": 9.626042,
+              "mean_cpu_ms": 25.644866666666665
+            },
+            {
+              "trial": 3,
+              "p50_ms": 8.504584,
+              "p99_ms": 9.034708,
+              "mean_cpu_ms": 24.681466666666665
+            }
+          ],
+          "min_trial_p50_ms": 8.504584,
+          "max_trial_p50_ms": 8.796417,
+          "iqr_trial_p50_ms": 0.14591650000000023
+        },
+        {
+          "language": "rust",
+          "engine": "duckdb",
+          "query": "join",
+          "median_trial_p50_ms": 6.312375,
+          "trials": [
+            {
+              "trial": 1,
+              "p50_ms": 6.414,
+              "p99_ms": 7.331083,
+              "mean_cpu_ms": 20.1234
+            },
+            {
+              "trial": 2,
+              "p50_ms": 6.312375,
+              "p99_ms": 7.755958,
+              "mean_cpu_ms": 20.1012
+            },
+            {
+              "trial": 3,
+              "p50_ms": 6.1805,
+              "p99_ms": 6.878583,
+              "mean_cpu_ms": 19.7984
+            }
+          ],
+          "min_trial_p50_ms": 6.1805,
+          "max_trial_p50_ms": 6.414,
+          "iqr_trial_p50_ms": 0.11674999999999969
+        }
+      ],
+      "controller": {
+        "wall_seconds": 17.331473207799718,
+        "user_cpu_seconds": 0.168191,
+        "system_cpu_seconds": 0.32216599999999995,
+        "child_cli_user_cpu_seconds": 2.481899,
+        "child_cli_system_cpu_seconds": 2.001269,
+        "process_peak_rss_bytes": 35258368,
+        "scope": "Host controller includes retained-fixture hashing, native API sampling and report generation. CLI subprocess CPU excludes server-side work. Docker daemon/VM excluded; this is separate from engine container costs."
+      }
+    }
+  ],
+  "scope": "Same native engines and C ABI in Python, C++ and Rust; two million seeded trades and ten thousand customers. Three fresh processes per cell; warm 15-query samples, not sustained capacity, OS-cold storage, persistence or native-language implementation comparisons.",
+  "limits": "Cgroup I/O can omit host-side Docker file sharing. Sample means/peaks can miss fast transitions; native cgroup/RSS peaks are separate. Native storage compression is not applicable: both engines are in memory and /tmp is tmpfs. Host controller CPU and peak RSS are separate; controller average RSS/time series and Docker daemon/VM costs are not collected."
+}
