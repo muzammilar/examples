@@ -102,6 +102,16 @@ class PublicationTests(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, "measurement window"):
             verify_query_evidence(records, query_summary(records), 1, 2)
 
+    def test_direct_monotonic_shortfall_never_gets_utc_tolerance(self):
+        records = self.records()
+        records[1]["elapsed_ns"] = 1_000_000_000
+        records[-1]["elapsed_ns"] = 1_999_999_999
+        with self.assertRaisesRegex(RuntimeError, "measurement window"):
+            verify_query_evidence(records, query_summary(records), 1, 2)
+        records[-1]["elapsed_ns"] = 2_000_000_000
+        audit = verify_query_evidence(records, query_summary(records), 1, 2)
+        self.assertEqual(audit["phase_clock"], "monotonic")
+
     def test_failed_raw_query_overrides_a_passing_summary(self):
         records = self.records()
         summary = query_summary(records)

@@ -23,6 +23,10 @@ def bounded_setting(name, default, low, high):
     return value
 
 
+def host_rss_bytes(value, system=None):
+    return value * (1 if (system or os.uname().sysname) == "Darwin" else 1024)
+
+
 def query_summary(records):
     queries = [
         r
@@ -37,15 +41,18 @@ def query_summary(records):
         for r in records
         if r.get("kind") == "phase-start" and r["phase"] == "measurement"
     )
-    end = next(
-        r["ended_ns"]
+    ending = next(
+        r
         for r in records
         if r.get("kind") == "phase-end" and r["phase"] == "measurement"
     )
-    return {
+    seconds = ending.get("elapsed_ns", ending["ended_ns"] - start) / 1e9
+    if seconds <= 0:
+        raise RuntimeError("measurement duration must be positive")
+    summary = {
         "queries": len(queries),
-        "measured_seconds": (end - start) / 1e9,
-        "queries_per_second": len(queries) / ((end - start) / 1e9),
+        "measured_seconds": seconds,
+        "queries_per_second": len(queries) / seconds,
         "mean_ms": statistics.mean(elapsed),
         "p50_ms": statistics.median(elapsed),
         "p95_ms": elapsed[math.ceil(0.95 * len(elapsed)) - 1],
@@ -53,6 +60,9 @@ def query_summary(records):
         "validation_mean_ms": statistics.mean(r["validation_ms"] for r in queries),
         "timed_scope": "SQL request through complete fetching/decoding; group validation reported separately. Measurement includes the final query completing after the deadline.",
     }
+    if "elapsed_ns" in ending:
+        summary["phase_timing_clock"] = "monotonic"
+    return summary
 
 
 def cell(backend, concurrent, trial, warmup, duration):
@@ -274,7 +284,7 @@ def main():
             "generation": lab["generation"],
             "seed_rows": lab["rows"],
             "query_groups": 100,
-            "cache_state": "warm engine/OS caches after workload warmup; no cold-cache claim",
+            "cache_state": "repeated queries after warmup; engine/OS hit ratios and page residency are not instrumented; no cold-cache claim",
             "scope": "Fixed seed analytical subset under append-only traffic; not arbitrary UPDATE/DELETE HTAP or saturated writer throughput. Live tails accumulate and are excluded by id predicate; their complete bodies remain verified.",
             "source_sha256": {
                 str(p.relative_to(control.ROOT)): hashlib.sha256(
@@ -349,12 +359,13 @@ if __name__ == "__main__":
                 + after.ru_stime
                 - before.ru_utime
                 - before.ru_stime,
-                "controller_peak_rss_bytes": after.ru_maxrss,
+                "controller_peak_rss_bytes": host_rss_bytes(after.ru_maxrss),
                 "child_cpu_core_seconds": children.ru_utime
                 + children.ru_stime
                 - children_before.ru_utime
                 - children_before.ru_stime,
-                "child_peak_rss_bytes": children.ru_maxrss,
-                "scope": "macOS host controller and Docker CLI children only; engines/Go clients use separate Linux counters. Child peak is the largest child, not a simultaneous aggregate.",
+                "child_peak_rss_bytes": host_rss_bytes(children.ru_maxrss),
+                "host_system": os.uname().sysname,
+                "scope": "Host controller and Docker CLI children only; ru_maxrss is bytes on Darwin and KiB on Linux. Engines/Go clients use separate Linux counters. Child peak is the largest child, not a simultaneous aggregate.",
             },
         )

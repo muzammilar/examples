@@ -67,8 +67,25 @@ allows at most **10 ms** of UTC shortfall only with matching declared phases,
 normal completion, the verified loop source/image and sufficient monotonic main
 time; larger discrepancies still fail. Rates/resource windows retain the actual
 UTC markers. Exact per-phase monotonic elapsed was not logged in this cohort;
-the next instrumentation revision must record it directly. See
+the subsequent instrumentation revision records it directly. See
 [Go's monotonic clock semantics](https://pkg.go.dev/time#hdr-Monotonic_Clocks).
+
+## Current instrumentation
+
+Each new phase-end record contains native monotonic `elapsed_ns`. New query-rate
+denominators and duration gates use that counter directly; even a one-nanosecond
+shortfall fails. UTC markers remain for history/resource correlation. Legacy logs
+remain readable with their explicit timing audit. The historical million-row
+comparison in this document was not rerun or relabeled with the new counters; use its
+tested source hashes (commit `4b2984d`) when reproducing that publication.
+
+The revised driver passed **four short native cells** with **10,000 seeded rows
+per backend**, 1 s warmup and 3 s measurement, complete body/ACK reconciliation,
+native duplicate/missing-key controls and **17 controller/report tests**. This
+qualifies instrumentation/correctness, not sustained performance. Host peak RSS
+converts Darwin bytes and Linux KiB into bytes. The Darwin host path ran natively;
+Linux unit conversion is unit-tested, with Linux-host integration still unrun.
+See [METRICS_QUALIFICATION.json](METRICS_QUALIFICATION.json).
 
 The reviewed Go driver passed **four short native qualification cells** (both
 engines, alone/concurrent): **111 / 33 / 81 / 34** analytical requests respectively,

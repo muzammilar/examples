@@ -2,7 +2,7 @@
 
 import unittest
 
-from htap import query_summary
+from htap import query_summary, host_rss_bytes
 
 
 class SummaryTests(unittest.TestCase):
@@ -39,6 +39,22 @@ class SummaryTests(unittest.TestCase):
         self.assertEqual(result["p50_ms"], 20)
         self.assertEqual(result["p99_ms"], 30)
         self.assertEqual(result["queries_per_second"], 1.5)
+
+    def test_direct_monotonic_elapsed_survives_wall_clock_adjustment(self):
+        records = self.records()
+        records[-1]["ended_ns"] = 500_000_000
+        records[-1]["elapsed_ns"] = 2_000_000_000
+        result = query_summary(records)
+        self.assertEqual(result["measured_seconds"], 2)
+        self.assertEqual(result["queries_per_second"], 1.5)
+        self.assertEqual(result["phase_timing_clock"], "monotonic")
+        records[-1]["elapsed_ns"] = 0
+        with self.assertRaisesRegex(RuntimeError, "positive"):
+            query_summary(records)
+
+    def test_host_peak_rss_units_are_normalized(self):
+        self.assertEqual(host_rss_bytes(4096, "Darwin"), 4096)
+        self.assertEqual(host_rss_bytes(4096, "Linux"), 4096 * 1024)
 
     def test_one_wrong_output_disqualifies_the_cell(self):
         records = self.records()

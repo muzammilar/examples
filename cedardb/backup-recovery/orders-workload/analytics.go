@@ -109,7 +109,8 @@ func analytics(ctx context.Context, conn *pgx.Conn, count int64) error {
 				return queryErr
 			}
 		}
-		if err := out.Encode(map[string]any{"kind": "phase-end", "phase": phase.name, "ended_ns": time.Now().UnixNano()}); err != nil {
+		finished := time.Now()
+		if err := out.Encode(map[string]any{"kind": "phase-end", "phase": phase.name, "ended_ns": finished.UnixNano(), "elapsed_ns": finished.Sub(start).Nanoseconds()}); err != nil {
 			return err
 		}
 	}

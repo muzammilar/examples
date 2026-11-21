@@ -21,6 +21,24 @@ def verify_query_evidence(records, recorded, warmup_s, duration_s):
     for key, actual in recomputed.items():
         if recorded.get(key) != actual:
             raise RuntimeError("query summary differs from raw evidence: " + key)
+    direct = {
+        r["phase"]: r["elapsed_ns"]
+        for r in records
+        if r.get("kind") == "phase-end" and "elapsed_ns" in r
+    }
+    if direct:
+        if set(direct) != {"warmup", "measurement"}:
+            raise RuntimeError("incomplete monotonic phase evidence")
+        if direct["warmup"] < warmup_s * 1e9:
+            raise RuntimeError("warmup window is shorter than declared")
+        if direct["measurement"] < duration_s * 1e9:
+            raise RuntimeError("measurement window is shorter than declared")
+        return {
+            "phase_clock": "monotonic",
+            "warmup_seconds": direct["warmup"] / 1e9,
+            "measurement_seconds": direct["measurement"] / 1e9,
+            "scope": "Direct native monotonic elapsed controls duration gates and query-rate denominators. UTC timestamps are retained for resource/history correlation; no legacy shortfall tolerance applies.",
+        }
     # Phase deadlines use time.Since (monotonic); UnixNano markers do not.
     # Accept at most 10ms of UTC discrepancy only with the declared phase
     # markers and an independently recorded monotonic main interval. The
