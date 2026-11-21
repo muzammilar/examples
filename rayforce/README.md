@@ -76,7 +76,14 @@ The [interior payload-corruption probe](duckdb-comparison/CORRUPTION.md) exposes
 a **failed integrity boundary**: native replay accepts a validly encoded one-bit
 price change and returns one wrong acknowledged body. An invalid serialized type
 fails closed; an untouched backup restores all 2,000,000 seed trades, 10,000
-customers and 2,269 ACKs correctly. The default seven-case `make test-production`
+customers and 2,269 ACKs correctly. The default eight-case `make test-production`
 propagates this failure. This logical edit on a fenced copy does not establish
 physical bit-rot behavior or normal process-crash data loss. General corruption
 repair and the distinct native CRC-protected AOF API remain unqualified.
+
+The [middle-header diagnostic](duckdb-comparison/HEADER_CORRUPTION.md) confirms
+startup fails closed for one-bit magic/version damage. Native prefix validation
+does not identify a safe recovery boundary: following its truncation hint on a
+disposable copy loses **566 of 2,259 ACKs** despite clean startup. Our guard
+rejects both edits; the intact backup recovers every body. This is a logical
+file-edit experiment, not evidence of physical bit rot or ordinary crash loss.

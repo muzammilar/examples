@@ -19,7 +19,8 @@ Use the five-command lifecycle in [README.md](README.md), then:
 make test-production
 ```
 
-The default seven-case matrix now includes this adversarial probe and returns
+The default eight-case matrix includes this adversarial probe and the
+[middle-header diagnostic](HEADER_CORRUPTION.md), and returns
 **nonzero on the measured build**. The six recovery cases run first; backup
 recovery inside this probe also finishes before its integrity failure propagates.
 The Python probe exits **1**; Make propagates failure. Do not read the final error
@@ -155,7 +156,8 @@ The separate native **AOF API** in the same source pin declares CRC32 protection
 over length plus payload. It is not the `-L` request-journal path tested here;
 its application integration, corruption detection and recovery remain unrun.
 Do not claim the whole system lacks checksums or that AOF fixes this deployment
-without testing it. Interior header/version damage, compressed frames, interrupted
+without testing it. The separate [middle-header diagnostic](HEADER_CORRUPTION.md)
+now measures unsafe-prefix loss. Compressed frames, interrupted
 snapshots, physical media faults and matched DuckDB recovery remain open.
 
 Sources: [pinned frame layout](https://github.com/RayforceDB/rayforce/blob/38fd4be3560d63a5514c1e6883685fe496d45e1a/src/store/serde.h),

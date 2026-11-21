@@ -102,7 +102,12 @@ replacement, torn tails versus interior corruption, writer fencing, native repai
 backup restoration, pressure and repeated performance/cache-temperature matrices
 are outside this saved-table profile. The separate [journal test](JOURNAL.md)
 now covers live synchronous Rayforce IPC, two SIGKILLs and a second snapshot/tail;
-other listed boundaries remain unrun. No clustered, HA, general transaction-atomicity or physical-power-loss
+separate tests now cover [ownership and filesystem locks](FENCING.md),
+[offline restoration](JOURNAL.md#offline-restore-into-separate-storage),
+[known torn-tail repair](TAIL_RECOVERY.md), [payload integrity](CORRUPTION.md)
+and [middle-header damage](HEADER_CORRUPTION.md), preserving failed outcomes.
+Asynchronous recovery, interrupted snapshots, live backups, pressure and repeated
+cache-temperature matrices remain unrun. No clustered, HA, general transaction-atomicity or physical-power-loss
 claim is made for this saved-table profile. Raw development probes remain separate
 from the explicitly selected result pair; failures must not be reset into passes.
 

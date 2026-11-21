@@ -133,8 +133,9 @@ Only the known injected trailer is removable from a verified copy. This is not
 an automatic production repair procedure. Real torn frames can contain ACKs or
 ambiguous operations; preserve logs, diagnostics, witnesses and backups before
 deciding what can safely be lost. Framing validation does not establish payload
-correctness or justify truncating an interior fault. Interior corruption,
-interrupted live snapshots, physical media loss and matched DuckDB recovery
+correctness or justify truncating an interior fault. Separate [payload](CORRUPTION.md)
+and [header](HEADER_CORRUPTION.md) diagnostics now demonstrate that distinction.
+Interrupted live snapshots, physical media loss and matched DuckDB recovery
 remain unrun here. This is one-host storage, not HA.
 
 Sources: [journal API](https://rayforcedb.com/docs/namespaces/log/),

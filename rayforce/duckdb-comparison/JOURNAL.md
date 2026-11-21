@@ -190,9 +190,11 @@ This is one authoritative local process, not replication/HA or physical power-lo
 testing. The equivalent DuckDB live application boundary remains unimplemented,
 so these results are **not a recovery/performance comparison with DuckDB**.
 Asynchronous journal/watermark recovery, interrupted snapshot publication,
-interior header/version damage, online backup/restore
+compressed journal frames, online backup/restore
 availability, isolated resource pressure and repeated sustained/cold performance
-remain unrun. Recovery did not delete or truncate any journal.
+remain unrun. This process-recovery profile did not delete or truncate any journal.
+Separate [payload](CORRUPTION.md) and [header](HEADER_CORRUPTION.md) diagnostics
+now measure logical corruption and unsafe-prefix loss on fenced copies.
 
 Sources: [native journal API](https://rayforcedb.com/docs/namespaces/log/),
 [instance ownership](https://rayforcedb.com/docs/guides/instances/),

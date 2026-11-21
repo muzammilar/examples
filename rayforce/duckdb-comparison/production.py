@@ -31,6 +31,7 @@ if __name__ == "__main__":
         command("journal_restore.py", str(source))
         command("journal_tail.py", str(source))
         if args.profile == "all":
+            command("journal_header.py", str(source))
             command("journal_corruption.py", str(source))
     finally:
         for resource, flags in (

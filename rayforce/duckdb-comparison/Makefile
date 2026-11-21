@@ -20,7 +20,7 @@ up:
 test: check-controls
 	python3 experiment.py test
 check-controls:
-	python3 -m unittest test_controller.py test_ingestion.py test_persistence.py test_live_journal.py test_journal_tail.py test_journal_corruption.py
+	python3 -m unittest test_controller.py test_ingestion.py test_persistence.py test_live_journal.py test_journal_tail.py test_journal_corruption.py test_journal_header.py
 benchmark:
 	python3 experiment.py benchmark
 down:
@@ -116,3 +116,13 @@ CORRUPTION_RESULT ?=
 report-journal-corruption:
 	@test -n "$(CORRUPTION_RESULT)" || { echo 'Set CORRUPTION_RESULT to an explicit journal-corruption directory'; exit 1; }
 	python3 publish_corruption_results.py "$(CORRUPTION_RESULT)"
+
+.PHONY: test-journal-header-corruption report-journal-header
+test-journal-header-corruption: check-controls
+	@test -n "$(JOURNAL_SOURCE)" || { echo 'Set JOURNAL_SOURCE to a completed journal-live result directory'; exit 1; }
+	python3 journal_header.py "$(JOURNAL_SOURCE)"
+
+HEADER_RESULT ?=
+report-journal-header:
+	@test -n "$(HEADER_RESULT)" || { echo 'Set HEADER_RESULT to an explicit journal-header directory'; exit 1; }
+	python3 journal_header.py --publish "$(HEADER_RESULT)"

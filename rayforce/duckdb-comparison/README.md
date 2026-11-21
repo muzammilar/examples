@@ -53,6 +53,9 @@ restore/repair source. The default `make test-production` adds the [interior
 payload-corruption probe](CORRUPTION.md) and currently returns nonzero: a valid
 one-bit edit replays one wrong ACK body. That finding remains failed; snapshot
 and ingestion targets remain separate.
+The [middle-header diagnostic](HEADER_CORRUPTION.md) also runs before that probe:
+startup rejects both edits, but blindly following its truncation hint on a
+disposable copy loses acknowledged rows. The guard rejects that unsafe repair.
 Changing `ROWS` requires archiving the old `results/`
 directory first. Failed runs remain evidence; no automatic data reset or retry.
 An example-local lock prevents concurrent controllers. Other examples must be
