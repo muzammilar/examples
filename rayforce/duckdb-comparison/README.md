@@ -48,8 +48,11 @@ add independent writers/readers through two retained-state process crashes.
 host-share lock failure separately. Do not assume a host bind mount enforces locks.
 [Controlled torn-tail recovery](TAIL_RECOVERY.md) verifies native refusal, framing
 validation and repair of only a known synthetic trailer in a separate copy.
-`make test-production` runs the six implemented journal cases serially and creates
-its own restore/repair source; snapshot and ingestion targets remain separate.
+`make test-production-recovery` runs the six recovery cases and creates its own
+restore/repair source. The default `make test-production` adds the [interior
+payload-corruption probe](CORRUPTION.md) and currently returns nonzero: a valid
+one-bit edit replays one wrong ACK body. That finding remains failed; snapshot
+and ingestion targets remain separate.
 Changing `ROWS` requires archiving the old `results/`
 directory first. Failed runs remain evidence; no automatic data reset or retry.
 An example-local lock prevents concurrent controllers. Other examples must be

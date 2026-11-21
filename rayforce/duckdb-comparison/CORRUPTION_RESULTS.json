@@ -1,0 +1,2527 @@
+{
+  "source_directory": "results/journal-corruption/33f49d9453db41769e0ef46e77d8995c",
+  "result": {
+    "diagnostic_completed": true,
+    "integrity_verdict": "FAILED: validly encoded one-bit payload corruption replayed without native rejection and changed an acknowledged body",
+    "source": "results/journal-live/24d6436146ef4967a24bf47691548168",
+    "original_files": {
+      "journal.2026.11.21T22.02.56Z.log": {
+        "bytes": 482,
+        "sha256": "b0e8fcf07d234ce359e7b746443cdecd24d180f40f168c8f936758b02dd861f3"
+      },
+      "journal.2026.11.21T22.03.30Z.log": {
+        "bytes": 186636,
+        "sha256": "58c1461b03e04ef8ec45c5ed55d352027ff9ba69de25b2573e997ffa2bdb6cc8"
+      },
+      "journal.lk": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "journal.log": {
+        "bytes": 187996,
+        "sha256": "b8ce640867171f938b9be093d14100aa243963247c70427a700753a10380ee8a"
+      },
+      "journal.qdb": {
+        "bytes": 96294816,
+        "sha256": "48a1f706e644110ca5ea41b40eb3967b4484d337d4643b9033b3696328d9f219"
+      }
+    },
+    "corrupt_native_files": {
+      "invalid-type": {
+        "journal.2026.11.21T22.02.56Z.log": {
+          "bytes": 482,
+          "sha256": "b0e8fcf07d234ce359e7b746443cdecd24d180f40f168c8f936758b02dd861f3"
+        },
+        "journal.2026.11.21T22.03.30Z.log": {
+          "bytes": 186636,
+          "sha256": "58c1461b03e04ef8ec45c5ed55d352027ff9ba69de25b2573e997ffa2bdb6cc8"
+        },
+        "journal.lk": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "journal.log": {
+          "bytes": 187996,
+          "sha256": "c629108bc5f98fc6421adf629a443397246eccd7efd26563fa6897da1283e530"
+        },
+        "journal.qdb": {
+          "bytes": 96294816,
+          "sha256": "48a1f706e644110ca5ea41b40eb3967b4484d337d4643b9033b3696328d9f219"
+        }
+      },
+      "valid-literal": {
+        "journal.2026.11.21T22.02.56Z.log": {
+          "bytes": 482,
+          "sha256": "b0e8fcf07d234ce359e7b746443cdecd24d180f40f168c8f936758b02dd861f3"
+        },
+        "journal.2026.11.21T22.03.30Z.log": {
+          "bytes": 186636,
+          "sha256": "58c1461b03e04ef8ec45c5ed55d352027ff9ba69de25b2573e997ffa2bdb6cc8"
+        },
+        "journal.lk": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "journal.log": {
+          "bytes": 187996,
+          "sha256": "64cff54f15bf76f4f16091126239d6a3a8a2f2c0d57b330c815b9299ff3460cc"
+        },
+        "journal.qdb": {
+          "bytes": 96294816,
+          "sha256": "48a1f706e644110ca5ea41b40eb3967b4484d337d4643b9033b3696328d9f219"
+        }
+      }
+    },
+    "faults": {
+      "invalid-type": {
+        "offset": 94342,
+        "old_byte": 243,
+        "new_byte": 127,
+        "bits_changed": 3,
+        "selected_frame": {
+          "offset": 94326,
+          "payload_offset": 94342,
+          "end": 94412,
+          "flags": 0,
+          "message": 1,
+          "index": 814,
+          "row": [
+            2002206,
+            2206,
+            30,
+            6,
+            7,
+            2304
+          ],
+          "price_digit_offset": 94408,
+          "total_frames": 1624,
+          "acknowledged_insert_frames": 1133
+        },
+        "log_bytes": 187996,
+        "sha256": "c629108bc5f98fc6421adf629a443397246eccd7efd26563fa6897da1283e530",
+        "tail_repair_rejected": true
+      },
+      "valid-literal": {
+        "offset": 94408,
+        "old_byte": 52,
+        "new_byte": 53,
+        "bits_changed": 1,
+        "expected_mutated_row": [
+          2002206,
+          2206,
+          30,
+          6,
+          7,
+          2305
+        ],
+        "selected_frame": {
+          "offset": 94326,
+          "payload_offset": 94342,
+          "end": 94412,
+          "flags": 0,
+          "message": 1,
+          "index": 814,
+          "row": [
+            2002206,
+            2206,
+            30,
+            6,
+            7,
+            2304
+          ],
+          "price_digit_offset": 94408,
+          "total_frames": 1624,
+          "acknowledged_insert_frames": 1133
+        },
+        "log_bytes": 187996,
+        "sha256": "64cff54f15bf76f4f16091126239d6a3a8a2f2c0d57b330c815b9299ff3460cc",
+        "tail_repair_rejected": true
+      }
+    },
+    "native_jobs": {
+      "invalid-type-validation": {
+        "exit_code": 0,
+        "command": [
+          "/opt/rayforce/rayforce",
+          "-c",
+          "1",
+          "-m",
+          "3G",
+          "-f",
+          "/state/validate.rfl"
+        ],
+        "wall_ns": 1086417,
+        "process_cpu_core_seconds": 0.000953,
+        "process_peak_rss_bytes": 15765504,
+        "mountinfo": "149 98 0:63 / / ro,relatime - overlay overlay rw,lowerdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88273/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88110/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88109/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88108/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88107/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88106/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88105/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88104/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88103/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88102/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88101/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88100/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88099/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88098/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/85372/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/85371/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/85369/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/85368/fs,upperdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88274/fs,workdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88274/work\n151 149 0:72 / /proc rw,nosuid,nodev,noexec,relatime - proc proc rw\n152 149 0:73 / /dev rw,nosuid - tmpfs tmpfs rw,size=65536k,mode=755\n153 152 0:74 / /dev/pts rw,nosuid,noexec,relatime - devpts devpts rw,gid=5,mode=620,ptmxmode=666\n154 149 0:75 / /sys ro,nosuid,nodev,noexec,relatime - sysfs sysfs ro\n155 154 0:40 / /sys/fs/cgroup ro,nosuid,nodev,noexec,relatime - cgroup2 cgroup rw\n156 152 0:70 / /dev/mqueue rw,nosuid,nodev,noexec,relatime - mqueue mqueue rw\n157 152 0:76 / /dev/shm rw,nosuid,nodev,noexec,relatime - tmpfs shm rw,size=65536k\n158 149 0:77 / /tmp rw,nosuid,nodev,noexec,relatime - tmpfs tmpfs rw,size=524288k\n159 149 254:1 /docker/volumes/rayforce-journal-tail-45e2bef0e5304c17b26ff32f68614a08/_data /state rw,relatime master:1 - ext4 /dev/vda1 rw,discard\n160 149 0:49 /muzammil/github.com/muzammilar/examples/rayforce/duckdb-comparison/results/journal-corruption/33f49d9453db41769e0ef46e77d8995c/invalid-type-validation/empty-input /data ro,nosuid,nodev,relatime - fakeowner /run/host_mark/Users rw,fakeowner\n161 149 254:1 /docker/containers/cc08c87080a426742260b61eaa6669be2f87a5fbc39c76e737bd11e664449964/resolv.conf /etc/resolv.conf ro,relatime - ext4 /dev/vda1 rw,discard\n162 149 254:1 /docker/containers/cc08c87080a426742260b61eaa6669be2f87a5fbc39c76e737bd11e664449964/hostname /etc/hostname ro,relatime - ext4 /dev/vda1 rw,discard\n163 149 254:1 /docker/containers/cc08c87080a426742260b61eaa6669be2f87a5fbc39c76e737bd11e664449964/hosts /etc/hosts ro,relatime - ext4 /dev/vda1 rw,discard\n99 151 0:72 /bus /proc/bus ro,nosuid,nodev,noexec,relatime - proc proc rw\n100 151 0:72 /fs /proc/fs ro,nosuid,nodev,noexec,relatime - proc proc rw\n101 151 0:72 /irq /proc/irq ro,nosuid,nodev,noexec,relatime - proc proc rw\n102 151 0:72 /sys /proc/sys ro,nosuid,nodev,noexec,relatime - proc proc rw\n103 151 0:72 /sysrq-trigger /proc/sysrq-trigger ro,nosuid,nodev,noexec,relatime - proc proc rw\n104 151 0:73 /null /proc/interrupts rw,nosuid - tmpfs tmpfs rw,size=65536k,mode=755\n105 151 0:73 /null /proc/kcore rw,nosuid - tmpfs tmpfs rw,size=65536k,mode=755\n106 151 0:73 /null /proc/keys rw,nosuid - tmpfs tmpfs rw,size=65536k,mode=755\n107 151 0:78 / /proc/scsi ro,relatime - tmpfs tmpfs ro,size=4k,nr_inodes=1\n108 151 0:73 /null /proc/timer_list rw,nosuid - tmpfs tmpfs rw,size=65536k,mode=755\n109 154 0:78 / /sys/firmware ro,relatime - tmpfs tmpfs ro,size=4k,nr_inodes=1\n",
+        "cgroup": {
+          "cpu.stat": "usage_usec 83020\nuser_usec 73796\nsystem_usec 9224\nnice_usec 0\nnr_periods 1\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+          "memory.peak": "22085632\n",
+          "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n",
+          "io.stat": ""
+        },
+        "sampled_resources": {
+          "available": true,
+          "sample_count": 1,
+          "sampled_mean_charged_memory_bytes": 11309056,
+          "sampled_max_charged_memory_bytes": 11309056,
+          "sampled_peak_cpu_percent_one_core_100": null,
+          "scope": "Approximately 100 ms plus API/inspection overhead; arithmetic sample mean, not heap or time-weighted mean. Sampling can miss short peaks; use native cgroup memory.peak and process RSS too. Docker daemon/VM overhead excluded."
+        },
+        "block_io": {
+          "available": true,
+          "devices": {},
+          "raw": "",
+          "totals": {
+            "rbytes": 0,
+            "rios": 0,
+            "wbytes": 0,
+            "wios": 0
+          },
+          "per_second": {
+            "rbytes": 0.0,
+            "rios": 0.0,
+            "wbytes": 0.0,
+            "wios": 0.0
+          },
+          "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth.",
+          "rate_scope": "Whole-container counters over StartedAt-to-FinishedAt lifetime; native child wall is narrower."
+        },
+        "native_files": {
+          "journal.2026.11.21T22.02.56Z.log": {
+            "bytes": 482,
+            "sha256": "b0e8fcf07d234ce359e7b746443cdecd24d180f40f168c8f936758b02dd861f3"
+          },
+          "journal.2026.11.21T22.03.30Z.log": {
+            "bytes": 186636,
+            "sha256": "58c1461b03e04ef8ec45c5ed55d352027ff9ba69de25b2573e997ffa2bdb6cc8"
+          },
+          "journal.lk": {
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "journal.log": {
+            "bytes": 187996,
+            "sha256": "c629108bc5f98fc6421adf629a443397246eccd7efd26563fa6897da1283e530"
+          },
+          "journal.qdb": {
+            "bytes": 96294816,
+            "sha256": "48a1f706e644110ca5ea41b40eb3967b4484d337d4643b9033b3696328d9f219"
+          }
+        },
+        "compressibility": {
+          "files": [
+            {
+              "name": "journal.2026.11.21T22.02.56Z.log",
+              "bytes": 482,
+              "gzip_level_1_bytes": 210,
+              "allocated_bytes": 4096
+            },
+            {
+              "name": "journal.2026.11.21T22.03.30Z.log",
+              "bytes": 186636,
+              "gzip_level_1_bytes": 26156,
+              "allocated_bytes": 188416
+            },
+            {
+              "name": "journal.lk",
+              "bytes": 0,
+              "gzip_level_1_bytes": 20,
+              "allocated_bytes": 0
+            },
+            {
+              "name": "journal.log",
+              "bytes": 187996,
+              "gzip_level_1_bytes": 26362,
+              "allocated_bytes": 188416
+            },
+            {
+              "name": "journal.qdb",
+              "bytes": 96294816,
+              "gzip_level_1_bytes": 22939033,
+              "allocated_bytes": 96296960
+            }
+          ],
+          "wall_ns": 345255709,
+          "cpu_ns": 343667000,
+          "zlib": "1.3.2",
+          "scope": "Host-side streamed gzip compressibility of stable native files, not native engine compression"
+        },
+        "native_process_cpu_percent_one_core_100": 87.71954047110825,
+        "container_lifetime_seconds": 0.141783
+      },
+      "invalid-type": {
+        "exit_code": 2,
+        "command": [
+          "/opt/rayforce/rayforce",
+          "-c",
+          "1",
+          "-m",
+          "3G",
+          "-L",
+          "/state/journal",
+          "-p",
+          "7701",
+          "-f",
+          "/state/verify.rfl"
+        ],
+        "wall_ns": 2801936668,
+        "process_cpu_core_seconds": 2.20921,
+        "process_peak_rss_bytes": 252223488,
+        "mountinfo": "149 98 0:63 / / ro,relatime - overlay overlay rw,lowerdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88277/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88110/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88109/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88108/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88107/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88106/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88105/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88104/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88103/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88102/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88101/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88100/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88099/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88098/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/85372/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/85371/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/85369/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/85368/fs,upperdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88278/fs,workdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88278/work\n151 149 0:72 / /proc rw,nosuid,nodev,noexec,relatime - proc proc rw\n152 149 0:73 / /dev rw,nosuid - tmpfs tmpfs rw,size=65536k,mode=755\n153 152 0:74 / /dev/pts rw,nosuid,noexec,relatime - devpts devpts rw,gid=5,mode=620,ptmxmode=666\n154 149 0:75 / /sys ro,nosuid,nodev,noexec,relatime - sysfs sysfs ro\n155 154 0:40 / /sys/fs/cgroup ro,nosuid,nodev,noexec,relatime - cgroup2 cgroup rw\n156 152 0:70 / /dev/mqueue rw,nosuid,nodev,noexec,relatime - mqueue mqueue rw\n157 152 0:76 / /dev/shm rw,nosuid,nodev,noexec,relatime - tmpfs shm rw,size=65536k\n158 149 0:77 / /tmp rw,nosuid,nodev,noexec,relatime - tmpfs tmpfs rw,size=524288k\n159 149 254:1 /docker/volumes/rayforce-journal-tail-ce9f30f66bbe4d58b091d3ce9187529a/_data /state rw,relatime master:1 - ext4 /dev/vda1 rw,discard\n160 149 0:49 /muzammil/github.com/muzammilar/examples/rayforce/duckdb-comparison/results/journal-corruption/33f49d9453db41769e0ef46e77d8995c/invalid-type/empty-input /data ro,nosuid,nodev,relatime - fakeowner /run/host_mark/Users rw,fakeowner\n161 149 254:1 /docker/containers/85df71d2407cc84e8fb17184b369b40aae916c5b7b9773a1977e1c397b1e9c31/resolv.conf /etc/resolv.conf ro,relatime - ext4 /dev/vda1 rw,discard\n162 149 254:1 /docker/containers/85df71d2407cc84e8fb17184b369b40aae916c5b7b9773a1977e1c397b1e9c31/hostname /etc/hostname ro,relatime - ext4 /dev/vda1 rw,discard\n163 149 254:1 /docker/containers/85df71d2407cc84e8fb17184b369b40aae916c5b7b9773a1977e1c397b1e9c31/hosts /etc/hosts ro,relatime - ext4 /dev/vda1 rw,discard\n99 151 0:72 /bus /proc/bus ro,nosuid,nodev,noexec,relatime - proc proc rw\n100 151 0:72 /fs /proc/fs ro,nosuid,nodev,noexec,relatime - proc proc rw\n101 151 0:72 /irq /proc/irq ro,nosuid,nodev,noexec,relatime - proc proc rw\n102 151 0:72 /sys /proc/sys ro,nosuid,nodev,noexec,relatime - proc proc rw\n103 151 0:72 /sysrq-trigger /proc/sysrq-trigger ro,nosuid,nodev,noexec,relatime - proc proc rw\n104 151 0:73 /null /proc/interrupts rw,nosuid - tmpfs tmpfs rw,size=65536k,mode=755\n105 151 0:73 /null /proc/kcore rw,nosuid - tmpfs tmpfs rw,size=65536k,mode=755\n106 151 0:73 /null /proc/keys rw,nosuid - tmpfs tmpfs rw,size=65536k,mode=755\n107 151 0:78 / /proc/scsi ro,relatime - tmpfs tmpfs ro,size=4k,nr_inodes=1\n108 151 0:73 /null /proc/timer_list rw,nosuid - tmpfs tmpfs rw,size=65536k,mode=755\n109 154 0:78 / /sys/firmware ro,relatime - tmpfs tmpfs ro,size=4k,nr_inodes=1\n",
+        "cgroup": {
+          "cpu.stat": "usage_usec 2880704\nuser_usec 2806943\nsystem_usec 73761\nnice_usec 0\nnr_periods 29\nnr_throttled 21\nthrottled_usec 933097\nnr_bursts 0\nburst_usec 0\n",
+          "memory.peak": "270413824\n",
+          "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n",
+          "io.stat": ""
+        },
+        "sampled_resources": {
+          "available": true,
+          "sample_count": 10,
+          "sampled_mean_charged_memory_bytes": 234535321.6,
+          "sampled_max_charged_memory_bytes": 259936256,
+          "sampled_peak_cpu_percent_one_core_100": 100.75336633440209,
+          "scope": "Approximately 100 ms plus API/inspection overhead; arithmetic sample mean, not heap or time-weighted mean. Sampling can miss short peaks; use native cgroup memory.peak and process RSS too. Docker daemon/VM overhead excluded."
+        },
+        "block_io": {
+          "available": true,
+          "devices": {},
+          "raw": "",
+          "totals": {
+            "rbytes": 0,
+            "rios": 0,
+            "wbytes": 0,
+            "wios": 0
+          },
+          "per_second": {
+            "rbytes": 0.0,
+            "rios": 0.0,
+            "wbytes": 0.0,
+            "wios": 0.0
+          },
+          "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth.",
+          "rate_scope": "Whole-container counters over StartedAt-to-FinishedAt lifetime; native child wall is narrower."
+        },
+        "native_files": {
+          "journal.2026.11.21T22.02.56Z.log": {
+            "bytes": 482,
+            "sha256": "b0e8fcf07d234ce359e7b746443cdecd24d180f40f168c8f936758b02dd861f3"
+          },
+          "journal.2026.11.21T22.03.30Z.log": {
+            "bytes": 186636,
+            "sha256": "58c1461b03e04ef8ec45c5ed55d352027ff9ba69de25b2573e997ffa2bdb6cc8"
+          },
+          "journal.lk": {
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "journal.log": {
+            "bytes": 187996,
+            "sha256": "c629108bc5f98fc6421adf629a443397246eccd7efd26563fa6897da1283e530"
+          },
+          "journal.qdb": {
+            "bytes": 96294816,
+            "sha256": "48a1f706e644110ca5ea41b40eb3967b4484d337d4643b9033b3696328d9f219"
+          }
+        },
+        "compressibility": {
+          "files": [
+            {
+              "name": "journal.2026.11.21T22.02.56Z.log",
+              "bytes": 482,
+              "gzip_level_1_bytes": 210,
+              "allocated_bytes": 4096
+            },
+            {
+              "name": "journal.2026.11.21T22.03.30Z.log",
+              "bytes": 186636,
+              "gzip_level_1_bytes": 26156,
+              "allocated_bytes": 188416
+            },
+            {
+              "name": "journal.lk",
+              "bytes": 0,
+              "gzip_level_1_bytes": 20,
+              "allocated_bytes": 0
+            },
+            {
+              "name": "journal.log",
+              "bytes": 187996,
+              "gzip_level_1_bytes": 26362,
+              "allocated_bytes": 188416
+            },
+            {
+              "name": "journal.qdb",
+              "bytes": 96294816,
+              "gzip_level_1_bytes": 22939033,
+              "allocated_bytes": 96296960
+            }
+          ],
+          "wall_ns": 340291875,
+          "cpu_ns": 339813000,
+          "zlib": "1.3.2",
+          "scope": "Host-side streamed gzip compressibility of stable native files, not native engine compression"
+        },
+        "native_process_cpu_percent_one_core_100": 78.84582207837397,
+        "container_lifetime_seconds": 2.964887
+      },
+      "valid-literal-validation": {
+        "exit_code": 0,
+        "command": [
+          "/opt/rayforce/rayforce",
+          "-c",
+          "1",
+          "-m",
+          "3G",
+          "-f",
+          "/state/validate.rfl"
+        ],
+        "wall_ns": 1338791,
+        "process_cpu_core_seconds": 0.0010429999999999999,
+        "process_peak_rss_bytes": 15757312,
+        "mountinfo": "149 98 0:63 / / ro,relatime - overlay overlay rw,lowerdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88281/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88110/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88109/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88108/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88107/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88106/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88105/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88104/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88103/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88102/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88101/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88100/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88099/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88098/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/85372/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/85371/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/85369/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/85368/fs,upperdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88282/fs,workdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88282/work\n151 149 0:72 / /proc rw,nosuid,nodev,noexec,relatime - proc proc rw\n152 149 0:73 / /dev rw,nosuid - tmpfs tmpfs rw,size=65536k,mode=755\n153 152 0:74 / /dev/pts rw,nosuid,noexec,relatime - devpts devpts rw,gid=5,mode=620,ptmxmode=666\n154 149 0:75 / /sys ro,nosuid,nodev,noexec,relatime - sysfs sysfs ro\n155 154 0:40 / /sys/fs/cgroup ro,nosuid,nodev,noexec,relatime - cgroup2 cgroup rw\n156 152 0:70 / /dev/mqueue rw,nosuid,nodev,noexec,relatime - mqueue mqueue rw\n157 152 0:76 / /dev/shm rw,nosuid,nodev,noexec,relatime - tmpfs shm rw,size=65536k\n158 149 0:77 / /tmp rw,nosuid,nodev,noexec,relatime - tmpfs tmpfs rw,size=524288k\n159 149 0:49 /muzammil/github.com/muzammilar/examples/rayforce/duckdb-comparison/results/journal-corruption/33f49d9453db41769e0ef46e77d8995c/valid-literal-validation/empty-input /data ro,nosuid,nodev,relatime - fakeowner /run/host_mark/Users rw,fakeowner\n160 149 254:1 /docker/volumes/rayforce-journal-tail-66a6e04e1ecc44a69ecaea6298acb0ef/_data /state rw,relatime master:1 - ext4 /dev/vda1 rw,discard\n161 149 254:1 /docker/containers/ec913d2ebf074149bee578543fe16b388bf0fc5cff8636b783fc9f30627c148d/resolv.conf /etc/resolv.conf ro,relatime - ext4 /dev/vda1 rw,discard\n162 149 254:1 /docker/containers/ec913d2ebf074149bee578543fe16b388bf0fc5cff8636b783fc9f30627c148d/hostname /etc/hostname ro,relatime - ext4 /dev/vda1 rw,discard\n163 149 254:1 /docker/containers/ec913d2ebf074149bee578543fe16b388bf0fc5cff8636b783fc9f30627c148d/hosts /etc/hosts ro,relatime - ext4 /dev/vda1 rw,discard\n99 151 0:72 /bus /proc/bus ro,nosuid,nodev,noexec,relatime - proc proc rw\n100 151 0:72 /fs /proc/fs ro,nosuid,nodev,noexec,relatime - proc proc rw\n101 151 0:72 /irq /proc/irq ro,nosuid,nodev,noexec,relatime - proc proc rw\n102 151 0:72 /sys /proc/sys ro,nosuid,nodev,noexec,relatime - proc proc rw\n103 151 0:72 /sysrq-trigger /proc/sysrq-trigger ro,nosuid,nodev,noexec,relatime - proc proc rw\n104 151 0:73 /null /proc/interrupts rw,nosuid - tmpfs tmpfs rw,size=65536k,mode=755\n105 151 0:73 /null /proc/kcore rw,nosuid - tmpfs tmpfs rw,size=65536k,mode=755\n106 151 0:73 /null /proc/keys rw,nosuid - tmpfs tmpfs rw,size=65536k,mode=755\n107 151 0:78 / /proc/scsi ro,relatime - tmpfs tmpfs ro,size=4k,nr_inodes=1\n108 151 0:73 /null /proc/timer_list rw,nosuid - tmpfs tmpfs rw,size=65536k,mode=755\n109 154 0:78 / /sys/firmware ro,relatime - tmpfs tmpfs ro,size=4k,nr_inodes=1\n",
+        "cgroup": {
+          "cpu.stat": "usage_usec 79925\nuser_usec 73777\nsystem_usec 6148\nnice_usec 0\nnr_periods 1\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+          "memory.peak": "22417408\n",
+          "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n",
+          "io.stat": ""
+        },
+        "sampled_resources": {
+          "available": true,
+          "sample_count": 1,
+          "sampled_mean_charged_memory_bytes": 11296768,
+          "sampled_max_charged_memory_bytes": 11296768,
+          "sampled_peak_cpu_percent_one_core_100": null,
+          "scope": "Approximately 100 ms plus API/inspection overhead; arithmetic sample mean, not heap or time-weighted mean. Sampling can miss short peaks; use native cgroup memory.peak and process RSS too. Docker daemon/VM overhead excluded."
+        },
+        "block_io": {
+          "available": true,
+          "devices": {},
+          "raw": "",
+          "totals": {
+            "rbytes": 0,
+            "rios": 0,
+            "wbytes": 0,
+            "wios": 0
+          },
+          "per_second": {
+            "rbytes": 0.0,
+            "rios": 0.0,
+            "wbytes": 0.0,
+            "wios": 0.0
+          },
+          "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth.",
+          "rate_scope": "Whole-container counters over StartedAt-to-FinishedAt lifetime; native child wall is narrower."
+        },
+        "native_files": {
+          "journal.2026.11.21T22.02.56Z.log": {
+            "bytes": 482,
+            "sha256": "b0e8fcf07d234ce359e7b746443cdecd24d180f40f168c8f936758b02dd861f3"
+          },
+          "journal.2026.11.21T22.03.30Z.log": {
+            "bytes": 186636,
+            "sha256": "58c1461b03e04ef8ec45c5ed55d352027ff9ba69de25b2573e997ffa2bdb6cc8"
+          },
+          "journal.lk": {
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "journal.log": {
+            "bytes": 187996,
+            "sha256": "64cff54f15bf76f4f16091126239d6a3a8a2f2c0d57b330c815b9299ff3460cc"
+          },
+          "journal.qdb": {
+            "bytes": 96294816,
+            "sha256": "48a1f706e644110ca5ea41b40eb3967b4484d337d4643b9033b3696328d9f219"
+          }
+        },
+        "compressibility": {
+          "files": [
+            {
+              "name": "journal.2026.11.21T22.02.56Z.log",
+              "bytes": 482,
+              "gzip_level_1_bytes": 210,
+              "allocated_bytes": 4096
+            },
+            {
+              "name": "journal.2026.11.21T22.03.30Z.log",
+              "bytes": 186636,
+              "gzip_level_1_bytes": 26156,
+              "allocated_bytes": 188416
+            },
+            {
+              "name": "journal.lk",
+              "bytes": 0,
+              "gzip_level_1_bytes": 20,
+              "allocated_bytes": 0
+            },
+            {
+              "name": "journal.log",
+              "bytes": 187996,
+              "gzip_level_1_bytes": 26348,
+              "allocated_bytes": 188416
+            },
+            {
+              "name": "journal.qdb",
+              "bytes": 96294816,
+              "gzip_level_1_bytes": 22939033,
+              "allocated_bytes": 96296960
+            }
+          ],
+          "wall_ns": 335053042,
+          "cpu_ns": 334856000,
+          "zlib": "1.3.2",
+          "scope": "Host-side streamed gzip compressibility of stable native files, not native engine compression"
+        },
+        "native_process_cpu_percent_one_core_100": 77.9061108119191,
+        "container_lifetime_seconds": 0.135055
+      },
+      "valid-literal": {
+        "exit_code": 0,
+        "command": [
+          "/opt/rayforce/rayforce",
+          "-c",
+          "1",
+          "-m",
+          "3G",
+          "-L",
+          "/state/journal",
+          "-p",
+          "7701",
+          "-f",
+          "/state/verify.rfl"
+        ],
+        "wall_ns": 6775875295,
+        "process_cpu_core_seconds": 5.404885,
+        "process_peak_rss_bytes": 253034496,
+        "mountinfo": "149 98 0:63 / / ro,relatime - overlay overlay rw,lowerdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88285/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88110/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88109/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88108/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88107/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88106/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88105/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88104/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88103/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88102/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88101/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88100/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88099/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88098/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/85372/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/85371/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/85369/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/85368/fs,upperdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88286/fs,workdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88286/work\n151 149 0:72 / /proc rw,nosuid,nodev,noexec,relatime - proc proc rw\n152 149 0:73 / /dev rw,nosuid - tmpfs tmpfs rw,size=65536k,mode=755\n153 152 0:74 / /dev/pts rw,nosuid,noexec,relatime - devpts devpts rw,gid=5,mode=620,ptmxmode=666\n154 149 0:75 / /sys ro,nosuid,nodev,noexec,relatime - sysfs sysfs ro\n155 154 0:40 / /sys/fs/cgroup ro,nosuid,nodev,noexec,relatime - cgroup2 cgroup rw\n156 152 0:70 / /dev/mqueue rw,nosuid,nodev,noexec,relatime - mqueue mqueue rw\n157 152 0:76 / /dev/shm rw,nosuid,nodev,noexec,relatime - tmpfs shm rw,size=65536k\n158 149 0:77 / /tmp rw,nosuid,nodev,noexec,relatime - tmpfs tmpfs rw,size=524288k\n159 149 254:1 /docker/volumes/rayforce-journal-tail-067f8ef2a8784ee3867e80a31000d215/_data /state rw,relatime master:1 - ext4 /dev/vda1 rw,discard\n160 149 0:49 /muzammil/github.com/muzammilar/examples/rayforce/duckdb-comparison/results/journal-corruption/33f49d9453db41769e0ef46e77d8995c/valid-literal/empty-input /data ro,nosuid,nodev,relatime - fakeowner /run/host_mark/Users rw,fakeowner\n161 149 254:1 /docker/containers/656b3c6ed4f88598ad43a57dd8ffa6e1d260dbe2cebffb789311e3770426bb6b/resolv.conf /etc/resolv.conf ro,relatime - ext4 /dev/vda1 rw,discard\n162 149 254:1 /docker/containers/656b3c6ed4f88598ad43a57dd8ffa6e1d260dbe2cebffb789311e3770426bb6b/hostname /etc/hostname ro,relatime - ext4 /dev/vda1 rw,discard\n163 149 254:1 /docker/containers/656b3c6ed4f88598ad43a57dd8ffa6e1d260dbe2cebffb789311e3770426bb6b/hosts /etc/hosts ro,relatime - ext4 /dev/vda1 rw,discard\n99 151 0:72 /bus /proc/bus ro,nosuid,nodev,noexec,relatime - proc proc rw\n100 151 0:72 /fs /proc/fs ro,nosuid,nodev,noexec,relatime - proc proc rw\n101 151 0:72 /irq /proc/irq ro,nosuid,nodev,noexec,relatime - proc proc rw\n102 151 0:72 /sys /proc/sys ro,nosuid,nodev,noexec,relatime - proc proc rw\n103 151 0:72 /sysrq-trigger /proc/sysrq-trigger ro,nosuid,nodev,noexec,relatime - proc proc rw\n104 151 0:73 /null /proc/interrupts rw,nosuid - tmpfs tmpfs rw,size=65536k,mode=755\n105 151 0:73 /null /proc/kcore rw,nosuid - tmpfs tmpfs rw,size=65536k,mode=755\n106 151 0:73 /null /proc/keys rw,nosuid - tmpfs tmpfs rw,size=65536k,mode=755\n107 151 0:78 / /proc/scsi ro,relatime - tmpfs tmpfs ro,size=4k,nr_inodes=1\n108 151 0:73 /null /proc/timer_list rw,nosuid - tmpfs tmpfs rw,size=65536k,mode=755\n109 154 0:78 / /sys/firmware ro,relatime - tmpfs tmpfs ro,size=4k,nr_inodes=1\n",
+        "cgroup": {
+          "cpu.stat": "usage_usec 6837553\nuser_usec 6685696\nsystem_usec 151856\nnice_usec 0\nnr_periods 69\nnr_throttled 47\nthrottled_usec 2439191\nnr_bursts 0\nburst_usec 0\n",
+          "memory.peak": "375623680\n",
+          "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n",
+          "io.stat": "254:0 rbytes=0 wbytes=105914368 rios=0 wios=113 dbytes=0 dios=0\n"
+        },
+        "sampled_resources": {
+          "available": true,
+          "sample_count": 23,
+          "sampled_mean_charged_memory_bytes": 258649221.5652174,
+          "sampled_max_charged_memory_bytes": 354881536,
+          "sampled_peak_cpu_percent_one_core_100": 102.07848014765226,
+          "scope": "Approximately 100 ms plus API/inspection overhead; arithmetic sample mean, not heap or time-weighted mean. Sampling can miss short peaks; use native cgroup memory.peak and process RSS too. Docker daemon/VM overhead excluded."
+        },
+        "block_io": {
+          "available": true,
+          "devices": {
+            "254:0": {
+              "rbytes": 0,
+              "wbytes": 105914368,
+              "wios": 113,
+              "rios": 0
+            }
+          },
+          "raw": "254:0 rbytes=0 wbytes=105914368 rios=0 wios=113 dbytes=0 dios=0\n",
+          "totals": {
+            "rbytes": 0,
+            "rios": 0,
+            "wbytes": 105914368,
+            "wios": 113
+          },
+          "per_second": {
+            "rbytes": 0.0,
+            "rios": 0.0,
+            "wbytes": 15264693.805695422,
+            "wios": 16.285896168908668
+          },
+          "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth.",
+          "rate_scope": "Whole-container counters over StartedAt-to-FinishedAt lifetime; native child wall is narrower."
+        },
+        "native_files": {
+          "journal.2026.11.21T22.02.56Z.log": {
+            "bytes": 482,
+            "sha256": "b0e8fcf07d234ce359e7b746443cdecd24d180f40f168c8f936758b02dd861f3"
+          },
+          "journal.2026.11.21T22.03.30Z.log": {
+            "bytes": 186636,
+            "sha256": "58c1461b03e04ef8ec45c5ed55d352027ff9ba69de25b2573e997ffa2bdb6cc8"
+          },
+          "journal.lk": {
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "journal.log": {
+            "bytes": 187996,
+            "sha256": "64cff54f15bf76f4f16091126239d6a3a8a2f2c0d57b330c815b9299ff3460cc"
+          },
+          "journal.qdb": {
+            "bytes": 96294816,
+            "sha256": "48a1f706e644110ca5ea41b40eb3967b4484d337d4643b9033b3696328d9f219"
+          }
+        },
+        "compressibility": {
+          "files": [
+            {
+              "name": "journal.2026.11.21T22.02.56Z.log",
+              "bytes": 482,
+              "gzip_level_1_bytes": 210,
+              "allocated_bytes": 4096
+            },
+            {
+              "name": "journal.2026.11.21T22.03.30Z.log",
+              "bytes": 186636,
+              "gzip_level_1_bytes": 26156,
+              "allocated_bytes": 188416
+            },
+            {
+              "name": "journal.lk",
+              "bytes": 0,
+              "gzip_level_1_bytes": 20,
+              "allocated_bytes": 0
+            },
+            {
+              "name": "journal.log",
+              "bytes": 187996,
+              "gzip_level_1_bytes": 26348,
+              "allocated_bytes": 188416
+            },
+            {
+              "name": "journal.qdb",
+              "bytes": 96294816,
+              "gzip_level_1_bytes": 22939033,
+              "allocated_bytes": 96296960
+            }
+          ],
+          "wall_ns": 336449041,
+          "cpu_ns": 335563000,
+          "zlib": "1.3.2",
+          "scope": "Host-side streamed gzip compressibility of stable native files, not native engine compression"
+        },
+        "native_process_cpu_percent_one_core_100": 79.7665949370162,
+        "container_lifetime_seconds": 6.938519
+      },
+      "backup": {
+        "exit_code": 0,
+        "command": [
+          "/opt/rayforce/rayforce",
+          "-c",
+          "1",
+          "-m",
+          "3G",
+          "-L",
+          "/state/journal",
+          "-p",
+          "7701",
+          "-f",
+          "/state/verify.rfl"
+        ],
+        "wall_ns": 6750550794,
+        "process_cpu_core_seconds": 5.386232,
+        "process_peak_rss_bytes": 255016960,
+        "mountinfo": "149 98 0:63 / / ro,relatime - overlay overlay rw,lowerdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88289/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88110/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88109/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88108/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88107/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88106/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88105/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88104/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88103/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88102/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88101/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88100/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88099/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88098/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/85372/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/85371/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/85369/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/85368/fs,upperdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88290/fs,workdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88290/work\n151 149 0:72 / /proc rw,nosuid,nodev,noexec,relatime - proc proc rw\n152 149 0:73 / /dev rw,nosuid - tmpfs tmpfs rw,size=65536k,mode=755\n153 152 0:74 / /dev/pts rw,nosuid,noexec,relatime - devpts devpts rw,gid=5,mode=620,ptmxmode=666\n154 149 0:75 / /sys ro,nosuid,nodev,noexec,relatime - sysfs sysfs ro\n155 154 0:40 / /sys/fs/cgroup ro,nosuid,nodev,noexec,relatime - cgroup2 cgroup rw\n156 152 0:70 / /dev/mqueue rw,nosuid,nodev,noexec,relatime - mqueue mqueue rw\n157 152 0:76 / /dev/shm rw,nosuid,nodev,noexec,relatime - tmpfs shm rw,size=65536k\n158 149 0:77 / /tmp rw,nosuid,nodev,noexec,relatime - tmpfs tmpfs rw,size=524288k\n159 149 254:1 /docker/volumes/rayforce-journal-tail-669ce5c4dfcc4027a6033e15b8bf7ac2/_data /state rw,relatime master:1 - ext4 /dev/vda1 rw,discard\n160 149 0:49 /muzammil/github.com/muzammilar/examples/rayforce/duckdb-comparison/results/journal-corruption/33f49d9453db41769e0ef46e77d8995c/backup/empty-input /data ro,nosuid,nodev,relatime - fakeowner /run/host_mark/Users rw,fakeowner\n161 149 254:1 /docker/containers/63ce57e932e8fe4756b5d2f40c18a226d09aaba19ea7f02039ced3dcae03df25/resolv.conf /etc/resolv.conf ro,relatime - ext4 /dev/vda1 rw,discard\n162 149 254:1 /docker/containers/63ce57e932e8fe4756b5d2f40c18a226d09aaba19ea7f02039ced3dcae03df25/hostname /etc/hostname ro,relatime - ext4 /dev/vda1 rw,discard\n163 149 254:1 /docker/containers/63ce57e932e8fe4756b5d2f40c18a226d09aaba19ea7f02039ced3dcae03df25/hosts /etc/hosts ro,relatime - ext4 /dev/vda1 rw,discard\n99 151 0:72 /bus /proc/bus ro,nosuid,nodev,noexec,relatime - proc proc rw\n100 151 0:72 /fs /proc/fs ro,nosuid,nodev,noexec,relatime - proc proc rw\n101 151 0:72 /irq /proc/irq ro,nosuid,nodev,noexec,relatime - proc proc rw\n102 151 0:72 /sys /proc/sys ro,nosuid,nodev,noexec,relatime - proc proc rw\n103 151 0:72 /sysrq-trigger /proc/sysrq-trigger ro,nosuid,nodev,noexec,relatime - proc proc rw\n104 151 0:73 /null /proc/interrupts rw,nosuid - tmpfs tmpfs rw,size=65536k,mode=755\n105 151 0:73 /null /proc/kcore rw,nosuid - tmpfs tmpfs rw,size=65536k,mode=755\n106 151 0:73 /null /proc/keys rw,nosuid - tmpfs tmpfs rw,size=65536k,mode=755\n107 151 0:78 / /proc/scsi ro,relatime - tmpfs tmpfs ro,size=4k,nr_inodes=1\n108 151 0:73 /null /proc/timer_list rw,nosuid - tmpfs tmpfs rw,size=65536k,mode=755\n109 154 0:78 / /sys/firmware ro,relatime - tmpfs tmpfs ro,size=4k,nr_inodes=1\n",
+        "cgroup": {
+          "cpu.stat": "usage_usec 6801904\nuser_usec 6662173\nsystem_usec 139730\nnice_usec 0\nnr_periods 68\nnr_throttled 52\nthrottled_usec 2337414\nnr_bursts 0\nburst_usec 0\n",
+          "memory.peak": "371482624\n",
+          "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n",
+          "io.stat": "254:0 rbytes=0 wbytes=105914368 rios=0 wios=102 dbytes=0 dios=0\n"
+        },
+        "sampled_resources": {
+          "available": true,
+          "sample_count": 24,
+          "sampled_mean_charged_memory_bytes": 261970090.66666666,
+          "sampled_max_charged_memory_bytes": 371220480,
+          "sampled_peak_cpu_percent_one_core_100": 101.43471770357127,
+          "scope": "Approximately 100 ms plus API/inspection overhead; arithmetic sample mean, not heap or time-weighted mean. Sampling can miss short peaks; use native cgroup memory.peak and process RSS too. Docker daemon/VM overhead excluded."
+        },
+        "block_io": {
+          "available": true,
+          "devices": {
+            "254:0": {
+              "rbytes": 0,
+              "wbytes": 105914368,
+              "wios": 102,
+              "rios": 0
+            }
+          },
+          "raw": "254:0 rbytes=0 wbytes=105914368 rios=0 wios=102 dbytes=0 dios=0\n",
+          "totals": {
+            "rbytes": 0,
+            "rios": 0,
+            "wbytes": 105914368,
+            "wios": 102
+          },
+          "per_second": {
+            "rbytes": 0.0,
+            "rios": 0.0,
+            "wbytes": 15356431.550851528,
+            "wios": 14.788890759248602
+          },
+          "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth.",
+          "rate_scope": "Whole-container counters over StartedAt-to-FinishedAt lifetime; native child wall is narrower."
+        },
+        "native_files": {
+          "journal.2026.11.21T22.02.56Z.log": {
+            "bytes": 482,
+            "sha256": "b0e8fcf07d234ce359e7b746443cdecd24d180f40f168c8f936758b02dd861f3"
+          },
+          "journal.2026.11.21T22.03.30Z.log": {
+            "bytes": 186636,
+            "sha256": "58c1461b03e04ef8ec45c5ed55d352027ff9ba69de25b2573e997ffa2bdb6cc8"
+          },
+          "journal.lk": {
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "journal.log": {
+            "bytes": 187996,
+            "sha256": "b8ce640867171f938b9be093d14100aa243963247c70427a700753a10380ee8a"
+          },
+          "journal.qdb": {
+            "bytes": 96294816,
+            "sha256": "48a1f706e644110ca5ea41b40eb3967b4484d337d4643b9033b3696328d9f219"
+          }
+        },
+        "compressibility": {
+          "files": [
+            {
+              "name": "journal.2026.11.21T22.02.56Z.log",
+              "bytes": 482,
+              "gzip_level_1_bytes": 210,
+              "allocated_bytes": 4096
+            },
+            {
+              "name": "journal.2026.11.21T22.03.30Z.log",
+              "bytes": 186636,
+              "gzip_level_1_bytes": 26156,
+              "allocated_bytes": 188416
+            },
+            {
+              "name": "journal.lk",
+              "bytes": 0,
+              "gzip_level_1_bytes": 20,
+              "allocated_bytes": 0
+            },
+            {
+              "name": "journal.log",
+              "bytes": 187996,
+              "gzip_level_1_bytes": 26350,
+              "allocated_bytes": 188416
+            },
+            {
+              "name": "journal.qdb",
+              "bytes": 96294816,
+              "gzip_level_1_bytes": 22939033,
+              "allocated_bytes": 96296960
+            }
+          ],
+          "wall_ns": 334814000,
+          "cpu_ns": 334705000,
+          "zlib": "1.3.2",
+          "scope": "Host-side streamed gzip compressibility of stable native files, not native engine compression"
+        },
+        "native_process_cpu_percent_one_core_100": 79.78951887581339,
+        "container_lifetime_seconds": 6.897069
+      }
+    },
+    "semantic_mismatches": {
+      "rows_compared": 2002269,
+      "wrong_bodies": 1,
+      "samples": [
+        {
+          "expected": [
+            2002206,
+            2206,
+            30,
+            6,
+            7,
+            2304
+          ],
+          "actual": [
+            2002206,
+            2206,
+            30,
+            6,
+            7,
+            2305
+          ]
+        }
+      ],
+      "missing_or_duplicate_ids": 0
+    },
+    "independent_oracle_error": "unexpected, duplicate or corrupt live body: [2002206, 2206, 30, 6, 7, 2305]",
+    "backup_recovery_proof": {
+      "seed_rows_verified": 2000000,
+      "intents": 2773,
+      "acknowledged": 2269,
+      "live_rows_verified": 2269,
+      "applied_unacknowledged_intents": 0,
+      "acknowledged_loss": 0,
+      "wrong_or_duplicate_bodies": 0,
+      "export_sha256": "01f5c5f55aa2af9efbfa183d2ef5ac3ef91ebff19eae4a71557dd0f2f0570a22"
+    },
+    "customers": {
+      "sha256": "c3a160b85050e71c8ba465e2ca7a72d25bc4fbb076954f6c6f9c22fcaabadc95",
+      "bytes": 92663,
+      "verified_rows": 10000,
+      "allocated_bytes": 94208,
+      "compression": {
+        "codec": "gzip",
+        "level": 1,
+        "zlib": "1.3.2",
+        "uncompressed_bytes": 92663,
+        "compressed_bytes": 32777,
+        "ratio": 2.827073862769625,
+        "wall_ns": 413167,
+        "cpu_ns": 412000,
+        "scope": "Host-side compressibility of the verified CSV witness, streamed into a byte counter; not native engine compression. Timers cover compression calls, excluding file reads/hash/fsync."
+      }
+    },
+    "source_and_corrupt_evidence_preserved": true,
+    "host_controller": {
+      "wall_ns": 35698941708,
+      "cpu_ns": 6520865000,
+      "peak_rss_bytes": 160235520
+    },
+    "scope": "Logical file-payload corruption beyond the healthy/process-crash contract. Native framing acceptance is not content integrity. Integrity failure remains FAILED despite successful backup recovery; no universal production/physical-media conclusion.",
+    "semantic_customers": {
+      "sha256": "c3a160b85050e71c8ba465e2ca7a72d25bc4fbb076954f6c6f9c22fcaabadc95",
+      "bytes": 92663,
+      "verified_rows": 10000,
+      "allocated_bytes": 94208,
+      "compression": {
+        "codec": "gzip",
+        "level": 1,
+        "zlib": "1.3.2",
+        "uncompressed_bytes": 92663,
+        "compressed_bytes": 32777,
+        "ratio": 2.827073862769625,
+        "wall_ns": 372125,
+        "cpu_ns": 373000,
+        "scope": "Host-side compressibility of the verified CSV witness, streamed into a byte counter; not native engine compression. Timers cover compression calls, excluding file reads/hash/fsync."
+      }
+    }
+  },
+  "environment": {
+    "utc": "2026-11-21T22:04:39Z",
+    "host": [
+      "Darwin",
+      "Muzammils-MacBook-Pro.local",
+      "25.5.0",
+      "Darwin Kernel Version 25.5.0: Mon Apr 27 20:41:15 PDT 2026; root:xnu-12377.121.6~2/RELEASE_ARM64_T6041",
+      "arm64"
+    ],
+    "cpu_model": "Apple M4 Pro",
+    "docker_info": {
+      "ID": "172e5e0a-2d95-4fb5-a6b4-fb16552caec8",
+      "Containers": 9,
+      "ContainersRunning": 0,
+      "ContainersPaused": 0,
+      "ContainersStopped": 9,
+      "Images": 10,
+      "Driver": "overlayfs",
+      "DriverStatus": [
+        [
+          "driver-type",
+          "io.containerd.snapshotter.v1"
+        ]
+      ],
+      "Plugins": {
+        "Volume": [
+          "local"
+        ],
+        "Network": [
+          "bridge",
+          "host",
+          "ipvlan",
+          "macvlan",
+          "null",
+          "overlay"
+        ],
+        "Authorization": null,
+        "Log": [
+          "awslogs",
+          "fluentd",
+          "gcplogs",
+          "gelf",
+          "journald",
+          "json-file",
+          "local",
+          "splunk",
+          "syslog"
+        ]
+      },
+      "MemoryLimit": true,
+      "SwapLimit": true,
+      "CpuCfsPeriod": true,
+      "CpuCfsQuota": true,
+      "CPUShares": true,
+      "CPUSet": true,
+      "PidsLimit": true,
+      "IPv4Forwarding": true,
+      "Debug": false,
+      "NFd": 44,
+      "OomKillDisable": false,
+      "NGoroutines": 82,
+      "SystemTime": "2026-11-21T22:04:39.690374751Z",
+      "LoggingDriver": "json-file",
+      "CgroupDriver": "cgroupfs",
+      "CgroupVersion": "2",
+      "NEventsListener": 13,
+      "KernelVersion": "6.12.76-linuxkit",
+      "OperatingSystem": "Docker Desktop",
+      "OSVersion": "",
+      "OSType": "linux",
+      "Architecture": "aarch64",
+      "IndexServerAddress": "https://index.docker.io/v1/",
+      "RegistryConfig": {
+        "InsecureRegistryCIDRs": [
+          "::1/128",
+          "127.0.0.0/8"
+        ],
+        "IndexConfigs": {
+          "docker.io": {
+            "Name": "docker.io",
+            "Mirrors": [],
+            "Secure": true,
+            "Official": true
+          },
+          "hubproxy.docker.internal:5555": {
+            "Name": "hubproxy.docker.internal:5555",
+            "Mirrors": [],
+            "Secure": false,
+            "Official": false
+          }
+        },
+        "Mirrors": []
+      },
+      "NCPU": 11,
+      "MemTotal": 26216296448,
+      "GenericResources": null,
+      "DockerRootDir": "/var/lib/docker",
+      "HttpProxy": "http.docker.internal:3128",
+      "HttpsProxy": "http.docker.internal:3128",
+      "NoProxy": "hubproxy.docker.internal",
+      "Name": "docker-desktop",
+      "Labels": [
+        "com.docker.desktop.address=unix:///Users/muzammil/Library/Containers/com.docker.docker/Data/docker-cli.sock"
+      ],
+      "ExperimentalBuild": false,
+      "ServerVersion": "29.5.3",
+      "Runtimes": {
+        "io.containerd.runc.v2": {
+          "path": "runc",
+          "status": {
+            "org.opencontainers.runtime-spec.features": "{\"ociVersionMin\":\"1.0.0\",\"ociVersionMax\":\"1.2.1\",\"hooks\":[\"prestart\",\"createRuntime\",\"createContainer\",\"startContainer\",\"poststart\",\"poststop\"],\"mountOptions\":[\"async\",\"atime\",\"bind\",\"defaults\",\"dev\",\"diratime\",\"dirsync\",\"exec\",\"iversion\",\"lazytime\",\"loud\",\"mand\",\"noatime\",\"nodev\",\"nodiratime\",\"noexec\",\"noiversion\",\"nolazytime\",\"nomand\",\"norelatime\",\"nostrictatime\",\"nosuid\",\"nosymfollow\",\"private\",\"ratime\",\"rbind\",\"rdev\",\"rdiratime\",\"relatime\",\"remount\",\"rexec\",\"rnoatime\",\"rnodev\",\"rnodiratime\",\"rnoexec\",\"rnorelatime\",\"rnostrictatime\",\"rnosuid\",\"rnosymfollow\",\"ro\",\"rprivate\",\"rrelatime\",\"rro\",\"rrw\",\"rshared\",\"rslave\",\"rstrictatime\",\"rsuid\",\"rsymfollow\",\"runbindable\",\"rw\",\"shared\",\"silent\",\"slave\",\"strictatime\",\"suid\",\"symfollow\",\"sync\",\"tmpcopyup\",\"unbindable\"],\"linux\":{\"namespaces\":[\"cgroup\",\"ipc\",\"mount\",\"network\",\"pid\",\"time\",\"user\",\"uts\"],\"capabilities\":[\"CAP_CHOWN\",\"CAP_DAC_OVERRIDE\",\"CAP_DAC_READ_SEARCH\",\"CAP_FOWNER\",\"CAP_FSETID\",\"CAP_KILL\",\"CAP_SETGID\",\"CAP_SETUID\",\"CAP_SETPCAP\",\"CAP_LINUX_IMMUTABLE\",\"CAP_NET_BIND_SERVICE\",\"CAP_NET_BROADCAST\",\"CAP_NET_ADMIN\",\"CAP_NET_RAW\",\"CAP_IPC_LOCK\",\"CAP_IPC_OWNER\",\"CAP_SYS_MODULE\",\"CAP_SYS_RAWIO\",\"CAP_SYS_CHROOT\",\"CAP_SYS_PTRACE\",\"CAP_SYS_PACCT\",\"CAP_SYS_ADMIN\",\"CAP_SYS_BOOT\",\"CAP_SYS_NICE\",\"CAP_SYS_RESOURCE\",\"CAP_SYS_TIME\",\"CAP_SYS_TTY_CONFIG\",\"CAP_MKNOD\",\"CAP_LEASE\",\"CAP_AUDIT_WRITE\",\"CAP_AUDIT_CONTROL\",\"CAP_SETFCAP\",\"CAP_MAC_OVERRIDE\",\"CAP_MAC_ADMIN\",\"CAP_SYSLOG\",\"CAP_WAKE_ALARM\",\"CAP_BLOCK_SUSPEND\",\"CAP_AUDIT_READ\",\"CAP_PERFMON\",\"CAP_BPF\",\"CAP_CHECKPOINT_RESTORE\"],\"cgroup\":{\"v1\":true,\"v2\":true,\"systemd\":true,\"systemdUser\":true,\"rdma\":true},\"seccomp\":{\"enabled\":true,\"actions\":[\"SCMP_ACT_ALLOW\",\"SCMP_ACT_ERRNO\",\"SCMP_ACT_KILL\",\"SCMP_ACT_KILL_PROCESS\",\"SCMP_ACT_KILL_THREAD\",\"SCMP_ACT_LOG\",\"SCMP_ACT_NOTIFY\",\"SCMP_ACT_TRACE\",\"SCMP_ACT_TRAP\"],\"operators\":[\"SCMP_CMP_EQ\",\"SCMP_CMP_GE\",\"SCMP_CMP_GT\",\"SCMP_CMP_LE\",\"SCMP_CMP_LT\",\"SCMP_CMP_MASKED_EQ\",\"SCMP_CMP_NE\"],\"archs\":[\"SCMP_ARCH_AARCH64\",\"SCMP_ARCH_ARM\",\"SCMP_ARCH_MIPS\",\"SCMP_ARCH_MIPS64\",\"SCMP_ARCH_MIPS64N32\",\"SCMP_ARCH_MIPSEL\",\"SCMP_ARCH_MIPSEL64\",\"SCMP_ARCH_MIPSEL64N32\",\"SCMP_ARCH_PPC\",\"SCMP_ARCH_PPC64\",\"SCMP_ARCH_PPC64LE\",\"SCMP_ARCH_RISCV64\",\"SCMP_ARCH_S390\",\"SCMP_ARCH_S390X\",\"SCMP_ARCH_X32\",\"SCMP_ARCH_X86\",\"SCMP_ARCH_X86_64\"],\"knownFlags\":[\"SECCOMP_FILTER_FLAG_TSYNC\",\"SECCOMP_FILTER_FLAG_SPEC_ALLOW\",\"SECCOMP_FILTER_FLAG_LOG\"],\"supportedFlags\":[\"SECCOMP_FILTER_FLAG_TSYNC\",\"SECCOMP_FILTER_FLAG_SPEC_ALLOW\",\"SECCOMP_FILTER_FLAG_LOG\"]},\"apparmor\":{\"enabled\":true},\"selinux\":{\"enabled\":true},\"intelRdt\":{\"enabled\":true},\"mountExtensions\":{\"idmap\":{\"enabled\":true}}},\"annotations\":{\"io.github.seccomp.libseccomp.version\":\"2.5.4\",\"org.opencontainers.runc.checkpoint.enabled\":\"true\",\"org.opencontainers.runc.commit\":\"v1.3.6-0-g491b69ba\",\"org.opencontainers.runc.version\":\"1.3.6\\n\"},\"potentiallyUnsafeConfigAnnotations\":[\"bundle\",\"org.systemd.property.\",\"org.criu.config\"]}"
+          }
+        },
+        "runc": {
+          "path": "runc",
+          "status": {
+            "org.opencontainers.runtime-spec.features": "{\"ociVersionMin\":\"1.0.0\",\"ociVersionMax\":\"1.2.1\",\"hooks\":[\"prestart\",\"createRuntime\",\"createContainer\",\"startContainer\",\"poststart\",\"poststop\"],\"mountOptions\":[\"async\",\"atime\",\"bind\",\"defaults\",\"dev\",\"diratime\",\"dirsync\",\"exec\",\"iversion\",\"lazytime\",\"loud\",\"mand\",\"noatime\",\"nodev\",\"nodiratime\",\"noexec\",\"noiversion\",\"nolazytime\",\"nomand\",\"norelatime\",\"nostrictatime\",\"nosuid\",\"nosymfollow\",\"private\",\"ratime\",\"rbind\",\"rdev\",\"rdiratime\",\"relatime\",\"remount\",\"rexec\",\"rnoatime\",\"rnodev\",\"rnodiratime\",\"rnoexec\",\"rnorelatime\",\"rnostrictatime\",\"rnosuid\",\"rnosymfollow\",\"ro\",\"rprivate\",\"rrelatime\",\"rro\",\"rrw\",\"rshared\",\"rslave\",\"rstrictatime\",\"rsuid\",\"rsymfollow\",\"runbindable\",\"rw\",\"shared\",\"silent\",\"slave\",\"strictatime\",\"suid\",\"symfollow\",\"sync\",\"tmpcopyup\",\"unbindable\"],\"linux\":{\"namespaces\":[\"cgroup\",\"ipc\",\"mount\",\"network\",\"pid\",\"time\",\"user\",\"uts\"],\"capabilities\":[\"CAP_CHOWN\",\"CAP_DAC_OVERRIDE\",\"CAP_DAC_READ_SEARCH\",\"CAP_FOWNER\",\"CAP_FSETID\",\"CAP_KILL\",\"CAP_SETGID\",\"CAP_SETUID\",\"CAP_SETPCAP\",\"CAP_LINUX_IMMUTABLE\",\"CAP_NET_BIND_SERVICE\",\"CAP_NET_BROADCAST\",\"CAP_NET_ADMIN\",\"CAP_NET_RAW\",\"CAP_IPC_LOCK\",\"CAP_IPC_OWNER\",\"CAP_SYS_MODULE\",\"CAP_SYS_RAWIO\",\"CAP_SYS_CHROOT\",\"CAP_SYS_PTRACE\",\"CAP_SYS_PACCT\",\"CAP_SYS_ADMIN\",\"CAP_SYS_BOOT\",\"CAP_SYS_NICE\",\"CAP_SYS_RESOURCE\",\"CAP_SYS_TIME\",\"CAP_SYS_TTY_CONFIG\",\"CAP_MKNOD\",\"CAP_LEASE\",\"CAP_AUDIT_WRITE\",\"CAP_AUDIT_CONTROL\",\"CAP_SETFCAP\",\"CAP_MAC_OVERRIDE\",\"CAP_MAC_ADMIN\",\"CAP_SYSLOG\",\"CAP_WAKE_ALARM\",\"CAP_BLOCK_SUSPEND\",\"CAP_AUDIT_READ\",\"CAP_PERFMON\",\"CAP_BPF\",\"CAP_CHECKPOINT_RESTORE\"],\"cgroup\":{\"v1\":true,\"v2\":true,\"systemd\":true,\"systemdUser\":true,\"rdma\":true},\"seccomp\":{\"enabled\":true,\"actions\":[\"SCMP_ACT_ALLOW\",\"SCMP_ACT_ERRNO\",\"SCMP_ACT_KILL\",\"SCMP_ACT_KILL_PROCESS\",\"SCMP_ACT_KILL_THREAD\",\"SCMP_ACT_LOG\",\"SCMP_ACT_NOTIFY\",\"SCMP_ACT_TRACE\",\"SCMP_ACT_TRAP\"],\"operators\":[\"SCMP_CMP_EQ\",\"SCMP_CMP_GE\",\"SCMP_CMP_GT\",\"SCMP_CMP_LE\",\"SCMP_CMP_LT\",\"SCMP_CMP_MASKED_EQ\",\"SCMP_CMP_NE\"],\"archs\":[\"SCMP_ARCH_AARCH64\",\"SCMP_ARCH_ARM\",\"SCMP_ARCH_MIPS\",\"SCMP_ARCH_MIPS64\",\"SCMP_ARCH_MIPS64N32\",\"SCMP_ARCH_MIPSEL\",\"SCMP_ARCH_MIPSEL64\",\"SCMP_ARCH_MIPSEL64N32\",\"SCMP_ARCH_PPC\",\"SCMP_ARCH_PPC64\",\"SCMP_ARCH_PPC64LE\",\"SCMP_ARCH_RISCV64\",\"SCMP_ARCH_S390\",\"SCMP_ARCH_S390X\",\"SCMP_ARCH_X32\",\"SCMP_ARCH_X86\",\"SCMP_ARCH_X86_64\"],\"knownFlags\":[\"SECCOMP_FILTER_FLAG_TSYNC\",\"SECCOMP_FILTER_FLAG_SPEC_ALLOW\",\"SECCOMP_FILTER_FLAG_LOG\"],\"supportedFlags\":[\"SECCOMP_FILTER_FLAG_TSYNC\",\"SECCOMP_FILTER_FLAG_SPEC_ALLOW\",\"SECCOMP_FILTER_FLAG_LOG\"]},\"apparmor\":{\"enabled\":true},\"selinux\":{\"enabled\":true},\"intelRdt\":{\"enabled\":true},\"mountExtensions\":{\"idmap\":{\"enabled\":true}}},\"annotations\":{\"io.github.seccomp.libseccomp.version\":\"2.5.4\",\"org.opencontainers.runc.checkpoint.enabled\":\"true\",\"org.opencontainers.runc.commit\":\"v1.3.6-0-g491b69ba\",\"org.opencontainers.runc.version\":\"1.3.6\\n\"},\"potentiallyUnsafeConfigAnnotations\":[\"bundle\",\"org.systemd.property.\",\"org.criu.config\"]}"
+          }
+        }
+      },
+      "DefaultRuntime": "runc",
+      "Swarm": {
+        "NodeID": "",
+        "NodeAddr": "",
+        "LocalNodeState": "inactive",
+        "ControlAvailable": false,
+        "Error": "",
+        "RemoteManagers": null
+      },
+      "LiveRestoreEnabled": false,
+      "Isolation": "",
+      "InitBinary": "docker-init",
+      "ContainerdCommit": {
+        "ID": "e53c7c1516c3b2bff98eb76f1f4117477e6f4e66"
+      },
+      "RuncCommit": {
+        "ID": "v1.3.6-0-g491b69ba"
+      },
+      "InitCommit": {
+        "ID": "de40ad0"
+      },
+      "SecurityOptions": [
+        "name=seccomp,profile=builtin",
+        "name=cgroupns"
+      ],
+      "FirewallBackend": {
+        "Driver": "iptables"
+      },
+      "CDISpecDirs": [
+        "/etc/cdi",
+        "/var/run/cdi"
+      ],
+      "DiscoveredDevices": [
+        {
+          "Source": "cdi",
+          "ID": "docker.com/gpu=webgpu"
+        }
+      ],
+      "Containerd": {
+        "Address": "/run/containerd/containerd.sock",
+        "Namespaces": {
+          "Containers": "moby",
+          "Plugins": "plugins.moby"
+        }
+      },
+      "Warnings": null,
+      "ClientInfo": {
+        "Debug": false,
+        "Version": "29.5.3",
+        "DefaultAPIVersion": "1.54",
+        "GitCommit": "d1c06ef",
+        "GoVersion": "go1.26.4",
+        "Os": "darwin",
+        "Arch": "arm64",
+        "BuildTime": "Wed Jun  3 17:59:08 2026",
+        "Context": "desktop-linux",
+        "Plugins": [
+          {
+            "SchemaVersion": "0.1.0",
+            "Vendor": "Docker Inc.",
+            "Version": "v1.79.0",
+            "ShortDescription": "Docker AI Agent Runner",
+            "Name": "agent",
+            "Path": "/Users/muzammil/.docker/cli-plugins/docker-agent"
+          },
+          {
+            "SchemaVersion": "0.1.0",
+            "Vendor": "Docker Inc.",
+            "Version": "v1.25.0",
+            "ShortDescription": "Docker AI Agent - Ask Gordon",
+            "Name": "ai",
+            "Path": "/Users/muzammil/.docker/cli-plugins/docker-ai"
+          },
+          {
+            "SchemaVersion": "0.1.0",
+            "Vendor": "Docker Inc.",
+            "Version": "v0.34.1-desktop.1",
+            "ShortDescription": "Docker Buildx",
+            "Name": "buildx",
+            "Path": "/Users/muzammil/.docker/cli-plugins/docker-buildx"
+          },
+          {
+            "SchemaVersion": "0.1.0",
+            "Vendor": "Docker Inc.",
+            "Version": "v5.1.4",
+            "ShortDescription": "Docker Compose",
+            "Name": "compose",
+            "Path": "/Users/muzammil/.docker/cli-plugins/docker-compose"
+          },
+          {
+            "SchemaVersion": "0.1.0",
+            "Vendor": "Docker Inc.",
+            "Version": "0.0.47",
+            "ShortDescription": "Get a shell into any image or container",
+            "Name": "debug",
+            "Path": "/Users/muzammil/.docker/cli-plugins/docker-debug"
+          },
+          {
+            "SchemaVersion": "0.1.0",
+            "Vendor": "Docker Inc.",
+            "Version": "v0.4.1",
+            "ShortDescription": "Docker Desktop commands",
+            "Name": "desktop",
+            "Path": "/Users/muzammil/.docker/cli-plugins/docker-desktop"
+          },
+          {
+            "SchemaVersion": "0.1.0",
+            "Vendor": "Docker Inc.",
+            "Version": "v0.0.4",
+            "ShortDescription": "CLI for managing Docker Hardened Images",
+            "Name": "dhi",
+            "Path": "/Users/muzammil/.docker/cli-plugins/docker-dhi"
+          },
+          {
+            "SchemaVersion": "0.1.0",
+            "Vendor": "Docker Inc.",
+            "Version": "v0.2.31",
+            "ShortDescription": "Manages Docker extensions",
+            "Name": "extension",
+            "Path": "/Users/muzammil/.docker/cli-plugins/docker-extension"
+          },
+          {
+            "SchemaVersion": "0.1.0",
+            "Vendor": "Docker Inc.",
+            "Version": "v1.4.0",
+            "ShortDescription": "Creates Docker-related starter files for your project",
+            "Name": "init",
+            "Path": "/Users/muzammil/.docker/cli-plugins/docker-init"
+          },
+          {
+            "SchemaVersion": "0.1.0",
+            "Vendor": "Docker Inc.",
+            "Version": "v0.42.2",
+            "ShortDescription": "Docker MCP Plugin",
+            "Name": "mcp",
+            "Path": "/Users/muzammil/.docker/cli-plugins/docker-mcp"
+          },
+          {
+            "SchemaVersion": "0.1.0",
+            "Vendor": "Docker Inc.",
+            "Version": "v1.2.1",
+            "ShortDescription": "Docker Model Runner",
+            "Name": "model",
+            "Path": "/Users/muzammil/.docker/cli-plugins/docker-model"
+          },
+          {
+            "SchemaVersion": "0.1.0",
+            "Vendor": "Docker Inc.",
+            "Version": "v0.6.4",
+            "ShortDescription": "Docker Offload",
+            "Name": "offload",
+            "Path": "/Users/muzammil/.docker/cli-plugins/docker-offload"
+          },
+          {
+            "SchemaVersion": "0.1.0",
+            "Vendor": "Docker Inc.",
+            "Version": "v0.1.5",
+            "ShortDescription": "Docker Pass Secrets Manager Plugin (beta)",
+            "Name": "pass",
+            "Path": "/Users/muzammil/.docker/cli-plugins/docker-pass"
+          },
+          {
+            "SchemaVersion": "0.1.0",
+            "Vendor": "Docker Inc.",
+            "Version": "v0.12.0",
+            "ShortDescription": "Docker Sandbox",
+            "Name": "sandbox",
+            "Path": "/Users/muzammil/.docker/cli-plugins/docker-sandbox"
+          },
+          {
+            "SchemaVersion": "0.1.0",
+            "Vendor": "Docker Inc.",
+            "Version": "v1.22.0",
+            "ShortDescription": "Docker Scout",
+            "Name": "scout",
+            "Path": "/Users/muzammil/.docker/cli-plugins/docker-scout"
+          }
+        ],
+        "Warnings": null
+      }
+    },
+    "fixture": {
+      "rows": 2000000,
+      "customers": 10000,
+      "seed": 20261117,
+      "seconds": 3.2101720420178026,
+      "sha256": {
+        "trades.csv": "c8756870bdbb238b69ef8d563c6d4f176753e3864ffa50f508e707ed94406de0",
+        "customers.csv": "c3a160b85050e71c8ba465e2ca7a72d25bc4fbb076954f6c6f9c22fcaabadc95",
+        "expected.json": "150c8e3d600939b01a5c3af70c563f6b11b22cef4699138b4f4b4a4ba0d15a72"
+      }
+    },
+    "source_sha256": {
+      "journal_corruption.py": "8a23c4ff56b68b0df6ace63b2a7150c72be102a7fa82f8fbaedff9b29fd2dd9e",
+      "journal_tail.py": "9fbd04e389ff983372f139e3c31c1139c2f4ab63025cdf28e879f62b101e6798",
+      "journal_volume.py": "aa8a468e797c4ba795fc7a9af52191aa9532c04391c5c4e85ac4a60a88645071",
+      "journal_restore.py": "37afc7a5d575ef4c3f51b52f88f7b9726a5dbaa8250230f3bfa35146574c2104",
+      "live_journal.py": "5b8314220947a1a675aca5ee39a6dd7a41dd10ab4e1b3cddd65b65faba981fdc",
+      "docker-compose.journal-tail.yml": "fb971ebb4f2318a56657ac1097421160a6fce4414f48b58a1540ce0f99a5c54b",
+      "docker-compose.journal-volume.yml": "f97301b164eb3a70ae88713c437712f8ea97d8065a3eecfb953670947a3411a7",
+      "docker-compose.journal.yml": "665a59f9754ce307ae6a3c3398d815f25d03a7134a17be56cc502ca984fa4ffd",
+      "docker/Dockerfile": "b9f3e44530667134a5fc8e942d70290e2a4a2ca8d7d43904a3d467b590a81593"
+    },
+    "contract": "Logical one-byte edits to a fenced copy, not physical bit rot/power loss. Invalid serialized type must fail startup. A native successful export with wrong acknowledged body is a FAILED integrity result. Never truncate an interior fault. Restore from an untouched backup and verify every body."
+  },
+  "native_stages": {
+    "invalid-type-validation": {
+      "image": "sha256:a3b867026c388fb48c670b399c2f2dad776bea0a793708bf37c7647f61a2997a",
+      "mounts": [
+        {
+          "Type": "bind",
+          "Source": "/Users/muzammil/github.com/muzammilar/examples/rayforce/duckdb-comparison/results/journal-corruption/33f49d9453db41769e0ef46e77d8995c/invalid-type-validation/empty-input",
+          "Destination": "/data",
+          "Mode": "ro",
+          "RW": false,
+          "Propagation": "rprivate"
+        },
+        {
+          "Type": "volume",
+          "Name": "rayforce-journal-tail-45e2bef0e5304c17b26ff32f68614a08",
+          "Source": "/var/lib/docker/volumes/rayforce-journal-tail-45e2bef0e5304c17b26ff32f68614a08/_data",
+          "Destination": "/state",
+          "Driver": "local",
+          "Mode": "rw",
+          "RW": true,
+          "Propagation": ""
+        }
+      ],
+      "initialization": {
+        "volume": {
+          "CreatedAt": "2026-11-21T22:04:39Z",
+          "Driver": "local",
+          "Labels": {
+            "com.docker.compose.config-hash": "020ba254defeea87a5cf8d043569fbd2b1bc6f44d0290c9bceb899f0a187540c",
+            "com.docker.compose.project": "rayforce-duckdb-journal",
+            "com.docker.compose.version": "5.1.4",
+            "com.docker.compose.volume": "journal-data"
+          },
+          "Mountpoint": "/var/lib/docker/volumes/rayforce-journal-tail-45e2bef0e5304c17b26ff32f68614a08/_data",
+          "Name": "rayforce-journal-tail-45e2bef0e5304c17b26ff32f68614a08",
+          "Options": null,
+          "Scope": "local"
+        },
+        "inspection": {
+          "Id": "c6224b36028fc01bd46e03be3e5ccbf33e0fbe532fcefcae37f68ee4be878530",
+          "Created": "2026-11-21T22:04:39.883232418Z",
+          "Path": "python",
+          "Args": [
+            "-c",
+            "import os,json,pathlib,resource; os.chmod('/state', 0o700); os.chown('/state', int(os.environ['LAB_UID']), int(os.environ['LAB_GID'])); print(json.dumps({'process_peak_rss_bytes':resource.getrusage(resource.RUSAGE_SELF).ru_maxrss*1024,'cgroup':{p:pathlib.Path('/sys/fs/cgroup',p).read_text() for p in ('cpu.stat','memory.peak','io.stat')}}))"
+          ],
+          "State": {
+            "Status": "exited",
+            "Running": false,
+            "Paused": false,
+            "Restarting": false,
+            "OOMKilled": false,
+            "Dead": false,
+            "Pid": 0,
+            "ExitCode": 0,
+            "Error": "",
+            "StartedAt": "2026-11-21T22:04:39.96651521Z",
+            "FinishedAt": "2026-11-21T22:04:40.062164668Z"
+          },
+          "Image": "sha256:a3b867026c388fb48c670b399c2f2dad776bea0a793708bf37c7647f61a2997a",
+          "ResolvConfPath": "/var/lib/docker/containers/c6224b36028fc01bd46e03be3e5ccbf33e0fbe532fcefcae37f68ee4be878530/resolv.conf",
+          "HostnamePath": "/var/lib/docker/containers/c6224b36028fc01bd46e03be3e5ccbf33e0fbe532fcefcae37f68ee4be878530/hostname",
+          "HostsPath": "/var/lib/docker/containers/c6224b36028fc01bd46e03be3e5ccbf33e0fbe532fcefcae37f68ee4be878530/hosts",
+          "LogPath": "/var/lib/docker/containers/c6224b36028fc01bd46e03be3e5ccbf33e0fbe532fcefcae37f68ee4be878530/c6224b36028fc01bd46e03be3e5ccbf33e0fbe532fcefcae37f68ee4be878530-json.log",
+          "Name": "/rayforce-duckdb-journal-init-volume-1",
+          "RestartCount": 0,
+          "Driver": "overlayfs",
+          "Platform": "linux",
+          "MountLabel": "",
+          "ProcessLabel": "",
+          "AppArmorProfile": "",
+          "ExecIDs": null,
+          "HostConfig": {
+            "Binds": [
+              "rayforce-journal-tail-45e2bef0e5304c17b26ff32f68614a08:/state:rw"
+            ],
+            "ContainerIDFile": "",
+            "LogConfig": {
+              "Type": "json-file",
+              "Config": {}
+            },
+            "NetworkMode": "none",
+            "PortBindings": {},
+            "RestartPolicy": {
+              "Name": "no",
+              "MaximumRetryCount": 0
+            },
+            "AutoRemove": false,
+            "VolumeDriver": "",
+            "VolumesFrom": null,
+            "ConsoleSize": [
+              0,
+              0
+            ],
+            "CapAdd": [
+              "CAP_CHOWN"
+            ],
+            "CapDrop": [
+              "ALL"
+            ],
+            "CgroupnsMode": "private",
+            "Dns": null,
+            "DnsOptions": null,
+            "DnsSearch": null,
+            "ExtraHosts": [],
+            "GroupAdd": null,
+            "IpcMode": "private",
+            "Cgroup": "",
+            "Links": null,
+            "OomScoreAdj": 0,
+            "PidMode": "",
+            "Privileged": false,
+            "PublishAllPorts": false,
+            "ReadonlyRootfs": true,
+            "SecurityOpt": [
+              "no-new-privileges:true"
+            ],
+            "UTSMode": "",
+            "UsernsMode": "",
+            "ShmSize": 67108864,
+            "Runtime": "runc",
+            "Isolation": "",
+            "CpuShares": 0,
+            "Memory": 536870912,
+            "NanoCpus": 1000000000,
+            "CgroupParent": "",
+            "BlkioWeight": 0,
+            "BlkioWeightDevice": null,
+            "BlkioDeviceReadBps": null,
+            "BlkioDeviceWriteBps": null,
+            "BlkioDeviceReadIOps": null,
+            "BlkioDeviceWriteIOps": null,
+            "CpuPeriod": 0,
+            "CpuQuota": 0,
+            "CpuRealtimePeriod": 0,
+            "CpuRealtimeRuntime": 0,
+            "CpusetCpus": "",
+            "CpusetMems": "",
+            "Devices": null,
+            "DeviceCgroupRules": null,
+            "DeviceRequests": null,
+            "MemoryReservation": 0,
+            "MemorySwap": 536870912,
+            "MemorySwappiness": null,
+            "OomKillDisable": null,
+            "PidsLimit": null,
+            "Ulimits": null,
+            "CpuCount": 0,
+            "CpuPercent": 0,
+            "IOMaximumIOps": 0,
+            "IOMaximumBandwidth": 0,
+            "MaskedPaths": [
+              "/proc/acpi",
+              "/proc/asound",
+              "/proc/interrupts",
+              "/proc/kcore",
+              "/proc/keys",
+              "/proc/latency_stats",
+              "/proc/sched_debug",
+              "/proc/scsi",
+              "/proc/timer_list",
+              "/proc/timer_stats",
+              "/sys/devices/virtual/powercap",
+              "/sys/firmware"
+            ],
+            "ReadonlyPaths": [
+              "/proc/bus",
+              "/proc/fs",
+              "/proc/irq",
+              "/proc/sys",
+              "/proc/sysrq-trigger"
+            ]
+          },
+          "Storage": {
+            "RootFS": {
+              "Snapshot": {
+                "Name": "overlayfs"
+              }
+            }
+          },
+          "Mounts": [
+            {
+              "Type": "volume",
+              "Name": "rayforce-journal-tail-45e2bef0e5304c17b26ff32f68614a08",
+              "Source": "/var/lib/docker/volumes/rayforce-journal-tail-45e2bef0e5304c17b26ff32f68614a08/_data",
+              "Destination": "/state",
+              "Driver": "local",
+              "Mode": "rw",
+              "RW": true,
+              "Propagation": ""
+            }
+          ],
+          "Config": {
+            "Hostname": "c6224b36028f",
+            "Domainname": "",
+            "User": "0:0",
+            "AttachStdin": false,
+            "AttachStdout": true,
+            "AttachStderr": true,
+            "Tty": false,
+            "OpenStdin": false,
+            "StdinOnce": false,
+            "Env": [
+              "LAB_GID=20",
+              "LAB_UID=501",
+              "PATH=/usr/local/cargo/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+              "LANG=C.UTF-8",
+              "GPG_KEY=7169605F62C751356D054A26A821E680E5FA6305",
+              "PYTHON_VERSION=3.12.12",
+              "PYTHON_SHA256=fb85a13414b028c49ba18bbd523c2d055a30b56b18b92ce454ea2c51edc656c4",
+              "RUSTUP_HOME=/usr/local/rustup",
+              "CARGO_HOME=/usr/local/cargo",
+              "LD_LIBRARY_PATH=/opt/bench:/opt/rayforce/lib:/opt/duckdb/lib"
+            ],
+            "Cmd": [
+              "import os,json,pathlib,resource; os.chmod('/state', 0o700); os.chown('/state', int(os.environ['LAB_UID']), int(os.environ['LAB_GID'])); print(json.dumps({'process_peak_rss_bytes':resource.getrusage(resource.RUSAGE_SELF).ru_maxrss*1024,'cgroup':{p:pathlib.Path('/sys/fs/cgroup',p).read_text() for p in ('cpu.stat','memory.peak','io.stat')}}))"
+            ],
+            "Image": "rayforce-duckdb-analytics:dev",
+            "Volumes": null,
+            "WorkingDir": "/workload",
+            "Entrypoint": [
+              "python",
+              "-c"
+            ],
+            "Labels": {
+              "com.docker.compose.config-hash": "9024e7c4fd3d812e3901accc93428c6aa01829120aa54acf6ef6debdc266e282",
+              "com.docker.compose.container-number": "1",
+              "com.docker.compose.depends_on": "",
+              "com.docker.compose.image": "sha256:a3b867026c388fb48c670b399c2f2dad776bea0a793708bf37c7647f61a2997a",
+              "com.docker.compose.oneoff": "False",
+              "com.docker.compose.project": "rayforce-duckdb-journal",
+              "com.docker.compose.project.config_files": "/Users/muzammil/github.com/muzammilar/examples/rayforce/duckdb-comparison/docker-compose.journal.yml,/Users/muzammil/github.com/muzammilar/examples/rayforce/duckdb-comparison/docker-compose.journal-volume.yml,/Users/muzammil/github.com/muzammilar/examples/rayforce/duckdb-comparison/docker-compose.journal-tail.yml",
+              "com.docker.compose.project.working_dir": "/Users/muzammil/github.com/muzammilar/examples/rayforce/duckdb-comparison",
+              "com.docker.compose.service": "init-volume",
+              "com.docker.compose.version": "5.1.4"
+            },
+            "StopTimeout": 1
+          },
+          "NetworkSettings": {
+            "SandboxID": "",
+            "SandboxKey": "",
+            "Ports": {},
+            "Networks": {
+              "none": {
+                "IPAMConfig": null,
+                "Links": null,
+                "Aliases": null,
+                "DriverOpts": null,
+                "GwPriority": 0,
+                "NetworkID": "e1d264013083b42e40fa3e809bd30227fb4cbd2bffb418d308d165c0844f9f8d",
+                "EndpointID": "",
+                "Gateway": "",
+                "IPAddress": "",
+                "MacAddress": "",
+                "IPPrefixLen": 0,
+                "IPv6Gateway": "",
+                "GlobalIPv6Address": "",
+                "GlobalIPv6PrefixLen": 0,
+                "DNSNames": null
+              }
+            }
+          },
+          "ImageManifestDescriptor": {
+            "mediaType": "application/vnd.oci.image.manifest.v1+json",
+            "digest": "sha256:b4412b1394611108d6a660ea0f43dc041e246843dedfb679511451a4096c9b0d",
+            "size": 3546,
+            "platform": {
+              "architecture": "arm64",
+              "os": "linux"
+            }
+          }
+        },
+        "log": "{\"process_peak_rss_bytes\": 14856192, \"cgroup\": {\"cpu.stat\": \"usage_usec 60714\\nuser_usec 54434\\nsystem_usec 6280\\nnice_usec 0\\nnr_periods 1\\nnr_throttled 0\\nthrottled_usec 0\\nnr_bursts 0\\nburst_usec 0\\n\", \"memory.peak\": \"10379264\\n\", \"io.stat\": \"\"}}\n"
+      },
+      "sampled_state_bytes_max_including_exports": 96670225,
+      "settled_state_bytes": 96670225,
+      "settled_allocated_bytes": 96686080
+    },
+    "invalid-type": {
+      "image": "sha256:a3b867026c388fb48c670b399c2f2dad776bea0a793708bf37c7647f61a2997a",
+      "mounts": [
+        {
+          "Type": "bind",
+          "Source": "/host_mnt/Users/muzammil/github.com/muzammilar/examples/rayforce/duckdb-comparison/results/journal-corruption/33f49d9453db41769e0ef46e77d8995c/invalid-type/empty-input",
+          "Destination": "/data",
+          "Mode": "ro",
+          "RW": false,
+          "Propagation": "rprivate"
+        },
+        {
+          "Type": "volume",
+          "Name": "rayforce-journal-tail-ce9f30f66bbe4d58b091d3ce9187529a",
+          "Source": "/var/lib/docker/volumes/rayforce-journal-tail-ce9f30f66bbe4d58b091d3ce9187529a/_data",
+          "Destination": "/state",
+          "Driver": "local",
+          "Mode": "rw",
+          "RW": true,
+          "Propagation": ""
+        }
+      ],
+      "initialization": {
+        "volume": {
+          "CreatedAt": "2026-11-21T22:04:42Z",
+          "Driver": "local",
+          "Labels": {
+            "com.docker.compose.config-hash": "3cb76cfe06cf446668a76e640b04680574263cc180d2f1016f8b399385bd2337",
+            "com.docker.compose.project": "rayforce-duckdb-journal",
+            "com.docker.compose.version": "5.1.4",
+            "com.docker.compose.volume": "journal-data"
+          },
+          "Mountpoint": "/var/lib/docker/volumes/rayforce-journal-tail-ce9f30f66bbe4d58b091d3ce9187529a/_data",
+          "Name": "rayforce-journal-tail-ce9f30f66bbe4d58b091d3ce9187529a",
+          "Options": null,
+          "Scope": "local"
+        },
+        "inspection": {
+          "Id": "9c098868bd1ce0ab3019368072e4dec4291455a6d98485a832f113de7edcfcbc",
+          "Created": "2026-11-21T22:04:42.819351711Z",
+          "Path": "python",
+          "Args": [
+            "-c",
+            "import os,json,pathlib,resource; os.chmod('/state', 0o700); os.chown('/state', int(os.environ['LAB_UID']), int(os.environ['LAB_GID'])); print(json.dumps({'process_peak_rss_bytes':resource.getrusage(resource.RUSAGE_SELF).ru_maxrss*1024,'cgroup':{p:pathlib.Path('/sys/fs/cgroup',p).read_text() for p in ('cpu.stat','memory.peak','io.stat')}}))"
+          ],
+          "State": {
+            "Status": "exited",
+            "Running": false,
+            "Paused": false,
+            "Restarting": false,
+            "OOMKilled": false,
+            "Dead": false,
+            "Pid": 0,
+            "ExitCode": 0,
+            "Error": "",
+            "StartedAt": "2026-11-21T22:04:42.925307711Z",
+            "FinishedAt": "2026-11-21T22:04:43.031603086Z"
+          },
+          "Image": "sha256:a3b867026c388fb48c670b399c2f2dad776bea0a793708bf37c7647f61a2997a",
+          "ResolvConfPath": "/var/lib/docker/containers/9c098868bd1ce0ab3019368072e4dec4291455a6d98485a832f113de7edcfcbc/resolv.conf",
+          "HostnamePath": "/var/lib/docker/containers/9c098868bd1ce0ab3019368072e4dec4291455a6d98485a832f113de7edcfcbc/hostname",
+          "HostsPath": "/var/lib/docker/containers/9c098868bd1ce0ab3019368072e4dec4291455a6d98485a832f113de7edcfcbc/hosts",
+          "LogPath": "/var/lib/docker/containers/9c098868bd1ce0ab3019368072e4dec4291455a6d98485a832f113de7edcfcbc/9c098868bd1ce0ab3019368072e4dec4291455a6d98485a832f113de7edcfcbc-json.log",
+          "Name": "/rayforce-duckdb-journal-init-volume-1",
+          "RestartCount": 0,
+          "Driver": "overlayfs",
+          "Platform": "linux",
+          "MountLabel": "",
+          "ProcessLabel": "",
+          "AppArmorProfile": "",
+          "ExecIDs": null,
+          "HostConfig": {
+            "Binds": [
+              "rayforce-journal-tail-ce9f30f66bbe4d58b091d3ce9187529a:/state:rw"
+            ],
+            "ContainerIDFile": "",
+            "LogConfig": {
+              "Type": "json-file",
+              "Config": {}
+            },
+            "NetworkMode": "none",
+            "PortBindings": {},
+            "RestartPolicy": {
+              "Name": "no",
+              "MaximumRetryCount": 0
+            },
+            "AutoRemove": false,
+            "VolumeDriver": "",
+            "VolumesFrom": null,
+            "ConsoleSize": [
+              0,
+              0
+            ],
+            "CapAdd": [
+              "CAP_CHOWN"
+            ],
+            "CapDrop": [
+              "ALL"
+            ],
+            "CgroupnsMode": "private",
+            "Dns": null,
+            "DnsOptions": null,
+            "DnsSearch": null,
+            "ExtraHosts": [],
+            "GroupAdd": null,
+            "IpcMode": "private",
+            "Cgroup": "",
+            "Links": null,
+            "OomScoreAdj": 0,
+            "PidMode": "",
+            "Privileged": false,
+            "PublishAllPorts": false,
+            "ReadonlyRootfs": true,
+            "SecurityOpt": [
+              "no-new-privileges:true"
+            ],
+            "UTSMode": "",
+            "UsernsMode": "",
+            "ShmSize": 67108864,
+            "Runtime": "runc",
+            "Isolation": "",
+            "CpuShares": 0,
+            "Memory": 536870912,
+            "NanoCpus": 1000000000,
+            "CgroupParent": "",
+            "BlkioWeight": 0,
+            "BlkioWeightDevice": null,
+            "BlkioDeviceReadBps": null,
+            "BlkioDeviceWriteBps": null,
+            "BlkioDeviceReadIOps": null,
+            "BlkioDeviceWriteIOps": null,
+            "CpuPeriod": 0,
+            "CpuQuota": 0,
+            "CpuRealtimePeriod": 0,
+            "CpuRealtimeRuntime": 0,
+            "CpusetCpus": "",
+            "CpusetMems": "",
+            "Devices": null,
+            "DeviceCgroupRules": null,
+            "DeviceRequests": null,
+            "MemoryReservation": 0,
+            "MemorySwap": 536870912,
+            "MemorySwappiness": null,
+            "OomKillDisable": null,
+            "PidsLimit": null,
+            "Ulimits": null,
+            "CpuCount": 0,
+            "CpuPercent": 0,
+            "IOMaximumIOps": 0,
+            "IOMaximumBandwidth": 0,
+            "MaskedPaths": [
+              "/proc/acpi",
+              "/proc/asound",
+              "/proc/interrupts",
+              "/proc/kcore",
+              "/proc/keys",
+              "/proc/latency_stats",
+              "/proc/sched_debug",
+              "/proc/scsi",
+              "/proc/timer_list",
+              "/proc/timer_stats",
+              "/sys/devices/virtual/powercap",
+              "/sys/firmware"
+            ],
+            "ReadonlyPaths": [
+              "/proc/bus",
+              "/proc/fs",
+              "/proc/irq",
+              "/proc/sys",
+              "/proc/sysrq-trigger"
+            ]
+          },
+          "Storage": {
+            "RootFS": {
+              "Snapshot": {
+                "Name": "overlayfs"
+              }
+            }
+          },
+          "Mounts": [
+            {
+              "Type": "volume",
+              "Name": "rayforce-journal-tail-ce9f30f66bbe4d58b091d3ce9187529a",
+              "Source": "/var/lib/docker/volumes/rayforce-journal-tail-ce9f30f66bbe4d58b091d3ce9187529a/_data",
+              "Destination": "/state",
+              "Driver": "local",
+              "Mode": "rw",
+              "RW": true,
+              "Propagation": ""
+            }
+          ],
+          "Config": {
+            "Hostname": "9c098868bd1c",
+            "Domainname": "",
+            "User": "0:0",
+            "AttachStdin": false,
+            "AttachStdout": true,
+            "AttachStderr": true,
+            "Tty": false,
+            "OpenStdin": false,
+            "StdinOnce": false,
+            "Env": [
+              "LAB_GID=20",
+              "LAB_UID=501",
+              "PATH=/usr/local/cargo/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+              "LANG=C.UTF-8",
+              "GPG_KEY=7169605F62C751356D054A26A821E680E5FA6305",
+              "PYTHON_VERSION=3.12.12",
+              "PYTHON_SHA256=fb85a13414b028c49ba18bbd523c2d055a30b56b18b92ce454ea2c51edc656c4",
+              "RUSTUP_HOME=/usr/local/rustup",
+              "CARGO_HOME=/usr/local/cargo",
+              "LD_LIBRARY_PATH=/opt/bench:/opt/rayforce/lib:/opt/duckdb/lib"
+            ],
+            "Cmd": [
+              "import os,json,pathlib,resource; os.chmod('/state', 0o700); os.chown('/state', int(os.environ['LAB_UID']), int(os.environ['LAB_GID'])); print(json.dumps({'process_peak_rss_bytes':resource.getrusage(resource.RUSAGE_SELF).ru_maxrss*1024,'cgroup':{p:pathlib.Path('/sys/fs/cgroup',p).read_text() for p in ('cpu.stat','memory.peak','io.stat')}}))"
+            ],
+            "Image": "rayforce-duckdb-analytics:dev",
+            "Volumes": null,
+            "WorkingDir": "/workload",
+            "Entrypoint": [
+              "python",
+              "-c"
+            ],
+            "Labels": {
+              "com.docker.compose.config-hash": "9024e7c4fd3d812e3901accc93428c6aa01829120aa54acf6ef6debdc266e282",
+              "com.docker.compose.container-number": "1",
+              "com.docker.compose.depends_on": "",
+              "com.docker.compose.image": "sha256:a3b867026c388fb48c670b399c2f2dad776bea0a793708bf37c7647f61a2997a",
+              "com.docker.compose.oneoff": "False",
+              "com.docker.compose.project": "rayforce-duckdb-journal",
+              "com.docker.compose.project.config_files": "/Users/muzammil/github.com/muzammilar/examples/rayforce/duckdb-comparison/docker-compose.journal.yml,/Users/muzammil/github.com/muzammilar/examples/rayforce/duckdb-comparison/docker-compose.journal-volume.yml,/Users/muzammil/github.com/muzammilar/examples/rayforce/duckdb-comparison/docker-compose.journal-tail.yml",
+              "com.docker.compose.project.working_dir": "/Users/muzammil/github.com/muzammilar/examples/rayforce/duckdb-comparison",
+              "com.docker.compose.service": "init-volume",
+              "com.docker.compose.version": "5.1.4"
+            },
+            "StopTimeout": 1
+          },
+          "NetworkSettings": {
+            "SandboxID": "",
+            "SandboxKey": "",
+            "Ports": {},
+            "Networks": {
+              "none": {
+                "IPAMConfig": null,
+                "Links": null,
+                "Aliases": null,
+                "DriverOpts": null,
+                "GwPriority": 0,
+                "NetworkID": "e1d264013083b42e40fa3e809bd30227fb4cbd2bffb418d308d165c0844f9f8d",
+                "EndpointID": "",
+                "Gateway": "",
+                "IPAddress": "",
+                "MacAddress": "",
+                "IPPrefixLen": 0,
+                "IPv6Gateway": "",
+                "GlobalIPv6Address": "",
+                "GlobalIPv6PrefixLen": 0,
+                "DNSNames": null
+              }
+            }
+          },
+          "ImageManifestDescriptor": {
+            "mediaType": "application/vnd.oci.image.manifest.v1+json",
+            "digest": "sha256:b4412b1394611108d6a660ea0f43dc041e246843dedfb679511451a4096c9b0d",
+            "size": 3546,
+            "platform": {
+              "architecture": "arm64",
+              "os": "linux"
+            }
+          }
+        },
+        "log": "{\"process_peak_rss_bytes\": 14852096, \"cgroup\": {\"cpu.stat\": \"usage_usec 60639\\nuser_usec 54575\\nsystem_usec 6063\\nnice_usec 0\\nnr_periods 0\\nnr_throttled 0\\nthrottled_usec 0\\nnr_bursts 0\\nburst_usec 0\\n\", \"memory.peak\": \"10366976\\n\", \"io.stat\": \"\"}}\n"
+      },
+      "sampled_state_bytes_max_including_exports": 96670225,
+      "settled_state_bytes": 96670225,
+      "settled_allocated_bytes": 96686080
+    },
+    "valid-literal-validation": {
+      "image": "sha256:a3b867026c388fb48c670b399c2f2dad776bea0a793708bf37c7647f61a2997a",
+      "mounts": [
+        {
+          "Type": "volume",
+          "Name": "rayforce-journal-tail-66a6e04e1ecc44a69ecaea6298acb0ef",
+          "Source": "/var/lib/docker/volumes/rayforce-journal-tail-66a6e04e1ecc44a69ecaea6298acb0ef/_data",
+          "Destination": "/state",
+          "Driver": "local",
+          "Mode": "rw",
+          "RW": true,
+          "Propagation": ""
+        },
+        {
+          "Type": "bind",
+          "Source": "/Users/muzammil/github.com/muzammilar/examples/rayforce/duckdb-comparison/results/journal-corruption/33f49d9453db41769e0ef46e77d8995c/valid-literal-validation/empty-input",
+          "Destination": "/data",
+          "Mode": "ro",
+          "RW": false,
+          "Propagation": "rprivate"
+        }
+      ],
+      "initialization": {
+        "volume": {
+          "CreatedAt": "2026-11-21T22:04:48Z",
+          "Driver": "local",
+          "Labels": {
+            "com.docker.compose.config-hash": "f3b7e6d52e65e6445cf828167c1ea092909ec39a5418ebc8b1df264b8996eee4",
+            "com.docker.compose.project": "rayforce-duckdb-journal",
+            "com.docker.compose.version": "5.1.4",
+            "com.docker.compose.volume": "journal-data"
+          },
+          "Mountpoint": "/var/lib/docker/volumes/rayforce-journal-tail-66a6e04e1ecc44a69ecaea6298acb0ef/_data",
+          "Name": "rayforce-journal-tail-66a6e04e1ecc44a69ecaea6298acb0ef",
+          "Options": null,
+          "Scope": "local"
+        },
+        "inspection": {
+          "Id": "cd47a427598bc9f9d6ecd39b0ed1b1b7920db30daa3fb387bc9142b1026e925c",
+          "Created": "2026-11-21T22:04:48.581312922Z",
+          "Path": "python",
+          "Args": [
+            "-c",
+            "import os,json,pathlib,resource; os.chmod('/state', 0o700); os.chown('/state', int(os.environ['LAB_UID']), int(os.environ['LAB_GID'])); print(json.dumps({'process_peak_rss_bytes':resource.getrusage(resource.RUSAGE_SELF).ru_maxrss*1024,'cgroup':{p:pathlib.Path('/sys/fs/cgroup',p).read_text() for p in ('cpu.stat','memory.peak','io.stat')}}))"
+          ],
+          "State": {
+            "Status": "exited",
+            "Running": false,
+            "Paused": false,
+            "Restarting": false,
+            "OOMKilled": false,
+            "Dead": false,
+            "Pid": 0,
+            "ExitCode": 0,
+            "Error": "",
+            "StartedAt": "2026-11-21T22:04:48.675026089Z",
+            "FinishedAt": "2026-11-21T22:04:48.779490131Z"
+          },
+          "Image": "sha256:a3b867026c388fb48c670b399c2f2dad776bea0a793708bf37c7647f61a2997a",
+          "ResolvConfPath": "/var/lib/docker/containers/cd47a427598bc9f9d6ecd39b0ed1b1b7920db30daa3fb387bc9142b1026e925c/resolv.conf",
+          "HostnamePath": "/var/lib/docker/containers/cd47a427598bc9f9d6ecd39b0ed1b1b7920db30daa3fb387bc9142b1026e925c/hostname",
+          "HostsPath": "/var/lib/docker/containers/cd47a427598bc9f9d6ecd39b0ed1b1b7920db30daa3fb387bc9142b1026e925c/hosts",
+          "LogPath": "/var/lib/docker/containers/cd47a427598bc9f9d6ecd39b0ed1b1b7920db30daa3fb387bc9142b1026e925c/cd47a427598bc9f9d6ecd39b0ed1b1b7920db30daa3fb387bc9142b1026e925c-json.log",
+          "Name": "/rayforce-duckdb-journal-init-volume-1",
+          "RestartCount": 0,
+          "Driver": "overlayfs",
+          "Platform": "linux",
+          "MountLabel": "",
+          "ProcessLabel": "",
+          "AppArmorProfile": "",
+          "ExecIDs": null,
+          "HostConfig": {
+            "Binds": [
+              "rayforce-journal-tail-66a6e04e1ecc44a69ecaea6298acb0ef:/state:rw"
+            ],
+            "ContainerIDFile": "",
+            "LogConfig": {
+              "Type": "json-file",
+              "Config": {}
+            },
+            "NetworkMode": "none",
+            "PortBindings": {},
+            "RestartPolicy": {
+              "Name": "no",
+              "MaximumRetryCount": 0
+            },
+            "AutoRemove": false,
+            "VolumeDriver": "",
+            "VolumesFrom": null,
+            "ConsoleSize": [
+              0,
+              0
+            ],
+            "CapAdd": [
+              "CAP_CHOWN"
+            ],
+            "CapDrop": [
+              "ALL"
+            ],
+            "CgroupnsMode": "private",
+            "Dns": null,
+            "DnsOptions": null,
+            "DnsSearch": null,
+            "ExtraHosts": [],
+            "GroupAdd": null,
+            "IpcMode": "private",
+            "Cgroup": "",
+            "Links": null,
+            "OomScoreAdj": 0,
+            "PidMode": "",
+            "Privileged": false,
+            "PublishAllPorts": false,
+            "ReadonlyRootfs": true,
+            "SecurityOpt": [
+              "no-new-privileges:true"
+            ],
+            "UTSMode": "",
+            "UsernsMode": "",
+            "ShmSize": 67108864,
+            "Runtime": "runc",
+            "Isolation": "",
+            "CpuShares": 0,
+            "Memory": 536870912,
+            "NanoCpus": 1000000000,
+            "CgroupParent": "",
+            "BlkioWeight": 0,
+            "BlkioWeightDevice": null,
+            "BlkioDeviceReadBps": null,
+            "BlkioDeviceWriteBps": null,
+            "BlkioDeviceReadIOps": null,
+            "BlkioDeviceWriteIOps": null,
+            "CpuPeriod": 0,
+            "CpuQuota": 0,
+            "CpuRealtimePeriod": 0,
+            "CpuRealtimeRuntime": 0,
+            "CpusetCpus": "",
+            "CpusetMems": "",
+            "Devices": null,
+            "DeviceCgroupRules": null,
+            "DeviceRequests": null,
+            "MemoryReservation": 0,
+            "MemorySwap": 536870912,
+            "MemorySwappiness": null,
+            "OomKillDisable": null,
+            "PidsLimit": null,
+            "Ulimits": null,
+            "CpuCount": 0,
+            "CpuPercent": 0,
+            "IOMaximumIOps": 0,
+            "IOMaximumBandwidth": 0,
+            "MaskedPaths": [
+              "/proc/acpi",
+              "/proc/asound",
+              "/proc/interrupts",
+              "/proc/kcore",
+              "/proc/keys",
+              "/proc/latency_stats",
+              "/proc/sched_debug",
+              "/proc/scsi",
+              "/proc/timer_list",
+              "/proc/timer_stats",
+              "/sys/devices/virtual/powercap",
+              "/sys/firmware"
+            ],
+            "ReadonlyPaths": [
+              "/proc/bus",
+              "/proc/fs",
+              "/proc/irq",
+              "/proc/sys",
+              "/proc/sysrq-trigger"
+            ]
+          },
+          "Storage": {
+            "RootFS": {
+              "Snapshot": {
+                "Name": "overlayfs"
+              }
+            }
+          },
+          "Mounts": [
+            {
+              "Type": "volume",
+              "Name": "rayforce-journal-tail-66a6e04e1ecc44a69ecaea6298acb0ef",
+              "Source": "/var/lib/docker/volumes/rayforce-journal-tail-66a6e04e1ecc44a69ecaea6298acb0ef/_data",
+              "Destination": "/state",
+              "Driver": "local",
+              "Mode": "rw",
+              "RW": true,
+              "Propagation": ""
+            }
+          ],
+          "Config": {
+            "Hostname": "cd47a427598b",
+            "Domainname": "",
+            "User": "0:0",
+            "AttachStdin": false,
+            "AttachStdout": true,
+            "AttachStderr": true,
+            "Tty": false,
+            "OpenStdin": false,
+            "StdinOnce": false,
+            "Env": [
+              "LAB_GID=20",
+              "LAB_UID=501",
+              "PATH=/usr/local/cargo/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+              "LANG=C.UTF-8",
+              "GPG_KEY=7169605F62C751356D054A26A821E680E5FA6305",
+              "PYTHON_VERSION=3.12.12",
+              "PYTHON_SHA256=fb85a13414b028c49ba18bbd523c2d055a30b56b18b92ce454ea2c51edc656c4",
+              "RUSTUP_HOME=/usr/local/rustup",
+              "CARGO_HOME=/usr/local/cargo",
+              "LD_LIBRARY_PATH=/opt/bench:/opt/rayforce/lib:/opt/duckdb/lib"
+            ],
+            "Cmd": [
+              "import os,json,pathlib,resource; os.chmod('/state', 0o700); os.chown('/state', int(os.environ['LAB_UID']), int(os.environ['LAB_GID'])); print(json.dumps({'process_peak_rss_bytes':resource.getrusage(resource.RUSAGE_SELF).ru_maxrss*1024,'cgroup':{p:pathlib.Path('/sys/fs/cgroup',p).read_text() for p in ('cpu.stat','memory.peak','io.stat')}}))"
+            ],
+            "Image": "rayforce-duckdb-analytics:dev",
+            "Volumes": null,
+            "WorkingDir": "/workload",
+            "Entrypoint": [
+              "python",
+              "-c"
+            ],
+            "Labels": {
+              "com.docker.compose.config-hash": "9024e7c4fd3d812e3901accc93428c6aa01829120aa54acf6ef6debdc266e282",
+              "com.docker.compose.container-number": "1",
+              "com.docker.compose.depends_on": "",
+              "com.docker.compose.image": "sha256:a3b867026c388fb48c670b399c2f2dad776bea0a793708bf37c7647f61a2997a",
+              "com.docker.compose.oneoff": "False",
+              "com.docker.compose.project": "rayforce-duckdb-journal",
+              "com.docker.compose.project.config_files": "/Users/muzammil/github.com/muzammilar/examples/rayforce/duckdb-comparison/docker-compose.journal.yml,/Users/muzammil/github.com/muzammilar/examples/rayforce/duckdb-comparison/docker-compose.journal-volume.yml,/Users/muzammil/github.com/muzammilar/examples/rayforce/duckdb-comparison/docker-compose.journal-tail.yml",
+              "com.docker.compose.project.working_dir": "/Users/muzammil/github.com/muzammilar/examples/rayforce/duckdb-comparison",
+              "com.docker.compose.service": "init-volume",
+              "com.docker.compose.version": "5.1.4"
+            },
+            "StopTimeout": 1
+          },
+          "NetworkSettings": {
+            "SandboxID": "",
+            "SandboxKey": "",
+            "Ports": {},
+            "Networks": {
+              "none": {
+                "IPAMConfig": null,
+                "Links": null,
+                "Aliases": null,
+                "DriverOpts": null,
+                "GwPriority": 0,
+                "NetworkID": "e1d264013083b42e40fa3e809bd30227fb4cbd2bffb418d308d165c0844f9f8d",
+                "EndpointID": "",
+                "Gateway": "",
+                "IPAddress": "",
+                "MacAddress": "",
+                "IPPrefixLen": 0,
+                "IPv6Gateway": "",
+                "GlobalIPv6Address": "",
+                "GlobalIPv6PrefixLen": 0,
+                "DNSNames": null
+              }
+            }
+          },
+          "ImageManifestDescriptor": {
+            "mediaType": "application/vnd.oci.image.manifest.v1+json",
+            "digest": "sha256:b4412b1394611108d6a660ea0f43dc041e246843dedfb679511451a4096c9b0d",
+            "size": 3546,
+            "platform": {
+              "architecture": "arm64",
+              "os": "linux"
+            }
+          }
+        },
+        "log": "{\"process_peak_rss_bytes\": 14839808, \"cgroup\": {\"cpu.stat\": \"usage_usec 59605\\nuser_usec 54467\\nsystem_usec 5138\\nnice_usec 0\\nnr_periods 1\\nnr_throttled 0\\nthrottled_usec 0\\nnr_bursts 0\\nburst_usec 0\\n\", \"memory.peak\": \"10407936\\n\", \"io.stat\": \"\"}}\n"
+      },
+      "sampled_state_bytes_max_including_exports": 96670225,
+      "settled_state_bytes": 96670225,
+      "settled_allocated_bytes": 96686080
+    },
+    "valid-literal": {
+      "image": "sha256:a3b867026c388fb48c670b399c2f2dad776bea0a793708bf37c7647f61a2997a",
+      "mounts": [
+        {
+          "Type": "volume",
+          "Name": "rayforce-journal-tail-067f8ef2a8784ee3867e80a31000d215",
+          "Source": "/var/lib/docker/volumes/rayforce-journal-tail-067f8ef2a8784ee3867e80a31000d215/_data",
+          "Destination": "/state",
+          "Driver": "local",
+          "Mode": "rw",
+          "RW": true,
+          "Propagation": ""
+        },
+        {
+          "Type": "bind",
+          "Source": "/host_mnt/Users/muzammil/github.com/muzammilar/examples/rayforce/duckdb-comparison/results/journal-corruption/33f49d9453db41769e0ef46e77d8995c/valid-literal/empty-input",
+          "Destination": "/data",
+          "Mode": "ro",
+          "RW": false,
+          "Propagation": "rprivate"
+        }
+      ],
+      "initialization": {
+        "volume": {
+          "CreatedAt": "2026-11-21T22:04:51Z",
+          "Driver": "local",
+          "Labels": {
+            "com.docker.compose.config-hash": "b55f2dee9496f0fbddc1192462b0efbf107e519e8cf5a9b3b4c03c8f02dc24b6",
+            "com.docker.compose.project": "rayforce-duckdb-journal",
+            "com.docker.compose.version": "5.1.4",
+            "com.docker.compose.volume": "journal-data"
+          },
+          "Mountpoint": "/var/lib/docker/volumes/rayforce-journal-tail-067f8ef2a8784ee3867e80a31000d215/_data",
+          "Name": "rayforce-journal-tail-067f8ef2a8784ee3867e80a31000d215",
+          "Options": null,
+          "Scope": "local"
+        },
+        "inspection": {
+          "Id": "f8fea5c9f2e1fb9da1e61da358d9b21615b81366828f982375fcf7c4202f250d",
+          "Created": "2026-11-21T22:04:51.501070674Z",
+          "Path": "python",
+          "Args": [
+            "-c",
+            "import os,json,pathlib,resource; os.chmod('/state', 0o700); os.chown('/state', int(os.environ['LAB_UID']), int(os.environ['LAB_GID'])); print(json.dumps({'process_peak_rss_bytes':resource.getrusage(resource.RUSAGE_SELF).ru_maxrss*1024,'cgroup':{p:pathlib.Path('/sys/fs/cgroup',p).read_text() for p in ('cpu.stat','memory.peak','io.stat')}}))"
+          ],
+          "State": {
+            "Status": "exited",
+            "Running": false,
+            "Paused": false,
+            "Restarting": false,
+            "OOMKilled": false,
+            "Dead": false,
+            "Pid": 0,
+            "ExitCode": 0,
+            "Error": "",
+            "StartedAt": "2026-11-21T22:04:51.591890215Z",
+            "FinishedAt": "2026-11-21T22:04:51.694394841Z"
+          },
+          "Image": "sha256:a3b867026c388fb48c670b399c2f2dad776bea0a793708bf37c7647f61a2997a",
+          "ResolvConfPath": "/var/lib/docker/containers/f8fea5c9f2e1fb9da1e61da358d9b21615b81366828f982375fcf7c4202f250d/resolv.conf",
+          "HostnamePath": "/var/lib/docker/containers/f8fea5c9f2e1fb9da1e61da358d9b21615b81366828f982375fcf7c4202f250d/hostname",
+          "HostsPath": "/var/lib/docker/containers/f8fea5c9f2e1fb9da1e61da358d9b21615b81366828f982375fcf7c4202f250d/hosts",
+          "LogPath": "/var/lib/docker/containers/f8fea5c9f2e1fb9da1e61da358d9b21615b81366828f982375fcf7c4202f250d/f8fea5c9f2e1fb9da1e61da358d9b21615b81366828f982375fcf7c4202f250d-json.log",
+          "Name": "/rayforce-duckdb-journal-init-volume-1",
+          "RestartCount": 0,
+          "Driver": "overlayfs",
+          "Platform": "linux",
+          "MountLabel": "",
+          "ProcessLabel": "",
+          "AppArmorProfile": "",
+          "ExecIDs": null,
+          "HostConfig": {
+            "Binds": [
+              "rayforce-journal-tail-067f8ef2a8784ee3867e80a31000d215:/state:rw"
+            ],
+            "ContainerIDFile": "",
+            "LogConfig": {
+              "Type": "json-file",
+              "Config": {}
+            },
+            "NetworkMode": "none",
+            "PortBindings": {},
+            "RestartPolicy": {
+              "Name": "no",
+              "MaximumRetryCount": 0
+            },
+            "AutoRemove": false,
+            "VolumeDriver": "",
+            "VolumesFrom": null,
+            "ConsoleSize": [
+              0,
+              0
+            ],
+            "CapAdd": [
+              "CAP_CHOWN"
+            ],
+            "CapDrop": [
+              "ALL"
+            ],
+            "CgroupnsMode": "private",
+            "Dns": null,
+            "DnsOptions": null,
+            "DnsSearch": null,
+            "ExtraHosts": [],
+            "GroupAdd": null,
+            "IpcMode": "private",
+            "Cgroup": "",
+            "Links": null,
+            "OomScoreAdj": 0,
+            "PidMode": "",
+            "Privileged": false,
+            "PublishAllPorts": false,
+            "ReadonlyRootfs": true,
+            "SecurityOpt": [
+              "no-new-privileges:true"
+            ],
+            "UTSMode": "",
+            "UsernsMode": "",
+            "ShmSize": 67108864,
+            "Runtime": "runc",
+            "Isolation": "",
+            "CpuShares": 0,
+            "Memory": 536870912,
+            "NanoCpus": 1000000000,
+            "CgroupParent": "",
+            "BlkioWeight": 0,
+            "BlkioWeightDevice": null,
+            "BlkioDeviceReadBps": null,
+            "BlkioDeviceWriteBps": null,
+            "BlkioDeviceReadIOps": null,
+            "BlkioDeviceWriteIOps": null,
+            "CpuPeriod": 0,
+            "CpuQuota": 0,
+            "CpuRealtimePeriod": 0,
+            "CpuRealtimeRuntime": 0,
+            "CpusetCpus": "",
+            "CpusetMems": "",
+            "Devices": null,
+            "DeviceCgroupRules": null,
+            "DeviceRequests": null,
+            "MemoryReservation": 0,
+            "MemorySwap": 536870912,
+            "MemorySwappiness": null,
+            "OomKillDisable": null,
+            "PidsLimit": null,
+            "Ulimits": null,
+            "CpuCount": 0,
+            "CpuPercent": 0,
+            "IOMaximumIOps": 0,
+            "IOMaximumBandwidth": 0,
+            "MaskedPaths": [
+              "/proc/acpi",
+              "/proc/asound",
+              "/proc/interrupts",
+              "/proc/kcore",
+              "/proc/keys",
+              "/proc/latency_stats",
+              "/proc/sched_debug",
+              "/proc/scsi",
+              "/proc/timer_list",
+              "/proc/timer_stats",
+              "/sys/devices/virtual/powercap",
+              "/sys/firmware"
+            ],
+            "ReadonlyPaths": [
+              "/proc/bus",
+              "/proc/fs",
+              "/proc/irq",
+              "/proc/sys",
+              "/proc/sysrq-trigger"
+            ]
+          },
+          "Storage": {
+            "RootFS": {
+              "Snapshot": {
+                "Name": "overlayfs"
+              }
+            }
+          },
+          "Mounts": [
+            {
+              "Type": "volume",
+              "Name": "rayforce-journal-tail-067f8ef2a8784ee3867e80a31000d215",
+              "Source": "/var/lib/docker/volumes/rayforce-journal-tail-067f8ef2a8784ee3867e80a31000d215/_data",
+              "Destination": "/state",
+              "Driver": "local",
+              "Mode": "rw",
+              "RW": true,
+              "Propagation": ""
+            }
+          ],
+          "Config": {
+            "Hostname": "f8fea5c9f2e1",
+            "Domainname": "",
+            "User": "0:0",
+            "AttachStdin": false,
+            "AttachStdout": true,
+            "AttachStderr": true,
+            "Tty": false,
+            "OpenStdin": false,
+            "StdinOnce": false,
+            "Env": [
+              "LAB_UID=501",
+              "LAB_GID=20",
+              "PATH=/usr/local/cargo/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+              "LANG=C.UTF-8",
+              "GPG_KEY=7169605F62C751356D054A26A821E680E5FA6305",
+              "PYTHON_VERSION=3.12.12",
+              "PYTHON_SHA256=fb85a13414b028c49ba18bbd523c2d055a30b56b18b92ce454ea2c51edc656c4",
+              "RUSTUP_HOME=/usr/local/rustup",
+              "CARGO_HOME=/usr/local/cargo",
+              "LD_LIBRARY_PATH=/opt/bench:/opt/rayforce/lib:/opt/duckdb/lib"
+            ],
+            "Cmd": [
+              "import os,json,pathlib,resource; os.chmod('/state', 0o700); os.chown('/state', int(os.environ['LAB_UID']), int(os.environ['LAB_GID'])); print(json.dumps({'process_peak_rss_bytes':resource.getrusage(resource.RUSAGE_SELF).ru_maxrss*1024,'cgroup':{p:pathlib.Path('/sys/fs/cgroup',p).read_text() for p in ('cpu.stat','memory.peak','io.stat')}}))"
+            ],
+            "Image": "rayforce-duckdb-analytics:dev",
+            "Volumes": null,
+            "WorkingDir": "/workload",
+            "Entrypoint": [
+              "python",
+              "-c"
+            ],
+            "Labels": {
+              "com.docker.compose.config-hash": "9024e7c4fd3d812e3901accc93428c6aa01829120aa54acf6ef6debdc266e282",
+              "com.docker.compose.container-number": "1",
+              "com.docker.compose.depends_on": "",
+              "com.docker.compose.image": "sha256:a3b867026c388fb48c670b399c2f2dad776bea0a793708bf37c7647f61a2997a",
+              "com.docker.compose.oneoff": "False",
+              "com.docker.compose.project": "rayforce-duckdb-journal",
+              "com.docker.compose.project.config_files": "/Users/muzammil/github.com/muzammilar/examples/rayforce/duckdb-comparison/docker-compose.journal.yml,/Users/muzammil/github.com/muzammilar/examples/rayforce/duckdb-comparison/docker-compose.journal-volume.yml,/Users/muzammil/github.com/muzammilar/examples/rayforce/duckdb-comparison/docker-compose.journal-tail.yml",
+              "com.docker.compose.project.working_dir": "/Users/muzammil/github.com/muzammilar/examples/rayforce/duckdb-comparison",
+              "com.docker.compose.service": "init-volume",
+              "com.docker.compose.version": "5.1.4"
+            },
+            "StopTimeout": 1
+          },
+          "NetworkSettings": {
+            "SandboxID": "",
+            "SandboxKey": "",
+            "Ports": {},
+            "Networks": {
+              "none": {
+                "IPAMConfig": null,
+                "Links": null,
+                "Aliases": null,
+                "DriverOpts": null,
+                "GwPriority": 0,
+                "NetworkID": "e1d264013083b42e40fa3e809bd30227fb4cbd2bffb418d308d165c0844f9f8d",
+                "EndpointID": "",
+                "Gateway": "",
+                "IPAddress": "",
+                "MacAddress": "",
+                "IPPrefixLen": 0,
+                "IPv6Gateway": "",
+                "GlobalIPv6Address": "",
+                "GlobalIPv6PrefixLen": 0,
+                "DNSNames": null
+              }
+            }
+          },
+          "ImageManifestDescriptor": {
+            "mediaType": "application/vnd.oci.image.manifest.v1+json",
+            "digest": "sha256:b4412b1394611108d6a660ea0f43dc041e246843dedfb679511451a4096c9b0d",
+            "size": 3546,
+            "platform": {
+              "architecture": "arm64",
+              "os": "linux"
+            }
+          }
+        },
+        "log": "{\"process_peak_rss_bytes\": 14852096, \"cgroup\": {\"cpu.stat\": \"usage_usec 62441\\nuser_usec 56197\\nsystem_usec 6244\\nnice_usec 0\\nnr_periods 0\\nnr_throttled 0\\nthrottled_usec 0\\nnr_bursts 0\\nburst_usec 0\\n\", \"memory.peak\": \"10395648\\n\", \"io.stat\": \"\"}}\n"
+      },
+      "sampled_state_bytes_max_including_exports": 202578603,
+      "settled_state_bytes": 202578603,
+      "settled_allocated_bytes": 202600448
+    },
+    "backup": {
+      "image": "sha256:a3b867026c388fb48c670b399c2f2dad776bea0a793708bf37c7647f61a2997a",
+      "mounts": [
+        {
+          "Type": "volume",
+          "Name": "rayforce-journal-tail-669ce5c4dfcc4027a6033e15b8bf7ac2",
+          "Source": "/var/lib/docker/volumes/rayforce-journal-tail-669ce5c4dfcc4027a6033e15b8bf7ac2/_data",
+          "Destination": "/state",
+          "Driver": "local",
+          "Mode": "rw",
+          "RW": true,
+          "Propagation": ""
+        },
+        {
+          "Type": "bind",
+          "Source": "/host_mnt/Users/muzammil/github.com/muzammilar/examples/rayforce/duckdb-comparison/results/journal-corruption/33f49d9453db41769e0ef46e77d8995c/backup/empty-input",
+          "Destination": "/data",
+          "Mode": "ro",
+          "RW": false,
+          "Propagation": "rprivate"
+        }
+      ],
+      "initialization": {
+        "volume": {
+          "CreatedAt": "2026-11-21T22:05:01Z",
+          "Driver": "local",
+          "Labels": {
+            "com.docker.compose.config-hash": "7a54e29ec51c05bf49acc128bcbcafe2a245dacb6906bea2f7c53ae7fdfc9c7f",
+            "com.docker.compose.project": "rayforce-duckdb-journal",
+            "com.docker.compose.version": "5.1.4",
+            "com.docker.compose.volume": "journal-data"
+          },
+          "Mountpoint": "/var/lib/docker/volumes/rayforce-journal-tail-669ce5c4dfcc4027a6033e15b8bf7ac2/_data",
+          "Name": "rayforce-journal-tail-669ce5c4dfcc4027a6033e15b8bf7ac2",
+          "Options": null,
+          "Scope": "local"
+        },
+        "inspection": {
+          "Id": "b14a73e53c4014839a2a9f2c7e2d68df6e2830829ade5be1c5606a666f294be4",
+          "Created": "2026-11-21T22:05:01.566491845Z",
+          "Path": "python",
+          "Args": [
+            "-c",
+            "import os,json,pathlib,resource; os.chmod('/state', 0o700); os.chown('/state', int(os.environ['LAB_UID']), int(os.environ['LAB_GID'])); print(json.dumps({'process_peak_rss_bytes':resource.getrusage(resource.RUSAGE_SELF).ru_maxrss*1024,'cgroup':{p:pathlib.Path('/sys/fs/cgroup',p).read_text() for p in ('cpu.stat','memory.peak','io.stat')}}))"
+          ],
+          "State": {
+            "Status": "exited",
+            "Running": false,
+            "Paused": false,
+            "Restarting": false,
+            "OOMKilled": false,
+            "Dead": false,
+            "Pid": 0,
+            "ExitCode": 0,
+            "Error": "",
+            "StartedAt": "2026-11-21T22:05:01.657385012Z",
+            "FinishedAt": "2026-11-21T22:05:01.76528922Z"
+          },
+          "Image": "sha256:a3b867026c388fb48c670b399c2f2dad776bea0a793708bf37c7647f61a2997a",
+          "ResolvConfPath": "/var/lib/docker/containers/b14a73e53c4014839a2a9f2c7e2d68df6e2830829ade5be1c5606a666f294be4/resolv.conf",
+          "HostnamePath": "/var/lib/docker/containers/b14a73e53c4014839a2a9f2c7e2d68df6e2830829ade5be1c5606a666f294be4/hostname",
+          "HostsPath": "/var/lib/docker/containers/b14a73e53c4014839a2a9f2c7e2d68df6e2830829ade5be1c5606a666f294be4/hosts",
+          "LogPath": "/var/lib/docker/containers/b14a73e53c4014839a2a9f2c7e2d68df6e2830829ade5be1c5606a666f294be4/b14a73e53c4014839a2a9f2c7e2d68df6e2830829ade5be1c5606a666f294be4-json.log",
+          "Name": "/rayforce-duckdb-journal-init-volume-1",
+          "RestartCount": 0,
+          "Driver": "overlayfs",
+          "Platform": "linux",
+          "MountLabel": "",
+          "ProcessLabel": "",
+          "AppArmorProfile": "",
+          "ExecIDs": null,
+          "HostConfig": {
+            "Binds": [
+              "rayforce-journal-tail-669ce5c4dfcc4027a6033e15b8bf7ac2:/state:rw"
+            ],
+            "ContainerIDFile": "",
+            "LogConfig": {
+              "Type": "json-file",
+              "Config": {}
+            },
+            "NetworkMode": "none",
+            "PortBindings": {},
+            "RestartPolicy": {
+              "Name": "no",
+              "MaximumRetryCount": 0
+            },
+            "AutoRemove": false,
+            "VolumeDriver": "",
+            "VolumesFrom": null,
+            "ConsoleSize": [
+              0,
+              0
+            ],
+            "CapAdd": [
+              "CAP_CHOWN"
+            ],
+            "CapDrop": [
+              "ALL"
+            ],
+            "CgroupnsMode": "private",
+            "Dns": null,
+            "DnsOptions": null,
+            "DnsSearch": null,
+            "ExtraHosts": [],
+            "GroupAdd": null,
+            "IpcMode": "private",
+            "Cgroup": "",
+            "Links": null,
+            "OomScoreAdj": 0,
+            "PidMode": "",
+            "Privileged": false,
+            "PublishAllPorts": false,
+            "ReadonlyRootfs": true,
+            "SecurityOpt": [
+              "no-new-privileges:true"
+            ],
+            "UTSMode": "",
+            "UsernsMode": "",
+            "ShmSize": 67108864,
+            "Runtime": "runc",
+            "Isolation": "",
+            "CpuShares": 0,
+            "Memory": 536870912,
+            "NanoCpus": 1000000000,
+            "CgroupParent": "",
+            "BlkioWeight": 0,
+            "BlkioWeightDevice": null,
+            "BlkioDeviceReadBps": null,
+            "BlkioDeviceWriteBps": null,
+            "BlkioDeviceReadIOps": null,
+            "BlkioDeviceWriteIOps": null,
+            "CpuPeriod": 0,
+            "CpuQuota": 0,
+            "CpuRealtimePeriod": 0,
+            "CpuRealtimeRuntime": 0,
+            "CpusetCpus": "",
+            "CpusetMems": "",
+            "Devices": null,
+            "DeviceCgroupRules": null,
+            "DeviceRequests": null,
+            "MemoryReservation": 0,
+            "MemorySwap": 536870912,
+            "MemorySwappiness": null,
+            "OomKillDisable": null,
+            "PidsLimit": null,
+            "Ulimits": null,
+            "CpuCount": 0,
+            "CpuPercent": 0,
+            "IOMaximumIOps": 0,
+            "IOMaximumBandwidth": 0,
+            "MaskedPaths": [
+              "/proc/acpi",
+              "/proc/asound",
+              "/proc/interrupts",
+              "/proc/kcore",
+              "/proc/keys",
+              "/proc/latency_stats",
+              "/proc/sched_debug",
+              "/proc/scsi",
+              "/proc/timer_list",
+              "/proc/timer_stats",
+              "/sys/devices/virtual/powercap",
+              "/sys/firmware"
+            ],
+            "ReadonlyPaths": [
+              "/proc/bus",
+              "/proc/fs",
+              "/proc/irq",
+              "/proc/sys",
+              "/proc/sysrq-trigger"
+            ]
+          },
+          "Storage": {
+            "RootFS": {
+              "Snapshot": {
+                "Name": "overlayfs"
+              }
+            }
+          },
+          "Mounts": [
+            {
+              "Type": "volume",
+              "Name": "rayforce-journal-tail-669ce5c4dfcc4027a6033e15b8bf7ac2",
+              "Source": "/var/lib/docker/volumes/rayforce-journal-tail-669ce5c4dfcc4027a6033e15b8bf7ac2/_data",
+              "Destination": "/state",
+              "Driver": "local",
+              "Mode": "rw",
+              "RW": true,
+              "Propagation": ""
+            }
+          ],
+          "Config": {
+            "Hostname": "b14a73e53c40",
+            "Domainname": "",
+            "User": "0:0",
+            "AttachStdin": false,
+            "AttachStdout": true,
+            "AttachStderr": true,
+            "Tty": false,
+            "OpenStdin": false,
+            "StdinOnce": false,
+            "Env": [
+              "LAB_GID=20",
+              "LAB_UID=501",
+              "PATH=/usr/local/cargo/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+              "LANG=C.UTF-8",
+              "GPG_KEY=7169605F62C751356D054A26A821E680E5FA6305",
+              "PYTHON_VERSION=3.12.12",
+              "PYTHON_SHA256=fb85a13414b028c49ba18bbd523c2d055a30b56b18b92ce454ea2c51edc656c4",
+              "RUSTUP_HOME=/usr/local/rustup",
+              "CARGO_HOME=/usr/local/cargo",
+              "LD_LIBRARY_PATH=/opt/bench:/opt/rayforce/lib:/opt/duckdb/lib"
+            ],
+            "Cmd": [
+              "import os,json,pathlib,resource; os.chmod('/state', 0o700); os.chown('/state', int(os.environ['LAB_UID']), int(os.environ['LAB_GID'])); print(json.dumps({'process_peak_rss_bytes':resource.getrusage(resource.RUSAGE_SELF).ru_maxrss*1024,'cgroup':{p:pathlib.Path('/sys/fs/cgroup',p).read_text() for p in ('cpu.stat','memory.peak','io.stat')}}))"
+            ],
+            "Image": "rayforce-duckdb-analytics:dev",
+            "Volumes": null,
+            "WorkingDir": "/workload",
+            "Entrypoint": [
+              "python",
+              "-c"
+            ],
+            "Labels": {
+              "com.docker.compose.config-hash": "9024e7c4fd3d812e3901accc93428c6aa01829120aa54acf6ef6debdc266e282",
+              "com.docker.compose.container-number": "1",
+              "com.docker.compose.depends_on": "",
+              "com.docker.compose.image": "sha256:a3b867026c388fb48c670b399c2f2dad776bea0a793708bf37c7647f61a2997a",
+              "com.docker.compose.oneoff": "False",
+              "com.docker.compose.project": "rayforce-duckdb-journal",
+              "com.docker.compose.project.config_files": "/Users/muzammil/github.com/muzammilar/examples/rayforce/duckdb-comparison/docker-compose.journal.yml,/Users/muzammil/github.com/muzammilar/examples/rayforce/duckdb-comparison/docker-compose.journal-volume.yml,/Users/muzammil/github.com/muzammilar/examples/rayforce/duckdb-comparison/docker-compose.journal-tail.yml",
+              "com.docker.compose.project.working_dir": "/Users/muzammil/github.com/muzammilar/examples/rayforce/duckdb-comparison",
+              "com.docker.compose.service": "init-volume",
+              "com.docker.compose.version": "5.1.4"
+            },
+            "StopTimeout": 1
+          },
+          "NetworkSettings": {
+            "SandboxID": "",
+            "SandboxKey": "",
+            "Ports": {},
+            "Networks": {
+              "none": {
+                "IPAMConfig": null,
+                "Links": null,
+                "Aliases": null,
+                "DriverOpts": null,
+                "GwPriority": 0,
+                "NetworkID": "e1d264013083b42e40fa3e809bd30227fb4cbd2bffb418d308d165c0844f9f8d",
+                "EndpointID": "",
+                "Gateway": "",
+                "IPAddress": "",
+                "MacAddress": "",
+                "IPPrefixLen": 0,
+                "IPv6Gateway": "",
+                "GlobalIPv6Address": "",
+                "GlobalIPv6PrefixLen": 0,
+                "DNSNames": null
+              }
+            }
+          },
+          "ImageManifestDescriptor": {
+            "mediaType": "application/vnd.oci.image.manifest.v1+json",
+            "digest": "sha256:b4412b1394611108d6a660ea0f43dc041e246843dedfb679511451a4096c9b0d",
+            "size": 3546,
+            "platform": {
+              "architecture": "arm64",
+              "os": "linux"
+            }
+          }
+        },
+        "log": "{\"process_peak_rss_bytes\": 14823424, \"cgroup\": {\"cpu.stat\": \"usage_usec 65797\\nuser_usec 55674\\nsystem_usec 10122\\nnice_usec 0\\nnr_periods 1\\nnr_throttled 0\\nthrottled_usec 0\\nnr_bursts 0\\nburst_usec 0\\n\", \"memory.peak\": \"10412032\\n\", \"io.stat\": \"\"}}\n"
+      },
+      "sampled_state_bytes_max_including_exports": 202578603,
+      "settled_state_bytes": 202578603,
+      "settled_allocated_bytes": 202600448
+    }
+  },
+  "runtime_image": {
+    "Id": "sha256:a3b867026c388fb48c670b399c2f2dad776bea0a793708bf37c7647f61a2997a",
+    "Architecture": "arm64",
+    "Os": "linux"
+  },
+  "retained_case_host_disk": {
+    "logical_bytes": 695572626,
+    "allocated_bytes": 695787520,
+    "scope": "All preserved corrupt/backup files, exports and raw evidence after volume deletion; source fixture/witness separate, reported blocks not exclusive physical extents."
+  },
+  "cleanup_verified": true,
+  "scope": "FAILED under the specified logical payload-edit fault model, not a failed normal process-crash guarantee or physical bit-rot test. Backup recovery passed independently; it does not turn the integrity violation into a pass.",
+  "publisher_sha256": "e0d6ba14aec973ff1d3ed66145e9a298d6b508608b474e206b0ba3d97400bd65"
+}

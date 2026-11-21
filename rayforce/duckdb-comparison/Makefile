@@ -20,7 +20,7 @@ up:
 test: check-controls
 	python3 experiment.py test
 check-controls:
-	python3 -m unittest test_controller.py test_ingestion.py test_persistence.py test_live_journal.py test_journal_tail.py
+	python3 -m unittest test_controller.py test_ingestion.py test_persistence.py test_live_journal.py test_journal_tail.py test_journal_corruption.py
 benchmark:
 	python3 experiment.py benchmark
 down:
@@ -74,6 +74,10 @@ test-lock-filesystem-bind:
 test-production: check-controls
 	JOURNAL_STORAGE=volume JOURNAL_SCENARIO=process-crash python3 production.py
 
+.PHONY: test-production-recovery
+test-production-recovery: check-controls
+	JOURNAL_STORAGE=volume JOURNAL_SCENARIO=process-crash python3 production.py --profile recovery
+
 JOURNAL_RESULT ?=
 report-journal:
 	@test -n "$(JOURNAL_RESULT)" || { echo 'Set JOURNAL_RESULT to an explicit journal-live result directory'; exit 1; }
@@ -101,3 +105,14 @@ TAIL_RESULT ?=
 report-journal-tail:
 	@test -n "$(TAIL_RESULT)" || { echo 'Set TAIL_RESULT to an explicit journal-tail result directory'; exit 1; }
 	python3 publish_tail_results.py "$(TAIL_RESULT)"
+
+.PHONY: test-journal-interior-corruption
+test-journal-interior-corruption: check-controls
+	@test -n "$(JOURNAL_SOURCE)" || { echo 'Set JOURNAL_SOURCE to a completed journal-live result directory'; exit 1; }
+	python3 journal_corruption.py "$(JOURNAL_SOURCE)"
+
+CORRUPTION_RESULT ?=
+.PHONY: report-journal-corruption
+report-journal-corruption:
+	@test -n "$(CORRUPTION_RESULT)" || { echo 'Set CORRUPTION_RESULT to an explicit journal-corruption directory'; exit 1; }
+	python3 publish_corruption_results.py "$(CORRUPTION_RESULT)"

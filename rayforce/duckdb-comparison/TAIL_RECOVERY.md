@@ -3,7 +3,7 @@
 Use the five-command lifecycle in [README.md](README.md). Before teardown:
 
 ```sh
-make test-production
+make test-production-recovery
 ```
 
 This serially runs native capability, filesystem locks, live writer exclusion,
@@ -116,7 +116,10 @@ I/O/storage/compression and cleanup proof. Selected raw case:
 `results/journal-live/43062c50ae894f24b520f2fdcd16d45d/`.
 Publish explicitly with
 `make report-journal-tail TAIL_RESULT=results/journal-tail/7b4cbea4ae054c6486497c70a84c4ff1`.
-The full serial workflow and **22 controller tests** passed. Earlier development
+The recorded six-case serial recovery workflow and **22 controller tests** passed.
+The default `make test-production` now adds [interior payload corruption](CORRUPTION.md)
+and returns nonzero for its recorded integrity failure; use the recovery-only
+target above for the six cases described here. Earlier development
 cases remain: two mount-alias safety refusals and a complete tail test against
 a different acknowledged source.
 The six-case receipt is [PRODUCTION_QUALIFICATION.json](PRODUCTION_QUALIFICATION.json).

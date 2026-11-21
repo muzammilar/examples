@@ -54,7 +54,7 @@ immutable snapshot checks do not qualify live journal or crash recovery.
 The separate [synchronous journal test](duckdb-comparison/JOURNAL.md) now recovers
 2,251 live ACKs and the full seed after two SIGKILLs, with independent writers,
 readers and an external witness. No acknowledged body loss was observed;
-asynchronous recovery, corruption, online backup and matched DuckDB recovery remain unrun.
+asynchronous recovery, online backup and matched DuckDB recovery remain unrun.
 An [offline snapshot/tail restore](duckdb-comparison/JOURNAL.md#offline-restore-into-separate-storage)
 also rebuilt every body in separate local storage without access to original input
 CSVs: 1,614 replayed entries, zero evaluation errors and zero ACK loss. This does
@@ -69,6 +69,14 @@ the two-crash volume rerun recovered all 2,255 ACKs with zero observed body loss
 [Controlled torn-tail recovery](duckdb-comparison/TAIL_RECOVERY.md) now rejects
 startup, validates 1,621 intact frames and removes only the known injected three
 bytes in a fresh copy. It restores 2,000,000 seed trades, 10,000 customers and
-2,262 live ACKs with zero missing/wrong bodies. `make test-production` creates
-its own recovery source and runs all implemented cases serially. Interior
-corruption and general-purpose production log repair remain unqualified.
+2,262 live ACKs with zero missing/wrong bodies. `make test-production-recovery`
+creates its own recovery source and runs the six recovery cases serially.
+
+The [interior payload-corruption probe](duckdb-comparison/CORRUPTION.md) exposes
+a **failed integrity boundary**: native replay accepts a validly encoded one-bit
+price change and returns one wrong acknowledged body. An invalid serialized type
+fails closed; an untouched backup restores all 2,000,000 seed trades, 10,000
+customers and 2,269 ACKs correctly. The default seven-case `make test-production`
+propagates this failure. This logical edit on a fenced copy does not establish
+physical bit-rot behavior or normal process-crash data loss. General corruption
+repair and the distinct native CRC-protected AOF API remain unqualified.

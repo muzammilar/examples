@@ -11,10 +11,10 @@ tests before teardown:
 ```sh
 make test-journal-capability  # native IPC/status/scalar replay gate
 make test-journal-recovery    # independent writer/reader through two SIGKILLs
-make test-production          # all cases, including fresh-source restore/tail repair
+make test-production-recovery # six recovery cases with fresh restore/tail source
 ```
 
-`test-production` also runs isolated restore and [controlled torn-tail recovery](TAIL_RECOVERY.md), creating their source in this example. Individual targets remain available for independent reruns.
+`test-production-recovery` runs six recovery cases including [controlled torn-tail recovery](TAIL_RECOVERY.md). The default `test-production` additionally runs [interior payload corruption](CORRUPTION.md), which currently fails integrity and exits nonzero. Individual targets remain available for independent reruns.
 
 `JOURNAL_BASELINE_S=10`, `JOURNAL_OUTAGE_S=5` and `JOURNAL_RECOVERY_S=15`
 are overridable; the second snapshot gets another baseline interval. These are
@@ -190,7 +190,7 @@ This is one authoritative local process, not replication/HA or physical power-lo
 testing. The equivalent DuckDB live application boundary remains unimplemented,
 so these results are **not a recovery/performance comparison with DuckDB**.
 Asynchronous journal/watermark recovery, interrupted snapshot publication,
-interior corruption, online backup/restore
+interior header/version damage, online backup/restore
 availability, isolated resource pressure and repeated sustained/cold performance
 remain unrun. Recovery did not delete or truncate any journal.
 

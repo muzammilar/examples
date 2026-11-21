@@ -7,7 +7,7 @@ independent and serial:
 make test-lock-filesystem          # standard flock, same/cross-container
 make test-journal-writer-lock      # ten native second-open attempts under load
 make test-journal-recovery         # two SIGKILL/replay cycles on the volume
-make test-production               # all above + fresh-source restore/tail repair
+make test-production-recovery      # all above + fresh-source restore/tail repair
 ```
 
 For the host-share diagnostic, use `make test-lock-filesystem-bind` and

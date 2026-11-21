@@ -1,0 +1,277 @@
+{
+  "command": "make test-production",
+  "profile": "all",
+  "controller_tests": 25,
+  "cases": [
+    {
+      "directory": "results/journal/5f183283560e43c1a869ff724d59ed68",
+      "result_sha256": "d3374db2260aaadcade55cabd4a272f35853974e188489e26f0049ae38d1f031",
+      "passed": true,
+      "scope": "One scalar synchronous native journal capability gate after fenced SIGKILL; no live reader/writer or power-loss qualification",
+      "proof": null,
+      "integrity_verdict": null
+    },
+    {
+      "directory": "results/lock-capability/aaf8b0cc9baf480d8dad409a1df3684a",
+      "result_sha256": "fc8437ffc0a4aac173be1a214b15b0f65059f439e8e3f20129bac4776094f2be",
+      "passed": true,
+      "scope": "Python standard fcntl.flock capability, not native database correctness or performance. Same inode/device are recorded. Empty lock file: zero payload/allocated bytes; data compression not applicable. Cgroup/process CPU/memory and block I/O recorded; physical host I/O unavailable.",
+      "proof": null,
+      "integrity_verdict": null
+    },
+    {
+      "directory": "results/journal-live/f4403e7143544e0e95c4bac5f944bdee",
+      "result_sha256": "facf06bd52284ffeebd8599f0854c3dc07d02c333ed40dbbb91ad3a4afefdc21",
+      "passed": true,
+      "scope": "Ten rejected cross-container journal opens under independent live writers/readers, unchanged authoritative process and complete body witness; not cross-host lease fencing or capacity",
+      "proof": {
+        "seed_rows_verified": 2000000,
+        "intents": 1149,
+        "acknowledged": 1149,
+        "live_rows_verified": 1149,
+        "applied_unacknowledged_intents": 0,
+        "acknowledged_loss": 0,
+        "wrong_or_duplicate_bodies": 0,
+        "export_sha256": "08f616082475baf92e95b50709f37b5ef410bb441e0bf9cad243715af9a4c137",
+        "customers": {
+          "sha256": "c3a160b85050e71c8ba465e2ca7a72d25bc4fbb076954f6c6f9c22fcaabadc95",
+          "bytes": 92663,
+          "verified_rows": 10000,
+          "allocated_bytes": 94208,
+          "compression": {
+            "codec": "gzip",
+            "level": 1,
+            "zlib": "1.3.2",
+            "uncompressed_bytes": 92663,
+            "compressed_bytes": 32777,
+            "ratio": 2.827073862769625,
+            "wall_ns": 371042,
+            "cpu_ns": 373000,
+            "scope": "Host-side compressibility of the verified CSV witness, streamed into a byte counter; not native engine compression. Timers cover compression calls, excluding file reads/hash/fsync."
+          }
+        }
+      },
+      "integrity_verdict": null
+    },
+    {
+      "directory": "results/journal-live/24d6436146ef4967a24bf47691548168",
+      "result_sha256": "a97e3b5298c2906901ad5355785d242dc54447cb268c07d934bad8798069c928",
+      "passed": true,
+      "scope": "Two retained-volume SIGKILL/replay cycles with live independent writers/readers, second snapshot plus tail; not capacity, HA, async journal, torn-tail or power-loss qualification",
+      "proof": {
+        "seed_rows_verified": 2000000,
+        "intents": 2773,
+        "acknowledged": 2269,
+        "live_rows_verified": 2269,
+        "applied_unacknowledged_intents": 0,
+        "acknowledged_loss": 0,
+        "wrong_or_duplicate_bodies": 0,
+        "export_sha256": "01f5c5f55aa2af9efbfa183d2ef5ac3ef91ebff19eae4a71557dd0f2f0570a22",
+        "customers": {
+          "sha256": "c3a160b85050e71c8ba465e2ca7a72d25bc4fbb076954f6c6f9c22fcaabadc95",
+          "bytes": 92663,
+          "verified_rows": 10000,
+          "allocated_bytes": 94208,
+          "compression": {
+            "codec": "gzip",
+            "level": 1,
+            "zlib": "1.3.2",
+            "uncompressed_bytes": 92663,
+            "compressed_bytes": 32777,
+            "ratio": 2.827073862769625,
+            "wall_ns": 370624,
+            "cpu_ns": 370000,
+            "scope": "Host-side compressibility of the verified CSV witness, streamed into a byte counter; not native engine compression. Timers cover compression calls, excluding file reads/hash/fsync."
+          }
+        }
+      },
+      "integrity_verdict": null
+    },
+    {
+      "directory": "results/journal-restore/51db94d6322d4f95a1a173234234d5db",
+      "result_sha256": "18a7fae0be5e7d23086e70d18abfea6cafd568c35da2bb4c02741f8b8a47affc",
+      "passed": true,
+      "scope": "Native snapshot plus journal-tail restore into separate local files, full independent old/ACK body oracle; offline verification, not live failover/backup availability or physical host loss",
+      "proof": {
+        "seed_rows_verified": 2000000,
+        "intents": 2773,
+        "acknowledged": 2269,
+        "live_rows_verified": 2269,
+        "applied_unacknowledged_intents": 0,
+        "acknowledged_loss": 0,
+        "wrong_or_duplicate_bodies": 0,
+        "export_sha256": "01f5c5f55aa2af9efbfa183d2ef5ac3ef91ebff19eae4a71557dd0f2f0570a22"
+      },
+      "integrity_verdict": null
+    },
+    {
+      "directory": "results/journal-tail/cb1b6bf5b2d743e9ad93210075c29367",
+      "result_sha256": "8d85daff40a8f4ad2af73e5e511b86de8886035a18dd0d90c0bbb10833b9ef15",
+      "passed": true,
+      "scope": "Controlled three-byte synthetic torn tail on an offline copy. Native fail-closed startup and validated-prefix repair into another fresh copy, zero original ACK loss. Does not justify truncating unknown production corruption or qualify interior-corruption repair.",
+      "proof": {
+        "seed_rows_verified": 2000000,
+        "intents": 2773,
+        "acknowledged": 2269,
+        "live_rows_verified": 2269,
+        "applied_unacknowledged_intents": 0,
+        "acknowledged_loss": 0,
+        "wrong_or_duplicate_bodies": 0,
+        "export_sha256": "01f5c5f55aa2af9efbfa183d2ef5ac3ef91ebff19eae4a71557dd0f2f0570a22"
+      },
+      "integrity_verdict": null
+    },
+    {
+      "directory": "results/journal-corruption/33f49d9453db41769e0ef46e77d8995c",
+      "result_sha256": "b8e2eae9492de153f389de1dacbd2184bfe45ac952b93768ad9a0303d6aecd7c",
+      "passed": false,
+      "scope": "Logical file-payload corruption beyond the healthy/process-crash contract. Native framing acceptance is not content integrity. Integrity failure remains FAILED despite successful backup recovery; no universal production/physical-media conclusion.",
+      "proof": {
+        "seed_rows_verified": 2000000,
+        "intents": 2773,
+        "acknowledged": 2269,
+        "live_rows_verified": 2269,
+        "applied_unacknowledged_intents": 0,
+        "acknowledged_loss": 0,
+        "wrong_or_duplicate_bodies": 0,
+        "export_sha256": "01f5c5f55aa2af9efbfa183d2ef5ac3ef91ebff19eae4a71557dd0f2f0570a22"
+      },
+      "integrity_verdict": "FAILED: validly encoded one-bit payload corruption replayed without native rejection and changed an acknowledged body"
+    }
+  ],
+  "passed": false,
+  "failed_integrity_cases": 1,
+  "scope": "Six recovery cases passed. Interior valid-literal logical payload edit produced one wrong acknowledged body; full production qualification FAILED under that fault model. Backup recovery inside that case passed independently. Not physical bit rot, normal process-crash loss or capacity qualification.",
+  "raw_log": "results/journal-production-with-interior.log",
+  "raw_log_sha256": "f59c918b92e60ca5bfffbdf564bbd2dcb26b89c86cba5624ebd54c553c103161",
+  "cleanup_verified_by_runner_and_corruption_publisher": true,
+  "compact_failure_evidence": "CORRUPTION_RESULTS.json",
+  "recovery_profile_rerun": {
+    "command": "make test-production-recovery",
+    "passed": true,
+    "cases": [
+      {
+        "directory": "results/journal/3c709bfeaf0b4193acb0f882607c978d",
+        "passed": true,
+        "result_sha256": "7a2066cba495a88857b2a8aab498098a1a247753eff37a68df5f4f1eb20e8d7a",
+        "proof": null
+      },
+      {
+        "directory": "results/lock-capability/ba32d5e5875c4519830621cda05fb2ce",
+        "passed": true,
+        "result_sha256": "bb7761c5eacdeac4b9fbbee2d29d24d6527a7f219f6fa9280fb87685138af187",
+        "proof": null
+      },
+      {
+        "directory": "results/journal-live/fb9d5a99267b4d2f94fbb6f6ebe7d685",
+        "passed": true,
+        "result_sha256": "57cf4096fa173a2821906b35cf2ce9b946da3e9439777cd986de7dbcb0664f6a",
+        "proof": {
+          "seed_rows_verified": 2000000,
+          "intents": 1151,
+          "acknowledged": 1151,
+          "live_rows_verified": 1151,
+          "applied_unacknowledged_intents": 0,
+          "acknowledged_loss": 0,
+          "wrong_or_duplicate_bodies": 0,
+          "export_sha256": "3446d2e05b67e3a16bd995866bd99cda0811de5d9d3793c74328d1c284b9413d",
+          "customers": {
+            "sha256": "c3a160b85050e71c8ba465e2ca7a72d25bc4fbb076954f6c6f9c22fcaabadc95",
+            "bytes": 92663,
+            "verified_rows": 10000,
+            "allocated_bytes": 94208,
+            "compression": {
+              "codec": "gzip",
+              "level": 1,
+              "zlib": "1.3.2",
+              "uncompressed_bytes": 92663,
+              "compressed_bytes": 32777,
+              "ratio": 2.827073862769625,
+              "wall_ns": 415958,
+              "cpu_ns": 416000,
+              "scope": "Host-side compressibility of the verified CSV witness, streamed into a byte counter; not native engine compression. Timers cover compression calls, excluding file reads/hash/fsync."
+            }
+          }
+        }
+      },
+      {
+        "directory": "results/journal-live/e5fe72c3a41b4e67a06f9e6a9e1ab049",
+        "passed": true,
+        "result_sha256": "1f59d7fc1e7b9aeec676bebc17ecd63d3f24ff1e3a4eb1d0c592194382fc8a9f",
+        "proof": {
+          "seed_rows_verified": 2000000,
+          "intents": 2634,
+          "acknowledged": 2259,
+          "live_rows_verified": 2259,
+          "applied_unacknowledged_intents": 0,
+          "acknowledged_loss": 0,
+          "wrong_or_duplicate_bodies": 0,
+          "export_sha256": "f5de6d9c1a53432bc600c5f9cfb4c19e81490b9c8b2976771a5c0c4507bfd53a",
+          "customers": {
+            "sha256": "c3a160b85050e71c8ba465e2ca7a72d25bc4fbb076954f6c6f9c22fcaabadc95",
+            "bytes": 92663,
+            "verified_rows": 10000,
+            "allocated_bytes": 94208,
+            "compression": {
+              "codec": "gzip",
+              "level": 1,
+              "zlib": "1.3.2",
+              "uncompressed_bytes": 92663,
+              "compressed_bytes": 32777,
+              "ratio": 2.827073862769625,
+              "wall_ns": 371375,
+              "cpu_ns": 371000,
+              "scope": "Host-side compressibility of the verified CSV witness, streamed into a byte counter; not native engine compression. Timers cover compression calls, excluding file reads/hash/fsync."
+            }
+          }
+        }
+      },
+      {
+        "directory": "results/journal-restore/a8e87bb6dce9420cb795ce8d43e53aea",
+        "passed": true,
+        "result_sha256": "2a27308c942ea9ebb370a0542f7556a99649262b1bc163beba0c76e78e02656e",
+        "proof": {
+          "seed_rows_verified": 2000000,
+          "intents": 2634,
+          "acknowledged": 2259,
+          "live_rows_verified": 2259,
+          "applied_unacknowledged_intents": 0,
+          "acknowledged_loss": 0,
+          "wrong_or_duplicate_bodies": 0,
+          "export_sha256": "f5de6d9c1a53432bc600c5f9cfb4c19e81490b9c8b2976771a5c0c4507bfd53a"
+        }
+      },
+      {
+        "directory": "results/journal-tail/e7703d4637d142058f3e39fd4caa5d88",
+        "passed": true,
+        "result_sha256": "c7c11751243e5c9c40ed0acf6bc86bea2e01892479cc686d8027f036f2514e03",
+        "proof": {
+          "seed_rows_verified": 2000000,
+          "intents": 2634,
+          "acknowledged": 2259,
+          "live_rows_verified": 2259,
+          "applied_unacknowledged_intents": 0,
+          "acknowledged_loss": 0,
+          "wrong_or_duplicate_bodies": 0,
+          "export_sha256": "f5de6d9c1a53432bc600c5f9cfb4c19e81490b9c8b2976771a5c0c4507bfd53a"
+        }
+      }
+    ],
+    "raw_log": "results/journal-recovery-profile.log",
+    "raw_log_sha256": "5b0bf8c67db7cad743b2ea6d26b063b5d01b88060c94f6989da13356fc4717cc",
+    "cleanup_verified_by_runner": true,
+    "prior_setup_failure": "results/journal-recovery-profile-image-pull-failed.log",
+    "prior_setup_failure_scope": "Compose attempted a denied registry pull before starting the database. Subsequent inspection found the exact measured image present. Retained failed setup log; no image rebuild or source reset."
+  },
+  "final_regression": {
+    "command": "make test",
+    "directory": "results/runs/ef28e46f85844321be063f9e3db800cd",
+    "full_data_engine_language_cases": 6,
+    "negative_controls": 18,
+    "controller_tests": 25,
+    "passed": true,
+    "scope": "Correctness regression, not a new comparative performance claim.",
+    "raw_log": "results/interior-regression.log",
+    "raw_log_sha256": "7a685a8de85248313271f56f525b9d824842d3ca1ed3b2f58e9f28350545ea3b"
+  }
+}
