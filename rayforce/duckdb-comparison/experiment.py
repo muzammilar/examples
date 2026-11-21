@@ -321,6 +321,14 @@ def resource_sample(path, identity):
             "anonymous_bytes": memory.get("stats", {}).get("anon"),
             "file_cache_bytes": memory.get("stats", {}).get("file"),
             "kernel_memory_bytes": memory.get("stats", {}).get("kernel"),
+            "network_bytes": {
+                direction: sum(
+                    interface[direction] for interface in stats["networks"].values()
+                )
+                for direction in ("rx_bytes", "tx_bytes")
+            }
+            if stats.get("networks")
+            else None,
         }
     finally:
         connection.close()
@@ -775,6 +783,21 @@ def main():
         "action", choices=["prepare", "test", "benchmark", "down", "docker-down"]
     )
     args = parser.parse_args()
+    if args.action in {"down", "docker-down"}:
+        journal_containers = capture(
+            [
+                "docker",
+                "ps",
+                "-aq",
+                "--filter",
+                "label=com.docker.compose.project=rayforce-duckdb-journal",
+            ],
+            text=True,
+        ).strip()
+        if journal_containers:
+            raise RuntimeError(
+                "journal workloads remain; preserve their state and inspect before teardown"
+            )
     if args.action == "prepare":
         prepare()
     elif args.action in {"test", "benchmark"}:

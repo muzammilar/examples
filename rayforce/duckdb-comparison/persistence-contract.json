@@ -39,7 +39,7 @@
     "operation_timeout_ms": 3000,
     "writer_connections": 1,
     "independent_reader": "Required for live failure cases; use native Rayforce IPC and make the DuckDB application boundary explicit before measuring. Adapter/RPC/FFI costs must be labeled",
-    "status": "Transport adapter and live failure controller not implemented yet",
+    "status": "Rayforce native IPC adapter and independent live-writer/reader controller implemented; DuckDB live adapter remains unimplemented. Saved-table profiles remain separate from the live failure results.",
     "scope": "The future live journal/fault profile. Offline snapshot C API calls currently use the existing 600-second whole-process bound, without per-call cancellation."
   },
   "resources": {

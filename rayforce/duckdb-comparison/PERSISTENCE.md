@@ -100,7 +100,9 @@ Live independent writers/readers, an external fsynced per-operation intent/ACK
 journal, synchronous versus asynchronous recovery, SIGKILL, interrupted snapshot
 replacement, torn tails versus interior corruption, writer fencing, native repair,
 backup restoration, pressure and repeated performance/cache-temperature matrices
-remain unrun. No clustered, HA, general transaction-atomicity or physical-power-loss
+are outside this saved-table profile. The separate [journal test](JOURNAL.md)
+now covers live synchronous Rayforce IPC, two SIGKILLs and a second snapshot/tail;
+other listed boundaries remain unrun. No clustered, HA, general transaction-atomicity or physical-power-loss
 claim is made for this saved-table profile. Raw development probes remain separate
 from the explicitly selected result pair; failures must not be reset into passes.
 

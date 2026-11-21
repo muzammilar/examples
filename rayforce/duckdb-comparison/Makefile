@@ -20,7 +20,7 @@ up:
 test: check-controls
 	python3 experiment.py test
 check-controls:
-	python3 -m unittest test_controller.py test_ingestion.py test_persistence.py
+	python3 -m unittest test_controller.py test_ingestion.py test_persistence.py test_live_journal.py
 benchmark:
 	python3 experiment.py benchmark
 down:
@@ -48,3 +48,20 @@ DUCK_RESULT ?=
 report-persistence:
 	@test -n "$(RAY_RESULT)" -a -n "$(DUCK_RESULT)" || { echo 'Set RAY_RESULT and DUCK_RESULT to explicit result.json paths'; exit 1; }
 	python3 write_persistence_results.py "$(RAY_RESULT)" "$(DUCK_RESULT)"
+
+.PHONY: test-journal-capability
+test-journal-capability: check-controls
+	python3 journal.py
+
+.PHONY: test-journal-recovery
+test-journal-recovery: check-controls
+	python3 live_journal.py
+
+.PHONY: test-production report-journal
+# Selected implemented cases; JOURNAL.md lists the remaining boundaries.
+test-production: test-journal-capability test-journal-recovery
+
+JOURNAL_RESULT ?=
+report-journal:
+	@test -n "$(JOURNAL_RESULT)" || { echo 'Set JOURNAL_RESULT to an explicit journal-live result directory'; exit 1; }
+	python3 write_journal_results.py "$(JOURNAL_RESULT)"

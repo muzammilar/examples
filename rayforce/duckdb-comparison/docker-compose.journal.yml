@@ -1,0 +1,36 @@
+name: rayforce-duckdb-journal
+services:
+  rayforce:
+    image: rayforce-duckdb-analytics:dev
+    entrypoint: [/opt/rayforce/rayforce]
+    command: [-c, "1", -m, 3G, -p, "7701", -L, /state/journal]
+    user: "${LAB_UID:-10001}:${LAB_GID:-10001}"
+    environment: {HOME: /tmp, RAYFORCE_NO_FSYNC: "0"}
+    cpus: 1
+    mem_limit: 4g
+    memswap_limit: 4g
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    tmpfs: [/tmp:size=512m]
+    volumes:
+      - "${JOURNAL_STORAGE_PATH:?Set an owned journal case storage path}:/state"
+      - ./results/data:/data:ro
+    networks: [journal]
+  observer:
+    image: rayforce-duckdb-analytics:dev
+    entrypoint: [/opt/bench/rayforce_ipc, rayforce, "7701"]
+    user: "${LAB_UID:-10001}:${LAB_GID:-10001}"
+    environment: {HOME: /tmp}
+    cpus: 1
+    mem_limit: 512m
+    memswap_limit: 512m
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    tmpfs: [/tmp:size=64m]
+    profiles: [tools]
+    networks: [journal]
+networks:
+  journal:
+    internal: true

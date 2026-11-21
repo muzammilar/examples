@@ -15,10 +15,11 @@ check every query result against an independent Python integer oracle.
 
 Docker Compose, a local Unix Docker API, cgroup v2 and host Python 3.11+ are
 required for the measured harness. No host C++/Rust compiler or
-Python packages are needed. There is no resident database server: every test starts
-its own embedded database inside an isolated one-shot Compose service. No ports,
-network access, external database state or sibling example outputs are needed at
-runtime. Initial source/toolchain downloads need network access.
+Python packages are needed. Embedded profiles start one-shot Compose applications
+without network access. The separate journal tests run a temporary native server
+and IPC applications on an internal Compose network, with no published host ports.
+No external database state or sibling example outputs are needed at runtime.
+Initial source/toolchain downloads need network access.
 
 Run measurements before cleanup:
 
@@ -30,6 +31,8 @@ make test-ingestion METHODS=native,columnar MUTATION_ROWS=10001 BATCH_SIZES=1,10
 make ingestion-benchmark METHODS=native,columnar MUTATION_ROWS=100000
 make test-rayforce-snapshot
 make test-duckdb-snapshot
+make test-journal-capability
+make test-journal-recovery
 ```
 
 `ROWS=2000000` defaults to two million; `REPEATS=15`, `TRIALS=3`,
@@ -37,7 +40,9 @@ make test-duckdb-snapshot
 **4 GiB** container ceiling; current runs disable swap. Historical artifacts retain
 their original inspected limits. The [persisted snapshot profiles](PERSISTENCE.md)
 verify full two-million-row reopens and native file footprints, separately from
-the in-memory measurements below. Changing `ROWS` requires archiving the old `results/`
+the in-memory measurements below. [Native synchronous journal tests](JOURNAL.md)
+add independent writers/readers through two retained-state process crashes.
+Changing `ROWS` requires archiving the old `results/`
 directory first. Failed runs remain evidence; no automatic data reset or retry.
 An example-local lock prevents concurrent controllers. Other examples must be
 stopped independently before performance measurements.

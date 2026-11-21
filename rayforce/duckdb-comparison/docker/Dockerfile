@@ -14,9 +14,11 @@ RUN mkdir -p /opt/rayforce/lib && tar -xzf /tmp/rayforce.tar.gz --strip-componen
 COPY duckdb-*.tar.gz /tmp/
 RUN mkdir -p /opt/duckdb/lib /opt/duckdb/include && tar -xzf /tmp/duckdb-${TARGETARCH}.tar.gz -C /opt/duckdb && \
     mv /opt/duckdb/libduckdb.so /opt/duckdb/lib/ && mv /opt/duckdb/*.h /opt/duckdb/include/ && rm /tmp/duckdb-*.tar.gz
+RUN case "$TARGETARCH" in arm64) march=armv8-a+simd ;; amd64) march=x86-64-v3 ;; *) exit 1 ;; esac && \
+    make -C /opt/rayforce -j4 release CC=gcc RAY_MARCH=$march GIT_HASH=38fd4be RAY_VERSION=3.0.2
 COPY analytics-workload /workload
 RUN cmake -S /workload -B /build -DCMAKE_BUILD_TYPE=Release && cmake --build /build -j4 && \
-    mkdir -p /opt/bench && cp /build/libbench*.so /build/cpp_* /opt/bench/
+    mkdir -p /opt/bench && cp /build/libbench*.so /build/cpp_* /build/rayforce_ipc /opt/bench/
 WORKDIR /workload/rust
 RUN cargo fmt --check && \
     ENGINE=rayforce cargo build --locked --release && cp target/release/analytics-workload /opt/bench/rust_rayforce && \
