@@ -1,0 +1,64 @@
+{
+  "recorded_at": "2026-11-21",
+  "scope": "Fresh offline archive hash recheck and host controls; live cluster faults and performance runs were not repeated today.",
+  "host_control_tests_passed": 15,
+  "archives": [
+    {
+      "archive": "9e4449dbe39b4adeab08af334462d376",
+      "verified_files": 774,
+      "manifest_sha256": "d4c4c24903e8199359c6ab8efac0fee03428f84f4931c09add68e792817a4b82",
+      "cases": [
+        {
+          "case": "bc11fbef4c9a4a3f874fd140b494898b",
+          "original_failed": true,
+          "failure_sha256": "e2f2712a07c1a09c0a23e069db18440150f3db940dd3e05fbf9531014ff92670"
+        },
+        {
+          "case": "45ec30c4317447b19c9fc35798b08bc6",
+          "original_failed": true,
+          "failure_sha256": "02cbdeacea0ebb816f5a424996eac58bd8ab0b61dfe07176b085d4e157f628fc"
+        },
+        {
+          "case": "fe14fbcc93ef498f957e480abc04857d",
+          "original_failed": false,
+          "recorded_passed": true,
+          "acknowledged": 2001024,
+          "result_sha256": "bacb75c4ff15a12a1863b1a8842b04e596c97499a52d7325f4e92c5ebb2fa7a3"
+        },
+        {
+          "case": "b007c649907a4b2ab4b606aec58d5157",
+          "original_failed": false,
+          "recorded_passed": true,
+          "acknowledged": 2001024,
+          "result_sha256": "3662ff2c3a689e70eeefed8383361ba1965ff0bb7ca67fd4032755ea04c40691"
+        },
+        {
+          "case": "ca829246c516404081f37645b9bebe8e",
+          "original_failed": false,
+          "recorded_passed": true,
+          "acknowledged": 2001024,
+          "result_sha256": "2620e543d486fc8bf46b99589a9ef1d5ee7d839c7b8084280558147af18a620c"
+        },
+        {
+          "case": "8d56f48ba3484710b85700cd5b439d60",
+          "original_failed": false,
+          "recorded_passed": true,
+          "acknowledged": 2001024,
+          "result_sha256": "c3211aa5293454b45f35a408f06938951dc97f478fd34fe48db307e71b75bb6b"
+        }
+      ]
+    },
+    {
+      "archive": "8f012e60c7b44f6395261e887a28b933",
+      "verified_files": 280,
+      "manifest_sha256": "75b1c1b2789f427df6de47ab0db7a5e66466a0ed3086c440330cde0b5c4188a3",
+      "cases": []
+    }
+  ],
+  "limitations": [
+    "Original failed/interrupted verdicts remain failed, even where separate data reconciliation succeeded.",
+    "Further fault domains and fair sustained/cold/hot benchmark coverage remain unrun as listed in README.",
+    "Historical measurements do not retroactively satisfy all new CPU/memory/compression/disk-I/O requirements.",
+    "At user request, bulky journals may be removed after these results are published; hashes/summaries cannot replay deleted raw events."
+  ]
+}

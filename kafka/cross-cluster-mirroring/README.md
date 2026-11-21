@@ -257,6 +257,16 @@ setup. This does not establish successful west replication/cutover for them.
   quorum/partitions, node outage, drain/PDB, operator outage/reconciliation, scaling,
   upgrades, pressure, independent restore, saturation/soak and fair comparisons.
 
+### Archived evidence recheck — 2026-11-21
+
+The [committed archive summary](VERIFIED_RESULTS.json) records a 2026-11-21
+recheck of **1,054 file hashes** across both completed archives; all matched.
+**15 host controller/checkpoint tests** also passed. No live cluster faults were
+repeated for this recheck, and original failed/interrupted verdicts stay failed.
+At the user's request, bulky journals are being cleaned after publication while
+reports and proof summaries remain. Deleted journals cannot be replayed from their
+hashes. The unrun fault and benchmark cases above remain gaps.
+
 ### Local workload source
 
 `replication-producer` is a repository-tracked symlink to
