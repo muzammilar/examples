@@ -1,0 +1,111 @@
+{
+  "recorded_at": "2026-11-21",
+  "scope": "Offline integrity/copy-proof recheck of retained 2026-11-19 runs; database faults and benchmarks were not rerun on 2026-11-21.",
+  "checks": {
+    "host_control_tests_passed": 16,
+    "archived_files_sha256_verified": 2321,
+    "final_archive_copy_proofs_checked": 3
+  },
+  "archives": [
+    {
+      "archive": "02ac15c0d98f49cca530fa6db7b6dcb0",
+      "mode": "cluster",
+      "verified_files": 565,
+      "verification_file": "verification-1795057418087782542.json",
+      "verification_sha256": "0f0f8539c9b02e96cbdb5e111089d2c9bda15ba5b861d473f60cf02b3800a463",
+      "verification": {
+        "attempted_rows": 33860,
+        "acknowledged_rows": 27870,
+        "ambiguous_rows": 5990,
+        "histories": 8,
+        "acknowledged_loss": 0,
+        "corruption": 0
+      },
+      "copies": {
+        "scope": "all-native-copies",
+        "copies": {
+          "pg0": {
+            "rows": 100000,
+            "logical_sha256": "250c3fe2eae3d7f0326b01a5446586629eff7b5e4e4cbcd4ae729435295c71a0"
+          },
+          "pg1": {
+            "rows": 100000,
+            "logical_sha256": "250c3fe2eae3d7f0326b01a5446586629eff7b5e4e4cbcd4ae729435295c71a0"
+          },
+          "pg2": {
+            "rows": 100000,
+            "logical_sha256": "250c3fe2eae3d7f0326b01a5446586629eff7b5e4e4cbcd4ae729435295c71a0"
+          }
+        },
+        "all_required_copies_identical": true
+      }
+    },
+    {
+      "archive": "2f994882c0b64ecfbdbf31a75df2c7e9",
+      "mode": "cluster",
+      "verified_files": 1414,
+      "verification_file": "verification-1795055505523108754.json",
+      "verification_sha256": "78902595cbfda5887a06e446e3a4cddb0e1d4b02bbc62bd309b1013c5037cb3c",
+      "verification": {
+        "attempted_rows": 127590,
+        "acknowledged_rows": 108320,
+        "ambiguous_rows": 19270,
+        "histories": 28,
+        "acknowledged_loss": 0,
+        "corruption": 0
+      },
+      "copies": {
+        "scope": "all-native-copies",
+        "copies": {
+          "pg0": {
+            "rows": 100000,
+            "logical_sha256": "50ec63af1ba56d56fcaec636556417d4f5dffcbc4684796985d244fb31b144a4"
+          },
+          "pg1": {
+            "rows": 100000,
+            "logical_sha256": "50ec63af1ba56d56fcaec636556417d4f5dffcbc4684796985d244fb31b144a4"
+          },
+          "pg2": {
+            "rows": 100000,
+            "logical_sha256": "50ec63af1ba56d56fcaec636556417d4f5dffcbc4684796985d244fb31b144a4"
+          }
+        },
+        "all_required_copies_identical": true
+      }
+    },
+    {
+      "archive": "46b9821a9c8a4296bc4518523a450578",
+      "mode": "single",
+      "verified_files": 342,
+      "verification_file": "verification-1795056364211751263.json",
+      "verification_sha256": "2f4f1f6c95758e6698c48fccb79554b0c5dfa07a7417e0443c0c8ab365ffedf5",
+      "verification": {
+        "attempted_rows": 12900,
+        "acknowledged_rows": 8720,
+        "ambiguous_rows": 4180,
+        "histories": 5,
+        "acknowledged_loss": 0,
+        "corruption": 0
+      },
+      "copies": {
+        "scope": "all-native-copies",
+        "copies": {
+          "single": {
+            "rows": 100000,
+            "logical_sha256": "907abae74c8c0705115529f6527b9c3b32f493fa1dd821588c8e9ec5486e164a"
+          }
+        },
+        "all_required_copies_identical": true
+      }
+    }
+  ],
+  "limitations": [
+    "Earlier failed runs remain failed.",
+    "Not an immutable history of every inventory version: latest acknowledged versions are lower bounds; subsequent witnessed updates may supersede them.",
+    "Native SQL readback and export audit, not independent decoding of PostgreSQL data files.",
+    "Archived warm-query diagnostics do not qualify cold/multi-trial capacity comparisons.",
+    "Partitions/quorum, scaling, upgrades, bounded pressure/EIO and independent restore remain unrun.",
+    "Historical CPU, memory, compression and disk-I/O coverage does not meet every newly added benchmark requirement."
+  ],
+  "retention": "After this recheck and publication, bulky full-row exports and regenerable corpus artifacts may be removed at user request. Retained reports/hashes do not substitute for the deleted raw exports; full replay requires a new run."
+}

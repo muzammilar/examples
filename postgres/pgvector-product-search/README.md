@@ -119,6 +119,20 @@ only basic wrong-password and native read-only replica rejection checks. TLS and
 least-privilege role isolation remain unqualified. All replicas share one Docker VM; this does
 not establish host/zone fault independence.
 
+## Archived evidence recheck — 2026-11-21
+
+The [committed verification summary](VERIFIED_RESULTS.json) records a fresh offline
+SHA-256 check of **2,321 archived files** and rechecks the final exact native-copy
+proof from each of the three archived datasets. All three pass; **16 host control
+tests** also pass. This rechecks retained evidence, not a new database fault run.
+The original failed cases and the unrun extended tests remain unchanged.
+
+At the user's request, bulky full-row exports and regenerable corpus artifacts
+are being cleaned up after preserving these summaries. Reports, operation journals,
+native proof summaries and hashes remain locally; deleted exports cannot be
+replayed. Historical measurements do not retroactively satisfy the newer holistic
+benchmark requirements. Reproduce a deleted proof through a fresh lifecycle.
+
 ## Architecture and limitations
 
 PostgreSQL **17** / pgvector **0.8.7** stores product text/vectors and a separate
