@@ -21,6 +21,15 @@ both cleanup steps exited successfully. No example containers or volumes remaine
 unrelated resources were retained. See [LIFECYCLE_RESULTS.json](LIFECYCLE_RESULTS.json).
 Use `make cli` for an interactive CedarDB SQL session.
 
+[Analytical contention under concurrent appends](HTAP.md) extends this same
+infrastructure with `make benchmark-htap`: a fixed million-row aggregate, alone
+and alongside independent live writers/readers. Its qualification/results are
+tracked separately from the recovery cohort below. The completed 12-cell cohort
+retained all **109,580 historical ACKs**. For this fixed aggregate, median query
+throughput was **3.33×** PostgreSQL alone and **2.69×** under live traffic;
+PostgreSQL used less charged memory. See the trial spread, resource costs and
+UTC/monotonic timing audit in that report.
+
 Run operational cases before cleanup, one command at a time:
 
 ```sh

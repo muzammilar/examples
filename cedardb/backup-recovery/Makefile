@@ -1,15 +1,20 @@
 SHELL := /bin/sh
 ROWS ?= 1000000
 RATE ?= 50
+TRIALS ?= 3
+ANALYTICS_WARMUP_S ?= 60
+ANALYTICS_DURATION_S ?= 300
+HTAP_RESULTS_DIR ?=
 export ROWS RATE
+export TRIALS ANALYTICS_WARMUP_S ANALYTICS_DURATION_S
 .NOTPARALLEL:
-.PHONY: docker-up up test check-controls graceful crash backup test-production report status cli down docker-down
+.PHONY: docker-up up test check-controls graceful crash backup test-production report benchmark-htap report-htap status cli down docker-down
 docker-up:
 	python3 control.py docker-up
 up:
 	python3 control.py up
 check-controls:
-	python3 -m unittest test_control.py
+	python3 -m unittest test_control.py test_htap.py test_htap_report.py
 test: check-controls
 	python3 control.py test
 	python3 driver_checks.py
@@ -23,6 +28,11 @@ test-production: check-controls
 	python3 control.py test-production
 report:
 	python3 report.py
+benchmark-htap:
+	python3 htap.py
+report-htap:
+	@test -n "$(HTAP_RESULTS_DIR)" || { echo 'Set HTAP_RESULTS_DIR=results/htap/<run-id> from the completed benchmark'; exit 1; }
+	python3 htap_report.py "$(HTAP_RESULTS_DIR)"
 status:
 	python3 control.py status
 cli:

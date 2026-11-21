@@ -339,6 +339,8 @@ func run() error {
 	}
 	defer closeConnection(conn)
 	switch mode {
+	case "analytics":
+		return analytics(ctx, conn, count)
 	case "seed":
 		return seed(ctx, conn, count)
 	case "export":

@@ -20,7 +20,18 @@ def compact_verification(value):
 def native_values(value):
     text = value["native_counters_disk_and_main_process"]
     disk = text.split("__DISK\n", 1)[1].split("__FILESYSTEM", 1)[0].splitlines()
+    process_status = text.partition("__PROCESS\n")[2]
+    process_memory = {"VmRSS": None, "VmHWM": None}
+    for line in process_status.splitlines():
+        fields = line.split()
+        if fields and fields[0].rstrip(":") in process_memory:
+            if len(fields) != 3 or fields[2] != "kB":
+                raise RuntimeError("unexpected Linux process memory units")
+            process_memory[fields[0].rstrip(":")] = int(fields[1]) * 1024
     return {
+        "pid1_memory_bytes": process_memory,
+        "pid1_status": process_status,
+        "pid1_memory_scope": "Linux /proc/1/status snapshot and lifetime high-water RSS for PID 1 only. Both databases have additional processes: the live CedarDB audit found a much larger second cedardb process, and PostgreSQL has backend/worker processes. PID 1 RSS is not whole-engine RSS. Use cgroup charged memory for whole-database comparisons; RSS is not heap size.",
         "database_logical_bytes": int(disk[0].split()[0]),
         "database_allocated_bytes": int(disk[1].split()[0]),
         "cgroup_peak_memory_bytes_since_last_start": int(
@@ -56,6 +67,8 @@ def publish():
             continue
         if (path.parent / "failure.json").exists():
             raise RuntimeError("qualification generation contains a failed case")
+        if meta["action"] not in {"graceful", "crash", "backup"}:
+            continue
         key = (meta["backend"], meta["action"])
         candidates.setdefault(key, []).append((meta["created_ns"], path.parent))
     expected = {

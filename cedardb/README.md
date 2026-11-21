@@ -4,7 +4,7 @@ Website: https://cedardb.com/
 
 CedarDB is the commercial spin-off of [Umbra](https://umbra-db.com/), the research database from TUM, built by the same team and speaking the PostgreSQL wire protocol.
 
-- [`backup-recovery/`](backup-recovery) — Go writers/readers, one million 256-byte orders per backend, synchronous commits, process crash/reopen and online physical backup/restore against PostgreSQL; full witnesses, CPU/memory, native compression, I/O and disk footprints.
+- [`backup-recovery/`](backup-recovery) — Go writers/readers, one million 256-byte orders per backend, synchronous commits, process crash/reopen and online physical backup/restore against PostgreSQL; full witnesses, CPU/memory, native compression, I/O and disk footprints. Its [analytical contention comparison](backup-recovery/HTAP.md) adds 12 sustained cells at matching 4-CPU/6-GiB budgets, alone and under live appends/reads.
 - [`single-node/`](single-node) — one CedarDB Community Edition server on Docker Compose, loaded with 3M generated rows for analytics, EXPLAIN plans, transactions, CSV and vectors.
 
 CedarDB has no cluster or replication mode yet (high availability is an announced

@@ -79,6 +79,8 @@ services:
       DATABASE_URL: "postgres://${CEDAR_LAB_USER:-postgres}:${CEDAR_LAB_PASSWORD:-Cedar-Lab-1}@${CEDAR_LAB_DB_HOST:-cedar}:5432/postgres?sslmode=disable"
       ROWS: ${ROWS:-1000000}
       RATE: ${RATE:-50}
+      ANALYTICS_WARMUP_S: ${ANALYTICS_WARMUP_S:-60}
+      ANALYTICS_DURATION_S: ${ANALYTICS_DURATION_S:-300}
       FIRST_ID: ${FIRST_ID:-1000000000}
       GOMAXPROCS: 1
       BACKEND: ${CEDAR_LAB_ENGINE:-cedar}
