@@ -98,7 +98,7 @@ disk-replacement tests, acknowledged-loss accounting and benchmark limitations.
 
 **High priority, next after the current work is complete:**
 
-- **CedarDB** — [existing single-node example and measurements](cedardb/README.md); keep follow-up work separate from the distributed-system backlog.
+- **CedarDB** — [single-node analytics and witnessed backup/recovery](cedardb/README.md), including a million-row PostgreSQL operational comparison. Follow up with matched HTAP workloads, sustained/cold benchmarks and bounded storage-pressure recovery; keep these single-node experiments separate from the distributed-system backlog.
 - **RayforceDB vs DuckDB** — [initial Python/C++/Rust comparison](rayforce/duckdb-comparison/README.md) measures bulk CSV loading, analytical queries, CPU/memory time series and block-I/O/input-storage accounting at equal 1/4-CPU budgets. The [single/batch append comparison](rayforce/duckdb-comparison/README.md#ingestion-comparison) adds 144 measured Python/C++/Rust trials with full-body verification and resource accounting. The separate [columnar Appender comparison](rayforce/duckdb-comparison/README.md#columnar-appender-comparison) adds 144 trials against the row-wise path on the same image. Follow up with prepared SQL, genuinely cold persisted queries, native disk storage/compression and persistence/recovery paths; document semantic differences and unsupported cases.
 
 ## Planned distributed database workloads

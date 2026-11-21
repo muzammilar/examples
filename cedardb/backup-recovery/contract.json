@@ -1,0 +1,12 @@
+{
+  "operations": ["bulk seed", "single-row append", "older/latest read", "ordered full-body export", "physical backup/restore"],
+  "consistency": "One authoritative instance per backend. Committed seed/live rows must be visible to new autocommit reads. No replica/HA claim.",
+  "atomicity": "Single INSERT acknowledgements only. General COPY error atomicity, multi-key transactions and snapshot-isolation anomalies are not qualified.",
+  "cedar_durability": "Every Go connection sets and reads back async_commit=off. Native backup requires v2026-11-18. Process SIGKILL is tested separately from physical power loss.",
+  "postgres_durability": "Every Go connection sets and reads back synchronous_commit=on. Server fsync and full_page_writes remain enabled.",
+  "restore": "Require all seed rows and every ACK witnessed before backup invocation. Reconcile later ACKs separately as measured snapshot RPO. Restore a clone on new owned storage; never mutate the backup archive.",
+  "reference_client": {"driver": "pgx/v5 v5.7.6", "protocol": "simple text", "connections_per_actor": 1, "connect_timeout_seconds": 2, "operation_timeout_seconds": 3, "mutation_retries": 0, "maximum_rate_per_actor": 50, "arrival": "ticker-paced closed loop, dropped ticks under backpressure", "tls": "disabled on private lab network, not a production security configuration"},
+  "data": {"default_seed_rows": 1000000, "customers": 10000, "columns": "id I64 PK, customer I32, amount I32, payload TEXT NOT NULL", "payload_bytes": 256, "shape": "192 bytes repeated customer prefix plus 64 ASCII SHA256 hex characters; deterministic order:<id>, no nulls", "live_ids": "Exclusive million-ID range per history, never reused"},
+  "witness": "Intent and outcome JSONL fsynced per operation outside database volumes. Failed/submitted outcomes remain ambiguous; reconnect never replays a mutation.",
+  "limits": "Single Docker host, no independent-host or power-loss proof. Fixed offered-load operational observations, not a capacity benchmark. No disk loss, corruption, partitions, pressure, upgrade or multi-node qualification yet. CedarDB engine source is not publicly available; inspect shipped entrypoint, versioned public APIs and the pinned pgx source instead."
+}

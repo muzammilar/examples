@@ -245,6 +245,9 @@ Planned as a `mysql/` folder, mirroring the Postgres section with the same `orde
 
 ## Embedded analytics
 
+- [x] `cedardb/backup-recovery`: synchronous million-row fixtures versus PostgreSQL, live independent actors, graceful/SIGKILL recovery, online physical backups, read-only fresh-copy restores, full ACK/body/history reconciliation and CPU/memory/compression/I/O/storage observations. CE privileges/async-commit and PostgreSQL replication-HBA gotchas documented.
+- [ ] CedarDB follow-up: matched HTAP analytics under mutation, sustained repeated single/batch/bulk and cache-temperature comparisons; bounded disk-full/pressure (including the observed `db.ballast`/WAL footprint), interrupted backup and supported upgrade paths. A single-pod kind StatefulSet may test deployment/PVC behavior; native CedarDB clustering/HA remains unsupported by this example.
+
 - [x] `rayforce/duckdb-comparison`: analytical queries plus single/batch query and typed append paths through Python/C++/Rust; 144 ingestion trials, full old/new body verification, CPU/memory and disk accounting. In-memory, single-writer scope.
 - [x] Extend that comparison with DuckDB columnar data-chunk Appender: 72 correctness cells and 144 fresh-process performance trials, per-batch query-visible acknowledgements, identical inputs and full-body verification.
 - [ ] Prepared SQL, persisted storage/compression, crash recovery and genuinely cold queries remain separate unrun work for Rayforce/DuckDB.

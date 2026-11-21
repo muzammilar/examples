@@ -1,0 +1,344 @@
+{
+  "date_utc": "2026-11-21",
+  "steps": [
+    {
+      "step": "previous-down",
+      "target": "down",
+      "exit_code": 0,
+      "duration_s": 0.665996789932251
+    },
+    {
+      "step": "previous-docker-down",
+      "target": "docker-down",
+      "exit_code": 0,
+      "duration_s": 0.9139699935913086
+    },
+    {
+      "step": "docker-up",
+      "target": "docker-up",
+      "exit_code": 0,
+      "duration_s": 7.721559047698975
+    },
+    {
+      "step": "up",
+      "target": "up",
+      "exit_code": 0,
+      "duration_s": 61.29649901390076
+    },
+    {
+      "step": "test",
+      "target": "test",
+      "exit_code": 0,
+      "duration_s": 95.31659388542175
+    },
+    {
+      "step": "down",
+      "target": "down",
+      "exit_code": 0,
+      "duration_s": 0.765178918838501
+    },
+    {
+      "step": "docker-down",
+      "target": "docker-down",
+      "exit_code": 0,
+      "duration_s": 0.7565786838531494
+    }
+  ],
+  "passed": true,
+  "generation": "fabbf421bbf941d5b92e6caea00ac273",
+  "seed_rows_per_backend": 1000000,
+  "final_state": "destroyed",
+  "setup_resources": {
+    "cedar": {
+      "samples": 52,
+      "unavailable_samples": 0,
+      "observed_cpu_core_seconds": 4.230988000000001,
+      "average_cpu_percent_one_core_100_observed_intervals": 7.0584413575988725,
+      "cpu_percent_one_core_100_min_max": [
+        0.868114125981975,
+        100.96912062438986
+      ],
+      "sampled_charged_memory_bytes_min_mean_max": [
+        77721600,
+        755819204.9230769,
+        810393600
+      ],
+      "observed_counter_resets": 0,
+      "io_and_network": {
+        "block_254:0_read_bytes": {
+          "observed_delta": 131072,
+          "observed_seconds": 59.942241999999986,
+          "per_second": 2186.638264214409,
+          "counter_resets": 0
+        },
+        "block_254:0_write_bytes": {
+          "observed_delta": 123580416,
+          "observed_seconds": 59.942241999999986,
+          "per_second": 2061658.220925404,
+          "counter_resets": 0
+        },
+        "network_eth0_rx_bytes": {
+          "observed_delta": 279902906,
+          "observed_seconds": 59.942241999999986,
+          "per_second": 4669543.49154975,
+          "counter_resets": 0
+        },
+        "network_eth0_tx_bytes": {
+          "observed_delta": 283984879,
+          "observed_seconds": 59.942241999999986,
+          "per_second": 4737641.92870864,
+          "counter_resets": 0
+        }
+      },
+      "io_scope": "Kernel per-device and per-interface counters, with reset intervals excluded. Missing fields are unavailable, not zero. Do not sum stacked devices or both endpoints into physical traffic; raw counters remain authoritative.",
+      "sampled_disk_bytes_min_max": {
+        "/var/lib/cedardb/data/database": {
+          "logical_bytes": [
+            222983,
+            314968709
+          ],
+          "allocated_bytes": [
+            1610862592,
+            1925595136
+          ]
+        },
+        "/backups": {
+          "logical_bytes": [
+            0,
+            0
+          ],
+          "allocated_bytes": [
+            4096,
+            4096
+          ]
+        }
+      },
+      "scope": "About 1s cadence. CPU covers deltas between usable native samples; restart/reset intervals and initial/final partial intervals are excluded, not estimated. Raw block I/O and all native fields remain in JSONL. This is not process RSS or a complete CPU total across crashes."
+    },
+    "postgres": {
+      "samples": 52,
+      "unavailable_samples": 0,
+      "observed_cpu_core_seconds": 3.397171,
+      "average_cpu_percent_one_core_100_observed_intervals": 5.666054456698764,
+      "cpu_percent_one_core_100_min_max": [
+        0.6694289047360777,
+        86.93254705728037
+      ],
+      "sampled_charged_memory_bytes_min_mean_max": [
+        117592064,
+        844811106.4615384,
+        1157574656
+      ],
+      "observed_counter_resets": 0,
+      "io_and_network": {
+        "block_254:0_read_bytes": {
+          "observed_delta": 0,
+          "observed_seconds": 59.95655399999999,
+          "per_second": 0.0,
+          "counter_resets": 0
+        },
+        "block_254:0_write_bytes": {
+          "observed_delta": 1028042752,
+          "observed_seconds": 59.95655399999999,
+          "per_second": 17146461.61952537,
+          "counter_resets": 0
+        },
+        "network_eth0_rx_bytes": {
+          "observed_delta": 275797574,
+          "observed_seconds": 59.95655399999999,
+          "per_second": 4599957.062242104,
+          "counter_resets": 0
+        },
+        "network_eth0_tx_bytes": {
+          "observed_delta": 280288872,
+          "observed_seconds": 59.95655399999999,
+          "per_second": 4674866.270666591,
+          "counter_resets": 0
+        }
+      },
+      "io_scope": "Kernel per-device and per-interface counters, with reset intervals excluded. Missing fields are unavailable, not zero. Do not sum stacked devices or both endpoints into physical traffic; raw counters remain authoritative.",
+      "sampled_disk_bytes_min_max": {
+        "/var/lib/postgresql/data": {
+          "logical_bytes": [
+            40185235,
+            730451347
+          ],
+          "allocated_bytes": [
+            40243200,
+            730513408
+          ]
+        }
+      },
+      "scope": "About 1s cadence. CPU covers deltas between usable native samples; restart/reset intervals and initial/final partial intervals are excluded, not estimated. Raw block I/O and all native fields remain in JSONL. This is not process RSS or a complete CPU total across crashes."
+    }
+  },
+  "driver_controls": {
+    "passed": true,
+    "generation": "fabbf421bbf941d5b92e6caea00ac273",
+    "systems": {
+      "cedar": {
+        "duplicate_rejected": {
+          "stdout": "{\"children_peak_rss_kib\":0,\"children_system_cpu_seconds\":0,\"children_user_cpu_seconds\":0,\"cpu.max\":\"100000 100000\\n\",\"cpu.stat\":\"usage_usec 11485\\nuser_usec 4417\\nsystem_usec 7068\\nnice_usec 0\\nnr_periods 1\\nnr_throttled 0\\nthrottled_usec 0\\nnr_bursts 0\\nburst_usec 0\\n\",\"cpu_percent_one_core_100_self_and_reaped_children\":43.67071348611638,\"io.stat\":\"\",\"kind\":\"process-resources\",\"main_cpu_seconds_self_and_reaped_children\":0.0019649999999999997,\"main_wall_seconds\":0.004499583,\"memory.events\":\"low 0\\nhigh 0\\nmax 0\\noom 0\\noom_kill 0\\noom_group_kill 0\\n\",\"memory.max\":\"536870912\\n\",\"memory.peak\":\"5402624\\n\",\"memory.swap.max\":\"536870912\\n\",\"peak_rss_kib\":11828,\"scope\":\"Linux Docker process lifetime; CPU covers all Go threads. Native cgroup peaks include charged cache/kernel memory.\",\"system_cpu_seconds\":0.005652,\"timing_scope\":\"Main wall time and CPU deltas bracket the operation and connection close; process-lifetime totals separately include runtime startup. Rusage/timer calls add small measurement overhead; native counters are sampled before final JSON/exit. Cgroup counters include parent/children; do not add them to process CPU again.\",\"user_cpu_seconds\":0.00471}\n",
+          "stderr": " Container cedardb-backup-recovery-orders-workload-run-8f69ebb5d5f1 Creating \n Container cedardb-backup-recovery-orders-workload-run-8f69ebb5d5f1 Created \nERROR: duplicate key value violates unique constraint \"orders_pkey\" (SQLSTATE 23505)\n\n",
+          "returncode": 1
+        },
+        "missing_key": [
+          {
+            "children_peak_rss_kib": 0,
+            "children_system_cpu_seconds": 0,
+            "children_user_cpu_seconds": 0,
+            "cpu.max": "100000 100000\n",
+            "cpu.stat": "usage_usec 11404\nuser_usec 5183\nsystem_usec 6220\nnice_usec 0\nnr_periods 1\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+            "cpu_percent_one_core_100_self_and_reaped_children": 61.735261629851955,
+            "io.stat": "",
+            "kind": "process-resources",
+            "main_cpu_seconds_self_and_reaped_children": 0.0015040000000000001,
+            "main_wall_seconds": 0.002436209,
+            "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n",
+            "memory.max": "536870912\n",
+            "memory.peak": "7954432\n",
+            "memory.swap.max": "536870912\n",
+            "peak_rss_kib": 14164,
+            "scope": "Linux Docker process lifetime; CPU covers all Go threads. Native cgroup peaks include charged cache/kernel memory.",
+            "system_cpu_seconds": 0.005129,
+            "timing_scope": "Main wall time and CPU deltas bracket the operation and connection close; process-lifetime totals separately include runtime startup. Rusage/timer calls add small measurement overhead; native counters are sampled before final JSON/exit. Cgroup counters include parent/children; do not add them to process CPU again.",
+            "user_cpu_seconds": 0.005129
+          }
+        ],
+        "unchanged_full_body": {
+          "seed_rows": 1000000,
+          "live_rows": 0,
+          "required_acks": 0,
+          "missing_required_acks": 0,
+          "all_historical_acks": 0,
+          "snapshot_excluded_acks": 0,
+          "unacknowledged_intents_present": 0,
+          "csv_sha256": "8e3eb0cc5a03c0fb2c5c2d5a218895b779628c245af6394a3bdac8a13de70941",
+          "csv_bytes": 274666817,
+          "host_allocated_csv_bytes": 285782016,
+          "gzip1_bytes": 60722279,
+          "gzip1_ratio": 4.523328529879453,
+          "compression_wall_seconds": 0.685515793,
+          "compression_cpu_seconds": 0.685315,
+          "compression_scope": "Off-path gzip level 1 calls only, excluding file reads/hash/fsync/body verification. Not native engine compression; native automatic codec CPU is not isolated from whole-container cost.",
+          "read_history": {
+            "successful_reads_checked": 0,
+            "stale_successes": 0,
+            "scope": "Offline lower-bound check: latest ID must cover ACKs completed before read invocation. Actors share the Docker VM wall clock. This is not a general linearizability or SQL anomaly checker."
+          }
+        }
+      },
+      "postgres": {
+        "duplicate_rejected": {
+          "stdout": "{\"children_peak_rss_kib\":0,\"children_system_cpu_seconds\":0,\"children_user_cpu_seconds\":0,\"cpu.max\":\"100000 100000\\n\",\"cpu.stat\":\"usage_usec 17573\\nuser_usec 8786\\nsystem_usec 8786\\nnice_usec 0\\nnr_periods 1\\nnr_throttled 0\\nthrottled_usec 0\\nnr_bursts 0\\nburst_usec 0\\n\",\"cpu_percent_one_core_100_self_and_reaped_children\":47.82299523078456,\"io.stat\":\"\",\"kind\":\"process-resources\",\"main_cpu_seconds_self_and_reaped_children\":0.0032530000000000007,\"main_wall_seconds\":0.006802167,\"memory.events\":\"low 0\\nhigh 0\\nmax 0\\noom 0\\noom_kill 0\\noom_group_kill 0\\n\",\"memory.max\":\"536870912\\n\",\"memory.peak\":\"5427200\\n\",\"memory.swap.max\":\"536870912\\n\",\"peak_rss_kib\":11768,\"scope\":\"Linux Docker process lifetime; CPU covers all Go threads. Native cgroup peaks include charged cache/kernel memory.\",\"system_cpu_seconds\":0.007096,\"timing_scope\":\"Main wall time and CPU deltas bracket the operation and connection close; process-lifetime totals separately include runtime startup. Rusage/timer calls add small measurement overhead; native counters are sampled before final JSON/exit. Cgroup counters include parent/children; do not add them to process CPU again.\",\"user_cpu_seconds\":0.00811}\n",
+          "stderr": " Container cedardb-backup-recovery-orders-workload-run-b8693dae03f0 Creating \n Container cedardb-backup-recovery-orders-workload-run-b8693dae03f0 Created \nERROR: duplicate key value violates unique constraint \"orders_pkey\" (SQLSTATE 23505)\n\n",
+          "returncode": 1
+        },
+        "missing_key": [
+          {
+            "children_peak_rss_kib": 0,
+            "children_system_cpu_seconds": 0,
+            "children_user_cpu_seconds": 0,
+            "cpu.max": "100000 100000\n",
+            "cpu.stat": "usage_usec 11480\nuser_usec 6377\nsystem_usec 5102\nnice_usec 0\nnr_periods 1\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+            "cpu_percent_one_core_100_self_and_reaped_children": 40.0266436895399,
+            "io.stat": "",
+            "kind": "process-resources",
+            "main_cpu_seconds_self_and_reaped_children": 0.0017029999999999997,
+            "main_wall_seconds": 0.004254666,
+            "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n",
+            "memory.max": "536870912\n",
+            "memory.peak": "5677056\n",
+            "memory.swap.max": "536870912\n",
+            "peak_rss_kib": 11824,
+            "scope": "Linux Docker process lifetime; CPU covers all Go threads. Native cgroup peaks include charged cache/kernel memory.",
+            "system_cpu_seconds": 0.003903,
+            "timing_scope": "Main wall time and CPU deltas bracket the operation and connection close; process-lifetime totals separately include runtime startup. Rusage/timer calls add small measurement overhead; native counters are sampled before final JSON/exit. Cgroup counters include parent/children; do not add them to process CPU again.",
+            "user_cpu_seconds": 0.006506
+          }
+        ],
+        "unchanged_full_body": {
+          "seed_rows": 1000000,
+          "live_rows": 0,
+          "required_acks": 0,
+          "missing_required_acks": 0,
+          "all_historical_acks": 0,
+          "snapshot_excluded_acks": 0,
+          "unacknowledged_intents_present": 0,
+          "csv_sha256": "8e3eb0cc5a03c0fb2c5c2d5a218895b779628c245af6394a3bdac8a13de70941",
+          "csv_bytes": 274666817,
+          "host_allocated_csv_bytes": 285265920,
+          "gzip1_bytes": 60722279,
+          "gzip1_ratio": 4.523328529879453,
+          "compression_wall_seconds": 0.687634613,
+          "compression_cpu_seconds": 0.687541,
+          "compression_scope": "Off-path gzip level 1 calls only, excluding file reads/hash/fsync/body verification. Not native engine compression; native automatic codec CPU is not isolated from whole-container cost.",
+          "read_history": {
+            "successful_reads_checked": 0,
+            "stale_successes": 0,
+            "scope": "Offline lower-bound check: latest ID must cover ACKs completed before read invocation. Actors share the Docker VM wall clock. This is not a general linearizability or SQL anomaly checker."
+          }
+        }
+      }
+    }
+  },
+  "teardown": {
+    "deleted_main_resources": true,
+    "preserved_histories": true,
+    "retained_restore_volumes": []
+  },
+  "cedar_seed": {
+    "rows": 1000000,
+    "process": [
+      {
+        "children_peak_rss_kib": 0,
+        "children_system_cpu_seconds": 0,
+        "children_user_cpu_seconds": 0,
+        "cpu.max": "100000 100000\n",
+        "cpu.stat": "usage_usec 1049988\nuser_usec 690623\nsystem_usec 359365\nnice_usec 0\nnr_periods 12\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "cpu_percent_one_core_100_self_and_reaped_children": 33.379771899926745,
+        "io.stat": "",
+        "kind": "process-resources",
+        "main_cpu_seconds_self_and_reaped_children": 1.040664,
+        "main_wall_seconds": 3.117648626,
+        "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n",
+        "memory.max": "536870912\n",
+        "memory.peak": "8916992\n",
+        "memory.swap.max": "536870912\n",
+        "peak_rss_kib": 14204,
+        "scope": "Linux Docker process lifetime; CPU covers all Go threads. Native cgroup peaks include charged cache/kernel memory.",
+        "system_cpu_seconds": 0.35899,
+        "timing_scope": "Main wall time and CPU deltas bracket the operation and connection close; process-lifetime totals separately include runtime startup. Rusage/timer calls add small measurement overhead; native counters are sampled before final JSON/exit. Cgroup counters include parent/children; do not add them to process CPU again.",
+        "user_cpu_seconds": 0.689904
+      }
+    ]
+  },
+  "postgres_seed": {
+    "rows": 1000000,
+    "process": [
+      {
+        "children_peak_rss_kib": 0,
+        "children_system_cpu_seconds": 0,
+        "children_user_cpu_seconds": 0,
+        "cpu.max": "100000 100000\n",
+        "cpu.stat": "usage_usec 586892\nuser_usec 542926\nsystem_usec 43965\nnice_usec 0\nnr_periods 17\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "cpu_percent_one_core_100_self_and_reaped_children": 33.486363816100116,
+        "io.stat": "",
+        "kind": "process-resources",
+        "main_cpu_seconds_self_and_reaped_children": 0.577318,
+        "main_wall_seconds": 1.7240390840000002,
+        "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n",
+        "memory.max": "536870912\n",
+        "memory.peak": "11390976\n",
+        "memory.swap.max": "536870912\n",
+        "peak_rss_kib": 14376,
+        "scope": "Linux Docker process lifetime; CPU covers all Go threads. Native cgroup peaks include charged cache/kernel memory.",
+        "system_cpu_seconds": 0.042927,
+        "timing_scope": "Main wall time and CPU deltas bracket the operation and connection close; process-lifetime totals separately include runtime startup. Rusage/timer calls add small measurement overhead; native counters are sampled before final JSON/exit. Cgroup counters include parent/children; do not add them to process CPU again.",
+        "user_cpu_seconds": 0.542728
+      }
+    ]
+  },
+  "remaining_example_containers": [],
+  "remaining_example_volumes": []
+}

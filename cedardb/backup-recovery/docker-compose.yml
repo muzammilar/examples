@@ -1,0 +1,132 @@
+name: cedardb-backup-recovery
+services:
+  cedar:
+    image: cedardb/cedardb:v2026-11-18@sha256:1f9601c215afa8f9c0fa72a3d8b288364994e55abe8ef51cfff77921ea33c1d0
+    cpus: 4
+    mem_limit: 6g
+    memswap_limit: 6g
+    environment:
+      CEDAR_PASSWORD: Cedar-Lab-1
+      CEDAR_USER: postgres
+      CEDAR_DB: postgres
+      PARALLEL: 4
+      BUFFERSIZE: 2G
+      WORKMEMSIZE: 2G
+    volumes:
+      - cedar-data:/var/lib/cedardb/data
+      - backups:/backups
+    stop_grace_period: 60s
+    healthcheck:
+      test: [CMD, pg_isready, -h, localhost, -U, postgres]
+      interval: 2s
+      timeout: 3s
+      retries: 60
+  postgres:
+    image: postgres:17.6-bookworm@sha256:f3bd19c606e442c3d7bdfa8002e03fe260a1023351e0ea4598032022b68dd6e3
+    cpus: 4
+    mem_limit: 6g
+    memswap_limit: 6g
+    environment:
+      POSTGRES_PASSWORD: Cedar-Lab-1
+    command: [postgres, -c, shared_buffers=2GB, -c, work_mem=32MB, -c, max_parallel_workers=4, -c, max_parallel_workers_per_gather=4, -c, max_worker_processes=8]
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./postgres-initdb:/docker-entrypoint-initdb.d:ro
+    stop_grace_period: 60s
+    healthcheck:
+      test: [CMD, pg_isready, -U, postgres]
+      interval: 2s
+      timeout: 3s
+      retries: 60
+  sql:
+    image: postgres:17.6-bookworm@sha256:f3bd19c606e442c3d7bdfa8002e03fe260a1023351e0ea4598032022b68dd6e3
+    profiles: [tools]
+    cpus: 1
+    mem_limit: 512m
+    environment:
+      PGHOST: ${CEDAR_LAB_DB_HOST:-cedar}
+      PGUSER: postgres
+      PGDATABASE: postgres
+      PGPASSWORD: Cedar-Lab-1
+      PGSSLMODE: disable
+    entrypoint: [psql, -X, -v, ON_ERROR_STOP=1]
+  backup-tools:
+    image: cedardb-recovery-backup:dev
+    profiles: [tools]
+    cpus: 1
+    mem_limit: 512m
+    volumes:
+      - backups:/backups
+    environment:
+      PGHOST: postgres
+      PGUSER: backup_agent
+      PGPASSWORD: Backup-Lab-1
+      PGSSLMODE: disable
+    entrypoint: [/orders-workload, maintenance]
+  orders-workload:
+    image: cedardb-recovery-orders:dev
+    build:
+      context: ./orders-workload
+      target: workload
+    profiles: [tools]
+    user: "${CEDAR_LAB_UID:-10001}:${CEDAR_LAB_GID:-10001}"
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    cpus: 1
+    mem_limit: 512m
+    environment:
+      DATABASE_URL: "postgres://${CEDAR_LAB_USER:-postgres}:${CEDAR_LAB_PASSWORD:-Cedar-Lab-1}@${CEDAR_LAB_DB_HOST:-cedar}:5432/postgres?sslmode=disable"
+      ROWS: ${ROWS:-1000000}
+      RATE: ${RATE:-50}
+      FIRST_ID: ${FIRST_ID:-1000000000}
+      GOMAXPROCS: 1
+      BACKEND: ${CEDAR_LAB_ENGINE:-cedar}
+      READ_ONLY: ${CEDAR_LAB_READ_ONLY:-0}
+    volumes:
+      - ./results:/results
+  cedar-restore:
+    extends:
+      service: cedar
+    profiles: [restore]
+    volumes:
+      - cedar-restore-data:/var/lib/cedardb/data
+      - backups:/backups:ro
+  postgres-backup:
+    extends:
+      service: orders-workload
+    image: cedardb-recovery-backup:dev
+    build:
+      context: ./orders-workload
+      target: backup-tools
+    user: "999:999"
+    environment:
+      PGPASSWORD: Backup-Lab-1
+      PGSSLMODE: disable
+    volumes:
+      - backups:/backups
+      - ./results:/results:ro
+  postgres-restore:
+    extends:
+      service: postgres
+    profiles: [restore]
+    volumes:
+      - postgres-restore-data:/var/lib/postgresql/data
+  restore-tools:
+    image: cedardb-recovery-backup:dev
+    profiles: [tools]
+    cpus: 1
+    mem_limit: 512m
+    entrypoint: [/orders-workload, maintenance]
+    volumes:
+      - backups:/backups:ro
+      - cedar-restore-data:/restore/cedar
+      - postgres-restore-data:/restore/postgres
+volumes:
+  cedar-data:
+  postgres-data:
+  backups:
+  cedar-restore-data:
+    name: cedardb-backup-recovery-restore-${CEDAR_LAB_RESTORE_ID:-unset}-cedar
+  postgres-restore-data:
+    name: cedardb-backup-recovery-restore-${CEDAR_LAB_RESTORE_ID:-unset}-postgres
