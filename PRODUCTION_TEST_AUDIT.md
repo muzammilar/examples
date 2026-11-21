@@ -15,6 +15,26 @@ execution evidence.
 
 ## Fresh qualification in this follow-up
 
+- [Kafka enrichment](kafka/connect-postgres-enrichment/VERIFIED_RESULTS.json): on
+  2026-11-21, fresh broker, active Connect worker, Go processor and PostgreSQL
+  SIGKILL cases passed with **8,020,480 ACKs**, live independent source/output/SQL
+  observations and full historical body/partition reconciliation. Three healthy
+  minimum-count diagnostic trials passed with another **6,013,312 ACKs**.
+  Final replay covers **18,038,912 ACKs across nine data histories**, zero
+  acknowledged loss/corruption. The original interrupted broker case received a
+  separate clean data reconciliation and remains failed; the RF1 setup failure
+  and known stale-CDC negative control remain preserved failures. Results include
+  CPU/memory/block-byte/storage samples and CRC-verified native compression.
+  These are short pipeline observations, not sustained/cold-cache capacity tests.
+  Clean-checkout recovery-harness lifecycle and extended failure domains remain
+  unqualified; its source remains on `kafka-connect-live-recovery`.
+- 2026-11-21 archive rechecks: PostgreSQL/pgvector **2,321 file hashes / 16 host
+  controls**, Strimzi **1,535 hashes / 11 controls**, MirrorMaker **1,054 hashes /
+  15 controls** passed. Their native faults were not rerun for these checks.
+  Compact results were committed before user-requested bulky export/journal
+  cleanup. Earlier preservation statements describe the original qualification;
+  consult current READMEs for retention limits. Deleted raw data cannot be replayed
+  from summaries/hashes.
 - [Neon Kubernetes](postgres/neon/kubernetes-statefulset/): latest shared Go workload
   rebuilt; five core recovery cases and five dependency/backup cases passed.
   Final full body reconciliation: **410,700 ACK rows across 17 journals**, zero
@@ -316,7 +336,7 @@ Closing one fault case does not close the entire deployment matrix.
 | Ceph | Example-owned `control.py`, independent `traffic.py`, preserved SDK histories and `native/` PG/deep-scrub/process auditor | All four core faults and warm benchmark qualified with independent live readers, preserved histories, native OSD UUID/serial fencing and all 17 daemon process witnesses. Cold reopen, retained-state setup, fresh default lifecycle, archived witness integrity and scoped cleanup also qualified above. Isolated daemon faults, quorum/partitions, pressure, topology changes, upgrades and independent restore remain unrun. |
 | Kafka Strimzi JBOD | Independent live C++/Rust actors, external histories, native CRI/ISR/directory proof and repaired-leader replay | Core and three fresh-process benchmark trials qualified above; short-deadline ambiguity/duplicate run remains failed with exact retained state. Still add scaling/vertical changes, operator reconciliation/outage, rolling/node/drain/PDB, partitions/quorum, upgrades, pressure, persistent PVC replacement and independent restore; isolate the duplicate reproducer. |
 | Kafka mirroring | Make orchestration, native checkpoint formatter and Rust offset/ISR/EOF inspection | Cutover/checkpoint proof plus live baseline, source-worker crash and retained-volume west-leader crash passed with preserved ACK histories and full replay. Fresh empty-storage replacement and separate post-crash full reconciliation passed; the original interrupted run stays failed. Recreated lifecycle/retained readback and cleanup passed; extended operator/failure cases remain pending. Historical Pod deletions do not qualify them. |
-| Kafka PostgreSQL enrichment | Make demo, producer/consumer and Go processor | Continuous CDC/RF3 fixes qualified with 2,004,096 ACKs and independent source/output/SQL witnesses on the recovery branch; original stale-CDC and RF1 setup failures retained. Broker recovery was stopped by the user during final replay and remains unqualified; Connect worker/task, processor, PostgreSQL failures and benchmarks remain pending. See the example handoff on `kafka-connect-live-recovery`. |
+| Kafka PostgreSQL enrichment | Witness-backed Compose harness on `kafka-connect-live-recovery`, independent C++/Rust actors and SQL probes | Four fresh core crash cases and three minimum-count diagnostics passed 2026-11-21; final replay checks 18,038,912 ACKs across nine histories with zero loss/corruption. Original RF1 setup, stale-CDC and interrupted broker failures retain their verdicts. Native compression and resource/storage results are committed in the example. Clean-checkout harness lifecycle, extended fault domains and sustained/cold/fair comparisons remain unqualified. |
 | StarRocks operator/Compose, Qdrant TurboQuant | Operator `operations.py`, Compose/Qdrant `fault.py`, independent live observers and reconciler | Existing role/disk/operator cases already have stronger observation paths. Do not duplicate them mechanically. Qualify pinned upgrades, independent restore, pressure and remaining topology/partition cases separately; no fresh rerun in this audit. |
 | Neon Compose and Greptime Compose | Local fault/scale controllers and independent observers | Bring the newly qualified Kubernetes dependency cases to supported Compose paths, then extend rolling changes, partitions, pressure and restore. Kubernetes results do not qualify Compose configuration. |
 | ClickHouse S3 tier | `scripts/fault.py`, `app/fault_workload.py` | Distinguish remote object durability from local metadata survival; audit independent reads, historical witnesses and native repair per backend before expanding fault counts. |
@@ -351,7 +371,7 @@ inventory with `python3 tools/audit-production-tests.py`; output is ignored unde
 | [greptimedb/single-node](greptimedb/single-node/) | Compose | none | suite, crash, disk, scale-out, scale-in, rolling, partition, pressure, restore, drain | declaration inventory only |
 | [iceberg/multi-system](iceberg/multi-system/) | Compose | none | suite, crash, disk, scale-out, scale-in, rolling, partition, pressure, restore, drain | declaration inventory only |
 | [iceberg/trino-minio](iceberg/trino-minio/) | Compose | crash | suite, disk, scale-out, scale-in, rolling, partition, pressure, restore, drain | declaration inventory only |
-| [kafka/connect-postgres-enrichment](kafka/connect-postgres-enrichment/) | Compose | none | suite, crash, disk, scale-out, scale-in, rolling, partition, pressure, restore, drain | declaration inventory only |
+| [kafka/connect-postgres-enrichment](kafka/connect-postgres-enrichment/) | Compose | recovery-branch core broker/Connect/processor/PostgreSQL crashes and three diagnostics | disk, scale-out, scale-in, rolling, partition/quorum, pressure, restore, drain, clean-harness lifecycle | individual core cases verified 2026-11-21; full aggregate invocation and extended matrix unrun; source on recovery branch |
 | [kafka/cross-cluster-mirroring](kafka/cross-cluster-mirroring/) | Kubernetes | suite, crash, disk | scale-out, scale-in, rolling, partition, pressure, restore, drain | core live recovery, exact cutover, retained-state replay and scoped lifecycle qualified above; private kubeconfig and explicit contexts verified; four-case aggregate invocation remains unrun |
 | [kafka/strimzi-jbod](kafka/strimzi-jbod/) | Kubernetes | none | suite, crash, disk, scale-out, scale-in, rolling, partition, pressure, restore, drain | declaration inventory only |
 | [lancedb/versioned-product-search](lancedb/versioned-product-search/) | Compose | test-production, writer-crash, reader-crash, maintenance, rolling-restart, cold-reopen, crash-reopen | partition, pressure, restore, SDK upgrade; native replication/sharding unsupported | core execution verified 2026-11-19; extended gaps above |

@@ -66,11 +66,114 @@ including native inspection and full verification. Largest sampled individual-co
 not run. Docker builds passed Go vet and race tests; the baseline also used C++
 CTest and eight Rust observer tests. Tested HTTP ports were 18083/18080.
 
-The broker recovery experiment was **stopped by the user during final replay**
-and is unqualified. Connect-worker, processor and PostgreSQL fault cases remain
-unrun; so do disk replacement, partitions, scaling, pressure, upgrades and restore.
-The paused harness and its resume instructions remain on `kafka-connect-live-recovery`;
-the normal five-command workflow above remains the simple walkthrough.
+At the 2026-11-20 pause, the broker experiment was **stopped during final replay**
+and the other fault cases and benchmark trials were unrun. The follow-up below
+closes those core cases. Extended disk, partition, scaling, pressure, upgrade and
+restore cases remain unrun.
+
+## Recovery and diagnostic trials — 2026-11-21
+
+[Committed results](VERIFIED_RESULTS.json) retain counts, latency distributions,
+phase markers, resource/storage measurements, image/source hashes and original
+failed verdicts. The existing ten service containers and volumes were resumed;
+no failed dataset was reset. Every new case kept independent writers/readers and
+SQL probes live through the operation and native repair, then replayed every
+current and earlier acknowledged order body, key and partition on both topics.
+
+| Fresh fault case | Source ACKs | Callback p50 / p99 ms | Enriched creation-to-observation p50 / p99 ms | ACK loss / corruption |
+|---|---:|---:|---:|---:|
+| Broker SIGKILL; repaired broker promoted to lead all 12 input/output partitions | 2,009,216 | 41.828 / 1271.923 | 28856.776 / 39775.313 | 0 / 0 |
+| Active Connect worker SIGKILL; surviving worker takes over CDC task | 2,001,024 | 27.791 / 704.158 | 9402.412 / 20396.451 | 0 / 0 |
+| Go processor SIGKILL; retained transactional group resumes | 2,004,096 | 49.916 / 699.223 | 9977.676 / 24362.953 | 0 / 0 |
+| PostgreSQL SIGKILL; cached enrichment continues and CDC catches up | 2,006,144 | 60.520 / 654.242 | 8298.486 / 21753.101 | 0 / 0 |
+
+The original interrupted broker case separately reconciled **2,001,024 ACKs** on
+both paths; its original verdict remains failed/interrupted. Including that
+history, the earlier baseline and the three trials below, the final replay covers
+**18,038,912 ACKs across nine data histories**, with zero acknowledged loss or
+corruption. The RF1 setup failure remains failed and has zero order records. The
+known one-record stale-CDC negative control is preserved separately and excluded
+from this passing cohort. All **1,161 acknowledged SQL probe operations** reconcile;
+ambiguous outcomes remain distinct from ACKs in the JSON reports.
+
+### Three healthy minimum-count trials
+
+Measured on **Apple M4 Pro / 48 GiB host RAM**, Docker Desktop **29.5.3**, native
+aarch64 Linux **6.12.76-linuxkit**, **11 vCPUs / 24.42 GiB VM RAM**. Six Kafka
+processes each have **1 CPU / 1,536 MiB**, two Connect workers each **1 CPU / 1 GiB**,
+PostgreSQL **1 CPU / 512 MiB**, Go **1 CPU / 256 MiB**, producer **1 CPU / 512 MiB**,
+each independent reader **1 CPU / 1 GiB**, and each replay verifier **2 CPUs / 2 GiB**.
+This is one shared host, not independent machines or a capacity comparison.
+Images were prebuilt; Docker builds and the initial retained-cluster restart are
+outside these trial windows. Each trial includes Go cache rebuild/setup. Witness
+producer/readers use librdkafka **2.12.1**; the Go processor uses franz-go **1.22.3**.
+
+Each trial uses a fresh Go process/topic/group, six partitions, RF3/min-ISR2 and
+**10,000 customers**. Source orders contain unique run/order IDs, customer IDs,
+integer amounts and creation timestamps; output adds the cached customer fields.
+Trials 1–2 contain **144,815,284 input / 228,456,286 output protobuf bytes** each;
+trial 3 contains **145,338,548 / 229,280,608 bytes**. UUIDs/timestamps differ; the
+generation pattern and client budgets are unchanged. In-flight drain can exceed
+the two-million minimum, so actual ACK counts are reported.
+
+| Trial | ACKs | First intent → last ACK / last enriched observation s | ACK / pipeline records/s | Callback mean / p50 / p99 ms | Enriched p50 / p99 ms |
+|---|---:|---:|---:|---:|---:|
+| 1 | 2,002,048 | 37.746 / 56.789 | 53040.49 / 35253.99 | 88.141 / 56.293 / 698.295 | 13267.920 / 26535.850 |
+| 2 | 2,002,048 | 38.810 / 57.881 | 51586.12 / 34589.33 | 100.927 / 69.574 / 774.035 | 14796.749 / 32073.589 |
+| 3 | 2,009,216 | 39.243 / 59.766 | 51199.91 / 33617.91 | 98.660 / 65.603 / 758.630 | 16606.815 / 27064.930 |
+
+Median ACK rate: **51,586.12 records/s** (range **51,199.91–53,040.49 records/s**,
+IQR **920.29 records/s**).
+Median pipeline observation rate: **34,589.33 records/s** (range
+**33,617.91–35,253.99 records/s**, IQR **818.04 records/s**). IQR uses inclusive
+linear interpolation across three trial rates. JSON includes mean/p50/p95/p99/p99.9
+and sample counts. Callback timing includes SDK queues/retries; observation latency
+includes encoding, processing, buffering and fsynced reader journals. These are
+different timing boundaries, not language performance comparisons.
+
+| Trial | Observed container / host-controller CPU core-s | Largest sampled individual-container charged memory MiB | Persistent allocated storage before → last sample MiB | Cgroup block read / write MiB | Source / enriched record-section compression ratio |
+|---|---:|---:|---:|---:|---:|
+| 1 | 505.555 / 84.247 | 1376.379 | 2231.609 → 2575.809 | 0.004 / 370.512 | 5.764 / 4.772 |
+| 2 | 474.086 / 86.022 | 1500.543 | 2576.129 → 2919.996 | 0.016 / 370.312 | 5.775 / 4.771 |
+| 3 | 513.361 / 87.354 | 1535.895 | 2920.348 → 3265.441 | 0.117 / 373.914 | 5.773 / 4.774 |
+
+Resource costs cover the **whole experiment**, including native inspection and
+growing historical replay work; the request/pipeline windows above are shorter.
+Raw samples target five-second cadence. JSON separates roles, CPU utilization
+(one core = 100%), memory sample means/maxima and read/write byte rates. Memory
+is cgroup charged usage, not heap, peak RSS or a simultaneous whole-stack peak.
+Host CPU excludes child CLI processes, which are recorded separately; VM/daemon
+overhead is excluded. Disk snapshots cover all owned persistent volumes, retained
+topics/replicas, WAL and metadata; phase samples can miss transient peaks.
+
+Compression was measured **after** the trials from every source/output partition
+on one repaired replica: CRC32C-verified Kafka magic-2 batches, decoded with pinned
+LZ4/CRC libraries using the [documented record format](https://kafka.apache.org/43/implementation/message-format/)
+and [Kafka 4.3.2 source](https://github.com/apache/kafka/blob/4.3.2/clients/src/main/java/org/apache/kafka/common/record/internal/DefaultRecordBatch.java).
+Ratios are uncompressed/compressed record-section bytes for the same stored data;
+batch headers, indexes and RF3 overhead are separate. Physical output had **19
+additional data records** in the processor-crash case and **45** in the original
+interrupted broker case; they were not visible to strict read-committed replay.
+Physical counts therefore do not establish duplicate committed processing. The
+inspector does not independently classify individual transaction outcomes.
+
+These are short pipeline diagnostics: no discarded 60-second warmup, sustained
+five-minute measurement or controlled cold-cache state. The customer cache is
+loaded before orders; replaying older data does not prove cold reads. Runtime
+block I/O accounting does not provide cache-hit rates; this API exposed no IOPS,
+I/O latency or queue depth. Customer display fields stay fixed during traffic
+while CDC probe versions change; no temporal-join/linearizability claim is made.
+Partitions/quorum loss, disk replacement, scaling, upgrades, pressure, independent
+restore, batch/skew/cold-read matrices and competing-system comparisons remain
+unrun. Eight host controller tests pass; the compression inspector also rejected
+corrupted-CRC and truncated native segments.
+
+The [experimental witness harness](https://github.com/muzammilar/examples/tree/kafka-connect-live-recovery/kafka/connect-postgres-enrichment)
+produced these results. Clean-checkout initialization and its full production-test
+lifecycle remain unqualified; these case results do not establish those paths.
+At the user's request, large journals and copied log segments are cleaned after
+publication. Reports, metric samples and proof summaries remain locally; hashes
+cannot replay deleted raw events. New full reproduction requires a fresh dataset.
 
 ## Setup
 
