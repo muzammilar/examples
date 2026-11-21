@@ -59,3 +59,9 @@ An [offline snapshot/tail restore](duckdb-comparison/JOURNAL.md#offline-restore-
 also rebuilt every body in separate local storage without access to original input
 CSVs: 1,614 replayed entries, zero evaluation errors and zero ACK loss. This does
 not establish online backup availability or independent-host durability.
+
+[Journal ownership tests](duckdb-comparison/FENCING.md) now reject all ten native
+second openers on Docker-managed ext4 storage while writers/readers continue.
+The host-share bind mount failed both native and standard-library locking controls;
+that failure remains reported. Current live tests use uniquely owned volumes, and
+the two-crash volume rerun recovered all 2,255 ACKs with zero observed body loss.

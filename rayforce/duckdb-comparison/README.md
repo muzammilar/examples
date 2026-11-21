@@ -33,6 +33,7 @@ make test-rayforce-snapshot
 make test-duckdb-snapshot
 make test-journal-capability
 make test-journal-recovery
+make test-journal-writer-lock
 ```
 
 `ROWS=2000000` defaults to two million; `REPEATS=15`, `TRIALS=3`,
@@ -42,6 +43,8 @@ their original inspected limits. The [persisted snapshot profiles](PERSISTENCE.m
 verify full two-million-row reopens and native file footprints, separately from
 the in-memory measurements below. [Native synchronous journal tests](JOURNAL.md)
 add independent writers/readers through two retained-state process crashes.
+[Writer-exclusion tests](FENCING.md) use a labeled Linux volume and retain the
+host-share lock failure separately. Do not assume a host bind mount enforces locks.
 Changing `ROWS` requires archiving the old `results/`
 directory first. Failed runs remain evidence; no automatic data reset or retry.
 An example-local lock prevents concurrent controllers. Other examples must be

@@ -57,9 +57,21 @@ test-journal-capability: check-controls
 test-journal-recovery: check-controls
 	python3 live_journal.py
 
+.PHONY: test-journal-writer-lock
+test-journal-writer-lock: check-controls
+	JOURNAL_SCENARIO=writer-lock python3 live_journal.py
+
+.PHONY: test-journal-writer-lock-bind test-lock-filesystem test-lock-filesystem-bind
+test-journal-writer-lock-bind: check-controls
+	JOURNAL_STORAGE=bind JOURNAL_SCENARIO=writer-lock python3 live_journal.py
+test-lock-filesystem:
+	python3 filesystem_lock_check.py volume
+test-lock-filesystem-bind:
+	python3 filesystem_lock_check.py bind
+
 .PHONY: test-production report-journal
 # Selected implemented cases; JOURNAL.md lists the remaining boundaries.
-test-production: test-journal-capability test-journal-recovery
+test-production: test-journal-capability test-lock-filesystem test-journal-writer-lock test-journal-recovery
 
 JOURNAL_RESULT ?=
 report-journal:

@@ -1,0 +1,818 @@
+{
+  "image_id": "sha256:8776c8e5a305ceb8c3456aa42c76ea511030050ce8cbec38693be9fd3980a22a",
+  "filesystem_controls": [
+    {
+      "directory": "results/lock-capability/d492a70d73c34313a475af8faa0a023e",
+      "environment": {
+        "utc": "2026-11-21T21:14:49Z",
+        "host": [
+          "Darwin",
+          "Muzammils-MacBook-Pro.local",
+          "25.5.0",
+          "Darwin Kernel Version 25.5.0: Mon Apr 27 20:41:15 PDT 2026; root:xnu-12377.121.6~2/RELEASE_ARM64_T6041",
+          "arm64"
+        ],
+        "docker_info": {
+          "ID": "172e5e0a-2d95-4fb5-a6b4-fb16552caec8",
+          "Containers": 9,
+          "ContainersRunning": 0,
+          "ContainersPaused": 0,
+          "ContainersStopped": 9,
+          "Images": 10,
+          "Driver": "overlayfs",
+          "DriverStatus": [
+            [
+              "driver-type",
+              "io.containerd.snapshotter.v1"
+            ]
+          ],
+          "Plugins": {
+            "Volume": [
+              "local"
+            ],
+            "Network": [
+              "bridge",
+              "host",
+              "ipvlan",
+              "macvlan",
+              "null",
+              "overlay"
+            ],
+            "Authorization": null,
+            "Log": [
+              "awslogs",
+              "fluentd",
+              "gcplogs",
+              "gelf",
+              "journald",
+              "json-file",
+              "local",
+              "splunk",
+              "syslog"
+            ]
+          },
+          "MemoryLimit": true,
+          "SwapLimit": true,
+          "CpuCfsPeriod": true,
+          "CpuCfsQuota": true,
+          "CPUShares": true,
+          "CPUSet": true,
+          "PidsLimit": true,
+          "IPv4Forwarding": true,
+          "Debug": false,
+          "NFd": 43,
+          "OomKillDisable": false,
+          "NGoroutines": 94,
+          "SystemTime": "2026-11-21T21:14:49.738112638Z",
+          "LoggingDriver": "json-file",
+          "CgroupDriver": "cgroupfs",
+          "CgroupVersion": "2",
+          "NEventsListener": 13,
+          "KernelVersion": "6.12.76-linuxkit",
+          "OperatingSystem": "Docker Desktop",
+          "OSVersion": "",
+          "OSType": "linux",
+          "Architecture": "aarch64",
+          "IndexServerAddress": "https://index.docker.io/v1/",
+          "RegistryConfig": {
+            "InsecureRegistryCIDRs": [
+              "::1/128",
+              "127.0.0.0/8"
+            ],
+            "IndexConfigs": {
+              "docker.io": {
+                "Name": "docker.io",
+                "Mirrors": [],
+                "Secure": true,
+                "Official": true
+              },
+              "hubproxy.docker.internal:5555": {
+                "Name": "hubproxy.docker.internal:5555",
+                "Mirrors": [],
+                "Secure": false,
+                "Official": false
+              }
+            },
+            "Mirrors": []
+          },
+          "NCPU": 11,
+          "MemTotal": 26216296448,
+          "GenericResources": null,
+          "DockerRootDir": "/var/lib/docker",
+          "HttpProxy": "http.docker.internal:3128",
+          "HttpsProxy": "http.docker.internal:3128",
+          "NoProxy": "hubproxy.docker.internal",
+          "Name": "docker-desktop",
+          "Labels": [
+            "com.docker.desktop.address=unix:///Users/muzammil/Library/Containers/com.docker.docker/Data/docker-cli.sock"
+          ],
+          "ExperimentalBuild": false,
+          "ServerVersion": "29.5.3",
+          "Runtimes": {
+            "io.containerd.runc.v2": {
+              "path": "runc",
+              "status": {
+                "org.opencontainers.runtime-spec.features": "{\"ociVersionMin\":\"1.0.0\",\"ociVersionMax\":\"1.2.1\",\"hooks\":[\"prestart\",\"createRuntime\",\"createContainer\",\"startContainer\",\"poststart\",\"poststop\"],\"mountOptions\":[\"async\",\"atime\",\"bind\",\"defaults\",\"dev\",\"diratime\",\"dirsync\",\"exec\",\"iversion\",\"lazytime\",\"loud\",\"mand\",\"noatime\",\"nodev\",\"nodiratime\",\"noexec\",\"noiversion\",\"nolazytime\",\"nomand\",\"norelatime\",\"nostrictatime\",\"nosuid\",\"nosymfollow\",\"private\",\"ratime\",\"rbind\",\"rdev\",\"rdiratime\",\"relatime\",\"remount\",\"rexec\",\"rnoatime\",\"rnodev\",\"rnodiratime\",\"rnoexec\",\"rnorelatime\",\"rnostrictatime\",\"rnosuid\",\"rnosymfollow\",\"ro\",\"rprivate\",\"rrelatime\",\"rro\",\"rrw\",\"rshared\",\"rslave\",\"rstrictatime\",\"rsuid\",\"rsymfollow\",\"runbindable\",\"rw\",\"shared\",\"silent\",\"slave\",\"strictatime\",\"suid\",\"symfollow\",\"sync\",\"tmpcopyup\",\"unbindable\"],\"linux\":{\"namespaces\":[\"cgroup\",\"ipc\",\"mount\",\"network\",\"pid\",\"time\",\"user\",\"uts\"],\"capabilities\":[\"CAP_CHOWN\",\"CAP_DAC_OVERRIDE\",\"CAP_DAC_READ_SEARCH\",\"CAP_FOWNER\",\"CAP_FSETID\",\"CAP_KILL\",\"CAP_SETGID\",\"CAP_SETUID\",\"CAP_SETPCAP\",\"CAP_LINUX_IMMUTABLE\",\"CAP_NET_BIND_SERVICE\",\"CAP_NET_BROADCAST\",\"CAP_NET_ADMIN\",\"CAP_NET_RAW\",\"CAP_IPC_LOCK\",\"CAP_IPC_OWNER\",\"CAP_SYS_MODULE\",\"CAP_SYS_RAWIO\",\"CAP_SYS_CHROOT\",\"CAP_SYS_PTRACE\",\"CAP_SYS_PACCT\",\"CAP_SYS_ADMIN\",\"CAP_SYS_BOOT\",\"CAP_SYS_NICE\",\"CAP_SYS_RESOURCE\",\"CAP_SYS_TIME\",\"CAP_SYS_TTY_CONFIG\",\"CAP_MKNOD\",\"CAP_LEASE\",\"CAP_AUDIT_WRITE\",\"CAP_AUDIT_CONTROL\",\"CAP_SETFCAP\",\"CAP_MAC_OVERRIDE\",\"CAP_MAC_ADMIN\",\"CAP_SYSLOG\",\"CAP_WAKE_ALARM\",\"CAP_BLOCK_SUSPEND\",\"CAP_AUDIT_READ\",\"CAP_PERFMON\",\"CAP_BPF\",\"CAP_CHECKPOINT_RESTORE\"],\"cgroup\":{\"v1\":true,\"v2\":true,\"systemd\":true,\"systemdUser\":true,\"rdma\":true},\"seccomp\":{\"enabled\":true,\"actions\":[\"SCMP_ACT_ALLOW\",\"SCMP_ACT_ERRNO\",\"SCMP_ACT_KILL\",\"SCMP_ACT_KILL_PROCESS\",\"SCMP_ACT_KILL_THREAD\",\"SCMP_ACT_LOG\",\"SCMP_ACT_NOTIFY\",\"SCMP_ACT_TRACE\",\"SCMP_ACT_TRAP\"],\"operators\":[\"SCMP_CMP_EQ\",\"SCMP_CMP_GE\",\"SCMP_CMP_GT\",\"SCMP_CMP_LE\",\"SCMP_CMP_LT\",\"SCMP_CMP_MASKED_EQ\",\"SCMP_CMP_NE\"],\"archs\":[\"SCMP_ARCH_AARCH64\",\"SCMP_ARCH_ARM\",\"SCMP_ARCH_MIPS\",\"SCMP_ARCH_MIPS64\",\"SCMP_ARCH_MIPS64N32\",\"SCMP_ARCH_MIPSEL\",\"SCMP_ARCH_MIPSEL64\",\"SCMP_ARCH_MIPSEL64N32\",\"SCMP_ARCH_PPC\",\"SCMP_ARCH_PPC64\",\"SCMP_ARCH_PPC64LE\",\"SCMP_ARCH_RISCV64\",\"SCMP_ARCH_S390\",\"SCMP_ARCH_S390X\",\"SCMP_ARCH_X32\",\"SCMP_ARCH_X86\",\"SCMP_ARCH_X86_64\"],\"knownFlags\":[\"SECCOMP_FILTER_FLAG_TSYNC\",\"SECCOMP_FILTER_FLAG_SPEC_ALLOW\",\"SECCOMP_FILTER_FLAG_LOG\"],\"supportedFlags\":[\"SECCOMP_FILTER_FLAG_TSYNC\",\"SECCOMP_FILTER_FLAG_SPEC_ALLOW\",\"SECCOMP_FILTER_FLAG_LOG\"]},\"apparmor\":{\"enabled\":true},\"selinux\":{\"enabled\":true},\"intelRdt\":{\"enabled\":true},\"mountExtensions\":{\"idmap\":{\"enabled\":true}}},\"annotations\":{\"io.github.seccomp.libseccomp.version\":\"2.5.4\",\"org.opencontainers.runc.checkpoint.enabled\":\"true\",\"org.opencontainers.runc.commit\":\"v1.3.6-0-g491b69ba\",\"org.opencontainers.runc.version\":\"1.3.6\\n\"},\"potentiallyUnsafeConfigAnnotations\":[\"bundle\",\"org.systemd.property.\",\"org.criu.config\"]}"
+              }
+            },
+            "runc": {
+              "path": "runc",
+              "status": {
+                "org.opencontainers.runtime-spec.features": "{\"ociVersionMin\":\"1.0.0\",\"ociVersionMax\":\"1.2.1\",\"hooks\":[\"prestart\",\"createRuntime\",\"createContainer\",\"startContainer\",\"poststart\",\"poststop\"],\"mountOptions\":[\"async\",\"atime\",\"bind\",\"defaults\",\"dev\",\"diratime\",\"dirsync\",\"exec\",\"iversion\",\"lazytime\",\"loud\",\"mand\",\"noatime\",\"nodev\",\"nodiratime\",\"noexec\",\"noiversion\",\"nolazytime\",\"nomand\",\"norelatime\",\"nostrictatime\",\"nosuid\",\"nosymfollow\",\"private\",\"ratime\",\"rbind\",\"rdev\",\"rdiratime\",\"relatime\",\"remount\",\"rexec\",\"rnoatime\",\"rnodev\",\"rnodiratime\",\"rnoexec\",\"rnorelatime\",\"rnostrictatime\",\"rnosuid\",\"rnosymfollow\",\"ro\",\"rprivate\",\"rrelatime\",\"rro\",\"rrw\",\"rshared\",\"rslave\",\"rstrictatime\",\"rsuid\",\"rsymfollow\",\"runbindable\",\"rw\",\"shared\",\"silent\",\"slave\",\"strictatime\",\"suid\",\"symfollow\",\"sync\",\"tmpcopyup\",\"unbindable\"],\"linux\":{\"namespaces\":[\"cgroup\",\"ipc\",\"mount\",\"network\",\"pid\",\"time\",\"user\",\"uts\"],\"capabilities\":[\"CAP_CHOWN\",\"CAP_DAC_OVERRIDE\",\"CAP_DAC_READ_SEARCH\",\"CAP_FOWNER\",\"CAP_FSETID\",\"CAP_KILL\",\"CAP_SETGID\",\"CAP_SETUID\",\"CAP_SETPCAP\",\"CAP_LINUX_IMMUTABLE\",\"CAP_NET_BIND_SERVICE\",\"CAP_NET_BROADCAST\",\"CAP_NET_ADMIN\",\"CAP_NET_RAW\",\"CAP_IPC_LOCK\",\"CAP_IPC_OWNER\",\"CAP_SYS_MODULE\",\"CAP_SYS_RAWIO\",\"CAP_SYS_CHROOT\",\"CAP_SYS_PTRACE\",\"CAP_SYS_PACCT\",\"CAP_SYS_ADMIN\",\"CAP_SYS_BOOT\",\"CAP_SYS_NICE\",\"CAP_SYS_RESOURCE\",\"CAP_SYS_TIME\",\"CAP_SYS_TTY_CONFIG\",\"CAP_MKNOD\",\"CAP_LEASE\",\"CAP_AUDIT_WRITE\",\"CAP_AUDIT_CONTROL\",\"CAP_SETFCAP\",\"CAP_MAC_OVERRIDE\",\"CAP_MAC_ADMIN\",\"CAP_SYSLOG\",\"CAP_WAKE_ALARM\",\"CAP_BLOCK_SUSPEND\",\"CAP_AUDIT_READ\",\"CAP_PERFMON\",\"CAP_BPF\",\"CAP_CHECKPOINT_RESTORE\"],\"cgroup\":{\"v1\":true,\"v2\":true,\"systemd\":true,\"systemdUser\":true,\"rdma\":true},\"seccomp\":{\"enabled\":true,\"actions\":[\"SCMP_ACT_ALLOW\",\"SCMP_ACT_ERRNO\",\"SCMP_ACT_KILL\",\"SCMP_ACT_KILL_PROCESS\",\"SCMP_ACT_KILL_THREAD\",\"SCMP_ACT_LOG\",\"SCMP_ACT_NOTIFY\",\"SCMP_ACT_TRACE\",\"SCMP_ACT_TRAP\"],\"operators\":[\"SCMP_CMP_EQ\",\"SCMP_CMP_GE\",\"SCMP_CMP_GT\",\"SCMP_CMP_LE\",\"SCMP_CMP_LT\",\"SCMP_CMP_MASKED_EQ\",\"SCMP_CMP_NE\"],\"archs\":[\"SCMP_ARCH_AARCH64\",\"SCMP_ARCH_ARM\",\"SCMP_ARCH_MIPS\",\"SCMP_ARCH_MIPS64\",\"SCMP_ARCH_MIPS64N32\",\"SCMP_ARCH_MIPSEL\",\"SCMP_ARCH_MIPSEL64\",\"SCMP_ARCH_MIPSEL64N32\",\"SCMP_ARCH_PPC\",\"SCMP_ARCH_PPC64\",\"SCMP_ARCH_PPC64LE\",\"SCMP_ARCH_RISCV64\",\"SCMP_ARCH_S390\",\"SCMP_ARCH_S390X\",\"SCMP_ARCH_X32\",\"SCMP_ARCH_X86\",\"SCMP_ARCH_X86_64\"],\"knownFlags\":[\"SECCOMP_FILTER_FLAG_TSYNC\",\"SECCOMP_FILTER_FLAG_SPEC_ALLOW\",\"SECCOMP_FILTER_FLAG_LOG\"],\"supportedFlags\":[\"SECCOMP_FILTER_FLAG_TSYNC\",\"SECCOMP_FILTER_FLAG_SPEC_ALLOW\",\"SECCOMP_FILTER_FLAG_LOG\"]},\"apparmor\":{\"enabled\":true},\"selinux\":{\"enabled\":true},\"intelRdt\":{\"enabled\":true},\"mountExtensions\":{\"idmap\":{\"enabled\":true}}},\"annotations\":{\"io.github.seccomp.libseccomp.version\":\"2.5.4\",\"org.opencontainers.runc.checkpoint.enabled\":\"true\",\"org.opencontainers.runc.commit\":\"v1.3.6-0-g491b69ba\",\"org.opencontainers.runc.version\":\"1.3.6\\n\"},\"potentiallyUnsafeConfigAnnotations\":[\"bundle\",\"org.systemd.property.\",\"org.criu.config\"]}"
+              }
+            }
+          },
+          "DefaultRuntime": "runc",
+          "Swarm": {
+            "NodeID": "",
+            "NodeAddr": "",
+            "LocalNodeState": "inactive",
+            "ControlAvailable": false,
+            "Error": "",
+            "RemoteManagers": null
+          },
+          "LiveRestoreEnabled": false,
+          "Isolation": "",
+          "InitBinary": "docker-init",
+          "ContainerdCommit": {
+            "ID": "e53c7c1516c3b2bff98eb76f1f4117477e6f4e66"
+          },
+          "RuncCommit": {
+            "ID": "v1.3.6-0-g491b69ba"
+          },
+          "InitCommit": {
+            "ID": "de40ad0"
+          },
+          "SecurityOptions": [
+            "name=seccomp,profile=builtin",
+            "name=cgroupns"
+          ],
+          "FirewallBackend": {
+            "Driver": "iptables"
+          },
+          "CDISpecDirs": [
+            "/etc/cdi",
+            "/var/run/cdi"
+          ],
+          "DiscoveredDevices": [
+            {
+              "Source": "cdi",
+              "ID": "docker.com/gpu=webgpu"
+            }
+          ],
+          "Containerd": {
+            "Address": "/run/containerd/containerd.sock",
+            "Namespaces": {
+              "Containers": "moby",
+              "Plugins": "plugins.moby"
+            }
+          },
+          "Warnings": null,
+          "ClientInfo": {
+            "Debug": false,
+            "Version": "29.5.3",
+            "DefaultAPIVersion": "1.54",
+            "GitCommit": "d1c06ef",
+            "GoVersion": "go1.26.4",
+            "Os": "darwin",
+            "Arch": "arm64",
+            "BuildTime": "Wed Jun  3 17:59:08 2026",
+            "Context": "desktop-linux",
+            "Plugins": [
+              {
+                "SchemaVersion": "0.1.0",
+                "Vendor": "Docker Inc.",
+                "Version": "v1.79.0",
+                "ShortDescription": "Docker AI Agent Runner",
+                "Name": "agent",
+                "Path": "/Users/muzammil/.docker/cli-plugins/docker-agent"
+              },
+              {
+                "SchemaVersion": "0.1.0",
+                "Vendor": "Docker Inc.",
+                "Version": "v1.25.0",
+                "ShortDescription": "Docker AI Agent - Ask Gordon",
+                "Name": "ai",
+                "Path": "/Users/muzammil/.docker/cli-plugins/docker-ai"
+              },
+              {
+                "SchemaVersion": "0.1.0",
+                "Vendor": "Docker Inc.",
+                "Version": "v0.34.1-desktop.1",
+                "ShortDescription": "Docker Buildx",
+                "Name": "buildx",
+                "Path": "/Users/muzammil/.docker/cli-plugins/docker-buildx"
+              },
+              {
+                "SchemaVersion": "0.1.0",
+                "Vendor": "Docker Inc.",
+                "Version": "v5.1.4",
+                "ShortDescription": "Docker Compose",
+                "Name": "compose",
+                "Path": "/Users/muzammil/.docker/cli-plugins/docker-compose"
+              },
+              {
+                "SchemaVersion": "0.1.0",
+                "Vendor": "Docker Inc.",
+                "Version": "0.0.47",
+                "ShortDescription": "Get a shell into any image or container",
+                "Name": "debug",
+                "Path": "/Users/muzammil/.docker/cli-plugins/docker-debug"
+              },
+              {
+                "SchemaVersion": "0.1.0",
+                "Vendor": "Docker Inc.",
+                "Version": "v0.4.1",
+                "ShortDescription": "Docker Desktop commands",
+                "Name": "desktop",
+                "Path": "/Users/muzammil/.docker/cli-plugins/docker-desktop"
+              },
+              {
+                "SchemaVersion": "0.1.0",
+                "Vendor": "Docker Inc.",
+                "Version": "v0.0.4",
+                "ShortDescription": "CLI for managing Docker Hardened Images",
+                "Name": "dhi",
+                "Path": "/Users/muzammil/.docker/cli-plugins/docker-dhi"
+              },
+              {
+                "SchemaVersion": "0.1.0",
+                "Vendor": "Docker Inc.",
+                "Version": "v0.2.31",
+                "ShortDescription": "Manages Docker extensions",
+                "Name": "extension",
+                "Path": "/Users/muzammil/.docker/cli-plugins/docker-extension"
+              },
+              {
+                "SchemaVersion": "0.1.0",
+                "Vendor": "Docker Inc.",
+                "Version": "v1.4.0",
+                "ShortDescription": "Creates Docker-related starter files for your project",
+                "Name": "init",
+                "Path": "/Users/muzammil/.docker/cli-plugins/docker-init"
+              },
+              {
+                "SchemaVersion": "0.1.0",
+                "Vendor": "Docker Inc.",
+                "Version": "v0.42.2",
+                "ShortDescription": "Docker MCP Plugin",
+                "Name": "mcp",
+                "Path": "/Users/muzammil/.docker/cli-plugins/docker-mcp"
+              },
+              {
+                "SchemaVersion": "0.1.0",
+                "Vendor": "Docker Inc.",
+                "Version": "v1.2.1",
+                "ShortDescription": "Docker Model Runner",
+                "Name": "model",
+                "Path": "/Users/muzammil/.docker/cli-plugins/docker-model"
+              },
+              {
+                "SchemaVersion": "0.1.0",
+                "Vendor": "Docker Inc.",
+                "Version": "v0.6.4",
+                "ShortDescription": "Docker Offload",
+                "Name": "offload",
+                "Path": "/Users/muzammil/.docker/cli-plugins/docker-offload"
+              },
+              {
+                "SchemaVersion": "0.1.0",
+                "Vendor": "Docker Inc.",
+                "Version": "v0.1.5",
+                "ShortDescription": "Docker Pass Secrets Manager Plugin (beta)",
+                "Name": "pass",
+                "Path": "/Users/muzammil/.docker/cli-plugins/docker-pass"
+              },
+              {
+                "SchemaVersion": "0.1.0",
+                "Vendor": "Docker Inc.",
+                "Version": "v0.12.0",
+                "ShortDescription": "Docker Sandbox",
+                "Name": "sandbox",
+                "Path": "/Users/muzammil/.docker/cli-plugins/docker-sandbox"
+              },
+              {
+                "SchemaVersion": "0.1.0",
+                "Vendor": "Docker Inc.",
+                "Version": "v1.22.0",
+                "ShortDescription": "Docker Scout",
+                "Name": "scout",
+                "Path": "/Users/muzammil/.docker/cli-plugins/docker-scout"
+              }
+            ],
+            "Warnings": null
+          }
+        },
+        "source_sha256": {
+          "filesystem_lock_check.py": "fd2afcca329e94a3ed7f40f9945c98d54e4668a5c348e4cc43b65c4bb8526efe",
+          "docker-compose.journal.yml": "665a59f9754ce307ae6a3c3398d815f25d03a7134a17be56cc502ca984fa4ffd",
+          "docker-compose.journal-volume.yml": "f97301b164eb3a70ae88713c437712f8ea97d8065a3eecfb953670947a3411a7"
+        }
+      },
+      "result": {
+        "mode": "bind",
+        "owner": {
+          "ready": true,
+          "stat": [
+            33188,
+            129,
+            46,
+            1,
+            501,
+            20,
+            0,
+            1795295689,
+            1795295689,
+            1795295689
+          ],
+          "mountinfo": "149 98 0:63 / / ro,relatime - overlay overlay rw,lowerdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88088/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88007/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88006/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88005/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88004/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88003/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88002/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88001/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88000/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/87999/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/87998/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/87997/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/87996/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/87995/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/85372/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/85371/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/85369/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/85368/fs,upperdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88089/fs,workdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88089/work\n151 149 0:72 / /proc rw,nosuid,nodev,noexec,relatime - proc proc rw\n152 149 0:73 / /dev rw,nosuid - tmpfs tmpfs rw,size=65536k,mode=755\n153 152 0:74 / /dev/pts rw,nosuid,noexec,relatime - devpts devpts rw,gid=5,mode=620,ptmxmode=666\n154 149 0:75 / /sys ro,nosuid,nodev,noexec,relatime - sysfs sysfs ro\n155 154 0:40 / /sys/fs/cgroup ro,nosuid,nodev,noexec,relatime - cgroup2 cgroup rw\n156 152 0:70 / /dev/mqueue rw,nosuid,nodev,noexec,relatime - mqueue mqueue rw\n157 152 0:76 / /dev/shm rw,nosuid,nodev,noexec,relatime - tmpfs shm rw,size=65536k\n158 149 0:77 / /tmp rw,nosuid,nodev,noexec,relatime - tmpfs tmpfs rw,size=65536k\n159 149 0:48 /muzammil/github.com/muzammilar/examples/rayforce/duckdb-comparison/results/lock-capability/d492a70d73c34313a475af8faa0a023e/state /state rw,nosuid,nodev,relatime - fakeowner /run/host_mark/Users rw,fakeowner\n160 149 254:1 /docker/containers/402aec46e7fd453997072afbb1bb0ceb2aeffb5e155bfd3145c3537892b5b459/resolv.conf /etc/resolv.conf ro,relatime - ext4 /dev/vda1 rw,discard\n161 149 254:1 /docker/containers/402aec46e7fd453997072afbb1bb0ceb2aeffb5e155bfd3145c3537892b5b459/hostname /etc/hostname ro,relatime - ext4 /dev/vda1 rw,discard\n162 149 254:1 /docker/containers/402aec46e7fd453997072afbb1bb0ceb2aeffb5e155bfd3145c3537892b5b459/hosts /etc/hosts ro,relatime - ext4 /dev/vda1 rw,discard\n99 151 0:72 /bus /proc/bus ro,nosuid,nodev,noexec,relatime - proc proc rw\n100 151 0:72 /fs /proc/fs ro,nosuid,nodev,noexec,relatime - proc proc rw\n101 151 0:72 /irq /proc/irq ro,nosuid,nodev,noexec,relatime - proc proc rw\n102 151 0:72 /sys /proc/sys ro,nosuid,nodev,noexec,relatime - proc proc rw\n103 151 0:72 /sysrq-trigger /proc/sysrq-trigger ro,nosuid,nodev,noexec,relatime - proc proc rw\n104 151 0:73 /null /proc/interrupts rw,nosuid - tmpfs tmpfs rw,size=65536k,mode=755\n105 151 0:73 /null /proc/kcore rw,nosuid - tmpfs tmpfs rw,size=65536k,mode=755\n106 151 0:73 /null /proc/keys rw,nosuid - tmpfs tmpfs rw,size=65536k,mode=755\n107 151 0:78 / /proc/scsi ro,relatime - tmpfs tmpfs ro,size=4k,nr_inodes=1\n108 151 0:73 /null /proc/timer_list rw,nosuid - tmpfs tmpfs rw,size=65536k,mode=755\n109 154 0:78 / /sys/firmware ro,relatime - tmpfs tmpfs ro,size=4k,nr_inodes=1\n"
+        },
+        "same_container": {
+          "blocked": false,
+          "stat": [
+            33188,
+            129,
+            46,
+            1,
+            501,
+            20,
+            0,
+            1795295689,
+            1795295689,
+            1795295689
+          ],
+          "file_bytes": 0,
+          "allocated_bytes": 0,
+          "wall_ns": 304125,
+          "cpu_ns": 84958,
+          "process_peak_rss_bytes": 14864384,
+          "cgroup": {
+            "cpu.stat": "usage_usec 101138\nuser_usec 89786\nsystem_usec 11352\nnice_usec 0\nnr_periods 2\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+            "memory.peak": "18247680\n",
+            "io.stat": ""
+          },
+          "mountinfo": "149 98 0:63 / / ro,relatime - overlay overlay rw,lowerdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88088/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88007/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88006/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88005/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88004/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88003/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88002/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88001/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88000/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/87999/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/87998/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/87997/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/87996/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/87995/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/85372/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/85371/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/85369/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/85368/fs,upperdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88089/fs,workdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88089/work\n151 149 0:72 / /proc rw,nosuid,nodev,noexec,relatime - proc proc rw\n152 149 0:73 / /dev rw,nosuid - tmpfs tmpfs rw,size=65536k,mode=755\n153 152 0:74 / /dev/pts rw,nosuid,noexec,relatime - devpts devpts rw,gid=5,mode=620,ptmxmode=666\n154 149 0:75 / /sys ro,nosuid,nodev,noexec,relatime - sysfs sysfs ro\n155 154 0:40 / /sys/fs/cgroup ro,nosuid,nodev,noexec,relatime - cgroup2 cgroup rw\n156 152 0:70 / /dev/mqueue rw,nosuid,nodev,noexec,relatime - mqueue mqueue rw\n157 152 0:76 / /dev/shm rw,nosuid,nodev,noexec,relatime - tmpfs shm rw,size=65536k\n158 149 0:77 / /tmp rw,nosuid,nodev,noexec,relatime - tmpfs tmpfs rw,size=65536k\n159 149 0:48 /muzammil/github.com/muzammilar/examples/rayforce/duckdb-comparison/results/lock-capability/d492a70d73c34313a475af8faa0a023e/state /state rw,nosuid,nodev,relatime - fakeowner /run/host_mark/Users rw,fakeowner\n160 149 254:1 /docker/containers/402aec46e7fd453997072afbb1bb0ceb2aeffb5e155bfd3145c3537892b5b459/resolv.conf /etc/resolv.conf ro,relatime - ext4 /dev/vda1 rw,discard\n161 149 254:1 /docker/containers/402aec46e7fd453997072afbb1bb0ceb2aeffb5e155bfd3145c3537892b5b459/hostname /etc/hostname ro,relatime - ext4 /dev/vda1 rw,discard\n162 149 254:1 /docker/containers/402aec46e7fd453997072afbb1bb0ceb2aeffb5e155bfd3145c3537892b5b459/hosts /etc/hosts ro,relatime - ext4 /dev/vda1 rw,discard\n99 151 0:72 /bus /proc/bus ro,nosuid,nodev,noexec,relatime - proc proc rw\n100 151 0:72 /fs /proc/fs ro,nosuid,nodev,noexec,relatime - proc proc rw\n101 151 0:72 /irq /proc/irq ro,nosuid,nodev,noexec,relatime - proc proc rw\n102 151 0:72 /sys /proc/sys ro,nosuid,nodev,noexec,relatime - proc proc rw\n103 151 0:72 /sysrq-trigger /proc/sysrq-trigger ro,nosuid,nodev,noexec,relatime - proc proc rw\n104 151 0:73 /null /proc/interrupts rw,nosuid - tmpfs tmpfs rw,size=65536k,mode=755\n105 151 0:73 /null /proc/kcore rw,nosuid - tmpfs tmpfs rw,size=65536k,mode=755\n106 151 0:73 /null /proc/keys rw,nosuid - tmpfs tmpfs rw,size=65536k,mode=755\n107 151 0:78 / /proc/scsi ro,relatime - tmpfs tmpfs ro,size=4k,nr_inodes=1\n108 151 0:73 /null /proc/timer_list rw,nosuid - tmpfs tmpfs rw,size=65536k,mode=755\n109 154 0:78 / /sys/firmware ro,relatime - tmpfs tmpfs ro,size=4k,nr_inodes=1\n"
+        },
+        "cross_container": {
+          "blocked": false,
+          "stat": [
+            33188,
+            129,
+            46,
+            1,
+            501,
+            20,
+            0,
+            1795295689,
+            1795295689,
+            1795295689
+          ],
+          "file_bytes": 0,
+          "allocated_bytes": 0,
+          "wall_ns": 320375,
+          "cpu_ns": 82458,
+          "process_peak_rss_bytes": 14868480,
+          "cgroup": {
+            "cpu.stat": "usage_usec 60079\nuser_usec 54900\nsystem_usec 5179\nnice_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+            "memory.peak": "10317824\n",
+            "io.stat": ""
+          },
+          "mountinfo": "198 131 0:65 / / ro,relatime - overlay overlay rw,lowerdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88090/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88007/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88006/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88005/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88004/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88003/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88002/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88001/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88000/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/87999/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/87998/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/87997/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/87996/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/87995/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/85372/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/85371/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/85369/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/85368/fs,upperdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88091/fs,workdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88091/work\n200 198 0:82 / /proc rw,nosuid,nodev,noexec,relatime - proc proc rw\n201 198 0:83 / /dev rw,nosuid - tmpfs tmpfs rw,size=65536k,mode=755\n202 201 0:84 / /dev/pts rw,nosuid,noexec,relatime - devpts devpts rw,gid=5,mode=620,ptmxmode=666\n203 198 0:85 / /sys ro,nosuid,nodev,noexec,relatime - sysfs sysfs ro\n204 203 0:40 / /sys/fs/cgroup ro,nosuid,nodev,noexec,relatime - cgroup2 cgroup rw\n205 201 0:80 / /dev/mqueue rw,nosuid,nodev,noexec,relatime - mqueue mqueue rw\n206 201 0:86 / /dev/shm rw,nosuid,nodev,noexec,relatime - tmpfs shm rw,size=65536k\n207 198 0:87 / /tmp rw,nosuid,nodev,noexec,relatime - tmpfs tmpfs rw,size=65536k\n208 198 0:48 /muzammil/github.com/muzammilar/examples/rayforce/duckdb-comparison/results/lock-capability/d492a70d73c34313a475af8faa0a023e/state /state rw,nosuid,nodev,relatime - fakeowner /run/host_mark/Users rw,fakeowner\n209 198 254:1 /docker/containers/37fe2d8c0b6c5540400f40758f9a92c49ee66f35e7c54cba69444c82b0443646/resolv.conf /etc/resolv.conf ro,relatime - ext4 /dev/vda1 rw,discard\n210 198 254:1 /docker/containers/37fe2d8c0b6c5540400f40758f9a92c49ee66f35e7c54cba69444c82b0443646/hostname /etc/hostname ro,relatime - ext4 /dev/vda1 rw,discard\n211 198 254:1 /docker/containers/37fe2d8c0b6c5540400f40758f9a92c49ee66f35e7c54cba69444c82b0443646/hosts /etc/hosts ro,relatime - ext4 /dev/vda1 rw,discard\n132 200 0:82 /bus /proc/bus ro,nosuid,nodev,noexec,relatime - proc proc rw\n133 200 0:82 /fs /proc/fs ro,nosuid,nodev,noexec,relatime - proc proc rw\n134 200 0:82 /irq /proc/irq ro,nosuid,nodev,noexec,relatime - proc proc rw\n135 200 0:82 /sys /proc/sys ro,nosuid,nodev,noexec,relatime - proc proc rw\n136 200 0:82 /sysrq-trigger /proc/sysrq-trigger ro,nosuid,nodev,noexec,relatime - proc proc rw\n137 200 0:83 /null /proc/interrupts rw,nosuid - tmpfs tmpfs rw,size=65536k,mode=755\n138 200 0:83 /null /proc/kcore rw,nosuid - tmpfs tmpfs rw,size=65536k,mode=755\n139 200 0:83 /null /proc/keys rw,nosuid - tmpfs tmpfs rw,size=65536k,mode=755\n140 200 0:88 / /proc/scsi ro,relatime - tmpfs tmpfs ro,size=4k,nr_inodes=1\n141 200 0:83 /null /proc/timer_list rw,nosuid - tmpfs tmpfs rw,size=65536k,mode=755\n142 203 0:88 / /sys/firmware ro,relatime - tmpfs tmpfs ro,size=4k,nr_inodes=1\n"
+        },
+        "locks_enforced": false,
+        "scope": "Python standard fcntl.flock capability, not native database correctness or performance. Same inode/device are recorded. Empty lock file: zero payload/allocated bytes; data compression not applicable. Cgroup/process CPU/memory and block I/O recorded; physical host I/O unavailable.",
+        "finalized_after_cleanup": true
+      },
+      "effective_limits": {
+        "NanoCpus": 1000000000,
+        "Memory": 536870912,
+        "MemorySwap": 536870912
+      },
+      "mounts": [
+        {
+          "Type": "bind",
+          "Source": "/Users/muzammil/github.com/muzammilar/examples/rayforce/duckdb-comparison/results/lock-capability/d492a70d73c34313a475af8faa0a023e/state",
+          "Destination": "/state",
+          "Mode": "rw",
+          "RW": true,
+          "Propagation": "rprivate"
+        }
+      ]
+    },
+    {
+      "directory": "results/lock-capability/c90fb07c5433476780192b46d1f2514f",
+      "environment": {
+        "utc": "2026-11-21T21:14:53Z",
+        "host": [
+          "Darwin",
+          "Muzammils-MacBook-Pro.local",
+          "25.5.0",
+          "Darwin Kernel Version 25.5.0: Mon Apr 27 20:41:15 PDT 2026; root:xnu-12377.121.6~2/RELEASE_ARM64_T6041",
+          "arm64"
+        ],
+        "docker_info": {
+          "ID": "172e5e0a-2d95-4fb5-a6b4-fb16552caec8",
+          "Containers": 9,
+          "ContainersRunning": 0,
+          "ContainersPaused": 0,
+          "ContainersStopped": 9,
+          "Images": 10,
+          "Driver": "overlayfs",
+          "DriverStatus": [
+            [
+              "driver-type",
+              "io.containerd.snapshotter.v1"
+            ]
+          ],
+          "Plugins": {
+            "Volume": [
+              "local"
+            ],
+            "Network": [
+              "bridge",
+              "host",
+              "ipvlan",
+              "macvlan",
+              "null",
+              "overlay"
+            ],
+            "Authorization": null,
+            "Log": [
+              "awslogs",
+              "fluentd",
+              "gcplogs",
+              "gelf",
+              "journald",
+              "json-file",
+              "local",
+              "splunk",
+              "syslog"
+            ]
+          },
+          "MemoryLimit": true,
+          "SwapLimit": true,
+          "CpuCfsPeriod": true,
+          "CpuCfsQuota": true,
+          "CPUShares": true,
+          "CPUSet": true,
+          "PidsLimit": true,
+          "IPv4Forwarding": true,
+          "Debug": false,
+          "NFd": 47,
+          "OomKillDisable": false,
+          "NGoroutines": 98,
+          "SystemTime": "2026-11-21T21:14:53.826876751Z",
+          "LoggingDriver": "json-file",
+          "CgroupDriver": "cgroupfs",
+          "CgroupVersion": "2",
+          "NEventsListener": 13,
+          "KernelVersion": "6.12.76-linuxkit",
+          "OperatingSystem": "Docker Desktop",
+          "OSVersion": "",
+          "OSType": "linux",
+          "Architecture": "aarch64",
+          "IndexServerAddress": "https://index.docker.io/v1/",
+          "RegistryConfig": {
+            "InsecureRegistryCIDRs": [
+              "::1/128",
+              "127.0.0.0/8"
+            ],
+            "IndexConfigs": {
+              "docker.io": {
+                "Name": "docker.io",
+                "Mirrors": [],
+                "Secure": true,
+                "Official": true
+              },
+              "hubproxy.docker.internal:5555": {
+                "Name": "hubproxy.docker.internal:5555",
+                "Mirrors": [],
+                "Secure": false,
+                "Official": false
+              }
+            },
+            "Mirrors": []
+          },
+          "NCPU": 11,
+          "MemTotal": 26216296448,
+          "GenericResources": null,
+          "DockerRootDir": "/var/lib/docker",
+          "HttpProxy": "http.docker.internal:3128",
+          "HttpsProxy": "http.docker.internal:3128",
+          "NoProxy": "hubproxy.docker.internal",
+          "Name": "docker-desktop",
+          "Labels": [
+            "com.docker.desktop.address=unix:///Users/muzammil/Library/Containers/com.docker.docker/Data/docker-cli.sock"
+          ],
+          "ExperimentalBuild": false,
+          "ServerVersion": "29.5.3",
+          "Runtimes": {
+            "io.containerd.runc.v2": {
+              "path": "runc",
+              "status": {
+                "org.opencontainers.runtime-spec.features": "{\"ociVersionMin\":\"1.0.0\",\"ociVersionMax\":\"1.2.1\",\"hooks\":[\"prestart\",\"createRuntime\",\"createContainer\",\"startContainer\",\"poststart\",\"poststop\"],\"mountOptions\":[\"async\",\"atime\",\"bind\",\"defaults\",\"dev\",\"diratime\",\"dirsync\",\"exec\",\"iversion\",\"lazytime\",\"loud\",\"mand\",\"noatime\",\"nodev\",\"nodiratime\",\"noexec\",\"noiversion\",\"nolazytime\",\"nomand\",\"norelatime\",\"nostrictatime\",\"nosuid\",\"nosymfollow\",\"private\",\"ratime\",\"rbind\",\"rdev\",\"rdiratime\",\"relatime\",\"remount\",\"rexec\",\"rnoatime\",\"rnodev\",\"rnodiratime\",\"rnoexec\",\"rnorelatime\",\"rnostrictatime\",\"rnosuid\",\"rnosymfollow\",\"ro\",\"rprivate\",\"rrelatime\",\"rro\",\"rrw\",\"rshared\",\"rslave\",\"rstrictatime\",\"rsuid\",\"rsymfollow\",\"runbindable\",\"rw\",\"shared\",\"silent\",\"slave\",\"strictatime\",\"suid\",\"symfollow\",\"sync\",\"tmpcopyup\",\"unbindable\"],\"linux\":{\"namespaces\":[\"cgroup\",\"ipc\",\"mount\",\"network\",\"pid\",\"time\",\"user\",\"uts\"],\"capabilities\":[\"CAP_CHOWN\",\"CAP_DAC_OVERRIDE\",\"CAP_DAC_READ_SEARCH\",\"CAP_FOWNER\",\"CAP_FSETID\",\"CAP_KILL\",\"CAP_SETGID\",\"CAP_SETUID\",\"CAP_SETPCAP\",\"CAP_LINUX_IMMUTABLE\",\"CAP_NET_BIND_SERVICE\",\"CAP_NET_BROADCAST\",\"CAP_NET_ADMIN\",\"CAP_NET_RAW\",\"CAP_IPC_LOCK\",\"CAP_IPC_OWNER\",\"CAP_SYS_MODULE\",\"CAP_SYS_RAWIO\",\"CAP_SYS_CHROOT\",\"CAP_SYS_PTRACE\",\"CAP_SYS_PACCT\",\"CAP_SYS_ADMIN\",\"CAP_SYS_BOOT\",\"CAP_SYS_NICE\",\"CAP_SYS_RESOURCE\",\"CAP_SYS_TIME\",\"CAP_SYS_TTY_CONFIG\",\"CAP_MKNOD\",\"CAP_LEASE\",\"CAP_AUDIT_WRITE\",\"CAP_AUDIT_CONTROL\",\"CAP_SETFCAP\",\"CAP_MAC_OVERRIDE\",\"CAP_MAC_ADMIN\",\"CAP_SYSLOG\",\"CAP_WAKE_ALARM\",\"CAP_BLOCK_SUSPEND\",\"CAP_AUDIT_READ\",\"CAP_PERFMON\",\"CAP_BPF\",\"CAP_CHECKPOINT_RESTORE\"],\"cgroup\":{\"v1\":true,\"v2\":true,\"systemd\":true,\"systemdUser\":true,\"rdma\":true},\"seccomp\":{\"enabled\":true,\"actions\":[\"SCMP_ACT_ALLOW\",\"SCMP_ACT_ERRNO\",\"SCMP_ACT_KILL\",\"SCMP_ACT_KILL_PROCESS\",\"SCMP_ACT_KILL_THREAD\",\"SCMP_ACT_LOG\",\"SCMP_ACT_NOTIFY\",\"SCMP_ACT_TRACE\",\"SCMP_ACT_TRAP\"],\"operators\":[\"SCMP_CMP_EQ\",\"SCMP_CMP_GE\",\"SCMP_CMP_GT\",\"SCMP_CMP_LE\",\"SCMP_CMP_LT\",\"SCMP_CMP_MASKED_EQ\",\"SCMP_CMP_NE\"],\"archs\":[\"SCMP_ARCH_AARCH64\",\"SCMP_ARCH_ARM\",\"SCMP_ARCH_MIPS\",\"SCMP_ARCH_MIPS64\",\"SCMP_ARCH_MIPS64N32\",\"SCMP_ARCH_MIPSEL\",\"SCMP_ARCH_MIPSEL64\",\"SCMP_ARCH_MIPSEL64N32\",\"SCMP_ARCH_PPC\",\"SCMP_ARCH_PPC64\",\"SCMP_ARCH_PPC64LE\",\"SCMP_ARCH_RISCV64\",\"SCMP_ARCH_S390\",\"SCMP_ARCH_S390X\",\"SCMP_ARCH_X32\",\"SCMP_ARCH_X86\",\"SCMP_ARCH_X86_64\"],\"knownFlags\":[\"SECCOMP_FILTER_FLAG_TSYNC\",\"SECCOMP_FILTER_FLAG_SPEC_ALLOW\",\"SECCOMP_FILTER_FLAG_LOG\"],\"supportedFlags\":[\"SECCOMP_FILTER_FLAG_TSYNC\",\"SECCOMP_FILTER_FLAG_SPEC_ALLOW\",\"SECCOMP_FILTER_FLAG_LOG\"]},\"apparmor\":{\"enabled\":true},\"selinux\":{\"enabled\":true},\"intelRdt\":{\"enabled\":true},\"mountExtensions\":{\"idmap\":{\"enabled\":true}}},\"annotations\":{\"io.github.seccomp.libseccomp.version\":\"2.5.4\",\"org.opencontainers.runc.checkpoint.enabled\":\"true\",\"org.opencontainers.runc.commit\":\"v1.3.6-0-g491b69ba\",\"org.opencontainers.runc.version\":\"1.3.6\\n\"},\"potentiallyUnsafeConfigAnnotations\":[\"bundle\",\"org.systemd.property.\",\"org.criu.config\"]}"
+              }
+            },
+            "runc": {
+              "path": "runc",
+              "status": {
+                "org.opencontainers.runtime-spec.features": "{\"ociVersionMin\":\"1.0.0\",\"ociVersionMax\":\"1.2.1\",\"hooks\":[\"prestart\",\"createRuntime\",\"createContainer\",\"startContainer\",\"poststart\",\"poststop\"],\"mountOptions\":[\"async\",\"atime\",\"bind\",\"defaults\",\"dev\",\"diratime\",\"dirsync\",\"exec\",\"iversion\",\"lazytime\",\"loud\",\"mand\",\"noatime\",\"nodev\",\"nodiratime\",\"noexec\",\"noiversion\",\"nolazytime\",\"nomand\",\"norelatime\",\"nostrictatime\",\"nosuid\",\"nosymfollow\",\"private\",\"ratime\",\"rbind\",\"rdev\",\"rdiratime\",\"relatime\",\"remount\",\"rexec\",\"rnoatime\",\"rnodev\",\"rnodiratime\",\"rnoexec\",\"rnorelatime\",\"rnostrictatime\",\"rnosuid\",\"rnosymfollow\",\"ro\",\"rprivate\",\"rrelatime\",\"rro\",\"rrw\",\"rshared\",\"rslave\",\"rstrictatime\",\"rsuid\",\"rsymfollow\",\"runbindable\",\"rw\",\"shared\",\"silent\",\"slave\",\"strictatime\",\"suid\",\"symfollow\",\"sync\",\"tmpcopyup\",\"unbindable\"],\"linux\":{\"namespaces\":[\"cgroup\",\"ipc\",\"mount\",\"network\",\"pid\",\"time\",\"user\",\"uts\"],\"capabilities\":[\"CAP_CHOWN\",\"CAP_DAC_OVERRIDE\",\"CAP_DAC_READ_SEARCH\",\"CAP_FOWNER\",\"CAP_FSETID\",\"CAP_KILL\",\"CAP_SETGID\",\"CAP_SETUID\",\"CAP_SETPCAP\",\"CAP_LINUX_IMMUTABLE\",\"CAP_NET_BIND_SERVICE\",\"CAP_NET_BROADCAST\",\"CAP_NET_ADMIN\",\"CAP_NET_RAW\",\"CAP_IPC_LOCK\",\"CAP_IPC_OWNER\",\"CAP_SYS_MODULE\",\"CAP_SYS_RAWIO\",\"CAP_SYS_CHROOT\",\"CAP_SYS_PTRACE\",\"CAP_SYS_PACCT\",\"CAP_SYS_ADMIN\",\"CAP_SYS_BOOT\",\"CAP_SYS_NICE\",\"CAP_SYS_RESOURCE\",\"CAP_SYS_TIME\",\"CAP_SYS_TTY_CONFIG\",\"CAP_MKNOD\",\"CAP_LEASE\",\"CAP_AUDIT_WRITE\",\"CAP_AUDIT_CONTROL\",\"CAP_SETFCAP\",\"CAP_MAC_OVERRIDE\",\"CAP_MAC_ADMIN\",\"CAP_SYSLOG\",\"CAP_WAKE_ALARM\",\"CAP_BLOCK_SUSPEND\",\"CAP_AUDIT_READ\",\"CAP_PERFMON\",\"CAP_BPF\",\"CAP_CHECKPOINT_RESTORE\"],\"cgroup\":{\"v1\":true,\"v2\":true,\"systemd\":true,\"systemdUser\":true,\"rdma\":true},\"seccomp\":{\"enabled\":true,\"actions\":[\"SCMP_ACT_ALLOW\",\"SCMP_ACT_ERRNO\",\"SCMP_ACT_KILL\",\"SCMP_ACT_KILL_PROCESS\",\"SCMP_ACT_KILL_THREAD\",\"SCMP_ACT_LOG\",\"SCMP_ACT_NOTIFY\",\"SCMP_ACT_TRACE\",\"SCMP_ACT_TRAP\"],\"operators\":[\"SCMP_CMP_EQ\",\"SCMP_CMP_GE\",\"SCMP_CMP_GT\",\"SCMP_CMP_LE\",\"SCMP_CMP_LT\",\"SCMP_CMP_MASKED_EQ\",\"SCMP_CMP_NE\"],\"archs\":[\"SCMP_ARCH_AARCH64\",\"SCMP_ARCH_ARM\",\"SCMP_ARCH_MIPS\",\"SCMP_ARCH_MIPS64\",\"SCMP_ARCH_MIPS64N32\",\"SCMP_ARCH_MIPSEL\",\"SCMP_ARCH_MIPSEL64\",\"SCMP_ARCH_MIPSEL64N32\",\"SCMP_ARCH_PPC\",\"SCMP_ARCH_PPC64\",\"SCMP_ARCH_PPC64LE\",\"SCMP_ARCH_RISCV64\",\"SCMP_ARCH_S390\",\"SCMP_ARCH_S390X\",\"SCMP_ARCH_X32\",\"SCMP_ARCH_X86\",\"SCMP_ARCH_X86_64\"],\"knownFlags\":[\"SECCOMP_FILTER_FLAG_TSYNC\",\"SECCOMP_FILTER_FLAG_SPEC_ALLOW\",\"SECCOMP_FILTER_FLAG_LOG\"],\"supportedFlags\":[\"SECCOMP_FILTER_FLAG_TSYNC\",\"SECCOMP_FILTER_FLAG_SPEC_ALLOW\",\"SECCOMP_FILTER_FLAG_LOG\"]},\"apparmor\":{\"enabled\":true},\"selinux\":{\"enabled\":true},\"intelRdt\":{\"enabled\":true},\"mountExtensions\":{\"idmap\":{\"enabled\":true}}},\"annotations\":{\"io.github.seccomp.libseccomp.version\":\"2.5.4\",\"org.opencontainers.runc.checkpoint.enabled\":\"true\",\"org.opencontainers.runc.commit\":\"v1.3.6-0-g491b69ba\",\"org.opencontainers.runc.version\":\"1.3.6\\n\"},\"potentiallyUnsafeConfigAnnotations\":[\"bundle\",\"org.systemd.property.\",\"org.criu.config\"]}"
+              }
+            }
+          },
+          "DefaultRuntime": "runc",
+          "Swarm": {
+            "NodeID": "",
+            "NodeAddr": "",
+            "LocalNodeState": "inactive",
+            "ControlAvailable": false,
+            "Error": "",
+            "RemoteManagers": null
+          },
+          "LiveRestoreEnabled": false,
+          "Isolation": "",
+          "InitBinary": "docker-init",
+          "ContainerdCommit": {
+            "ID": "e53c7c1516c3b2bff98eb76f1f4117477e6f4e66"
+          },
+          "RuncCommit": {
+            "ID": "v1.3.6-0-g491b69ba"
+          },
+          "InitCommit": {
+            "ID": "de40ad0"
+          },
+          "SecurityOptions": [
+            "name=seccomp,profile=builtin",
+            "name=cgroupns"
+          ],
+          "FirewallBackend": {
+            "Driver": "iptables"
+          },
+          "CDISpecDirs": [
+            "/etc/cdi",
+            "/var/run/cdi"
+          ],
+          "DiscoveredDevices": [
+            {
+              "Source": "cdi",
+              "ID": "docker.com/gpu=webgpu"
+            }
+          ],
+          "Containerd": {
+            "Address": "/run/containerd/containerd.sock",
+            "Namespaces": {
+              "Containers": "moby",
+              "Plugins": "plugins.moby"
+            }
+          },
+          "Warnings": null,
+          "ClientInfo": {
+            "Debug": false,
+            "Version": "29.5.3",
+            "DefaultAPIVersion": "1.54",
+            "GitCommit": "d1c06ef",
+            "GoVersion": "go1.26.4",
+            "Os": "darwin",
+            "Arch": "arm64",
+            "BuildTime": "Wed Jun  3 17:59:08 2026",
+            "Context": "desktop-linux",
+            "Plugins": [
+              {
+                "SchemaVersion": "0.1.0",
+                "Vendor": "Docker Inc.",
+                "Version": "v1.79.0",
+                "ShortDescription": "Docker AI Agent Runner",
+                "Name": "agent",
+                "Path": "/Users/muzammil/.docker/cli-plugins/docker-agent"
+              },
+              {
+                "SchemaVersion": "0.1.0",
+                "Vendor": "Docker Inc.",
+                "Version": "v1.25.0",
+                "ShortDescription": "Docker AI Agent - Ask Gordon",
+                "Name": "ai",
+                "Path": "/Users/muzammil/.docker/cli-plugins/docker-ai"
+              },
+              {
+                "SchemaVersion": "0.1.0",
+                "Vendor": "Docker Inc.",
+                "Version": "v0.34.1-desktop.1",
+                "ShortDescription": "Docker Buildx",
+                "Name": "buildx",
+                "Path": "/Users/muzammil/.docker/cli-plugins/docker-buildx"
+              },
+              {
+                "SchemaVersion": "0.1.0",
+                "Vendor": "Docker Inc.",
+                "Version": "v5.1.4",
+                "ShortDescription": "Docker Compose",
+                "Name": "compose",
+                "Path": "/Users/muzammil/.docker/cli-plugins/docker-compose"
+              },
+              {
+                "SchemaVersion": "0.1.0",
+                "Vendor": "Docker Inc.",
+                "Version": "0.0.47",
+                "ShortDescription": "Get a shell into any image or container",
+                "Name": "debug",
+                "Path": "/Users/muzammil/.docker/cli-plugins/docker-debug"
+              },
+              {
+                "SchemaVersion": "0.1.0",
+                "Vendor": "Docker Inc.",
+                "Version": "v0.4.1",
+                "ShortDescription": "Docker Desktop commands",
+                "Name": "desktop",
+                "Path": "/Users/muzammil/.docker/cli-plugins/docker-desktop"
+              },
+              {
+                "SchemaVersion": "0.1.0",
+                "Vendor": "Docker Inc.",
+                "Version": "v0.0.4",
+                "ShortDescription": "CLI for managing Docker Hardened Images",
+                "Name": "dhi",
+                "Path": "/Users/muzammil/.docker/cli-plugins/docker-dhi"
+              },
+              {
+                "SchemaVersion": "0.1.0",
+                "Vendor": "Docker Inc.",
+                "Version": "v0.2.31",
+                "ShortDescription": "Manages Docker extensions",
+                "Name": "extension",
+                "Path": "/Users/muzammil/.docker/cli-plugins/docker-extension"
+              },
+              {
+                "SchemaVersion": "0.1.0",
+                "Vendor": "Docker Inc.",
+                "Version": "v1.4.0",
+                "ShortDescription": "Creates Docker-related starter files for your project",
+                "Name": "init",
+                "Path": "/Users/muzammil/.docker/cli-plugins/docker-init"
+              },
+              {
+                "SchemaVersion": "0.1.0",
+                "Vendor": "Docker Inc.",
+                "Version": "v0.42.2",
+                "ShortDescription": "Docker MCP Plugin",
+                "Name": "mcp",
+                "Path": "/Users/muzammil/.docker/cli-plugins/docker-mcp"
+              },
+              {
+                "SchemaVersion": "0.1.0",
+                "Vendor": "Docker Inc.",
+                "Version": "v1.2.1",
+                "ShortDescription": "Docker Model Runner",
+                "Name": "model",
+                "Path": "/Users/muzammil/.docker/cli-plugins/docker-model"
+              },
+              {
+                "SchemaVersion": "0.1.0",
+                "Vendor": "Docker Inc.",
+                "Version": "v0.6.4",
+                "ShortDescription": "Docker Offload",
+                "Name": "offload",
+                "Path": "/Users/muzammil/.docker/cli-plugins/docker-offload"
+              },
+              {
+                "SchemaVersion": "0.1.0",
+                "Vendor": "Docker Inc.",
+                "Version": "v0.1.5",
+                "ShortDescription": "Docker Pass Secrets Manager Plugin (beta)",
+                "Name": "pass",
+                "Path": "/Users/muzammil/.docker/cli-plugins/docker-pass"
+              },
+              {
+                "SchemaVersion": "0.1.0",
+                "Vendor": "Docker Inc.",
+                "Version": "v0.12.0",
+                "ShortDescription": "Docker Sandbox",
+                "Name": "sandbox",
+                "Path": "/Users/muzammil/.docker/cli-plugins/docker-sandbox"
+              },
+              {
+                "SchemaVersion": "0.1.0",
+                "Vendor": "Docker Inc.",
+                "Version": "v1.22.0",
+                "ShortDescription": "Docker Scout",
+                "Name": "scout",
+                "Path": "/Users/muzammil/.docker/cli-plugins/docker-scout"
+              }
+            ],
+            "Warnings": null
+          }
+        },
+        "source_sha256": {
+          "filesystem_lock_check.py": "fd2afcca329e94a3ed7f40f9945c98d54e4668a5c348e4cc43b65c4bb8526efe",
+          "docker-compose.journal.yml": "665a59f9754ce307ae6a3c3398d815f25d03a7134a17be56cc502ca984fa4ffd",
+          "docker-compose.journal-volume.yml": "f97301b164eb3a70ae88713c437712f8ea97d8065a3eecfb953670947a3411a7"
+        }
+      },
+      "result": {
+        "mode": "volume",
+        "owner": {
+          "ready": true,
+          "stat": [
+            33188,
+            282938,
+            65025,
+            1,
+            501,
+            20,
+            0,
+            1795295694,
+            1795295694,
+            1795295694
+          ],
+          "mountinfo": "149 98 0:63 / / ro,relatime - overlay overlay rw,lowerdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88094/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88007/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88006/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88005/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88004/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88003/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88002/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88001/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88000/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/87999/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/87998/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/87997/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/87996/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/87995/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/85372/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/85371/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/85369/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/85368/fs,upperdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88095/fs,workdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88095/work\n151 149 0:72 / /proc rw,nosuid,nodev,noexec,relatime - proc proc rw\n152 149 0:73 / /dev rw,nosuid - tmpfs tmpfs rw,size=65536k,mode=755\n153 152 0:74 / /dev/pts rw,nosuid,noexec,relatime - devpts devpts rw,gid=5,mode=620,ptmxmode=666\n154 149 0:75 / /sys ro,nosuid,nodev,noexec,relatime - sysfs sysfs ro\n155 154 0:40 / /sys/fs/cgroup ro,nosuid,nodev,noexec,relatime - cgroup2 cgroup rw\n156 152 0:70 / /dev/mqueue rw,nosuid,nodev,noexec,relatime - mqueue mqueue rw\n157 152 0:76 / /dev/shm rw,nosuid,nodev,noexec,relatime - tmpfs shm rw,size=65536k\n158 149 0:77 / /tmp rw,nosuid,nodev,noexec,relatime - tmpfs tmpfs rw,size=65536k\n159 149 254:1 /docker/volumes/rayforce-journal-lock-c90fb07c5433476780192b46d1f2514f/_data /state rw,relatime master:1 - ext4 /dev/vda1 rw,discard\n160 149 254:1 /docker/containers/9bd1484d0b8de1213ba4dae8aa77ce50e530c18ee4a94f76e0e765248e8fc661/resolv.conf /etc/resolv.conf ro,relatime - ext4 /dev/vda1 rw,discard\n161 149 254:1 /docker/containers/9bd1484d0b8de1213ba4dae8aa77ce50e530c18ee4a94f76e0e765248e8fc661/hostname /etc/hostname ro,relatime - ext4 /dev/vda1 rw,discard\n162 149 254:1 /docker/containers/9bd1484d0b8de1213ba4dae8aa77ce50e530c18ee4a94f76e0e765248e8fc661/hosts /etc/hosts ro,relatime - ext4 /dev/vda1 rw,discard\n99 151 0:72 /bus /proc/bus ro,nosuid,nodev,noexec,relatime - proc proc rw\n100 151 0:72 /fs /proc/fs ro,nosuid,nodev,noexec,relatime - proc proc rw\n101 151 0:72 /irq /proc/irq ro,nosuid,nodev,noexec,relatime - proc proc rw\n102 151 0:72 /sys /proc/sys ro,nosuid,nodev,noexec,relatime - proc proc rw\n103 151 0:72 /sysrq-trigger /proc/sysrq-trigger ro,nosuid,nodev,noexec,relatime - proc proc rw\n104 151 0:73 /null /proc/interrupts rw,nosuid - tmpfs tmpfs rw,size=65536k,mode=755\n105 151 0:73 /null /proc/kcore rw,nosuid - tmpfs tmpfs rw,size=65536k,mode=755\n106 151 0:73 /null /proc/keys rw,nosuid - tmpfs tmpfs rw,size=65536k,mode=755\n107 151 0:78 / /proc/scsi ro,relatime - tmpfs tmpfs ro,size=4k,nr_inodes=1\n108 151 0:73 /null /proc/timer_list rw,nosuid - tmpfs tmpfs rw,size=65536k,mode=755\n109 154 0:78 / /sys/firmware ro,relatime - tmpfs tmpfs ro,size=4k,nr_inodes=1\n"
+        },
+        "same_container": {
+          "blocked": true,
+          "stat": [
+            33188,
+            282938,
+            65025,
+            1,
+            501,
+            20,
+            0,
+            1795295694,
+            1795295694,
+            1795295694
+          ],
+          "file_bytes": 0,
+          "allocated_bytes": 0,
+          "wall_ns": 36792,
+          "cpu_ns": 32875,
+          "process_peak_rss_bytes": 14843904,
+          "cgroup": {
+            "cpu.stat": "usage_usec 101886\nuser_usec 93815\nsystem_usec 8070\nnice_usec 0\nnr_periods 3\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+            "memory.peak": "18591744\n",
+            "io.stat": ""
+          },
+          "mountinfo": "149 98 0:63 / / ro,relatime - overlay overlay rw,lowerdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88094/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88007/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88006/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88005/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88004/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88003/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88002/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88001/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88000/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/87999/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/87998/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/87997/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/87996/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/87995/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/85372/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/85371/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/85369/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/85368/fs,upperdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88095/fs,workdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88095/work\n151 149 0:72 / /proc rw,nosuid,nodev,noexec,relatime - proc proc rw\n152 149 0:73 / /dev rw,nosuid - tmpfs tmpfs rw,size=65536k,mode=755\n153 152 0:74 / /dev/pts rw,nosuid,noexec,relatime - devpts devpts rw,gid=5,mode=620,ptmxmode=666\n154 149 0:75 / /sys ro,nosuid,nodev,noexec,relatime - sysfs sysfs ro\n155 154 0:40 / /sys/fs/cgroup ro,nosuid,nodev,noexec,relatime - cgroup2 cgroup rw\n156 152 0:70 / /dev/mqueue rw,nosuid,nodev,noexec,relatime - mqueue mqueue rw\n157 152 0:76 / /dev/shm rw,nosuid,nodev,noexec,relatime - tmpfs shm rw,size=65536k\n158 149 0:77 / /tmp rw,nosuid,nodev,noexec,relatime - tmpfs tmpfs rw,size=65536k\n159 149 254:1 /docker/volumes/rayforce-journal-lock-c90fb07c5433476780192b46d1f2514f/_data /state rw,relatime master:1 - ext4 /dev/vda1 rw,discard\n160 149 254:1 /docker/containers/9bd1484d0b8de1213ba4dae8aa77ce50e530c18ee4a94f76e0e765248e8fc661/resolv.conf /etc/resolv.conf ro,relatime - ext4 /dev/vda1 rw,discard\n161 149 254:1 /docker/containers/9bd1484d0b8de1213ba4dae8aa77ce50e530c18ee4a94f76e0e765248e8fc661/hostname /etc/hostname ro,relatime - ext4 /dev/vda1 rw,discard\n162 149 254:1 /docker/containers/9bd1484d0b8de1213ba4dae8aa77ce50e530c18ee4a94f76e0e765248e8fc661/hosts /etc/hosts ro,relatime - ext4 /dev/vda1 rw,discard\n99 151 0:72 /bus /proc/bus ro,nosuid,nodev,noexec,relatime - proc proc rw\n100 151 0:72 /fs /proc/fs ro,nosuid,nodev,noexec,relatime - proc proc rw\n101 151 0:72 /irq /proc/irq ro,nosuid,nodev,noexec,relatime - proc proc rw\n102 151 0:72 /sys /proc/sys ro,nosuid,nodev,noexec,relatime - proc proc rw\n103 151 0:72 /sysrq-trigger /proc/sysrq-trigger ro,nosuid,nodev,noexec,relatime - proc proc rw\n104 151 0:73 /null /proc/interrupts rw,nosuid - tmpfs tmpfs rw,size=65536k,mode=755\n105 151 0:73 /null /proc/kcore rw,nosuid - tmpfs tmpfs rw,size=65536k,mode=755\n106 151 0:73 /null /proc/keys rw,nosuid - tmpfs tmpfs rw,size=65536k,mode=755\n107 151 0:78 / /proc/scsi ro,relatime - tmpfs tmpfs ro,size=4k,nr_inodes=1\n108 151 0:73 /null /proc/timer_list rw,nosuid - tmpfs tmpfs rw,size=65536k,mode=755\n109 154 0:78 / /sys/firmware ro,relatime - tmpfs tmpfs ro,size=4k,nr_inodes=1\n"
+        },
+        "cross_container": {
+          "blocked": true,
+          "stat": [
+            33188,
+            282938,
+            65025,
+            1,
+            501,
+            20,
+            0,
+            1795295694,
+            1795295694,
+            1795295694
+          ],
+          "file_bytes": 0,
+          "allocated_bytes": 0,
+          "wall_ns": 39083,
+          "cpu_ns": 34917,
+          "process_peak_rss_bytes": 14872576,
+          "cgroup": {
+            "cpu.stat": "usage_usec 60568\nuser_usec 52355\nsystem_usec 8212\nnice_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+            "memory.peak": "10326016\n",
+            "io.stat": ""
+          },
+          "mountinfo": "198 131 0:65 / / ro,relatime - overlay overlay rw,lowerdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88096/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88007/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88006/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88005/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88004/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88003/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88002/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88001/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88000/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/87999/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/87998/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/87997/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/87996/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/87995/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/85372/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/85371/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/85369/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/85368/fs,upperdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88097/fs,workdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/88097/work\n200 198 0:82 / /proc rw,nosuid,nodev,noexec,relatime - proc proc rw\n201 198 0:83 / /dev rw,nosuid - tmpfs tmpfs rw,size=65536k,mode=755\n202 201 0:84 / /dev/pts rw,nosuid,noexec,relatime - devpts devpts rw,gid=5,mode=620,ptmxmode=666\n203 198 0:85 / /sys ro,nosuid,nodev,noexec,relatime - sysfs sysfs ro\n204 203 0:40 / /sys/fs/cgroup ro,nosuid,nodev,noexec,relatime - cgroup2 cgroup rw\n205 201 0:80 / /dev/mqueue rw,nosuid,nodev,noexec,relatime - mqueue mqueue rw\n206 201 0:86 / /dev/shm rw,nosuid,nodev,noexec,relatime - tmpfs shm rw,size=65536k\n207 198 0:87 / /tmp rw,nosuid,nodev,noexec,relatime - tmpfs tmpfs rw,size=65536k\n208 198 254:1 /docker/volumes/rayforce-journal-lock-c90fb07c5433476780192b46d1f2514f/_data /state rw,relatime master:1 - ext4 /dev/vda1 rw,discard\n209 198 254:1 /docker/containers/14b6c0b5318e3450c48992281404a0390518d6bfcaa11fef8ebeab01ce408ccf/resolv.conf /etc/resolv.conf ro,relatime - ext4 /dev/vda1 rw,discard\n210 198 254:1 /docker/containers/14b6c0b5318e3450c48992281404a0390518d6bfcaa11fef8ebeab01ce408ccf/hostname /etc/hostname ro,relatime - ext4 /dev/vda1 rw,discard\n211 198 254:1 /docker/containers/14b6c0b5318e3450c48992281404a0390518d6bfcaa11fef8ebeab01ce408ccf/hosts /etc/hosts ro,relatime - ext4 /dev/vda1 rw,discard\n132 200 0:82 /bus /proc/bus ro,nosuid,nodev,noexec,relatime - proc proc rw\n133 200 0:82 /fs /proc/fs ro,nosuid,nodev,noexec,relatime - proc proc rw\n134 200 0:82 /irq /proc/irq ro,nosuid,nodev,noexec,relatime - proc proc rw\n135 200 0:82 /sys /proc/sys ro,nosuid,nodev,noexec,relatime - proc proc rw\n136 200 0:82 /sysrq-trigger /proc/sysrq-trigger ro,nosuid,nodev,noexec,relatime - proc proc rw\n137 200 0:83 /null /proc/interrupts rw,nosuid - tmpfs tmpfs rw,size=65536k,mode=755\n138 200 0:83 /null /proc/kcore rw,nosuid - tmpfs tmpfs rw,size=65536k,mode=755\n139 200 0:83 /null /proc/keys rw,nosuid - tmpfs tmpfs rw,size=65536k,mode=755\n140 200 0:88 / /proc/scsi ro,relatime - tmpfs tmpfs ro,size=4k,nr_inodes=1\n141 200 0:83 /null /proc/timer_list rw,nosuid - tmpfs tmpfs rw,size=65536k,mode=755\n142 203 0:88 / /sys/firmware ro,relatime - tmpfs tmpfs ro,size=4k,nr_inodes=1\n"
+        },
+        "locks_enforced": true,
+        "scope": "Python standard fcntl.flock capability, not native database correctness or performance. Same inode/device are recorded. Empty lock file: zero payload/allocated bytes; data compression not applicable. Cgroup/process CPU/memory and block I/O recorded; physical host I/O unavailable.",
+        "finalized_after_cleanup": true
+      },
+      "effective_limits": {
+        "NanoCpus": 1000000000,
+        "Memory": 536870912,
+        "MemorySwap": 536870912
+      },
+      "mounts": [
+        {
+          "Type": "volume",
+          "Name": "rayforce-journal-lock-c90fb07c5433476780192b46d1f2514f",
+          "Source": "/var/lib/docker/volumes/rayforce-journal-lock-c90fb07c5433476780192b46d1f2514f/_data",
+          "Destination": "/state",
+          "Driver": "local",
+          "Mode": "rw",
+          "RW": true,
+          "Propagation": ""
+        }
+      ]
+    }
+  ],
+  "failed_native_case": {
+    "directory": "results/journal-live/0523e7da97724d3d9b4c3d7e1fae3b16",
+    "attempts": [
+      {
+        "attempt": 0,
+        "elapsed_ns": 2224754668,
+        "returncode": 0,
+        "rejected_by_lock": false,
+        "stdout": "",
+        "stderr": "log: loaded snapshot /state/journal.qdb (2 bound, 0 skipped, 0 errors)\nlog: replayed 804 entries (0 eval errors) from /state/journal.log\n"
+      }
+    ],
+    "verdict": "FAILED: native second opener unexpectedly acquired the bind-mounted journal. The scenario stopped, so no final ACK/body reconciliation or concurrency qualification is claimed for this run."
+  },
+  "scope": "Observed storage semantics on this host/runtime only. The host-share mount reports fakeowner; Docker-managed volume reports ext4. Standard-library controls show the bind-mount lock failure independently of Rayforce. Do not generalize to every bind mount or OS."
+}

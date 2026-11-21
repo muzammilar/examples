@@ -1,0 +1,1658 @@
+{
+  "source_directory": "results/journal-live/336010cd5edb447aac5eaa24374a2bfe",
+  "setup": {
+    "fixture": {
+      "rows": 2000000,
+      "customers": 10000,
+      "seed": 20261117,
+      "seconds": 3.2101720420178026,
+      "sha256": {
+        "trades.csv": "c8756870bdbb238b69ef8d563c6d4f176753e3864ffa50f508e707ed94406de0",
+        "customers.csv": "c3a160b85050e71c8ba465e2ca7a72d25bc4fbb076954f6c6f9c22fcaabadc95",
+        "expected.json": "150c8e3d600939b01a5c3af70c563f6b11b22cef4699138b4f4b4a4ba0d15a72"
+      }
+    },
+    "scenario": "process-crash",
+    "storage": "volume",
+    "volume_name": "rayforce-journal-data-336010cd5edb447aac5eaa24374a2bfe",
+    "scope": "One-host synchronous Rayforce IPC journal correctness; offered load is not capacity",
+    "timings_s": {
+      "baseline": 10,
+      "outage": 5,
+      "recovery": 15
+    },
+    "offered_rates_per_second": {
+      "write": 50,
+      "read": 20
+    },
+    "mutation_retries": 0,
+    "native_connect_timeout_ms": 3000,
+    "native_round_trip_timeout_ms": 3000,
+    "docker_info": {
+      "ID": "172e5e0a-2d95-4fb5-a6b4-fb16552caec8",
+      "Containers": 9,
+      "ContainersRunning": 0,
+      "ContainersPaused": 0,
+      "ContainersStopped": 9,
+      "Images": 10,
+      "Driver": "overlayfs",
+      "DriverStatus": [
+        [
+          "driver-type",
+          "io.containerd.snapshotter.v1"
+        ]
+      ],
+      "Plugins": {
+        "Volume": [
+          "local"
+        ],
+        "Network": [
+          "bridge",
+          "host",
+          "ipvlan",
+          "macvlan",
+          "null",
+          "overlay"
+        ],
+        "Authorization": null,
+        "Log": [
+          "awslogs",
+          "fluentd",
+          "gcplogs",
+          "gelf",
+          "journald",
+          "json-file",
+          "local",
+          "splunk",
+          "syslog"
+        ]
+      },
+      "MemoryLimit": true,
+      "SwapLimit": true,
+      "CpuCfsPeriod": true,
+      "CpuCfsQuota": true,
+      "CPUShares": true,
+      "CPUSet": true,
+      "PidsLimit": true,
+      "IPv4Forwarding": true,
+      "Debug": false,
+      "NFd": 47,
+      "OomKillDisable": false,
+      "NGoroutines": 98,
+      "SystemTime": "2026-11-21T21:12:47.057283845Z",
+      "LoggingDriver": "json-file",
+      "CgroupDriver": "cgroupfs",
+      "CgroupVersion": "2",
+      "NEventsListener": 13,
+      "KernelVersion": "6.12.76-linuxkit",
+      "OperatingSystem": "Docker Desktop",
+      "OSVersion": "",
+      "OSType": "linux",
+      "Architecture": "aarch64",
+      "IndexServerAddress": "https://index.docker.io/v1/",
+      "RegistryConfig": {
+        "InsecureRegistryCIDRs": [
+          "::1/128",
+          "127.0.0.0/8"
+        ],
+        "IndexConfigs": {
+          "docker.io": {
+            "Name": "docker.io",
+            "Mirrors": [],
+            "Secure": true,
+            "Official": true
+          },
+          "hubproxy.docker.internal:5555": {
+            "Name": "hubproxy.docker.internal:5555",
+            "Mirrors": [],
+            "Secure": false,
+            "Official": false
+          }
+        },
+        "Mirrors": []
+      },
+      "NCPU": 11,
+      "MemTotal": 26216296448,
+      "GenericResources": null,
+      "DockerRootDir": "/var/lib/docker",
+      "HttpProxy": "http.docker.internal:3128",
+      "HttpsProxy": "http.docker.internal:3128",
+      "NoProxy": "hubproxy.docker.internal",
+      "Name": "docker-desktop",
+      "Labels": [
+        "com.docker.desktop.address=unix:///Users/muzammil/Library/Containers/com.docker.docker/Data/docker-cli.sock"
+      ],
+      "ExperimentalBuild": false,
+      "ServerVersion": "29.5.3",
+      "Runtimes": {
+        "io.containerd.runc.v2": {
+          "path": "runc",
+          "status": {
+            "org.opencontainers.runtime-spec.features": "{\"ociVersionMin\":\"1.0.0\",\"ociVersionMax\":\"1.2.1\",\"hooks\":[\"prestart\",\"createRuntime\",\"createContainer\",\"startContainer\",\"poststart\",\"poststop\"],\"mountOptions\":[\"async\",\"atime\",\"bind\",\"defaults\",\"dev\",\"diratime\",\"dirsync\",\"exec\",\"iversion\",\"lazytime\",\"loud\",\"mand\",\"noatime\",\"nodev\",\"nodiratime\",\"noexec\",\"noiversion\",\"nolazytime\",\"nomand\",\"norelatime\",\"nostrictatime\",\"nosuid\",\"nosymfollow\",\"private\",\"ratime\",\"rbind\",\"rdev\",\"rdiratime\",\"relatime\",\"remount\",\"rexec\",\"rnoatime\",\"rnodev\",\"rnodiratime\",\"rnoexec\",\"rnorelatime\",\"rnostrictatime\",\"rnosuid\",\"rnosymfollow\",\"ro\",\"rprivate\",\"rrelatime\",\"rro\",\"rrw\",\"rshared\",\"rslave\",\"rstrictatime\",\"rsuid\",\"rsymfollow\",\"runbindable\",\"rw\",\"shared\",\"silent\",\"slave\",\"strictatime\",\"suid\",\"symfollow\",\"sync\",\"tmpcopyup\",\"unbindable\"],\"linux\":{\"namespaces\":[\"cgroup\",\"ipc\",\"mount\",\"network\",\"pid\",\"time\",\"user\",\"uts\"],\"capabilities\":[\"CAP_CHOWN\",\"CAP_DAC_OVERRIDE\",\"CAP_DAC_READ_SEARCH\",\"CAP_FOWNER\",\"CAP_FSETID\",\"CAP_KILL\",\"CAP_SETGID\",\"CAP_SETUID\",\"CAP_SETPCAP\",\"CAP_LINUX_IMMUTABLE\",\"CAP_NET_BIND_SERVICE\",\"CAP_NET_BROADCAST\",\"CAP_NET_ADMIN\",\"CAP_NET_RAW\",\"CAP_IPC_LOCK\",\"CAP_IPC_OWNER\",\"CAP_SYS_MODULE\",\"CAP_SYS_RAWIO\",\"CAP_SYS_CHROOT\",\"CAP_SYS_PTRACE\",\"CAP_SYS_PACCT\",\"CAP_SYS_ADMIN\",\"CAP_SYS_BOOT\",\"CAP_SYS_NICE\",\"CAP_SYS_RESOURCE\",\"CAP_SYS_TIME\",\"CAP_SYS_TTY_CONFIG\",\"CAP_MKNOD\",\"CAP_LEASE\",\"CAP_AUDIT_WRITE\",\"CAP_AUDIT_CONTROL\",\"CAP_SETFCAP\",\"CAP_MAC_OVERRIDE\",\"CAP_MAC_ADMIN\",\"CAP_SYSLOG\",\"CAP_WAKE_ALARM\",\"CAP_BLOCK_SUSPEND\",\"CAP_AUDIT_READ\",\"CAP_PERFMON\",\"CAP_BPF\",\"CAP_CHECKPOINT_RESTORE\"],\"cgroup\":{\"v1\":true,\"v2\":true,\"systemd\":true,\"systemdUser\":true,\"rdma\":true},\"seccomp\":{\"enabled\":true,\"actions\":[\"SCMP_ACT_ALLOW\",\"SCMP_ACT_ERRNO\",\"SCMP_ACT_KILL\",\"SCMP_ACT_KILL_PROCESS\",\"SCMP_ACT_KILL_THREAD\",\"SCMP_ACT_LOG\",\"SCMP_ACT_NOTIFY\",\"SCMP_ACT_TRACE\",\"SCMP_ACT_TRAP\"],\"operators\":[\"SCMP_CMP_EQ\",\"SCMP_CMP_GE\",\"SCMP_CMP_GT\",\"SCMP_CMP_LE\",\"SCMP_CMP_LT\",\"SCMP_CMP_MASKED_EQ\",\"SCMP_CMP_NE\"],\"archs\":[\"SCMP_ARCH_AARCH64\",\"SCMP_ARCH_ARM\",\"SCMP_ARCH_MIPS\",\"SCMP_ARCH_MIPS64\",\"SCMP_ARCH_MIPS64N32\",\"SCMP_ARCH_MIPSEL\",\"SCMP_ARCH_MIPSEL64\",\"SCMP_ARCH_MIPSEL64N32\",\"SCMP_ARCH_PPC\",\"SCMP_ARCH_PPC64\",\"SCMP_ARCH_PPC64LE\",\"SCMP_ARCH_RISCV64\",\"SCMP_ARCH_S390\",\"SCMP_ARCH_S390X\",\"SCMP_ARCH_X32\",\"SCMP_ARCH_X86\",\"SCMP_ARCH_X86_64\"],\"knownFlags\":[\"SECCOMP_FILTER_FLAG_TSYNC\",\"SECCOMP_FILTER_FLAG_SPEC_ALLOW\",\"SECCOMP_FILTER_FLAG_LOG\"],\"supportedFlags\":[\"SECCOMP_FILTER_FLAG_TSYNC\",\"SECCOMP_FILTER_FLAG_SPEC_ALLOW\",\"SECCOMP_FILTER_FLAG_LOG\"]},\"apparmor\":{\"enabled\":true},\"selinux\":{\"enabled\":true},\"intelRdt\":{\"enabled\":true},\"mountExtensions\":{\"idmap\":{\"enabled\":true}}},\"annotations\":{\"io.github.seccomp.libseccomp.version\":\"2.5.4\",\"org.opencontainers.runc.checkpoint.enabled\":\"true\",\"org.opencontainers.runc.commit\":\"v1.3.6-0-g491b69ba\",\"org.opencontainers.runc.version\":\"1.3.6\\n\"},\"potentiallyUnsafeConfigAnnotations\":[\"bundle\",\"org.systemd.property.\",\"org.criu.config\"]}"
+          }
+        },
+        "runc": {
+          "path": "runc",
+          "status": {
+            "org.opencontainers.runtime-spec.features": "{\"ociVersionMin\":\"1.0.0\",\"ociVersionMax\":\"1.2.1\",\"hooks\":[\"prestart\",\"createRuntime\",\"createContainer\",\"startContainer\",\"poststart\",\"poststop\"],\"mountOptions\":[\"async\",\"atime\",\"bind\",\"defaults\",\"dev\",\"diratime\",\"dirsync\",\"exec\",\"iversion\",\"lazytime\",\"loud\",\"mand\",\"noatime\",\"nodev\",\"nodiratime\",\"noexec\",\"noiversion\",\"nolazytime\",\"nomand\",\"norelatime\",\"nostrictatime\",\"nosuid\",\"nosymfollow\",\"private\",\"ratime\",\"rbind\",\"rdev\",\"rdiratime\",\"relatime\",\"remount\",\"rexec\",\"rnoatime\",\"rnodev\",\"rnodiratime\",\"rnoexec\",\"rnorelatime\",\"rnostrictatime\",\"rnosuid\",\"rnosymfollow\",\"ro\",\"rprivate\",\"rrelatime\",\"rro\",\"rrw\",\"rshared\",\"rslave\",\"rstrictatime\",\"rsuid\",\"rsymfollow\",\"runbindable\",\"rw\",\"shared\",\"silent\",\"slave\",\"strictatime\",\"suid\",\"symfollow\",\"sync\",\"tmpcopyup\",\"unbindable\"],\"linux\":{\"namespaces\":[\"cgroup\",\"ipc\",\"mount\",\"network\",\"pid\",\"time\",\"user\",\"uts\"],\"capabilities\":[\"CAP_CHOWN\",\"CAP_DAC_OVERRIDE\",\"CAP_DAC_READ_SEARCH\",\"CAP_FOWNER\",\"CAP_FSETID\",\"CAP_KILL\",\"CAP_SETGID\",\"CAP_SETUID\",\"CAP_SETPCAP\",\"CAP_LINUX_IMMUTABLE\",\"CAP_NET_BIND_SERVICE\",\"CAP_NET_BROADCAST\",\"CAP_NET_ADMIN\",\"CAP_NET_RAW\",\"CAP_IPC_LOCK\",\"CAP_IPC_OWNER\",\"CAP_SYS_MODULE\",\"CAP_SYS_RAWIO\",\"CAP_SYS_CHROOT\",\"CAP_SYS_PTRACE\",\"CAP_SYS_PACCT\",\"CAP_SYS_ADMIN\",\"CAP_SYS_BOOT\",\"CAP_SYS_NICE\",\"CAP_SYS_RESOURCE\",\"CAP_SYS_TIME\",\"CAP_SYS_TTY_CONFIG\",\"CAP_MKNOD\",\"CAP_LEASE\",\"CAP_AUDIT_WRITE\",\"CAP_AUDIT_CONTROL\",\"CAP_SETFCAP\",\"CAP_MAC_OVERRIDE\",\"CAP_MAC_ADMIN\",\"CAP_SYSLOG\",\"CAP_WAKE_ALARM\",\"CAP_BLOCK_SUSPEND\",\"CAP_AUDIT_READ\",\"CAP_PERFMON\",\"CAP_BPF\",\"CAP_CHECKPOINT_RESTORE\"],\"cgroup\":{\"v1\":true,\"v2\":true,\"systemd\":true,\"systemdUser\":true,\"rdma\":true},\"seccomp\":{\"enabled\":true,\"actions\":[\"SCMP_ACT_ALLOW\",\"SCMP_ACT_ERRNO\",\"SCMP_ACT_KILL\",\"SCMP_ACT_KILL_PROCESS\",\"SCMP_ACT_KILL_THREAD\",\"SCMP_ACT_LOG\",\"SCMP_ACT_NOTIFY\",\"SCMP_ACT_TRACE\",\"SCMP_ACT_TRAP\"],\"operators\":[\"SCMP_CMP_EQ\",\"SCMP_CMP_GE\",\"SCMP_CMP_GT\",\"SCMP_CMP_LE\",\"SCMP_CMP_LT\",\"SCMP_CMP_MASKED_EQ\",\"SCMP_CMP_NE\"],\"archs\":[\"SCMP_ARCH_AARCH64\",\"SCMP_ARCH_ARM\",\"SCMP_ARCH_MIPS\",\"SCMP_ARCH_MIPS64\",\"SCMP_ARCH_MIPS64N32\",\"SCMP_ARCH_MIPSEL\",\"SCMP_ARCH_MIPSEL64\",\"SCMP_ARCH_MIPSEL64N32\",\"SCMP_ARCH_PPC\",\"SCMP_ARCH_PPC64\",\"SCMP_ARCH_PPC64LE\",\"SCMP_ARCH_RISCV64\",\"SCMP_ARCH_S390\",\"SCMP_ARCH_S390X\",\"SCMP_ARCH_X32\",\"SCMP_ARCH_X86\",\"SCMP_ARCH_X86_64\"],\"knownFlags\":[\"SECCOMP_FILTER_FLAG_TSYNC\",\"SECCOMP_FILTER_FLAG_SPEC_ALLOW\",\"SECCOMP_FILTER_FLAG_LOG\"],\"supportedFlags\":[\"SECCOMP_FILTER_FLAG_TSYNC\",\"SECCOMP_FILTER_FLAG_SPEC_ALLOW\",\"SECCOMP_FILTER_FLAG_LOG\"]},\"apparmor\":{\"enabled\":true},\"selinux\":{\"enabled\":true},\"intelRdt\":{\"enabled\":true},\"mountExtensions\":{\"idmap\":{\"enabled\":true}}},\"annotations\":{\"io.github.seccomp.libseccomp.version\":\"2.5.4\",\"org.opencontainers.runc.checkpoint.enabled\":\"true\",\"org.opencontainers.runc.commit\":\"v1.3.6-0-g491b69ba\",\"org.opencontainers.runc.version\":\"1.3.6\\n\"},\"potentiallyUnsafeConfigAnnotations\":[\"bundle\",\"org.systemd.property.\",\"org.criu.config\"]}"
+          }
+        }
+      },
+      "DefaultRuntime": "runc",
+      "Swarm": {
+        "NodeID": "",
+        "NodeAddr": "",
+        "LocalNodeState": "inactive",
+        "ControlAvailable": false,
+        "Error": "",
+        "RemoteManagers": null
+      },
+      "LiveRestoreEnabled": false,
+      "Isolation": "",
+      "InitBinary": "docker-init",
+      "ContainerdCommit": {
+        "ID": "e53c7c1516c3b2bff98eb76f1f4117477e6f4e66"
+      },
+      "RuncCommit": {
+        "ID": "v1.3.6-0-g491b69ba"
+      },
+      "InitCommit": {
+        "ID": "de40ad0"
+      },
+      "SecurityOptions": [
+        "name=seccomp,profile=builtin",
+        "name=cgroupns"
+      ],
+      "FirewallBackend": {
+        "Driver": "iptables"
+      },
+      "CDISpecDirs": [
+        "/etc/cdi",
+        "/var/run/cdi"
+      ],
+      "DiscoveredDevices": [
+        {
+          "Source": "cdi",
+          "ID": "docker.com/gpu=webgpu"
+        }
+      ],
+      "Containerd": {
+        "Address": "/run/containerd/containerd.sock",
+        "Namespaces": {
+          "Containers": "moby",
+          "Plugins": "plugins.moby"
+        }
+      },
+      "Warnings": null,
+      "ClientInfo": {
+        "Debug": false,
+        "Version": "29.5.3",
+        "DefaultAPIVersion": "1.54",
+        "GitCommit": "d1c06ef",
+        "GoVersion": "go1.26.4",
+        "Os": "darwin",
+        "Arch": "arm64",
+        "BuildTime": "Wed Jun  3 17:59:08 2026",
+        "Context": "desktop-linux",
+        "Plugins": [
+          {
+            "SchemaVersion": "0.1.0",
+            "Vendor": "Docker Inc.",
+            "Version": "v1.79.0",
+            "ShortDescription": "Docker AI Agent Runner",
+            "Name": "agent",
+            "Path": "/Users/muzammil/.docker/cli-plugins/docker-agent"
+          },
+          {
+            "SchemaVersion": "0.1.0",
+            "Vendor": "Docker Inc.",
+            "Version": "v1.25.0",
+            "ShortDescription": "Docker AI Agent - Ask Gordon",
+            "Name": "ai",
+            "Path": "/Users/muzammil/.docker/cli-plugins/docker-ai"
+          },
+          {
+            "SchemaVersion": "0.1.0",
+            "Vendor": "Docker Inc.",
+            "Version": "v0.34.1-desktop.1",
+            "ShortDescription": "Docker Buildx",
+            "Name": "buildx",
+            "Path": "/Users/muzammil/.docker/cli-plugins/docker-buildx"
+          },
+          {
+            "SchemaVersion": "0.1.0",
+            "Vendor": "Docker Inc.",
+            "Version": "v5.1.4",
+            "ShortDescription": "Docker Compose",
+            "Name": "compose",
+            "Path": "/Users/muzammil/.docker/cli-plugins/docker-compose"
+          },
+          {
+            "SchemaVersion": "0.1.0",
+            "Vendor": "Docker Inc.",
+            "Version": "0.0.47",
+            "ShortDescription": "Get a shell into any image or container",
+            "Name": "debug",
+            "Path": "/Users/muzammil/.docker/cli-plugins/docker-debug"
+          },
+          {
+            "SchemaVersion": "0.1.0",
+            "Vendor": "Docker Inc.",
+            "Version": "v0.4.1",
+            "ShortDescription": "Docker Desktop commands",
+            "Name": "desktop",
+            "Path": "/Users/muzammil/.docker/cli-plugins/docker-desktop"
+          },
+          {
+            "SchemaVersion": "0.1.0",
+            "Vendor": "Docker Inc.",
+            "Version": "v0.0.4",
+            "ShortDescription": "CLI for managing Docker Hardened Images",
+            "Name": "dhi",
+            "Path": "/Users/muzammil/.docker/cli-plugins/docker-dhi"
+          },
+          {
+            "SchemaVersion": "0.1.0",
+            "Vendor": "Docker Inc.",
+            "Version": "v0.2.31",
+            "ShortDescription": "Manages Docker extensions",
+            "Name": "extension",
+            "Path": "/Users/muzammil/.docker/cli-plugins/docker-extension"
+          },
+          {
+            "SchemaVersion": "0.1.0",
+            "Vendor": "Docker Inc.",
+            "Version": "v1.4.0",
+            "ShortDescription": "Creates Docker-related starter files for your project",
+            "Name": "init",
+            "Path": "/Users/muzammil/.docker/cli-plugins/docker-init"
+          },
+          {
+            "SchemaVersion": "0.1.0",
+            "Vendor": "Docker Inc.",
+            "Version": "v0.42.2",
+            "ShortDescription": "Docker MCP Plugin",
+            "Name": "mcp",
+            "Path": "/Users/muzammil/.docker/cli-plugins/docker-mcp"
+          },
+          {
+            "SchemaVersion": "0.1.0",
+            "Vendor": "Docker Inc.",
+            "Version": "v1.2.1",
+            "ShortDescription": "Docker Model Runner",
+            "Name": "model",
+            "Path": "/Users/muzammil/.docker/cli-plugins/docker-model"
+          },
+          {
+            "SchemaVersion": "0.1.0",
+            "Vendor": "Docker Inc.",
+            "Version": "v0.6.4",
+            "ShortDescription": "Docker Offload",
+            "Name": "offload",
+            "Path": "/Users/muzammil/.docker/cli-plugins/docker-offload"
+          },
+          {
+            "SchemaVersion": "0.1.0",
+            "Vendor": "Docker Inc.",
+            "Version": "v0.1.5",
+            "ShortDescription": "Docker Pass Secrets Manager Plugin (beta)",
+            "Name": "pass",
+            "Path": "/Users/muzammil/.docker/cli-plugins/docker-pass"
+          },
+          {
+            "SchemaVersion": "0.1.0",
+            "Vendor": "Docker Inc.",
+            "Version": "v0.12.0",
+            "ShortDescription": "Docker Sandbox",
+            "Name": "sandbox",
+            "Path": "/Users/muzammil/.docker/cli-plugins/docker-sandbox"
+          },
+          {
+            "SchemaVersion": "0.1.0",
+            "Vendor": "Docker Inc.",
+            "Version": "v1.22.0",
+            "ShortDescription": "Docker Scout",
+            "Name": "scout",
+            "Path": "/Users/muzammil/.docker/cli-plugins/docker-scout"
+          }
+        ],
+        "Warnings": null
+      }
+    },
+    "host": [
+      "Darwin",
+      "Muzammils-MacBook-Pro.local",
+      "25.5.0",
+      "Darwin Kernel Version 25.5.0: Mon Apr 27 20:41:15 PDT 2026; root:xnu-12377.121.6~2/RELEASE_ARM64_T6041",
+      "arm64"
+    ],
+    "cpu_model": "Apple M4 Pro",
+    "source_sha256": {
+      "live_journal.py": "58cffd942e705a7eff3801f2b435271ac6a79e0ad313cfeb9e10c298baed09e9",
+      "experiment.py": "778fe3d747e1e62e118d8d21e2bcef9d7d6a863aaac583754f1ef59312435e1c",
+      "ingestion.py": "e08fa0da1cf059a22bc5a41c46c0288894814096574e00623538c5c1c566418b",
+      "journal.py": "e8c2b6c0617bdfbeadc14ea76b1a0a01fa09cd39fa92a4a7ac85c5c2666ff2ea",
+      "journal_fencing.py": "a7dd99ae722d5da07a21b105c486b71d06c09832c1288a76b7334dfd58c887c3",
+      "journal_volume.py": "aa8a468e797c4ba795fc7a9af52191aa9532c04391c5c4e85ac4a60a88645071",
+      "docker-compose.journal-volume.yml": "f97301b164eb3a70ae88713c437712f8ea97d8065a3eecfb953670947a3411a7",
+      "persistence-contract.json": "5ac0ddd7432afd4b94cbbdf29c93fe2ad67cc334807d9f27fd66c291b2f7322f",
+      "analytics-workload/cpp/ipc.cpp": "7104e228f44713aef7a73a17c01e9107faa56bd410ee2f2ad03b3170a54823a1",
+      "docker-compose.journal.yml": "665a59f9754ce307ae6a3c3398d815f25d03a7134a17be56cc502ca984fa4ffd",
+      "docker/Dockerfile": "b9f3e44530667134a5fc8e942d70290e2a4a2ca8d7d43904a3d467b590a81593"
+    },
+    "limits": "No HA, physical power-loss or OS-cold claim. 1 CPU/4GiB engine; 1 CPU/512MiB per native IPC actor, swap disabled; external fsynced host witness/controller measured separately. Bind-mount I/O can bypass cgroup block counters."
+  },
+  "result": {
+    "passed": true,
+    "scenario_passed": true,
+    "proof": {
+      "seed_rows_verified": 2000000,
+      "intents": 2765,
+      "acknowledged": 2255,
+      "live_rows_verified": 2255,
+      "applied_unacknowledged_intents": 0,
+      "acknowledged_loss": 0,
+      "wrong_or_duplicate_bodies": 0,
+      "export_sha256": "2ef7aa1a5eba4f53234c726458f50b629817703d89ff8b93f5ca699cdd3be6ca",
+      "customers": {
+        "sha256": "c3a160b85050e71c8ba465e2ca7a72d25bc4fbb076954f6c6f9c22fcaabadc95",
+        "bytes": 92663,
+        "verified_rows": 10000,
+        "allocated_bytes": 94208,
+        "compression": {
+          "codec": "gzip",
+          "level": 1,
+          "zlib": "1.3.2",
+          "uncompressed_bytes": 92663,
+          "compressed_bytes": 32777,
+          "ratio": 2.827073862769625,
+          "wall_ns": 424792,
+          "cpu_ns": 425000,
+          "scope": "Host-side compressibility of the verified CSV witness, streamed into a byte counter; not native engine compression. Timers cover compression calls, excluding file reads/hash/fsync."
+        }
+      }
+    },
+    "phases": {
+      "baseline/read/ok": {
+        "count": 195,
+        "mean_ms": 11.15534937948718,
+        "p50_ms": 10.777958,
+        "p99_ms": 16.139417,
+        "percentile_scope": "Nearest rank; low-count tails are effectively maxima, not established tail behavior"
+      },
+      "baseline/write/ok": {
+        "count": 452,
+        "mean_ms": 1.9657399623893805,
+        "p50_ms": 0.728375,
+        "p99_ms": 12.316167,
+        "percentile_scope": "Nearest rank; low-count tails are effectively maxima, not established tail behavior"
+      },
+      "outage-1/write/ok": {
+        "count": 1,
+        "mean_ms": 0.709792,
+        "p50_ms": 0.709792,
+        "p99_ms": 0.709792,
+        "percentile_scope": "Nearest rank; low-count tails are effectively maxima, not established tail behavior"
+      },
+      "outage-1/write/error": {
+        "count": 97,
+        "mean_ms": 31.61565727835052,
+        "p50_ms": 0.54675,
+        "p99_ms": 3006.969501,
+        "percentile_scope": "Nearest rank; low-count tails are effectively maxima, not established tail behavior"
+      },
+      "outage-1/read/error": {
+        "count": 98,
+        "mean_ms": 0.5633291020408163,
+        "p50_ms": 0.499084,
+        "p99_ms": 1.303,
+        "percentile_scope": "Nearest rank; low-count tails are effectively maxima, not established tail behavior"
+      },
+      "recovery-1/write/error": {
+        "count": 93,
+        "mean_ms": 0.23497978494623656,
+        "p50_ms": 0.224583,
+        "p99_ms": 0.667375,
+        "percentile_scope": "Nearest rank; low-count tails are effectively maxima, not established tail behavior"
+      },
+      "recovery-1/read/error": {
+        "count": 40,
+        "mean_ms": 0.23738955,
+        "p50_ms": 0.211791,
+        "p99_ms": 0.697125,
+        "percentile_scope": "Nearest rank; low-count tails are effectively maxima, not established tail behavior"
+      },
+      "recovery-1/write/ok": {
+        "count": 675,
+        "mean_ms": 1.9573841925925926,
+        "p50_ms": 0.709208,
+        "p99_ms": 12.762542,
+        "percentile_scope": "Nearest rank; low-count tails are effectively maxima, not established tail behavior"
+      },
+      "recovery-1/read/ok": {
+        "count": 291,
+        "mean_ms": 11.259485855670103,
+        "p50_ms": 10.810208,
+        "p99_ms": 15.220208,
+        "percentile_scope": "Nearest rank; low-count tails are effectively maxima, not established tail behavior"
+      },
+      "second-snapshot-tail/write/ok": {
+        "count": 454,
+        "mean_ms": 2.0687186189427313,
+        "p50_ms": 0.737167,
+        "p99_ms": 13.513666,
+        "percentile_scope": "Nearest rank; low-count tails are effectively maxima, not established tail behavior"
+      },
+      "second-snapshot-tail/read/ok": {
+        "count": 194,
+        "mean_ms": 11.280989092783505,
+        "p50_ms": 10.965334,
+        "p99_ms": 17.879,
+        "percentile_scope": "Nearest rank; low-count tails are effectively maxima, not established tail behavior"
+      },
+      "outage-2/write/ok": {
+        "count": 1,
+        "mean_ms": 0.742791,
+        "p50_ms": 0.742791,
+        "p99_ms": 0.742791,
+        "percentile_scope": "Nearest rank; low-count tails are effectively maxima, not established tail behavior"
+      },
+      "outage-2/read/error": {
+        "count": 98,
+        "mean_ms": 0.5352729795918367,
+        "p50_ms": 0.488292,
+        "p99_ms": 1.678792,
+        "percentile_scope": "Nearest rank; low-count tails are effectively maxima, not established tail behavior"
+      },
+      "outage-2/write/error": {
+        "count": 227,
+        "mean_ms": 0.5059405110132158,
+        "p50_ms": 0.434459,
+        "p99_ms": 1.332459,
+        "percentile_scope": "Nearest rank; low-count tails are effectively maxima, not established tail behavior"
+      },
+      "recovery-2/write/error": {
+        "count": 93,
+        "mean_ms": 0.2311688817204301,
+        "p50_ms": 0.227917,
+        "p99_ms": 0.691833,
+        "percentile_scope": "Nearest rank; low-count tails are effectively maxima, not established tail behavior"
+      },
+      "recovery-2/read/error": {
+        "count": 40,
+        "mean_ms": 0.22725932499999998,
+        "p50_ms": 0.221458,
+        "p99_ms": 0.534291,
+        "percentile_scope": "Nearest rank; low-count tails are effectively maxima, not established tail behavior"
+      },
+      "recovery-2/write/ok": {
+        "count": 672,
+        "mean_ms": 1.9006640535714285,
+        "p50_ms": 0.713541,
+        "p99_ms": 13.053208,
+        "percentile_scope": "Nearest rank; low-count tails are effectively maxima, not established tail behavior"
+      },
+      "recovery-2/read/ok": {
+        "count": 289,
+        "mean_ms": 11.118097065743944,
+        "p50_ms": 10.769458,
+        "p99_ms": 14.892708,
+        "percentile_scope": "Nearest rank; low-count tails are effectively maxima, not established tail behavior"
+      }
+    },
+    "recovery_observations": {
+      "cycle-1/read": {
+        "first_success_after_start_request_ms": 2184.204916,
+        "observed_success_gap_ms": 7441.262333,
+        "scope": "External fsynced completion timestamps; gap includes deliberate outage and client pacing/deadlines. Startup request includes Docker start plus replay; not isolated engine replay or election time."
+      },
+      "cycle-1/write": {
+        "first_success_after_start_request_ms": 2145.123708,
+        "observed_success_gap_ms": 7386.545375,
+        "scope": "External fsynced completion timestamps; gap includes deliberate outage and client pacing/deadlines. Startup request includes Docker start plus replay; not isolated engine replay or election time."
+      },
+      "cycle-2/read": {
+        "first_success_after_start_request_ms": 2178.102583,
+        "observed_success_gap_ms": 7409.322708,
+        "scope": "External fsynced completion timestamps; gap includes deliberate outage and client pacing/deadlines. Startup request includes Docker start plus replay; not isolated engine replay or election time."
+      },
+      "cycle-2/write": {
+        "first_success_after_start_request_ms": 2144.041833,
+        "observed_success_gap_ms": 7345.150458,
+        "scope": "External fsynced completion timestamps; gap includes deliberate outage and client pacing/deadlines. Startup request includes Docker start plus replay; not isolated engine replay or election time."
+      }
+    },
+    "wall_ns": 73020815333,
+    "scope": "Two retained-volume SIGKILL/replay cycles with live independent writers/readers, second snapshot plus tail; not capacity, HA, async journal, torn-tail or power-loss qualification",
+    "finalized_after_cleanup": true
+  },
+  "costs": {
+    "native_files_off_path_gzip": [
+      {
+        "file": "journal.2026.11.21T21.12.50Z.log",
+        "bytes": 482,
+        "gzip_level_1_bytes": 212,
+        "allocated_bytes": 4096
+      },
+      {
+        "file": "journal.2026.11.21T21.13.23Z.log",
+        "bytes": 185271,
+        "gzip_level_1_bytes": 25960,
+        "allocated_bytes": 188416
+      },
+      {
+        "file": "journal.lk",
+        "bytes": 0,
+        "gzip_level_1_bytes": 20,
+        "allocated_bytes": 0
+      },
+      {
+        "file": "journal.log",
+        "bytes": 187328,
+        "gzip_level_1_bytes": 26338,
+        "allocated_bytes": 188416
+      },
+      {
+        "file": "journal.qdb",
+        "bytes": 96294384,
+        "gzip_level_1_bytes": 22938696,
+        "allocated_bytes": 96296960
+      }
+    ],
+    "compression_wall_ns": 359138834,
+    "compression_cpu_ns": 358699000,
+    "host_cpu_core_seconds": 9.796394,
+    "host_peak_rss_bytes": 597098496,
+    "resources_samples": 165,
+    "sampling_scope": "200ms plus serial Docker API/inspection overhead; generation-keyed CPU counters, charged memory and non-atomic directory samples, native cgroup CPU/memory/IO and PID1 RSS at checkpoints. Exact raw cadence retained; physical bind-mount I/O/latency unavailable; external host collector/witness overhead separate.",
+    "cleanup_errors": []
+  },
+  "fencing": null,
+  "volume_initialization": {
+    "volume": {
+      "CreatedAt": "2026-11-21T21:12:47Z",
+      "Driver": "local",
+      "Labels": {
+        "com.docker.compose.config-hash": "04a681b88455dca323d5ebdfc6fe9d8d1aae15975298b5391cca5aa8f8a5b0d5",
+        "com.docker.compose.project": "rayforce-duckdb-journal",
+        "com.docker.compose.version": "5.1.4",
+        "com.docker.compose.volume": "journal-data"
+      },
+      "Mountpoint": "/var/lib/docker/volumes/rayforce-journal-data-336010cd5edb447aac5eaa24374a2bfe/_data",
+      "Name": "rayforce-journal-data-336010cd5edb447aac5eaa24374a2bfe",
+      "Options": null,
+      "Scope": "local"
+    },
+    "inspection": {
+      "Id": "c3c520365c76de72e222790dcc669d53eda36202c32a21e4f82cc0ddf21dec15",
+      "Created": "2026-11-21T21:12:47.148196262Z",
+      "Path": "python",
+      "Args": [
+        "-c",
+        "import os,json,pathlib,resource; os.chmod('/state', 0o700); os.chown('/state', int(os.environ['LAB_UID']), int(os.environ['LAB_GID'])); print(json.dumps({'process_peak_rss_bytes':resource.getrusage(resource.RUSAGE_SELF).ru_maxrss*1024,'cgroup':{p:pathlib.Path('/sys/fs/cgroup',p).read_text() for p in ('cpu.stat','memory.peak','io.stat')}}))"
+      ],
+      "State": {
+        "Status": "exited",
+        "Running": false,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 0,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-11-21T21:12:47.249722637Z",
+        "FinishedAt": "2026-11-21T21:12:47.354977554Z"
+      },
+      "Image": "sha256:8776c8e5a305ceb8c3456aa42c76ea511030050ce8cbec38693be9fd3980a22a",
+      "ResolvConfPath": "/var/lib/docker/containers/c3c520365c76de72e222790dcc669d53eda36202c32a21e4f82cc0ddf21dec15/resolv.conf",
+      "HostnamePath": "/var/lib/docker/containers/c3c520365c76de72e222790dcc669d53eda36202c32a21e4f82cc0ddf21dec15/hostname",
+      "HostsPath": "/var/lib/docker/containers/c3c520365c76de72e222790dcc669d53eda36202c32a21e4f82cc0ddf21dec15/hosts",
+      "LogPath": "/var/lib/docker/containers/c3c520365c76de72e222790dcc669d53eda36202c32a21e4f82cc0ddf21dec15/c3c520365c76de72e222790dcc669d53eda36202c32a21e4f82cc0ddf21dec15-json.log",
+      "Name": "/rayforce-duckdb-journal-init-volume-1",
+      "RestartCount": 0,
+      "Driver": "overlayfs",
+      "Platform": "linux",
+      "MountLabel": "",
+      "ProcessLabel": "",
+      "AppArmorProfile": "",
+      "ExecIDs": null,
+      "HostConfig": {
+        "Binds": [
+          "rayforce-journal-data-336010cd5edb447aac5eaa24374a2bfe:/state:rw"
+        ],
+        "ContainerIDFile": "",
+        "LogConfig": {
+          "Type": "json-file",
+          "Config": {}
+        },
+        "NetworkMode": "none",
+        "PortBindings": {},
+        "RestartPolicy": {
+          "Name": "no",
+          "MaximumRetryCount": 0
+        },
+        "AutoRemove": false,
+        "VolumeDriver": "",
+        "VolumesFrom": null,
+        "ConsoleSize": [
+          0,
+          0
+        ],
+        "CapAdd": [
+          "CAP_CHOWN"
+        ],
+        "CapDrop": [
+          "ALL"
+        ],
+        "CgroupnsMode": "private",
+        "Dns": null,
+        "DnsOptions": null,
+        "DnsSearch": null,
+        "ExtraHosts": [],
+        "GroupAdd": null,
+        "IpcMode": "private",
+        "Cgroup": "",
+        "Links": null,
+        "OomScoreAdj": 0,
+        "PidMode": "",
+        "Privileged": false,
+        "PublishAllPorts": false,
+        "ReadonlyRootfs": true,
+        "SecurityOpt": [
+          "no-new-privileges:true"
+        ],
+        "UTSMode": "",
+        "UsernsMode": "",
+        "ShmSize": 67108864,
+        "Runtime": "runc",
+        "Isolation": "",
+        "CpuShares": 0,
+        "Memory": 536870912,
+        "NanoCpus": 1000000000,
+        "CgroupParent": "",
+        "BlkioWeight": 0,
+        "BlkioWeightDevice": null,
+        "BlkioDeviceReadBps": null,
+        "BlkioDeviceWriteBps": null,
+        "BlkioDeviceReadIOps": null,
+        "BlkioDeviceWriteIOps": null,
+        "CpuPeriod": 0,
+        "CpuQuota": 0,
+        "CpuRealtimePeriod": 0,
+        "CpuRealtimeRuntime": 0,
+        "CpusetCpus": "",
+        "CpusetMems": "",
+        "Devices": null,
+        "DeviceCgroupRules": null,
+        "DeviceRequests": null,
+        "MemoryReservation": 0,
+        "MemorySwap": 536870912,
+        "MemorySwappiness": null,
+        "OomKillDisable": null,
+        "PidsLimit": null,
+        "Ulimits": null,
+        "CpuCount": 0,
+        "CpuPercent": 0,
+        "IOMaximumIOps": 0,
+        "IOMaximumBandwidth": 0,
+        "MaskedPaths": [
+          "/proc/acpi",
+          "/proc/asound",
+          "/proc/interrupts",
+          "/proc/kcore",
+          "/proc/keys",
+          "/proc/latency_stats",
+          "/proc/sched_debug",
+          "/proc/scsi",
+          "/proc/timer_list",
+          "/proc/timer_stats",
+          "/sys/devices/virtual/powercap",
+          "/sys/firmware"
+        ],
+        "ReadonlyPaths": [
+          "/proc/bus",
+          "/proc/fs",
+          "/proc/irq",
+          "/proc/sys",
+          "/proc/sysrq-trigger"
+        ]
+      },
+      "Storage": {
+        "RootFS": {
+          "Snapshot": {
+            "Name": "overlayfs"
+          }
+        }
+      },
+      "Mounts": [
+        {
+          "Type": "volume",
+          "Name": "rayforce-journal-data-336010cd5edb447aac5eaa24374a2bfe",
+          "Source": "/var/lib/docker/volumes/rayforce-journal-data-336010cd5edb447aac5eaa24374a2bfe/_data",
+          "Destination": "/state",
+          "Driver": "local",
+          "Mode": "rw",
+          "RW": true,
+          "Propagation": ""
+        }
+      ],
+      "Config": {
+        "Hostname": "c3c520365c76",
+        "Domainname": "",
+        "User": "0:0",
+        "AttachStdin": false,
+        "AttachStdout": true,
+        "AttachStderr": true,
+        "Tty": false,
+        "OpenStdin": false,
+        "StdinOnce": false,
+        "Env": [
+          "LAB_GID=20",
+          "LAB_UID=501",
+          "PATH=/usr/local/cargo/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+          "LANG=C.UTF-8",
+          "GPG_KEY=7169605F62C751356D054A26A821E680E5FA6305",
+          "PYTHON_VERSION=3.12.12",
+          "PYTHON_SHA256=fb85a13414b028c49ba18bbd523c2d055a30b56b18b92ce454ea2c51edc656c4",
+          "RUSTUP_HOME=/usr/local/rustup",
+          "CARGO_HOME=/usr/local/cargo",
+          "LD_LIBRARY_PATH=/opt/bench:/opt/rayforce/lib:/opt/duckdb/lib"
+        ],
+        "Cmd": [
+          "import os,json,pathlib,resource; os.chmod('/state', 0o700); os.chown('/state', int(os.environ['LAB_UID']), int(os.environ['LAB_GID'])); print(json.dumps({'process_peak_rss_bytes':resource.getrusage(resource.RUSAGE_SELF).ru_maxrss*1024,'cgroup':{p:pathlib.Path('/sys/fs/cgroup',p).read_text() for p in ('cpu.stat','memory.peak','io.stat')}}))"
+        ],
+        "Image": "rayforce-duckdb-analytics:dev",
+        "Volumes": null,
+        "WorkingDir": "/workload",
+        "Entrypoint": [
+          "python",
+          "-c"
+        ],
+        "Labels": {
+          "com.docker.compose.config-hash": "9024e7c4fd3d812e3901accc93428c6aa01829120aa54acf6ef6debdc266e282",
+          "com.docker.compose.container-number": "1",
+          "com.docker.compose.depends_on": "",
+          "com.docker.compose.image": "sha256:8776c8e5a305ceb8c3456aa42c76ea511030050ce8cbec38693be9fd3980a22a",
+          "com.docker.compose.oneoff": "False",
+          "com.docker.compose.project": "rayforce-duckdb-journal",
+          "com.docker.compose.project.config_files": "/Users/muzammil/github.com/muzammilar/examples/rayforce/duckdb-comparison/docker-compose.journal.yml,/Users/muzammil/github.com/muzammilar/examples/rayforce/duckdb-comparison/docker-compose.journal-volume.yml",
+          "com.docker.compose.project.working_dir": "/Users/muzammil/github.com/muzammilar/examples/rayforce/duckdb-comparison",
+          "com.docker.compose.service": "init-volume",
+          "com.docker.compose.version": "5.1.4"
+        },
+        "StopTimeout": 1
+      },
+      "NetworkSettings": {
+        "SandboxID": "",
+        "SandboxKey": "",
+        "Ports": {},
+        "Networks": {
+          "none": {
+            "IPAMConfig": null,
+            "Links": null,
+            "Aliases": null,
+            "DriverOpts": null,
+            "GwPriority": 0,
+            "NetworkID": "e1d264013083b42e40fa3e809bd30227fb4cbd2bffb418d308d165c0844f9f8d",
+            "EndpointID": "",
+            "Gateway": "",
+            "IPAddress": "",
+            "MacAddress": "",
+            "IPPrefixLen": 0,
+            "IPv6Gateway": "",
+            "GlobalIPv6Address": "",
+            "GlobalIPv6PrefixLen": 0,
+            "DNSNames": null
+          }
+        }
+      },
+      "ImageManifestDescriptor": {
+        "mediaType": "application/vnd.oci.image.manifest.v1+json",
+        "digest": "sha256:b4412b1394611108d6a660ea0f43dc041e246843dedfb679511451a4096c9b0d",
+        "size": 3546,
+        "platform": {
+          "architecture": "arm64",
+          "os": "linux"
+        }
+      }
+    },
+    "log": "{\"process_peak_rss_bytes\": 14802944, \"cgroup\": {\"cpu.stat\": \"usage_usec 61182\\nuser_usec 49340\\nsystem_usec 11841\\nnice_usec 0\\nnr_periods 0\\nnr_throttled 0\\nthrottled_usec 0\\nnr_bursts 0\\nburst_usec 0\\n\", \"memory.peak\": \"10358784\\n\", \"io.stat\": \"\"}}\n"
+  },
+  "image_id": "sha256:8776c8e5a305ceb8c3456aa42c76ea511030050ce8cbec38693be9fd3980a22a",
+  "native_generation_counters": {
+    "server": {
+      "2026-11-21T21:13:39.35567055Z": {
+        "cpu_core_seconds": 7.732747,
+        "user_core_seconds": 7.418783,
+        "system_core_seconds": 0.313964,
+        "cgroup_peak_bytes": 310030336,
+        "process_peak_rss_bytes": 253390848,
+        "io_checkpoints": {
+          "final-inspect.json": {
+            "available": true,
+            "devices": {
+              "254:0": {
+                "rbytes": 0,
+                "wbytes": 56893440,
+                "wios": 1022,
+                "rios": 0
+              }
+            },
+            "raw": "254:0 rbytes=0 wbytes=56893440 rios=0 wios=1022 dbytes=0 dios=0\n",
+            "totals": {
+              "rbytes": 0,
+              "rios": 0,
+              "wbytes": 56893440,
+              "wios": 1022
+            },
+            "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth."
+          },
+          "cycle-2-recovered-inspect.json": {
+            "available": true,
+            "devices": {
+              "254:0": {
+                "rbytes": 0,
+                "wbytes": 3866624,
+                "wios": 944,
+                "rios": 0
+              }
+            },
+            "raw": "254:0 rbytes=0 wbytes=3866624 rios=0 wios=944 dbytes=0 dios=0\n",
+            "totals": {
+              "rbytes": 0,
+              "rios": 0,
+              "wbytes": 3866624,
+              "wios": 944
+            },
+            "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth."
+          }
+        }
+      },
+      "2026-11-21T21:12:47.543351012Z": {
+        "cpu_core_seconds": 4.13946,
+        "user_core_seconds": 3.813795,
+        "system_core_seconds": 0.325665,
+        "cgroup_peak_bytes": 565473280,
+        "process_peak_rss_bytes": 500477952,
+        "io_checkpoints": {
+          "cycle-1-before-inspect.json": {
+            "available": true,
+            "devices": {
+              "254:0": {
+                "rbytes": 0,
+                "wbytes": 98947072,
+                "wios": 741,
+                "rios": 0
+              }
+            },
+            "raw": "254:0 rbytes=0 wbytes=98947072 rios=0 wios=741 dbytes=0 dios=0\n",
+            "totals": {
+              "rbytes": 0,
+              "rios": 0,
+              "wbytes": 98947072,
+              "wios": 741
+            },
+            "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth."
+          }
+        }
+      },
+      "2026-11-21T21:13:06.22918259Z": {
+        "cpu_core_seconds": 10.576463,
+        "user_core_seconds": 10.111563,
+        "system_core_seconds": 0.464899,
+        "cgroup_peak_bytes": 456617984,
+        "process_peak_rss_bytes": 348864512,
+        "io_checkpoints": {
+          "cycle-2-before-inspect.json": {
+            "available": true,
+            "devices": {
+              "254:0": {
+                "rbytes": 0,
+                "wbytes": 102862848,
+                "wios": 1694,
+                "rios": 0
+              }
+            },
+            "raw": "254:0 rbytes=0 wbytes=102862848 rios=0 wios=1694 dbytes=0 dios=0\n",
+            "totals": {
+              "rbytes": 0,
+              "rios": 0,
+              "wbytes": 102862848,
+              "wios": 1694
+            },
+            "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth."
+          },
+          "cycle-1-recovered-inspect.json": {
+            "available": true,
+            "devices": {
+              "254:0": {
+                "rbytes": 0,
+                "wbytes": 3825664,
+                "wios": 934,
+                "rios": 0
+              }
+            },
+            "raw": "254:0 rbytes=0 wbytes=3825664 rios=0 wios=934 dbytes=0 dios=0\n",
+            "totals": {
+              "rbytes": 0,
+              "rios": 0,
+              "wbytes": 3825664,
+              "wios": 934
+            },
+            "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth."
+          }
+        }
+      }
+    },
+    "control": {
+      "2026-11-21T21:12:47.873295929Z": {
+        "cpu_core_seconds": 1.25712,
+        "user_core_seconds": 1.196681,
+        "system_core_seconds": 0.060438,
+        "cgroup_peak_bytes": 441835520,
+        "process_peak_rss_bytes": 409231360,
+        "io_checkpoints": {
+          "final-inspect.json": {
+            "available": true,
+            "devices": {},
+            "raw": "",
+            "totals": {
+              "rbytes": 0,
+              "rios": 0,
+              "wbytes": 0,
+              "wios": 0
+            },
+            "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth."
+          },
+          "cycle-1-before-inspect.json": {
+            "available": true,
+            "devices": {},
+            "raw": "",
+            "totals": {
+              "rbytes": 0,
+              "rios": 0,
+              "wbytes": 0,
+              "wios": 0
+            },
+            "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth."
+          },
+          "cycle-2-before-inspect.json": {
+            "available": true,
+            "devices": {},
+            "raw": "",
+            "totals": {
+              "rbytes": 0,
+              "rios": 0,
+              "wbytes": 0,
+              "wios": 0
+            },
+            "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth."
+          },
+          "cycle-2-recovered-inspect.json": {
+            "available": true,
+            "devices": {},
+            "raw": "",
+            "totals": {
+              "rbytes": 0,
+              "rios": 0,
+              "wbytes": 0,
+              "wios": 0
+            },
+            "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth."
+          },
+          "cycle-1-recovered-inspect.json": {
+            "available": true,
+            "devices": {},
+            "raw": "",
+            "totals": {
+              "rbytes": 0,
+              "rios": 0,
+              "wbytes": 0,
+              "wios": 0
+            },
+            "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth."
+          }
+        }
+      }
+    },
+    "writer": {
+      "2026-11-21T21:12:48.077187262Z": {
+        "cpu_core_seconds": 0.359008,
+        "user_core_seconds": 0.145919,
+        "system_core_seconds": 0.213088,
+        "cgroup_peak_bytes": 14364672,
+        "process_peak_rss_bytes": 15515648,
+        "io_checkpoints": {
+          "final-inspect.json": {
+            "available": true,
+            "devices": {},
+            "raw": "",
+            "totals": {
+              "rbytes": 0,
+              "rios": 0,
+              "wbytes": 0,
+              "wios": 0
+            },
+            "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth."
+          },
+          "cycle-1-before-inspect.json": {
+            "available": true,
+            "devices": {},
+            "raw": "",
+            "totals": {
+              "rbytes": 0,
+              "rios": 0,
+              "wbytes": 0,
+              "wios": 0
+            },
+            "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth."
+          },
+          "cycle-2-before-inspect.json": {
+            "available": true,
+            "devices": {},
+            "raw": "",
+            "totals": {
+              "rbytes": 0,
+              "rios": 0,
+              "wbytes": 0,
+              "wios": 0
+            },
+            "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth."
+          },
+          "cycle-2-recovered-inspect.json": {
+            "available": true,
+            "devices": {},
+            "raw": "",
+            "totals": {
+              "rbytes": 0,
+              "rios": 0,
+              "wbytes": 0,
+              "wios": 0
+            },
+            "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth."
+          },
+          "cycle-1-recovered-inspect.json": {
+            "available": true,
+            "devices": {},
+            "raw": "",
+            "totals": {
+              "rbytes": 0,
+              "rios": 0,
+              "wbytes": 0,
+              "wios": 0
+            },
+            "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth."
+          }
+        }
+      }
+    },
+    "reader": {
+      "2026-11-21T21:12:48.314769887Z": {
+        "cpu_core_seconds": 0.224726,
+        "user_core_seconds": 0.097304,
+        "system_core_seconds": 0.127422,
+        "cgroup_peak_bytes": 14106624,
+        "process_peak_rss_bytes": 15515648,
+        "io_checkpoints": {
+          "final-inspect.json": {
+            "available": true,
+            "devices": {},
+            "raw": "",
+            "totals": {
+              "rbytes": 0,
+              "rios": 0,
+              "wbytes": 0,
+              "wios": 0
+            },
+            "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth."
+          },
+          "cycle-1-before-inspect.json": {
+            "available": true,
+            "devices": {},
+            "raw": "",
+            "totals": {
+              "rbytes": 0,
+              "rios": 0,
+              "wbytes": 0,
+              "wios": 0
+            },
+            "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth."
+          },
+          "cycle-2-before-inspect.json": {
+            "available": true,
+            "devices": {},
+            "raw": "",
+            "totals": {
+              "rbytes": 0,
+              "rios": 0,
+              "wbytes": 0,
+              "wios": 0
+            },
+            "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth."
+          },
+          "cycle-2-recovered-inspect.json": {
+            "available": true,
+            "devices": {},
+            "raw": "",
+            "totals": {
+              "rbytes": 0,
+              "rios": 0,
+              "wbytes": 0,
+              "wios": 0
+            },
+            "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth."
+          },
+          "cycle-1-recovered-inspect.json": {
+            "available": true,
+            "devices": {},
+            "raw": "",
+            "totals": {
+              "rbytes": 0,
+              "rios": 0,
+              "wbytes": 0,
+              "wios": 0
+            },
+            "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth."
+          }
+        }
+      }
+    }
+  },
+  "phase_sample_summaries": {
+    "bootstrap": {
+      "server": {
+        "cpu_observed_core_seconds": 0.5980540000000001,
+        "cpu_observed_window_s": 2.405337583972141,
+        "cpu_utilization_peak_percent_one_core_100": 62.001109649117815,
+        "network_bytes_at_last_sample": {
+          "rx_bytes": 56132,
+          "tx_bytes": 67523308
+        },
+        "sample_count": 6,
+        "sampled_memory_mean_bytes": 250174122.66666666,
+        "sampled_memory_max_bytes": 369549312,
+        "cpu_utilization_mean_percent_one_core_100": 24.863620141518012
+      },
+      "control": {
+        "cpu_observed_core_seconds": 1.202332,
+        "cpu_observed_window_s": 2.4090442499145865,
+        "cpu_utilization_peak_percent_one_core_100": 100.14061605903561,
+        "network_bytes_at_last_sample": {
+          "rx_bytes": 67524176,
+          "tx_bytes": 53208
+        },
+        "sample_count": 6,
+        "sampled_memory_mean_bytes": 154854741.33333334,
+        "sampled_memory_max_bytes": 308666368,
+        "cpu_utilization_mean_percent_one_core_100": 49.90908739192437
+      },
+      "writer": {
+        "cpu_observed_core_seconds": 0.0,
+        "cpu_observed_window_s": 2.0359797501005232,
+        "cpu_utilization_peak_percent_one_core_100": 0,
+        "network_bytes_at_last_sample": {
+          "rx_bytes": 2224,
+          "tx_bytes": 607
+        },
+        "sample_count": 5,
+        "sampled_memory_mean_bytes": 11702272,
+        "sampled_memory_max_bytes": 11702272,
+        "cpu_utilization_mean_percent_one_core_100": 0.0
+      },
+      "reader": {
+        "cpu_observed_core_seconds": 0.0,
+        "cpu_observed_window_s": 1.6400389580521733,
+        "cpu_utilization_peak_percent_one_core_100": 0,
+        "network_bytes_at_last_sample": {
+          "rx_bytes": 1834,
+          "tx_bytes": 607
+        },
+        "sample_count": 4,
+        "sampled_memory_mean_bytes": 11702272,
+        "sampled_memory_max_bytes": 11702272,
+        "cpu_utilization_mean_percent_one_core_100": 0.0
+      }
+    },
+    "baseline": {
+      "server": {
+        "cpu_observed_core_seconds": 3.317753,
+        "cpu_observed_window_s": 9.80837395787239,
+        "cpu_utilization_peak_percent_one_core_100": 37.233039859372276,
+        "network_bytes_at_last_sample": {
+          "rx_bytes": 212660,
+          "tx_bytes": 67780547
+        },
+        "sample_count": 23,
+        "sampled_memory_mean_bytes": 497973515.1304348,
+        "sampled_memory_max_bytes": 498794496,
+        "cpu_utilization_mean_percent_one_core_100": 33.82571886277957
+      },
+      "control": {
+        "cpu_observed_core_seconds": 0.0,
+        "cpu_observed_window_s": 9.805662124883384,
+        "cpu_utilization_peak_percent_one_core_100": 0,
+        "network_bytes_at_last_sample": {
+          "rx_bytes": 67682248,
+          "tx_bytes": 54413
+        },
+        "sample_count": 23,
+        "sampled_memory_mean_bytes": 176271360,
+        "sampled_memory_max_bytes": 176271360,
+        "cpu_utilization_mean_percent_one_core_100": 0.0
+      },
+      "writer": {
+        "cpu_observed_core_seconds": 0.036024,
+        "cpu_observed_window_s": 9.805519833927974,
+        "cpu_utilization_peak_percent_one_core_100": 0.4107526385232894,
+        "network_bytes_at_last_sample": {
+          "rx_bytes": 71775,
+          "tx_bytes": 97147
+        },
+        "sample_count": 23,
+        "sampled_memory_mean_bytes": 11702450.086956521,
+        "sampled_memory_max_bytes": 11706368,
+        "cpu_utilization_mean_percent_one_core_100": 0.36738490778789457
+      },
+      "reader": {
+        "cpu_observed_core_seconds": 0.020551,
+        "cpu_observed_window_s": 9.806007707957178,
+        "cpu_utilization_peak_percent_one_core_100": 0.24489340124885603,
+        "network_bytes_at_last_sample": {
+          "rx_bytes": 32232,
+          "tx_bytes": 60093
+        },
+        "sample_count": 23,
+        "sampled_memory_mean_bytes": 11703340.52173913,
+        "sampled_memory_max_bytes": 11706368,
+        "cpu_utilization_mean_percent_one_core_100": 0.20957560520091875
+      }
+    },
+    "outage-1": {
+      "control": {
+        "cpu_observed_core_seconds": 0.0,
+        "cpu_observed_window_s": 4.860838874941692,
+        "cpu_utilization_peak_percent_one_core_100": 0,
+        "network_bytes_at_last_sample": {
+          "rx_bytes": 67683974,
+          "tx_bytes": 54479
+        },
+        "sample_count": 15,
+        "sampled_memory_mean_bytes": 176304128,
+        "sampled_memory_max_bytes": 176304128,
+        "cpu_utilization_mean_percent_one_core_100": 0.0
+      },
+      "writer": {
+        "cpu_observed_core_seconds": 0.027784999999999997,
+        "cpu_observed_window_s": 4.866931000025943,
+        "cpu_utilization_peak_percent_one_core_100": 1.5688734252853371,
+        "network_bytes_at_last_sample": {
+          "rx_bytes": 75125,
+          "tx_bytes": 99701
+        },
+        "sample_count": 15,
+        "sampled_memory_mean_bytes": 11906252.8,
+        "sampled_memory_max_bytes": 12255232,
+        "cpu_utilization_mean_percent_one_core_100": 0.5708936494035336
+      },
+      "reader": {
+        "cpu_observed_core_seconds": 0.030791000000000002,
+        "cpu_observed_window_s": 4.87200374994427,
+        "cpu_utilization_peak_percent_one_core_100": 0.9123207612717129,
+        "network_bytes_at_last_sample": {
+          "rx_bytes": 34590,
+          "tx_bytes": 62711
+        },
+        "sample_count": 15,
+        "sampled_memory_mean_bytes": 11858193.066666666,
+        "sampled_memory_max_bytes": 12259328,
+        "cpu_utilization_mean_percent_one_core_100": 0.6319986925369715
+      }
+    },
+    "recovery-1": {
+      "server": {
+        "cpu_observed_core_seconds": 7.206374,
+        "cpu_observed_window_s": 17.450433499878272,
+        "cpu_utilization_peak_percent_one_core_100": 105.56492133897414,
+        "network_bytes_at_last_sample": {
+          "rx_bytes": 253323,
+          "tx_bytes": 162099
+        },
+        "sample_count": 40,
+        "sampled_memory_mean_bytes": 252089753.6,
+        "sampled_memory_max_bytes": 445788160,
+        "cpu_utilization_mean_percent_one_core_100": 41.296246308438526
+      },
+      "control": {
+        "cpu_observed_core_seconds": 0.009828,
+        "cpu_observed_window_s": 17.44835470803082,
+        "cpu_utilization_peak_percent_one_core_100": 1.6849330447015092,
+        "network_bytes_at_last_sample": {
+          "rx_bytes": 67686139,
+          "tx_bytes": 56930
+        },
+        "sample_count": 40,
+        "sampled_memory_mean_bytes": 176315904,
+        "sampled_memory_max_bytes": 176558080,
+        "cpu_utilization_mean_percent_one_core_100": 0.05632622768424431
+      },
+      "writer": {
+        "cpu_observed_core_seconds": 0.07658,
+        "cpu_observed_window_s": 17.44742254097946,
+        "cpu_utilization_peak_percent_one_core_100": 2.100348608201332,
+        "network_bytes_at_last_sample": {
+          "rx_bytes": 187018,
+          "tx_bytes": 255446
+        },
+        "sample_count": 40,
+        "sampled_memory_mean_bytes": 11778560,
+        "sampled_memory_max_bytes": 12013568,
+        "cpu_utilization_mean_percent_one_core_100": 0.4389186988515552
+      },
+      "reader": {
+        "cpu_observed_core_seconds": 0.044673,
+        "cpu_observed_window_s": 17.44592500012368,
+        "cpu_utilization_peak_percent_one_core_100": 2.1176778657710913,
+        "network_bytes_at_last_sample": {
+          "rx_bytes": 83450,
+          "tx_bytes": 157533
+        },
+        "sample_count": 40,
+        "sampled_memory_mean_bytes": 11752960,
+        "sampled_memory_max_bytes": 12017664,
+        "cpu_utilization_mean_percent_one_core_100": 0.25606552819459727
+      }
+    },
+    "second-snapshot-tail": {
+      "server": {
+        "cpu_observed_core_seconds": 3.300793,
+        "cpu_observed_window_s": 9.810898707946762,
+        "cpu_utilization_peak_percent_one_core_100": 36.283504078384105,
+        "network_bytes_at_last_sample": {
+          "rx_bytes": 411807,
+          "tx_bytes": 262456
+        },
+        "sample_count": 23,
+        "sampled_memory_mean_bytes": 445860285.2173913,
+        "sampled_memory_max_bytes": 446595072,
+        "cpu_utilization_mean_percent_one_core_100": 33.64414513143816
+      },
+      "control": {
+        "cpu_observed_core_seconds": 0.007435,
+        "cpu_observed_window_s": 9.80804254184477,
+        "cpu_utilization_peak_percent_one_core_100": 1.7599118795790967,
+        "network_bytes_at_last_sample": {
+          "rx_bytes": 67686139,
+          "tx_bytes": 56930
+        },
+        "sample_count": 23,
+        "sampled_memory_mean_bytes": 176304484.17391303,
+        "sampled_memory_max_bytes": 176312320,
+        "cpu_utilization_mean_percent_one_core_100": 0.07580513612455812
+      },
+      "writer": {
+        "cpu_observed_core_seconds": 0.043688000000000005,
+        "cpu_observed_window_s": 9.807109750108793,
+        "cpu_utilization_peak_percent_one_core_100": 2.1420730092448315,
+        "network_bytes_at_last_sample": {
+          "rx_bytes": 257354,
+          "tx_bytes": 354052
+        },
+        "sample_count": 23,
+        "sampled_memory_mean_bytes": 11751602.086956521,
+        "sampled_memory_max_bytes": 11997184,
+        "cpu_utilization_mean_percent_one_core_100": 0.4454727347118284
+      },
+      "reader": {
+        "cpu_observed_core_seconds": 0.027153000000000004,
+        "cpu_observed_window_s": 9.808464790927246,
+        "cpu_utilization_peak_percent_one_core_100": 1.9395255651544416,
+        "network_bytes_at_last_sample": {
+          "rx_bytes": 113786,
+          "tx_bytes": 217543
+        },
+        "sample_count": 23,
+        "sampled_memory_mean_bytes": 11771547.826086957,
+        "sampled_memory_max_bytes": 12435456,
+        "cpu_utilization_mean_percent_one_core_100": 0.27683231350451826
+      }
+    },
+    "outage-2": {
+      "control": {
+        "cpu_observed_core_seconds": 0.0,
+        "cpu_observed_window_s": 4.842122499831021,
+        "cpu_utilization_peak_percent_one_core_100": 0,
+        "network_bytes_at_last_sample": {
+          "rx_bytes": 67687178,
+          "tx_bytes": 56996
+        },
+        "sample_count": 15,
+        "sampled_memory_mean_bytes": 176308770.13333333,
+        "sampled_memory_max_bytes": 176316416,
+        "cpu_utilization_mean_percent_one_core_100": 0.0
+      },
+      "writer": {
+        "cpu_observed_core_seconds": 0.060752,
+        "cpu_observed_window_s": 4.84873929200694,
+        "cpu_utilization_peak_percent_one_core_100": 1.5968979669964751,
+        "network_bytes_at_last_sample": {
+          "rx_bytes": 258864,
+          "tx_bytes": 355467
+        },
+        "sample_count": 15,
+        "sampled_memory_mean_bytes": 12039236.266666668,
+        "sampled_memory_max_bytes": 12263424,
+        "cpu_utilization_mean_percent_one_core_100": 1.252944246768404
+      },
+      "reader": {
+        "cpu_observed_core_seconds": 0.027016000000000002,
+        "cpu_observed_window_s": 4.850550791947171,
+        "cpu_utilization_peak_percent_one_core_100": 0.7319407127639329,
+        "network_bytes_at_last_sample": {
+          "rx_bytes": 114891,
+          "tx_bytes": 217852
+        },
+        "sample_count": 15,
+        "sampled_memory_mean_bytes": 11852185.6,
+        "sampled_memory_max_bytes": 12251136,
+        "cpu_utilization_mean_percent_one_core_100": 0.5569676756060704
+      }
+    },
+    "recovery-2": {
+      "server": {
+        "cpu_observed_core_seconds": 6.941711000000001,
+        "cpu_observed_window_s": 17.153710999991745,
+        "cpu_utilization_peak_percent_one_core_100": 99.07434743419594,
+        "network_bytes_at_last_sample": {
+          "rx_bytes": 250364,
+          "tx_bytes": 159603
+        },
+        "sample_count": 39,
+        "sampled_memory_mean_bytes": 249792564.5128205,
+        "sampled_memory_max_bytes": 250626048,
+        "cpu_utilization_mean_percent_one_core_100": 40.46769238448369
+      },
+      "control": {
+        "cpu_observed_core_seconds": 0.009945,
+        "cpu_observed_window_s": 17.15356016694568,
+        "cpu_utilization_peak_percent_one_core_100": 1.743508499029401,
+        "network_bytes_at_last_sample": {
+          "rx_bytes": 67689128,
+          "tx_bytes": 59274
+        },
+        "sample_count": 39,
+        "sampled_memory_mean_bytes": 176323242.66666666,
+        "sampled_memory_max_bytes": 176816128,
+        "cpu_utilization_mean_percent_one_core_100": 0.05797630289695589
+      },
+      "writer": {
+        "cpu_observed_core_seconds": 0.07552500000000001,
+        "cpu_observed_window_s": 17.15401554107666,
+        "cpu_utilization_peak_percent_one_core_100": 2.1815989774550615,
+        "network_bytes_at_last_sample": {
+          "rx_bytes": 369320,
+          "tx_bytes": 509939
+        },
+        "sample_count": 39,
+        "sampled_memory_mean_bytes": 11779675.897435898,
+        "sampled_memory_max_bytes": 12509184,
+        "cpu_utilization_mean_percent_one_core_100": 0.440275921513242
+      },
+      "reader": {
+        "cpu_observed_core_seconds": 0.036631000000000004,
+        "cpu_observed_window_s": 17.152010249905288,
+        "cpu_utilization_peak_percent_one_core_100": 0.34894435135296453,
+        "network_bytes_at_last_sample": {
+          "rx_bytes": 162907,
+          "tx_bytes": 311004
+        },
+        "sample_count": 39,
+        "sampled_memory_mean_bytes": 11749743.58974359,
+        "sampled_memory_max_bytes": 11993088,
+        "cpu_utilization_mean_percent_one_core_100": 0.2135668033442452
+      }
+    },
+    "reconciliation": {
+      "server": {
+        "cpu_observed_core_seconds": 0.226814,
+        "cpu_observed_window_s": 0.38481374992989004,
+        "cpu_utilization_peak_percent_one_core_100": 58.94124106566454,
+        "network_bytes_at_last_sample": {
+          "rx_bytes": 252108,
+          "tx_bytes": 160838
+        },
+        "sample_count": 2,
+        "sampled_memory_mean_bytes": 295542784,
+        "sampled_memory_max_bytes": 304197632,
+        "cpu_utilization_mean_percent_one_core_100": 58.94124106566454
+      },
+      "control": {
+        "cpu_observed_core_seconds": 0.00745,
+        "cpu_observed_window_s": 0.3848792500793934,
+        "cpu_utilization_peak_percent_one_core_100": 1.9356720318030147,
+        "network_bytes_at_last_sample": {
+          "rx_bytes": 67689576,
+          "tx_bytes": 59733
+        },
+        "sample_count": 2,
+        "sampled_memory_mean_bytes": 176666624,
+        "sampled_memory_max_bytes": 177029120,
+        "cpu_utilization_mean_percent_one_core_100": 1.9356720318030147
+      },
+      "writer": {
+        "cpu_observed_core_seconds": 0.0,
+        "cpu_observed_window_s": 0.3857170841656625,
+        "cpu_utilization_peak_percent_one_core_100": 0,
+        "network_bytes_at_last_sample": {
+          "rx_bytes": 369634,
+          "tx_bytes": 510379
+        },
+        "sample_count": 2,
+        "sampled_memory_mean_bytes": 11739136,
+        "sampled_memory_max_bytes": 11739136,
+        "cpu_utilization_mean_percent_one_core_100": 0.0
+      },
+      "reader": {
+        "cpu_observed_core_seconds": 0.0,
+        "cpu_observed_window_s": 0.3861477919854224,
+        "cpu_utilization_peak_percent_one_core_100": 0,
+        "network_bytes_at_last_sample": {
+          "rx_bytes": 163065,
+          "tx_bytes": 311313
+        },
+        "sample_count": 2,
+        "sampled_memory_mean_bytes": 11747328,
+        "sampled_memory_max_bytes": 11747328,
+        "cpu_utilization_mean_percent_one_core_100": 0.0
+      }
+    }
+  },
+  "observed_completion_rates": {
+    "recovery-1/read": {
+      "observed_window_s": 17.547059375,
+      "successful_per_second": 16.58397534202223,
+      "failed_per_second": 2.2795842394532273,
+      "scope": "First invocation to last fsynced completion for this actor/phase; closed-loop offered load, not capacity"
+    },
+    "recovery-1/write": {
+      "observed_window_s": 17.56112975,
+      "successful_per_second": 38.437162620474346,
+      "failed_per_second": 5.295786849932021,
+      "scope": "First invocation to last fsynced completion for this actor/phase; closed-loop offered load, not capacity"
+    },
+    "second-snapshot-tail/read": {
+      "observed_window_s": 10.305539583,
+      "successful_per_second": 18.8248270202195,
+      "failed_per_second": 0.0,
+      "scope": "First invocation to last fsynced completion for this actor/phase; closed-loop offered load, not capacity"
+    },
+    "second-snapshot-tail/write": {
+      "observed_window_s": 10.340650167,
+      "successful_per_second": 43.904396016494694,
+      "failed_per_second": 0.0,
+      "scope": "First invocation to last fsynced completion for this actor/phase; closed-loop offered load, not capacity"
+    },
+    "outage-2/read": {
+      "observed_window_s": 5.195800875,
+      "successful_per_second": 0.0,
+      "failed_per_second": 18.861384867833298,
+      "scope": "First invocation to last fsynced completion for this actor/phase; closed-loop offered load, not capacity"
+    },
+    "outage-2/write": {
+      "observed_window_s": 5.196480291,
+      "successful_per_second": 0.19243794722592164,
+      "failed_per_second": 43.68341402028421,
+      "scope": "First invocation to last fsynced completion for this actor/phase; closed-loop offered load, not capacity"
+    },
+    "recovery-2/read": {
+      "observed_window_s": 17.467169833,
+      "successful_per_second": 16.545324901690957,
+      "failed_per_second": 2.2900103670160497,
+      "scope": "First invocation to last fsynced completion for this actor/phase; closed-loop offered load, not capacity"
+    },
+    "recovery-2/write": {
+      "observed_window_s": 17.50407325,
+      "successful_per_second": 38.39106420558426,
+      "failed_per_second": 5.313049064165679,
+      "scope": "First invocation to last fsynced completion for this actor/phase; closed-loop offered load, not capacity"
+    },
+    "outage-1/read": {
+      "observed_window_s": 5.209698042,
+      "successful_per_second": 0.0,
+      "failed_per_second": 18.811071046716144,
+      "scope": "First invocation to last fsynced completion for this actor/phase; closed-loop offered load, not capacity"
+    },
+    "outage-1/write": {
+      "observed_window_s": 5.257183417,
+      "successful_per_second": 0.1902159237523137,
+      "failed_per_second": 18.450944603974428,
+      "scope": "First invocation to last fsynced completion for this actor/phase; closed-loop offered load, not capacity"
+    },
+    "baseline/read": {
+      "observed_window_s": 10.295969375,
+      "successful_per_second": 18.939450273957327,
+      "failed_per_second": 0.0,
+      "scope": "First invocation to last fsynced completion for this actor/phase; closed-loop offered load, not capacity"
+    },
+    "baseline/write": {
+      "observed_window_s": 10.296560333,
+      "successful_per_second": 43.89815485773058,
+      "failed_per_second": 0.0,
+      "scope": "First invocation to last fsynced completion for this actor/phase; closed-loop offered load, not capacity"
+    }
+  },
+  "history_sha256": "8d7e423a4bbe3aebc60d9f7c938c61119a3b7f9a498a23e031348a11c9fff3ce",
+  "resource_history_sha256": "7380f0cb24ce50f686f8ee6fff55bdbe50d8d4d648925fb09f0c6c3d430a9307",
+  "sampled_native_file_bytes_max": 96667465,
+  "scope": "One synchronous Rayforce declared-scenario correctness experiment, not a DuckDB comparison or capacity benchmark. Native checkpoint counters are observed lower bounds on full lifetime CPU/I/O costs and observed memory peaks. Checkpoint exec overhead is included. Phase sample intervals crossing phase/generation boundaries are excluded. Memory means are sample means. Network values are cumulative generation counters, not per-phase traffic. Missing I/O/device latency and physical host I/O remain unavailable.",
+  "unrun": [
+    "equivalent DuckDB live adapter/recovery",
+    "asynchronous journal and explicit sync watermark",
+    "interrupted snapshot publication",
+    "torn tails and interior corruption",
+    "online backup/restore availability",
+    "bounded disk/CPU/memory pressure",
+    "repeated sustained capacity and verified OS-cold matrices"
+  ],
+  "publisher_sha256": "78965e94a37d9ada7792bf40cf75e2b0fc7bdea2ff8511e4269ca1b195933d2b"
+}

@@ -31,6 +31,13 @@ services:
     tmpfs: [/tmp:size=64m]
     profiles: [tools]
     networks: [journal]
+  contender:
+    extends:
+      service: observer
+    entrypoint: [python]
+    environment: {HOME: /tmp, RAYFORCE_NO_FSYNC: "0"}
+    volumes:
+      - "${JOURNAL_STORAGE_PATH:?Set an owned journal case storage path}:/state"
 networks:
   journal:
     internal: true

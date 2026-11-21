@@ -1,0 +1,32 @@
+# Native database state stays on a Docker-managed Linux filesystem. The host
+# witness is independent; the controller exports state before deleting the volume.
+services:
+  rayforce:
+    volumes:
+      - journal-data:/state
+  contender:
+    volumes:
+      - journal-data:/state
+  init-volume:
+    image: rayforce-duckdb-analytics:dev
+    user: "0:0"
+    entrypoint: [python, -c]
+    command:
+      - "import os,json,pathlib,resource; os.chmod('/state', 0o700); os.chown('/state', int(os.environ['LAB_UID']), int(os.environ['LAB_GID'])); print(json.dumps({'process_peak_rss_bytes':resource.getrusage(resource.RUSAGE_SELF).ru_maxrss*1024,'cgroup':{p:pathlib.Path('/sys/fs/cgroup',p).read_text() for p in ('cpu.stat','memory.peak','io.stat')}}))"
+    environment:
+      LAB_UID: "${LAB_UID:?Set the lab owner UID}"
+      LAB_GID: "${LAB_GID:?Set the lab owner GID}"
+    cpus: 1
+    mem_limit: 512m
+    memswap_limit: 512m
+    network_mode: none
+    read_only: true
+    cap_drop: [ALL]
+    cap_add: [CHOWN]
+    security_opt: [no-new-privileges:true]
+    profiles: [tools]
+    volumes:
+      - journal-data:/state
+volumes:
+  journal-data:
+    name: "${JOURNAL_VOLUME:?Set a unique owned journal volume name}"

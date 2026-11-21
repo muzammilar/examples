@@ -1,5 +1,10 @@
 # Rayforce synchronous journal recovery
 
+**Current live scenarios use a Docker-managed volume.** The original bind-based
+results below remain historical observations. [Writer-exclusion and volume
+results](FENCING.md) document an observed host-share locking failure, the new
+storage path, ten rejected second openers and a fresh two-crash volume run.
+
 Use the five-command lifecycle in [README.md](README.md), with these additional
 tests before teardown:
 
@@ -183,7 +188,7 @@ This is one authoritative local process, not replication/HA or physical power-lo
 testing. The equivalent DuckDB live application boundary remains unimplemented,
 so these results are **not a recovery/performance comparison with DuckDB**.
 Asynchronous journal/watermark recovery, interrupted snapshot publication,
-torn-tail/interior corruption, second-writer exclusion, online backup/restore
+torn-tail/interior corruption, online backup/restore
 availability, isolated resource pressure and repeated sustained/cold performance
 remain unrun. Recovery did not delete or truncate any journal.
 

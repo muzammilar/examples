@@ -149,6 +149,12 @@ def recovery_observations(events):
 def run():
     started = time.monotonic_ns()
     host_before = resource.getrusage(resource.RUSAGE_SELF)
+    scenario = os.environ.get("JOURNAL_SCENARIO", "process-crash")
+    if scenario not in {"process-crash", "writer-lock"}:
+        raise ValueError("JOURNAL_SCENARIO must be process-crash or writer-lock")
+    storage = os.environ.get("JOURNAL_STORAGE", "volume")
+    if storage not in {"bind", "volume"}:
+        raise ValueError("JOURNAL_STORAGE must be bind or volume")
     bench.RESULTS.mkdir(exist_ok=True)
     with (bench.RESULTS / "controller.lock").open("a") as lock:
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
@@ -182,6 +188,10 @@ def run():
             "-f",
             str(bench.ROOT / "docker-compose.journal.yml"),
         ]
+        if storage == "volume":
+            env["JOURNAL_VOLUME"] = "rayforce-journal-data-" + root.name
+            compose += ["-f", str(bench.ROOT / "docker-compose.journal-volume.yml")]
+        compose += ["--profile", "tools"]
         baseline = bench.integer("JOURNAL_BASELINE_S", 10, 5, 300)
         outage = bench.integer("JOURNAL_OUTAGE_S", 5, 4, 60)
         recovery = bench.integer("JOURNAL_RECOVERY_S", 15, 10, 300)
@@ -190,7 +200,10 @@ def run():
             root / "setup.json",
             {
                 "fixture": fixture,
-                "scope": "One-host synchronous Rayforce IPC journal process-crash correctness; offered load is not capacity",
+                "scenario": scenario,
+                "storage": storage,
+                "volume_name": env.get("JOURNAL_VOLUME"),
+                "scope": "One-host synchronous Rayforce IPC journal correctness; offered load is not capacity",
                 "timings_s": {
                     "baseline": baseline,
                     "outage": outage,
@@ -220,6 +233,9 @@ def run():
                         bench.ROOT / "experiment.py",
                         bench.ROOT / "ingestion.py",
                         bench.ROOT / "journal.py",
+                        bench.ROOT / "journal_fencing.py",
+                        bench.ROOT / "journal_volume.py",
+                        bench.ROOT / "docker-compose.journal-volume.yml",
                         bench.ROOT / "persistence-contract.json",
                         bench.ROOT / "analytics-workload/cpp/ipc.cpp",
                         bench.ROOT / "docker-compose.journal.yml",
@@ -238,6 +254,7 @@ def run():
         actor_starts = {}
         server = None
         result = None
+        volume_exported = False
         resource_log = (root / "resources.jsonl").open("x")
 
         def sample():
@@ -248,8 +265,34 @@ def run():
                         "phase": phase,
                         "monotonic_ns": time.monotonic_ns(),
                         "roles": {},
-                        "disk": bench.storage_sample(state),
+                        "disk": bench.storage_sample(state)
+                        if storage == "bind"
+                        else {
+                            "files": {},
+                            "available": False,
+                            "reason": "native server unavailable for volume observation",
+                        },
                     }
+                    if storage == "volume" and server is not None:
+                        from journal_volume import sample as volume_sample
+
+                        native_before = inspect_owned(server)
+                        if native_before["State"]["Running"]:
+                            try:
+                                snapshot["disk"] = volume_sample(server)
+                            except subprocess.CalledProcessError:
+                                native_after = inspect_owned(server)
+                                if (
+                                    native_after["State"]["Running"]
+                                    and native_after["State"]["StartedAt"]
+                                    == native_before["State"]["StartedAt"]
+                                ):
+                                    raise
+                                snapshot["disk"] = {
+                                    "files": {},
+                                    "available": False,
+                                    "reason": "native generation stopped/restarted during disk sampling",
+                                }
                     for role, identifier in list(names.items()):
                         info = inspect_owned(identifier)
                         if info["State"]["Running"]:
@@ -321,6 +364,10 @@ def run():
                 time.sleep(0.05)
 
         try:
+            if storage == "volume":
+                from journal_volume import initialize
+
+                initialize(compose, env, root)
             collector = threading.Thread(target=sample, name="resources")
             collector.start()
             subprocess.run(
@@ -331,7 +378,13 @@ def run():
             ).strip()
             info = inspect_owned(server)
             if not any(
-                m["Destination"] == "/state" and m["Source"] == str(state) and m["RW"]
+                m["Destination"] == "/state"
+                and m["RW"]
+                and (
+                    m.get("Name") == env["JOURNAL_VOLUME"]
+                    if storage == "volume"
+                    else m["Source"] == str(state)
+                )
                 for m in info["Mounts"]
             ):
                 raise RuntimeError("server storage is not this exact owned case")
@@ -400,6 +453,12 @@ def run():
                         )
                         beginning = time.monotonic_ns()
                         initial_phase = phase
+                        witness.add(
+                            kind="read-intent",
+                            phase=initial_phase,
+                            id=row[0],
+                            sequence=sequence,
+                        )
                         reply = actors[2].query(exact_row_query(row))
                         if reply["status"] == "ok" and reply["body"] != "1":
                             reply["status"] = "mismatch"
@@ -408,6 +467,7 @@ def run():
                             phase=initial_phase,
                             end_phase=phase,
                             id=row[0],
+                            sequence=sequence,
                             invocation_ns=beginning,
                             temperature="recent_ack"
                             if row is not first
@@ -431,54 +491,72 @@ def run():
                 thread.start()
                 threads.append(thread)
             hold(baseline)
-            for cycle in (1, 2):
-                if not all(
-                    any(
-                        e["kind"] == kind
-                        and e.get("status") == "ok"
-                        and e["phase"] == phase
+            if scenario == "writer-lock":
+                from journal_fencing import probe
+
+                for kind in ("read", "write"):
+                    if not any(
+                        e["kind"] == kind and e.get("status") == "ok"
                         for e in witness.events
-                    )
-                    for kind in ("read", "write")
-                ):
-                    raise RuntimeError(
-                        "no independent read/write progress before fault"
-                    )
-                checkpoint(f"cycle-{cycle}-before")
-                phase = f"outage-{cycle}"
+                    ):
+                        raise RuntimeError("no live progress before contender")
+                checkpoint("writer-lock-before")
+                phase = "writer-lock"
                 witness.add(kind="phase", phase=phase)
-                info = inspect_owned(server)
-                subprocess.run(
-                    ["docker", "kill", "--signal", "KILL", server],
-                    check=True,
-                    timeout=30,
-                )
-                dead = inspect_owned(server)
-                ingestion.save(root / f"cycle-{cycle}-killed.json", dead)
-                if dead["State"]["Running"] or dead["State"]["ExitCode"] != 137:
-                    raise RuntimeError("server kill was not proven")
-                hold(outage)
-                phase = f"recovery-{cycle}"
+                probe(compose, env, state, root, server, witness)
+                checkpoint("writer-lock-after")
+                phase = "after-lock"
                 witness.add(kind="phase", phase=phase)
-                subprocess.run(
-                    compose + ["start", "rayforce"], env=env, check=True, timeout=30
-                )
-                control("(+ 1 1)", "2", ready=True)
-                if (
-                    inspect_owned(server)["State"]["StartedAt"]
-                    == info["State"]["StartedAt"]
-                ):
-                    raise RuntimeError("server generation did not change")
-                control("(get (.log.status) 'open)", "true")
-                control("(get (.log.status) 'mode)", "sync")
-                hold(recovery)
-                checkpoint(f"cycle-{cycle}-recovered")
-                if cycle == 1:
-                    # Snapshot plus a new tail is exercised by the second crash.
-                    control("(.log.snapshot)")
-                    phase = "second-snapshot-tail"
+                hold(baseline)
+            else:
+                for cycle in (1, 2):
+                    if not all(
+                        any(
+                            e["kind"] == kind
+                            and e.get("status") == "ok"
+                            and e["phase"] == phase
+                            for e in witness.events
+                        )
+                        for kind in ("read", "write")
+                    ):
+                        raise RuntimeError(
+                            "no independent read/write progress before fault"
+                        )
+                    checkpoint(f"cycle-{cycle}-before")
+                    phase = f"outage-{cycle}"
                     witness.add(kind="phase", phase=phase)
-                    hold(baseline)
+                    info = inspect_owned(server)
+                    subprocess.run(
+                        ["docker", "kill", "--signal", "KILL", server],
+                        check=True,
+                        timeout=30,
+                    )
+                    dead = inspect_owned(server)
+                    ingestion.save(root / f"cycle-{cycle}-killed.json", dead)
+                    if dead["State"]["Running"] or dead["State"]["ExitCode"] != 137:
+                        raise RuntimeError("server kill was not proven")
+                    hold(outage)
+                    phase = f"recovery-{cycle}"
+                    witness.add(kind="phase", phase=phase)
+                    subprocess.run(
+                        compose + ["start", "rayforce"], env=env, check=True, timeout=30
+                    )
+                    control("(+ 1 1)", "2", ready=True)
+                    if (
+                        inspect_owned(server)["State"]["StartedAt"]
+                        == info["State"]["StartedAt"]
+                    ):
+                        raise RuntimeError("server generation did not change")
+                    control("(get (.log.status) 'open)", "true")
+                    control("(get (.log.status) 'mode)", "sync")
+                    hold(recovery)
+                    checkpoint(f"cycle-{cycle}-recovered")
+                    if cycle == 1:
+                        # Snapshot plus a new tail is exercised by the second crash.
+                        control("(.log.snapshot)")
+                        phase = "second-snapshot-tail"
+                        witness.add(kind="phase", phase=phase)
+                        hold(baseline)
             stop.set()
             for thread in threads:
                 thread.join(timeout=12)
@@ -488,10 +566,14 @@ def run():
                 raise RuntimeError("background failure") from errors[0]
             for kind in ("read", "write"):
                 for completed_phase in (
-                    "baseline",
-                    "recovery-1",
-                    "second-snapshot-tail",
-                    "recovery-2",
+                    ("baseline", "writer-lock", "after-lock")
+                    if scenario == "writer-lock"
+                    else (
+                        "baseline",
+                        "recovery-1",
+                        "second-snapshot-tail",
+                        "recovery-2",
+                    )
                 ):
                     if not any(
                         e["kind"] == kind
@@ -502,13 +584,32 @@ def run():
                         raise RuntimeError(
                             "missing live progress: " + kind + "/" + completed_phase
                         )
+            if scenario == "writer-lock" and any(
+                e["kind"] in {"read", "write"} and e["status"] != "ok"
+                for e in witness.events
+            ):
+                raise RuntimeError(
+                    "healthy primary returned errors during contender rejection"
+                )
             phase = "reconciliation"
+            witness.add(kind="phase", phase=phase)
             control(
                 '(.csv.write (select {from: trades asc: id}) "/state/recovered.csv")'
             )
             control(
                 '(.csv.write (select {from: customers asc: customer}) "/state/customers.csv")'
             )
+            if storage == "volume":
+                from journal_volume import export
+
+                checkpoint("final")
+                collector_stop.set()
+                collector.join(timeout=30)
+                if collector.is_alive():
+                    raise RuntimeError("collector did not stop before state export")
+                # Workload has ended. Fence the sole owner before exporting evidence.
+                export(server, state, root)
+                volume_exported = True
             # Re-read the fsynced external artifact instead of trusting in-memory counters.
             events = [
                 json.loads(line)
@@ -528,15 +629,20 @@ def run():
                     "sha256": fixture["sha256"]["customers.csv"],
                 },
             )
-            checkpoint("final")
+            if storage == "bind":
+                checkpoint("final")
             result = {
                 "passed": False,
                 "scenario_passed": True,
                 "proof": proof,
                 "phases": summarize(events),
-                "recovery_observations": recovery_observations(events),
+                "recovery_observations": recovery_observations(events)
+                if scenario == "process-crash"
+                else {},
                 "wall_ns": time.monotonic_ns() - started,
-                "scope": "Two retained-volume SIGKILL/replay cycles with live independent writers/readers, second snapshot plus tail; not capacity, HA, async journal, torn-tail or power-loss qualification",
+                "scope": "Ten rejected cross-container journal opens under independent live writers/readers, unchanged authoritative process and complete body witness; not cross-host lease fencing or capacity"
+                if scenario == "writer-lock"
+                else "Two retained-volume SIGKILL/replay cycles with live independent writers/readers, second snapshot plus tail; not capacity, HA, async journal, torn-tail or power-loss qualification",
             }
             ingestion.save(root / "result.json", result)
         finally:
@@ -567,7 +673,20 @@ def run():
                         timeout=30,
                     )
             finally:
-                subprocess.run(compose + ["down"], env=env, check=True, timeout=60)
+                if storage == "volume" and server is not None and not volume_exported:
+                    try:
+                        from journal_volume import export
+
+                        export(server, state, root)
+                        volume_exported = True
+                    except Exception as error:
+                        cleanup_errors.append(
+                            "Native volume preserved; export failed: " + str(error)
+                        )
+                teardown = ["down", "--remove-orphans"]
+                if storage == "volume" and volume_exported:
+                    teardown += ["--volumes"]
+                subprocess.run(compose + teardown, env=env, check=True, timeout=60)
             # Native files are now stable. Gzip is a separate off-path layer.
             compression = []
             compression_start = time.monotonic_ns()
@@ -611,7 +730,7 @@ def run():
             result["finalized_after_cleanup"] = True
             ingestion.save(root / "result.json", result)
             print(
-                "Live synchronous journal recovery passed:",
+                "Live synchronous journal scenario passed:",
                 root,
                 result["proof"],
                 flush=True,

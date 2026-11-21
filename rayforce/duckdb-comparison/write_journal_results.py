@@ -35,16 +35,31 @@ def publish(root):
         with (bench.RESULTS / "data" / name).open("rb") as stream:
             if hashlib.file_digest(stream, "sha256").hexdigest() != digest:
                 raise RuntimeError("fixture changed: " + name)
-    for cycle in (1, 2):
-        killed = load(root / f"cycle-{cycle}-killed.json")
-        if killed["State"]["Running"] or killed["State"]["ExitCode"] != 137:
-            raise RuntimeError("missing kill proof")
+    scenario = setup.get("scenario", "process-crash")
+    fencing = None
+    if scenario == "writer-lock":
+        fencing = load(root / "fencing-proof.json")
+        if (
+            not fencing["passed"]
+            or len(fencing["attempts"]) != 10
+            or not all(a["rejected_by_lock"] for a in fencing["attempts"])
+        ):
+            raise RuntimeError("missing native lock rejection proof")
+    elif scenario == "process-crash":
+        for cycle in (1, 2):
+            killed = load(root / f"cycle-{cycle}-killed.json")
+            if killed["State"]["Running"] or killed["State"]["ExitCode"] != 137:
+                raise RuntimeError("missing kill proof")
+    else:
+        raise ValueError("unknown journal scenario")
     samples = [
         json.loads(line) for line in (root / "resources.jsonl").read_text().splitlines()
     ]
     native = {}
     images = set()
     for path in root.glob("*-inspect.json"):
+        if path.name == "contender-inspect.json":
+            continue
         inspections = load(path)
         for role, info in inspections.items():
             images.add(info["Image"])
@@ -175,11 +190,26 @@ def publish(root):
                 / duration,
                 "scope": "First invocation to last fsynced completion for this actor/phase; closed-loop offered load, not capacity",
             }
+    volume_init = (
+        load(root / "volume-initialization.json")
+        if setup.get("storage") == "volume"
+        else None
+    )
+    if volume_init is not None:
+        if (
+            not (root / "volume-export.json").is_file()
+            or load(root / "volume-export-fenced.json")["State"]["Running"]
+        ):
+            raise RuntimeError("native volume was not fenced/exported")
+    if fencing and fencing["image_id"] not in images:
+        raise RuntimeError("contender used another image")
     report = {
         "source_directory": str(root.relative_to(bench.ROOT)),
         "setup": setup,
         "result": result,
         "costs": costs,
+        "fencing": fencing,
+        "volume_initialization": volume_init,
         "image_id": next(iter(images)),
         "native_generation_counters": native,
         "phase_sample_summaries": phases,
@@ -191,20 +221,29 @@ def publish(root):
             (root / "resources.jsonl").read_bytes()
         ).hexdigest(),
         "sampled_native_file_bytes_max": disk_max,
-        "scope": "One synchronous Rayforce process-crash correctness experiment, not a DuckDB comparison or capacity benchmark. Native checkpoint counters are observed lower bounds on full lifetime CPU/I/O costs and observed memory peaks. Checkpoint exec overhead is included. Phase sample intervals crossing phase/generation boundaries are excluded. Memory means are sample means. Network values are cumulative generation counters, not per-phase traffic. Missing I/O/device latency and physical host I/O remain unavailable.",
+        "scope": "One synchronous Rayforce declared-scenario correctness experiment, not a DuckDB comparison or capacity benchmark. Native checkpoint counters are observed lower bounds on full lifetime CPU/I/O costs and observed memory peaks. Checkpoint exec overhead is included. Phase sample intervals crossing phase/generation boundaries are excluded. Memory means are sample means. Network values are cumulative generation counters, not per-phase traffic. Missing I/O/device latency and physical host I/O remain unavailable.",
         "unrun": [
             "equivalent DuckDB live adapter/recovery",
             "asynchronous journal and explicit sync watermark",
             "interrupted snapshot publication",
             "torn tails and interior corruption",
-            "second-writer exclusion",
-            "isolated backup restoration",
+            "online backup/restore availability",
             "bounded disk/CPU/memory pressure",
             "repeated sustained capacity and verified OS-cold matrices",
         ],
         "publisher_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
     }
-    ingestion.save(bench.ROOT / "JOURNAL_RESULTS.json", report)
+    ingestion.save(
+        bench.ROOT
+        / (
+            "FENCING_RESULTS.json"
+            if scenario == "writer-lock"
+            else "JOURNAL_VOLUME_RESULTS.json"
+            if setup.get("storage") == "volume"
+            else "JOURNAL_RESULTS.json"
+        ),
+        report,
+    )
     print("Published finalized synchronous journal correctness and resource evidence")
 
 
