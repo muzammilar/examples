@@ -1,0 +1,58 @@
+{
+  "purpose": "Declared persistence requirements. Saved-table reopen does not qualify journal/crash recovery or repeated performance comparisons.",
+  "versions": {
+    "rayforce": "38fd4be3560d63a5514c1e6883685fe496d45e1a",
+    "duckdb": "2.0.0",
+    "artifact_pins": "sources.json"
+  },
+  "data": {
+    "default_seed_rows": 2000000,
+    "customers": 10000,
+    "schema": "Six non-null I64 columns: id, customer, symbol, day, qty, price",
+    "seed_profile": "Existing experiment.py generator, Random(20261117); preserve its CSV byte lengths and SHA256 manifest",
+    "live_profile": "Existing ingestion-contract.json deterministic append formula; IDs never reused",
+    "input_equivalence": "Same seed fixture, append IDs/bodies, grouping queries and complete ordered output on both engines"
+  },
+  "profiles": {
+    "saved_table": {
+      "rayforce": "Explicit native splayed/partitioned save and reload; in-memory insert is not a persisted acknowledgement",
+      "duckdb": "Persistent DuckDB file using the native C API, committed writes and explicit checkpoint where the case requires it",
+      "claims": "A saved-table reopen does not qualify live WAL recovery or physical power loss",
+      "atomicity_scope": "Immutable input fixture. Separate Rayforce table saves are not a multi-table atomic live backup; DuckDB CTAS commits before the explicit checkpoint."
+    },
+    "synchronous_journal": {
+      "rayforce": "Native synchronous IPC request path with journal opened in sync mode; RAYFORCE_NO_FSYNC=0 before initialization. Verify effective environment, native status and actual replay",
+      "duckdb": "Persistent file, default durable transactions and WAL; no fsync weakening to match another profile",
+      "claims": "Expect zero acknowledged row/body loss after a fenced process/container SIGKILL and retained-volume native recovery. Power-loss durability remains unqualified"
+    },
+    "asynchronous_journal": {
+      "rayforce": "Separate observation profile with explicit sync watermark; reconcile later ACKs and ambiguous intents independently",
+      "comparison": "Do not pool with the synchronous profile or label weaker durability as a faster equivalent"
+    }
+  },
+  "consistency": "One authoritative writer per persistent dataset; verify fresh reads of committed rows, native lock behavior and the declared API boundary. No distributed, HA or multi-process concurrent DuckDB writer claim.",
+  "atomicity": "Successful logical row/batch acknowledgements require complete expected columns. General failed-operation/OOM rollback and multi-request atomicity are not assumed; preserve intents and reconcile partial/ambiguous effects.",
+  "idempotency": "No automatic mutation retries; unique IDs are application-generated, not assumed to be server-side deduplicated. A timeout or closed connection is not proof that no mutation applied.",
+  "reference_client": {
+    "application": "C++ with CMake and upstream native C APIs",
+    "mutation_retries": 0,
+    "operation_timeout_ms": 3000,
+    "writer_connections": 1,
+    "independent_reader": "Required for live failure cases; use native Rayforce IPC and make the DuckDB application boundary explicit before measuring. Adapter/RPC/FFI costs must be labeled",
+    "status": "Transport adapter and live failure controller not implemented yet",
+    "scope": "The future live journal/fault profile. Offline snapshot C API calls currently use the existing 600-second whole-process bound, without per-call cancellation."
+  },
+  "resources": {
+    "initial_profile": "1 CPU / 4 GiB charged memory, swap disabled, per engine. Existing historical results keep their original captured limits.",
+    "required": "CPU utilization/core-seconds, process RSS and cgroup memory, logical/allocated disk and native persisted bytes, compression at a named layer, block read/write bytes and available I/O counters; include import, save, query, replay and repair phases"
+  },
+  "correctness_gates": [
+    "Validate every old/new row in ID order against the independent canonical CSV oracle, including earlier ACKs",
+    "Persist an fsynced external intent/ACK witness outside the failed storage",
+    "Prove old-owner exit before replacement; verify native replay and readable rebuilt state",
+    "Test snapshot plus journal tail, a second snapshot/restart, and no duplicate replay",
+    "Keep writers/readers live through operational faults; saved-table tests alone do not meet this gate",
+    "Distinguish torn final frames from corruption inside intact frames; retain original evidence and native diagnostics"
+  ],
+  "performance_gate": "Correctness/recovery first. Three fresh-process trials with matched input, query results, durability and resource budgets; report actual monotonic durations, trial spread, native storage/compression and per-phase resource costs. OS-cold behavior requires an isolated owned environment or supported cache controls; never clear shared host caches."
+}

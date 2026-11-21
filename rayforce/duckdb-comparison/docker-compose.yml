@@ -5,6 +5,7 @@ services:
     build: ./.build
     cpus: ${CPUS:-1}
     mem_limit: 4g
+    memswap_limit: 4g
     network_mode: none
     read_only: true
     tmpfs:
@@ -20,6 +21,6 @@ services:
     user: "${LAB_UID:-10001}:${LAB_GID:-10001}"
     cap_drop: [ALL]
     security_opt: [no-new-privileges:true]
-    environment: {HOME: /tmp}
+    environment: {HOME: /tmp, RAYFORCE_NO_FSYNC: "0"}
     volumes:
       - "${VERIFICATION_PATH:-./results/unused}:/verification"

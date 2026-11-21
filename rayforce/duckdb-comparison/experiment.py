@@ -179,7 +179,7 @@ def plan(engine, target, repeats):
                     stream.write(f"{phase}\t{name}\t{expected[name]}\t{query}\n")
 
 
-def runtime_script(language, engine, filename, threads):
+def runtime_script(language, engine, filename, threads, database_file=None):
     if language == "python":
         args = [
             "python",
@@ -190,6 +190,19 @@ def runtime_script(language, engine, filename, threads):
         ]
     else:
         args = [f"/opt/bench/{language}_{engine}", "/plans/" + filename, str(threads)]
+    if database_file is not None:
+        from pathlib import PurePosixPath
+
+        path = PurePosixPath(database_file)
+        if (
+            language != "cpp"
+            or engine != "duckdb"
+            or not path.is_relative_to("/verification")
+            or ".." in path.parts
+            or path == PurePosixPath("/verification")
+        ):
+            raise ValueError("persistent files require C++ DuckDB under /verification")
+        args.append(str(path))
     # cgroup files remain in the container until collected; the exit marker keeps
     # a fast workload observable without sampling away its peak or CPU totals.
     import shlex
@@ -340,6 +353,30 @@ def resource_summary(samples):
     }
 
 
+def storage_sample(folder):
+    files, raced = {}, []
+    for path in folder.rglob("*"):
+        if path.is_symlink():
+            raise ValueError("unexpected symlink in owned storage sampling")
+        try:
+            stat = path.stat()
+        except FileNotFoundError:
+            raced.append(str(path.relative_to(folder)))
+            continue
+        if path.is_file():
+            files[str(path.relative_to(folder))] = {
+                "bytes": stat.st_size,
+                "allocated_bytes": stat.st_blocks * 512,
+            }
+    return {
+        "monotonic_ns": time.monotonic_ns(),
+        "files": files,
+        "raced_paths": raced,
+        "logical_bytes": sum(v["bytes"] for v in files.values()),
+        "allocated_bytes": sum(v["allocated_bytes"] for v in files.values()),
+    }
+
+
 def run_case(
     language,
     engine,
@@ -350,13 +387,19 @@ def run_case(
     *,
     record_count=None,
     verification_path=None,
+    database_file=None,
+    sample_storage=False,
 ):
     name = f"rayforce-duckdb-{run.name[:8]}-{language}-{engine}-{trial}"
     filename = f"{engine}-{run.name}.tsv"
     path = RESULTS / "plans" / filename
     if not path.exists():
         plan(engine, path, repeats)
-    shell = runtime_script(language, engine, filename, threads)
+    if database_file is not None and verification_path is None:
+        raise ValueError("persistent file requires an owned writable output mount")
+    if sample_storage and verification_path is None:
+        raise ValueError("storage sampling requires an owned writable output mount")
+    shell = runtime_script(language, engine, filename, threads, database_file)
     cpus = float(os.environ.get("CPUS", str(threads)))
     if not 1 <= cpus <= 4:
         raise ValueError("CPUS must be 1..4")
@@ -384,6 +427,7 @@ def run_case(
             LAB_UID=str(os.getuid()),
             LAB_GID=str(os.getgid()),
         )
+    disk_samples = [storage_sample(verification_path)] if sample_storage else []
     command(args, stdout=subprocess.PIPE, env=environment)
     started = time.monotonic()
     samples = []
@@ -414,11 +458,15 @@ def run_case(
                         "verification witness mount differs from the owned case"
                     )
             if not inspection["State"]["Running"]:
+                if sample_storage:
+                    disk_samples.append(storage_sample(verification_path))
                 break
             endpoint = endpoint or docker_socket()
             stats = resource_sample(endpoint, inspection["Id"])
             if stats is not None:
                 samples.append(stats)
+            if sample_storage:
+                disk_samples.append(storage_sample(verification_path))
             if time.monotonic() - started > 600:
                 raise TimeoutError("workload exceeded 600 seconds")
             time.sleep(0.1)
@@ -486,6 +534,9 @@ def run_case(
             "image": inspection["Image"],
             "cpus": inspection["HostConfig"]["NanoCpus"] / 1e9,
             "memory_limit_bytes": inspection["HostConfig"]["Memory"],
+            "memory_swap_limit_bytes": inspection["HostConfig"]["MemorySwap"],
+            "owned_storage_samples": disk_samples,
+            "storage_sample_scope": "Observed verification mount files, including native state, WAL/temp files present at sampling and CSV exports. Peaks can be missed; raced paths are incomplete observations. Source fixture and container root filesystem are separate.",
             "wall_with_monitor_seconds": time.monotonic() - started,
             "memory_events": log.split("__MEMORY_EVENTS__\n")[1].split("__IO_STAT__\n")[
                 0

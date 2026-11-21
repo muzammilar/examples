@@ -40,8 +40,14 @@ generalizing from these bounded, single-writer measurements.
 
 This example embeds the engine and uses its native worker pool, not a distributed
 cluster. The Rayforce source pin is a development commit after v3.0.2; the
-benchmark does not qualify another release. Full production testing, persisted
-storage and crash recovery, graph/as-of workloads, and comparisons using official
+benchmark does not qualify another release. Full production testing,
+crash recovery, graph/as-of workloads, and comparisons using official
 language-specific DataFrame interfaces remain unrun. Consult the pinned
 [upstream architecture](https://github.com/RayforceDB/rayforce/tree/38fd4be3560d63a5514c1e6883685fe496d45e1a/docs/docs/architecture)
 before inferring storage or replication guarantees from in-memory query results.
+
+The [saved-snapshot profiles](duckdb-comparison/PERSISTENCE.md) now verify
+2,000,000 trade bodies and 10,000 customer bodies after a fresh-process reopen
+on both engines. Observed native files were 13,031,576 bytes for Rayforce and
+14,954,496 bytes for DuckDB, with CPU/memory/compression/I/O evidence. These
+immutable snapshot checks do not qualify live journal or crash recovery.

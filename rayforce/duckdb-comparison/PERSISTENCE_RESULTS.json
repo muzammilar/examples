@@ -1,0 +1,1916 @@
+{
+  "scope": "One matched saved-snapshot correctness/cost observation per engine, not a repeated capacity benchmark, live backup, crash recovery or power-loss test.",
+  "controller_tests": 17,
+  "publisher_sha256": "d53d459026f0e80c3f09c9a6dce427eff997fd7f70c550f34e7a73eee809d3f2",
+  "cases": [
+    {
+      "passed": true,
+      "scope": "rayforce persisted snapshot with complete body and grouped/join checks after reopen in two independent C++ processes; not a crash-recovery test or repeated performance benchmark. Live journal/fault cases remain unrun.",
+      "fixture": {
+        "rows": 2000000,
+        "customers": 10000,
+        "seed": 20261117,
+        "seconds": 3.2101720420178026,
+        "sha256": {
+          "trades.csv": "c8756870bdbb238b69ef8d563c6d4f176753e3864ffa50f508e707ed94406de0",
+          "customers.csv": "c3a160b85050e71c8ba465e2ca7a72d25bc4fbb076954f6c6f9c22fcaabadc95",
+          "expected.json": "150c8e3d600939b01a5c3af70c563f6b11b22cef4699138b4f4b4a4ba0d15a72"
+        }
+      },
+      "environment": {
+        "host": [
+          "Darwin",
+          "Muzammils-MacBook-Pro.local",
+          "25.5.0",
+          "Darwin Kernel Version 25.5.0: Mon Apr 27 20:41:15 PDT 2026; root:xnu-12377.121.6~2/RELEASE_ARM64_T6041",
+          "arm64"
+        ],
+        "docker": {
+          "ServerVersion": "29.5.3",
+          "KernelVersion": "6.12.76-linuxkit",
+          "Architecture": "aarch64",
+          "NCPU": 11,
+          "MemTotal": 26216296448,
+          "OperatingSystem": "Docker Desktop"
+        },
+        "storage": "Owned host directory bind-mounted into one Docker VM; physical medium/IOPS not qualified",
+        "topology": "Two serial independent processes on one host; no HA or power-loss proof",
+        "cpu_model": "Apple M4 Pro"
+      },
+      "contract": {
+        "purpose": "Declared persistence requirements. Saved-table reopen does not qualify journal/crash recovery or repeated performance comparisons.",
+        "versions": {
+          "rayforce": "38fd4be3560d63a5514c1e6883685fe496d45e1a",
+          "duckdb": "2.0.0",
+          "artifact_pins": "sources.json"
+        },
+        "data": {
+          "default_seed_rows": 2000000,
+          "customers": 10000,
+          "schema": "Six non-null I64 columns: id, customer, symbol, day, qty, price",
+          "seed_profile": "Existing experiment.py generator, Random(20261117); preserve its CSV byte lengths and SHA256 manifest",
+          "live_profile": "Existing ingestion-contract.json deterministic append formula; IDs never reused",
+          "input_equivalence": "Same seed fixture, append IDs/bodies, grouping queries and complete ordered output on both engines"
+        },
+        "profiles": {
+          "saved_table": {
+            "rayforce": "Explicit native splayed/partitioned save and reload; in-memory insert is not a persisted acknowledgement",
+            "duckdb": "Persistent DuckDB file using the native C API, committed writes and explicit checkpoint where the case requires it",
+            "claims": "A saved-table reopen does not qualify live WAL recovery or physical power loss",
+            "atomicity_scope": "Immutable input fixture. Separate Rayforce table saves are not a multi-table atomic live backup; DuckDB CTAS commits before the explicit checkpoint."
+          },
+          "synchronous_journal": {
+            "rayforce": "Native synchronous IPC request path with journal opened in sync mode; RAYFORCE_NO_FSYNC=0 before initialization. Verify effective environment, native status and actual replay",
+            "duckdb": "Persistent file, default durable transactions and WAL; no fsync weakening to match another profile",
+            "claims": "Expect zero acknowledged row/body loss after a fenced process/container SIGKILL and retained-volume native recovery. Power-loss durability remains unqualified"
+          },
+          "asynchronous_journal": {
+            "rayforce": "Separate observation profile with explicit sync watermark; reconcile later ACKs and ambiguous intents independently",
+            "comparison": "Do not pool with the synchronous profile or label weaker durability as a faster equivalent"
+          }
+        },
+        "consistency": "One authoritative writer per persistent dataset; verify fresh reads of committed rows, native lock behavior and the declared API boundary. No distributed, HA or multi-process concurrent DuckDB writer claim.",
+        "atomicity": "Successful logical row/batch acknowledgements require complete expected columns. General failed-operation/OOM rollback and multi-request atomicity are not assumed; preserve intents and reconcile partial/ambiguous effects.",
+        "idempotency": "No automatic mutation retries; unique IDs are application-generated, not assumed to be server-side deduplicated. A timeout or closed connection is not proof that no mutation applied.",
+        "reference_client": {
+          "application": "C++ with CMake and upstream native C APIs",
+          "mutation_retries": 0,
+          "operation_timeout_ms": 3000,
+          "writer_connections": 1,
+          "independent_reader": "Required for live failure cases; use native Rayforce IPC and make the DuckDB application boundary explicit before measuring. Adapter/RPC/FFI costs must be labeled",
+          "status": "Transport adapter and live failure controller not implemented yet",
+          "scope": "The future live journal/fault profile. Offline snapshot C API calls currently use the existing 600-second whole-process bound, without per-call cancellation."
+        },
+        "resources": {
+          "initial_profile": "1 CPU / 4 GiB charged memory, swap disabled, per engine. Existing historical results keep their original captured limits.",
+          "required": "CPU utilization/core-seconds, process RSS and cgroup memory, logical/allocated disk and native persisted bytes, compression at a named layer, block read/write bytes and available I/O counters; include import, save, query, replay and repair phases"
+        },
+        "correctness_gates": [
+          "Validate every old/new row in ID order against the independent canonical CSV oracle, including earlier ACKs",
+          "Persist an fsynced external intent/ACK witness outside the failed storage",
+          "Prove old-owner exit before replacement; verify native replay and readable rebuilt state",
+          "Test snapshot plus journal tail, a second snapshot/restart, and no duplicate replay",
+          "Keep writers/readers live through operational faults; saved-table tests alone do not meet this gate",
+          "Distinguish torn final frames from corruption inside intact frames; retain original evidence and native diagnostics"
+        ],
+        "performance_gate": "Correctness/recovery first. Three fresh-process trials with matched input, query results, durability and resource budgets; report actual monotonic durations, trial spread, native storage/compression and per-phase resource costs. OS-cold behavior requires an isolated owned environment or supported cache controls; never clear shared host caches."
+      },
+      "records": [
+        {
+          "language": "cpp",
+          "engine": "rayforce",
+          "trial": 1,
+          "records": [
+            {
+              "phase": "load",
+              "query": "load-0",
+              "elapsed_ns": 128164209,
+              "cpu_ns": 117458000,
+              "peak_rss_kib": 220272
+            },
+            {
+              "phase": "load",
+              "query": "load-1",
+              "elapsed_ns": 611333,
+              "cpu_ns": 330000,
+              "peak_rss_kib": 220272
+            },
+            {
+              "phase": "write",
+              "query": "save-trades",
+              "elapsed_ns": 142805083,
+              "cpu_ns": 120809000,
+              "peak_rss_kib": 220272
+            },
+            {
+              "phase": "write",
+              "query": "save-customers",
+              "elapsed_ns": 3202959,
+              "cpu_ns": 1005000,
+              "peak_rss_kib": 220272
+            },
+            {
+              "phase": "verify",
+              "query": "totals",
+              "elapsed_ns": 28842625,
+              "cpu_ns": 28203000,
+              "peak_rss_kib": 220272
+            },
+            {
+              "phase": "verify",
+              "query": "filtered",
+              "elapsed_ns": 10806208,
+              "cpu_ns": 10752000,
+              "peak_rss_kib": 220272
+            },
+            {
+              "phase": "verify",
+              "query": "symbols",
+              "elapsed_ns": 3738333,
+              "cpu_ns": 3695000,
+              "peak_rss_kib": 220272
+            },
+            {
+              "phase": "verify",
+              "query": "customers",
+              "elapsed_ns": 7486708,
+              "cpu_ns": 7454000,
+              "peak_rss_kib": 220272
+            },
+            {
+              "phase": "verify",
+              "query": "join",
+              "elapsed_ns": 88586958,
+              "cpu_ns": 87509000,
+              "peak_rss_kib": 370244
+            },
+            {
+              "phase": "window",
+              "query": "ingestion",
+              "elapsed_ns": 146026792,
+              "cpu_ns": 121831000,
+              "peak_rss_kib": 370244
+            }
+          ],
+          "cgroup_peak_memory_bytes": 425988096,
+          "cgroup_cpu_seconds": 0.387776,
+          "workload_window_seconds": 0.4200000000000159,
+          "container_lifetime_seconds": 0.469217,
+          "cpu_utilization_percent_one_core_100": 82.64321198933543,
+          "cpu_utilization_scope": "Cgroup CPU includes runtime, wrapper and accounting commands; denominator is Docker StartedAt to FinishedAt, parsed at microsecond resolution. CPU snapshot precedes the final accounting commands/exit, so their final CPU is not included. Driver uptime window has 10 ms resolution; per-query CPU and wall time are separate exact-clock samples.",
+          "block_io": {
+            "available": true,
+            "devices": {},
+            "raw": "",
+            "totals": {
+              "rbytes": 0,
+              "rios": 0,
+              "wbytes": 0,
+              "wios": 0
+            },
+            "per_second": {
+              "rbytes": 0.0,
+              "rios": 0.0,
+              "wbytes": 0.0,
+              "wios": 0.0
+            },
+            "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth."
+          },
+          "sampled_resources": {
+            "available": true,
+            "sample_count": 3,
+            "sampled_mean_charged_memory_bytes": 205753002.66666666,
+            "sampled_max_charged_memory_bytes": 248291328,
+            "sampled_peak_cpu_percent_one_core_100": 96.02043270399578,
+            "scope": "Approximately 100 ms plus API/inspection overhead; arithmetic sample mean, not heap or time-weighted mean. Sampling can miss short peaks; use native cgroup memory.peak and process RSS too. Docker daemon/VM overhead excluded."
+          },
+          "process_peak_rss_kib": 370244,
+          "image": "sha256:bf174f7dbb2af2a2b9daf8349cdb65cd1d73e87cbdf6dc09d77d2af18738caf0",
+          "cpus": 1.0,
+          "memory_limit_bytes": 4294967296,
+          "memory_swap_limit_bytes": 4294967296,
+          "owned_storage_samples": [
+            {
+              "monotonic_ns": 1100095763468125,
+              "files": {},
+              "raced_paths": [],
+              "logical_bytes": 0,
+              "allocated_bytes": 0
+            },
+            {
+              "monotonic_ns": 1100095955025208,
+              "files": {},
+              "raced_paths": [],
+              "logical_bytes": 0,
+              "allocated_bytes": 0
+            },
+            {
+              "monotonic_ns": 1100096078794166,
+              "files": {
+                "trades/.write.lock": {
+                  "bytes": 0,
+                  "allocated_bytes": 0
+                },
+                "trades/customer.tmp": {
+                  "bytes": 2600960,
+                  "allocated_bytes": 2600960
+                },
+                "trades/id": {
+                  "bytes": 363696,
+                  "allocated_bytes": 364544
+                }
+              },
+              "raced_paths": [],
+              "logical_bytes": 2964656,
+              "allocated_bytes": 2965504
+            },
+            {
+              "monotonic_ns": 1100096217810750,
+              "files": {
+                "customers/.write.lock": {
+                  "bytes": 0,
+                  "allocated_bytes": 0
+                },
+                "customers/factor": {
+                  "bytes": 7152,
+                  "allocated_bytes": 8192
+                },
+                "customers/region": {
+                  "bytes": 4976,
+                  "allocated_bytes": 8192
+                },
+                "customers/.d": {
+                  "bytes": 112,
+                  "allocated_bytes": 4096
+                },
+                "customers/customer": {
+                  "bytes": 5232,
+                  "allocated_bytes": 8192
+                },
+                "trades/.write.lock": {
+                  "bytes": 0,
+                  "allocated_bytes": 0
+                },
+                "trades/symbol": {
+                  "bytes": 2115432,
+                  "allocated_bytes": 2117632
+                },
+                "trades/price": {
+                  "bytes": 3613736,
+                  "allocated_bytes": 3616768
+                },
+                "trades/.d": {
+                  "bytes": 160,
+                  "allocated_bytes": 4096
+                },
+                "trades/id": {
+                  "bytes": 363696,
+                  "allocated_bytes": 364544
+                },
+                "trades/day": {
+                  "bytes": 1363672,
+                  "allocated_bytes": 1363968
+                },
+                "trades/customer": {
+                  "bytes": 3693208,
+                  "allocated_bytes": 3694592
+                },
+                "trades/qty": {
+                  "bytes": 1864200,
+                  "allocated_bytes": 1867776
+                }
+              },
+              "raced_paths": [],
+              "logical_bytes": 13031576,
+              "allocated_bytes": 13058048
+            },
+            {
+              "monotonic_ns": 1100096358583458,
+              "files": {
+                "customers/.write.lock": {
+                  "bytes": 0,
+                  "allocated_bytes": 0
+                },
+                "customers/factor": {
+                  "bytes": 7152,
+                  "allocated_bytes": 8192
+                },
+                "customers/region": {
+                  "bytes": 4976,
+                  "allocated_bytes": 8192
+                },
+                "customers/.d": {
+                  "bytes": 112,
+                  "allocated_bytes": 4096
+                },
+                "customers/customer": {
+                  "bytes": 5232,
+                  "allocated_bytes": 8192
+                },
+                "trades/.write.lock": {
+                  "bytes": 0,
+                  "allocated_bytes": 0
+                },
+                "trades/symbol": {
+                  "bytes": 2115432,
+                  "allocated_bytes": 2117632
+                },
+                "trades/price": {
+                  "bytes": 3613736,
+                  "allocated_bytes": 3616768
+                },
+                "trades/.d": {
+                  "bytes": 160,
+                  "allocated_bytes": 4096
+                },
+                "trades/id": {
+                  "bytes": 363696,
+                  "allocated_bytes": 364544
+                },
+                "trades/day": {
+                  "bytes": 1363672,
+                  "allocated_bytes": 1363968
+                },
+                "trades/customer": {
+                  "bytes": 3693208,
+                  "allocated_bytes": 3694592
+                },
+                "trades/qty": {
+                  "bytes": 1864200,
+                  "allocated_bytes": 1867776
+                }
+              },
+              "raced_paths": [],
+              "logical_bytes": 13031576,
+              "allocated_bytes": 13058048
+            }
+          ],
+          "storage_sample_scope": "Observed verification mount files, including native state, WAL/temp files present at sampling and CSV exports. Peaks can be missed; raced paths are incomplete observations. Source fixture and container root filesystem are separate.",
+          "wall_with_monitor_seconds": 0.4564332908485085,
+          "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n"
+        },
+        {
+          "language": "cpp",
+          "engine": "rayforce",
+          "trial": 2,
+          "records": [
+            {
+              "phase": "load",
+              "query": "reopen-trades",
+              "elapsed_ns": 3942375,
+              "cpu_ns": 764000,
+              "peak_rss_kib": 15276
+            },
+            {
+              "phase": "load",
+              "query": "reopen-customers",
+              "elapsed_ns": 2094333,
+              "cpu_ns": 365000,
+              "peak_rss_kib": 15432
+            },
+            {
+              "phase": "verify",
+              "query": "totals",
+              "elapsed_ns": 19606042,
+              "cpu_ns": 17976000,
+              "peak_rss_kib": 37724
+            },
+            {
+              "phase": "verify",
+              "query": "filtered",
+              "elapsed_ns": 15968291,
+              "cpu_ns": 15564000,
+              "peak_rss_kib": 37892
+            },
+            {
+              "phase": "verify",
+              "query": "symbols",
+              "elapsed_ns": 4300083,
+              "cpu_ns": 4268000,
+              "peak_rss_kib": 40740
+            },
+            {
+              "phase": "verify",
+              "query": "customers",
+              "elapsed_ns": 6787500,
+              "cpu_ns": 6729000,
+              "peak_rss_kib": 46500
+            },
+            {
+              "phase": "verify",
+              "query": "join",
+              "elapsed_ns": 81429167,
+              "cpu_ns": 80975000,
+              "peak_rss_kib": 317416
+            },
+            {
+              "phase": "export",
+              "query": "full-body",
+              "elapsed_ns": 947846875,
+              "cpu_ns": 597133000,
+              "peak_rss_kib": 318760
+            },
+            {
+              "phase": "export",
+              "query": "dimension-body",
+              "elapsed_ns": 2040500,
+              "cpu_ns": 1323000,
+              "peak_rss_kib": 318760
+            }
+          ],
+          "cgroup_peak_memory_bytes": 374185984,
+          "cgroup_cpu_seconds": 0.736041,
+          "workload_window_seconds": 1.0900000000000318,
+          "container_lifetime_seconds": 1.13956,
+          "cpu_utilization_percent_one_core_100": 64.58992944645303,
+          "cpu_utilization_scope": "Cgroup CPU includes runtime, wrapper and accounting commands; denominator is Docker StartedAt to FinishedAt, parsed at microsecond resolution. CPU snapshot precedes the final accounting commands/exit, so their final CPU is not included. Driver uptime window has 10 ms resolution; per-query CPU and wall time are separate exact-clock samples.",
+          "block_io": {
+            "available": true,
+            "devices": {},
+            "raw": "",
+            "totals": {
+              "rbytes": 0,
+              "rios": 0,
+              "wbytes": 0,
+              "wios": 0
+            },
+            "per_second": {
+              "rbytes": 0.0,
+              "rios": 0.0,
+              "wbytes": 0.0,
+              "wios": 0.0
+            },
+            "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth."
+          },
+          "sampled_resources": {
+            "available": true,
+            "sample_count": 8,
+            "sampled_mean_charged_memory_bytes": 305251328,
+            "sampled_max_charged_memory_bytes": 371003392,
+            "sampled_peak_cpu_percent_one_core_100": 87.05231001077671,
+            "scope": "Approximately 100 ms plus API/inspection overhead; arithmetic sample mean, not heap or time-weighted mean. Sampling can miss short peaks; use native cgroup memory.peak and process RSS too. Docker daemon/VM overhead excluded."
+          },
+          "process_peak_rss_kib": 318760,
+          "image": "sha256:bf174f7dbb2af2a2b9daf8349cdb65cd1d73e87cbdf6dc09d77d2af18738caf0",
+          "cpus": 1.0,
+          "memory_limit_bytes": 4294967296,
+          "memory_swap_limit_bytes": 4294967296,
+          "owned_storage_samples": [
+            {
+              "monotonic_ns": 1100096415963625,
+              "files": {
+                "customers/.write.lock": {
+                  "bytes": 0,
+                  "allocated_bytes": 0
+                },
+                "customers/factor": {
+                  "bytes": 7152,
+                  "allocated_bytes": 8192
+                },
+                "customers/region": {
+                  "bytes": 4976,
+                  "allocated_bytes": 8192
+                },
+                "customers/.d": {
+                  "bytes": 112,
+                  "allocated_bytes": 4096
+                },
+                "customers/customer": {
+                  "bytes": 5232,
+                  "allocated_bytes": 8192
+                },
+                "trades/.write.lock": {
+                  "bytes": 0,
+                  "allocated_bytes": 0
+                },
+                "trades/symbol": {
+                  "bytes": 2115432,
+                  "allocated_bytes": 2117632
+                },
+                "trades/price": {
+                  "bytes": 3613736,
+                  "allocated_bytes": 3616768
+                },
+                "trades/.d": {
+                  "bytes": 160,
+                  "allocated_bytes": 4096
+                },
+                "trades/id": {
+                  "bytes": 363696,
+                  "allocated_bytes": 364544
+                },
+                "trades/day": {
+                  "bytes": 1363672,
+                  "allocated_bytes": 1363968
+                },
+                "trades/customer": {
+                  "bytes": 3693208,
+                  "allocated_bytes": 3694592
+                },
+                "trades/qty": {
+                  "bytes": 1864200,
+                  "allocated_bytes": 1867776
+                }
+              },
+              "raced_paths": [],
+              "logical_bytes": 13031576,
+              "allocated_bytes": 13058048
+            },
+            {
+              "monotonic_ns": 1100096615099458,
+              "files": {
+                "customers/.write.lock": {
+                  "bytes": 0,
+                  "allocated_bytes": 0
+                },
+                "customers/factor": {
+                  "bytes": 7152,
+                  "allocated_bytes": 8192
+                },
+                "customers/region": {
+                  "bytes": 4976,
+                  "allocated_bytes": 8192
+                },
+                "customers/.d": {
+                  "bytes": 112,
+                  "allocated_bytes": 4096
+                },
+                "customers/customer": {
+                  "bytes": 5232,
+                  "allocated_bytes": 8192
+                },
+                "trades/.write.lock": {
+                  "bytes": 0,
+                  "allocated_bytes": 0
+                },
+                "trades/symbol": {
+                  "bytes": 2115432,
+                  "allocated_bytes": 2117632
+                },
+                "trades/price": {
+                  "bytes": 3613736,
+                  "allocated_bytes": 3616768
+                },
+                "trades/.d": {
+                  "bytes": 160,
+                  "allocated_bytes": 4096
+                },
+                "trades/id": {
+                  "bytes": 363696,
+                  "allocated_bytes": 364544
+                },
+                "trades/day": {
+                  "bytes": 1363672,
+                  "allocated_bytes": 1363968
+                },
+                "trades/customer": {
+                  "bytes": 3693208,
+                  "allocated_bytes": 3694592
+                },
+                "trades/qty": {
+                  "bytes": 1864200,
+                  "allocated_bytes": 1867776
+                }
+              },
+              "raced_paths": [],
+              "logical_bytes": 13031576,
+              "allocated_bytes": 13058048
+            },
+            {
+              "monotonic_ns": 1100096750847916,
+              "files": {
+                "trades.csv.tmp": {
+                  "bytes": 1462272,
+                  "allocated_bytes": 1462272
+                },
+                "customers/.write.lock": {
+                  "bytes": 0,
+                  "allocated_bytes": 0
+                },
+                "customers/factor": {
+                  "bytes": 7152,
+                  "allocated_bytes": 8192
+                },
+                "customers/region": {
+                  "bytes": 4976,
+                  "allocated_bytes": 8192
+                },
+                "customers/.d": {
+                  "bytes": 112,
+                  "allocated_bytes": 4096
+                },
+                "customers/customer": {
+                  "bytes": 5232,
+                  "allocated_bytes": 8192
+                },
+                "trades/.write.lock": {
+                  "bytes": 0,
+                  "allocated_bytes": 0
+                },
+                "trades/symbol": {
+                  "bytes": 2115432,
+                  "allocated_bytes": 2117632
+                },
+                "trades/price": {
+                  "bytes": 3613736,
+                  "allocated_bytes": 3616768
+                },
+                "trades/.d": {
+                  "bytes": 160,
+                  "allocated_bytes": 4096
+                },
+                "trades/id": {
+                  "bytes": 363696,
+                  "allocated_bytes": 364544
+                },
+                "trades/day": {
+                  "bytes": 1363672,
+                  "allocated_bytes": 1363968
+                },
+                "trades/customer": {
+                  "bytes": 3693208,
+                  "allocated_bytes": 3694592
+                },
+                "trades/qty": {
+                  "bytes": 1864200,
+                  "allocated_bytes": 1867776
+                }
+              },
+              "raced_paths": [],
+              "logical_bytes": 14493848,
+              "allocated_bytes": 14520320
+            },
+            {
+              "monotonic_ns": 1100096900299125,
+              "files": {
+                "trades.csv.tmp": {
+                  "bytes": 8732672,
+                  "allocated_bytes": 8732672
+                },
+                "customers/.write.lock": {
+                  "bytes": 0,
+                  "allocated_bytes": 0
+                },
+                "customers/factor": {
+                  "bytes": 7152,
+                  "allocated_bytes": 8192
+                },
+                "customers/region": {
+                  "bytes": 4976,
+                  "allocated_bytes": 8192
+                },
+                "customers/.d": {
+                  "bytes": 112,
+                  "allocated_bytes": 4096
+                },
+                "customers/customer": {
+                  "bytes": 5232,
+                  "allocated_bytes": 8192
+                },
+                "trades/.write.lock": {
+                  "bytes": 0,
+                  "allocated_bytes": 0
+                },
+                "trades/symbol": {
+                  "bytes": 2115432,
+                  "allocated_bytes": 2117632
+                },
+                "trades/price": {
+                  "bytes": 3613736,
+                  "allocated_bytes": 3616768
+                },
+                "trades/.d": {
+                  "bytes": 160,
+                  "allocated_bytes": 4096
+                },
+                "trades/id": {
+                  "bytes": 363696,
+                  "allocated_bytes": 364544
+                },
+                "trades/day": {
+                  "bytes": 1363672,
+                  "allocated_bytes": 1363968
+                },
+                "trades/customer": {
+                  "bytes": 3693208,
+                  "allocated_bytes": 3694592
+                },
+                "trades/qty": {
+                  "bytes": 1864200,
+                  "allocated_bytes": 1867776
+                }
+              },
+              "raced_paths": [],
+              "logical_bytes": 21764248,
+              "allocated_bytes": 21790720
+            },
+            {
+              "monotonic_ns": 1100097035058291,
+              "files": {
+                "trades.csv.tmp": {
+                  "bytes": 15159296,
+                  "allocated_bytes": 15159296
+                },
+                "customers/.write.lock": {
+                  "bytes": 0,
+                  "allocated_bytes": 0
+                },
+                "customers/factor": {
+                  "bytes": 7152,
+                  "allocated_bytes": 8192
+                },
+                "customers/region": {
+                  "bytes": 4976,
+                  "allocated_bytes": 8192
+                },
+                "customers/.d": {
+                  "bytes": 112,
+                  "allocated_bytes": 4096
+                },
+                "customers/customer": {
+                  "bytes": 5232,
+                  "allocated_bytes": 8192
+                },
+                "trades/.write.lock": {
+                  "bytes": 0,
+                  "allocated_bytes": 0
+                },
+                "trades/symbol": {
+                  "bytes": 2115432,
+                  "allocated_bytes": 2117632
+                },
+                "trades/price": {
+                  "bytes": 3613736,
+                  "allocated_bytes": 3616768
+                },
+                "trades/.d": {
+                  "bytes": 160,
+                  "allocated_bytes": 4096
+                },
+                "trades/id": {
+                  "bytes": 363696,
+                  "allocated_bytes": 364544
+                },
+                "trades/day": {
+                  "bytes": 1363672,
+                  "allocated_bytes": 1363968
+                },
+                "trades/customer": {
+                  "bytes": 3693208,
+                  "allocated_bytes": 3694592
+                },
+                "trades/qty": {
+                  "bytes": 1864200,
+                  "allocated_bytes": 1867776
+                }
+              },
+              "raced_paths": [],
+              "logical_bytes": 28190872,
+              "allocated_bytes": 28217344
+            },
+            {
+              "monotonic_ns": 1100097175564541,
+              "files": {
+                "trades.csv.tmp": {
+                  "bytes": 21798912,
+                  "allocated_bytes": 21798912
+                },
+                "customers/.write.lock": {
+                  "bytes": 0,
+                  "allocated_bytes": 0
+                },
+                "customers/factor": {
+                  "bytes": 7152,
+                  "allocated_bytes": 8192
+                },
+                "customers/region": {
+                  "bytes": 4976,
+                  "allocated_bytes": 8192
+                },
+                "customers/.d": {
+                  "bytes": 112,
+                  "allocated_bytes": 4096
+                },
+                "customers/customer": {
+                  "bytes": 5232,
+                  "allocated_bytes": 8192
+                },
+                "trades/.write.lock": {
+                  "bytes": 0,
+                  "allocated_bytes": 0
+                },
+                "trades/symbol": {
+                  "bytes": 2115432,
+                  "allocated_bytes": 2117632
+                },
+                "trades/price": {
+                  "bytes": 3613736,
+                  "allocated_bytes": 3616768
+                },
+                "trades/.d": {
+                  "bytes": 160,
+                  "allocated_bytes": 4096
+                },
+                "trades/id": {
+                  "bytes": 363696,
+                  "allocated_bytes": 364544
+                },
+                "trades/day": {
+                  "bytes": 1363672,
+                  "allocated_bytes": 1363968
+                },
+                "trades/customer": {
+                  "bytes": 3693208,
+                  "allocated_bytes": 3694592
+                },
+                "trades/qty": {
+                  "bytes": 1864200,
+                  "allocated_bytes": 1867776
+                }
+              },
+              "raced_paths": [],
+              "logical_bytes": 34830488,
+              "allocated_bytes": 34856960
+            },
+            {
+              "monotonic_ns": 1100097316233916,
+              "files": {
+                "trades.csv.tmp": {
+                  "bytes": 29769728,
+                  "allocated_bytes": 29769728
+                },
+                "customers/.write.lock": {
+                  "bytes": 0,
+                  "allocated_bytes": 0
+                },
+                "customers/factor": {
+                  "bytes": 7152,
+                  "allocated_bytes": 8192
+                },
+                "customers/region": {
+                  "bytes": 4976,
+                  "allocated_bytes": 8192
+                },
+                "customers/.d": {
+                  "bytes": 112,
+                  "allocated_bytes": 4096
+                },
+                "customers/customer": {
+                  "bytes": 5232,
+                  "allocated_bytes": 8192
+                },
+                "trades/.write.lock": {
+                  "bytes": 0,
+                  "allocated_bytes": 0
+                },
+                "trades/symbol": {
+                  "bytes": 2115432,
+                  "allocated_bytes": 2117632
+                },
+                "trades/price": {
+                  "bytes": 3613736,
+                  "allocated_bytes": 3616768
+                },
+                "trades/.d": {
+                  "bytes": 160,
+                  "allocated_bytes": 4096
+                },
+                "trades/id": {
+                  "bytes": 363696,
+                  "allocated_bytes": 364544
+                },
+                "trades/day": {
+                  "bytes": 1363672,
+                  "allocated_bytes": 1363968
+                },
+                "trades/customer": {
+                  "bytes": 3693208,
+                  "allocated_bytes": 3694592
+                },
+                "trades/qty": {
+                  "bytes": 1864200,
+                  "allocated_bytes": 1867776
+                }
+              },
+              "raced_paths": [],
+              "logical_bytes": 42801304,
+              "allocated_bytes": 42827776
+            },
+            {
+              "monotonic_ns": 1100097458370541,
+              "files": {
+                "trades.csv.tmp": {
+                  "bytes": 39886848,
+                  "allocated_bytes": 39886848
+                },
+                "customers/.write.lock": {
+                  "bytes": 0,
+                  "allocated_bytes": 0
+                },
+                "customers/factor": {
+                  "bytes": 7152,
+                  "allocated_bytes": 8192
+                },
+                "customers/region": {
+                  "bytes": 4976,
+                  "allocated_bytes": 8192
+                },
+                "customers/.d": {
+                  "bytes": 112,
+                  "allocated_bytes": 4096
+                },
+                "customers/customer": {
+                  "bytes": 5232,
+                  "allocated_bytes": 8192
+                },
+                "trades/.write.lock": {
+                  "bytes": 0,
+                  "allocated_bytes": 0
+                },
+                "trades/symbol": {
+                  "bytes": 2115432,
+                  "allocated_bytes": 2117632
+                },
+                "trades/price": {
+                  "bytes": 3613736,
+                  "allocated_bytes": 3616768
+                },
+                "trades/.d": {
+                  "bytes": 160,
+                  "allocated_bytes": 4096
+                },
+                "trades/id": {
+                  "bytes": 363696,
+                  "allocated_bytes": 364544
+                },
+                "trades/day": {
+                  "bytes": 1363672,
+                  "allocated_bytes": 1363968
+                },
+                "trades/customer": {
+                  "bytes": 3693208,
+                  "allocated_bytes": 3694592
+                },
+                "trades/qty": {
+                  "bytes": 1864200,
+                  "allocated_bytes": 1867776
+                }
+              },
+              "raced_paths": [],
+              "logical_bytes": 52918424,
+              "allocated_bytes": 52944896
+            },
+            {
+              "monotonic_ns": 1100097597522875,
+              "files": {
+                "trades.csv.tmp": {
+                  "bytes": 49123328,
+                  "allocated_bytes": 49123328
+                },
+                "customers/.write.lock": {
+                  "bytes": 0,
+                  "allocated_bytes": 0
+                },
+                "customers/factor": {
+                  "bytes": 7152,
+                  "allocated_bytes": 8192
+                },
+                "customers/region": {
+                  "bytes": 4976,
+                  "allocated_bytes": 8192
+                },
+                "customers/.d": {
+                  "bytes": 112,
+                  "allocated_bytes": 4096
+                },
+                "customers/customer": {
+                  "bytes": 5232,
+                  "allocated_bytes": 8192
+                },
+                "trades/.write.lock": {
+                  "bytes": 0,
+                  "allocated_bytes": 0
+                },
+                "trades/symbol": {
+                  "bytes": 2115432,
+                  "allocated_bytes": 2117632
+                },
+                "trades/price": {
+                  "bytes": 3613736,
+                  "allocated_bytes": 3616768
+                },
+                "trades/.d": {
+                  "bytes": 160,
+                  "allocated_bytes": 4096
+                },
+                "trades/id": {
+                  "bytes": 363696,
+                  "allocated_bytes": 364544
+                },
+                "trades/day": {
+                  "bytes": 1363672,
+                  "allocated_bytes": 1363968
+                },
+                "trades/customer": {
+                  "bytes": 3693208,
+                  "allocated_bytes": 3694592
+                },
+                "trades/qty": {
+                  "bytes": 1864200,
+                  "allocated_bytes": 1867776
+                }
+              },
+              "raced_paths": [],
+              "logical_bytes": 62154904,
+              "allocated_bytes": 62181376
+            },
+            {
+              "monotonic_ns": 1100097715994833,
+              "files": {
+                "customers.csv": {
+                  "bytes": 92663,
+                  "allocated_bytes": 94208
+                },
+                "trades.csv": {
+                  "bytes": 52801261,
+                  "allocated_bytes": 52801536
+                },
+                "customers/.write.lock": {
+                  "bytes": 0,
+                  "allocated_bytes": 0
+                },
+                "customers/factor": {
+                  "bytes": 7152,
+                  "allocated_bytes": 8192
+                },
+                "customers/region": {
+                  "bytes": 4976,
+                  "allocated_bytes": 8192
+                },
+                "customers/.d": {
+                  "bytes": 112,
+                  "allocated_bytes": 4096
+                },
+                "customers/customer": {
+                  "bytes": 5232,
+                  "allocated_bytes": 8192
+                },
+                "trades/.write.lock": {
+                  "bytes": 0,
+                  "allocated_bytes": 0
+                },
+                "trades/symbol": {
+                  "bytes": 2115432,
+                  "allocated_bytes": 2117632
+                },
+                "trades/price": {
+                  "bytes": 3613736,
+                  "allocated_bytes": 3616768
+                },
+                "trades/.d": {
+                  "bytes": 160,
+                  "allocated_bytes": 4096
+                },
+                "trades/id": {
+                  "bytes": 363696,
+                  "allocated_bytes": 364544
+                },
+                "trades/day": {
+                  "bytes": 1363672,
+                  "allocated_bytes": 1363968
+                },
+                "trades/customer": {
+                  "bytes": 3693208,
+                  "allocated_bytes": 3694592
+                },
+                "trades/qty": {
+                  "bytes": 1864200,
+                  "allocated_bytes": 1867776
+                }
+              },
+              "raced_paths": [],
+              "logical_bytes": 65925500,
+              "allocated_bytes": 65953792
+            }
+          ],
+          "storage_sample_scope": "Observed verification mount files, including native state, WAL/temp files present at sampling and CSV exports. Peaks can be missed; raced paths are incomplete observations. Source fixture and container root filesystem are separate.",
+          "wall_with_monitor_seconds": 1.1509568749461323,
+          "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n"
+        }
+      ],
+      "verification": {
+        "sha256": "c8756870bdbb238b69ef8d563c6d4f176753e3864ffa50f508e707ed94406de0",
+        "bytes": 52801261,
+        "verified_rows": 2000000,
+        "allocated_bytes": 52801536,
+        "compression": {
+          "codec": "gzip",
+          "level": 1,
+          "zlib": "1.3.2",
+          "uncompressed_bytes": 52801261,
+          "compressed_bytes": 24337454,
+          "ratio": 2.1695474391035314,
+          "wall_ns": 303922544,
+          "cpu_ns": 300559000,
+          "scope": "Host-side compressibility of the verified CSV witness, streamed into a byte counter; not native engine compression. Timers cover compression calls, excluding file reads/hash/fsync."
+        }
+      },
+      "dimension_verification": {
+        "sha256": "c3a160b85050e71c8ba465e2ca7a72d25bc4fbb076954f6c6f9c22fcaabadc95",
+        "bytes": 92663,
+        "verified_rows": 10000,
+        "allocated_bytes": 94208,
+        "compression": {
+          "codec": "gzip",
+          "level": 1,
+          "zlib": "1.3.2",
+          "uncompressed_bytes": 92663,
+          "compressed_bytes": 32777,
+          "ratio": 2.827073862769625,
+          "wall_ns": 448792,
+          "cpu_ns": 449000,
+          "scope": "Host-side compressibility of the verified CSV witness, streamed into a byte counter; not native engine compression. Timers cover compression calls, excluding file reads/hash/fsync."
+        }
+      },
+      "storage_files": [
+        {
+          "name": "customers/.d",
+          "bytes": 112,
+          "allocated_bytes": 4096
+        },
+        {
+          "name": "customers/.write.lock",
+          "bytes": 0,
+          "allocated_bytes": 0
+        },
+        {
+          "name": "customers/customer",
+          "bytes": 5232,
+          "allocated_bytes": 8192
+        },
+        {
+          "name": "customers/factor",
+          "bytes": 7152,
+          "allocated_bytes": 8192
+        },
+        {
+          "name": "customers/region",
+          "bytes": 4976,
+          "allocated_bytes": 8192
+        },
+        {
+          "name": "customers.csv",
+          "bytes": 92663,
+          "allocated_bytes": 94208
+        },
+        {
+          "name": "trades/.d",
+          "bytes": 160,
+          "allocated_bytes": 4096
+        },
+        {
+          "name": "trades/.write.lock",
+          "bytes": 0,
+          "allocated_bytes": 0
+        },
+        {
+          "name": "trades/customer",
+          "bytes": 3693208,
+          "allocated_bytes": 3694592
+        },
+        {
+          "name": "trades/day",
+          "bytes": 1363672,
+          "allocated_bytes": 1363968
+        },
+        {
+          "name": "trades/id",
+          "bytes": 363696,
+          "allocated_bytes": 364544
+        },
+        {
+          "name": "trades/price",
+          "bytes": 3613736,
+          "allocated_bytes": 3616768
+        },
+        {
+          "name": "trades/qty",
+          "bytes": 1864200,
+          "allocated_bytes": 1867776
+        },
+        {
+          "name": "trades/symbol",
+          "bytes": 2115432,
+          "allocated_bytes": 2117632
+        },
+        {
+          "name": "trades.csv",
+          "bytes": 52801261,
+          "allocated_bytes": 52801536
+        }
+      ],
+      "native_column_headers": [
+        {
+          "table": "trades",
+          "column": "id",
+          "rows": 2000000,
+          "format_generation": 2,
+          "payload_magic": "RENC",
+          "raw_i64_value_bytes": 16000000,
+          "file_bytes": 363696
+        },
+        {
+          "table": "trades",
+          "column": "customer",
+          "rows": 2000000,
+          "format_generation": 2,
+          "payload_magic": "RENC",
+          "raw_i64_value_bytes": 16000000,
+          "file_bytes": 3693208
+        },
+        {
+          "table": "trades",
+          "column": "symbol",
+          "rows": 2000000,
+          "format_generation": 2,
+          "payload_magic": "RENC",
+          "raw_i64_value_bytes": 16000000,
+          "file_bytes": 2115432
+        },
+        {
+          "table": "trades",
+          "column": "day",
+          "rows": 2000000,
+          "format_generation": 2,
+          "payload_magic": "RENC",
+          "raw_i64_value_bytes": 16000000,
+          "file_bytes": 1363672
+        },
+        {
+          "table": "trades",
+          "column": "qty",
+          "rows": 2000000,
+          "format_generation": 2,
+          "payload_magic": "RENC",
+          "raw_i64_value_bytes": 16000000,
+          "file_bytes": 1864200
+        },
+        {
+          "table": "trades",
+          "column": "price",
+          "rows": 2000000,
+          "format_generation": 2,
+          "payload_magic": "RENC",
+          "raw_i64_value_bytes": 16000000,
+          "file_bytes": 3613736
+        },
+        {
+          "table": "customers",
+          "column": "customer",
+          "rows": 10000,
+          "format_generation": 2,
+          "payload_magic": "RENC",
+          "raw_i64_value_bytes": 80000,
+          "file_bytes": 5232
+        },
+        {
+          "table": "customers",
+          "column": "region",
+          "rows": 10000,
+          "format_generation": 2,
+          "payload_magic": "RENC",
+          "raw_i64_value_bytes": 80000,
+          "file_bytes": 4976
+        },
+        {
+          "table": "customers",
+          "column": "factor",
+          "rows": 10000,
+          "format_generation": 2,
+          "payload_magic": "RENC",
+          "raw_i64_value_bytes": 80000,
+          "file_bytes": 7152
+        }
+      ],
+      "native_store_bytes": 13031576,
+      "native_storage_info_csv": null,
+      "native_compression_scope": "DuckDB storage_info reports codecs; Rayforce explicitly requests compressed durable column saves, with native files retained. File footprints include metadata; no pure codec ratio is inferred from a whole-database size. CSV gzip is a separate measured layer.",
+      "source_sha256": {
+        "persistence.py": "621597ac4aa82e7675bff0f1b0e81753615632c2f20a0eb1eba133cb87e4c8f4",
+        "experiment.py": "8084d4506efa2b34de779c058c8d5b98eb9d2c64bb93a114c9748e9e930fd16a",
+        "analytics-workload/native/bridge.c": "c88522764669a1afe67a5f286690ef65404bfe15451ad9681f5f80d23a3ac7b9",
+        "analytics-workload/native/bridge.h": "06834e880e5d83ff74573c6c62ad6b7360211edcfcbd5efa63a4636a4d431611",
+        "analytics-workload/cpp/main.cpp": "de3c1dc3a900d3152ef7cbd79ac959261eb9fa850718c2c11d2ff8b7a08de7c6",
+        "docker-compose.yml": "27edb716dfec74c43bf44000a5d5f5fd4e0856b727cb4db5ea1e692428cca80b",
+        "persistence-contract.json": "c4f379aac4441a77f3b0e17761f2779cfe9874ca0273b0fe83ed2b466a0313b6"
+      },
+      "host_controller": {
+        "wall_ns": 2452960625,
+        "cpu_seconds": 0.432411,
+        "peak_rss_bytes": 38666240,
+        "child_cli_cpu_seconds": 0.8038369999999999,
+        "scope": "Host controller and Docker CLI children. Export gzip/hash costs overlap this total; native engine/container metrics are separate."
+      },
+      "disk_scope": "Owned directory began empty. Per-process samples retain native state, observable WAL/temp files and CSV exports separately. Final file sizes are settled after graceful close/reopen; sampling can miss shorter peaks and records rename races.",
+      "verified_export_removed": true,
+      "sampled_native_file_bytes_max": 13031576,
+      "raw_native_file_samples_scope": "Non-atomic directory observations can miss peaks or race renames; raw per-file values and known races remain in each record. Export witnesses are excluded from the native-file sum.",
+      "source_result": "results/persistence/0ab5c99c43e14faaa52793c1c67feb14/result.json"
+    },
+    {
+      "passed": true,
+      "scope": "duckdb persisted snapshot with complete body and grouped/join checks after reopen in two independent C++ processes; not a crash-recovery test or repeated performance benchmark. Live journal/fault cases remain unrun.",
+      "fixture": {
+        "rows": 2000000,
+        "customers": 10000,
+        "seed": 20261117,
+        "seconds": 3.2101720420178026,
+        "sha256": {
+          "trades.csv": "c8756870bdbb238b69ef8d563c6d4f176753e3864ffa50f508e707ed94406de0",
+          "customers.csv": "c3a160b85050e71c8ba465e2ca7a72d25bc4fbb076954f6c6f9c22fcaabadc95",
+          "expected.json": "150c8e3d600939b01a5c3af70c563f6b11b22cef4699138b4f4b4a4ba0d15a72"
+        }
+      },
+      "environment": {
+        "host": [
+          "Darwin",
+          "Muzammils-MacBook-Pro.local",
+          "25.5.0",
+          "Darwin Kernel Version 25.5.0: Mon Apr 27 20:41:15 PDT 2026; root:xnu-12377.121.6~2/RELEASE_ARM64_T6041",
+          "arm64"
+        ],
+        "docker": {
+          "ServerVersion": "29.5.3",
+          "KernelVersion": "6.12.76-linuxkit",
+          "Architecture": "aarch64",
+          "NCPU": 11,
+          "MemTotal": 26216296448,
+          "OperatingSystem": "Docker Desktop"
+        },
+        "storage": "Owned host directory bind-mounted into one Docker VM; physical medium/IOPS not qualified",
+        "topology": "Two serial independent processes on one host; no HA or power-loss proof",
+        "cpu_model": "Apple M4 Pro"
+      },
+      "contract": {
+        "purpose": "Declared persistence requirements. Saved-table reopen does not qualify journal/crash recovery or repeated performance comparisons.",
+        "versions": {
+          "rayforce": "38fd4be3560d63a5514c1e6883685fe496d45e1a",
+          "duckdb": "2.0.0",
+          "artifact_pins": "sources.json"
+        },
+        "data": {
+          "default_seed_rows": 2000000,
+          "customers": 10000,
+          "schema": "Six non-null I64 columns: id, customer, symbol, day, qty, price",
+          "seed_profile": "Existing experiment.py generator, Random(20261117); preserve its CSV byte lengths and SHA256 manifest",
+          "live_profile": "Existing ingestion-contract.json deterministic append formula; IDs never reused",
+          "input_equivalence": "Same seed fixture, append IDs/bodies, grouping queries and complete ordered output on both engines"
+        },
+        "profiles": {
+          "saved_table": {
+            "rayforce": "Explicit native splayed/partitioned save and reload; in-memory insert is not a persisted acknowledgement",
+            "duckdb": "Persistent DuckDB file using the native C API, committed writes and explicit checkpoint where the case requires it",
+            "claims": "A saved-table reopen does not qualify live WAL recovery or physical power loss",
+            "atomicity_scope": "Immutable input fixture. Separate Rayforce table saves are not a multi-table atomic live backup; DuckDB CTAS commits before the explicit checkpoint."
+          },
+          "synchronous_journal": {
+            "rayforce": "Native synchronous IPC request path with journal opened in sync mode; RAYFORCE_NO_FSYNC=0 before initialization. Verify effective environment, native status and actual replay",
+            "duckdb": "Persistent file, default durable transactions and WAL; no fsync weakening to match another profile",
+            "claims": "Expect zero acknowledged row/body loss after a fenced process/container SIGKILL and retained-volume native recovery. Power-loss durability remains unqualified"
+          },
+          "asynchronous_journal": {
+            "rayforce": "Separate observation profile with explicit sync watermark; reconcile later ACKs and ambiguous intents independently",
+            "comparison": "Do not pool with the synchronous profile or label weaker durability as a faster equivalent"
+          }
+        },
+        "consistency": "One authoritative writer per persistent dataset; verify fresh reads of committed rows, native lock behavior and the declared API boundary. No distributed, HA or multi-process concurrent DuckDB writer claim.",
+        "atomicity": "Successful logical row/batch acknowledgements require complete expected columns. General failed-operation/OOM rollback and multi-request atomicity are not assumed; preserve intents and reconcile partial/ambiguous effects.",
+        "idempotency": "No automatic mutation retries; unique IDs are application-generated, not assumed to be server-side deduplicated. A timeout or closed connection is not proof that no mutation applied.",
+        "reference_client": {
+          "application": "C++ with CMake and upstream native C APIs",
+          "mutation_retries": 0,
+          "operation_timeout_ms": 3000,
+          "writer_connections": 1,
+          "independent_reader": "Required for live failure cases; use native Rayforce IPC and make the DuckDB application boundary explicit before measuring. Adapter/RPC/FFI costs must be labeled",
+          "status": "Transport adapter and live failure controller not implemented yet",
+          "scope": "The future live journal/fault profile. Offline snapshot C API calls currently use the existing 600-second whole-process bound, without per-call cancellation."
+        },
+        "resources": {
+          "initial_profile": "1 CPU / 4 GiB charged memory, swap disabled, per engine. Existing historical results keep their original captured limits.",
+          "required": "CPU utilization/core-seconds, process RSS and cgroup memory, logical/allocated disk and native persisted bytes, compression at a named layer, block read/write bytes and available I/O counters; include import, save, query, replay and repair phases"
+        },
+        "correctness_gates": [
+          "Validate every old/new row in ID order against the independent canonical CSV oracle, including earlier ACKs",
+          "Persist an fsynced external intent/ACK witness outside the failed storage",
+          "Prove old-owner exit before replacement; verify native replay and readable rebuilt state",
+          "Test snapshot plus journal tail, a second snapshot/restart, and no duplicate replay",
+          "Keep writers/readers live through operational faults; saved-table tests alone do not meet this gate",
+          "Distinguish torn final frames from corruption inside intact frames; retain original evidence and native diagnostics"
+        ],
+        "performance_gate": "Correctness/recovery first. Three fresh-process trials with matched input, query results, durability and resource budgets; report actual monotonic durations, trial spread, native storage/compression and per-phase resource costs. OS-cold behavior requires an isolated owned environment or supported cache controls; never clear shared host caches."
+      },
+      "records": [
+        {
+          "language": "cpp",
+          "engine": "duckdb",
+          "trial": 1,
+          "records": [
+            {
+              "phase": "load",
+              "query": "load-0",
+              "elapsed_ns": 496669001,
+              "cpu_ns": 476799000,
+              "peak_rss_kib": 166896
+            },
+            {
+              "phase": "load",
+              "query": "load-1",
+              "elapsed_ns": 8063292,
+              "cpu_ns": 6937000,
+              "peak_rss_kib": 170352
+            },
+            {
+              "phase": "write",
+              "query": "checkpoint",
+              "elapsed_ns": 1847000,
+              "cpu_ns": 1292000,
+              "peak_rss_kib": 170352
+            },
+            {
+              "phase": "verify",
+              "query": "totals",
+              "elapsed_ns": 5955000,
+              "cpu_ns": 5863000,
+              "peak_rss_kib": 170352
+            },
+            {
+              "phase": "verify",
+              "query": "filtered",
+              "elapsed_ns": 3468083,
+              "cpu_ns": 3469000,
+              "peak_rss_kib": 170352
+            },
+            {
+              "phase": "verify",
+              "query": "symbols",
+              "elapsed_ns": 10251542,
+              "cpu_ns": 10075000,
+              "peak_rss_kib": 170352
+            },
+            {
+              "phase": "verify",
+              "query": "customers",
+              "elapsed_ns": 18920041,
+              "cpu_ns": 18866000,
+              "peak_rss_kib": 170356
+            },
+            {
+              "phase": "verify",
+              "query": "join",
+              "elapsed_ns": 15992416,
+              "cpu_ns": 15968000,
+              "peak_rss_kib": 170956
+            },
+            {
+              "phase": "window",
+              "query": "ingestion",
+              "elapsed_ns": 1847000,
+              "cpu_ns": 1292000,
+              "peak_rss_kib": 170956
+            }
+          ],
+          "cgroup_peak_memory_bytes": 201031680,
+          "cgroup_cpu_seconds": 0.566031,
+          "workload_window_seconds": 0.589999999999975,
+          "container_lifetime_seconds": 0.624223,
+          "cpu_utilization_percent_one_core_100": 90.67769050483561,
+          "cpu_utilization_scope": "Cgroup CPU includes runtime, wrapper and accounting commands; denominator is Docker StartedAt to FinishedAt, parsed at microsecond resolution. CPU snapshot precedes the final accounting commands/exit, so their final CPU is not included. Driver uptime window has 10 ms resolution; per-query CPU and wall time are separate exact-clock samples.",
+          "block_io": {
+            "available": true,
+            "devices": {},
+            "raw": "",
+            "totals": {
+              "rbytes": 0,
+              "rios": 0,
+              "wbytes": 0,
+              "wios": 0
+            },
+            "per_second": {
+              "rbytes": 0.0,
+              "rios": 0.0,
+              "wbytes": 0.0,
+              "wios": 0.0
+            },
+            "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth."
+          },
+          "sampled_resources": {
+            "available": true,
+            "sample_count": 5,
+            "sampled_mean_charged_memory_bytes": 161307033.6,
+            "sampled_max_charged_memory_bytes": 199450624,
+            "sampled_peak_cpu_percent_one_core_100": 98.73815370188821,
+            "scope": "Approximately 100 ms plus API/inspection overhead; arithmetic sample mean, not heap or time-weighted mean. Sampling can miss short peaks; use native cgroup memory.peak and process RSS too. Docker daemon/VM overhead excluded."
+          },
+          "process_peak_rss_kib": 170956,
+          "image": "sha256:bf174f7dbb2af2a2b9daf8349cdb65cd1d73e87cbdf6dc09d77d2af18738caf0",
+          "cpus": 1.0,
+          "memory_limit_bytes": 4294967296,
+          "memory_swap_limit_bytes": 4294967296,
+          "owned_storage_samples": [
+            {
+              "monotonic_ns": 1100098390608125,
+              "files": {},
+              "raced_paths": [],
+              "logical_bytes": 0,
+              "allocated_bytes": 0
+            },
+            {
+              "monotonic_ns": 1100098586288458,
+              "files": {
+                "state.duckdb": {
+                  "bytes": 12288,
+                  "allocated_bytes": 12288
+                }
+              },
+              "raced_paths": [],
+              "logical_bytes": 12288,
+              "allocated_bytes": 12288
+            },
+            {
+              "monotonic_ns": 1100098715646875,
+              "files": {
+                "state.duckdb": {
+                  "bytes": 2371584,
+                  "allocated_bytes": 2371584
+                }
+              },
+              "raced_paths": [],
+              "logical_bytes": 2371584,
+              "allocated_bytes": 2371584
+            },
+            {
+              "monotonic_ns": 1100098848149166,
+              "files": {
+                "state.duckdb": {
+                  "bytes": 6041600,
+                  "allocated_bytes": 6041600
+                }
+              },
+              "raced_paths": [],
+              "logical_bytes": 6041600,
+              "allocated_bytes": 6041600
+            },
+            {
+              "monotonic_ns": 1100098981256375,
+              "files": {
+                "state.duckdb": {
+                  "bytes": 9449472,
+                  "allocated_bytes": 9449472
+                }
+              },
+              "raced_paths": [],
+              "logical_bytes": 9449472,
+              "allocated_bytes": 9449472
+            },
+            {
+              "monotonic_ns": 1100099113541541,
+              "files": {
+                "state.duckdb": {
+                  "bytes": 14954496,
+                  "allocated_bytes": 14954496
+                }
+              },
+              "raced_paths": [],
+              "logical_bytes": 14954496,
+              "allocated_bytes": 14954496
+            },
+            {
+              "monotonic_ns": 1100099251038375,
+              "files": {
+                "state.duckdb": {
+                  "bytes": 14954496,
+                  "allocated_bytes": 14954496
+                }
+              },
+              "raced_paths": [],
+              "logical_bytes": 14954496,
+              "allocated_bytes": 14954496
+            }
+          ],
+          "storage_sample_scope": "Observed verification mount files, including native state, WAL/temp files present at sampling and CSV exports. Peaks can be missed; raced paths are incomplete observations. Source fixture and container root filesystem are separate.",
+          "wall_with_monitor_seconds": 0.7199328748974949,
+          "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n"
+        },
+        {
+          "language": "cpp",
+          "engine": "duckdb",
+          "trial": 2,
+          "records": [
+            {
+              "phase": "verify",
+              "query": "totals",
+              "elapsed_ns": 11359750,
+              "cpu_ns": 9285000,
+              "peak_rss_kib": 58000
+            },
+            {
+              "phase": "verify",
+              "query": "filtered",
+              "elapsed_ns": 4194625,
+              "cpu_ns": 4198000,
+              "peak_rss_kib": 58308
+            },
+            {
+              "phase": "verify",
+              "query": "symbols",
+              "elapsed_ns": 13146542,
+              "cpu_ns": 12243000,
+              "peak_rss_kib": 62708
+            },
+            {
+              "phase": "verify",
+              "query": "customers",
+              "elapsed_ns": 25969500,
+              "cpu_ns": 24936000,
+              "peak_rss_kib": 71424
+            },
+            {
+              "phase": "verify",
+              "query": "join",
+              "elapsed_ns": 17886166,
+              "cpu_ns": 17788000,
+              "peak_rss_kib": 76528
+            },
+            {
+              "phase": "export",
+              "query": "full-body",
+              "elapsed_ns": 390654625,
+              "cpu_ns": 396349000,
+              "peak_rss_kib": 133460
+            },
+            {
+              "phase": "export",
+              "query": "native-compression",
+              "elapsed_ns": 7551959,
+              "cpu_ns": 7245000,
+              "peak_rss_kib": 134204
+            },
+            {
+              "phase": "export",
+              "query": "dimension-body",
+              "elapsed_ns": 2547416,
+              "cpu_ns": 1969000,
+              "peak_rss_kib": 134204
+            }
+          ],
+          "cgroup_peak_memory_bytes": 163000320,
+          "cgroup_cpu_seconds": 0.502663,
+          "workload_window_seconds": 0.5,
+          "container_lifetime_seconds": 0.533914,
+          "cpu_utilization_percent_one_core_100": 94.14681016043782,
+          "cpu_utilization_scope": "Cgroup CPU includes runtime, wrapper and accounting commands; denominator is Docker StartedAt to FinishedAt, parsed at microsecond resolution. CPU snapshot precedes the final accounting commands/exit, so their final CPU is not included. Driver uptime window has 10 ms resolution; per-query CPU and wall time are separate exact-clock samples.",
+          "block_io": {
+            "available": true,
+            "devices": {},
+            "raw": "",
+            "totals": {
+              "rbytes": 0,
+              "rios": 0,
+              "wbytes": 0,
+              "wios": 0
+            },
+            "per_second": {
+              "rbytes": 0.0,
+              "rios": 0.0,
+              "wbytes": 0.0,
+              "wios": 0.0
+            },
+            "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth."
+          },
+          "sampled_resources": {
+            "available": true,
+            "sample_count": 4,
+            "sampled_mean_charged_memory_bytes": 108995584,
+            "sampled_max_charged_memory_bytes": 156184576,
+            "sampled_peak_cpu_percent_one_core_100": 102.8044548525334,
+            "scope": "Approximately 100 ms plus API/inspection overhead; arithmetic sample mean, not heap or time-weighted mean. Sampling can miss short peaks; use native cgroup memory.peak and process RSS too. Docker daemon/VM overhead excluded."
+          },
+          "process_peak_rss_kib": 134204,
+          "image": "sha256:bf174f7dbb2af2a2b9daf8349cdb65cd1d73e87cbdf6dc09d77d2af18738caf0",
+          "cpus": 1.0,
+          "memory_limit_bytes": 4294967296,
+          "memory_swap_limit_bytes": 4294967296,
+          "owned_storage_samples": [
+            {
+              "monotonic_ns": 1100099310741708,
+              "files": {
+                "state.duckdb": {
+                  "bytes": 14954496,
+                  "allocated_bytes": 14954496
+                }
+              },
+              "raced_paths": [],
+              "logical_bytes": 14954496,
+              "allocated_bytes": 14954496
+            },
+            {
+              "monotonic_ns": 1100099486899833,
+              "files": {
+                "state.duckdb": {
+                  "bytes": 14954496,
+                  "allocated_bytes": 14954496
+                }
+              },
+              "raced_paths": [],
+              "logical_bytes": 14954496,
+              "allocated_bytes": 14954496
+            },
+            {
+              "monotonic_ns": 1100099616694375,
+              "files": {
+                "state.duckdb": {
+                  "bytes": 14954496,
+                  "allocated_bytes": 14954496
+                },
+                "trades.csv": {
+                  "bytes": 8447218,
+                  "allocated_bytes": 8450048
+                }
+              },
+              "raced_paths": [],
+              "logical_bytes": 23401714,
+              "allocated_bytes": 23404544
+            },
+            {
+              "monotonic_ns": 1100099756335458,
+              "files": {
+                "state.duckdb": {
+                  "bytes": 14954496,
+                  "allocated_bytes": 14954496
+                },
+                "trades.csv": {
+                  "bytes": 29971047,
+                  "allocated_bytes": 29974528
+                }
+              },
+              "raced_paths": [],
+              "logical_bytes": 44925543,
+              "allocated_bytes": 44929024
+            },
+            {
+              "monotonic_ns": 1100099893071375,
+              "files": {
+                "state.duckdb": {
+                  "bytes": 14954496,
+                  "allocated_bytes": 14954496
+                },
+                "trades.csv": {
+                  "bytes": 48243277,
+                  "allocated_bytes": 48246784
+                }
+              },
+              "raced_paths": [],
+              "logical_bytes": 63197773,
+              "allocated_bytes": 63201280
+            },
+            {
+              "monotonic_ns": 1100100039038791,
+              "files": {
+                "customers.csv": {
+                  "bytes": 92663,
+                  "allocated_bytes": 94208
+                },
+                "storage-info.csv": {
+                  "bytes": 24725,
+                  "allocated_bytes": 28672
+                },
+                "state.duckdb": {
+                  "bytes": 14954496,
+                  "allocated_bytes": 14954496
+                },
+                "trades.csv": {
+                  "bytes": 52801261,
+                  "allocated_bytes": 52801536
+                }
+              },
+              "raced_paths": [],
+              "logical_bytes": 67873145,
+              "allocated_bytes": 67878912
+            }
+          ],
+          "storage_sample_scope": "Observed verification mount files, including native state, WAL/temp files present at sampling and CSV exports. Peaks can be missed; raced paths are incomplete observations. Source fixture and container root filesystem are separate.",
+          "wall_with_monitor_seconds": 0.6024196669459343,
+          "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n"
+        }
+      ],
+      "verification": {
+        "sha256": "c8756870bdbb238b69ef8d563c6d4f176753e3864ffa50f508e707ed94406de0",
+        "bytes": 52801261,
+        "verified_rows": 2000000,
+        "allocated_bytes": 52801536,
+        "compression": {
+          "codec": "gzip",
+          "level": 1,
+          "zlib": "1.3.2",
+          "uncompressed_bytes": 52801261,
+          "compressed_bytes": 24337454,
+          "ratio": 2.1695474391035314,
+          "wall_ns": 316503960,
+          "cpu_ns": 314067000,
+          "scope": "Host-side compressibility of the verified CSV witness, streamed into a byte counter; not native engine compression. Timers cover compression calls, excluding file reads/hash/fsync."
+        }
+      },
+      "dimension_verification": {
+        "sha256": "c3a160b85050e71c8ba465e2ca7a72d25bc4fbb076954f6c6f9c22fcaabadc95",
+        "bytes": 92663,
+        "verified_rows": 10000,
+        "allocated_bytes": 94208,
+        "compression": {
+          "codec": "gzip",
+          "level": 1,
+          "zlib": "1.3.2",
+          "uncompressed_bytes": 92663,
+          "compressed_bytes": 32777,
+          "ratio": 2.827073862769625,
+          "wall_ns": 475042,
+          "cpu_ns": 475000,
+          "scope": "Host-side compressibility of the verified CSV witness, streamed into a byte counter; not native engine compression. Timers cover compression calls, excluding file reads/hash/fsync."
+        }
+      },
+      "storage_files": [
+        {
+          "name": "customers.csv",
+          "bytes": 92663,
+          "allocated_bytes": 94208
+        },
+        {
+          "name": "state.duckdb",
+          "bytes": 14954496,
+          "allocated_bytes": 14954496
+        },
+        {
+          "name": "storage-info.csv",
+          "bytes": 24725,
+          "allocated_bytes": 28672
+        },
+        {
+          "name": "trades.csv",
+          "bytes": 52801261,
+          "allocated_bytes": 52801536
+        }
+      ],
+      "native_column_headers": [],
+      "native_store_bytes": 14954496,
+      "native_storage_info_csv": "row_group_id,column_name,column_id,column_path,segment_id,segment_type,start,count,compression,stats,has_updates,persistent,block_id,block_offset,additional_block_ids\n0,id,0,[0],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 122879, 'min': 0}\",false,true,5,0,[]\n0,id,0,\"[0, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n0,customer,1,[1],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 9999, 'min': 0}\",false,true,0,0,[]\n0,customer,1,\"[1, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n0,symbol,2,[2],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 255, 'min': 0}\",false,true,5,6040,[]\n0,symbol,2,\"[2, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n0,day,3,[3],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 29, 'min': 0}\",false,true,30,124088,[]\n0,day,3,\"[3, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n0,qty,4,[4],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 100, 'min': 1}\",false,true,50,78008,[]\n0,qty,4,\"[4, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n0,price,5,[5],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 10000, 'min': 100}\",false,true,10,0,[]\n0,price,5,\"[5, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n1,id,0,[0],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 245759, 'min': 122880}\",false,true,5,1208,[]\n1,id,0,\"[0, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n1,customer,1,[1],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 9999, 'min': 0}\",false,true,1,0,[]\n1,customer,1,\"[1, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n1,symbol,2,[2],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 255, 'min': 0}\",false,true,5,130128,[]\n1,symbol,2,\"[2, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n1,day,3,[3],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 29, 'min': 0}\",false,true,7,0,[]\n1,day,3,\"[3, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n1,qty,4,[4],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 100, 'min': 1}\",false,true,8,0,[]\n1,qty,4,\"[4, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n1,price,5,[5],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 10000, 'min': 100}\",false,true,11,0,[]\n1,price,5,\"[5, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n2,id,0,[0],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 368639, 'min': 245760}\",false,true,5,2416,[]\n2,id,0,\"[0, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n2,customer,1,[1],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 9999, 'min': 0}\",false,true,2,0,[]\n2,customer,1,\"[1, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n2,symbol,2,[2],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 255, 'min': 0}\",false,true,6,0,[]\n2,symbol,2,\"[2, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n2,day,3,[3],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 29, 'min': 0}\",false,true,7,78008,[]\n2,day,3,\"[3, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n2,qty,4,[4],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 100, 'min': 1}\",false,true,8,108728,[]\n2,qty,4,\"[4, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n2,price,5,[5],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 10000, 'min': 100}\",false,true,12,0,[]\n2,price,5,\"[5, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n3,id,0,[0],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 491519, 'min': 368640}\",false,true,5,3624,[]\n3,id,0,\"[0, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n3,customer,1,[1],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 9999, 'min': 0}\",false,true,3,0,[]\n3,customer,1,\"[1, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n3,symbol,2,[2],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 255, 'min': 0}\",false,true,6,124088,[]\n3,symbol,2,\"[2, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n3,day,3,[3],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 29, 'min': 0}\",false,true,7,156016,[]\n3,day,3,\"[3, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n3,qty,4,[4],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 100, 'min': 1}\",false,true,9,0,[]\n3,qty,4,\"[4, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n3,price,5,[5],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 10000, 'min': 100}\",false,true,13,0,[]\n3,price,5,\"[5, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n4,id,0,[0],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 614399, 'min': 491520}\",false,true,5,4832,[]\n4,id,0,\"[0, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n4,customer,1,[1],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 9999, 'min': 0}\",false,true,4,0,[]\n4,customer,1,\"[1, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n4,symbol,2,[2],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 255, 'min': 0}\",false,true,30,0,[]\n4,symbol,2,\"[2, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n4,day,3,[3],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 29, 'min': 0}\",false,true,50,0,[]\n4,day,3,\"[3, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n4,qty,4,[4],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 100, 'min': 1}\",false,true,9,108728,[]\n4,qty,4,\"[4, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n4,price,5,[5],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 10000, 'min': 100}\",false,true,14,0,[]\n4,price,5,\"[5, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n5,id,0,[0],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 737279, 'min': 614400}\",false,true,30,202096,[]\n5,id,0,\"[0, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n5,customer,1,[1],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 9999, 'min': 0}\",false,true,15,0,[]\n5,customer,1,\"[1, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n5,symbol,2,[2],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 255, 'min': 0}\",false,true,20,0,[]\n5,symbol,2,\"[2, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n5,day,3,[3],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 29, 'min': 0}\",false,true,48,124088,[]\n5,day,3,\"[3, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n5,qty,4,[4],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 100, 'min': 1}\",false,true,52,78008,[]\n5,qty,4,\"[4, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n5,price,5,[5],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 10000, 'min': 100}\",false,true,25,0,[]\n5,price,5,\"[5, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n6,id,0,[0],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 860159, 'min': 737280}\",false,true,30,203304,[]\n6,id,0,\"[0, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n6,customer,1,[1],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 9999, 'min': 0}\",false,true,16,0,[]\n6,customer,1,\"[1, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n6,symbol,2,[2],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 255, 'min': 0}\",false,true,20,124088,[]\n6,symbol,2,\"[2, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n6,day,3,[3],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 29, 'min': 0}\",false,true,22,0,[]\n6,day,3,\"[3, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n6,qty,4,[4],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 100, 'min': 1}\",false,true,23,0,[]\n6,qty,4,\"[4, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n6,price,5,[5],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 10000, 'min': 100}\",false,true,26,0,[]\n6,price,5,\"[5, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n7,id,0,[0],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 983039, 'min': 860160}\",false,true,30,204512,[]\n7,id,0,\"[0, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n7,customer,1,[1],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 9999, 'min': 0}\",false,true,17,0,[]\n7,customer,1,\"[1, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n7,symbol,2,[2],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 255, 'min': 0}\",false,true,21,0,[]\n7,symbol,2,\"[2, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n7,day,3,[3],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 29, 'min': 0}\",false,true,22,78008,[]\n7,day,3,\"[3, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n7,qty,4,[4],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 100, 'min': 1}\",false,true,23,108728,[]\n7,qty,4,\"[4, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n7,price,5,[5],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 10000, 'min': 100}\",false,true,27,0,[]\n7,price,5,\"[5, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n8,id,0,[0],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 1105919, 'min': 983040}\",false,true,30,205720,[]\n8,id,0,\"[0, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n8,customer,1,[1],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 9999, 'min': 0}\",false,true,18,0,[]\n8,customer,1,\"[1, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n8,symbol,2,[2],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 255, 'min': 0}\",false,true,21,124088,[]\n8,symbol,2,\"[2, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n8,day,3,[3],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 29, 'min': 0}\",false,true,22,156016,[]\n8,day,3,\"[3, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n8,qty,4,[4],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 100, 'min': 1}\",false,true,24,0,[]\n8,qty,4,\"[4, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n8,price,5,[5],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 10000, 'min': 100}\",false,true,28,0,[]\n8,price,5,\"[5, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n9,id,0,[0],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 1228799, 'min': 1105920}\",false,true,30,206928,[]\n9,id,0,\"[0, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n9,customer,1,[1],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 9999, 'min': 0}\",false,true,19,0,[]\n9,customer,1,\"[1, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n9,symbol,2,[2],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 255, 'min': 0}\",false,true,48,0,[]\n9,symbol,2,\"[2, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n9,day,3,[3],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 29, 'min': 0}\",false,true,52,0,[]\n9,day,3,\"[3, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n9,qty,4,[4],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 100, 'min': 1}\",false,true,24,108728,[]\n9,qty,4,\"[4, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n9,price,5,[5],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 10000, 'min': 100}\",false,true,29,0,[]\n9,price,5,\"[5, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n10,id,0,[0],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 1351679, 'min': 1228800}\",false,true,30,208136,[]\n10,id,0,\"[0, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n10,customer,1,[1],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 9999, 'min': 0}\",false,true,31,0,[]\n10,customer,1,\"[1, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n10,symbol,2,[2],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 255, 'min': 0}\",false,true,36,0,[]\n10,symbol,2,\"[2, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n10,day,3,[3],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 29, 'min': 0}\",false,true,47,124088,[]\n10,day,3,\"[3, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n10,qty,4,[4],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 100, 'min': 1}\",false,true,53,78008,[]\n10,qty,4,\"[4, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n10,price,5,[5],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 10000, 'min': 100}\",false,true,41,0,[]\n10,price,5,\"[5, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n11,id,0,[0],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 1474559, 'min': 1351680}\",false,true,30,209344,[]\n11,id,0,\"[0, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n11,customer,1,[1],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 9999, 'min': 0}\",false,true,32,0,[]\n11,customer,1,\"[1, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n11,symbol,2,[2],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 255, 'min': 0}\",false,true,36,124088,[]\n11,symbol,2,\"[2, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n11,day,3,[3],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 29, 'min': 0}\",false,true,38,0,[]\n11,day,3,\"[3, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n11,qty,4,[4],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 100, 'min': 1}\",false,true,39,0,[]\n11,qty,4,\"[4, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n11,price,5,[5],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 10000, 'min': 100}\",false,true,42,0,[]\n11,price,5,\"[5, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n12,id,0,[0],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 1597439, 'min': 1474560}\",false,true,48,202096,[]\n12,id,0,\"[0, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n12,customer,1,[1],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 9999, 'min': 0}\",false,true,33,0,[]\n12,customer,1,\"[1, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n12,symbol,2,[2],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 255, 'min': 0}\",false,true,37,0,[]\n12,symbol,2,\"[2, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n12,day,3,[3],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 29, 'min': 0}\",false,true,38,78008,[]\n12,day,3,\"[3, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n12,qty,4,[4],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 100, 'min': 1}\",false,true,39,108728,[]\n12,qty,4,\"[4, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n12,price,5,[5],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 10000, 'min': 100}\",false,true,43,0,[]\n12,price,5,\"[5, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n13,id,0,[0],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 1720319, 'min': 1597440}\",false,true,48,203304,[]\n13,id,0,\"[0, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n13,customer,1,[1],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 9999, 'min': 0}\",false,true,34,0,[]\n13,customer,1,\"[1, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n13,symbol,2,[2],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 255, 'min': 0}\",false,true,37,124088,[]\n13,symbol,2,\"[2, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n13,day,3,[3],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 29, 'min': 0}\",false,true,38,156016,[]\n13,day,3,\"[3, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n13,qty,4,[4],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 100, 'min': 1}\",false,true,40,0,[]\n13,qty,4,\"[4, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n13,price,5,[5],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 10000, 'min': 100}\",false,true,44,0,[]\n13,price,5,\"[5, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n14,id,0,[0],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 1843199, 'min': 1720320}\",false,true,48,204512,[]\n14,id,0,\"[0, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n14,customer,1,[1],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 9999, 'min': 0}\",false,true,35,0,[]\n14,customer,1,\"[1, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n14,symbol,2,[2],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 255, 'min': 0}\",false,true,47,0,[]\n14,symbol,2,\"[2, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n14,day,3,[3],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 29, 'min': 0}\",false,true,53,0,[]\n14,day,3,\"[3, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n14,qty,4,[4],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 100, 'min': 1}\",false,true,40,108728,[]\n14,qty,4,\"[4, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n14,price,5,[5],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 10000, 'min': 100}\",false,true,45,0,[]\n14,price,5,\"[5, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n15,id,0,[0],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 1966079, 'min': 1843200}\",false,true,48,205720,[]\n15,id,0,\"[0, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n15,customer,1,[1],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 9999, 'min': 0}\",false,true,46,0,[]\n15,customer,1,\"[1, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n15,symbol,2,[2],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 255, 'min': 0}\",false,true,49,0,[]\n15,symbol,2,\"[2, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n15,day,3,[3],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 29, 'min': 0}\",false,true,49,124088,[]\n15,day,3,\"[3, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n15,qty,4,[4],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 100, 'min': 1}\",false,true,54,0,[]\n15,qty,4,\"[4, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n15,price,5,[5],0,BIGINT,0,122880,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 10000, 'min': 100}\",false,true,51,0,[]\n15,price,5,\"[5, 0]\",0,VALIDITY,0,122880,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n16,id,0,[0],0,BIGINT,0,33920,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 1999999, 'min': 1966080}\",false,true,48,206928,[]\n16,id,0,\"[0, 0]\",0,VALIDITY,0,33920,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n16,customer,1,[1],0,BIGINT,0,33920,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 9999, 'min': 0}\",false,true,47,202096,[]\n16,customer,1,\"[1, 0]\",0,VALIDITY,0,33920,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n16,symbol,2,[2],0,BIGINT,0,33920,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 255, 'min': 0}\",false,true,48,207280,[]\n16,symbol,2,\"[2, 0]\",0,VALIDITY,0,33920,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n16,day,3,[3],0,BIGINT,0,33920,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 29, 'min': 0}\",false,true,49,202096,[]\n16,day,3,\"[3, 0]\",0,VALIDITY,0,33920,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n16,qty,4,[4],0,BIGINT,0,33920,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 100, 'min': 1}\",false,true,50,186736,[]\n16,qty,4,\"[4, 0]\",0,VALIDITY,0,33920,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n16,price,5,[5],0,BIGINT,0,33920,BitPacking,\"{'has_no_null': true, 'has_null': false, 'max': 10000, 'min': 100}\",false,true,52,186736,[]\n16,price,5,\"[5, 0]\",0,VALIDITY,0,33920,Constant,\"{'has_no_null': true, 'has_null': false}\",false,true,-1,0,[]\n",
+      "native_compression_scope": "DuckDB storage_info reports codecs; Rayforce explicitly requests compressed durable column saves, with native files retained. File footprints include metadata; no pure codec ratio is inferred from a whole-database size. CSV gzip is a separate measured layer.",
+      "source_sha256": {
+        "persistence.py": "621597ac4aa82e7675bff0f1b0e81753615632c2f20a0eb1eba133cb87e4c8f4",
+        "experiment.py": "8084d4506efa2b34de779c058c8d5b98eb9d2c64bb93a114c9748e9e930fd16a",
+        "analytics-workload/native/bridge.c": "c88522764669a1afe67a5f286690ef65404bfe15451ad9681f5f80d23a3ac7b9",
+        "analytics-workload/native/bridge.h": "06834e880e5d83ff74573c6c62ad6b7360211edcfcbd5efa63a4636a4d431611",
+        "analytics-workload/cpp/main.cpp": "de3c1dc3a900d3152ef7cbd79ac959261eb9fa850718c2c11d2ff8b7a08de7c6",
+        "docker-compose.yml": "27edb716dfec74c43bf44000a5d5f5fd4e0856b727cb4db5ea1e692428cca80b",
+        "persistence-contract.json": "c4f379aac4441a77f3b0e17761f2779cfe9874ca0273b0fe83ed2b466a0313b6"
+      },
+      "host_controller": {
+        "wall_ns": 2153693667,
+        "cpu_seconds": 0.43005,
+        "peak_rss_bytes": 38174720,
+        "child_cli_cpu_seconds": 0.7647249999999999,
+        "scope": "Host controller and Docker CLI children. Export gzip/hash costs overlap this total; native engine/container metrics are separate."
+      },
+      "disk_scope": "Owned directory began empty. Per-process samples retain native state, observable WAL/temp files and CSV exports separately. Final file sizes are settled after graceful close/reopen; sampling can miss shorter peaks and records rename races.",
+      "verified_export_removed": true,
+      "sampled_native_file_bytes_max": 14954496,
+      "raw_native_file_samples_scope": "Non-atomic directory observations can miss peaks or race renames; raw per-file values and known races remain in each record. Export witnesses are excluded from the native-file sum.",
+      "source_result": "results/persistence/267ad4d4cdb14bcba17d9ef1ae4d978a/result.json"
+    }
+  ],
+  "unrun": [
+    "live journal recovery under independent writers/readers",
+    "SIGKILL, torn journal and interior corruption",
+    "snapshot replacement interrupted before/during publication",
+    "second-writer/fencing and supported backup restore",
+    "repeated performance matrix and genuinely OS-cold queries"
+  ]
+}

@@ -21,8 +21,12 @@ static duckdb_data_chunk append_chunk;
 static char error[4096];
 const char *bench_error(void) { return error; }
 void bench_free(char *result) { free(result); }
-int bench_open(int threads) {
+int bench_open_file(int threads, const char *path) {
 #ifdef ENGINE_RAYFORCE
+    if (path) {
+        snprintf(error, sizeof(error), "Rayforce requires explicit splayed/journal persistence APIs");
+        return 1;
+    }
     runtime = ray_runtime_create(0, NULL);
     if (!runtime || ray_pool_init_total((uint32_t)threads) != RAY_OK) {
         snprintf(error, sizeof(error), "Rayforce runtime/pool initialization failed");
@@ -36,7 +40,7 @@ int bench_open(int threads) {
     duckdb_set_config(config, "threads", count);
     duckdb_set_config(config, "memory_limit", "3GB");
     char *reason = NULL;
-    int failed = duckdb_open_ext(NULL, &database, config, &reason) != DuckDBSuccess;
+    int failed = duckdb_open_ext(path, &database, config, &reason) != DuckDBSuccess;
     duckdb_destroy_config(&config);
     if (failed) {
         snprintf(error, sizeof(error), "%s", reason ? reason : "open failed");
@@ -47,6 +51,7 @@ int bench_open(int threads) {
 #endif
     return 0;
 }
+int bench_open(int threads) { return bench_open_file(threads, NULL); }
 char *bench_eval(const char *source, int materialize) {
     const size_t capacity = materialize ? 4 * 1024 * 1024 : 1;
     char *text = malloc(capacity);

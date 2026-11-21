@@ -28,11 +28,16 @@ make THREADS=4 benchmark               # three trials, four CPUs/threads
 make REPEATS=50 TRIALS=5 benchmark      # longer run
 make test-ingestion METHODS=native,columnar MUTATION_ROWS=10001 BATCH_SIZES=1,100,1000,2048,2049,10000
 make ingestion-benchmark METHODS=native,columnar MUTATION_ROWS=100000
+make test-rayforce-snapshot
+make test-duckdb-snapshot
 ```
 
 `ROWS=2000000` defaults to two million; `REPEATS=15`, `TRIALS=3`,
 `THREADS=1`, `CPUS=$(THREADS)`. Threads and CPU caps support 1–4; each process has a
-**4 GiB** container ceiling. Changing `ROWS` requires archiving the old `results/`
+**4 GiB** container ceiling; current runs disable swap. Historical artifacts retain
+their original inspected limits. The [persisted snapshot profiles](PERSISTENCE.md)
+verify full two-million-row reopens and native file footprints, separately from
+the in-memory measurements below. Changing `ROWS` requires archiving the old `results/`
 directory first. Failed runs remain evidence; no automatic data reset or retry.
 An example-local lock prevents concurrent controllers. Other examples must be
 stopped independently before performance measurements.

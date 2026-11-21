@@ -15,8 +15,8 @@ static long long cpu_ns() {
            (usage.ru_utime.tv_usec + usage.ru_stime.tv_usec) * 1000LL;
 }
 struct Runtime {
-    explicit Runtime(int threads) {
-        if (bench_open(threads)) throw std::runtime_error(bench_error());
+    explicit Runtime(int threads, const char* database_file = nullptr) {
+        if (bench_open_file(threads, database_file)) throw std::runtime_error(bench_error());
     }
     ~Runtime() { bench_close(); }
     Runtime(const Runtime&) = delete;
@@ -24,8 +24,8 @@ struct Runtime {
 };
 int main(int argc, char** argv) {
     try {
-        if (argc != 3) throw std::runtime_error("usage: workload PLAN THREADS");
-        Runtime runtime(std::stoi(argv[2]));
+        if (argc != 3 && argc != 4) throw std::runtime_error("usage: workload PLAN THREADS [DUCKDB_FILE]");
+        Runtime runtime(std::stoi(argv[2]), argc == 4 ? argv[3] : nullptr);
         std::ifstream plan(argv[1]);
         if (!plan) throw std::runtime_error("cannot open plan");
         bool wrote = false;
