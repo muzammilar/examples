@@ -29,7 +29,12 @@ full verification of all 2,100,000 final rows per trial. In the one-CPU C++
 Rayforce and 7,032,472 for DuckDB’s row-wise Appender. CPU, memory and latency
 costs accompany the rates. These in-memory results do not establish equivalent
 transaction isolation, durability or sustained capacity; the columnar Appender
-remains unrun.
+is now measured in a separate [columnar comparison](duckdb-comparison/README.md#columnar-appender-comparison):
+144 further trials, with C++ large-batch DuckDB rates of **10.87 million rows/s**
+(columnar) versus **6.58 million** (row-wise) in the same run. Rayforce uses
+the identical typed implementation in both paths; its columnar-labeled median
+was **20.36 million rows/s**. See the trial spread and resource costs before
+generalizing from these bounded, single-writer measurements.
 
 ## Limits and remaining experiments
 

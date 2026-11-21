@@ -16,6 +16,7 @@ static const char *ray_message(void) {
 static duckdb_database database;
 static duckdb_connection connection;
 static duckdb_appender appender;
+static duckdb_data_chunk append_chunk;
 #endif
 static char error[4096];
 const char *bench_error(void) { return error; }
@@ -113,7 +114,7 @@ char *bench_eval(const char *source, int materialize) {
     return text;
 }
 
-int bench_append(int64_t first_id, int64_t rows) {
+static int append_trades(int64_t first_id, int64_t rows, int columnar) {
     if (first_id < 0 || rows < 1 || rows > 10000 || first_id > INT64_MAX - (rows - 1)) {
         snprintf(error, sizeof(error), "append requires nonnegative IDs and 1..10000 rows");
         return 1;
@@ -131,6 +132,7 @@ int bench_append(int64_t first_id, int64_t rows) {
     }
     int failed = 0;
 #ifdef ENGINE_RAYFORCE
+    (void)columnar; /* Both typed paths use the same Rayforce column API. */
     const char *names[] = {"id", "customer", "symbol", "day", "qty", "price"};
     ray_t *batch = ray_table_new(6);
     for (int col = 0; batch && !RAY_IS_ERR(batch) && col < 6; col++) {
@@ -164,10 +166,39 @@ int bench_append(int64_t first_id, int64_t rows) {
     ray_release(result);
 #else
     if (!appender && duckdb_appender_create(connection, NULL, "trades", &appender) != DuckDBSuccess) failed = 1;
-    for (int64_t r = 0; r < rows && !failed; r++) {
-        for (int c = 0; c < 6 && !failed; c++)
-            failed = duckdb_append_int64(appender, values[c * rows + r]) != DuckDBSuccess;
-        if (!failed) failed = duckdb_appender_end_row(appender) != DuckDBSuccess;
+    if (columnar && !failed) {
+        if (!append_chunk) {
+            duckdb_logical_type types[6];
+            for (int c = 0; c < 6; c++) types[c] = duckdb_create_logical_type(DUCKDB_TYPE_BIGINT);
+            append_chunk = duckdb_create_data_chunk(types, 6);
+            for (int c = 0; c < 6; c++) duckdb_destroy_logical_type(&types[c]);
+        }
+        if (!append_chunk || !duckdb_vector_size()) {
+            free(values);
+            snprintf(error, sizeof(error), "DuckDB data chunk allocation failed");
+            return 1;
+        }
+        for (idx_t offset = 0; offset < (idx_t)rows && !failed;) {
+            idx_t count = (idx_t)rows - offset;
+            if (count > duckdb_vector_size()) count = duckdb_vector_size();
+            duckdb_data_chunk_reset(append_chunk);
+            for (idx_t c = 0; c < 6; c++) {
+                duckdb_vector vector = duckdb_data_chunk_get_vector(append_chunk, c);
+                memcpy(duckdb_vector_get_data(vector), values + c * rows + offset,
+                       (size_t)count * sizeof(int64_t));
+            }
+            duckdb_data_chunk_set_size(append_chunk, count);
+            /* Pinned ColumnDataCollection::Append copies fixed-width values.
+             * Reuse the chunk; flush only at the requested ACK boundary below. */
+            failed = duckdb_append_data_chunk(appender, append_chunk) != DuckDBSuccess;
+            offset += count;
+        }
+    } else {
+        for (int64_t r = 0; r < rows && !failed; r++) {
+            for (int c = 0; c < 6 && !failed; c++)
+                failed = duckdb_append_int64(appender, values[c * rows + r]) != DuckDBSuccess;
+            if (!failed) failed = duckdb_appender_end_row(appender) != DuckDBSuccess;
+        }
     }
     free(values);
     /* A buffered append is not a visibility acknowledgement. Flush every batch. */
@@ -182,11 +213,19 @@ int bench_append(int64_t first_id, int64_t rows) {
     return failed;
 }
 
+int bench_append(int64_t first_id, int64_t rows) {
+    return append_trades(first_id, rows, 0);
+}
+int bench_append_columnar(int64_t first_id, int64_t rows) {
+    return append_trades(first_id, rows, 1);
+}
+
 void bench_close(void) {
 #ifdef ENGINE_RAYFORCE
     ray_pool_destroy();
     if (runtime) ray_runtime_destroy(runtime);
 #else
+    if (append_chunk) duckdb_destroy_data_chunk(&append_chunk);
     if (appender) duckdb_appender_destroy(&appender);
     if (connection) duckdb_disconnect(&connection);
     if (database) duckdb_close(&database);

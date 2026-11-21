@@ -10,6 +10,8 @@ const char *bench_error(void);
 char *bench_eval(const char *source, int materialize);
 /* Append deterministic six-I64 trades and make this batch query-visible in RAM. */
 int bench_append(int64_t first_id, int64_t rows);
+/* DuckDB data-chunk Appender; Rayforce uses the same typed-column path. */
+int bench_append_columnar(int64_t first_id, int64_t rows);
 void bench_free(char *result);
 void bench_close(void);
 #ifdef __cplusplus

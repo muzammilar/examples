@@ -37,7 +37,7 @@ int main(int argc, char** argv) {
             const auto phase = line.substr(0, a), name = line.substr(a + 1, b - a - 1);
             const auto expected = line.substr(b + 1, c - b - 1), query = line.substr(c + 1);
             int64_t first_id = 0, count = 0;
-            const bool append = phase == "append" || phase == "reject-append";
+            const bool append = phase == "append" || phase == "columnar" || phase == "reject-append" || phase == "reject-columnar";
             if (append) {
                 std::istringstream values(query);
                 if (!(values >> first_id >> count)) throw std::runtime_error("invalid append plan");
@@ -48,8 +48,9 @@ int main(int argc, char** argv) {
             const auto start = std::chrono::steady_clock::now();
             char* raw = nullptr;
             if (append) {
-                const bool failed = bench_append(first_id, count) != 0;
-                if (failed != (phase == "reject-append")) throw std::runtime_error(failed ? bench_error() : "invalid append unexpectedly accepted");
+                const bool columnar = phase == "columnar" || phase == "reject-columnar";
+                const bool failed = (columnar ? bench_append_columnar : bench_append)(first_id, count) != 0;
+                if (failed != (phase == "reject-append" || phase == "reject-columnar")) throw std::runtime_error(failed ? bench_error() : "invalid append unexpectedly accepted");
             } else {
                 raw = bench_eval(query.c_str(), phase != "load" && phase != "write" && phase != "export");
                 if (!raw) throw std::runtime_error(bench_error());
@@ -57,7 +58,7 @@ int main(int argc, char** argv) {
             const auto finished = std::chrono::steady_clock::now();
             const auto ns = std::chrono::duration_cast<std::chrono::nanoseconds>(finished - start).count();
             const auto used_cpu = cpu_ns() - cpu;
-            if (phase == "write" || phase == "append") {
+            if (phase == "write" || phase == "append" || phase == "columnar") {
                 if (!wrote) { first_write = start; first_write_cpu = cpu; wrote = true; }
                 last_write = finished;
                 last_write_cpu = cpu + used_cpu;

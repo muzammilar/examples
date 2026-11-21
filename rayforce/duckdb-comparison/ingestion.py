@@ -92,12 +92,26 @@ def write_plan(path, engine, method, first, count, batch_size):
     for i, (start, size) in enumerate(
         ((-1, 1), (first, 0), (first, 10001), (2**63 - 1, 2))
     ):
-        entries.append(("reject-append", "bounds-" + str(i), "", f"{start} {size}"))
+        entries.append(
+            (
+                "reject-columnar" if method == "columnar" else "reject-append",
+                "bounds-" + str(i),
+                "",
+                f"{start} {size}",
+            )
+        )
     batches = list(range(first, first + count, batch_size))
     for index, start in enumerate(batches):
         size = min(batch_size, first + count - start)
-        if method == "native":
-            entries.append(("append", "batch-" + str(index), "", f"{start} {size}"))
+        if method in {"native", "columnar"}:
+            entries.append(
+                (
+                    "columnar" if method == "columnar" else "append",
+                    "batch-" + str(index),
+                    "",
+                    f"{start} {size}",
+                )
+            )
         else:
             entries.append(
                 (
@@ -107,7 +121,7 @@ def write_plan(path, engine, method, first, count, batch_size):
                     insert(engine, [trade(i) for i in range(start, start + size)]),
                 )
             )
-        if index == len(batches) // 2:
+        if index == (len(batches) - 1) // 2:
             expected, query = point(engine, trade(start + size - 1))
             entries.append(("probe", "middle-readback", expected, query))
     expected, query = point(engine, trade(first + count - 1))
@@ -169,7 +183,9 @@ def verify_export(path, expected):
 
 
 def write_summary(result, count):
-    writes = [r for r in result["records"] if r["phase"] in {"write", "append"}]
+    writes = [
+        r for r in result["records"] if r["phase"] in {"write", "append", "columnar"}
+    ]
     windows = [
         r
         for r in result["records"]
@@ -226,7 +242,7 @@ def main():
             or any(not 1 <= n <= 10000 for n in batches)
         ):
             raise ValueError("BATCH_SIZES must be unique and within 1..10000")
-        methods = selected("METHODS", "query,native", ("query", "native"))
+        methods = selected("METHODS", "query,native", ("query", "native", "columnar"))
         languages = selected("LANGUAGES", "python,cpp,rust", ("python", "cpp", "rust"))
         root = bench.RESULTS / "ingestion" / uuid.uuid4().hex
         root.mkdir(parents=True)

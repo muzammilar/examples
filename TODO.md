@@ -246,7 +246,8 @@ Planned as a `mysql/` folder, mirroring the Postgres section with the same `orde
 ## Embedded analytics
 
 - [x] `rayforce/duckdb-comparison`: analytical queries plus single/batch query and typed append paths through Python/C++/Rust; 144 ingestion trials, full old/new body verification, CPU/memory and disk accounting. In-memory, single-writer scope.
-- [ ] Extend that comparison with DuckDB columnar data-chunk Appender and prepared SQL; retain per-batch query-visible acknowledgements, identical inputs and full-body verification. Persisted storage/compression, crash recovery and genuinely cold queries remain separate unrun work.
+- [x] Extend that comparison with DuckDB columnar data-chunk Appender: 72 correctness cells and 144 fresh-process performance trials, per-batch query-visible acknowledgements, identical inputs and full-body verification.
+- [ ] Prepared SQL, persisted storage/compression, crash recovery and genuinely cold queries remain separate unrun work for Rayforce/DuckDB.
 
 - [x] `duckdb-zfs-recovery`: four Quack clients, real ZFS snapshot replication, interrupted receive/resume, read-only clones and fenced-primary promotion with measured asynchronous loss.
 

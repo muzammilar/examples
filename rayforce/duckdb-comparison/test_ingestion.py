@@ -43,20 +43,42 @@ class IngestionTests(unittest.TestCase):
             patch.object(bench, "RESULTS", Path(temp)),
         ):
             self.fixture(Path(temp))
-            for method in ("query", "native"):
+            for method in ("query", "native", "columnar"):
                 path = Path(temp) / (method + ".tsv")
                 records = ingestion.write_plan(path, "duckdb", method, 3, 5, 2)
                 rows = [line.split("\t") for line in path.read_text().splitlines()]
                 self.assertEqual(records, len(rows) + 1)
-                self.assertEqual(sum(r[0] in {"append", "write"} for r in rows), 3)
-                self.assertEqual(sum(r[0] == "reject-append" for r in rows), 4)
-                if method == "native":
+                self.assertEqual(
+                    sum(r[0] in {"append", "write", "columnar"} for r in rows), 3
+                )
+                self.assertEqual(
+                    sum(r[0] in {"reject-append", "reject-columnar"} for r in rows), 4
+                )
+                if method in {"native", "columnar"}:
                     self.assertEqual(
-                        [r[3] for r in rows if r[0] == "append"], ["3 2", "5 2", "7 1"]
+                        [r[3] for r in rows if r[0] in {"append", "columnar"}],
+                        ["3 2", "5 2", "7 1"],
                     )
                 else:
                     last = [r[3] for r in rows if r[0] == "write"][-1]
                     self.assertEqual(last, "INSERT INTO trades VALUES (7,7,7,7,8,107)")
+
+    def test_middle_read_occurs_between_two_write_requests(self):
+        with (
+            tempfile.TemporaryDirectory() as temp,
+            patch.object(bench, "RESULTS", Path(temp)),
+        ):
+            self.fixture(Path(temp))
+            path = Path(temp) / "two-batches.tsv"
+            ingestion.write_plan(path, "duckdb", "columnar", 3, 10001, 10000)
+            rows = [line.split("\t") for line in path.read_text().splitlines()]
+            writes = [i for i, row in enumerate(rows) if row[0] == "columnar"]
+            middle = next(
+                i for i, row in enumerate(rows) if row[1] == "middle-readback"
+            )
+            self.assertLess(writes[0], middle)
+            self.assertLess(middle, writes[1])
+            self.assertEqual(rows[writes[1]][3], "10003 1")
 
     def test_rayforce_uses_quoted_mutation_instead_of_functional_copy(self):
         self.assertEqual(

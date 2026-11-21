@@ -17,6 +17,8 @@ def main():
     lib.bench_free.argtypes = [ctypes.c_void_p]
     lib.bench_append.argtypes = [ctypes.c_int64, ctypes.c_int64]
     lib.bench_append.restype = ctypes.c_int
+    lib.bench_append_columnar.argtypes = [ctypes.c_int64, ctypes.c_int64]
+    lib.bench_append_columnar.restype = ctypes.c_int
     lib.bench_close.restype = None
     if lib.bench_open(int(threads)):
         raise RuntimeError(lib.bench_error().decode())
@@ -28,7 +30,8 @@ def main():
                 encoded = query.encode()
                 append = (
                     tuple(map(int, query.split()))
-                    if phase in {"append", "reject-append"}
+                    if phase
+                    in {"append", "columnar", "reject-append", "reject-columnar"}
                     else None
                 )
                 if append is not None and (
@@ -38,8 +41,13 @@ def main():
                     raise ValueError("append plan requires two signed 64-bit integers")
                 cpu, start = time.process_time_ns(), time.perf_counter_ns()
                 if append is not None:
-                    failed = bool(lib.bench_append(*append))
-                    if failed != (phase == "reject-append"):
+                    function = (
+                        lib.bench_append_columnar
+                        if phase in {"columnar", "reject-columnar"}
+                        else lib.bench_append
+                    )
+                    failed = bool(function(*append))
+                    if failed != (phase in {"reject-append", "reject-columnar"}):
                         raise RuntimeError(
                             lib.bench_error().decode()
                             if failed
@@ -57,7 +65,7 @@ def main():
                     finished - start,
                     time.process_time_ns() - cpu,
                 )
-                if phase in {"write", "append"}:
+                if phase in {"write", "append", "columnar"}:
                     if first_write is None:
                         first_write = (start, cpu)
                     last_write = (finished, cpu + used_cpu)

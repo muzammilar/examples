@@ -26,6 +26,8 @@ Run measurements before cleanup:
 make benchmark                         # three trials, one CPU/thread
 make THREADS=4 benchmark               # three trials, four CPUs/threads
 make REPEATS=50 TRIALS=5 benchmark      # longer run
+make test-ingestion METHODS=native,columnar MUTATION_ROWS=10001 BATCH_SIZES=1,100,1000,2048,2049,10000
+make ingestion-benchmark METHODS=native,columnar MUTATION_ROWS=100000
 ```
 
 `ROWS=2000000` defaults to two million; `REPEATS=15`, `TRIALS=3`,
@@ -184,7 +186,7 @@ Measured **2026-11-21**, **1 CPU / 1 engine thread(s), 4 GiB per process**, the 
 
 Correctness passed **48 cells**, **480,000 new rows**, **96,480,000 complete snapshot rows** and **192 invalid native-call rejections**. Every timed cell also matched the SHA256 and byte count of *every* old and new row, in ID order. A changed old body is rejected even when row counts match. Point probes read the initial old row, middle-batch result and final new row.
 
-The [backend/client contract](ingestion-contract.json) declares same-process read-your-writes, no mutation retries/deduplication and **no crash durability**. Successful batches are query-visible in RAM. Query mode parses SQL INSERT VALUES or quoted-target Rayfall insert; typed mode uses DuckDB's row-wise C Appender with a flush per ACK, versus Rayforce C vectors/table/environment plus fixed Rayfall dispatch. Keeping a Rayforce view can disable its sole-owner fast path; this test retains no such view. A buffered Appender admission without flush would have a different ACK contract and is not used. DuckDB transaction/MVCC work remains enabled; Rayforce environment mutation does not establish equivalent SQL isolation. The columnar data-chunk Appender and prepared SQL paths remain unrun, so this is not an exhaustive ranking of ingestion APIs.
+The [backend/client contract](ingestion-contract.json) declares same-process read-your-writes, no mutation retries/deduplication and **no crash durability**. Successful batches are query-visible in RAM. Query mode parses SQL INSERT VALUES or quoted-target Rayfall insert; typed mode uses DuckDB's row-wise C Appender with a flush per ACK, versus Rayforce C vectors/table/environment plus fixed Rayfall dispatch. Keeping a Rayforce view can disable its sole-owner fast path; this test retains no such view. A buffered Appender admission without flush would have a different ACK contract and is not used. DuckDB transaction/MVCC work remains enabled; Rayforce environment mutation does not establish equivalent SQL isolation. The columnar data-chunk Appender was not evaluated in this initial run; see the separate [columnar comparison](#columnar-appender-comparison). Prepared SQL remains unrun, so this is not an exhaustive ranking of ingestion APIs.
 
 Rows/s below use the **actual first-write start to last-write finish**, including intervening plan handling/logging and the middle read when more than one request exists. They exclude CSV setup, initial/final probes, export and host verification. Request latency times the native call. Query payload strings are generated outside the container; typed timings include the shared C payload generator. These are bounded fixed-workload timings, not five-minute saturation/capacity tests or language implementation rankings.
 
@@ -249,6 +251,98 @@ The native path follows the pinned [DuckDB Appender implementation](https://gith
 Read/write block bytes/IOPS and CPU utilization/native RSS/OOM events are retained per trial. Docker Desktop file sharing can leave container block counters at zero despite host export I/O; this is not a physical-disk comparison. No replication, independent concurrent readers, engine-OOM atomicity, process/disk recovery, persistent storage or OS-cold behavior is established.
 
 <!-- /ingestion-results -->
+
+<!-- columnar-results -->
+
+## Columnar Appender comparison
+
+Measured **2026-11-21**, **1 CPU / 1 engine thread(s), 4 GiB per process**, the same pinned engines through Python/C++/Rust. Every fresh process loaded **2,000,000 trades / 10,000 customers**, then appended **100,000** deterministic six-I64 rows. **144 process trials**, 3 per cell; pair order reverses in the second trial.
+
+`make test-ingestion METHODS=native,columnar MUTATION_ROWS=10001 BATCH_SIZES=1,100,1000,2048,2049,10000` runs correctness; `make ingestion-benchmark METHODS=native,columnar MUTATION_ROWS=100000` runs this matrix. Override comma-separated `BATCH_SIZES`, `METHODS` (`query,native,columnar`) and `LANGUAGES` (`python,cpp,rust`) explicitly. `TRIALS` is at least three for benchmarks. These targets reuse the example's normal five-command lifecycle and private one-shot Compose service; no second database server is involved.
+
+Correctness passed **72 cells**, **720,072 new rows**, **144,720,072 complete snapshot rows** and **288 invalid native-call rejections**. Every timed cell also matched the SHA256 and byte count of *every* old and new row, in ID order. A changed old body is rejected even when row counts match. Point probes read the initial old row, middle-batch result and final new row.
+
+The [backend/client contract](ingestion-contract.json) declares same-process read-your-writes, no mutation retries/deduplication and **no crash durability**. Successful batches are query-visible in RAM. Query mode parses SQL INSERT VALUES or quoted-target Rayfall insert; typed mode uses DuckDB's row-wise C Appender with a flush per ACK, versus Rayforce C vectors/table/environment plus fixed Rayfall dispatch. Keeping a Rayforce view can disable its sole-owner fast path; this test retains no such view. A buffered Appender admission without flush would have a different ACK contract and is not used. DuckDB transaction/MVCC work remains enabled; Rayforce environment mutation does not establish equivalent SQL isolation. Prepared SQL remains unrun; this is not an exhaustive ranking of ingestion APIs.
+
+Rows/s below use the **actual first-write start to last-write finish**, including intervening plan handling/logging and the middle read when more than one request exists. They exclude CSV setup, initial/final probes, export and host verification. Request latency times the native call. Query payload strings are generated outside the container; typed timings include the shared C payload generator. These are bounded fixed-workload timings, not five-minute saturation/capacity tests or language implementation rankings.
+
+`native` retains the row-wise Appender baseline; `columnar` reuses a six-BIGINT DuckDB data chunk, copying the same generated column-major values in native vector-sized pieces and flushing only after the entire requested batch. Rayforce uses its **identical typed-column implementation in both paths**: their differences estimate trial noise, not two Rayforce APIs. Chunk creation, reset, copies and flush are timed; this is not zero-copy ingestion. The [pinned collection implementation](https://github.com/duckdb/duckdb/blob/v2.0.0/src/common/types/column/column_data_collection.cpp) copies fixed-width values before the input chunk is reused. The correctness command above records its exact batch sizes and append count, including partial final batches when the count is not divisible by the batch size. The earlier query/row-wise [baseline](INGESTION_RESULTS.json) remains a separate immutable run; compare the two paths below using this run's common image and workload.
+
+### Typed values / row-wise DuckDB Appender
+
+Medians across 3 fresh processes, rows/s.
+
+| Batch rows | Python Ray | Python Duck | C++ Ray | C++ Duck | Rust Ray | Rust Duck |
+| --- | --- | --- | --- | --- | --- | --- |
+| 1 | 146,268 | 6,886 | 259,070 | 7,178 | 277,528 | 7,318 |
+| 100 | 7,031,360 | 528,088 | 11,554,182 | 528,569 | 10,907,406 | 547,328 |
+| 1000 | 14,973,797 | 2,924,379 | 16,691,470 | 3,076,174 | 16,705,764 | 3,185,580 |
+| 10000 | 18,604,073 | 5,691,344 | 19,789,570 | 6,578,911 | 18,305,520 | 7,092,073 |
+
+### Columnar values / flushed batches
+
+Medians across 3 fresh processes, rows/s.
+
+| Batch rows | Python Ray | Python Duck | C++ Ray | C++ Duck | Rust Ray | Rust Duck |
+| --- | --- | --- | --- | --- | --- | --- |
+| 1 | 146,701 | 6,908 | 269,173 | 7,250 | 278,576 | 7,261 |
+| 100 | 7,279,963 | 544,346 | 11,298,105 | 541,697 | 11,019,891 | 547,371 |
+| 1000 | 14,794,998 | 3,521,819 | 14,492,577 | 3,820,111 | 18,375,877 | 3,713,319 |
+| 10000 | 17,848,512 | 8,628,004 | 20,362,970 | 10,871,929 | 12,519,170 | 9,883,335 |
+
+### C++ trial spread and call latency
+
+Median (minimum … maximum) and inclusive IQR of measured rows/s; request p50/p99 in ms are medians of trial percentiles. Large batches have few requests; their p99 is near the maximum. All language trial/resource values remain in [COLUMNAR_RESULTS.json](COLUMNAR_RESULTS.json).
+
+| Path | Batch | Ray rows/s | Duck rows/s | Ray p50/p99 ms | Duck p50/p99 ms |
+| --- | --- | --- | --- | --- | --- |
+| native | 1 | 259,070 (257,893 … 271,431); IQR 6,769 | 7,178 (7,097 … 7,219); IQR 61 | 0.001167 / 0.004041 | 0.127834 / 0.255042 |
+| native | 100 | 11,554,182 (11,376,188 … 11,709,259); IQR 166,536 | 528,569 (512,728 … 539,004); IQR 13,138 | 0.002459 / 0.006333 | 0.149875 / 0.550542 |
+| native | 1000 | 16,691,470 (14,330,411 … 17,620,757); IQR 1,645,173 | 3,076,174 (2,977,686 … 3,085,166); IQR 53,740 | 0.014104 / 0.036459 | 0.253520 / 1.156666 |
+| native | 10000 | 19,789,570 (16,453,119 … 20,729,148); IQR 2,138,014 | 6,578,911 (6,132,696 … 7,840,242); IQR 853,773 | 0.117875 / 3.290917 | 1.225709 / 2.543917 |
+| columnar | 1 | 269,173 (263,605 … 269,652); IQR 3,024 | 7,250 (7,231 … 7,337); IQR 53 | 0.001125 / 0.003667 | 0.126584 / 0.250041 |
+| columnar | 100 | 11,298,105 (10,577,907 … 11,670,880); IQR 546,487 | 541,697 (528,496 … 567,337); IQR 19,421 | 0.002437 / 0.006916 | 0.147541 / 0.560375 |
+| columnar | 1000 | 14,492,577 (13,253,810 … 18,613,163); IQR 2,679,676 | 3,820,111 (3,517,947 … 3,893,430); IQR 187,741 | 0.013979 / 0.039167 | 0.201396 / 0.888000 |
+| columnar | 10000 | 20,362,970 (14,361,110 … 20,558,860); IQR 3,098,875 | 10,871,929 (9,816,192 … 11,374,676); IQR 779,242 | 0.113292 / 3.289875 | 0.699480 / 2.204542 |
+
+### Whole-process costs
+
+C++ medians: total container CPU / ingestion-window process CPU in core-seconds; sampled mean charged / native cgroup peak memory in MiB. Total CPU includes import, probes and full CSV export. Window CPU overlaps native write/probe phases: do not sum them twice. Resource samples run at roughly 100 ms; native RSS and detailed per-phase timings are in the JSON.
+
+| Path | Batch | Ray CPU total/window | Duck CPU total/window | Ray memory mean/peak | Duck memory mean/peak |
+| --- | --- | --- | --- | --- | --- |
+| native | 1 | 1.079 / 0.382 | 14.587 / 13.914 | 291.7 / 377.2 | 201.0 / 311.8 |
+| native | 100 | 0.750 / 0.009 | 0.877 / 0.186 | 322.6 / 374.9 | 218.4 / 312.1 |
+| native | 1000 | 0.742 / 0.006 | 0.728 / 0.032 | 318.6 / 374.7 | 232.9 / 339.7 |
+| native | 10000 | 0.741 / 0.005 | 0.720 / 0.015 | 322.6 / 374.5 | 220.8 / 315.3 |
+| columnar | 1 | 1.087 / 0.367 | 14.429 / 13.743 | 293.1 / 377.6 | 201.1 / 313.3 |
+| columnar | 100 | 0.744 / 0.009 | 0.882 / 0.182 | 323.6 / 375.4 | 221.6 / 313.3 |
+| columnar | 1000 | 0.740 / 0.007 | 0.728 / 0.026 | 323.4 / 374.9 | 220.6 / 315.0 |
+| columnar | 10000 | 0.737 / 0.005 | 0.729 / 0.009 | 323.1 / 374.7 | 235.5 / 340.3 |
+
+Every final snapshot contains **2,100,000 rows / 55,496,000 CSV bytes**. Each export's actual allocated bytes were recorded before removal; only fully verified exports are deleted, after fsynced proof metadata. Failed exports remain evidence. Raw plans, operation timing logs and samples are ignored under `results/ingestion/11551decb68047c2a0a7e704bca2f8db/`.
+
+Off-path host gzip level 1 compresses that exact snapshot to **25,434,922 bytes**, ratio **2.182×**; compression CPU/wall time is recorded separately. This measures dataset/export compressibility, **not native database storage compression**. Databases remain in memory; the owned writable bind mount holds verification witnesses only.
+
+The native path follows the pinned [DuckDB Appender implementation](https://github.com/duckdb/duckdb/blob/v2.0.0/src/main/capi/v1/appender-c.cpp), [Appender guidance](https://duckdb.org/docs/current/clients/c/appender) and [Rayforce insert implementation](https://github.com/RayforceDB/rayforce/blob/38fd4be3560d63a5514c1e6883685fe496d45e1a/src/ops/query.c).
+
+Read/write block bytes/IOPS and CPU utilization/native RSS/OOM events are retained per trial. Docker Desktop file sharing can leave container block counters at zero despite host export I/O; this is not a physical-disk comparison. No replication, independent concurrent readers, engine-OOM atomicity, process/disk recovery, persistent storage or OS-cold behavior is established.
+
+<!-- /columnar-results -->
+
+In the C++ 10,000-row cell, DuckDB's columnar path measured **10.87 million
+rows/s versus 6.58 million** for its row-wise path in this same run (**65.2%**
+higher). Rayforce's unchanged typed implementation measured **20.36 million**
+versus **19.79 million** in the two paths; that difference is trial variation,
+not an API improvement. These are short single-writer timings, with only ten
+large requests per trial. The initial query/row-wise results above remain intact.
+
+The extended image also passed the original **180 analytical query checks and
+18 negative controls** (`baf3ee1056754637b0fe0ff128e454b7`), plus **15 controller
+tests**. The 72-cell correctness run includes 2,048/2,049-row batch sizes and
+10,001 appended rows, exercising chunk reuse and a partial final request.
+
+
 
 ## Analytical query outcome
 

@@ -12,6 +12,7 @@ unsafe extern "C" {
     fn bench_eval(source: *const c_char, materialize: c_int) -> *mut c_char;
     fn bench_free(result: *mut c_char);
     fn bench_append(first_id: i64, rows: i64) -> c_int;
+    fn bench_append_columnar(first_id: i64, rows: i64) -> c_int;
     fn bench_close();
 }
 struct Runtime;
@@ -72,7 +73,10 @@ fn run() -> Result<(), Box<dyn Error>> {
         }
         let (phase, name, expected, source) = (fields[0], fields[1], fields[2], fields[3]);
         let source = CString::new(source)?;
-        let append = if matches!(phase, "append" | "reject-append") {
+        let append = if matches!(
+            phase,
+            "append" | "columnar" | "reject-append" | "reject-columnar"
+        ) {
             let values: Vec<_> = fields[3].split_whitespace().collect();
             if values.len() != 2 {
                 return Err("invalid append plan".into());
@@ -84,8 +88,14 @@ fn run() -> Result<(), Box<dyn Error>> {
         let cpu = cpu_ns()?;
         let start = Instant::now();
         let actual = if let Some((first_id, rows)) = append {
-            let failed = unsafe { bench_append(first_id, rows) } != 0;
-            if failed != (phase == "reject-append") {
+            let failed = unsafe {
+                if matches!(phase, "columnar" | "reject-columnar") {
+                    bench_append_columnar(first_id, rows)
+                } else {
+                    bench_append(first_id, rows)
+                }
+            } != 0;
+            if failed != matches!(phase, "reject-append" | "reject-columnar") {
                 return Err(if failed {
                     engine_error()
                 } else {
@@ -103,7 +113,7 @@ fn run() -> Result<(), Box<dyn Error>> {
         let finished = Instant::now();
         let elapsed = finished.duration_since(start).as_nanos();
         let used_cpu = cpu_ns()?.saturating_sub(cpu);
-        if matches!(phase, "write" | "append") {
+        if matches!(phase, "write" | "append" | "columnar") {
             if first_write.is_none() {
                 first_write = Some((start, cpu));
             }
