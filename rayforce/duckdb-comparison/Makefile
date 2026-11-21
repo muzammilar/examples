@@ -65,3 +65,15 @@ JOURNAL_RESULT ?=
 report-journal:
 	@test -n "$(JOURNAL_RESULT)" || { echo 'Set JOURNAL_RESULT to an explicit journal-live result directory'; exit 1; }
 	python3 write_journal_results.py "$(JOURNAL_RESULT)"
+
+JOURNAL_SOURCE ?=
+.PHONY: test-journal-restore
+test-journal-restore: check-controls
+	@test -n "$(JOURNAL_SOURCE)" || { echo 'Set JOURNAL_SOURCE to a completed journal-live result directory'; exit 1; }
+	python3 journal_restore.py "$(JOURNAL_SOURCE)"
+
+RESTORE_RESULT ?=
+.PHONY: report-journal-restore
+report-journal-restore:
+	@test -n "$(RESTORE_RESULT)" || { echo 'Set RESTORE_RESULT to an explicit journal-restore result directory'; exit 1; }
+	python3 journal_restore.py --publish "$(RESTORE_RESULT)"

@@ -126,14 +126,65 @@ All six Python/C++/Rust × engine regressions, 18 native negative controls and
 one failed adapter omitted the required native poll, another expected quoted
 symbol formatting; two earlier full live runs passed with narrower assertions.
 
+## Offline restore into separate storage
+
+After `make test-journal-recovery` prints its completed result directory, run
+`make test-journal-restore JOURNAL_SOURCE=results/journal-live/<id>`.
+The example requires the exact source; it never guesses the latest run. A clean
+checkout creates that source with the preceding test, using this example alone.
+
+The controller refuses copying while any journal-project container remains.
+It fingerprints and fsyncs a separate copy of the snapshot and all journal files,
+then starts the native CLI there. **The database's `/data` mount is empty**: original
+input CSVs are available only to the independent host oracle. Native recovery must
+reconstruct the tables from snapshot/tail, with zero replay evaluation errors.
+It exports both tables again; the host checks every seed/customer/ACK body and
+proves the original source fingerprints remain unchanged.
+
+Measured **2026-11-21**, same native ARM64 platform, **1 CPU / 4 GiB**, swap disabled:
+
+| Observation | Result |
+|---|---:|
+| Snapshot/tail native bytes copied | 96,667,650 bytes |
+| Copy/fsync/hash verification window | 52.030 ms |
+| Native replay | 1,614 entries / 0 evaluation errors |
+| Seed trades / customers / live ACK bodies restored | 2,000,000 / 10,000 / 2,251 |
+| Missing ACK / corrupt or duplicate bodies | 0 / 0 |
+| Native CLI restore/replay/export wall time | 5,780.301 ms |
+| Native process CPU / cgroup CPU | 5.208 core-s / 5.286 core-s |
+| Native peak RSS / cgroup peak | 241.4 MiB / 391.1 MiB |
+| Off-path native-file gzip level 1 | 22,991,378 bytes, 4.205× |
+| That gzip CPU / wall time | 312.308 ms / 312.434 ms |
+| Host controller CPU / peak RSS | 1.904 core-s / 149.3 MiB |
+
+The CLI timer includes snapshot recovery, replay (including earlier logged CSV
+exports) and the new verification exports. It is **not isolated replay latency**
+or a repeated performance comparison. Cgroup CPU includes the Python wrapper;
+native process CPU/RSS come from its waited child. There were 42 resource samples.
+The selected run's cgroup block-I/O counters were empty; physical host read/write
+bytes, device latency and queue depth remain unavailable. This does not mean the
+restore performed no disk I/O. The offline CLI has no network data path.
+
+[RESTORE_RESULTS.json](RESTORE_RESULTS.json) records the selected source hashes,
+empty input mount, image, limits, copy proof, complete body proof and CPU/memory/
+I/O/storage/compression costs. Raw selected run:
+`results/journal-restore/16edabbd9b31435c9153ab29369bf4da/`.
+Publish it explicitly with
+`make report-journal-restore RESTORE_RESULT=results/journal-restore/16edabbd9b31435c9153ab29369bf4da`.
+
+This is a **fenced offline restore into new files on the same host**, not an online
+backup, failover availability test or independent-host backup. The source witness
+remains authoritative; no source or journal was reset/truncated. Earlier narrower
+restore development runs remain retained.
+
 ## Remaining boundaries
 
 This is one authoritative local process, not replication/HA or physical power-loss
 testing. The equivalent DuckDB live application boundary remains unimplemented,
 so these results are **not a recovery/performance comparison with DuckDB**.
 Asynchronous journal/watermark recovery, interrupted snapshot publication,
-torn-tail/interior corruption, second-writer exclusion, independent backup
-restoration, isolated resource pressure and repeated sustained/cold performance
+torn-tail/interior corruption, second-writer exclusion, online backup/restore
+availability, isolated resource pressure and repeated sustained/cold performance
 remain unrun. Recovery did not delete or truncate any journal.
 
 Sources: [native journal API](https://rayforcedb.com/docs/namespaces/log/),

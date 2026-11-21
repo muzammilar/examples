@@ -253,7 +253,8 @@ Planned as a `mysql/` folder, mirroring the Postgres section with the same `orde
 - [x] Extend that comparison with DuckDB columnar data-chunk Appender: 72 correctness cells and 144 fresh-process performance trials, per-batch query-visible acknowledgements, identical inputs and full-body verification.
 - [x] Rayforce/DuckDB saved snapshots: matching two-million-trade/10,000-customer fresh-process reopens, exact full-body/group/join checks, native file/encoded-column/codec evidence, sampled disk growth and CPU/memory/I/O costs. One functional snapshot observation per engine; no capacity or live recovery claim.
 - [x] Rayforce synchronous native IPC journal recovery: two live-writer/reader SIGKILL cycles, second snapshot plus tail, external fsynced witness, exact two-million-trade/10,000-customer and all-ACK reconciliation, CPU/memory/disk/I/O/compression evidence. Single-process correctness, not capacity or HA.
-- [ ] Rayforce/DuckDB: equivalent DuckDB live recovery adapter, asynchronous journal/watermark recovery, interrupted snapshot replacement, corruption/torn tails, second-writer exclusion, independent restore, pressure, prepared SQL and genuinely cold persisted-query matrices.
+- [x] Rayforce fenced snapshot/tail restore into separate owned local files with the original input unavailable to the database: zero replay errors, full seed/customer/ACK proofs and measured CPU/memory/disk/I/O/compression. Same-host offline restore, not live backup or independent-host durability.
+- [ ] Rayforce/DuckDB: equivalent DuckDB live recovery adapter, asynchronous journal/watermark recovery, interrupted snapshot replacement, corruption/torn tails, second-writer exclusion, online backup/restore, pressure, prepared SQL and genuinely cold persisted-query matrices.
 
 - [x] `duckdb-zfs-recovery`: four Quack clients, real ZFS snapshot replication, interrupted receive/resume, read-only clones and fenced-primary promotion with measured asynchronous loss.
 

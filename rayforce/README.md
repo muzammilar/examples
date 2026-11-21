@@ -54,4 +54,8 @@ immutable snapshot checks do not qualify live journal or crash recovery.
 The separate [synchronous journal test](duckdb-comparison/JOURNAL.md) now recovers
 2,251 live ACKs and the full seed after two SIGKILLs, with independent writers,
 readers and an external witness. No acknowledged body loss was observed;
-asynchronous recovery, corruption, restore and matched DuckDB recovery remain unrun.
+asynchronous recovery, corruption, online backup and matched DuckDB recovery remain unrun.
+An [offline snapshot/tail restore](duckdb-comparison/JOURNAL.md#offline-restore-into-separate-storage)
+also rebuilt every body in separate local storage without access to original input
+CSVs: 1,614 replayed entries, zero evaluation errors and zero ACK loss. This does
+not establish online backup availability or independent-host durability.

@@ -15,7 +15,7 @@ services:
     tmpfs: [/tmp:size=512m]
     volumes:
       - "${JOURNAL_STORAGE_PATH:?Set an owned journal case storage path}:/state"
-      - ./results/data:/data:ro
+      - "${JOURNAL_INPUT_PATH:-./results/data}:/data:ro"
     networks: [journal]
   observer:
     image: rayforce-duckdb-analytics:dev
