@@ -1,0 +1,2244 @@
+{
+  "date": "2026-11-21",
+  "scope": "Fresh fixture lifecycle and retained-state correctness; separate from the earlier deleted 18,038,912-ACK cohort. No sustained-capacity, cold-cache or new live-fault claim.",
+  "fixture": "6761c0e2fd5f4f61b1efe84cf1b292a3",
+  "case_id": "9cf286c569944b469d5554e7f3fab560",
+  "passed": true,
+  "acknowledged_orders": 2001024,
+  "postgres_acknowledged": 104,
+  "customers": 10000,
+  "source_and_output": {
+    "source": {
+      "acknowledged": 2001024,
+      "acknowledged_loss": 0,
+      "corruption": 0,
+      "wire_bytes": 144740532,
+      "overall": {
+        "write_ack": {
+          "count": 2001024,
+          "rate_per_second": 27751.434223286455,
+          "p50_ms": 13.409,
+          "p99_ms": 796.807,
+          "longest_completion_gap_seconds": 0.19667816162109375,
+          "latency_resolution_microseconds": 1
+        },
+        "read_message_poll": {
+          "count": 2001024,
+          "rate_per_second": 22191.104581111038,
+          "p50_ms": 0.001,
+          "p99_ms": 0.002,
+          "longest_completion_gap_seconds": 0.5281243324279785,
+          "latency_resolution_microseconds": 1
+        },
+        "read_message_end_to_end": {
+          "count": 2001024,
+          "rate_per_second": 22191.104581111038,
+          "p50_ms": 7227.667,
+          "p99_ms": 25811.63,
+          "longest_completion_gap_seconds": 0.5281243324279785,
+          "latency_resolution_microseconds": 1
+        },
+        "read_watermark": {
+          "count": 97,
+          "rate_per_second": 0.9523798207342549,
+          "p50_ms": 2.188,
+          "p99_ms": 531.706,
+          "longest_completion_gap_seconds": 1.5529918670654297,
+          "latency_resolution_microseconds": 1
+        }
+      },
+      "latency_boundaries": {
+        "write": "producer admission through delivery callback; includes native retries",
+        "read_message_poll": "one native consumer poll, which may serve prefetched data",
+        "read_message_end_to_end": "producer wall-clock serialization to live reader observation",
+        "read_watermark": "native ListOffsets RPC on partition 0; not a message body read"
+      }
+    },
+    "enriched": {
+      "acknowledged": 2001024,
+      "acknowledged_loss": 0,
+      "corruption": 0,
+      "wire_bytes": 228336918,
+      "overall": {
+        "write_ack": {
+          "count": 2001024,
+          "rate_per_second": 27751.434223286455,
+          "p50_ms": 13.409,
+          "p99_ms": 796.807,
+          "longest_completion_gap_seconds": 0.19667816162109375,
+          "latency_resolution_microseconds": 1
+        },
+        "read_message_poll": {
+          "count": 2001024,
+          "rate_per_second": 21677.0202232278,
+          "p50_ms": 0.001,
+          "p99_ms": 0.001,
+          "longest_completion_gap_seconds": 4.724079608917236,
+          "latency_resolution_microseconds": 1
+        },
+        "read_message_end_to_end": {
+          "count": 2001024,
+          "rate_per_second": 21677.0202232278,
+          "p50_ms": 8839.286,
+          "p99_ms": 23853.897,
+          "longest_completion_gap_seconds": 4.724079608917236,
+          "latency_resolution_microseconds": 1
+        },
+        "read_watermark": {
+          "count": 88,
+          "rate_per_second": 0.8763971238481922,
+          "p50_ms": 18.169,
+          "p99_ms": 510.079,
+          "longest_completion_gap_seconds": 1.521143913269043,
+          "latency_resolution_microseconds": 1
+        }
+      },
+      "latency_boundaries": {
+        "write": "producer admission through delivery callback; includes native retries",
+        "read_message_poll": "one native consumer poll, which may serve prefetched data",
+        "read_message_end_to_end": "producer wall-clock serialization to live reader observation",
+        "read_watermark": "native ListOffsets RPC on partition 0; not a message body read"
+      }
+    }
+  },
+  "environment": {
+    "architecture": "aarch64",
+    "cpus": 11,
+    "memory_bytes": 26216296448,
+    "kernel": "6.12.76-linuxkit",
+    "runtime": "29.5.3"
+  },
+  "upstream_images": {
+    "apache/kafka:4.3.2": {
+      "image_id": "sha256:852a0d49fc4e656b022e7f23785411802c9a088c78a7c5e39f33969de9c227a7",
+      "repo_digests": [
+        "apache/kafka@sha256:852a0d49fc4e656b022e7f23785411802c9a088c78a7c5e39f33969de9c227a7"
+      ],
+      "architecture": "arm64"
+    },
+    "quay.io/debezium/connect:3.7.1.Final": {
+      "image_id": "sha256:1589366704e1e016bad42b15fbdb364ba48780c61d0094197ca8632cb1271539",
+      "repo_digests": [
+        "quay.io/debezium/connect@sha256:1589366704e1e016bad42b15fbdb364ba48780c61d0094197ca8632cb1271539"
+      ],
+      "architecture": "arm64"
+    },
+    "postgres:18.7": {
+      "image_id": "sha256:eb63372c1e05c755f55fa30cbd07aecc443676fc6c0fa90b9002d01537841e1a",
+      "repo_digests": [
+        "postgres@sha256:eb63372c1e05c755f55fa30cbd07aecc443676fc6c0fa90b9002d01537841e1a"
+      ],
+      "architecture": "arm64"
+    }
+  },
+  "build_receipt": {
+    "source_sha256": "fab27772ee4deadfd1bfe300b183230d640bc78849e484c9a2ffaf33039c7c0c",
+    "images": {
+      "kafka-connect-postgres-enrichment-processor:latest": "sha256:c6f7bb6d9bf6b6277c125a1dbe5b0826216e9532898a660e222d4efc80e35f79",
+      "kafka-enrichment-witness-producer:dev": "sha256:943aa2d9cc1af86b7469a88cf9c32d7f7480072dd7709b96a31432ea454759bf",
+      "kafka-enrichment-observer:dev": "sha256:44c066896a013af14ba84428e969e0edf73b5543b1adff838bdabced9275b0a1"
+    }
+  },
+  "lifecycle": {
+    "fresh_setup": true,
+    "retained_reapply_unchanged_service_identities": 10,
+    "retained_processor_configuration_restored": true,
+    "unrelated_infrastructure_unchanged_on_processor_recreation": 9,
+    "retained_service_stop_start_reconciled": true,
+    "deleted_owned_volumes": 25,
+    "owned_containers_volumes_networks_remaining": 0,
+    "built_image_tags_remaining": 0,
+    "unchanged_foreign_containers": 9,
+    "unchanged_foreign_volumes": 10,
+    "controller_tests": 23
+  },
+  "preserved_failed_attempts": [
+    {
+      "passed": false,
+      "error": "Processor image rebuilt to a different ID despite unchanged application sources; all ACK histories replayed, but processor replacement failed no-disruption assertion. Original before/after inspections retained.",
+      "before": "reapply-before.json",
+      "after": "reapply-after.json"
+    },
+    {
+      "passed": false,
+      "error": "Initial down prototype removed the container without persisting its current processing identity; up defaulted to empty demonstration topics. Order histories retained and replayed. Restore from saved inspection, then qualify fixed down/up.",
+      "before": {
+        "Id": "014439ae4eed8fda15d841d9d89bc9309bae65451c7a9ed41b71f1d1e47ad88f",
+        "Created": "2026-11-21T13:25:18.877424343Z",
+        "Path": "/enricher",
+        "Args": [],
+        "State": {
+          "Status": "running",
+          "Running": true,
+          "Paused": false,
+          "Restarting": false,
+          "OOMKilled": false,
+          "Dead": false,
+          "Pid": 6730,
+          "ExitCode": 0,
+          "Error": "",
+          "StartedAt": "2026-11-21T13:25:20.477568678Z",
+          "FinishedAt": "0001-01-01T00:00:00Z",
+          "Health": {
+            "Status": "healthy",
+            "FailingStreak": 0,
+            "Log": [
+              {
+                "Start": "2026-11-21T13:26:15.90462305Z",
+                "End": "2026-11-21T13:26:15.947961175Z",
+                "ExitCode": 0,
+                "Output": ""
+              },
+              {
+                "Start": "2026-11-21T13:26:20.948455553Z",
+                "End": "2026-11-21T13:26:20.995185928Z",
+                "ExitCode": 0,
+                "Output": ""
+              },
+              {
+                "Start": "2026-11-21T13:26:25.997081014Z",
+                "End": "2026-11-21T13:26:26.054814597Z",
+                "ExitCode": 0,
+                "Output": ""
+              },
+              {
+                "Start": "2026-11-21T13:26:31.055704585Z",
+                "End": "2026-11-21T13:26:31.109079627Z",
+                "ExitCode": 0,
+                "Output": ""
+              },
+              {
+                "Start": "2026-11-21T13:26:36.111794004Z",
+                "End": "2026-11-21T13:26:36.159428254Z",
+                "ExitCode": 0,
+                "Output": ""
+              }
+            ]
+          }
+        },
+        "Image": "sha256:c6f7bb6d9bf6b6277c125a1dbe5b0826216e9532898a660e222d4efc80e35f79",
+        "ResolvConfPath": "/var/lib/docker/containers/014439ae4eed8fda15d841d9d89bc9309bae65451c7a9ed41b71f1d1e47ad88f/resolv.conf",
+        "HostnamePath": "/var/lib/docker/containers/014439ae4eed8fda15d841d9d89bc9309bae65451c7a9ed41b71f1d1e47ad88f/hostname",
+        "HostsPath": "/var/lib/docker/containers/014439ae4eed8fda15d841d9d89bc9309bae65451c7a9ed41b71f1d1e47ad88f/hosts",
+        "LogPath": "/var/lib/docker/containers/014439ae4eed8fda15d841d9d89bc9309bae65451c7a9ed41b71f1d1e47ad88f/014439ae4eed8fda15d841d9d89bc9309bae65451c7a9ed41b71f1d1e47ad88f-json.log",
+        "Name": "/kafka-connect-postgres-enrichment-processor-1",
+        "RestartCount": 0,
+        "Driver": "overlayfs",
+        "Platform": "linux",
+        "MountLabel": "",
+        "ProcessLabel": "",
+        "AppArmorProfile": "",
+        "ExecIDs": null,
+        "HostConfig": {
+          "Binds": null,
+          "ContainerIDFile": "",
+          "LogConfig": {
+            "Type": "json-file",
+            "Config": {}
+          },
+          "NetworkMode": "kafka-connect-postgres-enrichment_kafka-connect",
+          "PortBindings": {
+            "8080/tcp": [
+              {
+                "HostIp": "127.0.0.1",
+                "HostPort": "18080"
+              }
+            ]
+          },
+          "RestartPolicy": {
+            "Name": "unless-stopped",
+            "MaximumRetryCount": 0
+          },
+          "AutoRemove": false,
+          "VolumeDriver": "",
+          "VolumesFrom": null,
+          "ConsoleSize": [
+            0,
+            0
+          ],
+          "CapAdd": null,
+          "CapDrop": null,
+          "CgroupnsMode": "private",
+          "Dns": null,
+          "DnsOptions": null,
+          "DnsSearch": null,
+          "ExtraHosts": [],
+          "GroupAdd": null,
+          "IpcMode": "private",
+          "Cgroup": "",
+          "Links": null,
+          "OomScoreAdj": 0,
+          "PidMode": "",
+          "Privileged": false,
+          "PublishAllPorts": false,
+          "ReadonlyRootfs": false,
+          "SecurityOpt": null,
+          "UTSMode": "",
+          "UsernsMode": "",
+          "ShmSize": 67108864,
+          "Runtime": "runc",
+          "Isolation": "",
+          "CpuShares": 0,
+          "Memory": 268435456,
+          "NanoCpus": 1000000000,
+          "CgroupParent": "",
+          "BlkioWeight": 0,
+          "BlkioWeightDevice": null,
+          "BlkioDeviceReadBps": null,
+          "BlkioDeviceWriteBps": null,
+          "BlkioDeviceReadIOps": null,
+          "BlkioDeviceWriteIOps": null,
+          "CpuPeriod": 0,
+          "CpuQuota": 0,
+          "CpuRealtimePeriod": 0,
+          "CpuRealtimeRuntime": 0,
+          "CpusetCpus": "",
+          "CpusetMems": "",
+          "Devices": null,
+          "DeviceCgroupRules": null,
+          "DeviceRequests": null,
+          "MemoryReservation": 0,
+          "MemorySwap": 536870912,
+          "MemorySwappiness": null,
+          "OomKillDisable": null,
+          "PidsLimit": null,
+          "Ulimits": null,
+          "CpuCount": 0,
+          "CpuPercent": 0,
+          "IOMaximumIOps": 0,
+          "IOMaximumBandwidth": 0,
+          "MaskedPaths": [
+            "/proc/acpi",
+            "/proc/asound",
+            "/proc/interrupts",
+            "/proc/kcore",
+            "/proc/keys",
+            "/proc/latency_stats",
+            "/proc/sched_debug",
+            "/proc/scsi",
+            "/proc/timer_list",
+            "/proc/timer_stats",
+            "/sys/devices/virtual/powercap",
+            "/sys/firmware"
+          ],
+          "ReadonlyPaths": [
+            "/proc/bus",
+            "/proc/fs",
+            "/proc/irq",
+            "/proc/sys",
+            "/proc/sysrq-trigger"
+          ]
+        },
+        "Storage": {
+          "RootFS": {
+            "Snapshot": {
+              "Name": "overlayfs"
+            }
+          }
+        },
+        "Mounts": [],
+        "Config": {
+          "Hostname": "014439ae4eed",
+          "Domainname": "",
+          "User": "65532",
+          "AttachStdin": false,
+          "AttachStdout": true,
+          "AttachStderr": true,
+          "ExposedPorts": {
+            "8080/tcp": {}
+          },
+          "Tty": false,
+          "OpenStdin": false,
+          "StdinOnce": false,
+          "Env": [
+            "CONSUMER_GROUP=orders-enricher",
+            "CUSTOMER_TOPIC=pg.public.customers",
+            "BOOTSTRAP_SERVERS=kafka-broker-1:19092,kafka-broker-2:19092,kafka-broker-3:19092",
+            "GOMEMLIMIT=192MiB",
+            "TRANSACTIONAL_ID=orders-enricher-v1",
+            "INPUT_TOPIC=orders",
+            "OUTPUT_TOPIC=orders.enriched",
+            "EXPECTED_CUSTOMERS=10000",
+            "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+            "SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt"
+          ],
+          "Cmd": null,
+          "Healthcheck": {
+            "Test": [
+              "CMD",
+              "/enricher",
+              "healthcheck"
+            ],
+            "Interval": 5000000000,
+            "Timeout": 3000000000,
+            "Retries": 60
+          },
+          "Image": "kafka-connect-postgres-enrichment-processor",
+          "Volumes": null,
+          "WorkingDir": "/home/nonroot",
+          "Entrypoint": [
+            "/enricher"
+          ],
+          "Labels": {
+            "com.docker.compose.config-hash": "d363ac0f191b78d03387a4f1f6da34ac31a118d313a40d2deffb9dadf8786c2a",
+            "com.docker.compose.container-number": "1",
+            "com.docker.compose.depends_on": "kafka-broker-3:service_healthy:false,connect-1:service_healthy:false,connect-2:service_healthy:false,kafka-broker-1:service_healthy:false,kafka-broker-2:service_healthy:false",
+            "com.docker.compose.image": "sha256:c6f7bb6d9bf6b6277c125a1dbe5b0826216e9532898a660e222d4efc80e35f79",
+            "com.docker.compose.oneoff": "False",
+            "com.docker.compose.project": "kafka-connect-postgres-enrichment",
+            "com.docker.compose.project.config_files": "/Users/muzammil/github.com/muzammilar/examples/kafka/connect-postgres-enrichment/docker-compose.yml",
+            "com.docker.compose.project.working_dir": "/Users/muzammil/github.com/muzammilar/examples/kafka/connect-postgres-enrichment",
+            "com.docker.compose.service": "processor",
+            "com.docker.compose.version": "5.1.4"
+          },
+          "StopTimeout": 30
+        },
+        "NetworkSettings": {
+          "SandboxID": "2b8749932324b7456ab657e0b278f9852cf9d6b515ec797db4d85d1bdd5fa185",
+          "SandboxKey": "/var/run/docker/netns/2b8749932324",
+          "Ports": {
+            "8080/tcp": [
+              {
+                "HostIp": "127.0.0.1",
+                "HostPort": "18080"
+              }
+            ]
+          },
+          "Networks": {
+            "kafka-connect-postgres-enrichment_kafka-connect": {
+              "IPAMConfig": null,
+              "Links": null,
+              "Aliases": [
+                "kafka-connect-postgres-enrichment-processor-1",
+                "processor"
+              ],
+              "DriverOpts": null,
+              "GwPriority": 0,
+              "NetworkID": "15847e487d7774482dda84f9ff6ba7d2979695c715125888942df87dee6e835c",
+              "EndpointID": "dfbb70cd8a5025ac21e2dd6fc2246176b840bc7c7c2b56979c4ff5536788cab6",
+              "Gateway": "172.21.0.1",
+              "IPAddress": "172.21.0.11",
+              "MacAddress": "e6:a0:36:39:5d:1a",
+              "IPPrefixLen": 16,
+              "IPv6Gateway": "",
+              "GlobalIPv6Address": "",
+              "GlobalIPv6PrefixLen": 0,
+              "DNSNames": [
+                "kafka-connect-postgres-enrichment-processor-1",
+                "processor",
+                "014439ae4eed"
+              ]
+            }
+          }
+        },
+        "ImageManifestDescriptor": {
+          "mediaType": "application/vnd.oci.image.manifest.v1+json",
+          "digest": "sha256:e3f1f1ddfa36ae2b3f50e3c53b1063356892c513d09a2dce66bcd1f6b69d04ad",
+          "size": 2747,
+          "platform": {
+            "architecture": "arm64",
+            "os": "linux"
+          }
+        }
+      },
+      "restore_from": "reapply-before.json"
+    },
+    {
+      "passed": false,
+      "error": "Prototype shutdown guard required exit zero; both Connect JVMs exited SIGTERM status 143 after current-incarnation Kafka Connect stopped messages. No OOM or SIGKILL. Teardown stopped before deleting resources. Native logs and original stopped inspection retained; corrected guard requires native completion and rejects exit 137.",
+      "log": "kafka-lifecycle-docker-down-20261121.log"
+    },
+    {
+      "passed": false,
+      "error": "Connect native completion passed; Kafka brokers cleanly stopped with exit 143 but prototype checked an obsolete completion string. Corrected against pinned BrokerServer and KafkaRaftServer source. No resource deletion occurred. Original retry log and stopped inspections retained.",
+      "log": "kafka-lifecycle-docker-down-retry-20261121.log"
+    }
+  ],
+  "compression": {
+    "source:data": {
+      "records": 2001024,
+      "batches": 22879,
+      "compressed_bytes": 45502053,
+      "uncompressed_bytes": 255192651,
+      "batch_header_bytes": 1395619,
+      "uncompressed_over_compressed": 5.608376637423371
+    },
+    "enriched:data": {
+      "records": 2001024,
+      "batches": 2127,
+      "compressed_bytes": 71348613,
+      "uncompressed_bytes": 339223142,
+      "batch_header_bytes": 129747,
+      "uncompressed_over_compressed": 4.754446200657047
+    },
+    "enriched:control": {
+      "records": 2127,
+      "batches": 2127,
+      "compressed_bytes": 36159,
+      "uncompressed_bytes": 36159,
+      "batch_header_bytes": 129747,
+      "uncompressed_over_compressed": 1.0
+    }
+  },
+  "compression_scope": "CRC32C-checked full source/output partition segment copies on one in-sync replica; record sections only, headers/indexes/RF3 separately. All twelve partition directories covered.",
+  "resources": {
+    "samples": 542,
+    "cadence_target_seconds": 5,
+    "containers": {
+      "ea4909533496c26332920763102467060d14779507fcb5bc788b49493da68982/2026-11-21T13:17:31.138243293Z": {
+        "role": "processor",
+        "last_cpu": 115308000,
+        "sampled_max_charged_bytes": 21569536,
+        "sampled_max_anonymous_bytes": 20738048,
+        "cpu_limit_cores": 1.0,
+        "cpu_core_seconds": 0.007449,
+        "cpu_utilization_percent_one_core_100": {
+          "average": 0.148804470282276,
+          "sampled_peak": 0.148804470282276
+        },
+        "sampled_mean_charged_bytes": 21563392.0,
+        "block_io": {
+          "read_bytes": 0,
+          "write_bytes": 0,
+          "read_operations": null,
+          "write_operations": null
+        },
+        "block_io_rates_per_second": {
+          "read_bytes": 0.0,
+          "write_bytes": 0.0,
+          "read_operations": null,
+          "write_operations": null
+        }
+      },
+      "5b0572514816edcead581d7320d0f42733965678e0db0fe38bce244f9f08381e/2026-11-21T13:16:32.757937627Z": {
+        "role": "connect-1",
+        "last_cpu": 33441680000,
+        "sampled_max_charged_bytes": 1069703168,
+        "sampled_max_anonymous_bytes": 874905600,
+        "cpu_limit_cores": 1.0,
+        "cpu_core_seconds": 4.400052,
+        "cpu_utilization_percent_one_core_100": {
+          "average": 1.8711126970680607,
+          "sampled_peak": 4.862575461674109
+        },
+        "sampled_mean_charged_bytes": 1066770090.6666666,
+        "block_io": {
+          "read_bytes": 139264,
+          "write_bytes": 241664,
+          "read_operations": null,
+          "write_operations": null
+        },
+        "block_io_rates_per_second": {
+          "read_bytes": 592.2171798071623,
+          "write_bytes": 1027.6709884888992,
+          "read_operations": null,
+          "write_operations": null
+        }
+      },
+      "3002aff45eb215b1e98a3227dd34ca71035688342ad62c2d176063520702012d/2026-11-21T13:16:32.758903502Z": {
+        "role": "connect-2",
+        "last_cpu": 30096028000,
+        "sampled_max_charged_bytes": 676634624,
+        "sampled_max_anonymous_bytes": 552759296,
+        "cpu_limit_cores": 1.0,
+        "cpu_core_seconds": 2.97376,
+        "cpu_utilization_percent_one_core_100": {
+          "average": 1.2645870238253043,
+          "sampled_peak": 3.6855462453729886
+        },
+        "sampled_mean_charged_bytes": 675813120.0,
+        "block_io": {
+          "read_bytes": 0,
+          "write_bytes": 200704,
+          "read_operations": null,
+          "write_operations": null
+        },
+        "block_io_rates_per_second": {
+          "read_bytes": 0.0,
+          "write_bytes": 853.4907794503721,
+          "read_operations": null,
+          "write_operations": null
+        }
+      },
+      "794068dd3c5081246d013dcdac7d3bf3170732f2e74ab164d839d57b68d231c5/2026-11-21T13:16:16.121093592Z": {
+        "role": "kafka-broker-3",
+        "last_cpu": 56564018000,
+        "sampled_max_charged_bytes": 650715136,
+        "sampled_max_anonymous_bytes": 503820288,
+        "cpu_limit_cores": 1.0,
+        "cpu_core_seconds": 41.588341,
+        "cpu_utilization_percent_one_core_100": {
+          "average": 17.685744465518464,
+          "sampled_peak": 55.98534048462409
+        },
+        "sampled_mean_charged_bytes": 512872960.0,
+        "block_io": {
+          "read_bytes": 245760,
+          "write_bytes": 126054400,
+          "read_operations": null,
+          "write_operations": null
+        },
+        "block_io_rates_per_second": {
+          "read_bytes": 1045.1122731358334,
+          "write_bytes": 536055.5034292546,
+          "read_operations": null,
+          "write_operations": null
+        }
+      },
+      "f6b52dc2e16ae02b774ff19001870c7a8494a990984492e2770b3178cb72c519/2026-11-21T13:16:16.12004055Z": {
+        "role": "kafka-broker-2",
+        "last_cpu": 58664566000,
+        "sampled_max_charged_bytes": 656539648,
+        "sampled_max_anonymous_bytes": 509296640,
+        "cpu_limit_cores": 1.0,
+        "cpu_core_seconds": 44.071918,
+        "cpu_utilization_percent_one_core_100": {
+          "average": 18.741927798744257,
+          "sampled_peak": 56.01986578193553
+        },
+        "sampled_mean_charged_bytes": 520201813.3333333,
+        "block_io": {
+          "read_bytes": 278528,
+          "write_bytes": 126058496,
+          "read_operations": null,
+          "write_operations": null
+        },
+        "block_io_rates_per_second": {
+          "read_bytes": 1184.462102586196,
+          "write_bytes": 536073.6127822465,
+          "read_operations": null,
+          "write_operations": null
+        }
+      },
+      "39e2ed0d9aea69e1eee8e2623f9199e9b27e8004410a22b1f6944929142f2bb7/2026-11-21T13:16:16.121305759Z": {
+        "role": "kafka-broker-1",
+        "last_cpu": 76986389000,
+        "sampled_max_charged_bytes": 644300800,
+        "sampled_max_anonymous_bytes": 515002368,
+        "cpu_limit_cores": 1.0,
+        "cpu_core_seconds": 56.305117,
+        "cpu_utilization_percent_one_core_100": {
+          "average": 23.944237203645287,
+          "sampled_peak": 84.96637112913379
+        },
+        "sampled_mean_charged_bytes": 523902634.6666667,
+        "block_io": {
+          "read_bytes": 290816,
+          "write_bytes": 125956096,
+          "read_operations": null,
+          "write_operations": null
+        },
+        "block_io_rates_per_second": {
+          "read_bytes": 1236.7201522048713,
+          "write_bytes": 535639.1746542534,
+          "read_operations": null,
+          "write_operations": null
+        }
+      },
+      "edfda7135dc00079b9d87917231f75f5e9df183686026f991efe1e2d5ac6283e/2026-11-21T13:15:59.502259459Z": {
+        "role": "postgres",
+        "last_cpu": 6129289000,
+        "sampled_max_charged_bytes": 169709568,
+        "sampled_max_anonymous_bytes": 17317888,
+        "cpu_limit_cores": 1.0,
+        "cpu_core_seconds": 4.897958,
+        "cpu_utilization_percent_one_core_100": {
+          "average": 2.0829040338880995,
+          "sampled_peak": 4.432995773764763
+        },
+        "sampled_mean_charged_bytes": 162960981.33333334,
+        "block_io": {
+          "read_bytes": 135168,
+          "write_bytes": 3014656,
+          "read_operations": null,
+          "write_operations": null
+        },
+        "block_io_rates_per_second": {
+          "read_bytes": 574.8149993376559,
+          "write_bytes": 12820.116348864083,
+          "read_operations": null,
+          "write_operations": null
+        }
+      },
+      "59d194f7f2fe899470f05d2672bf2c13a9c96a30f38e475357b34dd59e04eb9a/2026-11-21T13:15:59.498463084Z": {
+        "role": "kafka-controller-3",
+        "last_cpu": 29876558000,
+        "sampled_max_charged_bytes": 360341504,
+        "sampled_max_anonymous_bytes": 296271872,
+        "cpu_limit_cores": 1.0,
+        "cpu_core_seconds": 17.087477,
+        "cpu_utilization_percent_one_core_100": {
+          "average": 7.26663851518906,
+          "sampled_peak": 23.879761530687734
+        },
+        "sampled_mean_charged_bytes": 264336384.0,
+        "block_io": {
+          "read_bytes": 0,
+          "write_bytes": 2895872,
+          "read_operations": null,
+          "write_operations": null
+        },
+        "block_io_rates_per_second": {
+          "read_bytes": 0.0,
+          "write_bytes": 12315.015850647567,
+          "read_operations": null,
+          "write_operations": null
+        }
+      },
+      "f7c049193053afa851f4688441afd5852d8bf02aecf4e00793e1cbfb0d9092b5/2026-11-21T13:15:59.499684793Z": {
+        "role": "kafka-controller-2",
+        "last_cpu": 30238080000,
+        "sampled_max_charged_bytes": 352333824,
+        "sampled_max_anonymous_bytes": 299692032,
+        "cpu_limit_cores": 1.0,
+        "cpu_core_seconds": 17.177666,
+        "cpu_utilization_percent_one_core_100": {
+          "average": 7.304995769369266,
+          "sampled_peak": 24.83815684964301
+        },
+        "sampled_mean_charged_bytes": 254029482.66666666,
+        "block_io": {
+          "read_bytes": 0,
+          "write_bytes": 2899968,
+          "read_operations": null,
+          "write_operations": null
+        },
+        "block_io_rates_per_second": {
+          "read_bytes": 0.0,
+          "write_bytes": 12332.440257777891,
+          "read_operations": null,
+          "write_operations": null
+        }
+      },
+      "f62da9cfa59ee20853d888882a41f3273b90e6229761dcc423c1869428e77718/2026-11-21T13:15:59.498985626Z": {
+        "role": "kafka-controller-1",
+        "last_cpu": 33740326000,
+        "sampled_max_charged_bytes": 347303936,
+        "sampled_max_anonymous_bytes": 304619520,
+        "cpu_limit_cores": 1.0,
+        "cpu_core_seconds": 18.850699,
+        "cpu_utilization_percent_one_core_100": {
+          "average": 8.016490459970289,
+          "sampled_peak": 25.00540752201369
+        },
+        "sampled_mean_charged_bytes": 260923050.66666666,
+        "block_io": {
+          "read_bytes": 16384,
+          "write_bytes": 2932736,
+          "read_operations": null,
+          "write_operations": null
+        },
+        "block_io_rates_per_second": {
+          "read_bytes": 69.67496520747225,
+          "write_bytes": 12471.818772137533,
+          "read_operations": null,
+          "write_operations": null
+        }
+      },
+      "6164bcd0638483225957793208753a1550ae9bf97d3172eb70947279bcfc7620/2026-11-21T13:18:04.276746503Z": {
+        "role": "processor",
+        "last_cpu": 3160211000,
+        "sampled_max_charged_bytes": 202907648,
+        "sampled_max_anonymous_bytes": 176521216,
+        "cpu_limit_cores": 1.0,
+        "cpu_core_seconds": 3.160211,
+        "cpu_utilization_percent_one_core_100": {
+          "average": 1.3776802907926373,
+          "sampled_peak": 12.346197014280222
+        },
+        "sampled_mean_charged_bytes": 75958361.04347827,
+        "block_io": {
+          "read_bytes": null,
+          "write_bytes": null,
+          "read_operations": null,
+          "write_operations": null
+        },
+        "block_io_rates_per_second": {
+          "read_bytes": null,
+          "write_bytes": null,
+          "read_operations": null,
+          "write_operations": null
+        }
+      },
+      "48edcc5fcc856449059d05ca58af0ace9ee3471363a74965c349c525f7312209/2026-11-21T13:18:18.554410468Z": {
+        "role": "witness-producer",
+        "last_cpu": 33241978000,
+        "sampled_max_charged_bytes": 353173504,
+        "sampled_max_anonymous_bytes": 86675456,
+        "cpu_limit_cores": 1.0,
+        "cpu_core_seconds": 33.241978,
+        "cpu_utilization_percent_one_core_100": {
+          "average": 45.69010857201035,
+          "sampled_peak": 95.58561093740603
+        },
+        "sampled_mean_charged_bytes": 160590233.6,
+        "block_io": {
+          "read_bytes": 1794048,
+          "write_bytes": 0,
+          "read_operations": null,
+          "write_operations": null
+        },
+        "block_io_rates_per_second": {
+          "read_bytes": 0.0,
+          "write_bytes": 0.0,
+          "read_operations": null,
+          "write_operations": null
+        }
+      },
+      "8613308793ed5b5c36ee56d2186087627449d4aa1326bec77b4a5c8e62a0ff00/2026-11-21T13:18:18.326465218Z": {
+        "role": "enriched-reader",
+        "last_cpu": 34769627000,
+        "sampled_max_charged_bytes": 549289984,
+        "sampled_max_anonymous_bytes": 498761728,
+        "cpu_limit_cores": 1.0,
+        "cpu_core_seconds": 34.769627,
+        "cpu_utilization_percent_one_core_100": {
+          "average": 34.976193110478725,
+          "sampled_peak": 70.58363845644604
+        },
+        "sampled_mean_charged_bytes": 247537664.0,
+        "block_io": {
+          "read_bytes": null,
+          "write_bytes": null,
+          "read_operations": null,
+          "write_operations": null
+        },
+        "block_io_rates_per_second": {
+          "read_bytes": null,
+          "write_bytes": null,
+          "read_operations": null,
+          "write_operations": null
+        }
+      },
+      "ac197c9eff51348a40030f86ed249ce9f6a5f1e4e066be577dba561ef1348969/2026-11-21T13:18:18.10373376Z": {
+        "role": "source-reader",
+        "last_cpu": 35137358000,
+        "sampled_max_charged_bytes": 527212544,
+        "sampled_max_anonymous_bytes": 480681984,
+        "cpu_limit_cores": 1.0,
+        "cpu_core_seconds": 35.137358,
+        "cpu_utilization_percent_one_core_100": {
+          "average": 33.68891824977506,
+          "sampled_peak": 69.85939343631907
+        },
+        "sampled_mean_charged_bytes": 249734095.23809522,
+        "block_io": {
+          "read_bytes": 3137536,
+          "write_bytes": 0,
+          "read_operations": null,
+          "write_operations": null
+        },
+        "block_io_rates_per_second": {
+          "read_bytes": 0.0,
+          "write_bytes": 0.0,
+          "read_operations": null,
+          "write_operations": null
+        }
+      },
+      "c70d32be9b2a300aa1c48be08c9e4482392f57cbe2cab92105d5b7509f6256cb/2026-11-21T13:20:03.375271253Z": {
+        "role": "witness-verifier",
+        "last_cpu": 6182891000,
+        "sampled_max_charged_bytes": 1132019712,
+        "sampled_max_anonymous_bytes": 863690752,
+        "cpu_limit_cores": 2.0,
+        "cpu_core_seconds": 6.182891,
+        "cpu_utilization_percent_one_core_100": {
+          "average": 34.91014222218079,
+          "sampled_peak": 48.039945450802094
+        },
+        "sampled_mean_charged_bytes": 914755584.0,
+        "block_io": {
+          "read_bytes": null,
+          "write_bytes": null,
+          "read_operations": null,
+          "write_operations": null
+        },
+        "block_io_rates_per_second": {
+          "read_bytes": null,
+          "write_bytes": null,
+          "read_operations": null,
+          "write_operations": null
+        }
+      },
+      "dac84774af29f7da1ddf7c2984469a02ebb78b14959414fa3b46a006df5adf28/2026-11-21T13:20:17.008046884Z": {
+        "role": "witness-verifier",
+        "last_cpu": 6963864000,
+        "sampled_max_charged_bytes": 1169002496,
+        "sampled_max_anonymous_bytes": 899272704,
+        "cpu_limit_cores": 2.0,
+        "cpu_core_seconds": 6.963864,
+        "cpu_utilization_percent_one_core_100": {
+          "average": 31.445813922183746,
+          "sampled_peak": 32.712130547981154
+        },
+        "sampled_mean_charged_bytes": 1045348352.0,
+        "block_io": {
+          "read_bytes": null,
+          "write_bytes": null,
+          "read_operations": null,
+          "write_operations": null
+        },
+        "block_io_rates_per_second": {
+          "read_bytes": null,
+          "write_bytes": null,
+          "read_operations": null,
+          "write_operations": null
+        }
+      }
+    },
+    "cpu_core_seconds": 326.816366,
+    "limits": "Cgroup CPU across all threads; one core = 100%. Memory mean is a sample mean; maxima are sampled charged/anonymous usage, not process peak RSS or simultaneous stack peak. Block I/O is runtime cgroup accounting, not logical engine I/O; empty counters are unavailable. I/O latency/queue depth unavailable. Stopped tails and short-lived work can be missed. Host controllers/Docker VM overhead excluded.",
+    "host_controller": {
+      "wall_seconds": 239.7441834998317,
+      "user_cpu_seconds": 77.482732,
+      "system_cpu_seconds": 2.226257,
+      "cpu_utilization_percent_one_core_100": 33.24751734803024,
+      "child_cli_user_cpu_seconds": 23.060912,
+      "child_cli_system_cpu_seconds": 11.602397999999999,
+      "process_lifetime_peak_rss_bytes": 1175339008,
+      "limits": "Controller CPU deltas include witness reconciliation; child CPU is local CLI processes, not Docker VM/container work. Peak RSS is process-lifetime and can include earlier trials in the same invocation, not a per-trial or whole-stack peak. Docker daemon/VM overhead excluded."
+    }
+  },
+  "block_io_observation": {
+    "read_bytes": {
+      "observed_delta": 6037504,
+      "covered_incarnations": 12,
+      "total_incarnations": 16
+    },
+    "write_bytes": {
+      "observed_delta": 390254592,
+      "covered_incarnations": 12,
+      "total_incarnations": 16
+    }
+  },
+  "storage_snapshots": [
+    {
+      "phase": "baseline",
+      "allocated_bytes": 115175424
+    },
+    {
+      "phase": "recovered-live",
+      "allocated_bytes": 120758272
+    },
+    {
+      "phase": "finish-load",
+      "allocated_bytes": 126832640
+    },
+    {
+      "phase": "reconcile",
+      "allocated_bytes": 466477056
+    },
+    {
+      "phase": "setup",
+      "allocated_bytes": 95592448
+    }
+  ],
+  "measurement_limits": [
+    "Container resource counters cover the baseline, native probes and initial full replay, not image builds, later lifecycle replays or teardown.",
+    "CPU sums observed container deltas; memory is sampled charged/anonymous memory, not a simultaneous stack peak or process heap. Host controller counters are separate.",
+    "Block bytes are partial coverage as enumerated; missing counters are unknown. Runtime API did not expose IOPS, I/O latency or queue depth.",
+    "Writers stopped during lifecycle maintenance; retained replay establishes persistence, not continuous availability. No cache controls: these are buffered/recent-data observations.",
+    "Core fault cases and three diagnostic trials were qualified separately before this lifecycle pass; the single aggregate invocation and extended matrix remain unrun."
+  ],
+  "source_sha256": {
+    "test_lifecycle.py": "51e6580d553f3e9a4d31be7bc4f36fed0b8a5baf78f7ff6a59867740ec24e9da",
+    "prepare_workload.py": "ab0d5ce4b63566b892b5606a79f30d96d4f6ad6617e2714d5814304413f68a52",
+    "enrichment_probes.py": "7c52928223e437cce469ff518fe1ea3089910114d10acd37b814c54f7b4dae7c",
+    "enrichment_lab.py": "a294fdda2fb06869695e09b96bd0252e3ff04d1304d52ca3b15f94c6ba1bcfd7",
+    "enrichment_control.py": "4f8ec5a7df88813e316a06a6adbf65546ba6a3382bdc1b54fa8067ca66d845de",
+    "test_enrichment.py": "7b5a107eae0e6c1b85a25da98a7afaf737f836c434d4ab163e5f2f621ec75bc0",
+    "enrichment_lifecycle.py": "7c8cd495a729249a861b51f9fa2ef8927092e112b2e18012530d9ce152181626",
+    "inspect_compression.py": "6ebd17b6bcf54909e51ded2450067faa7860bd9851960e8aedd01873b35a301d",
+    "enrichment_metrics.py": "7095ea281527e3a7b77da9808889b8516b423982145cb4d0f54f07d3efaa6139",
+    "Makefile": "1c85c43c1f6ff02b4769f2efd41b0f688351436eda255bb085d158333da38d18",
+    "docker-compose.yml": "42006698c3d306101013eb2676ea78c4de31fc3000fbbe9b729330339a3aecb7"
+  },
+  "evidence_sha256": {
+    "archives/6761c0e2fd5f4f61b1efe84cf1b292a3/CLOSED.json": "0f571ed355ce96b7eceb5c25858551f02366386c05844bc521b3511b81a5f975",
+    "archives/6761c0e2fd5f4f61b1efe84cf1b292a3/reapply-fixed-proof.json": "a6ee082529dafffdcd5db2b6e5cc3be958dc0420310d98e6e371f224f70cde2d",
+    "archives/6761c0e2fd5f4f61b1efe84cf1b292a3/retained-restart-proof.json": "741029b7054498ba6baae7efd25a17e874c12425b5c47f03a9561b8f70826d4f",
+    "archives/6761c0e2fd5f4f61b1efe84cf1b292a3/post-stop-recovery-proof.json": "4346bbe4a31f0ecf7254522ac7325e994dbf50f216f682d942b2a5ec1ac506eb",
+    "archives/6761c0e2fd5f4f61b1efe84cf1b292a3/cases/9cf286c569944b469d5554e7f3fab560/result.json": "f5fe9d062a169ef089f56dda81eb8964e2e4fba67f5758e34d9433f5e27d0b6d",
+    "archives/6761c0e2fd5f4f61b1efe84cf1b292a3/cases/9cf286c569944b469d5554e7f3fab560/experiment.json": "bd2cdd5ea421b8eb01e0e68605e2a2b00b47c06b481fac9e89682a3dc2696586",
+    "archives/6761c0e2fd5f4f61b1efe84cf1b292a3/cases/9cf286c569944b469d5554e7f3fab560/compression.json": "d75f6047e92a1b6eb03523e497f879e20ccfc267b591fa54be6b76ccae8bc082"
+  },
+  "raw_results": "Ignored results/ retains the final fresh-fixture journals, segment copies, resource samples, command logs and closure. The earlier lifecycle fixture is archived under results/archives/6761c0e2fd5f4f61b1efe84cf1b292a3/; the original 18,038,912-ACK cohort under results/archives/757176bf1c4b4340aa567867c271f156/ has already-deleted large journals and cannot be fully replayed.",
+  "final_fresh_revision_lifecycle": {
+    "passed": true,
+    "fixture": "e11e4a5a036248afb57a1807ecbbb167",
+    "case_id": "ec8ddd5b0f974e6aa4680d8fdfe08141",
+    "commands": [
+      {
+        "command": [
+          "make",
+          "docker-up",
+          "CONNECT_PORT=18083",
+          "PROCESSOR_PORT=18080"
+        ],
+        "started_at": 1795268388.478258,
+        "ended_at": 1795268453.168032,
+        "exit_code": 0,
+        "log": "kafka-final-clean-docker-up-20261121.log"
+      },
+      {
+        "command": [
+          "make",
+          "up"
+        ],
+        "started_at": 1795268453.168378,
+        "ended_at": 1795268479.152321,
+        "exit_code": 0,
+        "log": "kafka-final-clean-up-20261121.log"
+      },
+      {
+        "command": [
+          "make",
+          "test",
+          "COUNT=1000000"
+        ],
+        "started_at": 1795268479.152729,
+        "ended_at": 1795268649.536484,
+        "exit_code": 0,
+        "log": "kafka-final-clean-test-20261121.log"
+      },
+      {
+        "command": [
+          "make",
+          "down"
+        ],
+        "started_at": 1795268649.536947,
+        "ended_at": 1795268668.416376,
+        "exit_code": 0,
+        "log": "kafka-final-clean-down-20261121.log"
+      },
+      {
+        "command": [
+          "make",
+          "docker-down"
+        ],
+        "started_at": 1795268668.416714,
+        "ended_at": 1795268696.333605,
+        "exit_code": 0,
+        "log": "kafka-final-clean-docker-down-20261121.log"
+      }
+    ],
+    "acknowledged": 1001024,
+    "postgres": {
+      "acknowledged": 83,
+      "loss": 0,
+      "ambiguous_applied": 0,
+      "ambiguous_absent": 0,
+      "phases": {
+        "setup:ack": {
+          "count": 18,
+          "rate_per_second": 1.0576808546672487,
+          "p50_ms": 108.592,
+          "p99_ms": 160.807,
+          "longest_completion_gap_seconds": 1.0464749336242676,
+          "latency_resolution_microseconds": 1
+        },
+        "baseline:ack": {
+          "count": 19,
+          "rate_per_second": 1.053488792505207,
+          "p50_ms": 96.605,
+          "p99_ms": 112.774,
+          "longest_completion_gap_seconds": 1.0257000923156738,
+          "latency_resolution_microseconds": 1
+        },
+        "recovered-live:ack": {
+          "count": 17,
+          "rate_per_second": 1.058318632312924,
+          "p50_ms": 111.758,
+          "p99_ms": 133.959,
+          "longest_completion_gap_seconds": 1.0215659141540527,
+          "latency_resolution_microseconds": 1
+        },
+        "finish-load:ack": {
+          "count": 29,
+          "rate_per_second": 1.030668612649229,
+          "p50_ms": 110.757,
+          "p99_ms": 150.275,
+          "longest_completion_gap_seconds": 1.048192024230957,
+          "latency_resolution_microseconds": 1
+        },
+        "setup:read": {
+          "count": 18,
+          "rate_per_second": 1.0576712974234013,
+          "p50_ms": 115.731,
+          "p99_ms": 182.826,
+          "longest_completion_gap_seconds": 1.0722026824951172,
+          "latency_resolution_microseconds": 1
+        },
+        "baseline:read": {
+          "count": 19,
+          "rate_per_second": 1.051560203330185,
+          "p50_ms": 108.449,
+          "p99_ms": 122.982,
+          "longest_completion_gap_seconds": 1.018974781036377,
+          "latency_resolution_microseconds": 1
+        },
+        "recovered-live:read": {
+          "count": 17,
+          "rate_per_second": 1.05830235895653,
+          "p50_ms": 117.502,
+          "p99_ms": 139.893,
+          "longest_completion_gap_seconds": 1.0215492248535156,
+          "latency_resolution_microseconds": 1
+        },
+        "finish-load:read": {
+          "count": 29,
+          "rate_per_second": 1.0306113950045144,
+          "p50_ms": 110.009,
+          "p99_ms": 142.615,
+          "longest_completion_gap_seconds": 1.047645092010498,
+          "latency_resolution_microseconds": 1
+        }
+      }
+    },
+    "reports": {
+      "source": {
+        "intended": 1001024,
+        "acknowledged": 1001024,
+        "acknowledged_without_native_offset": 0,
+        "ambiguous": 0,
+        "rejected": 0,
+        "live_observed_acknowledged": 1001024,
+        "live_visible_nonack": 0,
+        "duplicate_live_deliveries": 0,
+        "acknowledged_loss": 0,
+        "corruption": 0,
+        "phases": {
+          "setup": {
+            "write_ack": {
+              "count": 103627,
+              "rate_per_second": 3288.28559828091,
+              "p50_ms": 758.199,
+              "p99_ms": 1025.247,
+              "longest_completion_gap_seconds": 0.08591198921203613,
+              "latency_resolution_microseconds": 1
+            },
+            "read_watermark": {
+              "count": 8,
+              "rate_per_second": 0.25385550856675654,
+              "p50_ms": 7.649,
+              "p99_ms": 40.591,
+              "longest_completion_gap_seconds": 1.04616379737854,
+              "latency_resolution_microseconds": 1
+            },
+            "read_message_poll": {
+              "count": 103627,
+              "rate_per_second": 3288.28559828091,
+              "p50_ms": 0.001,
+              "p99_ms": 0.337,
+              "longest_completion_gap_seconds": 0.06412696838378906,
+              "latency_resolution_microseconds": 1
+            },
+            "read_message_end_to_end": {
+              "count": 103627,
+              "rate_per_second": 3288.28559828091,
+              "p50_ms": 1670.199,
+              "p99_ms": 2575.433,
+              "longest_completion_gap_seconds": 0.06412696838378906,
+              "latency_resolution_microseconds": 1
+            }
+          },
+          "baseline": {
+            "write_ack": {
+              "count": 9623,
+              "rate_per_second": 504.5016956681048,
+              "p50_ms": 8.037,
+              "p99_ms": 201.014,
+              "longest_completion_gap_seconds": 0.18705296516418457,
+              "latency_resolution_microseconds": 1
+            },
+            "read_message_poll": {
+              "count": 9623,
+              "rate_per_second": 504.5016956681048,
+              "p50_ms": 0.001,
+              "p99_ms": 9.874,
+              "longest_completion_gap_seconds": 0.18953537940979004,
+              "latency_resolution_microseconds": 1
+            },
+            "read_message_end_to_end": {
+              "count": 9623,
+              "rate_per_second": 504.5016956681048,
+              "p50_ms": 1084.444,
+              "p99_ms": 2044.979,
+              "longest_completion_gap_seconds": 0.18953537940979004,
+              "latency_resolution_microseconds": 1
+            },
+            "read_watermark": {
+              "count": 19,
+              "rate_per_second": 0.9961064343441745,
+              "p50_ms": 2.675,
+              "p99_ms": 50.773,
+              "longest_completion_gap_seconds": 1.051316738128662,
+              "latency_resolution_microseconds": 1
+            }
+          },
+          "recovered-live": {
+            "write_ack": {
+              "count": 8784,
+              "rate_per_second": 508.3722840345833,
+              "p50_ms": 7.994,
+              "p99_ms": 177.194,
+              "longest_completion_gap_seconds": 0.08597517013549805,
+              "latency_resolution_microseconds": 1
+            },
+            "read_message_poll": {
+              "count": 8784,
+              "rate_per_second": 508.3722840345833,
+              "p50_ms": 0.001,
+              "p99_ms": 8.004,
+              "longest_completion_gap_seconds": 0.0844731330871582,
+              "latency_resolution_microseconds": 1
+            },
+            "read_message_end_to_end": {
+              "count": 8784,
+              "rate_per_second": 508.3722840345833,
+              "p50_ms": 987.098,
+              "p99_ms": 2000.127,
+              "longest_completion_gap_seconds": 0.0844731330871582,
+              "latency_resolution_microseconds": 1
+            },
+            "read_watermark": {
+              "count": 17,
+              "rate_per_second": 0.9838716790286789,
+              "p50_ms": 3.254,
+              "p99_ms": 15.193,
+              "longest_completion_gap_seconds": 1.0479846000671387,
+              "latency_resolution_microseconds": 1
+            }
+          },
+          "finish-load": {
+            "write_ack": {
+              "count": 878990,
+              "rate_per_second": 23420.926028822465,
+              "p50_ms": 12.956,
+              "p99_ms": 179.37,
+              "longest_completion_gap_seconds": 0.14052987098693848,
+              "latency_resolution_microseconds": 1
+            },
+            "read_message_poll": {
+              "count": 878990,
+              "rate_per_second": 23420.926028822465,
+              "p50_ms": 0.001,
+              "p99_ms": 0.001,
+              "longest_completion_gap_seconds": 0.20042777061462402,
+              "latency_resolution_microseconds": 1
+            },
+            "read_message_end_to_end": {
+              "count": 878990,
+              "rate_per_second": 23420.926028822465,
+              "p50_ms": 3841.292,
+              "p99_ms": 9972.933,
+              "longest_completion_gap_seconds": 0.20042777061462402,
+              "latency_resolution_microseconds": 1
+            },
+            "read_watermark": {
+              "count": 33,
+              "rate_per_second": 0.8792939156886214,
+              "p50_ms": 4.299,
+              "p99_ms": 493.547,
+              "longest_completion_gap_seconds": 1.508162260055542,
+              "latency_resolution_microseconds": 1
+            }
+          }
+        },
+        "overall": {
+          "write_ack": {
+            "count": 1001024,
+            "rate_per_second": 16318.610208837374,
+            "p50_ms": 13.919,
+            "p99_ms": 921.839,
+            "longest_completion_gap_seconds": 0.18705296516418457,
+            "latency_resolution_microseconds": 1
+          },
+          "read_watermark": {
+            "count": 77,
+            "rate_per_second": 0.9539359465995744,
+            "p50_ms": 4.299,
+            "p99_ms": 493.547,
+            "longest_completion_gap_seconds": 1.508162260055542,
+            "latency_resolution_microseconds": 1
+          },
+          "read_message_poll": {
+            "count": 1001024,
+            "rate_per_second": 14371.131728223178,
+            "p50_ms": 0.001,
+            "p99_ms": 0.009,
+            "longest_completion_gap_seconds": 0.20042777061462402,
+            "latency_resolution_microseconds": 1
+          },
+          "read_message_end_to_end": {
+            "count": 1001024,
+            "rate_per_second": 14371.131728223178,
+            "p50_ms": 3278.488,
+            "p99_ms": 9884.829,
+            "longest_completion_gap_seconds": 0.20042777061462402,
+            "latency_resolution_microseconds": 1
+          }
+        },
+        "partition_observations": {
+          "5:write_ack": {
+            "count": 166349,
+            "rate_per_second": 2711.9305735662215,
+            "p50_ms": 13.636,
+            "p99_ms": 753.926,
+            "longest_completion_gap_seconds": 0.28521108627319336,
+            "latency_resolution_microseconds": 1
+          },
+          "3:write_ack": {
+            "count": 167326,
+            "rate_per_second": 2735.030526842432,
+            "p50_ms": 14.248,
+            "p99_ms": 829.417,
+            "longest_completion_gap_seconds": 0.40108275413513184,
+            "latency_resolution_microseconds": 1
+          },
+          "4:write_ack": {
+            "count": 166804,
+            "rate_per_second": 2728.6928473797334,
+            "p50_ms": 13.786,
+            "p99_ms": 790.329,
+            "longest_completion_gap_seconds": 0.2298271656036377,
+            "latency_resolution_microseconds": 1
+          },
+          "1:write_ack": {
+            "count": 166839,
+            "rate_per_second": 2731.6836474459806,
+            "p50_ms": 13.952,
+            "p99_ms": 897.497,
+            "longest_completion_gap_seconds": 0.34888315200805664,
+            "latency_resolution_microseconds": 1
+          },
+          "0:write_ack": {
+            "count": 167368,
+            "rate_per_second": 2743.0157259135385,
+            "p50_ms": 13.876,
+            "p99_ms": 946.15,
+            "longest_completion_gap_seconds": 0.2689061164855957,
+            "latency_resolution_microseconds": 1
+          },
+          "2:write_ack": {
+            "count": 166338,
+            "rate_per_second": 2728.5387933341585,
+            "p50_ms": 14.034,
+            "p99_ms": 1012.313,
+            "longest_completion_gap_seconds": 0.2722134590148926,
+            "latency_resolution_microseconds": 1
+          },
+          "0:read_watermark": {
+            "count": 77,
+            "rate_per_second": 0.9539359465995744,
+            "p50_ms": 4.299,
+            "p99_ms": 493.547,
+            "longest_completion_gap_seconds": 1.508162260055542,
+            "latency_resolution_microseconds": 1
+          },
+          "5:read_message_poll": {
+            "count": 166349,
+            "rate_per_second": 2511.3848784727084,
+            "p50_ms": 0.001,
+            "p99_ms": 0.009,
+            "longest_completion_gap_seconds": 3.141757011413574,
+            "latency_resolution_microseconds": 1
+          },
+          "5:read_message_end_to_end": {
+            "count": 166349,
+            "rate_per_second": 2511.3848784727084,
+            "p50_ms": 3137.226,
+            "p99_ms": 6956.732,
+            "longest_completion_gap_seconds": 3.141757011413574,
+            "latency_resolution_microseconds": 1
+          },
+          "3:read_message_poll": {
+            "count": 167326,
+            "rate_per_second": 2475.053584681563,
+            "p50_ms": 0.001,
+            "p99_ms": 0.01,
+            "longest_completion_gap_seconds": 3.8879311084747314,
+            "latency_resolution_microseconds": 1
+          },
+          "3:read_message_end_to_end": {
+            "count": 167326,
+            "rate_per_second": 2475.053584681563,
+            "p50_ms": 4382.189,
+            "p99_ms": 8476.079,
+            "longest_completion_gap_seconds": 3.8879311084747314,
+            "latency_resolution_microseconds": 1
+          },
+          "4:read_message_poll": {
+            "count": 166804,
+            "rate_per_second": 2413.352961795879,
+            "p50_ms": 0.001,
+            "p99_ms": 0.008,
+            "longest_completion_gap_seconds": 4.217865228652954,
+            "latency_resolution_microseconds": 1
+          },
+          "4:read_message_end_to_end": {
+            "count": 166804,
+            "rate_per_second": 2413.352961795879,
+            "p50_ms": 4932.511,
+            "p99_ms": 10374.783,
+            "longest_completion_gap_seconds": 4.217865228652954,
+            "latency_resolution_microseconds": 1
+          },
+          "1:read_message_poll": {
+            "count": 166839,
+            "rate_per_second": 2515.609964060824,
+            "p50_ms": 0.001,
+            "p99_ms": 0.009,
+            "longest_completion_gap_seconds": 4.609456300735474,
+            "latency_resolution_microseconds": 1
+          },
+          "1:read_message_end_to_end": {
+            "count": 166839,
+            "rate_per_second": 2515.609964060824,
+            "p50_ms": 3522.759,
+            "p99_ms": 7669.901,
+            "longest_completion_gap_seconds": 4.609456300735474,
+            "latency_resolution_microseconds": 1
+          },
+          "0:read_message_poll": {
+            "count": 167368,
+            "rate_per_second": 2463.9869231755833,
+            "p50_ms": 0.001,
+            "p99_ms": 0.009,
+            "longest_completion_gap_seconds": 4.138900518417358,
+            "latency_resolution_microseconds": 1
+          },
+          "0:read_message_end_to_end": {
+            "count": 167368,
+            "rate_per_second": 2463.9869231755833,
+            "p50_ms": 3860.842,
+            "p99_ms": 9416.981,
+            "longest_completion_gap_seconds": 4.138900518417358,
+            "latency_resolution_microseconds": 1
+          },
+          "2:read_message_poll": {
+            "count": 166338,
+            "rate_per_second": 2587.3241809800847,
+            "p50_ms": 0.001,
+            "p99_ms": 0.004,
+            "longest_completion_gap_seconds": 3.7750089168548584,
+            "latency_resolution_microseconds": 1
+          },
+          "2:read_message_end_to_end": {
+            "count": 166338,
+            "rate_per_second": 2587.3241809800847,
+            "p50_ms": 2792.3,
+            "p99_ms": 6147.652,
+            "longest_completion_gap_seconds": 3.7750089168548584,
+            "latency_resolution_microseconds": 1
+          }
+        },
+        "first_success_after_fault": {},
+        "completion_gap_boundary": "Longest interval between observed completions including phase boundaries; not proof of complete service outage. First success may have started before injection.",
+        "latency_boundaries": {
+          "write": "producer admission through delivery callback; includes native retries",
+          "read_message_poll": "one native consumer poll, which may serve prefetched data",
+          "read_message_end_to_end": "producer wall-clock serialization to live reader observation",
+          "read_watermark": "native ListOffsets RPC on partition 0; not a message body read"
+        },
+        "wire_bytes": 71851532
+      },
+      "enriched": {
+        "intended": 1001024,
+        "acknowledged": 1001024,
+        "acknowledged_without_native_offset": 0,
+        "ambiguous": 0,
+        "rejected": 0,
+        "live_observed_acknowledged": 1001024,
+        "live_visible_nonack": 0,
+        "duplicate_live_deliveries": 0,
+        "acknowledged_loss": 0,
+        "corruption": 0,
+        "phases": {
+          "setup": {
+            "write_ack": {
+              "count": 103627,
+              "rate_per_second": 3288.28559828091,
+              "p50_ms": 758.199,
+              "p99_ms": 1025.247,
+              "longest_completion_gap_seconds": 0.08591198921203613,
+              "latency_resolution_microseconds": 1
+            },
+            "read_message_poll": {
+              "count": 102344,
+              "rate_per_second": 3247.5735210945168,
+              "p50_ms": 0.001,
+              "p99_ms": 0.001,
+              "longest_completion_gap_seconds": 3.851771831512451,
+              "latency_resolution_microseconds": 1
+            },
+            "read_message_end_to_end": {
+              "count": 102344,
+              "rate_per_second": 3247.5735210945168,
+              "p50_ms": 6108.963,
+              "p99_ms": 7267.208,
+              "longest_completion_gap_seconds": 3.851771831512451,
+              "latency_resolution_microseconds": 1
+            },
+            "read_watermark": {
+              "count": 5,
+              "rate_per_second": 0.15865969285422285,
+              "p50_ms": 465.752,
+              "p99_ms": 492.223,
+              "longest_completion_gap_seconds": 1.5047550201416016,
+              "latency_resolution_microseconds": 1
+            }
+          },
+          "baseline": {
+            "write_ack": {
+              "count": 9623,
+              "rate_per_second": 504.5016956681048,
+              "p50_ms": 8.037,
+              "p99_ms": 201.014,
+              "longest_completion_gap_seconds": 0.18705296516418457,
+              "latency_resolution_microseconds": 1
+            },
+            "read_watermark": {
+              "count": 14,
+              "rate_per_second": 0.7339731621483391,
+              "p50_ms": 398.413,
+              "p99_ms": 497.569,
+              "longest_completion_gap_seconds": 1.5608820915222168,
+              "latency_resolution_microseconds": 1
+            },
+            "read_message_poll": {
+              "count": 9849,
+              "rate_per_second": 516.3501195713566,
+              "p50_ms": 0.001,
+              "p99_ms": 0.002,
+              "longest_completion_gap_seconds": 4.490389823913574,
+              "latency_resolution_microseconds": 1
+            },
+            "read_message_end_to_end": {
+              "count": 9849,
+              "rate_per_second": 516.3501195713566,
+              "p50_ms": 3281.119,
+              "p99_ms": 6304.017,
+              "longest_completion_gap_seconds": 4.490389823913574,
+              "latency_resolution_microseconds": 1
+            }
+          },
+          "recovered-live": {
+            "write_ack": {
+              "count": 8784,
+              "rate_per_second": 508.3722840345833,
+              "p50_ms": 7.994,
+              "p99_ms": 177.194,
+              "longest_completion_gap_seconds": 0.08597517013549805,
+              "latency_resolution_microseconds": 1
+            },
+            "read_watermark": {
+              "count": 14,
+              "rate_per_second": 0.8102472650824415,
+              "p50_ms": 307.53,
+              "p99_ms": 502.107,
+              "longest_completion_gap_seconds": 1.5245981216430664,
+              "latency_resolution_microseconds": 1
+            },
+            "read_message_poll": {
+              "count": 9153,
+              "rate_per_second": 529.7280869499705,
+              "p50_ms": 0.001,
+              "p99_ms": 0.004,
+              "longest_completion_gap_seconds": 4.460239887237549,
+              "latency_resolution_microseconds": 1
+            },
+            "read_message_end_to_end": {
+              "count": 9153,
+              "rate_per_second": 529.7280869499705,
+              "p50_ms": 2912.266,
+              "p99_ms": 6838.516,
+              "longest_completion_gap_seconds": 4.460239887237549,
+              "latency_resolution_microseconds": 1
+            }
+          },
+          "finish-load": {
+            "write_ack": {
+              "count": 878990,
+              "rate_per_second": 23420.926028822465,
+              "p50_ms": 12.956,
+              "p99_ms": 179.37,
+              "longest_completion_gap_seconds": 0.14052987098693848,
+              "latency_resolution_microseconds": 1
+            },
+            "read_watermark": {
+              "count": 32,
+              "rate_per_second": 0.852648645516239,
+              "p50_ms": 1.176,
+              "p99_ms": 495.376,
+              "longest_completion_gap_seconds": 1.513467788696289,
+              "latency_resolution_microseconds": 1
+            },
+            "read_message_poll": {
+              "count": 879678,
+              "rate_per_second": 23439.257974701064,
+              "p50_ms": 0.001,
+              "p99_ms": 0.001,
+              "longest_completion_gap_seconds": 3.5099780559539795,
+              "latency_resolution_microseconds": 1
+            },
+            "read_message_end_to_end": {
+              "count": 879678,
+              "rate_per_second": 23439.257974701064,
+              "p50_ms": 6834.632,
+              "p99_ms": 12409.1,
+              "longest_completion_gap_seconds": 3.5099780559539795,
+              "latency_resolution_microseconds": 1
+            }
+          }
+        },
+        "overall": {
+          "write_ack": {
+            "count": 1001024,
+            "rate_per_second": 16318.610208837374,
+            "p50_ms": 13.919,
+            "p99_ms": 921.839,
+            "longest_completion_gap_seconds": 0.18705296516418457,
+            "latency_resolution_microseconds": 1
+          },
+          "read_message_poll": {
+            "count": 1001024,
+            "rate_per_second": 13978.29407805061,
+            "p50_ms": 0.001,
+            "p99_ms": 0.001,
+            "longest_completion_gap_seconds": 4.850473880767822,
+            "latency_resolution_microseconds": 1
+          },
+          "read_message_end_to_end": {
+            "count": 1001024,
+            "rate_per_second": 13978.29407805061,
+            "p50_ms": 6449.55,
+            "p99_ms": 12346.015,
+            "longest_completion_gap_seconds": 4.850473880767822,
+            "latency_resolution_microseconds": 1
+          },
+          "read_watermark": {
+            "count": 65,
+            "rate_per_second": 0.8144414496292659,
+            "p50_ms": 217.591,
+            "p99_ms": 502.107,
+            "longest_completion_gap_seconds": 1.5608820915222168,
+            "latency_resolution_microseconds": 1
+          }
+        },
+        "partition_observations": {
+          "5:write_ack": {
+            "count": 166349,
+            "rate_per_second": 2711.9305735662215,
+            "p50_ms": 13.636,
+            "p99_ms": 753.926,
+            "longest_completion_gap_seconds": 0.28521108627319336,
+            "latency_resolution_microseconds": 1
+          },
+          "3:write_ack": {
+            "count": 167326,
+            "rate_per_second": 2735.030526842432,
+            "p50_ms": 14.248,
+            "p99_ms": 829.417,
+            "longest_completion_gap_seconds": 0.40108275413513184,
+            "latency_resolution_microseconds": 1
+          },
+          "4:write_ack": {
+            "count": 166804,
+            "rate_per_second": 2728.6928473797334,
+            "p50_ms": 13.786,
+            "p99_ms": 790.329,
+            "longest_completion_gap_seconds": 0.2298271656036377,
+            "latency_resolution_microseconds": 1
+          },
+          "1:write_ack": {
+            "count": 166839,
+            "rate_per_second": 2731.6836474459806,
+            "p50_ms": 13.952,
+            "p99_ms": 897.497,
+            "longest_completion_gap_seconds": 0.34888315200805664,
+            "latency_resolution_microseconds": 1
+          },
+          "0:write_ack": {
+            "count": 167368,
+            "rate_per_second": 2743.0157259135385,
+            "p50_ms": 13.876,
+            "p99_ms": 946.15,
+            "longest_completion_gap_seconds": 0.2689061164855957,
+            "latency_resolution_microseconds": 1
+          },
+          "2:write_ack": {
+            "count": 166338,
+            "rate_per_second": 2728.5387933341585,
+            "p50_ms": 14.034,
+            "p99_ms": 1012.313,
+            "longest_completion_gap_seconds": 0.2722134590148926,
+            "latency_resolution_microseconds": 1
+          },
+          "5:read_message_poll": {
+            "count": 166349,
+            "rate_per_second": 2454.978826128278,
+            "p50_ms": 0.001,
+            "p99_ms": 0.001,
+            "longest_completion_gap_seconds": 6.836784601211548,
+            "latency_resolution_microseconds": 1
+          },
+          "5:read_message_end_to_end": {
+            "count": 166349,
+            "rate_per_second": 2454.978826128278,
+            "p50_ms": 7050.467,
+            "p99_ms": 10192.327,
+            "longest_completion_gap_seconds": 6.836784601211548,
+            "latency_resolution_microseconds": 1
+          },
+          "0:read_watermark": {
+            "count": 65,
+            "rate_per_second": 0.8144414496292659,
+            "p50_ms": 217.591,
+            "p99_ms": 502.107,
+            "longest_completion_gap_seconds": 1.5608820915222168,
+            "latency_resolution_microseconds": 1
+          },
+          "3:read_message_poll": {
+            "count": 167326,
+            "rate_per_second": 2354.637150622167,
+            "p50_ms": 0.001,
+            "p99_ms": 0.001,
+            "longest_completion_gap_seconds": 4.992141962051392,
+            "latency_resolution_microseconds": 1
+          },
+          "3:read_message_end_to_end": {
+            "count": 167326,
+            "rate_per_second": 2354.637150622167,
+            "p50_ms": 5521.536,
+            "p99_ms": 11146.37,
+            "longest_completion_gap_seconds": 4.992141962051392,
+            "latency_resolution_microseconds": 1
+          },
+          "4:read_message_poll": {
+            "count": 166804,
+            "rate_per_second": 2353.714904129625,
+            "p50_ms": 0.001,
+            "p99_ms": 0.001,
+            "longest_completion_gap_seconds": 8.376501560211182,
+            "latency_resolution_microseconds": 1
+          },
+          "4:read_message_end_to_end": {
+            "count": 166804,
+            "rate_per_second": 2353.714904129625,
+            "p50_ms": 6275.495,
+            "p99_ms": 12621.637,
+            "longest_completion_gap_seconds": 8.376501560211182,
+            "latency_resolution_microseconds": 1
+          },
+          "2:read_message_poll": {
+            "count": 166338,
+            "rate_per_second": 2379.0947763328186,
+            "p50_ms": 0.001,
+            "p99_ms": 0.001,
+            "longest_completion_gap_seconds": 7.657559871673584,
+            "latency_resolution_microseconds": 1
+          },
+          "2:read_message_end_to_end": {
+            "count": 166338,
+            "rate_per_second": 2379.0947763328186,
+            "p50_ms": 5680.453,
+            "p99_ms": 11756.73,
+            "longest_completion_gap_seconds": 7.657559871673584,
+            "latency_resolution_microseconds": 1
+          },
+          "1:read_message_poll": {
+            "count": 166839,
+            "rate_per_second": 2673.2801380702567,
+            "p50_ms": 0.001,
+            "p99_ms": 0.001,
+            "longest_completion_gap_seconds": 6.223130941390991,
+            "latency_resolution_microseconds": 1
+          },
+          "1:read_message_end_to_end": {
+            "count": 166839,
+            "rate_per_second": 2673.2801380702567,
+            "p50_ms": 7256.354,
+            "p99_ms": 11061.241,
+            "longest_completion_gap_seconds": 6.223130941390991,
+            "latency_resolution_microseconds": 1
+          },
+          "0:read_message_poll": {
+            "count": 167368,
+            "rate_per_second": 2622.550076490018,
+            "p50_ms": 0.001,
+            "p99_ms": 0.001,
+            "longest_completion_gap_seconds": 4.885551452636719,
+            "latency_resolution_microseconds": 1
+          },
+          "0:read_message_end_to_end": {
+            "count": 167368,
+            "rate_per_second": 2622.550076490018,
+            "p50_ms": 6530.924,
+            "p99_ms": 10439.846,
+            "longest_completion_gap_seconds": 4.885551452636719,
+            "latency_resolution_microseconds": 1
+          }
+        },
+        "first_success_after_fault": {},
+        "completion_gap_boundary": "Longest interval between observed completions including phase boundaries; not proof of complete service outage. First success may have started before injection.",
+        "latency_boundaries": {
+          "write": "producer admission through delivery callback; includes native retries",
+          "read_message_poll": "one native consumer poll, which may serve prefetched data",
+          "read_message_end_to_end": "producer wall-clock serialization to live reader observation",
+          "read_watermark": "native ListOffsets RPC on partition 0; not a message body read"
+        },
+        "wire_bytes": 113670118
+      }
+    },
+    "resources": {
+      "samples": 388,
+      "cadence_target_seconds": 5,
+      "containers": {
+        "22c0d369dfacdb6e9928d212229b87695db0a3fe9feba172ad7d8f3ebd39d72f/2026-11-21T13:41:07.010630546Z": {
+          "role": "processor",
+          "last_cpu": 90306000,
+          "sampled_max_charged_bytes": 19533824,
+          "sampled_max_anonymous_bytes": 18685952,
+          "cpu_limit_cores": 1.0,
+          "cpu_core_seconds": 0.008658,
+          "cpu_utilization_percent_one_core_100": {
+            "average": 0.17301476722897058,
+            "sampled_peak": 0.17301476722897058
+          },
+          "sampled_mean_charged_bytes": 19533824.0,
+          "block_io": {
+            "read_bytes": null,
+            "write_bytes": null,
+            "read_operations": null,
+            "write_operations": null
+          },
+          "block_io_rates_per_second": {
+            "read_bytes": null,
+            "write_bytes": null,
+            "read_operations": null,
+            "write_operations": null
+          }
+        },
+        "ff3340a5118a9fb1d436012ff3b519b8c9a5bb47d0771e176b3a05af1a39f79a/2026-11-21T13:40:22.399367053Z": {
+          "role": "connect-1",
+          "last_cpu": 31353018000,
+          "sampled_max_charged_bytes": 613646336,
+          "sampled_max_anonymous_bytes": 607539200,
+          "cpu_limit_cores": 1.0,
+          "cpu_core_seconds": 3.550097,
+          "cpu_utilization_percent_one_core_100": {
+            "average": 2.150149393515054,
+            "sampled_peak": 4.833246348118603
+          },
+          "sampled_mean_charged_bytes": 612478132.7058823,
+          "block_io": {
+            "read_bytes": 0,
+            "write_bytes": 245760,
+            "read_operations": null,
+            "write_operations": null
+          },
+          "block_io_rates_per_second": {
+            "read_bytes": 0.0,
+            "write_bytes": 1488.46838537161,
+            "read_operations": null,
+            "write_operations": null
+          }
+        },
+        "00affaef08db313ed2ab5dfa2a0882cd9f8107e45ffcf76e2285ee806e5739ad/2026-11-21T13:40:22.401240387Z": {
+          "role": "connect-2",
+          "last_cpu": 28415095000,
+          "sampled_max_charged_bytes": 563093504,
+          "sampled_max_anonymous_bytes": 550252544,
+          "cpu_limit_cores": 1.0,
+          "cpu_core_seconds": 2.559497,
+          "cpu_utilization_percent_one_core_100": {
+            "average": 1.550191517024537,
+            "sampled_peak": 6.699528324662839
+          },
+          "sampled_mean_charged_bytes": 560883109.6470588,
+          "block_io": {
+            "read_bytes": 0,
+            "write_bytes": 237568,
+            "read_operations": null,
+            "write_operations": null
+          },
+          "block_io_rates_per_second": {
+            "read_bytes": 0.0,
+            "write_bytes": 1438.8604413933099,
+            "read_operations": null,
+            "write_operations": null
+          }
+        },
+        "189dec5b2005b2537a42d57170e8a96da25433e1aa823b5e56c8355b7e680295/2026-11-21T13:40:05.795947879Z": {
+          "role": "kafka-broker-2",
+          "last_cpu": 41620647000,
+          "sampled_max_charged_bytes": 558424064,
+          "sampled_max_anonymous_bytes": 501293056,
+          "cpu_limit_cores": 1.0,
+          "cpu_core_seconds": 30.691717,
+          "cpu_utilization_percent_one_core_100": {
+            "average": 18.588867487307677,
+            "sampled_peak": 50.47399547918412
+          },
+          "sampled_mean_charged_bytes": 464146672.9411765,
+          "block_io": {
+            "read_bytes": 0,
+            "write_bytes": 65249280,
+            "read_operations": null,
+            "write_operations": null
+          },
+          "block_io_rates_per_second": {
+            "read_bytes": 0.0,
+            "write_bytes": 395191.38651064556,
+            "read_operations": null,
+            "write_operations": null
+          }
+        },
+        "3d098c57a9f5b2d08174be234ee382b01152959a184e2a0ff94426ca6422354a/2026-11-21T13:40:05.796682837Z": {
+          "role": "kafka-broker-1",
+          "last_cpu": 64722135000,
+          "sampled_max_charged_bytes": 558301184,
+          "sampled_max_anonymous_bytes": 507203584,
+          "cpu_limit_cores": 1.0,
+          "cpu_core_seconds": 47.303118,
+          "cpu_utilization_percent_one_core_100": {
+            "average": 28.64982113359317,
+            "sampled_peak": 80.47097670461041
+          },
+          "sampled_mean_charged_bytes": 476222162.8235294,
+          "block_io": {
+            "read_bytes": 0,
+            "write_bytes": 65982464,
+            "read_operations": null,
+            "write_operations": null
+          },
+          "block_io_rates_per_second": {
+            "read_bytes": 0.0,
+            "write_bytes": 399632.38608367235,
+            "read_operations": null,
+            "write_operations": null
+          }
+        },
+        "336f23f98bfbffd2bfcd6ceb244a18c845646c8ea628021ba61441aa4dec1982/2026-11-21T13:40:05.797759212Z": {
+          "role": "kafka-broker-3",
+          "last_cpu": 44711619000,
+          "sampled_max_charged_bytes": 536272896,
+          "sampled_max_anonymous_bytes": 494362624,
+          "cpu_limit_cores": 1.0,
+          "cpu_core_seconds": 33.784654,
+          "cpu_utilization_percent_one_core_100": {
+            "average": 20.462091645458607,
+            "sampled_peak": 51.02199921690084
+          },
+          "sampled_mean_charged_bytes": 467712481.88235295,
+          "block_io": {
+            "read_bytes": 0,
+            "write_bytes": 65331200,
+            "read_operations": null,
+            "write_operations": null
+          },
+          "block_io_rates_per_second": {
+            "read_bytes": 0.0,
+            "write_bytes": 395686.45625548955,
+            "read_operations": null,
+            "write_operations": null
+          }
+        },
+        "fd570d79a09ea57c660012302710dd95fc39c709f78f6c7c0d67b54a83253338/2026-11-21T13:39:49.216054469Z": {
+          "role": "postgres",
+          "last_cpu": 4959363000,
+          "sampled_max_charged_bytes": 110067712,
+          "sampled_max_anonymous_bytes": 11272192,
+          "cpu_limit_cores": 1.0,
+          "cpu_core_seconds": 3.940157,
+          "cpu_utilization_percent_one_core_100": {
+            "average": 2.3864080400826744,
+            "sampled_peak": 5.111722018466595
+          },
+          "sampled_mean_charged_bytes": 109919533.1764706,
+          "block_io": {
+            "read_bytes": 0,
+            "write_bytes": 1331200,
+            "read_operations": null,
+            "write_operations": null
+          },
+          "block_io_rates_per_second": {
+            "read_bytes": 0.0,
+            "write_bytes": 8062.588325688687,
+            "read_operations": null,
+            "write_operations": null
+          }
+        },
+        "0f631a0f5879bd898737ad18ad0d3179b5431825f9189784a43925d31699f644/2026-11-21T13:39:49.212297635Z": {
+          "role": "kafka-controller-3",
+          "last_cpu": 25412315000,
+          "sampled_max_charged_bytes": 311115776,
+          "sampled_max_anonymous_bytes": 307077120,
+          "cpu_limit_cores": 1.0,
+          "cpu_core_seconds": 13.969219,
+          "cpu_utilization_percent_one_core_100": {
+            "average": 8.460703523145346,
+            "sampled_peak": 25.015365891868008
+          },
+          "sampled_mean_charged_bytes": 218822174.11764705,
+          "block_io": {
+            "read_bytes": 0,
+            "write_bytes": 2138112,
+            "read_operations": null,
+            "write_operations": null
+          },
+          "block_io_rates_per_second": {
+            "read_bytes": 0.0,
+            "write_bytes": 12949.851907454055,
+            "read_operations": null,
+            "write_operations": null
+          }
+        },
+        "04f7ff5021ebcbfbc2947823097e334067a7e5facfff7bb5f44d55500b54c237/2026-11-21T13:39:49.20973426Z": {
+          "role": "kafka-controller-1",
+          "last_cpu": 22104231000,
+          "sampled_max_charged_bytes": 277106688,
+          "sampled_max_anonymous_bytes": 273117184,
+          "cpu_limit_cores": 1.0,
+          "cpu_core_seconds": 12.12772,
+          "cpu_utilization_percent_one_core_100": {
+            "average": 7.345231793766985,
+            "sampled_peak": 23.23394833081369
+          },
+          "sampled_mean_charged_bytes": 198387832.47058824,
+          "block_io": {
+            "read_bytes": 0,
+            "write_bytes": 2138112,
+            "read_operations": null,
+            "write_operations": null
+          },
+          "block_io_rates_per_second": {
+            "read_bytes": 0.0,
+            "write_bytes": 12949.61315155257,
+            "read_operations": null,
+            "write_operations": null
+          }
+        },
+        "dce07beccc0b02d0653de4057d99a477ccc64d417443571d480ff2e659218541/2026-11-21T13:39:49.213549177Z": {
+          "role": "kafka-controller-2",
+          "last_cpu": 22353434000,
+          "sampled_max_charged_bytes": 282578944,
+          "sampled_max_anonymous_bytes": 277499904,
+          "cpu_limit_cores": 1.0,
+          "cpu_core_seconds": 12.602641,
+          "cpu_utilization_percent_one_core_100": {
+            "average": 7.632835676401366,
+            "sampled_peak": 25.986386840533726
+          },
+          "sampled_mean_charged_bytes": 196747504.94117647,
+          "block_io": {
+            "read_bytes": 0,
+            "write_bytes": 2109440,
+            "read_operations": null,
+            "write_operations": null
+          },
+          "block_io_rates_per_second": {
+            "read_bytes": 0.0,
+            "write_bytes": 12775.900614187216,
+            "read_operations": null,
+            "write_operations": null
+          }
+        },
+        "c43a620b4d98079e5489a6e110a4b7e22fe769b56854bcafbfc2649dd6683ded/2026-11-21T13:41:27.635979417Z": {
+          "role": "processor",
+          "last_cpu": 1771717000,
+          "sampled_max_charged_bytes": 194514944,
+          "sampled_max_anonymous_bytes": 167776256,
+          "cpu_limit_cores": 1.0,
+          "cpu_core_seconds": 1.771717,
+          "cpu_utilization_percent_one_core_100": {
+            "average": 1.1048365183431461,
+            "sampled_peak": 11.312573248799723
+          },
+          "sampled_mean_charged_bytes": 109601152.0,
+          "block_io": {
+            "read_bytes": null,
+            "write_bytes": null,
+            "read_operations": null,
+            "write_operations": null
+          },
+          "block_io_rates_per_second": {
+            "read_bytes": null,
+            "write_bytes": null,
+            "read_operations": null,
+            "write_operations": null
+          }
+        },
+        "606c218c763ae51fcf8a4255eddd33377e419624ca35e11c9951f39293a1c830/2026-11-21T13:41:42.287561007Z": {
+          "role": "witness-producer",
+          "last_cpu": 19581366000,
+          "sampled_max_charged_bytes": 219893760,
+          "sampled_max_anonymous_bytes": 85893120,
+          "cpu_limit_cores": 1.0,
+          "cpu_core_seconds": 19.581366,
+          "cpu_utilization_percent_one_core_100": {
+            "average": 29.409477665752583,
+            "sampled_peak": 91.26435058853716
+          },
+          "sampled_mean_charged_bytes": 119225422.76923077,
+          "block_io": {
+            "read_bytes": null,
+            "write_bytes": null,
+            "read_operations": null,
+            "write_operations": null
+          },
+          "block_io_rates_per_second": {
+            "read_bytes": null,
+            "write_bytes": null,
+            "read_operations": null,
+            "write_operations": null
+          }
+        },
+        "059e19dfac31f482364aaeed406a96edc7ffe96d9568dbe41ff116797c71e3c4/2026-11-21T13:41:42.024490798Z": {
+          "role": "enriched-reader",
+          "last_cpu": 17577749000,
+          "sampled_max_charged_bytes": 376827904,
+          "sampled_max_anonymous_bytes": 349413376,
+          "cpu_limit_cores": 1.0,
+          "cpu_core_seconds": 17.577749,
+          "cpu_utilization_percent_one_core_100": {
+            "average": 22.42113933033988,
+            "sampled_peak": 72.8753880244076
+          },
+          "sampled_mean_charged_bytes": 147498752.0,
+          "block_io": {
+            "read_bytes": null,
+            "write_bytes": null,
+            "read_operations": null,
+            "write_operations": null
+          },
+          "block_io_rates_per_second": {
+            "read_bytes": null,
+            "write_bytes": null,
+            "read_operations": null,
+            "write_operations": null
+          }
+        },
+        "c935da49f1b3afc4446ca5bff362d5e7c6d018bf6b9cb40e5804d8e746e442eb/2026-11-21T13:41:41.787075215Z": {
+          "role": "source-reader",
+          "last_cpu": 18630049000,
+          "sampled_max_charged_bytes": 269246464,
+          "sampled_max_anonymous_bytes": 250515456,
+          "cpu_limit_cores": 1.0,
+          "cpu_core_seconds": 18.630049,
+          "cpu_utilization_percent_one_core_100": {
+            "average": 23.369145929031454,
+            "sampled_peak": 70.66394048746206
+          },
+          "sampled_mean_charged_bytes": 118230528.0,
+          "block_io": {
+            "read_bytes": null,
+            "write_bytes": null,
+            "read_operations": null,
+            "write_operations": null
+          },
+          "block_io_rates_per_second": {
+            "read_bytes": null,
+            "write_bytes": null,
+            "read_operations": null,
+            "write_operations": null
+          }
+        },
+        "82ad76dd8822d19646250b0f34e7f9a012c1b47752a4142ef7fa07d8d7ae0658/2026-11-21T13:43:06.253454504Z": {
+          "role": "witness-verifier",
+          "last_cpu": 2427067000,
+          "sampled_max_charged_bytes": 589807616,
+          "sampled_max_anonymous_bytes": 454836224,
+          "cpu_limit_cores": 2.0,
+          "cpu_core_seconds": 2.427067,
+          "cpu_utilization_percent_one_core_100": {
+            "average": null,
+            "sampled_peak": null
+          },
+          "sampled_mean_charged_bytes": 589807616.0,
+          "block_io": {
+            "read_bytes": null,
+            "write_bytes": null,
+            "read_operations": null,
+            "write_operations": null
+          },
+          "block_io_rates_per_second": {
+            "read_bytes": null,
+            "write_bytes": null,
+            "read_operations": null,
+            "write_operations": null
+          }
+        },
+        "877e7b7dffc05a3bd7785bc25f92f5198d738fc6609c98bb82469382e6927af1/2026-11-21T13:43:13.737054008Z": {
+          "role": "witness-verifier",
+          "last_cpu": 3222723000,
+          "sampled_max_charged_bytes": 613281792,
+          "sampled_max_anonymous_bytes": 477278208,
+          "cpu_limit_cores": 2.0,
+          "cpu_core_seconds": 3.222723,
+          "cpu_utilization_percent_one_core_100": {
+            "average": 49.15444685038937,
+            "sampled_peak": 49.15444685038937
+          },
+          "sampled_mean_charged_bytes": 360734720.0,
+          "block_io": {
+            "read_bytes": null,
+            "write_bytes": null,
+            "read_operations": null,
+            "write_operations": null
+          },
+          "block_io_rates_per_second": {
+            "read_bytes": null,
+            "write_bytes": null,
+            "read_operations": null,
+            "write_operations": null
+          }
+        }
+      },
+      "cpu_core_seconds": 223.748149,
+      "limits": "Cgroup CPU across all threads; one core = 100%. Memory mean is a sample mean; maxima are sampled charged/anonymous usage, not process peak RSS or simultaneous stack peak. Block I/O is runtime cgroup accounting, not logical engine I/O; empty counters are unavailable. I/O latency/queue depth unavailable. Stopped tails and short-lived work can be missed. Host controllers/Docker VM overhead excluded.",
+      "host_controller": {
+        "wall_seconds": 170.06258583301678,
+        "user_cpu_seconds": 39.452073,
+        "system_cpu_seconds": 1.7501390000000001,
+        "cpu_utilization_percent_one_core_100": 24.227675827801505,
+        "child_cli_user_cpu_seconds": 20.549985,
+        "child_cli_system_cpu_seconds": 10.291866,
+        "process_lifetime_peak_rss_bytes": 652804096,
+        "limits": "Controller CPU deltas include witness reconciliation; child CPU is local CLI processes, not Docker VM/container work. Peak RSS is process-lifetime and can include earlier trials in the same invocation, not a per-trial or whole-stack peak. Docker daemon/VM overhead excluded."
+      }
+    },
+    "compression": {
+      "source:data": {
+        "records": 1001024,
+        "batches": 19323,
+        "compressed_bytes": 23409720,
+        "uncompressed_bytes": 126577194,
+        "batch_header_bytes": 1178703,
+        "uncompressed_over_compressed": 5.407035795387557
+      },
+      "enriched:data": {
+        "records": 1001024,
+        "batches": 1311,
+        "compressed_bytes": 35702035,
+        "uncompressed_bytes": 168586607,
+        "batch_header_bytes": 79971,
+        "uncompressed_over_compressed": 4.722044751790759
+      },
+      "enriched:control": {
+        "records": 1311,
+        "batches": 1311,
+        "compressed_bytes": 22287,
+        "uncompressed_bytes": 22287,
+        "batch_header_bytes": 79971,
+        "uncompressed_over_compressed": 1.0
+      }
+    },
+    "deleted_volumes": 25,
+    "foreign_containers_unchanged": 9,
+    "foreign_volumes_unchanged": 10,
+    "closure_sha256": "5002e80a3371a61036f9b0929008ffbabab8542983f513132dc480c4cf1cf09e",
+    "limit": "This final independent fixture ran all five commands serially without retries, using COUNT=1000000. CPU/resource samples include baseline native verification and separate compression-copy inspection; no capacity/comparative/cold-cache claim."
+  }
+}

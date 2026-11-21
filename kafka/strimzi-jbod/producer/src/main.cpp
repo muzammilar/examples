@@ -215,6 +215,9 @@ void run() {
   bounded(plan, "format_version", 1, 1);
   const auto minimum = bounded(plan, "minimum_messages", 1, 2000000);
   const auto warmup = bounded(plan, "warmup_messages", 1, minimum);
+  const auto customer_count = plan.contains("customer_count")
+                                  ? bounded(plan, "customer_count", 1, 1000000)
+                                  : 10;
   const auto live_rate = bounded(plan, "live_rate", 1, 100000);
   const auto burst_rate = bounded(plan, "burst_rate", 0, 1000000);
   const auto duration = bounded(plan, "duration_seconds", 60, 7200);
@@ -298,7 +301,7 @@ void run() {
       value->id = run_id + "-order-" + std::to_string(sequence);
       kafka::demo::v1::Order order;
       order.set_order_id(value->id);
-      order.set_customer_id("customer-" + std::to_string(sequence % 10));
+      order.set_customer_id("customer-" + std::to_string(sequence % customer_count));
       order.set_amount_cents(1000 + static_cast<std::int64_t>(sequence % 5000));
       order.set_created_at_unix_ms(value->created_ms);
       if (!order.SerializeToString(&value->payload))

@@ -8,15 +8,53 @@ Kafka Connect connector plugins implement JVM APIs, so a Go program cannot run a
 
 1. `make docker-up` — start Kafka, PostgreSQL, and the Connect workers.
 2. `make up` — create topics, register Debezium, and wait for the Go processor.
-3. `make test` — produce 2,000,000 protobuf orders by default and check every enriched output (`make test COUNT=3000000` changes the workload; the producer allows up to 5,000,000).
-4. `make down` — stop and remove the Go processor container while keeping the services and data available.
-5. `make docker-down` — stop the Compose stack and remove its volumes and local images.
+3. `make test` — run the witnessed baseline with at least 2,000,000 protobuf orders and replay every acknowledged source/enriched body, key and partition (`COUNT=1000000` selects one million).
+4. `make down` — reconcile retained histories, then stop and remove the Go processor while keeping infrastructure and data.
+5. `make docker-down` — reconcile again, stop the stack, and remove its owned volumes and built workload images; preserve external evidence.
 
-Prerequisites: Docker with the Compose v2 plugin, `make`, `curl`, `jq`, and `seq`. C++, Go, Rust, and `protoc` toolchains run in the image builds.
+Prerequisites: Docker with Compose, `make`, and Python 3.11+. C++, Go, Rust, and `protoc` toolchains run in the image builds.
 
 Use `make status`, `make logs`, and `make cli` for inspection and database access. `make demo` reruns the producer/consumer flow without rebuilding the infrastructure.
 
-`make up` can also be run directly; it starts the Compose infrastructure before provisioning the example. `make demo` runs the same producer/consumer flow as `make test`.
+`make up` also works directly. It prepares infrastructure, builds the C++/Rust
+witness workloads and Go processor, and configures topics/CDC. `make demo` is an
+alias for `make test`. The recovery harness accepts **1–2 million** minimum orders
+and **10,000 customers**; completed delivery batches may slightly exceed `COUNT`.
+The older simple producer/consumer remain available as Compose `apps` services.
+
+The lifecycle saves its owner and chosen loopback ports in ignored `results/`.
+Override ports on the first `make docker-up`, for example `CONNECT_PORT=18083
+PROCESSOR_PORT=18080`; later commands reuse those saved ports. Reapplying `make up`
+preserves the current processor topics, group and transaction identity. Run repeat
+setup as a separate Make invocation. `make cli` opens an interactive PostgreSQL
+session using the saved configuration.
+
+One lock serializes lifecycle and experiment commands. An unqualified failed
+history blocks destructive cleanup until separately diagnosed/reconciled. Teardown
+saves stopped-process inspection, checks for clean exits, and removes anonymous
+volumes only after a healthy runtime listing proves no container references them.
+The next setup archives a closed fixture under `results/archives/<owner>/`, keeping
+its failed verdicts and evidence separate from the fresh fixture. It refuses to
+adopt an unowned existing project or start over remaining owned storage.
+The cleanup checks supplement [Compose's documented `down` behavior](https://docs.docker.com/reference/cli/docker/compose/down/)
+and its [v5.1.4 removal implementation](https://github.com/docker/compose/blob/v5.1.4/pkg/compose/down.go),
+which can report an in-use resource as a warning rather than a failed command.
+
+## Operational commands
+
+| Command | Scope |
+|---|---|
+| `make test-production` | Serial baseline, broker, active Connect worker, processor and PostgreSQL crash cases; each replays current/prior ACK histories |
+| `make chaos-broker` / `make chaos-connect` | One native role-aware crash and recovery case |
+| `make chaos-processor` / `make chaos-postgres` | One application/CDC dependency crash and recovery case |
+| `make benchmark` | Three fresh minimum-count diagnostic cases; not a sustained capacity benchmark |
+| `make verify-history` | Read-only strict source/output replay and SQL witness reconciliation |
+| `make reconcile-prior CASE_ID=<id>` | Separate data reconciliation for an interrupted case; keeps its failed verdict |
+| `make workload-images` | Explicitly rebuild local workload images; normal `up` reuses matching source/image receipts |
+
+All load cases use `COUNT=2000000` by default, allowing **1–2 million** minimum
+orders. Keep operational cases serial. Extended partition/disk/quorum/scaling,
+pressure, upgrade and independent restore cases are not implemented by these targets.
 
 ## What it demonstrates
 
@@ -53,7 +91,7 @@ worker configurations and actual RF3/ISR3/zero-lag state were checked. New setup
 request RF3 from creation. The configurable 10-second rebalance grace is a local
 lab setting; it does not weaken replication or durability.
 
-The [recovery branch's independent witness baseline](https://github.com/muzammilar/examples/blob/kafka-connect-live-recovery/kafka/connect-postgres-enrichment/RECOVERY_TEST_STATUS.md)
+The [independent witness baseline](RECOVERY_TEST_STATUS.md)
 verified **2,004,096 ACKs / 10,000 customers**, every source/enriched order body,
 key and partition, and **zero acknowledged loss/corruption**. Serialized input:
 **144,964,788 bytes**; enriched output: **228,691,806 bytes**. Callback p50/p99:
@@ -63,7 +101,7 @@ Those include SDK/witness queues and reader backlog. The mixed rate-limited/fina
 burst ACK window was **22,921.20 ACK/s**, not a capacity benchmark. Resource
 sampling counted **448.620 CPU core-seconds** across the observed experiment,
 including native inspection and full verification. Largest sampled individual-container charged/anonymous memory was **1,153,605,632 / 881,565,696 bytes** (the replay verifier); these are sample maxima, not process peak RSS or a simultaneous stack peak. Three benchmark trials have
-not run. Docker builds passed Go vet and race tests; the baseline also used C++
+not run at that pause. Docker builds passed Go vet and race tests; the baseline also used C++
 CTest and eight Rust observer tests. Tested HTTP ports were 18083/18080.
 
 At the 2026-11-20 pause, the broker experiment was **stopped during final replay**
@@ -168,10 +206,9 @@ restore, batch/skew/cold-read matrices and competing-system comparisons remain
 unrun. Eight host controller tests pass; the compression inspector also rejected
 corrupted-CRC and truncated native segments.
 
-The [experimental witness harness](https://github.com/muzammilar/examples/tree/kafka-connect-live-recovery/kafka/connect-postgres-enrichment)
-produced these results. Clean-checkout initialization and its full production-test
-lifecycle remain unqualified; these case results do not establish those paths.
-After publishing the results, cleanup removed **129 owned containers / 25 owned
+The local witness harness produced these results. Its subsequent lifecycle
+qualification is recorded below; the individual core cases do not establish the
+extended production-test matrix. After publishing the original results, cleanup removed **129 owned containers / 25 owned
 volumes**, with **nine unrelated containers / ten unrelated volumes unchanged**.
 All example-built image tags are gone. Compose left **six unused anonymous Connect
 volumes**; the initial teardown post-check failed. A separate scoped cleanup used
@@ -179,11 +216,61 @@ the saved mount identities and healthy empty-reference listings to remove exactl
 those six volumes. The original failed teardown log remains preserved.
 
 At the user's request, **145 large journal/log-copy paths** were deleted after
-publication, reclaiming **5.48 GiB allocated**. Local results now occupy **60.3 MiB**:
+publication, reclaiming **5.48 GiB allocated**. That cleanup left **60.3 MiB** from this cohort:
 reports, SQL journals, metric samples, failure records and proof summaries remain.
 Hashes cannot replay deleted raw events, and native topics/volumes no longer exist.
-New full reproduction requires a fresh dataset; the original control survives as
-local evidence rather than a live Kafka topic.
+New full reproduction uses a fresh dataset; the original control survives under
+`results/archives/757176bf1c4b4340aa567867c271f156/` as local evidence rather than a
+live Kafka topic.
+
+## Recovery-harness lifecycle — 2026-11-21
+
+The final corrected revision also passed **all five commands serially without
+retries on empty owned infrastructure**, using `make test COUNT=1000000`:
+**1,001,024 ACK orders**, zero acknowledged loss/corruption, followed by verified
+application removal and complete owned-resource cleanup. This was an independent
+fixture; the larger retained-state qualification below was not reused as its data.
+
+[Lifecycle results](LIFECYCLE_RESULTS.json) record a fresh **2,001,024-ACK** baseline
+with **10,000 customers / 104 SQL probe ACKs**, zero acknowledged loss/corruption,
+and retained-state replay after setup, application removal/recreation and native
+service stop/start. Corrected repeated setup retained all **10 service IDs/start
+times**. Application recreation restored the exact topics, consumer group and
+transaction identity while leaving the other **nine services unchanged**.
+
+The prototype exposed four failed checks: an unnecessary rebuild replaced the Go
+container, removed application configuration fell back to demo defaults, and two
+shutdown checks rejected normal JVM SIGTERM exits or expected an obsolete broker
+message. These attempts remain failed evidence. The final checks use source/image
+hash receipts, saved processor configuration and current-incarnation native
+shutdown logs. **23 controller tests pass**. No failed data was reset. Final
+teardown removed **25 owned volumes**, all owned containers/networks and built
+image tags, preserving **nine foreign containers / ten foreign volumes**.
+The role-specific shutdown checks follow Kafka 4.3.2's
+[broker](https://github.com/apache/kafka/blob/4.3.2/core/src/main/scala/kafka/server/BrokerServer.scala),
+[controller](https://github.com/apache/kafka/blob/4.3.2/core/src/main/scala/kafka/server/ControllerServer.scala)
+and [Raft server](https://github.com/apache/kafka/blob/4.3.2/core/src/main/scala/kafka/server/KafkaRaftServer.scala)
+paths; exit 143 alone is insufficient.
+
+During the baseline and its original verification, observed container CPU deltas
+totaled **326.816 core-seconds**. The largest sampled individual-container charged
+memory was **1,169,002,496 bytes** (Rust verifier); this is not a simultaneous stack
+peak. Owned allocated storage snapshots grew from **95,592,448** to
+**466,477,056 bytes**. Exposed block counters covered **12/16 container incarnations**:
+observed reads/writes were **6,037,504 / 390,254,592 bytes**; missing counters are
+unknown, and IOPS/I/O latency/queue depth were unavailable. These resource counters
+exclude later lifecycle replays, image builds and teardown.
+
+CRC-verified copies of all twelve source/output partitions contained exactly
+**2,001,024 data records per side**. Source LZ4 record sections occupied
+**45,502,053 bytes** from **255,192,651 uncompressed bytes**; output occupied
+**71,348,613 bytes** from **339,223,142 bytes**, excluding headers/control records,
+indexes and RF3 overhead. Callback p50/p99 was **13.409/796.807 ms**; enriched
+creation-to-observation p50/p99 was **8,839.286/23,853.897 ms**, including buffering
+and reader backlog. This mixed live/final-burst correctness run is not a capacity
+benchmark. Lifecycle maintenance ran with writers stopped: retained readback
+establishes persistence, not uninterrupted availability. The earlier crash tests
+used live independent workloads.
 
 ## Setup
 
@@ -206,6 +293,9 @@ The Go service rebuilds its in-memory lookup from the compacted CDC topic at sta
 | `connectors/postgres-customers.json` | Debezium PostgreSQL connector configuration |
 | `proto/order.proto` | Shared order, customer, and enriched-order protobuf contract |
 | `producer/`, `processor/`, `consumer/` | C++, Go, and Rust applications |
+| `orders-producer`, `enrichment-observer/`, `order_report.py` | Tracked repository links to the existing C++ witness producer and Rust/Python observation helpers; local enrichment-specific verification stays here |
+| `prepare_workload.py`, `.build/enrichment/` | Materialize linked source as regular hard links/copies for local Docker builds; `.build/` is ignored and regenerated |
+| `enrichment_lifecycle.py`, `enrichment_control.py`, `enrichment_probes.py`, `enrichment_metrics.py` | Example-owned lifecycle, fault controller, durable SQL probes and resource recorder |
 
 ## Links
 

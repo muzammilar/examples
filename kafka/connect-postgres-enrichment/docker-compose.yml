@@ -276,6 +276,51 @@ services:
       kafka-broker-2: {condition: service_healthy}
       kafka-broker-3: {condition: service_healthy}
 
+  witness-producer:
+    profiles: [workloads]
+    image: kafka-enrichment-witness-producer:dev
+    build:
+      context: .build/enrichment/producer
+      labels: {lab.example.system: kafka-connect-postgres-enrichment}
+    networks: [kafka-connect]
+    cpus: 1
+    mem_limit: 512m
+    user: "${LAB_UID:-10001}:${LAB_GID:-10001}"
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    environment: {WITNESS_DIR: /witness}
+    volumes: ["${CASE_PATH:-./results/unused}:/witness"]
+
+  source-reader: &witness-reader
+    profiles: [workloads]
+    image: kafka-enrichment-observer:dev
+    build:
+      context: .build/enrichment
+      dockerfile: ../../enrichment-observer/Dockerfile
+      labels: {lab.example.system: kafka-connect-postgres-enrichment}
+    networks: [kafka-connect]
+    cpus: 1
+    mem_limit: 1g
+    user: "${LAB_UID:-10001}:${LAB_GID:-10001}"
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    environment: {WITNESS_DIR: /witness, MODE: "${WORKLOAD_MODE:-live}"}
+    volumes: ["${CASE_PATH:-./results/unused}:/witness"]
+
+  enriched-reader:
+    <<: *witness-reader
+
+  witness-verifier:
+    <<: *witness-reader
+    cpus: 2
+    mem_limit: 2g
+    volumes:
+      - "${CASE_PATH:-./results/unused}:/witness:ro"
+      - "${VERIFICATION_PATH:-./results/unused}:/verification"
+    environment: {WITNESS_DIR: /witness, MODE: verify, OUTPUT_DIR: /verification}
+
 networks:
   kafka-connect:
     driver: bridge

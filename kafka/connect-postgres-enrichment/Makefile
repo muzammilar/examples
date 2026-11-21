@@ -1,7 +1,5 @@
-COMPOSE := docker compose -f docker-compose.yml
 COUNT ?= 2000000
 CUSTOMER_COUNT ?= 10000
-TIMEOUT_SECONDS ?= 1800
 CONNECT_PORT ?= 8083
 POSTGRES_PORT ?= 55432
 KAFKA_BROKER_1_PORT ?= 29092
@@ -9,67 +7,51 @@ KAFKA_BROKER_2_PORT ?= 39092
 KAFKA_BROKER_3_PORT ?= 49092
 PROCESSOR_PORT ?= 8080
 export CONNECT_PORT POSTGRES_PORT KAFKA_BROKER_1_PORT KAFKA_BROKER_2_PORT KAFKA_BROKER_3_PORT PROCESSOR_PORT CUSTOMER_COUNT
-CONNECT_URL := http://127.0.0.1:$(CONNECT_PORT)
-RUN_ID ?= $(shell date -u +%Y%m%dT%H%M%SZ)
+
+CONTROL := python3 enrichment_lifecycle.py
 
 .PHONY: docker-up up kafka-topics connector processor demo test status logs cli down docker-down
+.PHONY: prepare-workload workload-images probe-schema verify-history
 
-docker-up:
-	$(COMPOSE) up --build --detach --wait kafka-controller-1 kafka-controller-2 kafka-controller-3 \
-		kafka-broker-1 kafka-broker-2 kafka-broker-3 postgres connect-1 connect-2
+docker-up up kafka-topics connector status logs cli down docker-down workload-images probe-schema verify-history:
+	$(CONTROL) $@
 
-up: docker-up
-	$(MAKE) kafka-topics
-	$(MAKE) connector
-	$(COMPOSE) up --build --detach --wait processor
+processor: up
 
-kafka-topics:
-	$(COMPOSE) exec -T kafka-broker-1 /opt/kafka/bin/kafka-topics.sh \
-		--bootstrap-server kafka-broker-1:19092 --create --if-not-exists --topic orders \
-		--partitions 6 --replication-factor 3 --config cleanup.policy=delete
-	$(COMPOSE) exec -T kafka-broker-1 /opt/kafka/bin/kafka-topics.sh \
-		--bootstrap-server kafka-broker-1:19092 --create --if-not-exists --topic orders.enriched \
-		--partitions 6 --replication-factor 3 --config cleanup.policy=delete
-	$(COMPOSE) exec -T kafka-broker-1 /opt/kafka/bin/kafka-topics.sh \
-		--bootstrap-server kafka-broker-1:19092 --create --if-not-exists --topic pg.public.customers \
-		--partitions 6 --replication-factor 3 --config cleanup.policy=compact
+prepare-workload:
+	python3 prepare_workload.py
 
-connector:
-	curl --fail --silent --show-error --retry 30 --retry-delay 2 --retry-connrefused \
-		-X PUT -H 'Content-Type: application/json' \
-		--data-binary @connectors/postgres-customers.json \
-		$(CONNECT_URL)/connectors/postgres-customers/config
-	@for i in $$(seq 60); do \
-		status=$$(curl -fsS $(CONNECT_URL)/connectors/postgres-customers/status 2>/dev/null | jq -r '.connector.state + ":" + ([.tasks[].state] | unique | join(","))' 2>/dev/null || true); \
-		[ "$$status" = 'RUNNING:RUNNING' ] && { echo "Debezium connector and task are RUNNING"; exit 0; }; \
-		sleep 2; \
-	done; curl -fsS $(CONNECT_URL)/connectors/postgres-customers/status; exit 1
+# The witnessed baseline uses independent live readers and replays every ACK.
+test: check-controls
+	COUNT=$(COUNT) python3 enrichment_control.py baseline
 
-processor:
-	$(COMPOSE) up --build --detach --wait processor
+demo: test
 
-demo:
-	$(COMPOSE) run --rm --build -e COUNT=$(COUNT) -e CUSTOMER_COUNT=$(CUSTOMER_COUNT) -e RUN_ID=$(RUN_ID) producer
-	$(COMPOSE) run --rm --build -e EXPECTED_COUNT=$(COUNT) -e TIMEOUT_SECONDS=$(TIMEOUT_SECONDS) -e RUN_ID=$(RUN_ID) consumer
+.NOTPARALLEL:
+.PHONY: check-controls test-production chaos-broker chaos-connect chaos-processor chaos-postgres benchmark reconcile-prior inspect-compression
+check-controls:
+	python3 -m unittest -v test_enrichment.py test_lifecycle.py
 
-test: demo
+test-production: check-controls
+	COUNT=$(COUNT) python3 enrichment_control.py test-production
 
-status:
-	$(COMPOSE) ps
-	curl -fsS $(CONNECT_URL)/connectors/postgres-customers/status | jq
-	curl -fsS http://127.0.0.1:8080/ready
-	$(COMPOSE) exec -T kafka-broker-1 /opt/kafka/bin/kafka-topics.sh \
-		--bootstrap-server kafka-broker-1:19092 --describe --topic orders.enriched
+chaos-broker: check-controls
+	COUNT=$(COUNT) python3 enrichment_control.py broker
 
-logs:
-	$(COMPOSE) logs --tail=100 kafka-broker-1 connect-1 connect-2 postgres processor
+chaos-connect: check-controls
+	COUNT=$(COUNT) python3 enrichment_control.py connect
 
-cli:
-	$(COMPOSE) exec postgres psql -U admin -d enrichment
+chaos-processor: check-controls
+	COUNT=$(COUNT) python3 enrichment_control.py processor
 
-down:
-	-$(COMPOSE) stop processor
-	-$(COMPOSE) rm --force processor
+chaos-postgres: check-controls
+	COUNT=$(COUNT) python3 enrichment_control.py postgres
 
-docker-down:
-	$(COMPOSE) --profile apps down --volumes --remove-orphans --rmi local
+benchmark: check-controls
+	COUNT=$(COUNT) python3 enrichment_control.py benchmark
+
+reconcile-prior: check-controls
+	CASE_ID=$(CASE_ID) python3 enrichment_control.py reconcile-prior
+
+inspect-compression:
+	uv run --script inspect_compression.py $(SEGMENTS)

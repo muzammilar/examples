@@ -1,0 +1,1 @@
+../../../cross-cluster-mirroring/replication-observer/src/main.rs
