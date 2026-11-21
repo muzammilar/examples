@@ -18,7 +18,7 @@ RUN case "$TARGETARCH" in arm64) march=armv8-a+simd ;; amd64) march=x86-64-v3 ;;
     make -C /opt/rayforce -j4 release CC=gcc RAY_MARCH=$march GIT_HASH=38fd4be RAY_VERSION=3.0.2
 COPY analytics-workload /workload
 RUN cmake -S /workload -B /build -DCMAKE_BUILD_TYPE=Release && cmake --build /build -j4 && \
-    mkdir -p /opt/bench && cp /build/libbench*.so /build/cpp_* /build/rayforce_ipc /opt/bench/
+    mkdir -p /opt/bench && cp /build/libbench*.so /build/cpp_* /build/rayforce_ipc /build/rayforce_aof /opt/bench/
 WORKDIR /workload/rust
 RUN cargo fmt --check && \
     ENGINE=rayforce cargo build --locked --release && cp target/release/analytics-workload /opt/bench/rust_rayforce && \

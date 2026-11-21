@@ -89,7 +89,9 @@ def repair_known_tail(damaged, repaired, validated_bytes, known_log):
         raise RuntimeError("repair is not byte-identical to the original known prefix")
 
 
-def native_job(root, validate_only=False):
+def native_job(root, validate_only=False, aof_mode=None):
+    if aof_mode not in (None, "seed", "scan", "open"):
+        raise ValueError("unknown native AOF operation")
     require_empty_project()
     state = root / "state"
     empty_input = root / "empty-input"
@@ -104,6 +106,7 @@ def native_job(root, validate_only=False):
         JOURNAL_INPUT_TOKEN=input_token,
         JOURNAL_VOLUME=volume,
         JOURNAL_VALIDATE_ONLY="1" if validate_only else "0",
+        AOF_MODE=aof_mode or "",
         LAB_UID=str(os.getuid()),
         LAB_GID=str(os.getgid()),
     )
@@ -116,9 +119,10 @@ def native_job(root, validate_only=False):
         str(bench.ROOT / "docker-compose.journal-volume.yml"),
         "-f",
         str(bench.ROOT / "docker-compose.journal-tail.yml"),
-        "--profile",
-        "tools",
     ]
+    if aof_mode:
+        compose += ["-f", str(bench.ROOT / "docker-compose.aof.yml")]
+    compose += ["--profile", "tools"]
     samples, disks = [], []
     server = None
     exported = False
@@ -203,13 +207,19 @@ def native_job(root, validate_only=False):
         exported = True
         metrics = records[0]
         metrics["sampled_resources"] = bench.resource_summary(samples)
+        metrics["container_lifetime_seconds"] = bench.container_seconds(info)
+        metrics["native_process_cpu_percent_one_core_100"] = (
+            100 * metrics["process_cpu_core_seconds"] / (metrics["wall_ns"] / 1e9)
+        )
         metrics["block_io"] = bench.io_counters(
-            metrics["cgroup"]["io.stat"], metrics["wall_ns"] / 1e9
+            metrics["cgroup"]["io.stat"], metrics["container_lifetime_seconds"]
         )
-        metrics["native_files"] = fingerprint(sorted(state.glob("journal*")))
-        metrics["compressibility"] = archive_compressibility(
-            sorted(state.glob("journal*"))
+        metrics["block_io"]["rate_scope"] = (
+            "Whole-container counters over StartedAt-to-FinishedAt lifetime; native-child wall is narrower."
         )
+        native_files = sorted(state.glob("*.aof" if aof_mode else "journal*"))
+        metrics["native_files"] = fingerprint(native_files)
+        metrics["compressibility"] = archive_compressibility(native_files)
         ingestion.save(root / "native-result.json", metrics)
     finally:
         if server is not None and not exported:

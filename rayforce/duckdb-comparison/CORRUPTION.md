@@ -19,11 +19,12 @@ Use the five-command lifecycle in [README.md](README.md), then:
 make test-production
 ```
 
-The default eight-case matrix includes this adversarial probe and the
-[middle-header diagnostic](HEADER_CORRUPTION.md), and returns
+The default production matrix includes this adversarial probe, the
+[middle-header diagnostic](HEADER_CORRUPTION.md) and [native AOF probes](AOF.md), and returns
 **nonzero on the measured build**. The six recovery cases run first; backup
-recovery inside this probe also finishes before its integrity failure propagates.
-The Python probe exits **1**; Make propagates failure. Do not read the final error
+recovery inside this probe also finishes before its integrity failure is reported.
+The runner records both independent payload/AOF outcomes, then returns nonzero
+if either failed. The standalone Python probe exits **1**. Do not read the final error
 as an unexecuted test or turn it green by deleting evidence.
 
 Run only the six process/recovery cases with `make test-production-recovery`.
@@ -154,9 +155,11 @@ native outcomes, resource budgets, failed-state fingerprints and cleanup.
 
 The separate native **AOF API** in the same source pin declares CRC32 protection
 over length plus payload. It is not the `-L` request-journal path tested here;
-its application integration, corruption detection and recovery remain unrun.
+the [C++ AOF profile](AOF.md) now verifies payload rejection and known-tail recovery,
+but also reports silent committed-prefix loss for length/commit-marker edits.
 Do not claim the whole system lacks checksums or that AOF fixes this deployment
-without testing it. The separate [middle-header diagnostic](HEADER_CORRUPTION.md)
+without checking the specific path. Live AOF crash/rotation qualification remains
+open. The separate [middle-header diagnostic](HEADER_CORRUPTION.md)
 now measures unsafe-prefix loss. Compressed frames, interrupted
 snapshots, physical media faults and matched DuckDB recovery remain open.
 

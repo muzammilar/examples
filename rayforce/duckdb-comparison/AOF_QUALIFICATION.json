@@ -1,0 +1,320 @@
+{
+  "command": "make test-production",
+  "runner_exit_code": 1,
+  "make_exit_code": 2,
+  "passed": false,
+  "controller_tests": 31,
+  "cases": [
+    {
+      "directory": "results/journal/dcd8e2e69d6343ac8d0fc44d14fa1fc2",
+      "passed": true,
+      "result_sha256": "e323a758f0bc18b899fe9c674a87e6f0bc9cce9a37884af64249433f050b36a3",
+      "scope": "One scalar synchronous native journal capability gate after fenced SIGKILL; no live reader/writer or power-loss qualification",
+      "proof": null
+    },
+    {
+      "directory": "results/lock-capability/49a9af5d1a7b46bf87fff6e20a9075b1",
+      "passed": true,
+      "result_sha256": "58140414bacea6f1ab58b406887cb8f5dc4871869e4aebf515708554cc6a53ba",
+      "scope": "Python standard fcntl.flock capability, not native database correctness or performance. Same inode/device are recorded. Empty lock file: zero payload/allocated bytes; data compression not applicable. Cgroup/process CPU/memory and block I/O recorded; physical host I/O unavailable.",
+      "proof": null
+    },
+    {
+      "directory": "results/journal-live/3ad73400f2c74885bfa20fcec416e797",
+      "passed": true,
+      "result_sha256": "0b16994268d435d9d73c13d600a8e6c09eddc0772f0b4f2370539e9c792c9c25",
+      "scope": "Ten rejected cross-container journal opens under independent live writers/readers, unchanged authoritative process and complete body witness; not cross-host lease fencing or capacity",
+      "proof": {
+        "seed_rows_verified": 2000000,
+        "intents": 1150,
+        "acknowledged": 1150,
+        "live_rows_verified": 1150,
+        "applied_unacknowledged_intents": 0,
+        "acknowledged_loss": 0,
+        "wrong_or_duplicate_bodies": 0,
+        "export_sha256": "c09afb442c4ed9f745fa8d091b9ad9e051c583ddce6763fd639ce67f2ee4fa0c",
+        "customers": {
+          "sha256": "c3a160b85050e71c8ba465e2ca7a72d25bc4fbb076954f6c6f9c22fcaabadc95",
+          "bytes": 92663,
+          "verified_rows": 10000,
+          "allocated_bytes": 94208,
+          "compression": {
+            "codec": "gzip",
+            "level": 1,
+            "zlib": "1.3.2",
+            "uncompressed_bytes": 92663,
+            "compressed_bytes": 32777,
+            "ratio": 2.827073862769625,
+            "wall_ns": 384250,
+            "cpu_ns": 386000,
+            "scope": "Host-side compressibility of the verified CSV witness, streamed into a byte counter; not native engine compression. Timers cover compression calls, excluding file reads/hash/fsync."
+          }
+        }
+      }
+    },
+    {
+      "directory": "results/journal-live/eafcfee66d014da68cff050c70a43c73",
+      "passed": true,
+      "result_sha256": "966eb2fb6b5d51993d3b6a18bbdf3479628bbc39a2a36c7e094a2f834aa5a6a2",
+      "scope": "Two retained-volume SIGKILL/replay cycles with live independent writers/readers, second snapshot plus tail; not capacity, HA, async journal, torn-tail or power-loss qualification",
+      "proof": {
+        "seed_rows_verified": 2000000,
+        "intents": 2758,
+        "acknowledged": 2258,
+        "live_rows_verified": 2258,
+        "applied_unacknowledged_intents": 0,
+        "acknowledged_loss": 0,
+        "wrong_or_duplicate_bodies": 0,
+        "export_sha256": "2220283e4749f65bd544ecad5e7842e61a952c1d2f2b44a6d7638767264686cd",
+        "customers": {
+          "sha256": "c3a160b85050e71c8ba465e2ca7a72d25bc4fbb076954f6c6f9c22fcaabadc95",
+          "bytes": 92663,
+          "verified_rows": 10000,
+          "allocated_bytes": 94208,
+          "compression": {
+            "codec": "gzip",
+            "level": 1,
+            "zlib": "1.3.2",
+            "uncompressed_bytes": 92663,
+            "compressed_bytes": 32777,
+            "ratio": 2.827073862769625,
+            "wall_ns": 370376,
+            "cpu_ns": 370000,
+            "scope": "Host-side compressibility of the verified CSV witness, streamed into a byte counter; not native engine compression. Timers cover compression calls, excluding file reads/hash/fsync."
+          }
+        }
+      }
+    },
+    {
+      "directory": "results/journal-restore/06302abc6f514530a396868722be95db",
+      "passed": true,
+      "result_sha256": "fed7f1f59713372ebbc8e8f0d6763d63f193865c2aeb0009ba068fad18e89a7b",
+      "scope": "Native snapshot plus journal-tail restore into separate local files, full independent old/ACK body oracle; offline verification, not live failover/backup availability or physical host loss",
+      "proof": {
+        "seed_rows_verified": 2000000,
+        "intents": 2758,
+        "acknowledged": 2258,
+        "live_rows_verified": 2258,
+        "applied_unacknowledged_intents": 0,
+        "acknowledged_loss": 0,
+        "wrong_or_duplicate_bodies": 0,
+        "export_sha256": "2220283e4749f65bd544ecad5e7842e61a952c1d2f2b44a6d7638767264686cd"
+      }
+    },
+    {
+      "directory": "results/journal-tail/0c0f91466ab74ae0a6e4a086f0c24778",
+      "passed": true,
+      "result_sha256": "4f1f1f78d4fa1f117ac8bca866c03a5506b6ad829e2cddf15dc6d5bde05ca3cf",
+      "scope": "Controlled three-byte synthetic torn tail on an offline copy. Native fail-closed startup and validated-prefix repair into another fresh copy, zero original ACK loss. Does not justify truncating unknown production corruption or qualify interior-corruption repair.",
+      "proof": {
+        "seed_rows_verified": 2000000,
+        "intents": 2758,
+        "acknowledged": 2258,
+        "live_rows_verified": 2258,
+        "applied_unacknowledged_intents": 0,
+        "acknowledged_loss": 0,
+        "wrong_or_duplicate_bodies": 0,
+        "export_sha256": "2220283e4749f65bd544ecad5e7842e61a952c1d2f2b44a6d7638767264686cd"
+      }
+    },
+    {
+      "directory": "results/journal-header/30ade000644442eeb14ef01aa4b39688",
+      "passed": true,
+      "result_sha256": "76f91b3419421b11ab9cf54169b0b948d6b56efde6d471cab77d5d1c7eeb81eb",
+      "scope": "Diagnostic passed: fail-closed middle-header startup, guard rejection, exact backup recovery, and quantified data loss on a separate unsafe-prefix copy. Unsafe recovery remains FAILED. Not physical bit rot or normal crash loss.",
+      "proof": {
+        "seed_rows_verified": 2000000,
+        "intents": 2758,
+        "acknowledged": 2258,
+        "live_rows_verified": 2258,
+        "applied_unacknowledged_intents": 0,
+        "acknowledged_loss": 0,
+        "wrong_or_duplicate_bodies": 0,
+        "export_sha256": "2220283e4749f65bd544ecad5e7842e61a952c1d2f2b44a6d7638767264686cd"
+      },
+      "unsafe_prefix_acknowledged_loss": 565
+    },
+    {
+      "directory": "results/journal-corruption/47e5f2444ba74a6788a005482ccf0b0c",
+      "passed": false,
+      "result_sha256": "23eeb426d3fadabc04abecd1a17f46016748c0e69824537adea5fe7f41b5a7d0",
+      "scope": "Logical file-payload corruption beyond the healthy/process-crash contract. Native framing acceptance is not content integrity. Integrity failure remains FAILED despite successful backup recovery; no universal production/physical-media conclusion.",
+      "proof": {
+        "seed_rows_verified": 2000000,
+        "intents": 2758,
+        "acknowledged": 2258,
+        "live_rows_verified": 2258,
+        "applied_unacknowledged_intents": 0,
+        "acknowledged_loss": 0,
+        "wrong_or_duplicate_bodies": 0,
+        "export_sha256": "2220283e4749f65bd544ecad5e7842e61a952c1d2f2b44a6d7638767264686cd"
+      },
+      "integrity_verdict": "FAILED: validly encoded one-bit payload corruption replayed without native rejection and changed an acknowledged body"
+    },
+    {
+      "directory": "results/aof/a2422af7f624497ba4e3681796c80541",
+      "passed": false,
+      "result_sha256": "7fec9713ba4a9f7799edccd9f6d27665c95410a2a748481a4c9b2ba27ef33ef0",
+      "scope": "Single-segment, fenced offline AOF API corruption diagnostic. A successful backup does not erase native silent-loss findings. No live availability, capacity, physical bit rot, request-journal or database transaction guarantee.",
+      "proof": {
+        "acknowledged": 10000,
+        "bodies_verified": 10000,
+        "missing_acknowledged": 0,
+        "missing_ids": [],
+        "wrong_bodies": 0,
+        "wrong_ids": [],
+        "duplicate_ids": 0
+      },
+      "fault_results": {
+        "payload": {
+          "open": {
+            "native_status": [
+              10,
+              -1
+            ],
+            "verdict": "PASSED: RAY_ERR_CORRUPT, evidence unchanged",
+            "missing_acknowledged": null
+          },
+          "scan": {
+            "native_status": [
+              10,
+              -1,
+              0
+            ],
+            "verdict": "PASSED: RAY_ERR_CORRUPT, evidence unchanged",
+            "missing_acknowledged": null
+          }
+        },
+        "length": {
+          "open": {
+            "native_status": [
+              0,
+              5000
+            ],
+            "verdict": "FAILED: native success with acknowledged loss/corruption",
+            "missing_acknowledged": 5000
+          },
+          "scan": {
+            "native_status": [
+              0,
+              5000,
+              5000
+            ],
+            "verdict": "FAILED: native success with acknowledged loss/corruption",
+            "missing_acknowledged": 5000
+          }
+        },
+        "middle-commit": {
+          "open": {
+            "native_status": [
+              0,
+              5000
+            ],
+            "verdict": "FAILED: native success with acknowledged loss/corruption",
+            "missing_acknowledged": 5000
+          },
+          "scan": {
+            "native_status": [
+              0,
+              5000,
+              5000
+            ],
+            "verdict": "FAILED: native success with acknowledged loss/corruption",
+            "missing_acknowledged": 5000
+          }
+        },
+        "last-commit": {
+          "open": {
+            "native_status": [
+              0,
+              9900
+            ],
+            "verdict": "FAILED: native success with acknowledged loss/corruption",
+            "missing_acknowledged": 100
+          },
+          "scan": {
+            "native_status": [
+              0,
+              9900,
+              9900
+            ],
+            "verdict": "FAILED: native success with acknowledged loss/corruption",
+            "missing_acknowledged": 100
+          }
+        },
+        "uncommitted-trailer": {
+          "open": {
+            "native_status": [
+              0,
+              10000
+            ],
+            "verdict": "PASSED: all acknowledged bodies retained",
+            "missing_acknowledged": 0
+          },
+          "scan": {
+            "native_status": [
+              0,
+              10000,
+              10000
+            ],
+            "verdict": "PASSED: all acknowledged bodies retained",
+            "missing_acknowledged": 0
+          }
+        }
+      }
+    }
+  ],
+  "scope": "Seven recovery/diagnostic cases passed their assertions, including the explicitly unsafe header-copy counterexample. Payload and native AOF strict-integrity profiles FAILED. Independent intact-backup checks passed; no ordinary process-crash/power-loss/capacity qualification is implied.",
+  "raw_log": "results/journal-production-with-aof-witness.log",
+  "raw_log_sha256": "e4cd9058cd6ad87442ddbd82fe267a45c05467eaae00a241e08b8a66b64f0813",
+  "cleanup_verified_by_runner": true,
+  "selected_aof_report": "AOF_RESULTS.json",
+  "native_regression": {
+    "command": "make test",
+    "directory": "results/runs/c029dd949cc84a27afecdbf248152e57",
+    "passed": true,
+    "full_data_engine_language_cases": 6,
+    "negative_controls": 18,
+    "controller_tests": 31,
+    "raw_log": "results/aof-lifecycle-test.log",
+    "raw_log_sha256": "e28bc9160beb25d7e69c5ab55d750b57d2899087f3ea7e05576c94dc83ae831c"
+  },
+  "resource_sampler_cli_warnings": {
+    "count": 2,
+    "scope": "Retained raw sample errors at process-exit races; completed native-result/fenced-export records and full-body checks are separate evidence. Short disk samples can be unavailable."
+  },
+  "lifecycle": {
+    "owned_runtime_listings": {
+      "rayforce-duckdb-journal/ps": [],
+      "rayforce-duckdb-journal/network": [],
+      "rayforce-duckdb-journal/volume": [],
+      "rayforce-duckdb-comparison/ps": [],
+      "rayforce-duckdb-comparison/network": [],
+      "rayforce-duckdb-comparison/volume": []
+    },
+    "built_image_removed": true,
+    "evidence_preserved": true,
+    "logs": {
+      "docker-up": {
+        "path": "results/aof-build-precision.log",
+        "sha256": "14ce3e9b833ee1b5ba03e4780f235eef62c58eb55988ae6bb25cb2a761bdaefd"
+      },
+      "up": {
+        "path": "results/aof-lifecycle-up.log",
+        "sha256": "7fda1e6efd608c2f0c9edd0c50d30ede4502142fa4f9a7a545b1fe7f381959f9"
+      },
+      "test": {
+        "path": "results/aof-lifecycle-test.log",
+        "sha256": "e28bc9160beb25d7e69c5ab55d750b57d2899087f3ea7e05576c94dc83ae831c"
+      },
+      "down": {
+        "path": "results/aof-lifecycle-down.log",
+        "sha256": "b63a4e2f9a2948eb316171f8ed91ecc686655a22986747e972e65f5a25facd85"
+      },
+      "docker-down": {
+        "path": "results/aof-lifecycle-docker-down.log",
+        "sha256": "52325982d002c48ab6ccf9a6c9cb0dedacb6a4d0187894ea239289adbec41cdd"
+      }
+    }
+  }
+}

@@ -20,7 +20,7 @@ up:
 test: check-controls
 	python3 experiment.py test
 check-controls:
-	python3 -m unittest test_controller.py test_ingestion.py test_persistence.py test_live_journal.py test_journal_tail.py test_journal_corruption.py test_journal_header.py
+	python3 -m unittest test_controller.py test_ingestion.py test_persistence.py test_live_journal.py test_journal_tail.py test_journal_corruption.py test_journal_header.py test_aof.py
 benchmark:
 	python3 experiment.py benchmark
 down:
@@ -126,3 +126,13 @@ HEADER_RESULT ?=
 report-journal-header:
 	@test -n "$(HEADER_RESULT)" || { echo 'Set HEADER_RESULT to an explicit journal-header directory'; exit 1; }
 	python3 journal_header.py --publish "$(HEADER_RESULT)"
+
+.PHONY: test-aof-integrity
+test-aof-integrity: check-controls
+	python3 aof.py
+
+AOF_RESULT ?=
+.PHONY: report-aof
+report-aof:
+	@test -n "$(AOF_RESULT)" || { echo 'Set AOF_RESULT to an explicit AOF result directory'; exit 1; }
+	python3 publish_aof.py "$(AOF_RESULT)"

@@ -18,6 +18,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--profile", choices=("all", "recovery"), default="all")
     args = parser.parse_args()
+    failed_diagnostics = []
     try:
         command("journal.py")
         command("filesystem_lock_check.py", "volume")
@@ -32,7 +33,13 @@ if __name__ == "__main__":
         command("journal_tail.py", str(source))
         if args.profile == "all":
             command("journal_header.py", str(source))
-            command("journal_corruption.py", str(source))
+            # These independent offline fault models do not consume each other's
+            # outputs. Preserve both outcomes without qualifying either failure.
+            for arguments in (("journal_corruption.py", str(source)), ("aof.py",)):
+                try:
+                    command(*arguments)
+                except subprocess.CalledProcessError:
+                    failed_diagnostics.append(arguments[0])
     finally:
         for resource, flags in (
             ("ps", ["-aq"]),
@@ -51,6 +58,11 @@ if __name__ == "__main__":
             ).strip()
             if result:
                 raise RuntimeError("journal-owned resources remain: " + resource)
+    if failed_diagnostics:
+        print(
+            "FAILED production diagnostics:", ", ".join(failed_diagnostics), flush=True
+        )
+        raise SystemExit(1)
     print(
         "Serial production profile passed:", args.profile, "source:", source, flush=True
     )

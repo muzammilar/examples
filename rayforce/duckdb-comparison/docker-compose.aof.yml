@@ -1,0 +1,9 @@
+services:
+  rayforce:
+    entrypoint: [python, /workload/python/measure_aof.py]
+    command: []
+    environment:
+      AOF_MODE: "${AOF_MODE:?Set the native AOF operation}"
+      AOF_ROWS: "${AOF_ROWS:-10000}"
+      AOF_BYTES: "${AOF_BYTES:-1024}"
+      AOF_SEGMENT_LIMIT: "${AOF_SEGMENT_LIMIT:-67108864}"

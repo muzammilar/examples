@@ -21,8 +21,8 @@ make test-journal-header-corruption JOURNAL_SOURCE=results/journal-live/<id>
 
 Create the source through this example's own `make test-journal-recovery`.
 The expanded `make test-production` runs this diagnostic before the existing
-[payload-integrity probe](CORRUPTION.md). Its eight-case matrix still exits
-nonzero for that separate integrity failure. `make test-production-recovery`
+[payload-integrity probe](CORRUPTION.md). The production matrix also evaluates the
+distinct native AOF API and exits nonzero for either integrity failure. `make test-production-recovery`
 selects only the six original recovery cases.
 
 ## Fault, rejection and recovery

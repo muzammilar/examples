@@ -34,6 +34,7 @@ make test-duckdb-snapshot
 make test-journal-capability
 make test-journal-recovery
 make test-journal-writer-lock
+make test-aof-integrity                 # strict offline integrity probe; known failure
 make test-production
 ```
 
@@ -56,6 +57,11 @@ and ingestion targets remain separate.
 The [middle-header diagnostic](HEADER_CORRUPTION.md) also runs before that probe:
 startup rejects both edits, but blindly following its truncation hint on a
 disposable copy loses acknowledged rows. The guard rejects that unsafe repair.
+The distinct [native AOF profile](AOF.md) uses 10,000 opaque 1,024-byte events:
+payload edits are rejected, but length/commit-marker edits yield successful native
+results with 5,000/5,000/100 missing acknowledged records. Intact-backup verification
+passes. The full production runner records both independent payload/AOF failures
+and returns nonzero; neither is hidden by the other's failure.
 Changing `ROWS` requires archiving the old `results/`
 directory first. Failed runs remain evidence; no automatic data reset or retry.
 An example-local lock prevents concurrent controllers. Other examples must be
