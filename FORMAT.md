@@ -104,6 +104,19 @@ cleanup from infrastructure teardown:
 
 ## Docker Compose
 
+Verify required storage semantics on the actual mounted filesystem. When a
+database relies on file locks or atomic publication, test them across independent
+processes/containers; do not infer support from a mount path or syscall success.
+Compare a small standard-library control with the native database operation.
+Keep a failing storage configuration reported when evaluating an alternative.
+Host shares, named volumes and PVC storage may differ; a flush request is not
+proof of physical power-loss durability.
+
+After teardown, use healthy runtime listings to verify owned containers, networks
+and volumes are absent, including profile-only/one-shot resources. Exit status 0
+alone is insufficient: cleanup can warn that a resource is still in use. Export
+failed state only after fencing its owner, and retain storage if export fails.
+
 - `name: <system>-<example>` at the top: a unique project name, so examples run side by side.
 - Container names prefixed with the system (`rondb-fs-ndbd-1`).
 - Pin every image tag (no `latest`); note why a version was chosen if not the newest.

@@ -215,6 +215,7 @@ availability/error budgets and recovery deadlines before injection.
 | Routing and connection recovery | Keep existing pooled connections and fresh clients active through failover, pod IP changes and Service/endpoint updates. Where advertised, test clients outside the cluster, returned/redirected addresses, DNS TTL/staleness, read-only old primaries and topology refresh. |
 | Placement and blast radius | Check physical worker/failure-domain placement, all-member role/range agreement and restored replica count. Observe unaffected shards and, where applicable, several example-owned clusters during a shared controller/configuration change; detect coordinated rollouts and correlated loss of quorum. |
 | Storage and maintenance pressure | Separate slow I/O, rejected writes, bounded disk-full, empty-disk replacement and background compaction/checkpoint/backup contention. Track write/read amplification, space growth, repair traffic and foreground latency until work settles. |
+| Storage primitive contract | Where ownership or publication relies on file locks, atomic rename or exclusive creation, verify the actual primitive across independent processes and containers/Pods sharing that storage. Record mount/filesystem and reported inode/device identity; a matching pathname or successful syscall alone is insufficient. Use a small standard-library control to distinguish storage behavior from database behavior. A failed prerequisite blocks that storage configuration's ownership/durability qualification; preserve it when testing a different storage backend. A flush call alone does not establish physical power-loss durability. |
 | Security/configuration lifecycle | When configured, rotate credentials/certificates under load, check revocation and allowed/denied access, and test invalid/live configuration changes. Verify effective data-plane settings after controller restart and declarative reapply. |
 
 AP systems need not reject every minority write; assert their declared conflict and
@@ -328,6 +329,12 @@ observations during the operation.
   election, catch-up and full-repair times separately where observable. State polling
   resolution, deliberate hold time, resources, versions and failure boundaries.
   One-host Compose/kind replicas do not establish independent-host durability.
+- Verify teardown with healthy runtime/API listings that prove exact owned
+  containers, networks, volumes, clusters and contexts are gone as applicable.
+  A zero command exit status can accompany warnings that a resource remains in
+  use. Include profile-only and one-shot resources in these checks. If exporting
+  failed state, fence its owner first and preserve its storage when export fails;
+  do not delete the only remaining copy or mark incomplete cleanup fully passed.
 
 ### Docker Compose cluster tests
 
