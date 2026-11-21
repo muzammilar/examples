@@ -7436,7 +7436,7 @@
       "lz4": "4.4.5",
       "google-crc32c": "1.9.0"
     },
-    "method": "Copied all six source and enriched partition log segments from one fully repaired replica after trials. Verified every magic-2 batch CRC32C; decoded record sections with maintained LZ4 bindings. Ratio excludes 61-byte batch headers, indexes, RF3 overhead and WAL/metadata. Physical data includes aborted transactions; control batches counted separately. This is not a separate compression-CPU benchmark.",
+    "method": "Copied all six source and enriched partition log segments from one in-sync replica after native repair after trials. Verified every magic-2 batch CRC32C; decoded record sections with maintained LZ4 bindings. Ratio excludes 61-byte batch headers, indexes, RF3 overhead and WAL/metadata. Physical data includes aborted transactions; control batches counted separately. This is not a separate compression-CPU benchmark.",
     "measurement_tool_wall_seconds": 26.783662333036773,
     "measurement_tool_user_cpu_seconds": 3.302174,
     "measurement_tool_system_cpu_seconds": 0.805097,
@@ -8674,5 +8674,31 @@
     "witness_librdkafka": "2.12.1",
     "rust_rdkafka": "0.39.0",
     "go_franz_go": "1.22.3"
+  },
+  "cleanup": {
+    "time": "2026-11-21T03:57:56.641697+00:00",
+    "authorization": "Finish tests, commit results, clean up; all case/trial verdicts and native compression checks completed before deletion",
+    "published_results_commit": "1b288e8b34420d5cad59c00f5c4e9b36b84fb798",
+    "before_allocated_bytes": 5948121088,
+    "removed_file_paths": 145,
+    "removed_logical_path_bytes": 8159751861,
+    "removed_unique_inode_bytes": 5769124990,
+    "limitation": "Raw large journals and native log copies deleted, not archived elsewhere. Reports, SQL journals, metrics and original failure/proof summaries remain; a fresh fixture is required for full reproduction.",
+    "after_allocated_bytes": 63225856,
+    "allocated_bytes_reclaimed": 5884895232
+  },
+  "teardown": {
+    "time": 1795233322.1500642,
+    "original_compose_cleanup_complete": false,
+    "gotcha": "Compose down left six unused anonymous Connect volumes; saved mount ownership and positive empty container listings justified exact-ID removal. Original teardown.log is preserved.",
+    "manual_owned_orphan_volumes_removed": 6,
+    "owned_containers_removed": 129,
+    "owned_volumes_removed": 25,
+    "custom_image_tags_removed": [],
+    "final_owned_containers": 0,
+    "final_owned_volumes": 0,
+    "foreign_containers_unchanged": 9,
+    "foreign_volumes_unchanged": 10,
+    "final_cleanup_passed": true
   }
 }

@@ -147,7 +147,7 @@ overhead is excluded. Disk snapshots cover all owned persistent volumes, retaine
 topics/replicas, WAL and metadata; phase samples can miss transient peaks.
 
 Compression was measured **after** the trials from every source/output partition
-on one repaired replica: CRC32C-verified Kafka magic-2 batches, decoded with pinned
+on one in-sync replica after native repair: CRC32C-verified Kafka magic-2 batches, decoded with pinned
 LZ4/CRC libraries using the [documented record format](https://kafka.apache.org/43/implementation/message-format/)
 and [Kafka 4.3.2 source](https://github.com/apache/kafka/blob/4.3.2/clients/src/main/java/org/apache/kafka/common/record/internal/DefaultRecordBatch.java).
 Ratios are uncompressed/compressed record-section bytes for the same stored data;
@@ -171,9 +171,19 @@ corrupted-CRC and truncated native segments.
 The [experimental witness harness](https://github.com/muzammilar/examples/tree/kafka-connect-live-recovery/kafka/connect-postgres-enrichment)
 produced these results. Clean-checkout initialization and its full production-test
 lifecycle remain unqualified; these case results do not establish those paths.
-At the user's request, large journals and copied log segments are cleaned after
-publication. Reports, metric samples and proof summaries remain locally; hashes
-cannot replay deleted raw events. New full reproduction requires a fresh dataset.
+After publishing the results, cleanup removed **129 owned containers / 25 owned
+volumes**, with **nine unrelated containers / ten unrelated volumes unchanged**.
+All example-built image tags are gone. Compose left **six unused anonymous Connect
+volumes**; the initial teardown post-check failed. A separate scoped cleanup used
+the saved mount identities and healthy empty-reference listings to remove exactly
+those six volumes. The original failed teardown log remains preserved.
+
+At the user's request, **145 large journal/log-copy paths** were deleted after
+publication, reclaiming **5.48 GiB allocated**. Local results now occupy **60.3 MiB**:
+reports, SQL journals, metric samples, failure records and proof summaries remain.
+Hashes cannot replay deleted raw events, and native topics/volumes no longer exist.
+New full reproduction requires a fresh dataset; the original control survives as
+local evidence rather than a live Kafka topic.
 
 ## Setup
 
