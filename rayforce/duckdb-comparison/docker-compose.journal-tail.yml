@@ -1,0 +1,30 @@
+services:
+  rayforce:
+    entrypoint: [python, -c]
+    environment:
+      JOURNAL_VALIDATE_ONLY: "${JOURNAL_VALIDATE_ONLY:-0}"
+      JOURNAL_INPUT_TOKEN: "${JOURNAL_INPUT_TOKEN:?Set the isolated input token}"
+    command:
+      - |
+        import json, os, pathlib, resource, subprocess, time
+        inputs = pathlib.Path('/data')
+        if sorted(p.name for p in inputs.iterdir()) != ['.isolation-token'] or (inputs / '.isolation-token').read_text() != os.environ['JOURNAL_INPUT_TOKEN']:
+            raise RuntimeError('Original input isolation was not proved')
+        command = ['/opt/rayforce/rayforce', '-c', '1', '-m', '3G']
+        if os.environ['JOURNAL_VALIDATE_ONLY'] == '1':
+            command += ['-f', '/state/validate.rfl']
+        else:
+            command += ['-L', '/state/journal', '-p', '7701', '-f', '/state/verify.rfl']
+        started = time.monotonic_ns()
+        code = subprocess.run(command).returncode
+        usage = resource.getrusage(resource.RUSAGE_CHILDREN)
+        print('__JOURNAL_JOB__'+json.dumps({
+            'exit_code': code, 'command': command,
+            'wall_ns': time.monotonic_ns()-started,
+            'process_cpu_core_seconds': usage.ru_utime+usage.ru_stime,
+            'process_peak_rss_bytes': usage.ru_maxrss*1024,
+            'mountinfo': pathlib.Path('/proc/self/mountinfo').read_text(),
+            'cgroup': {name: pathlib.Path('/sys/fs/cgroup', name).read_text()
+                for name in ('cpu.stat','memory.peak','memory.events','io.stat')}
+        }), flush=True)
+        raise SystemExit(code)

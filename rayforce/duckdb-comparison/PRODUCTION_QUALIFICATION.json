@@ -1,0 +1,115 @@
+{
+  "scope": "Executed serial production target: native capability, Linux-volume lock control, live native writer exclusion, two-crash recovery, separate-file restore and controlled torn-tail repair. No live backup, arbitrary corruption repair, capacity or power-loss qualification.",
+  "controller_tests": 22,
+  "cases": [
+    {
+      "directory": "results/journal-live/43062c50ae894f24b520f2fdcd16d45d",
+      "scope": "Two retained-volume SIGKILL/replay cycles with live independent writers/readers, second snapshot plus tail; not capacity, HA, async journal, torn-tail or power-loss qualification",
+      "proof": {
+        "seed_rows_verified": 2000000,
+        "intents": 2890,
+        "acknowledged": 2262,
+        "live_rows_verified": 2262,
+        "applied_unacknowledged_intents": 0,
+        "acknowledged_loss": 0,
+        "wrong_or_duplicate_bodies": 0,
+        "export_sha256": "0c39ada353a4687a7e866c9e8e13532b1caf8ed63ccd99e005ea66035fbb6b58",
+        "customers": {
+          "sha256": "c3a160b85050e71c8ba465e2ca7a72d25bc4fbb076954f6c6f9c22fcaabadc95",
+          "bytes": 92663,
+          "verified_rows": 10000,
+          "allocated_bytes": 94208,
+          "compression": {
+            "codec": "gzip",
+            "level": 1,
+            "zlib": "1.3.2",
+            "uncompressed_bytes": 92663,
+            "compressed_bytes": 32777,
+            "ratio": 2.827073862769625,
+            "wall_ns": 422084,
+            "cpu_ns": 418000,
+            "scope": "Host-side compressibility of the verified CSV witness, streamed into a byte counter; not native engine compression. Timers cover compression calls, excluding file reads/hash/fsync."
+          }
+        }
+      },
+      "passed": true
+    },
+    {
+      "directory": "results/journal-live/a9fc80e5020a4e52a3d93eb22cb8f59a",
+      "scope": "Ten rejected cross-container journal opens under independent live writers/readers, unchanged authoritative process and complete body witness; not cross-host lease fencing or capacity",
+      "proof": {
+        "seed_rows_verified": 2000000,
+        "intents": 1155,
+        "acknowledged": 1155,
+        "live_rows_verified": 1155,
+        "applied_unacknowledged_intents": 0,
+        "acknowledged_loss": 0,
+        "wrong_or_duplicate_bodies": 0,
+        "export_sha256": "4cbaafff1cd9fbd9b214605354fca897175c2e6c6554355f9fd7509919104e0b",
+        "customers": {
+          "sha256": "c3a160b85050e71c8ba465e2ca7a72d25bc4fbb076954f6c6f9c22fcaabadc95",
+          "bytes": 92663,
+          "verified_rows": 10000,
+          "allocated_bytes": 94208,
+          "compression": {
+            "codec": "gzip",
+            "level": 1,
+            "zlib": "1.3.2",
+            "uncompressed_bytes": 92663,
+            "compressed_bytes": 32777,
+            "ratio": 2.827073862769625,
+            "wall_ns": 388874,
+            "cpu_ns": 389000,
+            "scope": "Host-side compressibility of the verified CSV witness, streamed into a byte counter; not native engine compression. Timers cover compression calls, excluding file reads/hash/fsync."
+          }
+        }
+      },
+      "passed": true
+    },
+    {
+      "directory": "results/journal-restore/f89948f057484226a1cb887d6f467183",
+      "scope": "Native snapshot plus journal-tail restore into separate local files, full independent old/ACK body oracle; offline verification, not live failover/backup availability or physical host loss",
+      "proof": {
+        "seed_rows_verified": 2000000,
+        "intents": 2890,
+        "acknowledged": 2262,
+        "live_rows_verified": 2262,
+        "applied_unacknowledged_intents": 0,
+        "acknowledged_loss": 0,
+        "wrong_or_duplicate_bodies": 0,
+        "export_sha256": "0c39ada353a4687a7e866c9e8e13532b1caf8ed63ccd99e005ea66035fbb6b58"
+      },
+      "passed": true
+    },
+    {
+      "directory": "results/journal-tail/7b4cbea4ae054c6486497c70a84c4ff1",
+      "scope": "Controlled three-byte synthetic torn tail on an offline copy. Native fail-closed startup and validated-prefix repair into another fresh copy, zero original ACK loss. Does not justify truncating unknown production corruption or qualify interior-corruption repair.",
+      "proof": {
+        "seed_rows_verified": 2000000,
+        "intents": 2890,
+        "acknowledged": 2262,
+        "live_rows_verified": 2262,
+        "applied_unacknowledged_intents": 0,
+        "acknowledged_loss": 0,
+        "wrong_or_duplicate_bodies": 0,
+        "export_sha256": "0c39ada353a4687a7e866c9e8e13532b1caf8ed63ccd99e005ea66035fbb6b58"
+      },
+      "passed": true
+    },
+    {
+      "directory": "results/journal/707fcded9f084a868046e6048ee6f66a",
+      "scope": "One scalar synchronous native journal capability gate after fenced SIGKILL; no live reader/writer or power-loss qualification",
+      "proof": null,
+      "passed": true
+    },
+    {
+      "directory": "results/lock-capability/aff821a2ef204b1db0f826b975949c9a",
+      "scope": "Python standard fcntl.flock capability, not native database correctness or performance. Same inode/device are recorded. Empty lock file: zero payload/allocated bytes; data compression not applicable. Cgroup/process CPU/memory and block I/O recorded; physical host I/O unavailable.",
+      "proof": null,
+      "passed": true
+    }
+  ],
+  "raw_log": "results/journal-production-with-tail.log",
+  "raw_log_sha256": "6a4b5eb222fd6021ac71eb27b29527eb7c7916d4e2673244339c89fe745a1f3a",
+  "cleanup": "The runner verified healthy listings contain no owned journal containers, networks or volumes."
+}

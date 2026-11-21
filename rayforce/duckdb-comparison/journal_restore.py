@@ -20,7 +20,10 @@ from live_journal import reconcile
 
 
 WRAPPER = r"""
-import json, pathlib, resource, subprocess, time
+import json, os, pathlib, resource, subprocess, time
+inputs = pathlib.Path('/data')
+if sorted(p.name for p in inputs.iterdir()) != ['.isolation-token'] or (inputs / '.isolation-token').read_text() != os.environ['JOURNAL_INPUT_TOKEN']:
+    raise RuntimeError('Original input isolation was not proved')
 started = time.monotonic_ns()
 code = subprocess.run(['/opt/rayforce/rayforce', '-c', '1', '-m', '3G', '-L', '/state/journal', '-f', '/state/verify.rfl']).returncode
 usage = resource.getrusage(resource.RUSAGE_CHILDREN)
@@ -104,6 +107,8 @@ def restore(source):
     state.mkdir(parents=True)
     empty_input = root / "empty-input"
     empty_input.mkdir()
+    input_token = uuid.uuid4().hex
+    (empty_input / ".isolation-token").write_text(input_token)
     ingestion.save(
         root / "environment.json",
         {
@@ -175,6 +180,8 @@ def restore(source):
                 "--no-deps",
                 "--name",
                 name,
+                "--env",
+                "JOURNAL_INPUT_TOKEN=" + input_token,
                 "--entrypoint",
                 "python",
                 "rayforce",
@@ -204,7 +211,7 @@ def restore(source):
         ingestion.save(root / "samples.json", {"resources": samples, "disk": disks})
         if not any(
             m["Destination"] == "/data"
-            and m["Source"] == str(empty_input)
+            and m["Source"] in {str(empty_input), "/host_mnt" + str(empty_input)}
             and not m["RW"]
             for m in inspection["Mounts"]
         ):

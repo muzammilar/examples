@@ -20,7 +20,7 @@ up:
 test: check-controls
 	python3 experiment.py test
 check-controls:
-	python3 -m unittest test_controller.py test_ingestion.py test_persistence.py test_live_journal.py
+	python3 -m unittest test_controller.py test_ingestion.py test_persistence.py test_live_journal.py test_journal_tail.py
 benchmark:
 	python3 experiment.py benchmark
 down:
@@ -71,7 +71,8 @@ test-lock-filesystem-bind:
 
 .PHONY: test-production report-journal
 # Selected implemented cases; JOURNAL.md lists the remaining boundaries.
-test-production: test-journal-capability test-lock-filesystem test-journal-writer-lock test-journal-recovery
+test-production: check-controls
+	JOURNAL_STORAGE=volume JOURNAL_SCENARIO=process-crash python3 production.py
 
 JOURNAL_RESULT ?=
 report-journal:
@@ -89,3 +90,14 @@ RESTORE_RESULT ?=
 report-journal-restore:
 	@test -n "$(RESTORE_RESULT)" || { echo 'Set RESTORE_RESULT to an explicit journal-restore result directory'; exit 1; }
 	python3 journal_restore.py --publish "$(RESTORE_RESULT)"
+
+.PHONY: test-journal-tail-recovery
+test-journal-tail-recovery: check-controls
+	@test -n "$(JOURNAL_SOURCE)" || { echo 'Set JOURNAL_SOURCE to a completed journal-live result directory'; exit 1; }
+	python3 journal_tail.py "$(JOURNAL_SOURCE)"
+
+TAIL_RESULT ?=
+.PHONY: report-journal-tail
+report-journal-tail:
+	@test -n "$(TAIL_RESULT)" || { echo 'Set TAIL_RESULT to an explicit journal-tail result directory'; exit 1; }
+	python3 publish_tail_results.py "$(TAIL_RESULT)"

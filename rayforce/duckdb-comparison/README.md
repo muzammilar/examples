@@ -34,6 +34,7 @@ make test-duckdb-snapshot
 make test-journal-capability
 make test-journal-recovery
 make test-journal-writer-lock
+make test-production
 ```
 
 `ROWS=2000000` defaults to two million; `REPEATS=15`, `TRIALS=3`,
@@ -45,6 +46,10 @@ the in-memory measurements below. [Native synchronous journal tests](JOURNAL.md)
 add independent writers/readers through two retained-state process crashes.
 [Writer-exclusion tests](FENCING.md) use a labeled Linux volume and retain the
 host-share lock failure separately. Do not assume a host bind mount enforces locks.
+[Controlled torn-tail recovery](TAIL_RECOVERY.md) verifies native refusal, framing
+validation and repair of only a known synthetic trailer in a separate copy.
+`make test-production` runs the six implemented journal cases serially and creates
+its own restore/repair source; snapshot and ingestion targets remain separate.
 Changing `ROWS` requires archiving the old `results/`
 directory first. Failed runs remain evidence; no automatic data reset or retry.
 An example-local lock prevents concurrent controllers. Other examples must be

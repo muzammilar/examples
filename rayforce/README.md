@@ -65,3 +65,10 @@ second openers on Docker-managed ext4 storage while writers/readers continue.
 The host-share bind mount failed both native and standard-library locking controls;
 that failure remains reported. Current live tests use uniquely owned volumes, and
 the two-crash volume rerun recovered all 2,255 ACKs with zero observed body loss.
+
+[Controlled torn-tail recovery](duckdb-comparison/TAIL_RECOVERY.md) now rejects
+startup, validates 1,621 intact frames and removes only the known injected three
+bytes in a fresh copy. It restores 2,000,000 seed trades, 10,000 customers and
+2,262 live ACKs with zero missing/wrong bodies. `make test-production` creates
+its own recovery source and runs all implemented cases serially. Interior
+corruption and general-purpose production log repair remain unqualified.

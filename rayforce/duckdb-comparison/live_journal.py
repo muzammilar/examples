@@ -735,6 +735,7 @@ def run():
                 result["proof"],
                 flush=True,
             )
+            return root
 
 
 if __name__ == "__main__":
