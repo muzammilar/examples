@@ -245,6 +245,9 @@ Planned as a `mysql/` folder, mirroring the Postgres section with the same `orde
 
 ## Embedded analytics
 
+- [x] `rayforce/duckdb-comparison`: analytical queries plus single/batch query and typed append paths through Python/C++/Rust; 144 ingestion trials, full old/new body verification, CPU/memory and disk accounting. In-memory, single-writer scope.
+- [ ] Extend that comparison with DuckDB columnar data-chunk Appender and prepared SQL; retain per-batch query-visible acknowledgements, identical inputs and full-body verification. Persisted storage/compression, crash recovery and genuinely cold queries remain separate unrun work.
+
 - [x] `duckdb-zfs-recovery`: four Quack clients, real ZFS snapshot replication, interrupted receive/resume, read-only clones and fenced-primary promotion with measured asynchronous loss.
 
 - [ ] `hyper-api-embedded`: Salesforce/Tableau Hyper (Umbra lineage, compiled queries) via `pip install tableauhyperapi`; free, closed source. macOS arm64 wheels stop after 0.0.26479 (newer releases: Linux x86_64 and Windows only), so pin that on a Mac. Compare with DuckDB on the same data.

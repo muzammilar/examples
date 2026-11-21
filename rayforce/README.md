@@ -22,6 +22,15 @@ Exported kernel block counters were zero for these cached in-memory runs; this
 does not compare physical disk performance. Persisted-storage compression remains
 outside this profile.
 
+The [ingestion comparison](duckdb-comparison/README.md#ingestion-comparison) adds
+144 fresh-process trials with 100,000 appends each, batches of 1–10,000 and
+full verification of all 2,100,000 final rows per trial. In the one-CPU C++
+10,000-row typed path, median observed rates were 19,999,500 rows/s for
+Rayforce and 7,032,472 for DuckDB’s row-wise Appender. CPU, memory and latency
+costs accompany the rates. These in-memory results do not establish equivalent
+transaction isolation, durability or sustained capacity; the columnar Appender
+remains unrun.
+
 ## Limits and remaining experiments
 
 This example embeds the engine and uses its native worker pool, not a distributed

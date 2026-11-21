@@ -13,3 +13,13 @@ services:
       - ./results/data:/data:ro
       - ./results/plans:/plans:ro
     profiles: [tools]
+
+  ingestion:
+    extends:
+      service: analytics
+    user: "${LAB_UID:-10001}:${LAB_GID:-10001}"
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    environment: {HOME: /tmp}
+    volumes:
+      - "${VERIFICATION_PATH:-./results/unused}:/verification"

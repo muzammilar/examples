@@ -94,7 +94,10 @@ class FailureEvidence(unittest.TestCase):
             state = {
                 "Id": "owned-container",
                 "Config": {
-                    "Labels": {"com.docker.compose.project": experiment.PROJECT}
+                    "Labels": {
+                        "com.docker.compose.project": experiment.PROJECT,
+                        "com.docker.compose.project.working_dir": str(experiment.ROOT),
+                    }
                 },
                 "State": {"Running": True},
             }

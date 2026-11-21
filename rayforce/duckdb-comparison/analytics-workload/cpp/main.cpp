@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
+#include <sstream>
 #include <stdexcept>
 #include <string>
 #include <sys/resource.h>
@@ -27,18 +28,41 @@ int main(int argc, char** argv) {
         Runtime runtime(std::stoi(argv[2]));
         std::ifstream plan(argv[1]);
         if (!plan) throw std::runtime_error("cannot open plan");
+        bool wrote = false;
+        std::chrono::steady_clock::time_point first_write{}, last_write{};
+        long long first_write_cpu = 0, last_write_cpu = 0;
         for (std::string line; std::getline(plan, line);) {
             const auto a = line.find('\t'), b = line.find('\t', a + 1), c = line.find('\t', b + 1);
             if (a == line.npos || b == line.npos || c == line.npos) throw std::runtime_error("invalid plan");
             const auto phase = line.substr(0, a), name = line.substr(a + 1, b - a - 1);
             const auto expected = line.substr(b + 1, c - b - 1), query = line.substr(c + 1);
+            int64_t first_id = 0, count = 0;
+            const bool append = phase == "append" || phase == "reject-append";
+            if (append) {
+                std::istringstream values(query);
+                if (!(values >> first_id >> count)) throw std::runtime_error("invalid append plan");
+                values >> std::ws;
+                if (!values.eof()) throw std::runtime_error("invalid append plan");
+            }
             const auto cpu = cpu_ns();
             const auto start = std::chrono::steady_clock::now();
-            char* raw = bench_eval(query.c_str(), phase != "load");
-            const auto ns = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::steady_clock::now() - start).count();
+            char* raw = nullptr;
+            if (append) {
+                const bool failed = bench_append(first_id, count) != 0;
+                if (failed != (phase == "reject-append")) throw std::runtime_error(failed ? bench_error() : "invalid append unexpectedly accepted");
+            } else {
+                raw = bench_eval(query.c_str(), phase != "load" && phase != "write" && phase != "export");
+                if (!raw) throw std::runtime_error(bench_error());
+            }
+            const auto finished = std::chrono::steady_clock::now();
+            const auto ns = std::chrono::duration_cast<std::chrono::nanoseconds>(finished - start).count();
             const auto used_cpu = cpu_ns() - cpu;
-            if (!raw) throw std::runtime_error(bench_error());
-            const std::string actual(raw);
+            if (phase == "write" || phase == "append") {
+                if (!wrote) { first_write = start; first_write_cpu = cpu; wrote = true; }
+                last_write = finished;
+                last_write_cpu = cpu + used_cpu;
+            }
+            const std::string actual = raw ? raw : "";
             bench_free(raw);
             if (actual != expected) throw std::runtime_error("incorrect result: " + name + " got " + actual);
             rusage usage{};
@@ -46,5 +70,12 @@ int main(int argc, char** argv) {
             std::cout << phase << '\t' << name << '\t' << ns << '\t' << used_cpu << '\t' << usage.ru_maxrss << '\n' << std::flush;
         }
         if (!plan.eof()) throw std::runtime_error("plan read failed");
+        if (wrote) {
+            rusage usage{};
+            if (getrusage(RUSAGE_SELF, &usage)) throw std::runtime_error("getrusage failed");
+            std::cout << "window\tingestion\t"
+                      << std::chrono::duration_cast<std::chrono::nanoseconds>(last_write - first_write).count()
+                      << '\t' << last_write_cpu - first_write_cpu << '\t' << usage.ru_maxrss << '\n';
+        }
     } catch (const std::exception& error) { std::cerr << error.what() << '\n'; return 1; }
 }

@@ -15,30 +15,70 @@ def main():
     lib.bench_eval.argtypes = [ctypes.c_char_p, ctypes.c_int]
     lib.bench_eval.restype = ctypes.c_void_p
     lib.bench_free.argtypes = [ctypes.c_void_p]
+    lib.bench_append.argtypes = [ctypes.c_int64, ctypes.c_int64]
+    lib.bench_append.restype = ctypes.c_int
     lib.bench_close.restype = None
     if lib.bench_open(int(threads)):
         raise RuntimeError(lib.bench_error().decode())
     try:
+        first_write = last_write = None
         with open(plan) as source:
             for line in source:
                 phase, name, expected, query = line.rstrip("\n").split("\t", 3)
                 encoded = query.encode()
+                append = (
+                    tuple(map(int, query.split()))
+                    if phase in {"append", "reject-append"}
+                    else None
+                )
+                if append is not None and (
+                    len(append) != 2
+                    or any(not -(2**63) <= value < 2**63 for value in append)
+                ):
+                    raise ValueError("append plan requires two signed 64-bit integers")
                 cpu, start = time.process_time_ns(), time.perf_counter_ns()
-                result = lib.bench_eval(encoded, phase != "load")
+                if append is not None:
+                    failed = bool(lib.bench_append(*append))
+                    if failed != (phase == "reject-append"):
+                        raise RuntimeError(
+                            lib.bench_error().decode()
+                            if failed
+                            else "invalid append unexpectedly accepted"
+                        )
+                    result = None
+                else:
+                    result = lib.bench_eval(
+                        encoded, phase not in {"load", "write", "export"}
+                    )
+                    if not result:
+                        raise RuntimeError(lib.bench_error().decode())
+                finished = time.perf_counter_ns()
                 elapsed, used_cpu = (
-                    time.perf_counter_ns() - start,
+                    finished - start,
                     time.process_time_ns() - cpu,
                 )
-                if not result:
-                    raise RuntimeError(lib.bench_error().decode())
+                if phase in {"write", "append"}:
+                    if first_write is None:
+                        first_write = (start, cpu)
+                    last_write = (finished, cpu + used_cpu)
                 try:
-                    actual = ctypes.string_at(result).decode()
+                    actual = ctypes.string_at(result).decode() if result else ""
                 finally:
                     lib.bench_free(result)
                 if actual != expected:
                     raise RuntimeError(f"incorrect result: {name}: {actual}")
                 rss = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
                 print(phase, name, elapsed, used_cpu, rss, sep="\t", flush=True)
+        if first_write is not None:
+            print(
+                "window",
+                "ingestion",
+                last_write[0] - first_write[0],
+                last_write[1] - first_write[1],
+                resource.getrusage(resource.RUSAGE_SELF).ru_maxrss,
+                sep="\t",
+                flush=True,
+            )
     finally:
         lib.bench_close()
 

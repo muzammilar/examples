@@ -1,0 +1,16 @@
+{
+  "operations": ["append", "same-process read", "canonical CSV export"],
+  "schema": "Six non-null I64 columns: id, customer, symbol, day, qty, price",
+  "consistency": "Read-your-writes in one process; DuckDB native batches flush before acknowledgement",
+  "durability": "In-memory only. No process/power-loss durability or replication claim.",
+  "atomicity": "No cross-call transaction. Valid batches and adapter argument rejection are tested; general engine error/OOM atomicity remains unqualified.",
+  "idempotency": "None: IDs are unique by construction, not enforced by a primary-key constraint",
+  "retry": "No mutation retries; any unexpected error fails the case",
+  "query_path": "Parsed SQL INSERT VALUES versus quoted-target Rayfall insert, including source parsing",
+  "typed_path": "DuckDB C Appender + per-batch flush versus Rayforce C typed vectors/table + fixed Rayfall dispatch",
+  "append_payload": "id=x, customer=x%10000, symbol=x%256, day=x%30, qty=1+x%100, price=100+x%9901",
+  "read_and_cache_scope": "Fresh in-memory processes load the same CSV; reads are hot/recent, not OS-cold",
+  "oracle": "Every old and new row is exported in ID order and matched to independently generated canonical CSV bytes by length and SHA256",
+  "timing": "Actual first-write-start to last-write-finish includes intervening dispatch/logging and the middle read for multi-request cells. Setup, initial/final read and export are separately timed.",
+  "limits": "Single writer; no distributed or availability claim. Both engines use the same CPU/memory cap. Native adapter batches contain 1..10000 rows. CSV witness exports are verification artifacts, not engine persistence."
+}

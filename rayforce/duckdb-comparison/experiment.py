@@ -340,7 +340,17 @@ def resource_summary(samples):
     }
 
 
-def run_case(language, engine, trial, run, repeats, threads):
+def run_case(
+    language,
+    engine,
+    trial,
+    run,
+    repeats,
+    threads,
+    *,
+    record_count=None,
+    verification_path=None,
+):
     name = f"rayforce-duckdb-{run.name[:8]}-{language}-{engine}-{trial}"
     filename = f"{engine}-{run.name}.tsv"
     path = RESULTS / "plans" / filename
@@ -360,11 +370,21 @@ def run_case(language, engine, trial, run, repeats, threads):
         name,
         "--entrypoint",
         "/bin/sh",
-        "analytics",
+        "ingestion" if verification_path is not None else "analytics",
         "-c",
         shell,
     ]
-    command(args, stdout=subprocess.PIPE, env=os.environ | {"CPUS": str(cpus)})
+    environment = os.environ | {"CPUS": str(cpus)}
+    if verification_path is not None:
+        verification_path = verification_path.resolve(strict=True)
+        if not verification_path.is_relative_to(RESULTS.resolve()):
+            raise ValueError("verification output must remain inside owned results")
+        environment.update(
+            VERIFICATION_PATH=str(verification_path),
+            LAB_UID=str(os.getuid()),
+            LAB_GID=str(os.getgid()),
+        )
+    command(args, stdout=subprocess.PIPE, env=environment)
     started = time.monotonic()
     samples = []
     inspection = None
@@ -372,11 +392,27 @@ def run_case(language, engine, trial, run, repeats, threads):
     try:
         while True:
             inspection = json.loads(capture(["docker", "inspect", name], text=True))[0]
-            if (
-                inspection["Config"]["Labels"].get("com.docker.compose.project")
-                != PROJECT
-            ):
+            if inspection["Config"]["Labels"].get(
+                "com.docker.compose.project"
+            ) != PROJECT or inspection["Config"]["Labels"].get(
+                "com.docker.compose.project.working_dir"
+            ) != str(ROOT):
                 raise RuntimeError("unexpected container owner")
+            if verification_path is not None:
+                mounts = [
+                    m
+                    for m in inspection["Mounts"]
+                    if m["Destination"] == "/verification"
+                ]
+                allowed = {str(verification_path), "/host_mnt" + str(verification_path)}
+                if (
+                    len(mounts) != 1
+                    or mounts[0]["Source"] not in allowed
+                    or not mounts[0]["RW"]
+                ):
+                    raise RuntimeError(
+                        "verification witness mount differs from the owned case"
+                    )
             if not inspection["State"]["Running"]:
                 break
             endpoint = endpoint or docker_socket()
@@ -406,7 +442,9 @@ def run_case(language, engine, trial, run, repeats, threads):
                         "peak_rss_kib": int(rss),
                     }
                 )
-        expected_count = 2 + 5 * (4 + repeats)
+        expected_count = (
+            record_count if record_count is not None else 2 + 5 * (4 + repeats)
+        )
         if len(records) != expected_count:
             raise RuntimeError("incomplete operation evidence")
         peak = int(log.split("__MEMORY_PEAK__\n")[1].splitlines()[0])
@@ -473,6 +511,10 @@ def run_case(language, engine, trial, run, repeats, threads):
             inspection is not None
             and inspection["Config"]["Labels"].get("com.docker.compose.project")
             == PROJECT
+            and inspection["Config"]["Labels"].get(
+                "com.docker.compose.project.working_dir"
+            )
+            == str(ROOT)
         ):
             command(["docker", "rm", "-f", name], stdout=subprocess.DEVNULL)
 
