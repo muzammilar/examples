@@ -289,6 +289,16 @@ remain unrun. Full teardown archived and hash-verified 1,535 files under
 `results/archives/45ac3389ca4f4b4bb9822a096685bf3d/`. The private cluster/kubeconfig
 were removed, and 23 unrelated Docker volumes were preserved.
 
+## Archived evidence recheck — 2026-11-21
+
+The [committed result summary](VERIFIED_RESULTS.json) preserves the core recovery
+numbers, three diagnostic benchmark trials and original case verdicts. On
+2026-11-21, all **1,535 archived file hashes** matched again and **11 controller
+tests** passed. These were offline/host checks, not new live fault experiments.
+At the user's request, bulky archived message journals are being removed after
+publication; reports and proof summaries remain. Hashes alone cannot replay deleted
+journals. The extended unrun cases above remain unqualified.
+
 ## Layout
 
 - `producer/`, `consumer/`: application source, dependency locks/builds and Dockerfiles.

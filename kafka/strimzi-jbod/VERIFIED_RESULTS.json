@@ -1,0 +1,278 @@
+{
+  "recorded_at": "2026-11-21",
+  "scope": "Fresh offline archive hash recheck and host controls; live cluster faults and performance runs were not repeated today.",
+  "host_control_tests_passed": 11,
+  "archives": [
+    {
+      "archive": "45ac3389ca4f4b4bb9822a096685bf3d",
+      "verified_files": 1535,
+      "manifest_sha256": "a60813fc5893b53dde8ef863fc85b5eda7f514fbdb03debe5edde32652a08dd5",
+      "cases": [
+        {
+          "case": "d7833c50cbe44a999b8e96671657cc0f",
+          "original_failed": false,
+          "recorded_passed": true,
+          "acknowledged": 2002048,
+          "result_sha256": "a1b0c4d264fae97767f85bebed98e6b82178c1b9332dcb7a04751002af578367"
+        },
+        {
+          "case": "952c618c32574aaaa89afe1874937dc2",
+          "original_failed": false,
+          "recorded_passed": true,
+          "acknowledged": 1001024,
+          "result_sha256": "0a0ad4d7ab1672192c03db29afd79cfc6a8881a7b86ba37ebfc0502b9caca894"
+        },
+        {
+          "case": "8ea5a5d461f64d2b945eeeac555e3777",
+          "original_failed": true,
+          "failure_sha256": "69bc356721f35feb7b730611c77645ea712364a50f7d3faa19f1e82001225fc7"
+        },
+        {
+          "case": "6160325b5f9c4c43b5a73e3b5ea8ccf9",
+          "original_failed": true,
+          "failure_sha256": "b679012861368cbad27e44c2e59cc3bd317244d18cd03d4d7a30f53c92e5b68a"
+        },
+        {
+          "case": "49cb69b1a51a4129848479c996d8e09a",
+          "original_failed": false,
+          "recorded_passed": true,
+          "acknowledged": 2001024,
+          "result_sha256": "a830f6423f30e1835981121b4997aab9b0d88ec2d91c29ca8be3793b77097bb0"
+        },
+        {
+          "case": "5674e8c26203437bb06333fc5216fa73",
+          "original_failed": false,
+          "recorded_passed": true,
+          "acknowledged": 1001024,
+          "result_sha256": "3539f3055360f79aa132c987937e9a7d8dbe44bd9ef05316ab91dd4e1146ff9d"
+        },
+        {
+          "case": "2f1584808ead4c269bc76ff6191d6f74",
+          "original_failed": false,
+          "recorded_passed": true,
+          "acknowledged": 1001024,
+          "result_sha256": "3c699dad4cc9587df03033186a36e15386b5d91bb88627f915b3620a439ad3dc"
+        },
+        {
+          "case": "4ce08be7a2b14ea4806c87de6e28f886",
+          "original_failed": false,
+          "recorded_passed": true,
+          "acknowledged": 1001024,
+          "result_sha256": "b9fd30e9f636edd54474cbe2554f4bc20e581f9cafefdf4e2ec08dc2dcaed4fd"
+        },
+        {
+          "case": "93530b7eae0541af844d6fd3a902d5cf",
+          "original_failed": true,
+          "failure_sha256": "c0cb1118d51718d12a88b845ce688a112be17820145a8a0eee87a50b5dd84951"
+        },
+        {
+          "case": "9a72c5078303417bac0656556a2f02c9",
+          "original_failed": false,
+          "recorded_passed": true,
+          "acknowledged": 1001024,
+          "result_sha256": "16fae33a630fc6a97166a43735fc974abaf83de02cdb1c5c35a28faf989bd1d3"
+        },
+        {
+          "case": "6b1eccf0a47b435387419e7c66cd383c",
+          "original_failed": false,
+          "recorded_passed": true,
+          "acknowledged": 1001024,
+          "result_sha256": "a37f642c0de7beb3ee23a0afd244f1cc686e72d7d1ddb14e8937a2842e3a1989"
+        },
+        {
+          "case": "73b15ac842dd4a56b636d76d8624119e",
+          "original_failed": false,
+          "recorded_passed": true,
+          "acknowledged": 1001024,
+          "result_sha256": "e16da7fb54655d0c3bf02a30498145f64472f78a99a18064dc7801f47dcbe8fb"
+        },
+        {
+          "case": "9a72b34778af4d0790422e29c34e5c56",
+          "original_failed": true,
+          "failure_sha256": "0f66182dc84cc0bfbf20d7de79cd2b05a65dc15f6e163c610954b94d605740b8"
+        },
+        {
+          "case": "8e76e6f7c2a344b9afb5b96df1e9f079",
+          "original_failed": false,
+          "recorded_passed": true,
+          "acknowledged": 2001024,
+          "result_sha256": "f55c697ca1bce421156992a57beeef41c830d42aa26bef9f2c18186ee672f427"
+        },
+        {
+          "case": "5d00816840184f85b6a86ebe05fa3c78",
+          "original_failed": false,
+          "recorded_passed": true,
+          "acknowledged": 1001024,
+          "result_sha256": "dd069c9aa6352b8d7e86c28d87be6e82cccd88bd91212987d1a9287a27807ad1"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "Original failed/interrupted verdicts remain failed, even where separate data reconciliation succeeded.",
+    "Further fault domains and fair sustained/cold/hot benchmark coverage remain unrun as listed in README.",
+    "Historical measurements do not retroactively satisfy all new CPU/memory/compression/disk-I/O requirements.",
+    "At user request, bulky journals may be removed after these results are published; hashes/summaries cannot replay deleted raw events."
+  ],
+  "core_measurements": [
+    {
+      "scenario": "disk-failure",
+      "case_id": "952c618c32574aaaa89afe1874937dc2",
+      "acknowledged": 1001024,
+      "serialized_payload_bytes": 68960570,
+      "ambiguous": 0,
+      "unknown_ack_offsets": 6,
+      "ack_loss": 0,
+      "corruption": 0,
+      "observed_process_ready_seconds": 92.04342818260193,
+      "observed_native_repair_seconds": 98.73294425010681,
+      "write_p50_ms": 11.519,
+      "write_p99_ms": 11950.524,
+      "end_to_end_p50_ms": 2864.029,
+      "end_to_end_p99_ms": 12411.34,
+      "watermark_errors": 2,
+      "message_poll_errors": 0,
+      "observed_cluster_cpu_core_seconds": 306.709819
+    },
+    {
+      "scenario": "broker-crash",
+      "case_id": "2f1584808ead4c269bc76ff6191d6f74",
+      "acknowledged": 1001024,
+      "serialized_payload_bytes": 68960570,
+      "ambiguous": 0,
+      "unknown_ack_offsets": 2,
+      "ack_loss": 0,
+      "corruption": 0,
+      "observed_process_ready_seconds": 23.452259063720703,
+      "observed_native_repair_seconds": 30.42134690284729,
+      "write_p50_ms": 11.471,
+      "write_p99_ms": 796.043,
+      "end_to_end_p50_ms": 3270.616,
+      "end_to_end_p99_ms": 6799.318,
+      "watermark_errors": 6,
+      "message_poll_errors": 2,
+      "observed_cluster_cpu_core_seconds": 176.235416
+    },
+    {
+      "scenario": "correctness",
+      "case_id": "6b1eccf0a47b435387419e7c66cd383c",
+      "acknowledged": 1001024,
+      "serialized_payload_bytes": 68960570,
+      "ambiguous": 0,
+      "unknown_ack_offsets": 0,
+      "ack_loss": 0,
+      "corruption": 0,
+      "observed_process_ready_seconds": null,
+      "observed_native_repair_seconds": null,
+      "write_p50_ms": 11.29,
+      "write_p99_ms": 889.477,
+      "end_to_end_p50_ms": 3745.356,
+      "end_to_end_p99_ms": 7851.063,
+      "watermark_errors": 0,
+      "message_poll_errors": 0,
+      "observed_cluster_cpu_core_seconds": 139.123096
+    },
+    {
+      "scenario": "controller-crash",
+      "case_id": "73b15ac842dd4a56b636d76d8624119e",
+      "acknowledged": 1001024,
+      "serialized_payload_bytes": 68960570,
+      "ambiguous": 0,
+      "unknown_ack_offsets": 0,
+      "ack_loss": 0,
+      "corruption": 0,
+      "observed_process_ready_seconds": 23.398527145385742,
+      "observed_native_repair_seconds": 29.70221185684204,
+      "write_p50_ms": 11.392,
+      "write_p99_ms": 854.365,
+      "end_to_end_p50_ms": 3567.183,
+      "end_to_end_p99_ms": 7417.096,
+      "watermark_errors": 0,
+      "message_poll_errors": 0,
+      "observed_cluster_cpu_core_seconds": 185.744545
+    }
+  ],
+  "diagnostic_benchmark_trials": [
+    {
+      "case": "49cb69b1a51a4129848479c996d8e09a",
+      "started": 1795095537.8221319,
+      "acknowledged": 2001024,
+      "attempted": 2001024,
+      "payload_bytes": 138960570,
+      "seconds_first_admission_to_last_ack": 60.149375200271606,
+      "acknowledged_records_per_second": 33267.57748251663,
+      "payload_MiB_per_second": 2.203233635610141,
+      "write_p50_ms": 10.832,
+      "write_p99_ms": 1248.716,
+      "observation_p50_ms": 5437.332,
+      "observation_p99_ms": 12518.893,
+      "producer_observed_cpu_core_seconds": 23.653165,
+      "whole_experiment_kind_observed_cpu_core_seconds": 206.79673300000002,
+      "kafka_roles_observed_cpu_core_seconds_including_full_history_reads": 81.39981300000001,
+      "sampled_producer_max_RSS_MiB": 81.83203125,
+      "sampled_reader_max_RSS_MiB": 388.80078125,
+      "sampled_verifier_max_RSS_MiB": 754.015625,
+      "sampled_kafka_container_max_RSS_MiB": 868.59375,
+      "node_samples": 204,
+      "body_loss": 0,
+      "corruption": 0,
+      "producer_journal_sha256": "1d6138be136fab3401f5727a13a12a9253163f6e4bc035f9ca2acbcc1db3dda7",
+      "admission_retries": 52,
+      "ambiguous": 0
+    },
+    {
+      "case": "d7833c50cbe44a999b8e96671657cc0f",
+      "started": 1795095824.748179,
+      "acknowledged": 2002048,
+      "attempted": 2002048,
+      "payload_bytes": 139032250,
+      "seconds_first_admission_to_last_ack": 60.0055365562439,
+      "acknowledged_records_per_second": 33364.38793649411,
+      "payload_MiB_per_second": 2.209654201706759,
+      "write_p50_ms": 10.877,
+      "write_p99_ms": 705.332,
+      "observation_p50_ms": 5890.495,
+      "observation_p99_ms": 12647.985,
+      "producer_observed_cpu_core_seconds": 22.499038,
+      "whole_experiment_kind_observed_cpu_core_seconds": 218.54722099999998,
+      "kafka_roles_observed_cpu_core_seconds_including_full_history_reads": 82.636952,
+      "sampled_producer_max_RSS_MiB": 81.35546875,
+      "sampled_reader_max_RSS_MiB": 410.38671875,
+      "sampled_verifier_max_RSS_MiB": 849.09375,
+      "sampled_kafka_container_max_RSS_MiB": 868.38671875,
+      "node_samples": 224,
+      "body_loss": 0,
+      "corruption": 0,
+      "producer_journal_sha256": "060311399cc69ad61c155dd07468ca6bfe7be1762904e5c5cd4d975a44f31900",
+      "admission_retries": 5,
+      "ambiguous": 0
+    },
+    {
+      "case": "8e76e6f7c2a344b9afb5b96df1e9f079",
+      "started": 1795096136.216079,
+      "acknowledged": 2001024,
+      "attempted": 2001024,
+      "payload_bytes": 138960570,
+      "seconds_first_admission_to_last_ack": 59.99701499938965,
+      "acknowledged_records_per_second": 33352.059265287724,
+      "payload_MiB_per_second": 2.2088286659514815,
+      "write_p50_ms": 10.866,
+      "write_p99_ms": 720.255,
+      "observation_p50_ms": 5860.597,
+      "observation_p99_ms": 12310.233,
+      "producer_observed_cpu_core_seconds": 23.434223,
+      "whole_experiment_kind_observed_cpu_core_seconds": 216.245795,
+      "kafka_roles_observed_cpu_core_seconds_including_full_history_reads": 78.304602,
+      "sampled_producer_max_RSS_MiB": 77.6015625,
+      "sampled_reader_max_RSS_MiB": 395.81640625,
+      "sampled_verifier_max_RSS_MiB": 843.32421875,
+      "sampled_kafka_container_max_RSS_MiB": 868.0703125,
+      "node_samples": 232,
+      "body_loss": 0,
+      "corruption": 0,
+      "producer_journal_sha256": "bf15eaecd9f6441a8e99f6439d46e0100a5c9a30589b88cf9430bf5bfd153028",
+      "admission_retries": 0,
+      "ambiguous": 0
+    }
+  ]
+}
