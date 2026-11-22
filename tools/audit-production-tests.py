@@ -48,7 +48,15 @@ applications = {
 }
 checks = {
     "suite": {"test-production"},
-    "crash": {"failover", "chaos", "chaos-node", "test-failover"},
+    "crash": {
+        "crash",
+        "crash-test",
+        "test-crash",
+        "failover",
+        "chaos",
+        "chaos-node",
+        "test-failover",
+    },
     "disk": {"disk-failure", "disk-replacement", "test-disk-failure"},
     "scale-out": {"scale-out"},
     "scale-in": {"scale-in"},

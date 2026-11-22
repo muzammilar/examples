@@ -422,11 +422,11 @@ inventory with `python3 tools/audit-production-tests.py`; output is ignored unde
 
 | Example | Shape | Declared categories | No recognized target; review applicability | Evidence status |
 |---|---|---|---|---|
-| [cedardb/backup-recovery](cedardb/backup-recovery/) | Compose | suite | crash, disk, scale-out, scale-in, rolling, partition, pressure, restore, drain | four million-row healthy/SIGKILL mutation prerequisites pass; twelve-cell sustained matrix is in progress, not qualified; earlier append-only results remain separate |
+| [cedardb/backup-recovery](cedardb/backup-recovery/) | Compose | suite, crash | disk, scale-out, scale-in, rolling, partition, pressure, restore, drain | four million-row healthy/SIGKILL mutation prerequisites pass; twelve-cell sustained matrix is in progress, not qualified; earlier append-only results remain separate |
 | [ceph/s3-cluster](ceph/s3-cluster/) | Compose | suite, crash, disk | scale-out, scale-in, rolling, partition, pressure, restore, drain | four live faults, benchmark, cold reopen and fresh lifecycle/cleanup qualified above; extended categories remain unrun |
 | [clickhouse/iceberg](clickhouse/iceberg/) | Compose | none | suite, crash, disk, scale-out, scale-in, rolling, partition, pressure, restore, drain | declaration inventory only |
 | [clickhouse/s3-tiered-storage](clickhouse/s3-tiered-storage/) | Compose | crash, disk | suite, scale-out, scale-in, rolling, partition, pressure, restore, drain | declaration inventory only |
-| [duckdb/zfs-recovery](duckdb/zfs-recovery/) | Compose | none | suite, crash, disk, scale-out, scale-in, rolling, partition, pressure, restore, drain | declaration inventory only |
+| [duckdb/zfs-recovery](duckdb/zfs-recovery/) | Compose | crash | suite, disk, scale-out, scale-in, rolling, partition, pressure, restore, drain | declaration inventory only |
 | [garage/s3-cluster](garage/s3-cluster/) | Compose | suite, crash, disk | scale-out, scale-in, rolling, partition, pressure, restore, drain | live history/reader/native-copy recovery qualified above; extended categories require separate work |
 | [greptimedb/docker-compose-cluster](greptimedb/docker-compose-cluster/) | Compose | suite, crash, disk, scale-out, scale-in | rolling, partition, pressure, restore, drain | declaration inventory only |
 | [greptimedb/kubernetes-operator](greptimedb/kubernetes-operator/) | Kubernetes | suite, crash, disk, scale-out, scale-in, rolling, partition, pressure, drain | restore | declaration inventory only |
