@@ -1,0 +1,2572 @@
+{
+  "date": "2026-11-22",
+  "functional_paths_passed": true,
+  "one_shot_report_coverage_passed": true,
+  "workload_tool_reports": 22,
+  "performance_comparison_qualified": false,
+  "full_benchmark_evidence_complete": false,
+  "full_production_testing_complete": false,
+  "scope": "Resource-accounting qualification on all five functional paths. Original process-tick spike reports retained; corrected aggregation replays unchanged native samples. Final corrected image rechecked natively on the retained 2.1-million-row table, not a new all-five final-image performance trial.",
+  "environment": {
+    "context": "desktop-linux",
+    "endpoint": "unix:///Users/muzammil/.docker/run/docker.sock",
+    "daemon": {
+      "ID": "172e5e0a-2d95-4fb5-a6b4-fb16552caec8",
+      "Name": "docker-desktop",
+      "ServerVersion": "29.5.3",
+      "Architecture": "aarch64",
+      "NCPU": 11,
+      "MemTotal": 26216296448,
+      "KernelVersion": "6.12.76-linuxkit",
+      "OperatingSystem": "Docker Desktop"
+    }
+  },
+  "host": {
+    "model": "Mac16,7",
+    "cpu": "Apple M4 Pro",
+    "physical_cores": 14,
+    "ram_bytes": 51539607552
+  },
+  "budget": {
+    "full_serving_and_one_tool_cpus": 11,
+    "full_serving_and_one_tool_memory_bytes": 17716740096,
+    "builder_cpus": 2,
+    "builder_memory_bytes": 4294967296,
+    "builder_swap_bytes": 0,
+    "builder_removed_before_serving_matrix": true
+  },
+  "workload": {
+    "initial_rows_per_architecture": 2000000,
+    "customers": 10000,
+    "batch_rows": 100000,
+    "core_lake_fields": [
+      "event_id BIGINT",
+      "customer_id INTEGER",
+      "amount_cents BIGINT"
+    ],
+    "additional_archive_column": "ClickHouse archive also retains event_day DATE; its hot table includes expire_at DateTime.",
+    "generation": "Deterministic sequential IDs; customer=i%10000, amount=i%10000+1. No nulls. Native serving case appends100000rows. Archive lake contains1000000oldrows; remaining1000000retainedhot.",
+    "input_payload_bytes": "unavailable: generated in-engine; not inferred from nominal column widths"
+  },
+  "make_test_duration_s": 92.931173,
+  "go_commands": [
+    {
+      "architecture": "ch-archive",
+      "role": "clickhouse-archive-workload",
+      "mode": "archive",
+      "application_elapsed_ns": 1005723750,
+      "process_cpu": {
+        "user_core_seconds": 0.006373,
+        "system_core_seconds": 0.0039180000000000005,
+        "total_core_seconds": 0.010291000000000002,
+        "percent_one_core_100": 1.0232432116672199
+      },
+      "process_lifetime_peak_rss_bytes": 14442496,
+      "native_cgroup_cpu_delta": {
+        "usage_usec": 10398,
+        "user_usec": 6081,
+        "system_usec": 4316,
+        "nice_usec": 0,
+        "nr_periods": 8,
+        "nr_throttled": 0,
+        "throttled_usec": 0,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      },
+      "process_io_delta": {
+        "rchar": 59230,
+        "wchar": 28272,
+        "syscr": 185,
+        "syscw": 89,
+        "read_bytes": 0,
+        "write_bytes": 1582,
+        "cancelled_write_bytes": 0
+      },
+      "cgroup_io_after_raw": "",
+      "source_report": "results/metrics-20261122/normal/ch-archive/command-metrics-3274739672.json"
+    },
+    {
+      "architecture": "ch-archive",
+      "role": "duckdb-iceberg-workload",
+      "mode": "verify",
+      "application_elapsed_ns": 212064542,
+      "process_cpu": {
+        "system_core_seconds": 0.021285,
+        "user_core_seconds": 0.340233,
+        "utilization_percent_one_core_100": 170.47545836304874
+      },
+      "process_lifetime_peak_rss_bytes": 173707264,
+      "native_cgroup_cpu_delta": {
+        "usage_usec": 362458,
+        "user_usec": 341131,
+        "system_usec": 21327,
+        "nice_usec": 0,
+        "nr_periods": 2,
+        "nr_throttled": 1,
+        "throttled_usec": 241118,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      },
+      "process_io_delta": {
+        "rchar": 76355389,
+        "wchar": 2119,
+        "syscr": 9430,
+        "syscw": 20,
+        "read_bytes": 0,
+        "write_bytes": 275,
+        "cancelled_write_bytes": 0
+      },
+      "cgroup_io_after_raw": "",
+      "source_report": "results/metrics-20261122/normal/ch-archive/command-resources-2211207009.json"
+    },
+    {
+      "architecture": "ch-archive",
+      "role": "duckdb-iceberg-workload",
+      "mode": "verify",
+      "application_elapsed_ns": 183846417,
+      "process_cpu": {
+        "system_core_seconds": 0.032645,
+        "user_core_seconds": 0.263179,
+        "utilization_percent_one_core_100": 160.9082215619138
+      },
+      "process_lifetime_peak_rss_bytes": 169566208,
+      "native_cgroup_cpu_delta": {
+        "usage_usec": 296677,
+        "user_usec": 263995,
+        "system_usec": 32682,
+        "nice_usec": 0,
+        "nr_periods": 2,
+        "nr_throttled": 1,
+        "throttled_usec": 130489,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      },
+      "process_io_delta": {
+        "rchar": 76359768,
+        "wchar": 2319,
+        "syscr": 9481,
+        "syscw": 45,
+        "read_bytes": 0,
+        "write_bytes": 275,
+        "cancelled_write_bytes": 0
+      },
+      "cgroup_io_after_raw": "",
+      "source_report": "results/metrics-20261122/normal/ch-archive/command-resources-4123871736.json"
+    },
+    {
+      "architecture": "ch-direct",
+      "role": "clickhouse-archive-workload",
+      "mode": "direct",
+      "application_elapsed_ns": 834586126,
+      "process_cpu": {
+        "user_core_seconds": 0.0018480000000000003,
+        "system_core_seconds": 0.005668,
+        "total_core_seconds": 0.007516,
+        "percent_one_core_100": 0.9005661328235404
+      },
+      "process_lifetime_peak_rss_bytes": 14389248,
+      "native_cgroup_cpu_delta": {
+        "usage_usec": 7641,
+        "user_usec": 1905,
+        "system_usec": 5735,
+        "nice_usec": 0,
+        "nr_periods": 4,
+        "nr_throttled": 0,
+        "throttled_usec": 0,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      },
+      "process_io_delta": {
+        "rchar": 41329,
+        "wchar": 15846,
+        "syscr": 121,
+        "syscw": 59,
+        "read_bytes": 0,
+        "write_bytes": 1434,
+        "cancelled_write_bytes": 0
+      },
+      "cgroup_io_after_raw": "",
+      "source_report": "results/metrics-20261122/normal/ch-direct/command-metrics-4062830837.json"
+    },
+    {
+      "architecture": "ch-direct",
+      "role": "duckdb-iceberg-workload",
+      "mode": "verify",
+      "application_elapsed_ns": 337176000,
+      "process_cpu": {
+        "system_core_seconds": 0.04781,
+        "user_core_seconds": 0.414818,
+        "utilization_percent_one_core_100": 137.20668137708498
+      },
+      "process_lifetime_peak_rss_bytes": 207785984,
+      "native_cgroup_cpu_delta": {
+        "usage_usec": 463410,
+        "user_usec": 415571,
+        "system_usec": 47839,
+        "nice_usec": 0,
+        "nr_periods": 4,
+        "nr_throttled": 1,
+        "throttled_usec": 77256,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      },
+      "process_io_delta": {
+        "rchar": 76364790,
+        "wchar": 2609,
+        "syscr": 9547,
+        "syscw": 81,
+        "read_bytes": 0,
+        "write_bytes": 276,
+        "cancelled_write_bytes": 0
+      },
+      "cgroup_io_after_raw": "",
+      "source_report": "results/metrics-20261122/normal/ch-direct/command-resources-658246542.json"
+    },
+    {
+      "architecture": "ch-direct",
+      "role": "duckdb-iceberg-workload",
+      "mode": "verify",
+      "application_elapsed_ns": 300197042,
+      "process_cpu": {
+        "system_core_seconds": 0.020727,
+        "user_core_seconds": 0.364987,
+        "utilization_percent_one_core_100": 128.48694225308188
+      },
+      "process_lifetime_peak_rss_bytes": 239366144,
+      "native_cgroup_cpu_delta": {
+        "usage_usec": 386283,
+        "user_usec": 365489,
+        "system_usec": 20793,
+        "nice_usec": 0,
+        "nr_periods": 3,
+        "nr_throttled": 1,
+        "throttled_usec": 199683,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      },
+      "process_io_delta": {
+        "rchar": 76355214,
+        "wchar": 2129,
+        "syscr": 9429,
+        "syscw": 21,
+        "read_bytes": 0,
+        "write_bytes": 276,
+        "cancelled_write_bytes": 0
+      },
+      "cgroup_io_after_raw": "",
+      "source_report": "results/metrics-20261122/normal/ch-direct/command-resources-885335181.json"
+    },
+    {
+      "architecture": "ch-sharded",
+      "role": "duckdb-iceberg-workload",
+      "mode": "native-recover",
+      "application_elapsed_ns": 841823084,
+      "process_cpu": {
+        "system_core_seconds": 0.007877,
+        "user_core_seconds": 0.013799,
+        "utilization_percent_one_core_100": 2.5748878133638824
+      },
+      "process_lifetime_peak_rss_bytes": 34258944,
+      "native_cgroup_cpu_delta": {
+        "usage_usec": 22138,
+        "user_usec": 13956,
+        "system_usec": 8182,
+        "nice_usec": 0,
+        "nr_periods": 8,
+        "nr_throttled": 0,
+        "throttled_usec": 0,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      },
+      "process_io_delta": {
+        "rchar": 120420,
+        "wchar": 33378,
+        "syscr": 585,
+        "syscw": 207,
+        "read_bytes": 0,
+        "write_bytes": 2521,
+        "cancelled_write_bytes": 0
+      },
+      "cgroup_io_after_raw": "",
+      "source_report": "results/metrics-20261122/normal/ch-sharded/command-resources-1541477723.json"
+    },
+    {
+      "architecture": "ch-sharded",
+      "role": "duckdb-iceberg-workload",
+      "mode": "native-stage",
+      "application_elapsed_ns": 1510857501,
+      "process_cpu": {
+        "system_core_seconds": 0.010801,
+        "user_core_seconds": 0.009905,
+        "utilization_percent_one_core_100": 1.3704800079620483
+      },
+      "process_lifetime_peak_rss_bytes": 34410496,
+      "native_cgroup_cpu_delta": {
+        "usage_usec": 21530,
+        "user_usec": 10349,
+        "system_usec": 11181,
+        "nice_usec": 0,
+        "nr_periods": 12,
+        "nr_throttled": 0,
+        "throttled_usec": 0,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      },
+      "process_io_delta": {
+        "rchar": 113628,
+        "wchar": 30473,
+        "syscr": 524,
+        "syscw": 177,
+        "read_bytes": 0,
+        "write_bytes": 2365,
+        "cancelled_write_bytes": 0
+      },
+      "cgroup_io_after_raw": "",
+      "source_report": "results/metrics-20261122/normal/ch-sharded/command-resources-2253034773.json"
+    },
+    {
+      "architecture": "ch-sharded",
+      "role": "duckdb-iceberg-workload",
+      "mode": "native",
+      "application_elapsed_ns": 2253729585,
+      "process_cpu": {
+        "system_core_seconds": 0.012818,
+        "user_core_seconds": 0.012818,
+        "utilization_percent_one_core_100": 1.1374922781607804
+      },
+      "process_lifetime_peak_rss_bytes": 34394112,
+      "native_cgroup_cpu_delta": {
+        "usage_usec": 26152,
+        "user_usec": 13076,
+        "system_usec": 13076,
+        "nice_usec": 0,
+        "nr_periods": 15,
+        "nr_throttled": 0,
+        "throttled_usec": 0,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      },
+      "process_io_delta": {
+        "rchar": 137458,
+        "wchar": 34431,
+        "syscr": 590,
+        "syscw": 200,
+        "read_bytes": 0,
+        "write_bytes": 2610,
+        "cancelled_write_bytes": 0
+      },
+      "cgroup_io_after_raw": "",
+      "source_report": "results/metrics-20261122/normal/ch-sharded/command-resources-2754310176.json"
+    },
+    {
+      "architecture": "ch-sharded",
+      "role": "duckdb-iceberg-workload",
+      "mode": "append-source",
+      "application_elapsed_ns": 296820084,
+      "process_cpu": {
+        "system_core_seconds": 0.022829,
+        "user_core_seconds": 0.206629,
+        "utilization_percent_one_core_100": 77.30541576155609
+      },
+      "process_lifetime_peak_rss_bytes": 101076992,
+      "native_cgroup_cpu_delta": {
+        "usage_usec": 230402,
+        "user_usec": 207550,
+        "system_usec": 22853,
+        "nice_usec": 0,
+        "nr_periods": 3,
+        "nr_throttled": 1,
+        "throttled_usec": 126051,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      },
+      "process_io_delta": {
+        "rchar": 76346689,
+        "wchar": 155,
+        "syscr": 9393,
+        "syscw": 9,
+        "read_bytes": 0,
+        "write_bytes": 91,
+        "cancelled_write_bytes": 0
+      },
+      "cgroup_io_after_raw": "",
+      "source_report": "results/metrics-20261122/normal/ch-sharded/command-resources-2775172045.json"
+    },
+    {
+      "architecture": "ch-sharded",
+      "role": "duckdb-iceberg-workload",
+      "mode": "verify",
+      "application_elapsed_ns": 373306584,
+      "process_cpu": {
+        "system_core_seconds": 0.044808,
+        "user_core_seconds": 0.445403,
+        "utilization_percent_one_core_100": 131.31592664328687
+      },
+      "process_lifetime_peak_rss_bytes": 247734272,
+      "native_cgroup_cpu_delta": {
+        "usage_usec": 490690,
+        "user_usec": 445992,
+        "system_usec": 44698,
+        "nice_usec": 0,
+        "nr_periods": 4,
+        "nr_throttled": 1,
+        "throttled_usec": 15259,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      },
+      "process_io_delta": {
+        "rchar": 76355331,
+        "wchar": 2124,
+        "syscr": 9428,
+        "syscw": 20,
+        "read_bytes": 0,
+        "write_bytes": 276,
+        "cancelled_write_bytes": 0
+      },
+      "cgroup_io_after_raw": "",
+      "source_report": "results/metrics-20261122/normal/ch-sharded/command-resources-3785722235.json"
+    },
+    {
+      "architecture": "ch-sharded",
+      "role": "duckdb-iceberg-workload",
+      "mode": "load",
+      "application_elapsed_ns": 635635042,
+      "process_cpu": {
+        "system_core_seconds": 0.071102,
+        "user_core_seconds": 0.470447,
+        "utilization_percent_one_core_100": 85.19810334811592
+      },
+      "process_lifetime_peak_rss_bytes": 143380480,
+      "native_cgroup_cpu_delta": {
+        "usage_usec": 542787,
+        "user_usec": 470846,
+        "system_usec": 71940,
+        "nice_usec": 0,
+        "nr_periods": 6,
+        "nr_throttled": 1,
+        "throttled_usec": 138639,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      },
+      "process_io_delta": {
+        "rchar": 76366471,
+        "wchar": 2844,
+        "syscr": 9624,
+        "syscw": 164,
+        "read_bytes": 0,
+        "write_bytes": 1264,
+        "cancelled_write_bytes": 0
+      },
+      "cgroup_io_after_raw": "",
+      "source_report": "results/metrics-20261122/normal/ch-sharded/command-resources-947731922.json"
+    },
+    {
+      "architecture": "duck-archive",
+      "role": "duckdb-iceberg-workload",
+      "mode": "duck-archive",
+      "application_elapsed_ns": 822898709,
+      "process_cpu": {
+        "system_core_seconds": 0.108415,
+        "user_core_seconds": 0.806725,
+        "utilization_percent_one_core_100": 111.20931288275968
+      },
+      "process_lifetime_peak_rss_bytes": 248647680,
+      "native_cgroup_cpu_delta": {
+        "usage_usec": 916999,
+        "user_usec": 807720,
+        "system_usec": 109279,
+        "nice_usec": 0,
+        "nr_periods": 8,
+        "nr_throttled": 2,
+        "throttled_usec": 126646,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      },
+      "process_io_delta": {
+        "rchar": 152702252,
+        "wchar": 10147632,
+        "syscr": 19016,
+        "syscw": 1140,
+        "read_bytes": 0,
+        "write_bytes": 10144780,
+        "cancelled_write_bytes": 0
+      },
+      "cgroup_io_after_raw": "",
+      "source_report": "results/metrics-20261122/normal/duck-archive/command-resources-670630278.json"
+    },
+    {
+      "architecture": "duck-archive",
+      "role": "duckdb-iceberg-workload",
+      "mode": "verify",
+      "application_elapsed_ns": 247476834,
+      "process_cpu": {
+        "system_core_seconds": 0.023129,
+        "user_core_seconds": 0.290136,
+        "utilization_percent_one_core_100": 126.58356539343801
+      },
+      "process_lifetime_peak_rss_bytes": 183365632,
+      "native_cgroup_cpu_delta": {
+        "usage_usec": 313671,
+        "user_usec": 290582,
+        "system_usec": 23089,
+        "nice_usec": 0,
+        "nr_periods": 2,
+        "nr_throttled": 1,
+        "throttled_usec": 504629,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      },
+      "process_io_delta": {
+        "rchar": 76355426,
+        "wchar": 2094,
+        "syscr": 9426,
+        "syscw": 17,
+        "read_bytes": 0,
+        "write_bytes": 274,
+        "cancelled_write_bytes": 0
+      },
+      "cgroup_io_after_raw": "",
+      "source_report": "results/metrics-20261122/normal/duck-archive/command-resources-673694745.json"
+    },
+    {
+      "architecture": "duck-direct",
+      "role": "duckdb-iceberg-workload",
+      "mode": "verify",
+      "application_elapsed_ns": 326735875,
+      "process_cpu": {
+        "system_core_seconds": 0.020908,
+        "user_core_seconds": 0.554327,
+        "utilization_percent_one_core_100": 176.05504752118208
+      },
+      "process_lifetime_peak_rss_bytes": 246673408,
+      "native_cgroup_cpu_delta": {
+        "usage_usec": 581254,
+        "user_usec": 559023,
+        "system_usec": 22231,
+        "nice_usec": 0,
+        "nr_periods": 3,
+        "nr_throttled": 1,
+        "throttled_usec": 16463,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      },
+      "process_io_delta": {
+        "rchar": 76355248,
+        "wchar": 2137,
+        "syscr": 9431,
+        "syscw": 22,
+        "read_bytes": 0,
+        "write_bytes": 276,
+        "cancelled_write_bytes": 0
+      },
+      "cgroup_io_after_raw": "",
+      "source_report": "results/metrics-20261122/normal/duck-direct/command-resources-3298146342.json"
+    },
+    {
+      "architecture": "duck-direct",
+      "role": "duckdb-iceberg-workload",
+      "mode": "verify",
+      "application_elapsed_ns": 388690459,
+      "process_cpu": {
+        "system_core_seconds": 0.041183,
+        "user_core_seconds": 0.391342,
+        "utilization_percent_one_core_100": 111.27749343597858
+      },
+      "process_lifetime_peak_rss_bytes": 220053504,
+      "native_cgroup_cpu_delta": {
+        "usage_usec": 433786,
+        "user_usec": 392277,
+        "system_usec": 41510,
+        "nice_usec": 0,
+        "nr_periods": 4,
+        "nr_throttled": 1,
+        "throttled_usec": 260256,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      },
+      "process_io_delta": {
+        "rchar": 76366063,
+        "wchar": 2553,
+        "syscr": 9541,
+        "syscw": 74,
+        "read_bytes": 0,
+        "write_bytes": 276,
+        "cancelled_write_bytes": 0
+      },
+      "cgroup_io_after_raw": "",
+      "source_report": "results/metrics-20261122/normal/duck-direct/command-resources-3410712929.json"
+    },
+    {
+      "architecture": "duck-direct",
+      "role": "duckdb-iceberg-workload",
+      "mode": "load",
+      "application_elapsed_ns": 825740084,
+      "process_cpu": {
+        "system_core_seconds": 0.075469,
+        "user_core_seconds": 0.640198,
+        "utilization_percent_one_core_100": 86.66976617305647
+      },
+      "process_lifetime_peak_rss_bytes": 149065728,
+      "native_cgroup_cpu_delta": {
+        "usage_usec": 717515,
+        "user_usec": 641327,
+        "system_usec": 76187,
+        "nice_usec": 0,
+        "nr_periods": 8,
+        "nr_throttled": 1,
+        "throttled_usec": 312532,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      },
+      "process_io_delta": {
+        "rchar": 76366538,
+        "wchar": 2843,
+        "syscr": 9625,
+        "syscw": 164,
+        "read_bytes": 970752,
+        "write_bytes": 1263,
+        "cancelled_write_bytes": 0
+      },
+      "cgroup_io_after_raw": "254:0 rbytes=5005312 wbytes=0 rios=267 wios=0 dbytes=0 dios=0\n",
+      "source_report": "results/metrics-20261122/normal/duck-direct/command-resources-3890055786.json"
+    }
+  ],
+  "spark_corrected_aggregations": [
+    {
+      "architecture": "ch-archive",
+      "scope": "Offline corrected aggregation of unchanged native samples. Original reports retained. CPU core-seconds/peak memory verified unchanged; short coarse-tick process utilization suppressed.",
+      "source_report_sha256": "690352128d467be75cae3f38f4fef22c982e897768f495c94d54dfb234f975be",
+      "raw_samples_sha256": "289ed8429505aeeae531a7f7476de4f16f740fb4f717897067fef099fda01acf",
+      "resources": {
+        "samples": 11,
+        "clock_ticks_per_second": 100,
+        "container": {
+          "observed_seconds": 6.323462252000001,
+          "cpu_core_seconds": 11.283726999999999,
+          "cpu_percent_one_core_100": 178.4422291195168,
+          "cpu_counter_resolution_seconds": 1e-06,
+          "cpu_utilization_min_interval_seconds": 0.0,
+          "cpu_short_intervals_suppressed": 0,
+          "cpu_interval_percent_min_mean_max": {
+            "min": 44.89318525270339,
+            "mean": 155.49058295498654,
+            "max": 199.27423967286074
+          },
+          "sampled_memory_bytes_min_mean_max": {
+            "min": 178675712,
+            "mean": 474261690.1818182,
+            "max": 694632448
+          },
+          "lifetime_peak_memory_bytes": 703807488,
+          "generations": [],
+          "io": {
+            "254:0": {
+              "observed_seconds": 6.323462252000001,
+              "counters": {
+                "rbytes": 0,
+                "wbytes": 3338240,
+                "rios": 0,
+                "wios": 18
+              },
+              "per_second": {
+                "rbytes": 0.0,
+                "wbytes": 527913.3276938868,
+                "rios": 0.0,
+                "wios": 2.8465418599291734
+              }
+            }
+          },
+          "identity_or_counter_gaps": 0
+        },
+        "python": {
+          "observed_seconds": 6.323462252000001,
+          "cpu_core_seconds": 0.3,
+          "cpu_percent_one_core_100": 4.744236433215288,
+          "cpu_counter_resolution_seconds": 0.01,
+          "cpu_utilization_min_interval_seconds": 0.1,
+          "cpu_short_intervals_suppressed": 1,
+          "cpu_interval_percent_min_mean_max": {
+            "min": 0.0,
+            "mean": 3.8284814543232986,
+            "max": 26.99073766952616
+          },
+          "sampled_memory_bytes_min_mean_max": {
+            "min": 17113088,
+            "mean": 36644677.81818182,
+            "max": 41349120
+          },
+          "lifetime_peak_memory_bytes": 41549824,
+          "generations": [
+            {
+              "pid": 53,
+              "start_ticks": 29628
+            }
+          ],
+          "io": {
+            "process": {
+              "observed_seconds": 6.323462252000001,
+              "counters": {
+                "rchar": 3287134,
+                "wchar": 44023,
+                "syscr": 757,
+                "syscw": 11,
+                "read_bytes": 0,
+                "write_bytes": 44023,
+                "cancelled_write_bytes": 0
+              },
+              "per_second": {
+                "rchar": 519831.36278869014,
+                "wchar": 6961.850683314555,
+                "syscr": 119.71289933146579,
+                "syscw": 1.7395533588456058,
+                "read_bytes": 0.0,
+                "write_bytes": 6961.850683314555,
+                "cancelled_write_bytes": 0.0
+              }
+            }
+          },
+          "identity_or_counter_gaps": 0
+        },
+        "jvm": {
+          "observed_seconds": 6.322429586,
+          "cpu_core_seconds": 10.99,
+          "cpu_percent_one_core_100": 173.82558161399822,
+          "cpu_counter_resolution_seconds": 0.01,
+          "cpu_utilization_min_interval_seconds": 0.1,
+          "cpu_short_intervals_suppressed": 0,
+          "cpu_interval_percent_min_mean_max": {
+            "min": 46.05531435150661,
+            "mean": 162.6074833265866,
+            "max": 197.62388064935715
+          },
+          "sampled_memory_bytes_min_mean_max": {
+            "min": 185225216,
+            "mean": 484938547.2,
+            "max": 673656832
+          },
+          "lifetime_peak_memory_bytes": 678559744,
+          "generations": [
+            {
+              "pid": 1,
+              "start_ticks": 29552
+            }
+          ],
+          "io": {
+            "process": {
+              "observed_seconds": 6.322429586,
+              "counters": {
+                "rchar": 55485320,
+                "wchar": 6328234,
+                "syscr": 34529,
+                "syscw": 1600,
+                "read_bytes": 0,
+                "write_bytes": 3780608,
+                "cancelled_write_bytes": 139264
+              },
+              "per_second": {
+                "rchar": 8775949.062819662,
+                "wchar": 1000918.0670058948,
+                "syscr": 5461.349870381933,
+                "syscw": 253.0672707756116,
+                "read_bytes": 0.0,
+                "write_bytes": 597967.5927702772,
+                "cancelled_write_bytes": 22026.975248309234
+              }
+            }
+          },
+          "identity_or_counter_gaps": 0
+        },
+        "scope": "Container cgroup v2 totals include the JVM and Python, including any JVM startup before Python entry; deltas cover observed intervals only. Process CPU/IO deltas never bridge a changed PID/start-tick generation. Process CPU counters have 1/SC_CLK_TCK-second resolution: interval utilization requires at least 10 ticks of elapsed time, and whole-run utilization requires the same minimum total observed duration. Short intervals are counted and excluded only from utilization peaks/interval summaries, never CPU core-seconds or raw counters. Cgroup CPU has microsecond counter resolution and uses its observed intervals without the process tick threshold. Cgroup charged memory includes page cache; Python/JVM RSS and lifetime peaks are separate and must not be summed. Memory means are sample means. /tmp and /results statvfs values are shared-filesystem capacity/free space, not per-job disk allocation. Block IO counters are container/VM accounting, not physical-drive latency; devices are separate and stacked devices must not be summed; Python/JVM rchar/wchar are syscall bytes, not disk bytes. Missing counters/devices remain unavailable, not zero."
+      },
+      "compaction": {
+        "table": "lab.events",
+        "target_file_bytes": 134217728,
+        "spark_version": "4.0.1",
+        "iceberg_version": "1.10.1",
+        "before": {
+          "files": 10,
+          "bytes": 6922634,
+          "min_bytes": 691354,
+          "max_bytes": 700415,
+          "snapshot": 1873262107615743345,
+          "rows": 1000000
+        },
+        "rewrite": [
+          {
+            "rewritten_data_files_count": 10,
+            "added_data_files_count": 1,
+            "rewritten_bytes_count": 6922634,
+            "failed_data_files_count": 0,
+            "removed_delete_files_count": 0
+          }
+        ],
+        "manifests": [
+          {
+            "rewritten_manifests_count": 11,
+            "added_manifests_count": 1
+          }
+        ],
+        "seconds": 2.0487291249999657,
+        "after": {
+          "files": 1,
+          "bytes": 2453261,
+          "min_bytes": 2453261,
+          "max_bytes": 2453261,
+          "snapshot": 5709835363630706308,
+          "rows": 1000000
+        },
+        "retained_snapshot_rows": 1000000
+      },
+      "stop": {
+        "attempted": true,
+        "started_ns": 1795336395225995209,
+        "passed": true,
+        "completed_ns": 1795336395356181959
+      }
+    },
+    {
+      "architecture": "ch-direct",
+      "scope": "Offline corrected aggregation of unchanged native samples. Original reports retained. CPU core-seconds/peak memory verified unchanged; short coarse-tick process utilization suppressed.",
+      "source_report_sha256": "566acb53d69d1a78c8329d44636ac1a517955a0e55bed768081d4460e4d204f2",
+      "raw_samples_sha256": "78b619d3851fcd814064c575823eeeb80fa6a5b07626cfcb48282fbae94d4460",
+      "resources": {
+        "samples": 12,
+        "clock_ticks_per_second": 100,
+        "container": {
+          "observed_seconds": 7.306859961999999,
+          "cpu_core_seconds": 12.961558,
+          "cpu_percent_one_core_100": 177.3888930047624,
+          "cpu_counter_resolution_seconds": 1e-06,
+          "cpu_utilization_min_interval_seconds": 0.0,
+          "cpu_short_intervals_suppressed": 0,
+          "cpu_interval_percent_min_mean_max": {
+            "min": 52.79857294702912,
+            "mean": 161.906887871152,
+            "max": 202.8265542200158
+          },
+          "sampled_memory_bytes_min_mean_max": {
+            "min": 187863040,
+            "mean": 524069888,
+            "max": 806187008
+          },
+          "lifetime_peak_memory_bytes": 806973440,
+          "generations": [],
+          "io": {
+            "254:0": {
+              "observed_seconds": 7.306859961999999,
+              "counters": {
+                "rbytes": 0,
+                "wbytes": 7483392,
+                "rios": 0,
+                "wios": 36
+              },
+              "per_second": {
+                "rbytes": 0.0,
+                "wbytes": 1024159.7675223108,
+                "rios": 0.0,
+                "wios": 4.9268769604483085
+              }
+            }
+          },
+          "identity_or_counter_gaps": 0
+        },
+        "python": {
+          "observed_seconds": 7.306859961999999,
+          "cpu_core_seconds": 0.29,
+          "cpu_percent_one_core_100": 3.968873107027804,
+          "cpu_counter_resolution_seconds": 0.01,
+          "cpu_utilization_min_interval_seconds": 0.1,
+          "cpu_short_intervals_suppressed": 1,
+          "cpu_interval_percent_min_mean_max": {
+            "min": 0.0,
+            "mean": 3.5077523873881646,
+            "max": 24.98478009646298
+          },
+          "sampled_memory_bytes_min_mean_max": {
+            "min": 17125376,
+            "mean": 36982784,
+            "max": 41242624
+          },
+          "lifetime_peak_memory_bytes": 41558016,
+          "generations": [
+            {
+              "pid": 53,
+              "start_ticks": 28556
+            }
+          ],
+          "io": {
+            "process": {
+              "observed_seconds": 7.306859961999999,
+              "counters": {
+                "rchar": 3290520,
+                "wchar": 48513,
+                "syscr": 785,
+                "syscw": 12,
+                "read_bytes": 0,
+                "write_bytes": 48513,
+                "cancelled_write_bytes": 0
+              },
+              "per_second": {
+                "rchar": 450332.9771081769,
+                "wchar": 6639.377277284133,
+                "syscr": 107.4332892764423,
+                "syscw": 1.6422923201494362,
+                "read_bytes": 0.0,
+                "write_bytes": 6639.377277284133,
+                "cancelled_write_bytes": 0.0
+              }
+            }
+          },
+          "identity_or_counter_gaps": 0
+        },
+        "jvm": {
+          "observed_seconds": 7.305854253,
+          "cpu_core_seconds": 12.659999999999998,
+          "cpu_percent_one_core_100": 173.2856906473521,
+          "cpu_counter_resolution_seconds": 0.01,
+          "cpu_utilization_min_interval_seconds": 0.1,
+          "cpu_short_intervals_suppressed": 0,
+          "cpu_interval_percent_min_mean_max": {
+            "min": 92.83846213087432,
+            "mean": 168.96472297599757,
+            "max": 202.7498488584772
+          },
+          "sampled_memory_bytes_min_mean_max": {
+            "min": 194232320,
+            "mean": 536126929.45454544,
+            "max": 781275136
+          },
+          "lifetime_peak_memory_bytes": 782598144,
+          "generations": [
+            {
+              "pid": 1,
+              "start_ticks": 28476
+            }
+          ],
+          "io": {
+            "process": {
+              "observed_seconds": 7.305854253,
+              "counters": {
+                "rchar": 64037684,
+                "wchar": 14702346,
+                "syscr": 34806,
+                "syscw": 2953,
+                "read_bytes": 0,
+                "write_bytes": 7970816,
+                "cancelled_write_bytes": 184320
+              },
+              "per_second": {
+                "rchar": 8765256.160661053,
+                "wchar": 2012406.1459291747,
+                "syscr": 4764.124604006113,
+                "syscw": 404.19640164425823,
+                "read_bytes": 0.0,
+                "write_bytes": 1091017.658438361,
+                "cancelled_write_bytes": 25229.082543538665
+              }
+            }
+          },
+          "identity_or_counter_gaps": 0
+        },
+        "scope": "Container cgroup v2 totals include the JVM and Python, including any JVM startup before Python entry; deltas cover observed intervals only. Process CPU/IO deltas never bridge a changed PID/start-tick generation. Process CPU counters have 1/SC_CLK_TCK-second resolution: interval utilization requires at least 10 ticks of elapsed time, and whole-run utilization requires the same minimum total observed duration. Short intervals are counted and excluded only from utilization peaks/interval summaries, never CPU core-seconds or raw counters. Cgroup CPU has microsecond counter resolution and uses its observed intervals without the process tick threshold. Cgroup charged memory includes page cache; Python/JVM RSS and lifetime peaks are separate and must not be summed. Memory means are sample means. /tmp and /results statvfs values are shared-filesystem capacity/free space, not per-job disk allocation. Block IO counters are container/VM accounting, not physical-drive latency; devices are separate and stacked devices must not be summed; Python/JVM rchar/wchar are syscall bytes, not disk bytes. Missing counters/devices remain unavailable, not zero."
+      },
+      "compaction": {
+        "table": "lab.events",
+        "target_file_bytes": 134217728,
+        "spark_version": "4.0.1",
+        "iceberg_version": "1.10.1",
+        "before": {
+          "files": 20,
+          "bytes": 13726692,
+          "min_bytes": 684462,
+          "max_bytes": 721789,
+          "snapshot": 1638445801969005888,
+          "rows": 2000000
+        },
+        "rewrite": [
+          {
+            "rewritten_data_files_count": 20,
+            "added_data_files_count": 1,
+            "rewritten_bytes_count": 13726692,
+            "failed_data_files_count": 0,
+            "removed_delete_files_count": 0
+          }
+        ],
+        "manifests": [
+          {
+            "rewritten_manifests_count": 21,
+            "added_manifests_count": 1
+          }
+        ],
+        "seconds": 2.7700897510000004,
+        "after": {
+          "files": 1,
+          "bytes": 6515304,
+          "min_bytes": 6515304,
+          "max_bytes": 6515304,
+          "snapshot": 109968350149808128,
+          "rows": 2000000
+        },
+        "retained_snapshot_rows": 2000000
+      },
+      "stop": {
+        "attempted": true,
+        "started_ns": 1795336385497923719,
+        "passed": true,
+        "completed_ns": 1795336385616308302
+      }
+    },
+    {
+      "architecture": "ch-sharded",
+      "scope": "Offline corrected aggregation of unchanged native samples. Original reports retained. CPU core-seconds/peak memory verified unchanged; short coarse-tick process utilization suppressed.",
+      "source_report_sha256": "254e3224a7e0b8f6d0d4d1dd66681d6cd5807a0d42a4acea2de44a295874a500",
+      "raw_samples_sha256": "a27aed441424f7b350efd938cd012c40b67e450f12e32a7c9d998f0c949197a9",
+      "resources": {
+        "samples": 12,
+        "clock_ticks_per_second": 100,
+        "container": {
+          "observed_seconds": 7.268942127999999,
+          "cpu_core_seconds": 12.556453999999999,
+          "cpu_percent_one_core_100": 172.74114690819286,
+          "cpu_counter_resolution_seconds": 1e-06,
+          "cpu_utilization_min_interval_seconds": 0.0,
+          "cpu_short_intervals_suppressed": 0,
+          "cpu_interval_percent_min_mean_max": {
+            "min": 58.42905275022298,
+            "mean": 157.32852498324394,
+            "max": 201.70683865621737
+          },
+          "sampled_memory_bytes_min_mean_max": {
+            "min": 168300544,
+            "mean": 513444864,
+            "max": 775376896
+          },
+          "lifetime_peak_memory_bytes": 775901184,
+          "generations": [],
+          "io": {
+            "254:0": {
+              "observed_seconds": 7.268942127999999,
+              "counters": {
+                "rbytes": 0,
+                "wbytes": 6717440,
+                "rios": 0,
+                "wios": 30
+              },
+              "per_second": {
+                "rbytes": 0.0,
+                "wbytes": 924128.9697608665,
+                "rios": 0.0,
+                "wios": 4.1271480047199525
+              }
+            }
+          },
+          "identity_or_counter_gaps": 0
+        },
+        "python": {
+          "observed_seconds": 7.268942127999999,
+          "cpu_core_seconds": 0.29,
+          "cpu_percent_one_core_100": 3.98957640456262,
+          "cpu_counter_resolution_seconds": 0.01,
+          "cpu_utilization_min_interval_seconds": 0.1,
+          "cpu_short_intervals_suppressed": 2,
+          "cpu_interval_percent_min_mean_max": {
+            "min": 0.0,
+            "mean": 3.232882488884319,
+            "max": 24.964985534293774
+          },
+          "sampled_memory_bytes_min_mean_max": {
+            "min": 17125376,
+            "mean": 36763648,
+            "max": 40992768
+          },
+          "lifetime_peak_memory_bytes": 41562112,
+          "generations": [
+            {
+              "pid": 53,
+              "start_ticks": 31419
+            }
+          ],
+          "io": {
+            "process": {
+              "observed_seconds": 7.268942127999999,
+              "counters": {
+                "rchar": 3290517,
+                "wchar": 48501,
+                "syscr": 785,
+                "syscw": 12,
+                "read_bytes": 0,
+                "write_bytes": 48501,
+                "cancelled_write_bytes": 0
+              },
+              "per_second": {
+                "rchar": 452681.6890349028,
+                "wchar": 6672.360179230747,
+                "syscr": 107.99370612350542,
+                "syscw": 1.6508592018879809,
+                "read_bytes": 0.0,
+                "write_bytes": 6672.360179230747,
+                "cancelled_write_bytes": 0.0
+              }
+            }
+          },
+          "identity_or_counter_gaps": 0
+        },
+        "jvm": {
+          "observed_seconds": 7.268113961999999,
+          "cpu_core_seconds": 12.280000000000001,
+          "cpu_percent_one_core_100": 168.95717464260642,
+          "cpu_counter_resolution_seconds": 0.01,
+          "cpu_utilization_min_interval_seconds": 0.1,
+          "cpu_short_intervals_suppressed": 1,
+          "cpu_interval_percent_min_mean_max": {
+            "min": 58.53988827201824,
+            "mean": 160.4198617227829,
+            "max": 201.59316805304292
+          },
+          "sampled_memory_bytes_min_mean_max": {
+            "min": 173264896,
+            "mean": 525787880.72727275,
+            "max": 750247936
+          },
+          "lifetime_peak_memory_bytes": 751587328,
+          "generations": [
+            {
+              "pid": 1,
+              "start_ticks": 31343
+            }
+          ],
+          "io": {
+            "process": {
+              "observed_seconds": 7.268113961999999,
+              "counters": {
+                "rchar": 71795261,
+                "wchar": 13948082,
+                "syscr": 34741,
+                "syscw": 2744,
+                "read_bytes": 0,
+                "write_bytes": 7204864,
+                "cancelled_write_bytes": 184320
+              },
+              "per_second": {
+                "rchar": 9878114.374013444,
+                "wchar": 1919078.6045630253,
+                "syscr": 4779.919547442011,
+                "syscw": 377.5394847062802,
+                "read_bytes": 0.0,
+                "write_bytes": 991297.6100360162,
+                "cancelled_write_bytes": 25360.086669483077
+              }
+            }
+          },
+          "identity_or_counter_gaps": 0
+        },
+        "scope": "Container cgroup v2 totals include the JVM and Python, including any JVM startup before Python entry; deltas cover observed intervals only. Process CPU/IO deltas never bridge a changed PID/start-tick generation. Process CPU counters have 1/SC_CLK_TCK-second resolution: interval utilization requires at least 10 ticks of elapsed time, and whole-run utilization requires the same minimum total observed duration. Short intervals are counted and excluded only from utilization peaks/interval summaries, never CPU core-seconds or raw counters. Cgroup CPU has microsecond counter resolution and uses its observed intervals without the process tick threshold. Cgroup charged memory includes page cache; Python/JVM RSS and lifetime peaks are separate and must not be summed. Memory means are sample means. /tmp and /results statvfs values are shared-filesystem capacity/free space, not per-job disk allocation. Block IO counters are container/VM accounting, not physical-drive latency; devices are separate and stacked devices must not be summed; Python/JVM rchar/wchar are syscall bytes, not disk bytes. Missing counters/devices remain unavailable, not zero."
+      },
+      "compaction": {
+        "table": "lab.events",
+        "target_file_bytes": 134217728,
+        "spark_version": "4.0.1",
+        "iceberg_version": "1.10.1",
+        "before": {
+          "files": 20,
+          "bytes": 17297012,
+          "min_bytes": 864793,
+          "max_bytes": 865556,
+          "snapshot": 3493778576531672025,
+          "rows": 2000000
+        },
+        "rewrite": [
+          {
+            "rewritten_data_files_count": 20,
+            "added_data_files_count": 1,
+            "rewritten_bytes_count": 17297012,
+            "failed_data_files_count": 0,
+            "removed_delete_files_count": 0
+          }
+        ],
+        "manifests": [
+          {
+            "rewritten_manifests_count": 21,
+            "added_manifests_count": 1
+          }
+        ],
+        "seconds": 2.664056252000023,
+        "after": {
+          "files": 1,
+          "bytes": 6517399,
+          "min_bytes": 6517399,
+          "max_bytes": 6517399,
+          "snapshot": 7341101288000236093,
+          "rows": 2000000
+        },
+        "retained_snapshot_rows": 2000000
+      },
+      "stop": {
+        "attempted": true,
+        "started_ns": 1795336413925772218,
+        "passed": true,
+        "completed_ns": 1795336414215506510
+      }
+    },
+    {
+      "architecture": "duck-archive",
+      "scope": "Offline corrected aggregation of unchanged native samples. Original reports retained. CPU core-seconds/peak memory verified unchanged; short coarse-tick process utilization suppressed.",
+      "source_report_sha256": "258fd902c4e4c63f02e7b31cdeac933d8bef90ac2f246156292027a517fb9497",
+      "raw_samples_sha256": "0e83d16473a499a947a0d75fed7e6a2cef76aa78c7132489d5fc9c1d554ffd60",
+      "resources": {
+        "samples": 11,
+        "clock_ticks_per_second": 100,
+        "container": {
+          "observed_seconds": 6.259063962,
+          "cpu_core_seconds": 11.329346000000001,
+          "cpu_percent_one_core_100": 181.00703346031727,
+          "cpu_counter_resolution_seconds": 1e-06,
+          "cpu_utilization_min_interval_seconds": 0.0,
+          "cpu_short_intervals_suppressed": 0,
+          "cpu_interval_percent_min_mean_max": {
+            "min": 61.51221556409233,
+            "mean": 162.95819308563466,
+            "max": 204.18128024426616
+          },
+          "sampled_memory_bytes_min_mean_max": {
+            "min": 171417600,
+            "mean": 506244747.6363636,
+            "max": 843067392
+          },
+          "lifetime_peak_memory_bytes": 844115968,
+          "generations": [],
+          "io": {
+            "254:0": {
+              "observed_seconds": 6.259063962,
+              "counters": {
+                "rbytes": 0,
+                "wbytes": 3391488,
+                "rios": 0,
+                "wios": 17
+              },
+              "per_second": {
+                "rbytes": 0.0,
+                "wbytes": 541852.2674620976,
+                "rios": 0.0,
+                "wios": 2.71606107609865
+              }
+            }
+          },
+          "identity_or_counter_gaps": 0
+        },
+        "python": {
+          "observed_seconds": 6.259063962,
+          "cpu_core_seconds": 0.27999999999999997,
+          "cpu_percent_one_core_100": 4.4735123606330705,
+          "cpu_counter_resolution_seconds": 0.01,
+          "cpu_utilization_min_interval_seconds": 0.1,
+          "cpu_short_intervals_suppressed": 1,
+          "cpu_interval_percent_min_mean_max": {
+            "min": 0.0,
+            "mean": 3.2183501829547647,
+            "max": 24.972620643042486
+          },
+          "sampled_memory_bytes_min_mean_max": {
+            "min": 17125376,
+            "mean": 36585472,
+            "max": 41230336
+          },
+          "lifetime_peak_memory_bytes": 41562112,
+          "generations": [
+            {
+              "pid": 53,
+              "start_ticks": 30536
+            }
+          ],
+          "io": {
+            "process": {
+              "observed_seconds": 6.259063962,
+              "counters": {
+                "rchar": 3287135,
+                "wchar": 44022,
+                "syscr": 757,
+                "syscw": 11,
+                "read_bytes": 0,
+                "write_bytes": 44022,
+                "cancelled_write_bytes": 0
+              },
+              "per_second": {
+                "rchar": 525179.9661989139,
+                "wchar": 7033.320040706752,
+                "syscr": 120.94460203568694,
+                "syscw": 1.7574512845344206,
+                "read_bytes": 0.0,
+                "write_bytes": 7033.320040706752,
+                "cancelled_write_bytes": 0.0
+              }
+            }
+          },
+          "identity_or_counter_gaps": 0
+        },
+        "jvm": {
+          "observed_seconds": 6.257987752999999,
+          "cpu_core_seconds": 11.04,
+          "cpu_percent_one_core_100": 176.41453508290368,
+          "cpu_counter_resolution_seconds": 0.01,
+          "cpu_utilization_min_interval_seconds": 0.1,
+          "cpu_short_intervals_suppressed": 0,
+          "cpu_interval_percent_min_mean_max": {
+            "min": 113.4686052462675,
+            "mean": 170.3106559497924,
+            "max": 203.74971039200935
+          },
+          "sampled_memory_bytes_min_mean_max": {
+            "min": 177872896,
+            "mean": 521798041.6,
+            "max": 819359744
+          },
+          "lifetime_peak_memory_bytes": 820240384,
+          "generations": [
+            {
+              "pid": 1,
+              "start_ticks": 30456
+            }
+          ],
+          "io": {
+            "process": {
+              "observed_seconds": 6.257987752999999,
+              "counters": {
+                "rchar": 60391071,
+                "wchar": 7208503,
+                "syscr": 34330,
+                "syscw": 1693,
+                "read_bytes": 0,
+                "write_bytes": 3833856,
+                "cancelled_write_bytes": 139264
+              },
+              "per_second": {
+                "rchar": 9650237.965238793,
+                "wchar": 1151888.320098475,
+                "syscr": 5485.788939670366,
+                "syscw": 270.5342462820253,
+                "read_bytes": 0.0,
+                "write_bytes": 612633.9889626818,
+                "cancelled_write_bytes": 22253.798744370924
+              }
+            }
+          },
+          "identity_or_counter_gaps": 0
+        },
+        "scope": "Container cgroup v2 totals include the JVM and Python, including any JVM startup before Python entry; deltas cover observed intervals only. Process CPU/IO deltas never bridge a changed PID/start-tick generation. Process CPU counters have 1/SC_CLK_TCK-second resolution: interval utilization requires at least 10 ticks of elapsed time, and whole-run utilization requires the same minimum total observed duration. Short intervals are counted and excluded only from utilization peaks/interval summaries, never CPU core-seconds or raw counters. Cgroup CPU has microsecond counter resolution and uses its observed intervals without the process tick threshold. Cgroup charged memory includes page cache; Python/JVM RSS and lifetime peaks are separate and must not be summed. Memory means are sample means. /tmp and /results statvfs values are shared-filesystem capacity/free space, not per-job disk allocation. Block IO counters are container/VM accounting, not physical-drive latency; devices are separate and stacked devices must not be summed; Python/JVM rchar/wchar are syscall bytes, not disk bytes. Missing counters/devices remain unavailable, not zero."
+      },
+      "compaction": {
+        "table": "lab.events",
+        "target_file_bytes": 134217728,
+        "spark_version": "4.0.1",
+        "iceberg_version": "1.10.1",
+        "before": {
+          "files": 10,
+          "bytes": 9244523,
+          "min_bytes": 864778,
+          "max_bytes": 1033095,
+          "snapshot": 850757717646263334,
+          "rows": 1000000
+        },
+        "rewrite": [
+          {
+            "rewritten_data_files_count": 10,
+            "added_data_files_count": 1,
+            "rewritten_bytes_count": 9244523,
+            "failed_data_files_count": 0,
+            "removed_delete_files_count": 0
+          }
+        ],
+        "manifests": [
+          {
+            "rewritten_manifests_count": 11,
+            "added_manifests_count": 1
+          }
+        ],
+        "seconds": 2.0002320419999933,
+        "after": {
+          "files": 1,
+          "bytes": 3275337,
+          "min_bytes": 3275337,
+          "max_bytes": 3275337,
+          "snapshot": 5680807994616598984,
+          "rows": 1000000
+        },
+        "retained_snapshot_rows": 1000000
+      },
+      "stop": {
+        "attempted": true,
+        "started_ns": 1795336404259526880,
+        "passed": true,
+        "completed_ns": 1795336404365139463
+      }
+    },
+    {
+      "architecture": "duck-direct",
+      "scope": "Offline corrected aggregation of unchanged native samples. Original reports retained. CPU core-seconds/peak memory verified unchanged; short coarse-tick process utilization suppressed.",
+      "source_report_sha256": "e3ad073683120a103c51b981e0b481062a63be8d1c46e759c9eb8a58db87713d",
+      "raw_samples_sha256": "16ccdd9563c8984a69f535b0b0e83714f3b7b37e444f98f0e6c1935af77cf957",
+      "resources": {
+        "samples": 12,
+        "clock_ticks_per_second": 100,
+        "container": {
+          "observed_seconds": 7.8033967120000005,
+          "cpu_core_seconds": 13.632435,
+          "cpu_percent_one_core_100": 174.69873060581617,
+          "cpu_counter_resolution_seconds": 1e-06,
+          "cpu_utilization_min_interval_seconds": 0.0,
+          "cpu_short_intervals_suppressed": 0,
+          "cpu_interval_percent_min_mean_max": {
+            "min": 52.617249914991916,
+            "mean": 159.78578949007186,
+            "max": 204.77056308744696
+          },
+          "sampled_memory_bytes_min_mean_max": {
+            "min": 179453952,
+            "mean": 523161600,
+            "max": 808783872
+          },
+          "lifetime_peak_memory_bytes": 810405888,
+          "generations": [],
+          "io": {
+            "254:0": {
+              "observed_seconds": 7.8033967120000005,
+              "counters": {
+                "rbytes": 0,
+                "wbytes": 7139328,
+                "rios": 0,
+                "wios": 51
+              },
+              "per_second": {
+                "rbytes": 0.0,
+                "wbytes": 914900.0446204662,
+                "rios": 0.0,
+                "wios": 6.535615435464483
+              }
+            }
+          },
+          "identity_or_counter_gaps": 0
+        },
+        "python": {
+          "observed_seconds": 7.8033967120000005,
+          "cpu_core_seconds": 0.31000000000000005,
+          "cpu_percent_one_core_100": 3.972628990184295,
+          "cpu_counter_resolution_seconds": 0.01,
+          "cpu_utilization_min_interval_seconds": 0.1,
+          "cpu_short_intervals_suppressed": 1,
+          "cpu_interval_percent_min_mean_max": {
+            "min": 0.0,
+            "mean": 3.3187708454731095,
+            "max": 25.976139798620952
+          },
+          "sampled_memory_bytes_min_mean_max": {
+            "min": 17125376,
+            "mean": 36972544,
+            "max": 41230336
+          },
+          "lifetime_peak_memory_bytes": 41562112,
+          "generations": [
+            {
+              "pid": 53,
+              "start_ticks": 27429
+            }
+          ],
+          "io": {
+            "process": {
+              "observed_seconds": 7.8033967120000005,
+              "counters": {
+                "rchar": 3290528,
+                "wchar": 48510,
+                "syscr": 785,
+                "syscw": 12,
+                "read_bytes": 0,
+                "write_bytes": 48510,
+                "cancelled_write_bytes": 0
+              },
+              "per_second": {
+                "rchar": 421678.9330907466,
+                "wchar": 6216.523623027099,
+                "syscr": 100.59721797724744,
+                "syscw": 1.5377918671681137,
+                "read_bytes": 0.0,
+                "write_bytes": 6216.523623027099,
+                "cancelled_write_bytes": 0.0
+              }
+            }
+          },
+          "identity_or_counter_gaps": 0
+        },
+        "jvm": {
+          "observed_seconds": 7.802295754,
+          "cpu_core_seconds": 13.32,
+          "cpu_percent_one_core_100": 170.71898348856155,
+          "cpu_counter_resolution_seconds": 0.01,
+          "cpu_utilization_min_interval_seconds": 0.1,
+          "cpu_short_intervals_suppressed": 0,
+          "cpu_interval_percent_min_mean_max": {
+            "min": 49.39566466550734,
+            "mean": 166.35710330496138,
+            "max": 204.49225411720946
+          },
+          "sampled_memory_bytes_min_mean_max": {
+            "min": 185389056,
+            "mean": 536242734.54545456,
+            "max": 786386944
+          },
+          "lifetime_peak_memory_bytes": 787488768,
+          "generations": [
+            {
+              "pid": 1,
+              "start_ticks": 27341
+            }
+          ],
+          "io": {
+            "process": {
+              "observed_seconds": 7.802295754,
+              "counters": {
+                "rchar": 71805628,
+                "wchar": 13948078,
+                "syscr": 34787,
+                "syscw": 2745,
+                "read_bytes": 0,
+                "write_bytes": 7245824,
+                "cancelled_write_bytes": 122880
+              },
+              "per_second": {
+                "rchar": 9203141.00669504,
+                "wchar": 1787688.9622966733,
+                "syscr": 4458.559518480924,
+                "syscw": 351.81952678386,
+                "read_bytes": 0.0,
+                "write_bytes": 928678.4593220894,
+                "cancelled_write_bytes": 15749.210729034869
+              }
+            }
+          },
+          "identity_or_counter_gaps": 0
+        },
+        "scope": "Container cgroup v2 totals include the JVM and Python, including any JVM startup before Python entry; deltas cover observed intervals only. Process CPU/IO deltas never bridge a changed PID/start-tick generation. Process CPU counters have 1/SC_CLK_TCK-second resolution: interval utilization requires at least 10 ticks of elapsed time, and whole-run utilization requires the same minimum total observed duration. Short intervals are counted and excluded only from utilization peaks/interval summaries, never CPU core-seconds or raw counters. Cgroup CPU has microsecond counter resolution and uses its observed intervals without the process tick threshold. Cgroup charged memory includes page cache; Python/JVM RSS and lifetime peaks are separate and must not be summed. Memory means are sample means. /tmp and /results statvfs values are shared-filesystem capacity/free space, not per-job disk allocation. Block IO counters are container/VM accounting, not physical-drive latency; devices are separate and stacked devices must not be summed; Python/JVM rchar/wchar are syscall bytes, not disk bytes. Missing counters/devices remain unavailable, not zero."
+      },
+      "compaction": {
+        "table": "lab.events",
+        "target_file_bytes": 134217728,
+        "spark_version": "4.0.1",
+        "iceberg_version": "1.10.1",
+        "before": {
+          "files": 20,
+          "bytes": 17297012,
+          "min_bytes": 864793,
+          "max_bytes": 865556,
+          "snapshot": 4798463815765475791,
+          "rows": 2000000
+        },
+        "rewrite": [
+          {
+            "rewritten_data_files_count": 20,
+            "added_data_files_count": 1,
+            "rewritten_bytes_count": 17297012,
+            "failed_data_files_count": 0,
+            "removed_delete_files_count": 0
+          }
+        ],
+        "manifests": [
+          {
+            "rewritten_manifests_count": 21,
+            "added_manifests_count": 1
+          }
+        ],
+        "seconds": 2.840886667999996,
+        "after": {
+          "files": 1,
+          "bytes": 6517399,
+          "min_bytes": 6517399,
+          "max_bytes": 6517399,
+          "snapshot": 8655734035538234881,
+          "rows": 2000000
+        },
+        "retained_snapshot_rows": 2000000
+      },
+      "stop": {
+        "attempted": true,
+        "started_ns": 1795336374440400422,
+        "passed": true,
+        "completed_ns": 1795336374845146547
+      }
+    }
+  ],
+  "docker_workload_lifetimes": [
+    {
+      "container_id": "1dc979563bc85ae0b8f9dcdec909f32899650920df3221e98c75220cc9e41ff5",
+      "role": "runner",
+      "lifetime_ns": 923402501,
+      "exit_code": 0
+    },
+    {
+      "container_id": "982e289844fad5c60dafbb6344f9a7fe4d9a73ecb7403139b0496af240cb8615",
+      "role": "runner",
+      "lifetime_ns": 433616958,
+      "exit_code": 0
+    },
+    {
+      "container_id": "29ebc23aa3d377803a58207fb8011d37e9a2a7aa62196f3546a94162832b4ec3",
+      "role": "compactor",
+      "lifetime_ns": 8738558088,
+      "exit_code": 0
+    },
+    {
+      "container_id": "1a7fe2576e82d86f911e3e3887c522cd5afc48220be282f28cabf94c70ea0a8d",
+      "role": "runner",
+      "lifetime_ns": 383713625,
+      "exit_code": 0
+    },
+    {
+      "container_id": "31e3aa06f7446e86d79749e6ac533f2222fd5f9cea942c2ff9799e39405d4506",
+      "role": "ch-workload",
+      "lifetime_ns": 889116292,
+      "exit_code": 0
+    },
+    {
+      "container_id": "5d3cca7210d66b73b0603cfaddd1bf983532f8f25608b6e9c1e09d5bb8ccbf50",
+      "role": "runner",
+      "lifetime_ns": 388117250,
+      "exit_code": 0
+    },
+    {
+      "container_id": "0fed078ec21c2a1766e72bc98679bb047edbc8d341228464f5100914f1d741e9",
+      "role": "compactor",
+      "lifetime_ns": 8196771212,
+      "exit_code": 0
+    },
+    {
+      "container_id": "bfd748bd9ae67155fe610943c283907276bd6c65e96088ee912617696e130460",
+      "role": "runner",
+      "lifetime_ns": 362510042,
+      "exit_code": 0
+    },
+    {
+      "container_id": "8440e7ef110e4315182be04531869bba5af7bfe94395d6e2da0be60c980d82f7",
+      "role": "ch-workload",
+      "lifetime_ns": 1067456709,
+      "exit_code": 0
+    },
+    {
+      "container_id": "382a5e3e56f55201bf58a5001b421d1fb427674e3e45fd0392b376c6d0d6b10d",
+      "role": "runner",
+      "lifetime_ns": 239395375,
+      "exit_code": 0
+    },
+    {
+      "container_id": "30e80f19d34e38685e63bf237407d02e7dcc16b6e69faeb6fed24119b2f4b6bc",
+      "role": "compactor",
+      "lifetime_ns": 7205951823,
+      "exit_code": 0
+    },
+    {
+      "container_id": "e991f06c107230d36ef03cac032a0ba2aa15008aa310ac9b052b326294ecca62",
+      "role": "runner",
+      "lifetime_ns": 271668958,
+      "exit_code": 0
+    },
+    {
+      "container_id": "cc29086a4c529b70038b6e810f402bffa7d64d8510064b28fb4cf8d942f41dd7",
+      "role": "runner",
+      "lifetime_ns": 883909667,
+      "exit_code": 0
+    },
+    {
+      "container_id": "381381d3c9dd7dfacf079d45c5d4c0c45a0789d879d5ab86a6eab7ff76b018c9",
+      "role": "compactor",
+      "lifetime_ns": 7157184587,
+      "exit_code": 0
+    },
+    {
+      "container_id": "81629dced0a2a8cfb6374e82b75289f8a16c448ed10824ab364f7ddf23a3c9b7",
+      "role": "runner",
+      "lifetime_ns": 309651000,
+      "exit_code": 0
+    },
+    {
+      "container_id": "691c8d4c30784509e53fcd66cd7f4764928d3d4afb2e5c371f1eb16dd3d2a359",
+      "role": "runner",
+      "lifetime_ns": 698562167,
+      "exit_code": 0
+    },
+    {
+      "container_id": "3b99ea5982d15e42750d304242a8c8205369112457029a3499d4ebb9c8fc3c59",
+      "role": "compactor",
+      "lifetime_ns": 8150551254,
+      "exit_code": 0
+    },
+    {
+      "container_id": "a54a47691a8ea77550df33c7106661608ff099790ede1cbc3366feea9c7a4e62",
+      "role": "runner",
+      "lifetime_ns": 432815500,
+      "exit_code": 0
+    },
+    {
+      "container_id": "a4685c2d8f45b760e8043bb38d763ef6933671b4f1678b925c3bed1d28906e77",
+      "role": "runner",
+      "lifetime_ns": 2318396501,
+      "exit_code": 0
+    },
+    {
+      "container_id": "1543a0b3f476a33b87b322c607ef4a9474932220e8d9aa36b3db2d84e9b1ed1e",
+      "role": "runner",
+      "lifetime_ns": 326665084,
+      "exit_code": 0
+    },
+    {
+      "container_id": "0cf99f8a95992bded4a622759d7ea235f218c2f0c649d22542b676a5e01f3cd2",
+      "role": "runner",
+      "lifetime_ns": 1552304084,
+      "exit_code": 0
+    },
+    {
+      "container_id": "29a79469978cccaf1a01faffaf878222b242ba46065417eae4a322d25a7aaa64",
+      "role": "runner",
+      "lifetime_ns": 900818417,
+      "exit_code": 0
+    }
+  ],
+  "separate_control_container_excluded_from_workload_lifetimes": "55bb923caa7440cdc16648b8023162d6bdad87dde3bc7c4439d82dddd3a7030f",
+  "server_resource_window": {
+    "started_ns": 1795336431344058000,
+    "completed_ns": 1795336440394373000,
+    "server_generations": [
+      "clickhouse-ef1f7ba45f8e",
+      "storage-78b217910186",
+      "ch31-e7d864a3f856",
+      "ch12-1e5e6baff648",
+      "ch32-3ecd9487b949",
+      "keeper2-4a3464f46917",
+      "ch33-ffbe686873bb",
+      "ch11-e0c53b8c5f36",
+      "ch22-e571c9037374",
+      "keeper3-459ff0e2ac1c",
+      "ch13-3bc36b1c6ffe",
+      "ch21-6d96f67b9038",
+      "keeper1-aaccb6e02cb0",
+      "ch23-a796d1ef0d52"
+    ],
+    "scope": "Quiescent post-test healthy-server sampling; separate from workload performance."
+  },
+  "server_resources": {
+    "ch11-e0c53b8c5f36": {
+      "samples": 4,
+      "unavailable_samples": 1,
+      "observed_seconds": 14.02,
+      "cpu_core_seconds": {
+        "total": 0.7218610000000001,
+        "user": 0.437253,
+        "system": 0.284609
+      },
+      "cpu_percent_one_core_100": 5.148794579172612,
+      "charged_memory_bytes_min_mean_max": [
+        551112704,
+        554487808,
+        561065984
+      ],
+      "lifetime_peak_memory_bytes": 647499776,
+      "allocated_disk_bytes_first_peak_last": [
+        8609792,
+        9748480,
+        9748480
+      ],
+      "native_block_io": {
+        "254:0": {
+          "observed_seconds": 14.02,
+          "rbytes": 245760,
+          "wbytes": 3264512,
+          "rios": 2,
+          "wios": 45,
+          "rbytes_per_second": 17529.243937232524,
+          "wbytes_per_second": 232846.79029957205,
+          "rios_per_second": 0.14265335235378032,
+          "wios_per_second": 3.209700427960057
+        }
+      },
+      "identity_or_counter_gaps": 0
+    },
+    "ch12-1e5e6baff648": {
+      "samples": 4,
+      "unavailable_samples": 1,
+      "observed_seconds": 14.010000000000002,
+      "cpu_core_seconds": {
+        "total": 0.747131,
+        "user": 0.475007,
+        "system": 0.272124
+      },
+      "cpu_percent_one_core_100": 5.3328408279800135,
+      "charged_memory_bytes_min_mean_max": [
+        560521216,
+        565783552,
+        570109952
+      ],
+      "lifetime_peak_memory_bytes": 656945152,
+      "allocated_disk_bytes_first_peak_last": [
+        8613888,
+        9572352,
+        9572352
+      ],
+      "native_block_io": {
+        "254:0": {
+          "observed_seconds": 14.010000000000002,
+          "rbytes": 200704,
+          "wbytes": 3264512,
+          "rios": 2,
+          "wios": 45,
+          "rbytes_per_second": 14325.767309064951,
+          "wbytes_per_second": 233012.9907209136,
+          "rios_per_second": 0.1427551748750892,
+          "wios_per_second": 3.2119914346895073
+        }
+      },
+      "identity_or_counter_gaps": 0
+    },
+    "ch13-3bc36b1c6ffe": {
+      "samples": 4,
+      "unavailable_samples": 1,
+      "observed_seconds": 14.0,
+      "cpu_core_seconds": {
+        "total": 0.783972,
+        "user": 0.484553,
+        "system": 0.299419
+      },
+      "cpu_percent_one_core_100": 5.5998,
+      "charged_memory_bytes_min_mean_max": [
+        551526400,
+        565828608,
+        578088960
+      ],
+      "lifetime_peak_memory_bytes": 648499200,
+      "allocated_disk_bytes_first_peak_last": [
+        8609792,
+        9752576,
+        9752576
+      ],
+      "native_block_io": {
+        "254:0": {
+          "observed_seconds": 14.0,
+          "rbytes": 331776,
+          "wbytes": 3264512,
+          "rios": 3,
+          "wios": 45,
+          "rbytes_per_second": 23698.285714285714,
+          "wbytes_per_second": 233179.42857142858,
+          "rios_per_second": 0.21428571428571427,
+          "wios_per_second": 3.2142857142857144
+        }
+      },
+      "identity_or_counter_gaps": 0
+    },
+    "ch21-6d96f67b9038": {
+      "samples": 2,
+      "unavailable_samples": 2,
+      "observed_seconds": 4.66,
+      "cpu_core_seconds": {
+        "total": 0.209679,
+        "user": 0.113113,
+        "system": 0.096565
+      },
+      "cpu_percent_one_core_100": 4.499549356223175,
+      "charged_memory_bytes_min_mean_max": [
+        464674816,
+        465922048,
+        467169280
+      ],
+      "lifetime_peak_memory_bytes": 533147648,
+      "allocated_disk_bytes_first_peak_last": [
+        9207808,
+        9207808,
+        9207808
+      ],
+      "native_block_io": {
+        "254:0": {
+          "observed_seconds": 4.66,
+          "rbytes": 0,
+          "wbytes": 0,
+          "rios": 0,
+          "wios": 0,
+          "rbytes_per_second": 0.0,
+          "wbytes_per_second": 0.0,
+          "rios_per_second": 0.0,
+          "wios_per_second": 0.0
+        }
+      },
+      "identity_or_counter_gaps": 0
+    },
+    "ch22-e571c9037374": {
+      "samples": 4,
+      "unavailable_samples": 1,
+      "observed_seconds": 14.02,
+      "cpu_core_seconds": {
+        "total": 0.7178979999999999,
+        "user": 0.40944,
+        "system": 0.308458
+      },
+      "cpu_percent_one_core_100": 5.120527817403708,
+      "charged_memory_bytes_min_mean_max": [
+        555761664,
+        573635584,
+        600268800
+      ],
+      "lifetime_peak_memory_bytes": 637603840,
+      "allocated_disk_bytes_first_peak_last": [
+        8470528,
+        9609216,
+        9609216
+      ],
+      "native_block_io": {
+        "254:0": {
+          "observed_seconds": 14.02,
+          "rbytes": 131072,
+          "wbytes": 3190784,
+          "rios": 1,
+          "wios": 45,
+          "rbytes_per_second": 9348.930099857347,
+          "wbytes_per_second": 227588.0171184023,
+          "rios_per_second": 0.07132667617689016,
+          "wios_per_second": 3.209700427960057
+        }
+      },
+      "identity_or_counter_gaps": 0
+    },
+    "ch23-a796d1ef0d52": {
+      "samples": 4,
+      "unavailable_samples": 1,
+      "observed_seconds": 13.959999999999999,
+      "cpu_core_seconds": {
+        "total": 0.766982,
+        "user": 0.477704,
+        "system": 0.28927800000000004
+      },
+      "cpu_percent_one_core_100": 5.494140401146132,
+      "charged_memory_bytes_min_mean_max": [
+        522952704,
+        529458176,
+        532668416
+      ],
+      "lifetime_peak_memory_bytes": 604655616,
+      "allocated_disk_bytes_first_peak_last": [
+        8470528,
+        9609216,
+        9609216
+      ],
+      "native_block_io": {
+        "254:0": {
+          "observed_seconds": 13.959999999999999,
+          "rbytes": 0,
+          "wbytes": 3190784,
+          "rios": 0,
+          "wios": 45,
+          "rbytes_per_second": 0.0,
+          "wbytes_per_second": 228566.18911174787,
+          "rios_per_second": 0.0,
+          "wios_per_second": 3.2234957020057307
+        }
+      },
+      "identity_or_counter_gaps": 0
+    },
+    "ch31-e7d864a3f856": {
+      "samples": 4,
+      "unavailable_samples": 1,
+      "observed_seconds": 14.0,
+      "cpu_core_seconds": {
+        "total": 0.6982539999999999,
+        "user": 0.43868999999999997,
+        "system": 0.259565
+      },
+      "cpu_percent_one_core_100": 4.987528571428571,
+      "charged_memory_bytes_min_mean_max": [
+        547708928,
+        560784384,
+        582758400
+      ],
+      "lifetime_peak_memory_bytes": 670146560,
+      "allocated_disk_bytes_first_peak_last": [
+        8626176,
+        9592832,
+        9592832
+      ],
+      "native_block_io": {
+        "254:0": {
+          "observed_seconds": 14.0,
+          "rbytes": 483328,
+          "wbytes": 3268608,
+          "rios": 4,
+          "wios": 45,
+          "rbytes_per_second": 34523.42857142857,
+          "wbytes_per_second": 233472.0,
+          "rios_per_second": 0.2857142857142857,
+          "wios_per_second": 3.2142857142857144
+        }
+      },
+      "identity_or_counter_gaps": 0
+    },
+    "ch32-3ecd9487b949": {
+      "samples": 4,
+      "unavailable_samples": 1,
+      "observed_seconds": 14.01,
+      "cpu_core_seconds": {
+        "total": 0.742567,
+        "user": 0.426484,
+        "system": 0.316083
+      },
+      "cpu_percent_one_core_100": 5.300264097073519,
+      "charged_memory_bytes_min_mean_max": [
+        526008320,
+        532710400,
+        535719936
+      ],
+      "lifetime_peak_memory_bytes": 634425344,
+      "allocated_disk_bytes_first_peak_last": [
+        8626176,
+        9584640,
+        9584640
+      ],
+      "native_block_io": {
+        "254:16": {
+          "observed_seconds": 14.01,
+          "rbytes": 0,
+          "wbytes": 0,
+          "rios": 0,
+          "wios": 0,
+          "rbytes_per_second": 0.0,
+          "wbytes_per_second": 0.0,
+          "rios_per_second": 0.0,
+          "wios_per_second": 0.0
+        },
+        "254:0": {
+          "observed_seconds": 14.01,
+          "rbytes": 131072,
+          "wbytes": 3268608,
+          "rios": 1,
+          "wios": 45,
+          "rbytes_per_second": 9355.603140613848,
+          "wbytes_per_second": 233305.35331905782,
+          "rios_per_second": 0.07137758743754462,
+          "wios_per_second": 3.2119914346895078
+        }
+      },
+      "identity_or_counter_gaps": 0
+    },
+    "ch33-ffbe686873bb": {
+      "samples": 4,
+      "unavailable_samples": 1,
+      "observed_seconds": 14.01,
+      "cpu_core_seconds": {
+        "total": 0.836598,
+        "user": 0.49884100000000003,
+        "system": 0.337756
+      },
+      "cpu_percent_one_core_100": 5.971434689507495,
+      "charged_memory_bytes_min_mean_max": [
+        565919744,
+        575517696,
+        585912320
+      ],
+      "lifetime_peak_memory_bytes": 657076224,
+      "allocated_disk_bytes_first_peak_last": [
+        8626176,
+        9592832,
+        9592832
+      ],
+      "native_block_io": {
+        "254:0": {
+          "observed_seconds": 14.01,
+          "rbytes": 32768,
+          "wbytes": 3272704,
+          "rios": 1,
+          "wios": 43,
+          "rbytes_per_second": 2338.900785153462,
+          "wbytes_per_second": 233597.715917202,
+          "rios_per_second": 0.07137758743754462,
+          "wios_per_second": 3.0692362598144185
+        }
+      },
+      "identity_or_counter_gaps": 0
+    },
+    "clickhouse-ef1f7ba45f8e": {
+      "samples": 21,
+      "unavailable_samples": 0,
+      "observed_seconds": 84.77,
+      "cpu_core_seconds": {
+        "total": 6.964177,
+        "user": 4.4185099999999995,
+        "system": 2.545667
+      },
+      "cpu_percent_one_core_100": 8.215379261531202,
+      "charged_memory_bytes_min_mean_max": [
+        1073631232,
+        1158180083.8095238,
+        1199534080
+      ],
+      "lifetime_peak_memory_bytes": 1312935936,
+      "allocated_disk_bytes_first_peak_last": [
+        4685824,
+        37015552,
+        37015552
+      ],
+      "native_block_io": {
+        "254:0": {
+          "observed_seconds": 84.77,
+          "rbytes": 18399232,
+          "wbytes": 32595968,
+          "rios": 165,
+          "wios": 1968,
+          "rbytes_per_second": 217048.86162557508,
+          "wbytes_per_second": 384522.44897959183,
+          "rios_per_second": 1.9464433172112776,
+          "wios_per_second": 23.21576029255633
+        }
+      },
+      "identity_or_counter_gaps": 0
+    },
+    "keeper1-aaccb6e02cb0": {
+      "samples": 4,
+      "unavailable_samples": 1,
+      "observed_seconds": 13.98,
+      "cpu_core_seconds": {
+        "total": 0.305671,
+        "user": 0.113543,
+        "system": 0.192127
+      },
+      "cpu_percent_one_core_100": 2.1864878397711016,
+      "charged_memory_bytes_min_mean_max": [
+        219783168,
+        225469440,
+        228986880
+      ],
+      "lifetime_peak_memory_bytes": 268435456,
+      "allocated_disk_bytes_first_peak_last": [
+        104890368,
+        104890368,
+        104890368
+      ],
+      "native_block_io": {
+        "254:0": {
+          "observed_seconds": 13.98,
+          "rbytes": 8192,
+          "wbytes": 307200,
+          "rios": 2,
+          "wios": 75,
+          "rbytes_per_second": 585.9799713876967,
+          "wbytes_per_second": 21974.248927038625,
+          "rios_per_second": 0.14306151645207438,
+          "wios_per_second": 5.364806866952789
+        }
+      },
+      "identity_or_counter_gaps": 0
+    },
+    "keeper2-4a3464f46917": {
+      "samples": 4,
+      "unavailable_samples": 1,
+      "observed_seconds": 14.01,
+      "cpu_core_seconds": {
+        "total": 0.301532,
+        "user": 0.12478,
+        "system": 0.176751
+      },
+      "cpu_percent_one_core_100": 2.1522626695217704,
+      "charged_memory_bytes_min_mean_max": [
+        191782912,
+        194923520,
+        197050368
+      ],
+      "lifetime_peak_memory_bytes": 268435456,
+      "allocated_disk_bytes_first_peak_last": [
+        104890368,
+        104890368,
+        104890368
+      ],
+      "native_block_io": {
+        "254:0": {
+          "observed_seconds": 14.01,
+          "rbytes": 8192,
+          "wbytes": 294912,
+          "rios": 2,
+          "wios": 73,
+          "rbytes_per_second": 584.7251962883655,
+          "wbytes_per_second": 21050.107066381155,
+          "rios_per_second": 0.14275517487508924,
+          "wios_per_second": 5.210563882940757
+        }
+      },
+      "identity_or_counter_gaps": 0
+    },
+    "keeper3-459ff0e2ac1c": {
+      "samples": 4,
+      "unavailable_samples": 1,
+      "observed_seconds": 14.01,
+      "cpu_core_seconds": {
+        "total": 0.27665,
+        "user": 0.10824600000000001,
+        "system": 0.168404
+      },
+      "cpu_percent_one_core_100": 1.9746609564596718,
+      "charged_memory_bytes_min_mean_max": [
+        215363584,
+        217231360,
+        218894336
+      ],
+      "lifetime_peak_memory_bytes": 268435456,
+      "allocated_disk_bytes_first_peak_last": [
+        104890368,
+        104890368,
+        104890368
+      ],
+      "native_block_io": {
+        "254:0": {
+          "observed_seconds": 14.01,
+          "rbytes": 0,
+          "wbytes": 307200,
+          "rios": 0,
+          "wios": 76,
+          "rbytes_per_second": 0.0,
+          "wbytes_per_second": 21927.194860813706,
+          "rios_per_second": 0.0,
+          "wios_per_second": 5.42469664525339
+        }
+      },
+      "identity_or_counter_gaps": 0
+    },
+    "storage-78b217910186": {
+      "samples": 21,
+      "unavailable_samples": 0,
+      "observed_seconds": 84.76,
+      "cpu_core_seconds": {
+        "total": 3.2965290000000005,
+        "user": 2.6846919999999996,
+        "system": 0.6118379999999999
+      },
+      "cpu_percent_one_core_100": 3.8892508258612555,
+      "charged_memory_bytes_min_mean_max": [
+        231337984,
+        563638467.0476191,
+        678633472
+      ],
+      "lifetime_peak_memory_bytes": 679735296,
+      "allocated_disk_bytes_first_peak_last": [
+        512000,
+        97222656,
+        97222656
+      ],
+      "native_block_io": {
+        "254:0": {
+          "observed_seconds": 84.76,
+          "rbytes": 2891776,
+          "wbytes": 97038336,
+          "rios": 41,
+          "wios": 270,
+          "rbytes_per_second": 34117.22510618216,
+          "wbytes_per_second": 1144860.028315243,
+          "rios_per_second": 0.48371873525247755,
+          "wios_per_second": 3.1854648419065597
+        }
+      },
+      "identity_or_counter_gaps": 0
+    }
+  },
+  "final_corrected_compaction": {
+    "run_id": "4f108792-641a-49df-af15-0d2eee8fed5d",
+    "started_ns": 1795336943400649879,
+    "passed": true,
+    "samples_file": "compaction-4f108792-641a-49df-af15-0d2eee8fed5d-resources.jsonl",
+    "phases": {
+      "spark_startup_started_ns": 1795336943403986213,
+      "spark_startup_completed_ns": 1795336944975241547,
+      "compaction_started_ns": 1795336944978368839,
+      "compaction_completed_ns": 1795336949823040632
+    },
+    "errors": [],
+    "compression": {
+      "available": false,
+      "reason": "Iceberg data-file sizes before/after rewriting are object bytes, not encoded Parquet compression. This job does not sum Parquet compressed/uncompressed column chunks."
+    },
+    "disk_allocation": {
+      "available": false,
+      "reason": "S3 data lives in the storage service. Container cgroup block bytes/IOPS and filesystem free space are measured; per-job allocated scratch and remote physical storage are not measured."
+    },
+    "table": "lab.events",
+    "target_file_bytes": 134217728,
+    "compaction_result": {
+      "table": "lab.events",
+      "target_file_bytes": 134217728,
+      "spark_version": "4.0.1",
+      "iceberg_version": "1.10.1",
+      "before": {
+        "files": 2,
+        "bytes": 7382211,
+        "min_bytes": 864812,
+        "max_bytes": 6517399,
+        "snapshot": 5054293850138234719,
+        "rows": 2100000
+      },
+      "rewrite": [
+        {
+          "rewritten_data_files_count": 2,
+          "added_data_files_count": 1,
+          "rewritten_bytes_count": 7382211,
+          "failed_data_files_count": 0,
+          "removed_delete_files_count": 0
+        }
+      ],
+      "manifests": [
+        {
+          "rewritten_manifests_count": 3,
+          "added_manifests_count": 1
+        }
+      ],
+      "seconds": 2.3904037930000186,
+      "after": {
+        "files": 1,
+        "bytes": 6841779,
+        "min_bytes": 6841779,
+        "max_bytes": 6841779,
+        "snapshot": 5804341511707158022,
+        "rows": 2100000
+      },
+      "retained_snapshot_rows": 2100000
+    },
+    "stop": {
+      "attempted": true,
+      "started_ns": 1795336949824353674,
+      "passed": true,
+      "completed_ns": 1795336950228143883
+    },
+    "resources": {
+      "samples": 11,
+      "clock_ticks_per_second": 100,
+      "container": {
+        "observed_seconds": 6.826927795,
+        "cpu_core_seconds": 11.179324,
+        "cpu_percent_one_core_100": 163.75336514013915,
+        "cpu_counter_resolution_seconds": 1e-06,
+        "cpu_utilization_min_interval_seconds": 0.0,
+        "cpu_short_intervals_suppressed": 0,
+        "cpu_interval_percent_min_mean_max": {
+          "min": 30.040957661348862,
+          "mean": 148.5029883002907,
+          "max": 203.68898577938546
+        },
+        "sampled_memory_bytes_min_mean_max": {
+          "min": 171331584,
+          "mean": 449008360.72727275,
+          "max": 716337152
+        },
+        "lifetime_peak_memory_bytes": 731283456,
+        "generations": [],
+        "io": {
+          "254:0": {
+            "observed_seconds": 0.816601959,
+            "counters": {
+              "rbytes": 0,
+              "wbytes": 16384,
+              "rios": 0,
+              "wios": 2
+            },
+            "per_second": {
+              "rbytes": 0.0,
+              "wbytes": 20063.630535571614,
+              "rios": 0.0,
+              "wios": 2.4491736493617693
+            }
+          }
+        },
+        "identity_or_counter_gaps": 0
+      },
+      "python": {
+        "observed_seconds": 6.826927795,
+        "cpu_core_seconds": 0.27999999999999997,
+        "cpu_percent_one_core_100": 4.10140561622858,
+        "cpu_counter_resolution_seconds": 0.01,
+        "cpu_utilization_min_interval_seconds": 0.1,
+        "cpu_short_intervals_suppressed": 1,
+        "cpu_interval_percent_min_mean_max": {
+          "min": 0.0,
+          "mean": 3.255370009696181,
+          "max": 24.96725544448456
+        },
+        "sampled_memory_bytes_min_mean_max": {
+          "min": 17125376,
+          "mean": 36605579.63636363,
+          "max": 41254912
+        },
+        "lifetime_peak_memory_bytes": 41558016,
+        "generations": [
+          {
+            "pid": 53,
+            "start_ticks": 85064
+          }
+        ],
+        "io": {
+          "process": {
+            "observed_seconds": 6.826927795,
+            "counters": {
+              "rchar": 3286699,
+              "wchar": 43509,
+              "syscr": 750,
+              "syscw": 11,
+              "read_bytes": 0,
+              "write_bytes": 43509,
+              "cancelled_write_bytes": 0
+            },
+            "per_second": {
+              "rchar": 481431.6334804593,
+              "wchar": 6373.14489130319,
+              "syscr": 109.8590790061227,
+              "syscw": 1.6112664920897997,
+              "read_bytes": 0.0,
+              "write_bytes": 6373.14489130319,
+              "cancelled_write_bytes": 0.0
+            }
+          }
+        },
+        "identity_or_counter_gaps": 0
+      },
+      "jvm": {
+        "observed_seconds": 6.825944628,
+        "cpu_core_seconds": 10.89,
+        "cpu_percent_one_core_100": 159.53835832961872,
+        "cpu_counter_resolution_seconds": 0.01,
+        "cpu_utilization_min_interval_seconds": 0.1,
+        "cpu_short_intervals_suppressed": 0,
+        "cpu_interval_percent_min_mean_max": {
+          "min": 29.69965907909866,
+          "mean": 155.5588950723662,
+          "max": 201.1843616719678
+        },
+        "sampled_memory_bytes_min_mean_max": {
+          "min": 177434624,
+          "mean": 459148492.8,
+          "max": 697720832
+        },
+        "lifetime_peak_memory_bytes": 707641344,
+        "generations": [
+          {
+            "pid": 1,
+            "start_ticks": 84988
+          }
+        ],
+        "io": {
+          "process": {
+            "observed_seconds": 6.825944628,
+            "counters": {
+              "rchar": 62197942,
+              "wchar": 14167267,
+              "syscr": 34128,
+              "syscw": 2578,
+              "read_bytes": 0,
+              "write_bytes": 7294976,
+              "cancelled_write_bytes": 98304
+            },
+            "per_second": {
+              "rchar": 9111990.41153429,
+              "wchar": 2075502.772449387,
+              "syscr": 4999.747560214167,
+              "syscw": 377.67666462236645,
+              "read_bytes": 0.0,
+              "write_bytes": 1068713.0349806875,
+              "cancelled_write_bytes": 14401.523211418586
+            }
+          }
+        },
+        "identity_or_counter_gaps": 0
+      },
+      "scope": "Container cgroup v2 totals include the JVM and Python, including any JVM startup before Python entry; deltas cover observed intervals only. Process CPU/IO deltas never bridge a changed PID/start-tick generation. Process CPU counters have 1/SC_CLK_TCK-second resolution: interval utilization requires at least 10 ticks of elapsed time, and whole-run utilization requires the same minimum total observed duration. Short intervals are counted and excluded only from utilization peaks/interval summaries, never CPU core-seconds or raw counters. Cgroup CPU has microsecond counter resolution and uses its observed intervals without the process tick threshold. Cgroup charged memory includes page cache; Python/JVM RSS and lifetime peaks are separate and must not be summed. Memory means are sample means. /tmp and /results statvfs values are shared-filesystem capacity/free space, not per-job disk allocation. Block IO counters are container/VM accounting, not physical-drive latency; devices are separate and stacked devices must not be summed; Python/JVM rchar/wchar are syscall bytes, not disk bytes. Missing counters/devices remain unavailable, not zero."
+    },
+    "completed_ns": 1795336950230360674
+  },
+  "final_data_verification": {
+    "amount_cents": 10501050000,
+    "clickhouse": "26.10.2.103",
+    "clickhouse_check_seconds": 0.0886875,
+    "duckdb": "v1.5.5",
+    "duckdb_check_seconds": 0.178093667,
+    "duplicate_ids": 0,
+    "invalid_rows": 0,
+    "missing_ids": 0,
+    "rows": 2100000,
+    "unique_ids": 2100000
+  },
+  "limits": [
+    "Single functional trial, no capacity comparison or winner; no repeated cold/warm statistical qualification.",
+    "Application dispatch excludes container startup and final report IO; Docker events show whole-container lifetime separately.",
+    "Server sampling includes setup/repair and a distinct quiescent post-test coverage window; it is not per-query server attribution.",
+    "Process RSS and container charged memory/peaks are distinct; never sum Python/JVM RSS with cgroup memory.",
+    "Short process CPU intervals are suppressed only for utilization estimates; raw counts, IO and coreseconds remain.",
+    "Disk block counters are DockerVM accounting, not physicalSSDlatency. Process rchar/wchar are syscalltraffic. Empty device lists remainunavailable.",
+    "S3/live compression was measured separately for the seven-field recovery dataset; normal path file shrink is not encoded compression. Normal per-snapshot codec/compression and full startup/exit cost remain gaps.",
+    "/tmp or /results filesystem free space is not per-job allocation; shared witness directories must not be summed across containers.",
+    "No compiler/control-test timing is a database benchmark. No host/AWSconfiguration or managed cloudresources used."
+  ],
+  "artifact_sha256": {
+    "results/metrics-20261122/normal/ch-archive/command-metrics-3274739672.json": "de5887ec4eb7d31c01a1dda86b1bd29ab72aedd888937d024e1447ab972dbe08",
+    "results/metrics-20261122/normal/ch-archive/command-resources-2211207009.json": "e5d52b796c208a9c3b618dccc611e96d116866a390adc04e173aa97b7ca08a8e",
+    "results/metrics-20261122/normal/ch-archive/command-resources-4123871736.json": "b793133405bf81384baa3f686e0e9e2215f05c29f370e58ff47099af6805b37f",
+    "results/metrics-20261122/normal/ch-direct/command-metrics-4062830837.json": "e5971f6d964f0a01b06ecf5660945bfcb9dfb4a8180d582ecff2f7c1fcdcbcf6",
+    "results/metrics-20261122/normal/ch-direct/command-resources-658246542.json": "80911fdf3592298cd41c8ec39fd4fa308ddf40f654a007406828ebac9cf6383b",
+    "results/metrics-20261122/normal/ch-direct/command-resources-885335181.json": "16e988f9a0c4551c9fb153a5e1b8e0697d2674b90ba0bc65e8904313edffccde",
+    "results/metrics-20261122/normal/ch-sharded/command-resources-1541477723.json": "e54410bb8cb8ae7070042b58a47fdfab0cb7e4bdfee798ed40d33e98642b9ba7",
+    "results/metrics-20261122/normal/ch-sharded/command-resources-2253034773.json": "666fb4177f5ad62d496c0827f3a74749f80533bb83109f6fe1180dd2b158d41f",
+    "results/metrics-20261122/normal/ch-sharded/command-resources-2754310176.json": "e3762a2c2db4746c1f09fd292d35f5c3585ff2e5a3d271fad9ad81a6eaad2ab4",
+    "results/metrics-20261122/normal/ch-sharded/command-resources-2775172045.json": "6cdc1169e3ed943e9ef6fe53ec84b19edd17f9c3ea3f74dca56297dce0d3ba4c",
+    "results/metrics-20261122/normal/ch-sharded/command-resources-3785722235.json": "8634f716a3ae41a8f437939e76f9bfc8e71b22aaf7bfac6f72a21887b78c9239",
+    "results/metrics-20261122/normal/ch-sharded/command-resources-947731922.json": "74e7489fdfe5001cdc1e69dc1a06d758269bf09e5bda4bc0e364686f876aafd4",
+    "results/metrics-20261122/normal/duck-archive/command-resources-670630278.json": "c761d2b7abcc6ae8ddb6dd763548cf985196956fd292170f8549dd11856c3b25",
+    "results/metrics-20261122/normal/duck-archive/command-resources-673694745.json": "c504a6f268bb9dffac79069543303dd408b634e7effc8a4ca1ba1b1ef2724884",
+    "results/metrics-20261122/normal/duck-direct/command-resources-3298146342.json": "d74c29c7298d5e536dd6364150c1fa137148f9b54c41cf890784337bfe3b115d",
+    "results/metrics-20261122/normal/duck-direct/command-resources-3410712929.json": "95bddf40e630c419721b66e7fc4b563396a908c65a8148962d02eaf91ff774a8",
+    "results/metrics-20261122/normal/duck-direct/command-resources-3890055786.json": "1d5afa8844f7947307b7d4fc3b3f89e96bd26871d24d7cf9bc7ac4cff7abaf02",
+    "results/metrics-20261122/corrected-summaries/ch-archive.json": "8e59bd34c796fd84547c0351e43374c6da5b80f506679c5e8f83212ea21e9e19",
+    "results/metrics-20261122/normal/ch-archive/compaction-ba6c6439-b453-4039-bdcd-a56190fd89be-resources.json": "690352128d467be75cae3f38f4fef22c982e897768f495c94d54dfb234f975be",
+    "results/metrics-20261122/normal/ch-archive/compaction-ba6c6439-b453-4039-bdcd-a56190fd89be-resources.jsonl": "289ed8429505aeeae531a7f7476de4f16f740fb4f717897067fef099fda01acf",
+    "results/metrics-20261122/corrected-summaries/ch-direct.json": "e0feb9e41e86dfb91f5a5d616f76d0719a6be6cc6ee17988f407da0a0453e1cd",
+    "results/metrics-20261122/normal/ch-direct/compaction-ac8c05f2-f7dc-46b2-9969-ed6746dc9d61-resources.json": "566acb53d69d1a78c8329d44636ac1a517955a0e55bed768081d4460e4d204f2",
+    "results/metrics-20261122/normal/ch-direct/compaction-ac8c05f2-f7dc-46b2-9969-ed6746dc9d61-resources.jsonl": "78b619d3851fcd814064c575823eeeb80fa6a5b07626cfcb48282fbae94d4460",
+    "results/metrics-20261122/corrected-summaries/ch-sharded.json": "c5d6804fd5831c81e2d1ad7fd58d06ba6925e7cdae51cf46d672d0b92130d1cf",
+    "results/metrics-20261122/normal/ch-sharded/compaction-42c88a62-99de-4b37-b90f-633da3e06c46-resources.json": "254e3224a7e0b8f6d0d4d1dd66681d6cd5807a0d42a4acea2de44a295874a500",
+    "results/metrics-20261122/normal/ch-sharded/compaction-42c88a62-99de-4b37-b90f-633da3e06c46-resources.jsonl": "a27aed441424f7b350efd938cd012c40b67e450f12e32a7c9d998f0c949197a9",
+    "results/metrics-20261122/corrected-summaries/duck-archive.json": "cc572c7085482e4fb07f546ff198e8942a21a29730929f6b8c1e334d1e278220",
+    "results/metrics-20261122/normal/duck-archive/compaction-6eb372e7-757b-4b83-a1d0-5d03cf94a168-resources.json": "258fd902c4e4c63f02e7b31cdeac933d8bef90ac2f246156292027a517fb9497",
+    "results/metrics-20261122/normal/duck-archive/compaction-6eb372e7-757b-4b83-a1d0-5d03cf94a168-resources.jsonl": "0e83d16473a499a947a0d75fed7e6a2cef76aa78c7132489d5fc9c1d554ffd60",
+    "results/metrics-20261122/corrected-summaries/duck-direct.json": "b6fa3e2af576b4543d0bd93d8b630c587287d9a912c0c3e175ef9d197ab6b5f4",
+    "results/metrics-20261122/normal/duck-direct/compaction-318d17d1-a27b-41c3-a82b-438e9f3c1062-resources.json": "e3ad073683120a103c51b981e0b481062a63be8d1c46e759c9eb8a58db87713d",
+    "results/metrics-20261122/normal/duck-direct/compaction-318d17d1-a27b-41c3-a82b-438e9f3c1062-resources.jsonl": "16ccdd9563c8984a69f535b0b0e83714f3b7b37e444f98f0e6c1935af77cf957",
+    "results/metrics-fixed-20261122/final-native/compaction-4f108792-641a-49df-af15-0d2eee8fed5d-resources.json": "8be553192e67a13052667c5182e4cb23341ad718332c483953f50d1c34f5e2de",
+    "results/metrics-20261122/03-test.json": "d47a1bdcaa86af8883801626097add8951fbae56e6ac1cf3d6e99852df1f7ecf",
+    "results/metrics-20261122/03-test.log": "18472b1edb0f206a25f4d317b27de20f970be7b4349562f3b4603f10f88fbd54",
+    "results/metrics-20261122/build-source-check.json": "8b9a4b71f6b3acf1730830c834703c423a7f70b327c22325b28e42dbb22c0f53",
+    "results/metrics-20261122/preservation/first-native-artifacts.json": "e60298c615aadda7fac4a61eb085bad863b289fd50aa3550f26ee1c6270d188a",
+    "results/metrics-20261122/observer/container-events.jsonl": "bc6faad06d1cff4f1d6c00b138223acd07737d73fb12df57e9bffc879844615a",
+    "results/metrics-fixed-20261122/native-controls-result.json": "4d66b75a063fe898a164d49f67f97becc5b3eff0db044d51b1d3344bb629484f",
+    "results/metrics-fixed-20261122/builder-cleanup.json": "342f72e730c9fbaa076233f44fc5094d6d41db2ada6a2ddb7effe80caf7b4563",
+    "results/qualification-20261122/09-corrected-compaction.result.json": "3a6525721021338a38c9e7d66a0f64396c918eda9145aa893d70a170b6e55f56",
+    "results/qualification-20261122/10-corrected-verify.result.json": "58bb1d10149549b6a11d450bc9704baa81c3ded030ca19ae711131310d5cfe2c",
+    "results/metrics-fixed-20261122/final-cleanup.json": "ac7c87cf00da53f9d7f7cd293070cf990496eceb68f7bacaa35c99c26e1b7c4a"
+  },
+  "final_cleanup": {
+    "passed": true,
+    "foreign_container_count": 9,
+    "foreign_containers_unchanged": true,
+    "owned_inventory_empty": true,
+    "owned_image_tags_removed": true,
+    "offline_closed_histories_passed": true,
+    "unreferenced_original_compactor_images_removed": []
+  },
+  "quantization_fix": {
+    "implemented": true,
+    "offline_native_streams_replayed": 5,
+    "cpu_core_seconds_and_memory_peaks_unchanged": true,
+    "final_image_native_controls": 15,
+    "native_retained_rows_rechecked": 2100000,
+    "first_diagnostic_text_retained": true
+  },
+  "first_run_diagnostic": {
+    "functional_passed": true,
+    "all_22_reports_created": true,
+    "full_metric_qualification_passed": false,
+    "issue": "Immediate phase samples can be closer than Linux100HzprocessCPUtick resolution, producing misleading interval CPU spikes; overallmulti-secondCPU totals remain interpretable.",
+    "example": "duck-direct Python max apparent interval908.3percent; overall3.97percent over7.803s.",
+    "fix_pending": "Suppress unresolvable process utilizationintervals, retain rawcounts/CPUtotals, record suppressedintervalcount and resolution; requalify."
+  }
+}

@@ -36,6 +36,47 @@ volumes and the storage/query services. Run it after the normal matrix before
 topologies. Run `make verify-history` again after subsequent faults, before
 teardown, to recheck earlier recovery acknowledgements.
 
+Normal Go commands also save unique `command-resources-*.json` reports; the
+shared archive worker uses `command-metrics-*.json`. They retain success/failure,
+elapsed time, native process CPU/peak RSS and raw cgroup/process I/O counters
+before Compose removes the tool. Spark saves `compaction-<UUID>-resources.json`
+and its sample JSONL, including separate Python and JVM observations and startup/
+stop outcomes. The reported application intervals exclude container startup and
+final teardown; Docker events provide container lifetime separately. Engine
+memory is not just the Go/Python heap. Empty device counters mean unavailable,
+not zero. Server sampling remains separate. This reporting passed a fresh
+five-architecture functional run; it does not retroactively fill earlier samples.
+
+Resource reporting qualification (2026-11-22): actual `make test` passed in
+**92.931 s**, with **22 tool reports** (15 runner, 2 archive-worker, 5 Spark).
+Docker start/die events independently captured all 22 successful workload
+lifetimes; a separate 0.088-second unit-control container is excluded explicitly.
+All 14 serving/storage roles also have native resource intervals, including a
+separately labeled quiescent post-test window. This is functional resource
+accounting, not a capacity or architecture ranking. See
+[`RESOURCE_REPORT_RESULTS.json`](RESOURCE_REPORT_RESULTS.json).
+
+| Compaction case | Lake rows | Observed cgroup CPU, core-s | Lifetime charged-memory peak, MiB |
+|---|---:|---:|---:|
+| DuckDB direct | 2,000,000 | 13.632 | 772.9 |
+| ClickHouse direct | 2,000,000 | 12.962 | 769.6 |
+| ClickHouse archive | 1,000,000 | 11.284 | 671.2 |
+| DuckDB archive | 1,000,000 | 11.329 | 805.0 |
+| Native serving source | 2,000,000 | 12.556 | 740.0 |
+
+CPU deltas cover observed intervals after Python entry, not all JVM startup/exit
+costs; memory peaks are native container-lifetime values including file cache.
+Python-only memory would omit most of the engine. The first report exposed
+coarse 100-Hz process-CPU ticks producing a false short-interval spike. Original
+reports remain intact; corrected aggregation replays the same five raw streams,
+retaining CPU totals/I/O and counting suppressed utilization estimates below ten
+ticks. All 15 controls passed under the actual Spark image's Python 3.10.12.
+The corrected image then compacted **2,100,000 rows** in a separate native check,
+retained the old snapshot and passed both-engine verification; only aggregation
+changed after the full five-path run. Cleanup passed and nine unrelated
+containers stayed unchanged. Normal-path encoded compression, full startup/exit
+cost and repeated cold/warm capacity trials remain incomplete.
+
 ## Architectures
 
 | Case | Data path | Purpose |
@@ -124,10 +165,10 @@ tracked source bytes and are regular hard links on this host; generated files
 are ignored and a symlinked build destination is rejected. The archive-worker
 Go unit suite passes from this local context with networking disabled and
 2-CPU/1-GiB limits; all three workload build contexts resolve inside this example.
-This validates preparation and existing controls, not a rerun of the five live
-data paths or the still-unrun production fault/concurrency matrix below.
+That checkpoint validated preparation and existing controls; the later live
+data-path and recovery results are recorded separately below.
 
-Local isolation follow-up (2026-11-22, live qualification pending): the Compose
+Initial isolation checkpoint (2026-11-22, before live qualification): the Compose
 network is now internal, workload metadata discovery is disabled, and the Go
 runner rejects endpoint/profile/credential-discovery overrides before opening
 an engine. Credentials remain explicit lab values; host AWS configuration is
@@ -154,8 +195,8 @@ three actual entry-point rejection probes passed. The bounded image builder used
 charged memory under a 2-CPU/4-GiB cap, with no OOM. Runtime probes peaked at
 **69.38 MiB** under 1 CPU/2 GiB. Source/binary and extension hashes are recorded in
 [`RUNTIME_PREPARATION_RESULTS.json`](RUNTIME_PREPARATION_RESULTS.json), including
-preserved failed helper attempts. These are build/control costs. The five-path
-rerun and live recovery qualification remain pending. Runtime extensions/JARs
+preserved failed helper attempts. These are build/control costs, recorded before
+the five-path rerun and live recovery qualification. Runtime extensions/JARs
 must be installed during image build, since the running lab has no outbound
 network.
 
@@ -179,10 +220,11 @@ instrumentation. Its updated image has now passed the canonical Docker build,
 native local-Parquet SQL checks, offline extension loading and entry-point guards.
 The bounded 2-CPU/4-GiB builder used **89.145 CPU core-seconds** between counter
 snapshots and peaked at **3.67 GiB** charged memory. Its state and probe containers
-were removed; the new runner image remains. The local SQL control validates footer
+were removed. The local SQL control validates footer
 APIs, not an Iceberg/S3 workload compression result.
 [`STORAGE_RUNTIME_RESULTS.json`](STORAGE_RUNTIME_RESULTS.json) records the 15-file
-source freeze and counters. Live snapshot inspection and recovery remain pending.
+source freeze and counters. This preparation preceded live snapshot inspection
+and recovery qualification.
 
 ## Live recovery qualification (2026-11-22)
 

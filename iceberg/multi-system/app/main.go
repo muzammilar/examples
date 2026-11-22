@@ -142,8 +142,21 @@ func main() {
 	if len(os.Args) != 2 {
 		log.Fatal("usage: lab extensions|probe|load|verify")
 	}
+	mode := os.Args[1]
 	var err error
-	switch os.Args[1] {
+	if mode == "extensions" || strings.HasPrefix(mode, "recovery-") {
+		err = runCommand(mode)
+	} else {
+		err = measureCommand(mode, "/results", func() error { return runCommand(mode) })
+	}
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func runCommand(mode string) error {
+	var err error
+	switch mode {
 	case "recovery-seed":
 		err = recoverySeed()
 	case "recovery-write":
@@ -191,9 +204,7 @@ func main() {
 	case "probe":
 		err = probe()
 	default:
-		err = fmt.Errorf("unknown mode %s", os.Args[1])
+		err = fmt.Errorf("unknown mode %s", mode)
 	}
-	if err != nil {
-		log.Fatal(err)
-	}
+	return err
 }

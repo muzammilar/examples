@@ -41,21 +41,61 @@ serving topology or another lab whose combined caps exceed the Docker budget.
 Report native CPU, memory, disk bytes/I/O, object size/compression and phase-tagged
 operation latencies; these functional runs are not capacity comparisons.
 
-The normal matrix also needs exit-time metrics for short-lived tools: sampling
-alone missed complete Spark runs and serving-node CPU/I/O intervals. Reuse the
-runner's native cgroup/process counters for normal Go modes, and instrument the
-tracked archive worker before its final exit (including its ambiguous-write exit
-42). For Spark, measure its JVM as well as Python, retain counters before JVM
-shutdown, and save a unique report even when compaction fails. Distinguish
-application elapsed time from whole-container lifetime; empty `io.stat` is
-unavailable, while `/proc/self/io` character counts are not physical disk I/O.
-Keep base-server sampling and these reports separate. Rebuild from tracked source
-and rerun the normal matrix before claiming complete resource measurements.
+Exit-time resource reporting now covers all 22 tools in a fresh normal matrix:
+Go process/cgroup counters and Spark's JVM/Python/container observations. A
+separate post-test window ensures native server intervals; Docker events retain
+tool lifetimes. The process-CPU tick correction replays original samples and
+passes native controls plus a fresh 2.1-million-row compaction/readback. See
+`RESOURCE_REPORT_RESULTS.json`. Keep application elapsed time distinct from
+container lifetime; empty `io.stat` is unavailable and `/proc/self/io` character
+counts are not physical disk I/O. Full engine startup/exit CPU, normal-table
+snapshot compression and repeated capacity trials still need work.
 
 Before destructive cleanup, preserve and reverify all recovery tables on the
 current volume against their original witnesses, including earlier cases after
 later faults. Failed or incomplete qualification must retain its native state
 and diagnostic exports; a successful subset cannot replace the failed verdict.
+
+### Next fault: interrupted compactor output (not implemented)
+
+Use a fresh UUID table with the two-million-row witness; never compact the
+archived precision-failure table, whose exact native snapshot is sealed.
+Keep independent readers and append writers direct to storage. Pin
+`partial-progress.enabled=false` and one concurrent rewrite group, with enough
+small files to require rewriting. Test data-file rewriting before adding a
+separate manifest-rewrite interruption.
+
+A compactor-only, example-owned S3 response gate can forward uploads to local
+SeaweedFS, then withhold **all** successful final-upload acknowledgements for
+new Parquet objects under this table's exact data prefix. Cover ordinary PUT
+and multipart completion; an uploaded part alone is insufficient. Preserve
+signed headers, path and query bytes, and prove the ungated baseline works first.
+Do not gate readers, writers or their catalog commits. Independently check a
+complete new object and valid Parquet footer before SIGKILL/fencing of the exact
+compactor container. This interrupts native output close, rather than sleeping
+and assuming that rewriting happened. Retain output candidates and fault logs.
+
+The pinned source makes this boundary observable: Iceberg's
+[`S3OutputStream.close`](https://github.com/apache/iceberg/blob/apache-iceberg-1.10.1/aws/src/main/java/org/apache/iceberg/aws/s3/S3OutputStream.java)
+waits for single-object/multipart completion. Its
+[`S3FileIOProperties`](https://github.com/apache/iceberg/blob/apache-iceberg-1.10.1/aws/src/main/java/org/apache/iceberg/aws/s3/S3FileIOProperties.java)
+defaults to five S3 retries, so withholding one response is insufficient.
+With partial progress disabled, the
+[`rewrite action`](https://github.com/apache/iceberg/blob/apache-iceberg-1.10.1/spark/v4.0/spark/src/main/java/org/apache/iceberg/spark/actions/RewriteDataFilesSparkAction.java)
+finishes rewrite groups before its commit. A REST commit gate is an alternative,
+but must be labeled post-rewrite/pre-commit interruption.
+
+Retain the starting snapshot and verify all acknowledged bodies after the fault.
+Concurrent append snapshots may legitimately advance; require absence of the
+compactor replacement commit, not an unchanged current snapshot. Reconcile the
+authoritative catalog history before starting a new compaction attempt. Unknown
+commit state remains ambiguous; the native
+[`commit manager`](https://github.com/apache/iceberg/blob/apache-iceberg-1.10.1/core/src/main/java/org/apache/iceberg/actions/RewriteDataFilesCommitManager.java)
+also avoids cleanup in that state. Do not expire snapshots or delete orphans in
+this first test: the [maintenance guidance](https://iceberg.apache.org/docs/1.10.1/maintenance/)
+warns that retention shorter than an in-flight write can corrupt tables. Measure
+continuous service, output/commit state, catch-up, compression and resources;
+the gate alone is not evidence of recovery.
 
 The workload is append-heavy customer-order analytics, plus sealed-period archival. Native ClickHouse copies are serving caches; Iceberg remains the interoperability/archive layer. This is not an OLTP replacement or an engine-speed ranking.
 
@@ -122,8 +162,9 @@ unsupported active delete files. Do not glob the warehouse or filter manifests
 to the latest sequence: older manifests can still contain live files. At the
 pinned Iceberg extension `45163a28`, the source renders data-file content as
 `EXISTING`, so the collector must validate and record native labels rather than
-assume a `content='DATA'` filter. This source finding still needs native snapshot
-qualification. [Pinned metadata implementation](https://github.com/duckdb/duckdb-iceberg/blob/45163a28/src/function/metadata/iceberg_metadata.cpp),
+assume a `content='DATA'` filter. Native snapshot qualification now passes on the
+2.48/2.49-million-row recovery tables; normal-table coverage remains separate.
+[Pinned metadata implementation](https://github.com/duckdb/duckdb-iceberg/blob/45163a28/src/function/metadata/iceberg_metadata.cpp),
 [content conversion](https://github.com/duckdb/duckdb-iceberg/blob/45163a28/src/core/metadata/manifest/iceberg_manifest.cpp).
 
 Sum each row-group/leaf-column's compressed and uncompressed chunk sizes once.
