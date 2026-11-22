@@ -75,6 +75,7 @@ services:
     security_opt: [no-new-privileges:true]
     cpus: 1
     mem_limit: 512m
+    memswap_limit: 512m
     environment:
       DATABASE_URL: "postgres://${CEDAR_LAB_USER:-postgres}:${CEDAR_LAB_PASSWORD:-Cedar-Lab-1}@${CEDAR_LAB_DB_HOST:-cedar}:5432/postgres?sslmode=disable"
       ROWS: ${ROWS:-1000000}
@@ -85,6 +86,9 @@ services:
       GOMAXPROCS: 1
       BACKEND: ${CEDAR_LAB_ENGINE:-cedar}
       READ_ONLY: ${CEDAR_LAB_READ_ONLY:-0}
+      MUTABLE_RUN_ID: ${MUTABLE_RUN_ID:-unset}
+      MUTABLE_PAIRS: ${MUTABLE_PAIRS:-}
+      MUTABLE_READ_RATE: ${MUTABLE_READ_RATE:-20}
     volumes:
       - ./results:/results
   cedar-restore:

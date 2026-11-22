@@ -44,10 +44,10 @@ func checkGroups(actual, expected []aggregate) error {
 	return nil
 }
 
-func analyticQuery(ctx context.Context, conn *pgx.Conn, count int64, expected []aggregate) (time.Duration, time.Duration, error) {
+func analyticQueryOn(ctx context.Context, conn *pgx.Conn, table string, count int64, expected []aggregate) (time.Duration, time.Duration, error) {
 	// Live appends use IDs >= 1e9. This predicate preserves the same query input
 	// during both cells; independent readers still observe the changing live tail.
-	query := fmt.Sprintf("SELECT customer %% 100 AS bucket, count(*), sum(amount), sum(length(payload)) FROM orders WHERE id < %d GROUP BY customer %% 100 ORDER BY bucket", count)
+	query := fmt.Sprintf("SELECT customer %% 100 AS bucket, count(*), sum(amount), sum(length(payload)) FROM %s WHERE id < %d GROUP BY customer %% 100 ORDER BY bucket", table, count)
 	started := time.Now()
 	rows, err := conn.Query(ctx, query)
 	if err != nil {
@@ -74,6 +74,10 @@ func analyticQuery(ctx context.Context, conn *pgx.Conn, count int64, expected []
 }
 
 func analytics(ctx context.Context, conn *pgx.Conn, count int64) error {
+	return analyticsOn(ctx, conn, "orders", count)
+}
+
+func analyticsOn(ctx context.Context, conn *pgx.Conn, table string, count int64) error {
 	warmup, err := number("ANALYTICS_WARMUP_S", 60, 0, 3600)
 	if err != nil {
 		return err
@@ -96,7 +100,7 @@ func analytics(ctx context.Context, conn *pgx.Conn, count int64) error {
 			// Bound each query independently; a failed/cancelled query fails the cell.
 			bounded, cancel := context.WithTimeout(ctx, 30*time.Second)
 			queryStart := time.Now()
-			elapsed, validation, queryErr := analyticQuery(bounded, conn, count, expected)
+			elapsed, validation, queryErr := analyticQueryOn(bounded, conn, table, count, expected)
 			cancel()
 			record := map[string]any{"kind": "analytic-query", "phase": phase.name, "started_ns": queryStart.UnixNano(), "ended_ns": time.Now().UnixNano(), "query_fetch_ms": float64(elapsed) / 1e6, "validation_ms": float64(validation) / 1e6, "verified_groups": len(expected), "seed_rows": count, "passed": queryErr == nil}
 			if queryErr != nil {

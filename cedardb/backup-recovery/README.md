@@ -30,6 +30,13 @@ throughput was **3.33×** PostgreSQL alone and **2.69×** under live traffic;
 PostgreSQL used less charged memory. See the trial spread, resource costs and
 UTC/monotonic timing audit in that report.
 
+[Transactional updates and delete/reinsert](MUTABLE.md) now add a separate Go
+workload over data that analytical queries actually read. Four **10,000-row**
+healthy/SIGKILL cases pass with zero ACK loss or wrong/partial rows. A four-cell
+short benchmark-harness diagnostic passes; the repeated **million-row** mutation
+comparison is still pending. Its numbers must not be substituted for the
+append-only results above.
+
 Run operational cases before cleanup, one command at a time:
 
 ```sh

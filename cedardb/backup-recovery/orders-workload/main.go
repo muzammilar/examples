@@ -129,7 +129,7 @@ type event struct {
 	Error     string `json:"error,omitempty"`
 }
 
-func record(file *os.File, value event) error {
+func record(file *os.File, value any) error {
 	if err := json.NewEncoder(file).Encode(value); err != nil {
 		return err
 	}
@@ -291,6 +291,9 @@ func run() error {
 		return err
 	}
 	mode := os.Args[1]
+	if strings.HasPrefix(mode, "mutable-") {
+		return runMutable(ctx, mode, count)
+	}
 	if mode == "maintenance" {
 		if len(os.Args) != 3 {
 			return errors.New("maintenance requires one trusted repository command")

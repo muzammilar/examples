@@ -1,0 +1,2478 @@
+{
+  "scope": "Functional/recovery qualification and short four-cell benchmark-harness diagnostic, not sustained million-row or comparative performance qualification",
+  "workload_image": "sha256:cd5f60c628e2cf8b9a628b98022a9260f470b0aa9c3a13daa7b3e882293bb931",
+  "cases": [
+    {
+      "source_directory": "results/mutable/129a87d7016c46fa9d2c12de98c01471",
+      "config": {
+        "created_ns": 1795309283178618000,
+        "backend": "cedar",
+        "identity": "129a87d7016c46fa9d2c12de98c01471",
+        "generation": "570e83ea57dd4059a0ece283e2a36c98",
+        "rows": 10000,
+        "pairs": 8,
+        "writer_rate": 50,
+        "reader_rate": 20,
+        "backend_contract": {
+          "operations": [
+            "paired row UPDATE",
+            "paired DELETE and reinsert",
+            "transactional native receipt",
+            "four-body repeatable-read snapshot",
+            "100-bucket analytical aggregate",
+            "ordered full-row and receipt export"
+          ],
+          "consistency": "CedarDB snapshot isolation and PostgreSQL REPEATABLE READ for mutation/read transactions. Analytical SELECTs are individually snapshot-consistent. No serializable, multi-writer conflict or general linearizability claim.",
+          "atomicity": "Each two-row change and its receipt are one synchronous database transaction. Group count, amount sum and payload length stay fixed, while stored bodies and revisions genuinely change.",
+          "durability": "Every connection sets/checks CedarDB async_commit=off or PostgreSQL synchronous_commit=on, fsync=on, full_page_writes=on. Retained-volume process/container crash is distinct from device/power loss.",
+          "retries": "No mutation replay. All submitted errors remain ambiguous until native receipts and complete bodies are reconciled with fsynced external intents. Later requests use new sequence IDs.",
+          "deletes": "Two rows are deleted and reinserted inside one transaction; readers must never see the transient missing pair. Permanent delete/TTL/reclamation workloads remain separate.",
+          "client": {
+            "driver": "pgx/v5 v5.7.6",
+            "protocol": "simple text",
+            "connections_per_actor": 1,
+            "statement_cache": "disabled",
+            "connect_timeout_s": 2,
+            "live_operation_timeout_s": 3,
+            "rollback_cleanup_timeout_s": 1,
+            "max_in_flight_per_actor": 1,
+            "write_rate_ceiling_per_s": 50,
+            "snapshot_read_rate_ceiling_per_s": 20,
+            "arrival": "ticker-paced closed loop; missed ticks under backpressure are not queued",
+            "tls": "disabled on the isolated lab network"
+          },
+          "data": {
+            "default_rows": 1000000,
+            "customers": 10000,
+            "groups": 100,
+            "payload_bytes": 256,
+            "types": "BIGINT PK id; INTEGER customer/amount; TEXT payload; BIGINT revision",
+            "nulls": false,
+            "mutable_pairs_default": 10000,
+            "pattern": "Each selected pair receives UPDATE then DELETE/reinsert; cycle through the configured pair window. Same analytical bucket, balanced signed amount adjustment, same payload length. One final pair remains historical and immutable.",
+            "payload": "192 bytes of repeated customer prefix plus 64 ASCII SHA256 hex characters; versioned suffix for actual mutations"
+          },
+          "oracle": "Native receipt set must include every ACK and only externally intended sequences. Replay committed sequences, then verify every seeded row/version/body and all 100 group invariants. Independent snapshots verify latest committed pair and an older untouched pair; UTC prior-ACK watermark check uses a documented 10ms guard.",
+          "namespace": "New UUID schema per case; preserve failed schemas. Drop a successful schema only after actors stop and complete external exports are fsynced/verified. Base orders fixture remains unchanged and independently verified.",
+          "resources": "One active backend per performance cell, 4 CPUs/6 GiB/no swap. Each Go actor has 1 CPU/512 MiB/no swap; 1 analytical actor alone or 3 actors with mutations. Whole-store counters include the retained immutable base fixture as well as mutable data, receipts, indexes, WAL and engine files.",
+          "limits": "Single Docker VM, no HA/replica/sharding claim. Same-key multi-writer conflicts, arbitrary update effects, permanent deletes, verified OS-cold access, open-loop saturation, disk EIO/full and physical power-loss recovery are unqualified. CedarDB engine source is closed; inspect versioned public APIs, shipped configuration and pinned pgx/PostgreSQL source."
+        },
+        "contract": "Synchronous repeatable-read transactions. Each paired UPDATE or DELETE/reinsert and its native receipt commit atomically. External intent/ACK journal; no mutation retries. Whole group totals stay fixed while actual queried bodies change.",
+        "source_sha256": {
+          "mutable_lab.py": "ed1c6086064bf1e89115f03c7b18507f7d0a7a4c0e38a1a50de85214a7895bb9",
+          "mutable_oracle.py": "3838c142113531416d133cc6586e185398829f76b753138a8b95a4659a622563",
+          "mutable-contract.json": "3d554f4ef76142c041499fce6134ee171f9be498e6900f81018320b8eb805eea",
+          "control.py": "1b5ba9c14c8be30b6962be5d1481c5b9593c02d61fb43fcc9075b68d72dbcb83",
+          "resources.py": "70e07d69204e91815a1739831ab998bec7efdb59f2c2042cbc3071be32fc72ea",
+          "docker-compose.yml": "04306e322b6d792f6eee0eba05c4b548808e4e4d77112e33ea0d1afb3b82f09b",
+          "orders-workload/analytics.go": "7c877b4ff3c713c7979f750abfe50f9b8cd7004e00da5691f9d724d653d4abaf",
+          "orders-workload/analytics_test.go": "0a40aeeb571efef90e3e3827bc80b8dd557bca1b4ada3838f41e88569c4d96a6",
+          "orders-workload/main.go": "240286bc6ddac85f525cc7d77ffe313f3f9602835b33c163e6e67b0da75af576",
+          "orders-workload/mutable.go": "adf0a77169041245785ee38ea414333d821af02bdeb70fbdf4451dd0fd657fad",
+          "orders-workload/mutable_test.go": "87872c937f2b206d350d772524129a004543fac521f6f0780064215e0d95d0e5",
+          "orders-workload/process_test.go": "178ba50732f8ae3f9b3701eff7de4f70098be3bcdbd9e022a482694f835eb4d6",
+          "orders-workload/go.mod": "640974387b995fa723f98e37f36c28ad67eba09cc0ddb5f13f24dbef24e46916",
+          "orders-workload/go.sum": "4e7e05768d607a1cc09d1dbe92d138751e9111200e8eadf2be5d7c99b189e834",
+          "orders-workload/Dockerfile": "25b508b62456be94d2e63608a3314c93aa46633e620837465a703e61ed0c5bc9"
+        }
+      },
+      "backend": "cedar",
+      "crash": false,
+      "proof": {
+        "seed_rows_verified": 10000,
+        "intents": 594,
+        "acknowledged_transactions": 594,
+        "committed_transactions": 594,
+        "applied_unacknowledged_intents": 0,
+        "acknowledged_loss": 0,
+        "wrong_duplicate_or_partial_rows": 0,
+        "groups_verified": 100,
+        "last_committed_seq": 594,
+        "row_export_sha256": "f67928feaace8579a7ea5f9afd504a6a72b711bd59535f8204641c701ce72d4d",
+        "receipt_export_sha256": "2c061e6ac24bbfa54baeadeb5de392f0ccc58d15182615ae00c236a6f86b5d36",
+        "read_history": {
+          "successful_snapshots": 237,
+          "requests": 237,
+          "mismatches": 0,
+          "ack_lower_bound_clock_guard_ms": 10,
+          "scope": "Four-body repeatable-read snapshots and prior-ACK watermark lower bounds; shared-VM UTC with a conservative guard, not a general linearizability proof"
+        },
+        "compression": [
+          {
+            "file": "rows.csv",
+            "codec": "gzip",
+            "level": 1,
+            "source_bytes": 2746547,
+            "archive_bytes": 607296,
+            "ratio": 4.522583715354621,
+            "wall_ns": 7762792,
+            "cpu_ns": 7764000,
+            "scope": "Off-path CSV compressibility, not native engine compression"
+          },
+          {
+            "file": "receipts.csv",
+            "codec": "gzip",
+            "level": 1,
+            "source_bytes": 14773,
+            "archive_bytes": 2004,
+            "ratio": 7.371756487025948,
+            "wall_ns": 113166,
+            "cpu_ns": 114000,
+            "scope": "Off-path CSV compressibility, not native engine compression"
+          }
+        ]
+      },
+      "phases": {
+        "baseline": {
+          "writer": {
+            "ok": {
+              "count": 250,
+              "rate": 49.925411435315645,
+              "p50_ms": 5.826979,
+              "p99_ms": 16.040416
+            },
+            "fail": {
+              "count": 0,
+              "rate": 0.0,
+              "p50_ms": null,
+              "p99_ms": null
+            },
+            "ambiguous": {
+              "count": 0,
+              "rate": 0.0,
+              "p50_ms": null,
+              "p99_ms": null
+            },
+            "mismatch": {
+              "count": 0,
+              "rate": 0.0,
+              "p50_ms": null,
+              "p99_ms": null
+            }
+          },
+          "reader": {
+            "ok": {
+              "count": 100,
+              "rate": 19.970164574126258,
+              "p50_ms": 1.889146,
+              "p99_ms": 4.718333
+            },
+            "fail": {
+              "count": 0,
+              "rate": 0.0,
+              "p50_ms": null,
+              "p99_ms": null
+            },
+            "ambiguous": {
+              "count": 0,
+              "rate": 0.0,
+              "p50_ms": null,
+              "p99_ms": null
+            },
+            "mismatch": {
+              "count": 0,
+              "rate": 0.0,
+              "p50_ms": null,
+              "p99_ms": null
+            }
+          }
+        }
+      },
+      "resources": {
+        "cedar": {
+          "samples": 14,
+          "unavailable_samples": 0,
+          "observed_cpu_core_seconds": 14.509619,
+          "average_cpu_percent_one_core_100_observed_intervals": 103.09995821180047,
+          "cpu_percent_one_core_100_min_max": [
+            4.285459605705201,
+            223.1128629074132
+          ],
+          "sampled_charged_memory_bytes_min_mean_max": [
+            86777856,
+            133374829.71428572,
+            144101376
+          ],
+          "observed_counter_resets": 0,
+          "io_and_network": {
+            "block_254:0_read_bytes": {
+              "observed_delta": 8671232,
+              "observed_seconds": 14.073350999999999,
+              "per_second": 616145.507917766,
+              "counter_resets": 0
+            },
+            "block_254:0_write_bytes": {
+              "observed_delta": 18780160,
+              "observed_seconds": 14.073350999999999,
+              "per_second": 1334448.3485134423,
+              "counter_resets": 0
+            },
+            "network_eth0_rx_bytes": {
+              "observed_delta": 3708641,
+              "observed_seconds": 14.073350999999999,
+              "per_second": 263522.24143347243,
+              "counter_resets": 0
+            },
+            "network_eth0_tx_bytes": {
+              "observed_delta": 37266850,
+              "observed_seconds": 14.073350999999999,
+              "per_second": 2648043.8098928966,
+              "counter_resets": 0
+            }
+          },
+          "io_scope": "Kernel per-device and per-interface counters, with reset intervals excluded. Missing fields are unavailable, not zero. Do not sum stacked devices or both endpoints into physical traffic; raw counters remain authoritative.",
+          "sampled_disk_bytes_min_max": {
+            "/var/lib/cedardb/data/database": {
+              "logical_bytes": [
+                11763211,
+                27446597
+              ],
+              "allocated_bytes": [
+                1622482944,
+                1622851584
+              ]
+            },
+            "/backups": {
+              "logical_bytes": [
+                0,
+                0
+              ],
+              "allocated_bytes": [
+                4096,
+                4096
+              ]
+            }
+          },
+          "scope": "About 1s cadence. CPU covers deltas between usable native samples; restart/reset intervals and initial/final partial intervals are excluded, not estimated. Raw block I/O and all native fields remain in JSONL. This is not process RSS or a complete CPU total across crashes."
+        },
+        "reader": {
+          "samples": 11,
+          "unavailable_samples": 1,
+          "observed_cpu_core_seconds": 0.065428,
+          "average_cpu_percent_one_core_100_observed_intervals": 0.6034061070290522,
+          "cpu_percent_one_core_100_min_max": [
+            0.410973903296328,
+            0.9674549599488125
+          ],
+          "sampled_charged_memory_bytes_min_mean_max": [
+            3145728,
+            5402251.636363637,
+            7966720
+          ],
+          "observed_counter_resets": 0,
+          "io_and_network": {
+            "network_eth0_rx_bytes": {
+              "observed_delta": 368313,
+              "observed_seconds": 10.843112,
+              "per_second": 33967.46247756179,
+              "counter_resets": 0
+            },
+            "network_eth0_tx_bytes": {
+              "observed_delta": 161671,
+              "observed_seconds": 10.843112,
+              "per_second": 14910.01845226721,
+              "counter_resets": 0
+            }
+          },
+          "io_scope": "Kernel per-device and per-interface counters, with reset intervals excluded. Missing fields are unavailable, not zero. Do not sum stacked devices or both endpoints into physical traffic; raw counters remain authoritative.",
+          "sampled_disk_bytes_min_max": {},
+          "scope": "About 1s cadence. CPU covers deltas between usable native samples; restart/reset intervals and initial/final partial intervals are excluded, not estimated. Raw block I/O and all native fields remain in JSONL. This is not process RSS or a complete CPU total across crashes."
+        },
+        "writer": {
+          "samples": 11,
+          "unavailable_samples": 1,
+          "observed_cpu_core_seconds": 0.213903,
+          "average_cpu_percent_one_core_100_observed_intervals": 2.191837502582213,
+          "cpu_percent_one_core_100_min_max": [
+            1.4931963418220207,
+            3.1606617007804023
+          ],
+          "sampled_charged_memory_bytes_min_mean_max": [
+            5423104,
+            7066828.8,
+            8658944
+          ],
+          "observed_counter_resets": 1,
+          "io_and_network": {
+            "network_eth0_rx_bytes": {
+              "observed_delta": 264254,
+              "observed_seconds": 9.759071999999998,
+              "per_second": 27077.779526577942,
+              "counter_resets": 0
+            },
+            "network_eth0_tx_bytes": {
+              "observed_delta": 661413,
+              "observed_seconds": 9.759071999999998,
+              "per_second": 67774.16951119943,
+              "counter_resets": 0
+            }
+          },
+          "io_scope": "Kernel per-device and per-interface counters, with reset intervals excluded. Missing fields are unavailable, not zero. Do not sum stacked devices or both endpoints into physical traffic; raw counters remain authoritative.",
+          "sampled_disk_bytes_min_max": {},
+          "scope": "About 1s cadence. CPU covers deltas between usable native samples; restart/reset intervals and initial/final partial intervals are excluded, not estimated. Raw block I/O and all native fields remain in JSONL. This is not process RSS or a complete CPU total across crashes."
+        }
+      },
+      "actors": {
+        "writer": {
+          "native_process": {
+            "children_peak_rss_kib": 0,
+            "children_system_cpu_seconds": 0,
+            "children_user_cpu_seconds": 0,
+            "cpu.max": "100000 100000\n",
+            "cpu.stat": "usage_usec 271080\nuser_usec 104735\nsystem_usec 166344\nnice_usec 0\nnr_periods 119\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+            "cpu_percent_one_core_100_self_and_reaped_children": 2.196813973715771,
+            "io.stat": "",
+            "kind": "process-resources",
+            "main_cpu_seconds_self_and_reaped_children": 0.26126900000000003,
+            "main_wall_seconds": 11.893087131,
+            "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n",
+            "memory.max": "536870912\n",
+            "memory.peak": "8970240\n",
+            "memory.swap.max": "0\n",
+            "peak_rss_kib": 13560,
+            "scope": "Linux Docker process lifetime; CPU covers all Go threads. Native cgroup peaks include charged cache/kernel memory.",
+            "system_cpu_seconds": 0.164978,
+            "timing_scope": "Main wall time and CPU deltas bracket the operation and connection close; process-lifetime totals separately include runtime startup. Rusage/timer calls add small measurement overhead; native counters are sampled before final JSON/exit. Cgroup counters include parent/children; do not add them to process CPU again.",
+            "user_cpu_seconds": 0.105174
+          },
+          "operations": {
+            "delete-reinsert": {
+              "ok": {
+                "count": 297,
+                "rate": 25.07160084100279,
+                "p50_ms": 5.873375,
+                "p99_ms": 17.77525
+              },
+              "fail": {
+                "count": 0,
+                "rate": 0.0,
+                "p50_ms": null,
+                "p99_ms": null
+              },
+              "ambiguous": {
+                "count": 0,
+                "rate": 0.0,
+                "p50_ms": null,
+                "p99_ms": null
+              },
+              "mismatch": {
+                "count": 0,
+                "rate": 0.0,
+                "p50_ms": null,
+                "p99_ms": null
+              }
+            },
+            "paired-update": {
+              "ok": {
+                "count": 297,
+                "rate": 25.071670332661498,
+                "p50_ms": 5.817583,
+                "p99_ms": 15.907125
+              },
+              "fail": {
+                "count": 0,
+                "rate": 0.0,
+                "p50_ms": null,
+                "p99_ms": null
+              },
+              "ambiguous": {
+                "count": 0,
+                "rate": 0.0,
+                "p50_ms": null,
+                "p99_ms": null
+              },
+              "mismatch": {
+                "count": 0,
+                "rate": 0.0,
+                "p50_ms": null,
+                "p99_ms": null
+              }
+            }
+          }
+        },
+        "reader": {
+          "native_process": {
+            "children_peak_rss_kib": 0,
+            "children_system_cpu_seconds": 0,
+            "children_user_cpu_seconds": 0,
+            "cpu.max": "100000 100000\n",
+            "cpu.stat": "usage_usec 85182\nuser_usec 46140\nsystem_usec 39042\nnice_usec 0\nnr_periods 90\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+            "cpu_percent_one_core_100_self_and_reaped_children": 0.6362827578176226,
+            "io.stat": "",
+            "kind": "process-resources",
+            "main_cpu_seconds_self_and_reaped_children": 0.075706,
+            "main_wall_seconds": 11.898169339,
+            "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n",
+            "memory.max": "536870912\n",
+            "memory.peak": "8224768\n",
+            "memory.swap.max": "0\n",
+            "peak_rss_kib": 13984,
+            "scope": "Linux Docker process lifetime; CPU covers all Go threads. Native cgroup peaks include charged cache/kernel memory.",
+            "system_cpu_seconds": 0.038638,
+            "timing_scope": "Main wall time and CPU deltas bracket the operation and connection close; process-lifetime totals separately include runtime startup. Rusage/timer calls add small measurement overhead; native counters are sampled before final JSON/exit. Cgroup counters include parent/children; do not add them to process CPU again.",
+            "user_cpu_seconds": 0.045663
+          },
+          "operations": {
+            "snapshot-recent-and-historical": {
+              "ok": {
+                "count": 237,
+                "rate": 20.076349581511813,
+                "p50_ms": 1.196667,
+                "p99_ms": 4.078291
+              },
+              "fail": {
+                "count": 0,
+                "rate": 0.0,
+                "p50_ms": null,
+                "p99_ms": null
+              },
+              "ambiguous": {
+                "count": 0,
+                "rate": 0.0,
+                "p50_ms": null,
+                "p99_ms": null
+              },
+              "mismatch": {
+                "count": 0,
+                "rate": 0.0,
+                "p50_ms": null,
+                "p99_ms": null
+              }
+            }
+          }
+        }
+      },
+      "native_after": {
+        "pid1_memory_bytes": {
+          "VmRSS": 25128960,
+          "VmHWM": 25128960
+        },
+        "pid1_status": "Name:\tcedardb\nUmask:\t0022\nState:\tS (sleeping)\nTgid:\t1\nNgid:\t0\nPid:\t1\nPPid:\t0\nTracerPid:\t0\nUid:\t999\t999\t999\t999\nGid:\t999\t999\t999\t999\nFDSize:\t256\nGroups:\t \nNStgid:\t1\nNSpid:\t1\nNSpgid:\t1\nNSsid:\t1\nKthread:\t0\nVmPeak:\t  102616 kB\nVmSize:\t  102616 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t   24540 kB\nVmRSS:\t   24540 kB\nRssAnon:\t    4452 kB\nRssFile:\t   20088 kB\nRssShmem:\t       0 kB\nVmData:\t    4812 kB\nVmStk:\t     132 kB\nVmExe:\t   58368 kB\nVmLib:\t    2576 kB\nVmPTE:\t     180 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffff\nThreads:\t1\nSigQ:\t0/99998\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000000000000\nSigCgt:\t0000000000004003\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t00000000a80425fb\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t2\nSeccomp_filters:\t1\nSpeculation_Store_Bypass:\tvulnerable\nSpeculationIndirectBranch:\tunknown\nCpus_allowed:\t7ff\nCpus_allowed_list:\t0-10\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t27\nnonvoluntary_ctxt_switches:\t4\n",
+        "pid1_memory_scope": "Linux /proc/1/status snapshot and lifetime high-water RSS for PID 1 only. Both databases have additional processes: the live CedarDB audit found a much larger second cedardb process, and PostgreSQL has backend/worker processes. PID 1 RSS is not whole-engine RSS. Use cgroup charged memory for whole-database comparisons; RSS is not heap size.",
+        "database_logical_bytes": 27446597,
+        "database_allocated_bytes": 1622851584,
+        "cgroup_peak_memory_bytes_since_last_start": 150511616,
+        "native_compression": {
+          "available": true,
+          "query": "SELECT v.attributename,v.encoding,v.generalcompression,v.uncompressedsize,v.encodedsize,v.compressedsize FROM cedardb_compression_info v JOIN pg_class c ON c.oid=v.oid JOIN pg_namespace n ON n.oid=c.relnamespace WHERE c.relname='mutable_orders' AND n.nspname='mutable_129a87d7016c46fa9d2c12de98c01471'",
+          "scope": "Native cold-column statistics for this case's mutable_orders; empty rows do not establish no compression",
+          "records": [
+            {
+              "children_peak_rss_kib": 0,
+              "children_system_cpu_seconds": 0,
+              "children_user_cpu_seconds": 0,
+              "cpu.max": "100000 100000\n",
+              "cpu.stat": "usage_usec 12589\nuser_usec 3147\nsystem_usec 9441\nnice_usec 0\nnr_periods 1\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+              "cpu_percent_one_core_100_self_and_reaped_children": 6.021141365476761,
+              "io.stat": "",
+              "kind": "process-resources",
+              "main_cpu_seconds_self_and_reaped_children": 0.0019679999999999993,
+              "main_wall_seconds": 0.032684833,
+              "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n",
+              "memory.max": "536870912\n",
+              "memory.peak": "7323648\n",
+              "memory.swap.max": "0\n",
+              "peak_rss_kib": 14044,
+              "scope": "Linux Docker process lifetime; CPU covers all Go threads. Native cgroup peaks include charged cache/kernel memory.",
+              "system_cpu_seconds": 0.007976,
+              "timing_scope": "Main wall time and CPU deltas bracket the operation and connection close; process-lifetime totals separately include runtime startup. Rusage/timer calls add small measurement overhead; native counters are sampled before final JSON/exit. Cgroup counters include parent/children; do not add them to process CPU again.",
+              "user_cpu_seconds": 0.003349
+            }
+          ]
+        },
+        "native_counter_text": "__memory.peak\n150511616\n__cpu.stat\nusage_usec 15289656\nuser_usec 13891353\nsystem_usec 1398302\nnice_usec 0\nnr_periods 314\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n__io.stat\n254:0 rbytes=8941568 wbytes=18800640 rios=133 wios=3969 dbytes=0 dios=0\n__memory.events\nlow 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n__DISK\n27446597\t/var/lib/cedardb/data/database\n1622851584\t/var/lib/cedardb/data/database\n__FILESYSTEM\nFilesystem        1-blocks        Used   Available Capacity Mounted on\n/dev/vda1      83954712576 31803224064 47839801344      40% /var/lib/cedardb/data\n",
+        "image_id": "sha256:1f9601c215afa8f9c0fa72a3d8b288364994e55abe8ef51cfff77921ea33c1d0",
+        "image_reference": "cedardb/cedardb:v2026-11-18@sha256:1f9601c215afa8f9c0fa72a3d8b288364994e55abe8ef51cfff77921ea33c1d0",
+        "cpus": 4.0,
+        "memory_limit_bytes": 6442450944
+      },
+      "native_controls": {
+        "kind": "mutable-negative-controls",
+        "passed": true,
+        "readonly_sqlstate": "25006",
+        "rollback_sqlstate": "22012"
+      },
+      "raw_result_sha256": "97adb8ff554ea216e54ebb892befb06060240ee2f4d51f6ded61e32a83d4c36a"
+    },
+    {
+      "source_directory": "results/mutable/f2f63cbedb044f6995c75babd2080b2e",
+      "config": {
+        "created_ns": 1795309299171427000,
+        "backend": "postgres",
+        "identity": "f2f63cbedb044f6995c75babd2080b2e",
+        "generation": "570e83ea57dd4059a0ece283e2a36c98",
+        "rows": 10000,
+        "pairs": 8,
+        "writer_rate": 50,
+        "reader_rate": 20,
+        "backend_contract": {
+          "operations": [
+            "paired row UPDATE",
+            "paired DELETE and reinsert",
+            "transactional native receipt",
+            "four-body repeatable-read snapshot",
+            "100-bucket analytical aggregate",
+            "ordered full-row and receipt export"
+          ],
+          "consistency": "CedarDB snapshot isolation and PostgreSQL REPEATABLE READ for mutation/read transactions. Analytical SELECTs are individually snapshot-consistent. No serializable, multi-writer conflict or general linearizability claim.",
+          "atomicity": "Each two-row change and its receipt are one synchronous database transaction. Group count, amount sum and payload length stay fixed, while stored bodies and revisions genuinely change.",
+          "durability": "Every connection sets/checks CedarDB async_commit=off or PostgreSQL synchronous_commit=on, fsync=on, full_page_writes=on. Retained-volume process/container crash is distinct from device/power loss.",
+          "retries": "No mutation replay. All submitted errors remain ambiguous until native receipts and complete bodies are reconciled with fsynced external intents. Later requests use new sequence IDs.",
+          "deletes": "Two rows are deleted and reinserted inside one transaction; readers must never see the transient missing pair. Permanent delete/TTL/reclamation workloads remain separate.",
+          "client": {
+            "driver": "pgx/v5 v5.7.6",
+            "protocol": "simple text",
+            "connections_per_actor": 1,
+            "statement_cache": "disabled",
+            "connect_timeout_s": 2,
+            "live_operation_timeout_s": 3,
+            "rollback_cleanup_timeout_s": 1,
+            "max_in_flight_per_actor": 1,
+            "write_rate_ceiling_per_s": 50,
+            "snapshot_read_rate_ceiling_per_s": 20,
+            "arrival": "ticker-paced closed loop; missed ticks under backpressure are not queued",
+            "tls": "disabled on the isolated lab network"
+          },
+          "data": {
+            "default_rows": 1000000,
+            "customers": 10000,
+            "groups": 100,
+            "payload_bytes": 256,
+            "types": "BIGINT PK id; INTEGER customer/amount; TEXT payload; BIGINT revision",
+            "nulls": false,
+            "mutable_pairs_default": 10000,
+            "pattern": "Each selected pair receives UPDATE then DELETE/reinsert; cycle through the configured pair window. Same analytical bucket, balanced signed amount adjustment, same payload length. One final pair remains historical and immutable.",
+            "payload": "192 bytes of repeated customer prefix plus 64 ASCII SHA256 hex characters; versioned suffix for actual mutations"
+          },
+          "oracle": "Native receipt set must include every ACK and only externally intended sequences. Replay committed sequences, then verify every seeded row/version/body and all 100 group invariants. Independent snapshots verify latest committed pair and an older untouched pair; UTC prior-ACK watermark check uses a documented 10ms guard.",
+          "namespace": "New UUID schema per case; preserve failed schemas. Drop a successful schema only after actors stop and complete external exports are fsynced/verified. Base orders fixture remains unchanged and independently verified.",
+          "resources": "One active backend per performance cell, 4 CPUs/6 GiB/no swap. Each Go actor has 1 CPU/512 MiB/no swap; 1 analytical actor alone or 3 actors with mutations. Whole-store counters include the retained immutable base fixture as well as mutable data, receipts, indexes, WAL and engine files.",
+          "limits": "Single Docker VM, no HA/replica/sharding claim. Same-key multi-writer conflicts, arbitrary update effects, permanent deletes, verified OS-cold access, open-loop saturation, disk EIO/full and physical power-loss recovery are unqualified. CedarDB engine source is closed; inspect versioned public APIs, shipped configuration and pinned pgx/PostgreSQL source."
+        },
+        "contract": "Synchronous repeatable-read transactions. Each paired UPDATE or DELETE/reinsert and its native receipt commit atomically. External intent/ACK journal; no mutation retries. Whole group totals stay fixed while actual queried bodies change.",
+        "source_sha256": {
+          "mutable_lab.py": "ed1c6086064bf1e89115f03c7b18507f7d0a7a4c0e38a1a50de85214a7895bb9",
+          "mutable_oracle.py": "3838c142113531416d133cc6586e185398829f76b753138a8b95a4659a622563",
+          "mutable-contract.json": "3d554f4ef76142c041499fce6134ee171f9be498e6900f81018320b8eb805eea",
+          "control.py": "1b5ba9c14c8be30b6962be5d1481c5b9593c02d61fb43fcc9075b68d72dbcb83",
+          "resources.py": "70e07d69204e91815a1739831ab998bec7efdb59f2c2042cbc3071be32fc72ea",
+          "docker-compose.yml": "04306e322b6d792f6eee0eba05c4b548808e4e4d77112e33ea0d1afb3b82f09b",
+          "orders-workload/analytics.go": "7c877b4ff3c713c7979f750abfe50f9b8cd7004e00da5691f9d724d653d4abaf",
+          "orders-workload/analytics_test.go": "0a40aeeb571efef90e3e3827bc80b8dd557bca1b4ada3838f41e88569c4d96a6",
+          "orders-workload/main.go": "240286bc6ddac85f525cc7d77ffe313f3f9602835b33c163e6e67b0da75af576",
+          "orders-workload/mutable.go": "adf0a77169041245785ee38ea414333d821af02bdeb70fbdf4451dd0fd657fad",
+          "orders-workload/mutable_test.go": "87872c937f2b206d350d772524129a004543fac521f6f0780064215e0d95d0e5",
+          "orders-workload/process_test.go": "178ba50732f8ae3f9b3701eff7de4f70098be3bcdbd9e022a482694f835eb4d6",
+          "orders-workload/go.mod": "640974387b995fa723f98e37f36c28ad67eba09cc0ddb5f13f24dbef24e46916",
+          "orders-workload/go.sum": "4e7e05768d607a1cc09d1dbe92d138751e9111200e8eadf2be5d7c99b189e834",
+          "orders-workload/Dockerfile": "25b508b62456be94d2e63608a3314c93aa46633e620837465a703e61ed0c5bc9"
+        }
+      },
+      "backend": "postgres",
+      "crash": false,
+      "proof": {
+        "seed_rows_verified": 10000,
+        "intents": 598,
+        "acknowledged_transactions": 598,
+        "committed_transactions": 598,
+        "applied_unacknowledged_intents": 0,
+        "acknowledged_loss": 0,
+        "wrong_duplicate_or_partial_rows": 0,
+        "groups_verified": 100,
+        "last_committed_seq": 598,
+        "row_export_sha256": "33df440ab981c0f2be008016732bd6dc23ee2c28f1e02f3f37e28793d4cf29f0",
+        "receipt_export_sha256": "dde81a5f872f2c6ba7d90ebf903f9584fd0e1e165b855c172c88ec73cd0d15df",
+        "read_history": {
+          "successful_snapshots": 239,
+          "requests": 239,
+          "mismatches": 0,
+          "ack_lower_bound_clock_guard_ms": 10,
+          "scope": "Four-body repeatable-read snapshots and prior-ACK watermark lower bounds; shared-VM UTC with a conservative guard, not a general linearizability proof"
+        },
+        "compression": [
+          {
+            "file": "rows.csv",
+            "codec": "gzip",
+            "level": 1,
+            "source_bytes": 2746547,
+            "archive_bytes": 607308,
+            "ratio": 4.522494352124458,
+            "wall_ns": 7607917,
+            "cpu_ns": 7608000,
+            "scope": "Off-path CSV compressibility, not native engine compression"
+          },
+          {
+            "file": "receipts.csv",
+            "codec": "gzip",
+            "level": 1,
+            "source_bytes": 14873,
+            "archive_bytes": 2016,
+            "ratio": 7.377480158730159,
+            "wall_ns": 79000,
+            "cpu_ns": 79000,
+            "scope": "Off-path CSV compressibility, not native engine compression"
+          }
+        ]
+      },
+      "phases": {
+        "baseline": {
+          "writer": {
+            "ok": {
+              "count": 254,
+              "rate": 49.98005717010162,
+              "p50_ms": 1.1803955,
+              "p99_ms": 3.659792
+            },
+            "fail": {
+              "count": 0,
+              "rate": 0.0,
+              "p50_ms": null,
+              "p99_ms": null
+            },
+            "ambiguous": {
+              "count": 0,
+              "rate": 0.0,
+              "p50_ms": null,
+              "p99_ms": null
+            },
+            "mismatch": {
+              "count": 0,
+              "rate": 0.0,
+              "p50_ms": null,
+              "p99_ms": null
+            }
+          },
+          "reader": {
+            "ok": {
+              "count": 102,
+              "rate": 20.070731619489624,
+              "p50_ms": 0.708271,
+              "p99_ms": 2.940375
+            },
+            "fail": {
+              "count": 0,
+              "rate": 0.0,
+              "p50_ms": null,
+              "p99_ms": null
+            },
+            "ambiguous": {
+              "count": 0,
+              "rate": 0.0,
+              "p50_ms": null,
+              "p99_ms": null
+            },
+            "mismatch": {
+              "count": 0,
+              "rate": 0.0,
+              "p50_ms": null,
+              "p99_ms": null
+            }
+          }
+        }
+      },
+      "resources": {
+        "postgres": {
+          "samples": 15,
+          "unavailable_samples": 0,
+          "observed_cpu_core_seconds": 6.537804999999999,
+          "average_cpu_percent_one_core_100_observed_intervals": 43.134831973668085,
+          "cpu_percent_one_core_100_min_max": [
+            3.077138306772521,
+            102.0139820082538
+          ],
+          "sampled_charged_memory_bytes_min_mean_max": [
+            78467072,
+            89443259.73333333,
+            92475392
+          ],
+          "observed_counter_resets": 0,
+          "io_and_network": {
+            "block_254:0_read_bytes": {
+              "observed_delta": 0,
+              "observed_seconds": 15.156672000000002,
+              "per_second": 0.0,
+              "counter_resets": 0
+            },
+            "block_254:0_write_bytes": {
+              "observed_delta": 3686400,
+              "observed_seconds": 15.156672000000002,
+              "per_second": 243219.61971599038,
+              "counter_resets": 0
+            },
+            "network_eth0_rx_bytes": {
+              "observed_delta": 1640811,
+              "observed_seconds": 15.156672000000002,
+              "per_second": 108256.68062223685,
+              "counter_resets": 0
+            },
+            "network_eth0_tx_bytes": {
+              "observed_delta": 11403032,
+              "observed_seconds": 15.156672000000002,
+              "per_second": 752344.0501978269,
+              "counter_resets": 0
+            }
+          },
+          "io_scope": "Kernel per-device and per-interface counters, with reset intervals excluded. Missing fields are unavailable, not zero. Do not sum stacked devices or both endpoints into physical traffic; raw counters remain authoritative.",
+          "sampled_disk_bytes_min_max": {
+            "/var/lib/postgresql/data": {
+              "logical_bytes": [
+                64408979,
+                68095379
+              ],
+              "allocated_bytes": [
+                64471040,
+                68157440
+              ]
+            }
+          },
+          "scope": "About 1s cadence. CPU covers deltas between usable native samples; restart/reset intervals and initial/final partial intervals are excluded, not estimated. Raw block I/O and all native fields remain in JSONL. This is not process RSS or a complete CPU total across crashes."
+        },
+        "reader": {
+          "samples": 11,
+          "unavailable_samples": 2,
+          "observed_cpu_core_seconds": 0.06311399999999999,
+          "average_cpu_percent_one_core_100_observed_intervals": 0.5816004914954497,
+          "cpu_percent_one_core_100_min_max": [
+            0.32115713268234086,
+            1.1712103357421022
+          ],
+          "sampled_charged_memory_bytes_min_mean_max": [
+            3174400,
+            5404113.454545454,
+            7950336
+          ],
+          "observed_counter_resets": 0,
+          "io_and_network": {
+            "network_eth0_rx_bytes": {
+              "observed_delta": 369790,
+              "observed_seconds": 10.851779,
+              "per_second": 34076.440369823235,
+              "counter_resets": 0
+            },
+            "network_eth0_tx_bytes": {
+              "observed_delta": 161749,
+              "observed_seconds": 10.851779,
+              "per_second": 14905.298016113302,
+              "counter_resets": 0
+            }
+          },
+          "io_scope": "Kernel per-device and per-interface counters, with reset intervals excluded. Missing fields are unavailable, not zero. Do not sum stacked devices or both endpoints into physical traffic; raw counters remain authoritative.",
+          "sampled_disk_bytes_min_max": {},
+          "scope": "About 1s cadence. CPU covers deltas between usable native samples; restart/reset intervals and initial/final partial intervals are excluded, not estimated. Raw block I/O and all native fields remain in JSONL. This is not process RSS or a complete CPU total across crashes."
+        },
+        "writer": {
+          "samples": 11,
+          "unavailable_samples": 2,
+          "observed_cpu_core_seconds": 0.20752700000000004,
+          "average_cpu_percent_one_core_100_observed_intervals": 1.9123861437405705,
+          "cpu_percent_one_core_100_min_max": [
+            0.9566734271588854,
+            3.827987002280158
+          ],
+          "sampled_charged_memory_bytes_min_mean_max": [
+            3305472,
+            6897291.636363637,
+            8912896
+          ],
+          "observed_counter_resets": 0,
+          "io_and_network": {
+            "network_eth0_rx_bytes": {
+              "observed_delta": 293910,
+              "observed_seconds": 10.851731000000001,
+              "per_second": 27084.158278527175,
+              "counter_resets": 0
+            },
+            "network_eth0_tx_bytes": {
+              "observed_delta": 735924,
+              "observed_seconds": 10.851731000000001,
+              "per_second": 67816.27742154684,
+              "counter_resets": 0
+            }
+          },
+          "io_scope": "Kernel per-device and per-interface counters, with reset intervals excluded. Missing fields are unavailable, not zero. Do not sum stacked devices or both endpoints into physical traffic; raw counters remain authoritative.",
+          "sampled_disk_bytes_min_max": {},
+          "scope": "About 1s cadence. CPU covers deltas between usable native samples; restart/reset intervals and initial/final partial intervals are excluded, not estimated. Raw block I/O and all native fields remain in JSONL. This is not process RSS or a complete CPU total across crashes."
+        }
+      },
+      "actors": {
+        "writer": {
+          "native_process": {
+            "children_peak_rss_kib": 0,
+            "children_system_cpu_seconds": 0,
+            "children_user_cpu_seconds": 0,
+            "cpu.max": "100000 100000\n",
+            "cpu.stat": "usage_usec 244057\nuser_usec 105463\nsystem_usec 138594\nnice_usec 0\nnr_periods 120\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+            "cpu_percent_one_core_100_self_and_reaped_children": 1.9517845409702455,
+            "io.stat": "",
+            "kind": "process-resources",
+            "main_cpu_seconds_self_and_reaped_children": 0.233803,
+            "main_wall_seconds": 11.978934923,
+            "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n",
+            "memory.max": "536870912\n",
+            "memory.peak": "8912896\n",
+            "memory.swap.max": "0\n",
+            "peak_rss_kib": 13560,
+            "scope": "Linux Docker process lifetime; CPU covers all Go threads. Native cgroup peaks include charged cache/kernel memory.",
+            "system_cpu_seconds": 0.137232,
+            "timing_scope": "Main wall time and CPU deltas bracket the operation and connection close; process-lifetime totals separately include runtime startup. Rusage/timer calls add small measurement overhead; native counters are sampled before final JSON/exit. Cgroup counters include parent/children; do not add them to process CPU again.",
+            "user_cpu_seconds": 0.105609
+          },
+          "operations": {
+            "delete-reinsert": {
+              "ok": {
+                "count": 299,
+                "rate": 25.08179588031459,
+                "p50_ms": 0.742208,
+                "p99_ms": 5.278417
+              },
+              "fail": {
+                "count": 0,
+                "rate": 0.0,
+                "p50_ms": null,
+                "p99_ms": null
+              },
+              "ambiguous": {
+                "count": 0,
+                "rate": 0.0,
+                "p50_ms": null,
+                "p99_ms": null
+              },
+              "mismatch": {
+                "count": 0,
+                "rate": 0.0,
+                "p50_ms": null,
+                "p99_ms": null
+              }
+            },
+            "paired-update": {
+              "ok": {
+                "count": 299,
+                "rate": 25.084413005382086,
+                "p50_ms": 0.653333,
+                "p99_ms": 2.993959
+              },
+              "fail": {
+                "count": 0,
+                "rate": 0.0,
+                "p50_ms": null,
+                "p99_ms": null
+              },
+              "ambiguous": {
+                "count": 0,
+                "rate": 0.0,
+                "p50_ms": null,
+                "p99_ms": null
+              },
+              "mismatch": {
+                "count": 0,
+                "rate": 0.0,
+                "p50_ms": null,
+                "p99_ms": null
+              }
+            }
+          }
+        },
+        "reader": {
+          "native_process": {
+            "children_peak_rss_kib": 0,
+            "children_system_cpu_seconds": 0,
+            "children_user_cpu_seconds": 0,
+            "cpu.max": "100000 100000\n",
+            "cpu.stat": "usage_usec 81567\nuser_usec 38517\nsystem_usec 43049\nnice_usec 0\nnr_periods 88\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+            "cpu_percent_one_core_100_self_and_reaped_children": 0.6037395195427748,
+            "io.stat": "",
+            "kind": "process-resources",
+            "main_cpu_seconds_self_and_reaped_children": 0.072239,
+            "main_wall_seconds": 11.965259464,
+            "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n",
+            "memory.max": "536870912\n",
+            "memory.peak": "8491008\n",
+            "memory.swap.max": "0\n",
+            "peak_rss_kib": 13560,
+            "scope": "Linux Docker process lifetime; CPU covers all Go threads. Native cgroup peaks include charged cache/kernel memory.",
+            "system_cpu_seconds": 0.041423,
+            "timing_scope": "Main wall time and CPU deltas bracket the operation and connection close; process-lifetime totals separately include runtime startup. Rusage/timer calls add small measurement overhead; native counters are sampled before final JSON/exit. Cgroup counters include parent/children; do not add them to process CPU again.",
+            "user_cpu_seconds": 0.039121
+          },
+          "operations": {
+            "snapshot-recent-and-historical": {
+              "ok": {
+                "count": 239,
+                "rate": 20.081673937443554,
+                "p50_ms": 0.463375,
+                "p99_ms": 2.940375
+              },
+              "fail": {
+                "count": 0,
+                "rate": 0.0,
+                "p50_ms": null,
+                "p99_ms": null
+              },
+              "ambiguous": {
+                "count": 0,
+                "rate": 0.0,
+                "p50_ms": null,
+                "p99_ms": null
+              },
+              "mismatch": {
+                "count": 0,
+                "rate": 0.0,
+                "p50_ms": null,
+                "p99_ms": null
+              }
+            }
+          }
+        }
+      },
+      "native_after": {
+        "pid1_memory_bytes": {
+          "VmRSS": 83632128,
+          "VmHWM": 83632128
+        },
+        "pid1_status": "Name:\tpostgres\nUmask:\t0077\nState:\tS (sleeping)\nTgid:\t1\nNgid:\t0\nPid:\t1\nPPid:\t0\nTracerPid:\t0\nUid:\t999\t999\t999\t999\nGid:\t999\t999\t999\t999\nFDSize:\t1024\nGroups:\t101 \nNStgid:\t1\nNSpid:\t1\nNSpgid:\t1\nNSsid:\t1\nKthread:\t0\nVmPeak:\t 2261692 kB\nVmSize:\t 2261692 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t   81672 kB\nVmRSS:\t   81672 kB\nRssAnon:\t    2384 kB\nRssFile:\t   15432 kB\nRssShmem:\t   63856 kB\nVmData:\t    1640 kB\nVmStk:\t     132 kB\nVmExe:\t    9396 kB\nVmLib:\t   57636 kB\nVmPTE:\t     292 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffff\nThreads:\t1\nSigQ:\t0/99998\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\t0000000000400000\nSigIgn:\t0000000001303000\nSigCgt:\t0000000000014a07\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t00000000a80425fb\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t2\nSeccomp_filters:\t1\nSpeculation_Store_Bypass:\tvulnerable\nSpeculationIndirectBranch:\tunknown\nCpus_allowed:\t7ff\nCpus_allowed_list:\t0-10\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t177\nnonvoluntary_ctxt_switches:\t19\n",
+        "pid1_memory_scope": "Linux /proc/1/status snapshot and lifetime high-water RSS for PID 1 only. Both databases have additional processes: the live CedarDB audit found a much larger second cedardb process, and PostgreSQL has backend/worker processes. PID 1 RSS is not whole-engine RSS. Use cgroup charged memory for whole-database comparisons; RSS is not heap size.",
+        "database_logical_bytes": 68095379,
+        "database_allocated_bytes": 68157440,
+        "cgroup_peak_memory_bytes_since_last_start": 97288192,
+        "native_compression": {
+          "available": true,
+          "query": "SELECT coalesce(pg_column_compression(payload),'none'),count(*),sum(pg_column_size(payload)) FROM \"mutable_f2f63cbedb044f6995c75babd2080b2e\".mutable_orders GROUP BY pg_column_compression(payload)",
+          "scope": "Actual mutable payload storage/compression; tuple, index, receipt, WAL and base fixture bytes are separate",
+          "records": [
+            [
+              "none",
+              10000,
+              2600000
+            ],
+            {
+              "children_peak_rss_kib": 0,
+              "children_system_cpu_seconds": 0,
+              "children_user_cpu_seconds": 0,
+              "cpu.max": "100000 100000\n",
+              "cpu.stat": "usage_usec 11099\nuser_usec 6342\nsystem_usec 4757\nnice_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+              "cpu_percent_one_core_100_self_and_reaped_children": 36.992136554032555,
+              "io.stat": "",
+              "kind": "process-resources",
+              "main_cpu_seconds_self_and_reaped_children": 0.002085,
+              "main_wall_seconds": 0.005636333,
+              "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n",
+              "memory.max": "536870912\n",
+              "memory.peak": "8269824\n",
+              "memory.swap.max": "0\n",
+              "peak_rss_kib": 14260,
+              "scope": "Linux Docker process lifetime; CPU covers all Go threads. Native cgroup peaks include charged cache/kernel memory.",
+              "system_cpu_seconds": 0.00339,
+              "timing_scope": "Main wall time and CPU deltas bracket the operation and connection close; process-lifetime totals separately include runtime startup. Rusage/timer calls add small measurement overhead; native counters are sampled before final JSON/exit. Cgroup counters include parent/children; do not add them to process CPU again.",
+              "user_cpu_seconds": 0.00678
+            }
+          ]
+        },
+        "native_counter_text": "__memory.peak\n97288192\n__cpu.stat\nusage_usec 7694303\nuser_usec 7121789\nsystem_usec 572514\nnice_usec 0\nnr_periods 324\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n__io.stat\n254:0 rbytes=0 wbytes=3907584 rios=0 wios=639 dbytes=0 dios=0\n__memory.events\nlow 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n__DISK\n68095379\t/var/lib/postgresql/data\n68157440\t/var/lib/postgresql/data\n__FILESYSTEM\nFilesystem        1-blocks        Used   Available Capacity Mounted on\n/dev/vda1      83954712576 31806910464 47836114944      40% /var/lib/postgresql/data\n",
+        "image_id": "sha256:f3bd19c606e442c3d7bdfa8002e03fe260a1023351e0ea4598032022b68dd6e3",
+        "image_reference": "postgres:17.6-bookworm@sha256:f3bd19c606e442c3d7bdfa8002e03fe260a1023351e0ea4598032022b68dd6e3",
+        "cpus": 4.0,
+        "memory_limit_bytes": 6442450944
+      },
+      "native_controls": {
+        "kind": "mutable-negative-controls",
+        "passed": true,
+        "readonly_sqlstate": "25006",
+        "rollback_sqlstate": "22012"
+      },
+      "raw_result_sha256": "adece121cd9760e868c71dd008239a98a517d5a7fe6d62a16ce259ee8cb7e0d2"
+    },
+    {
+      "source_directory": "results/mutable/7d1c8f1f825a43ed9b38f647a2902ed7",
+      "config": {
+        "created_ns": 1795309315639286000,
+        "backend": "cedar",
+        "identity": "7d1c8f1f825a43ed9b38f647a2902ed7",
+        "generation": "570e83ea57dd4059a0ece283e2a36c98",
+        "rows": 10000,
+        "pairs": 8,
+        "writer_rate": 50,
+        "reader_rate": 20,
+        "backend_contract": {
+          "operations": [
+            "paired row UPDATE",
+            "paired DELETE and reinsert",
+            "transactional native receipt",
+            "four-body repeatable-read snapshot",
+            "100-bucket analytical aggregate",
+            "ordered full-row and receipt export"
+          ],
+          "consistency": "CedarDB snapshot isolation and PostgreSQL REPEATABLE READ for mutation/read transactions. Analytical SELECTs are individually snapshot-consistent. No serializable, multi-writer conflict or general linearizability claim.",
+          "atomicity": "Each two-row change and its receipt are one synchronous database transaction. Group count, amount sum and payload length stay fixed, while stored bodies and revisions genuinely change.",
+          "durability": "Every connection sets/checks CedarDB async_commit=off or PostgreSQL synchronous_commit=on, fsync=on, full_page_writes=on. Retained-volume process/container crash is distinct from device/power loss.",
+          "retries": "No mutation replay. All submitted errors remain ambiguous until native receipts and complete bodies are reconciled with fsynced external intents. Later requests use new sequence IDs.",
+          "deletes": "Two rows are deleted and reinserted inside one transaction; readers must never see the transient missing pair. Permanent delete/TTL/reclamation workloads remain separate.",
+          "client": {
+            "driver": "pgx/v5 v5.7.6",
+            "protocol": "simple text",
+            "connections_per_actor": 1,
+            "statement_cache": "disabled",
+            "connect_timeout_s": 2,
+            "live_operation_timeout_s": 3,
+            "rollback_cleanup_timeout_s": 1,
+            "max_in_flight_per_actor": 1,
+            "write_rate_ceiling_per_s": 50,
+            "snapshot_read_rate_ceiling_per_s": 20,
+            "arrival": "ticker-paced closed loop; missed ticks under backpressure are not queued",
+            "tls": "disabled on the isolated lab network"
+          },
+          "data": {
+            "default_rows": 1000000,
+            "customers": 10000,
+            "groups": 100,
+            "payload_bytes": 256,
+            "types": "BIGINT PK id; INTEGER customer/amount; TEXT payload; BIGINT revision",
+            "nulls": false,
+            "mutable_pairs_default": 10000,
+            "pattern": "Each selected pair receives UPDATE then DELETE/reinsert; cycle through the configured pair window. Same analytical bucket, balanced signed amount adjustment, same payload length. One final pair remains historical and immutable.",
+            "payload": "192 bytes of repeated customer prefix plus 64 ASCII SHA256 hex characters; versioned suffix for actual mutations"
+          },
+          "oracle": "Native receipt set must include every ACK and only externally intended sequences. Replay committed sequences, then verify every seeded row/version/body and all 100 group invariants. Independent snapshots verify latest committed pair and an older untouched pair; UTC prior-ACK watermark check uses a documented 10ms guard.",
+          "namespace": "New UUID schema per case; preserve failed schemas. Drop a successful schema only after actors stop and complete external exports are fsynced/verified. Base orders fixture remains unchanged and independently verified.",
+          "resources": "One active backend per performance cell, 4 CPUs/6 GiB/no swap. Each Go actor has 1 CPU/512 MiB/no swap; 1 analytical actor alone or 3 actors with mutations. Whole-store counters include the retained immutable base fixture as well as mutable data, receipts, indexes, WAL and engine files.",
+          "limits": "Single Docker VM, no HA/replica/sharding claim. Same-key multi-writer conflicts, arbitrary update effects, permanent deletes, verified OS-cold access, open-loop saturation, disk EIO/full and physical power-loss recovery are unqualified. CedarDB engine source is closed; inspect versioned public APIs, shipped configuration and pinned pgx/PostgreSQL source."
+        },
+        "contract": "Synchronous repeatable-read transactions. Each paired UPDATE or DELETE/reinsert and its native receipt commit atomically. External intent/ACK journal; no mutation retries. Whole group totals stay fixed while actual queried bodies change.",
+        "source_sha256": {
+          "mutable_lab.py": "ed1c6086064bf1e89115f03c7b18507f7d0a7a4c0e38a1a50de85214a7895bb9",
+          "mutable_oracle.py": "3838c142113531416d133cc6586e185398829f76b753138a8b95a4659a622563",
+          "mutable-contract.json": "3d554f4ef76142c041499fce6134ee171f9be498e6900f81018320b8eb805eea",
+          "control.py": "1b5ba9c14c8be30b6962be5d1481c5b9593c02d61fb43fcc9075b68d72dbcb83",
+          "resources.py": "70e07d69204e91815a1739831ab998bec7efdb59f2c2042cbc3071be32fc72ea",
+          "docker-compose.yml": "04306e322b6d792f6eee0eba05c4b548808e4e4d77112e33ea0d1afb3b82f09b",
+          "orders-workload/analytics.go": "7c877b4ff3c713c7979f750abfe50f9b8cd7004e00da5691f9d724d653d4abaf",
+          "orders-workload/analytics_test.go": "0a40aeeb571efef90e3e3827bc80b8dd557bca1b4ada3838f41e88569c4d96a6",
+          "orders-workload/main.go": "240286bc6ddac85f525cc7d77ffe313f3f9602835b33c163e6e67b0da75af576",
+          "orders-workload/mutable.go": "adf0a77169041245785ee38ea414333d821af02bdeb70fbdf4451dd0fd657fad",
+          "orders-workload/mutable_test.go": "87872c937f2b206d350d772524129a004543fac521f6f0780064215e0d95d0e5",
+          "orders-workload/process_test.go": "178ba50732f8ae3f9b3701eff7de4f70098be3bcdbd9e022a482694f835eb4d6",
+          "orders-workload/go.mod": "640974387b995fa723f98e37f36c28ad67eba09cc0ddb5f13f24dbef24e46916",
+          "orders-workload/go.sum": "4e7e05768d607a1cc09d1dbe92d138751e9111200e8eadf2be5d7c99b189e834",
+          "orders-workload/Dockerfile": "25b508b62456be94d2e63608a3314c93aa46633e620837465a703e61ed0c5bc9"
+        }
+      },
+      "backend": "cedar",
+      "crash": true,
+      "proof": {
+        "seed_rows_verified": 10000,
+        "intents": 1105,
+        "acknowledged_transactions": 921,
+        "committed_transactions": 921,
+        "applied_unacknowledged_intents": 0,
+        "acknowledged_loss": 0,
+        "wrong_duplicate_or_partial_rows": 0,
+        "groups_verified": 100,
+        "last_committed_seq": 1105,
+        "row_export_sha256": "9797db743397c431d4a1e707c8abcbd9214d356328174a0a0fcaf56f4a5eb1d0",
+        "receipt_export_sha256": "afd29f25b264baabf7dec752da0ce8cd022c4f7c7a4b0c6907d06dee01cb5809",
+        "read_history": {
+          "successful_snapshots": 368,
+          "requests": 481,
+          "mismatches": 0,
+          "ack_lower_bound_clock_guard_ms": 10,
+          "scope": "Four-body repeatable-read snapshots and prior-ACK watermark lower bounds; shared-VM UTC with a conservative guard, not a general linearizability proof"
+        },
+        "compression": [
+          {
+            "file": "rows.csv",
+            "codec": "gzip",
+            "level": 1,
+            "source_bytes": 2746563,
+            "archive_bytes": 607310,
+            "ratio": 4.522505804284467,
+            "wall_ns": 7770041,
+            "cpu_ns": 7764000,
+            "scope": "Off-path CSV compressibility, not native engine compression"
+          },
+          {
+            "file": "receipts.csv",
+            "codec": "gzip",
+            "level": 1,
+            "source_bytes": 23053,
+            "archive_bytes": 3095,
+            "ratio": 7.448465266558966,
+            "wall_ns": 138083,
+            "cpu_ns": 138000,
+            "scope": "Off-path CSV compressibility, not native engine compression"
+          }
+        ]
+      },
+      "phases": {
+        "baseline": {
+          "writer": {
+            "ok": {
+              "count": 256,
+              "rate": 50.00576238277458,
+              "p50_ms": 5.6229165,
+              "p99_ms": 10.844708
+            },
+            "fail": {
+              "count": 0,
+              "rate": 0.0,
+              "p50_ms": null,
+              "p99_ms": null
+            },
+            "ambiguous": {
+              "count": 0,
+              "rate": 0.0,
+              "p50_ms": null,
+              "p99_ms": null
+            },
+            "mismatch": {
+              "count": 0,
+              "rate": 0.0,
+              "p50_ms": null,
+              "p99_ms": null
+            }
+          },
+          "reader": {
+            "ok": {
+              "count": 103,
+              "rate": 20.119505958694457,
+              "p50_ms": 1.609667,
+              "p99_ms": 3.65125
+            },
+            "fail": {
+              "count": 0,
+              "rate": 0.0,
+              "p50_ms": null,
+              "p99_ms": null
+            },
+            "ambiguous": {
+              "count": 0,
+              "rate": 0.0,
+              "p50_ms": null,
+              "p99_ms": null
+            },
+            "mismatch": {
+              "count": 0,
+              "rate": 0.0,
+              "p50_ms": null,
+              "p99_ms": null
+            }
+          }
+        },
+        "outage": {
+          "writer": {
+            "ok": {
+              "count": 0,
+              "rate": 0.0,
+              "p50_ms": null,
+              "p99_ms": null
+            },
+            "fail": {
+              "count": 159,
+              "rate": 31.051054769178368,
+              "p50_ms": 5.273583,
+              "p99_ms": 9.411667
+            },
+            "ambiguous": {
+              "count": 0,
+              "rate": 0.0,
+              "p50_ms": null,
+              "p99_ms": null
+            },
+            "mismatch": {
+              "count": 0,
+              "rate": 0.0,
+              "p50_ms": null,
+              "p99_ms": null
+            }
+          },
+          "reader": {
+            "ok": {
+              "count": 0,
+              "rate": 0.0,
+              "p50_ms": null,
+              "p99_ms": null
+            },
+            "fail": {
+              "count": 102,
+              "rate": 19.91954456890688,
+              "p50_ms": 5.4651250000000005,
+              "p99_ms": 9.609875
+            },
+            "ambiguous": {
+              "count": 0,
+              "rate": 0.0,
+              "p50_ms": null,
+              "p99_ms": null
+            },
+            "mismatch": {
+              "count": 0,
+              "rate": 0.0,
+              "p50_ms": null,
+              "p99_ms": null
+            }
+          }
+        },
+        "recovered": {
+          "writer": {
+            "ok": {
+              "count": 504,
+              "rate": 50.00469290074248,
+              "p50_ms": 5.7297285,
+              "p99_ms": 9.886917
+            },
+            "fail": {
+              "count": 0,
+              "rate": 0.0,
+              "p50_ms": null,
+              "p99_ms": null
+            },
+            "ambiguous": {
+              "count": 0,
+              "rate": 0.0,
+              "p50_ms": null,
+              "p99_ms": null
+            },
+            "mismatch": {
+              "count": 0,
+              "rate": 0.0,
+              "p50_ms": null,
+              "p99_ms": null
+            }
+          },
+          "reader": {
+            "ok": {
+              "count": 201,
+              "rate": 19.942347763986582,
+              "p50_ms": 1.792,
+              "p99_ms": 4.862375
+            },
+            "fail": {
+              "count": 0,
+              "rate": 0.0,
+              "p50_ms": null,
+              "p99_ms": null
+            },
+            "ambiguous": {
+              "count": 0,
+              "rate": 0.0,
+              "p50_ms": null,
+              "p99_ms": null
+            },
+            "mismatch": {
+              "count": 0,
+              "rate": 0.0,
+              "p50_ms": null,
+              "p99_ms": null
+            }
+          }
+        }
+      },
+      "resources": {
+        "cedar": {
+          "samples": 26,
+          "unavailable_samples": 0,
+          "observed_cpu_core_seconds": 3.7858579999999997,
+          "average_cpu_percent_one_core_100_observed_intervals": 14.655201012756503,
+          "cpu_percent_one_core_100_min_max": [
+            0.0,
+            29.91257459646448
+          ],
+          "sampled_charged_memory_bytes_min_mean_max": [
+            128237568,
+            137473267.80952382,
+            149151744
+          ],
+          "observed_counter_resets": 1,
+          "io_and_network": {
+            "block_254:0_read_bytes": {
+              "observed_delta": 22269952,
+              "observed_seconds": 26.910512,
+              "per_second": 827555.8636714158,
+              "counter_resets": 0
+            },
+            "block_254:0_write_bytes": {
+              "observed_delta": 24072192,
+              "observed_seconds": 20.696419,
+              "per_second": 1163109.0383317037,
+              "counter_resets": 1
+            },
+            "network_eth0_rx_bytes": {
+              "observed_delta": 1504027,
+              "observed_seconds": 20.696419,
+              "per_second": 72670.8808900709,
+              "counter_resets": 1
+            },
+            "network_eth0_tx_bytes": {
+              "observed_delta": 3935212,
+              "observed_seconds": 20.696419,
+              "per_second": 190139.75316212917,
+              "counter_resets": 1
+            }
+          },
+          "io_scope": "Kernel per-device and per-interface counters, with reset intervals excluded. Missing fields are unavailable, not zero. Do not sum stacked devices or both endpoints into physical traffic; raw counters remain authoritative.",
+          "sampled_disk_bytes_min_max": {
+            "/var/lib/cedardb/data/database": {
+              "logical_bytes": [
+                19630795,
+                37158179
+              ],
+              "allocated_bytes": [
+                1622851584,
+                1630208000
+              ]
+            },
+            "/backups": {
+              "logical_bytes": [
+                0,
+                0
+              ],
+              "allocated_bytes": [
+                4096,
+                4096
+              ]
+            }
+          },
+          "scope": "About 1s cadence. CPU covers deltas between usable native samples; restart/reset intervals and initial/final partial intervals are excluded, not estimated. Raw block I/O and all native fields remain in JSONL. This is not process RSS or a complete CPU total across crashes."
+        },
+        "reader": {
+          "samples": 22,
+          "unavailable_samples": 2,
+          "observed_cpu_core_seconds": 0.194417,
+          "average_cpu_percent_one_core_100_observed_intervals": 0.8614281380303707,
+          "cpu_percent_one_core_100_min_max": [
+            0.636572347261066,
+            1.3773911553299176
+          ],
+          "sampled_charged_memory_bytes_min_mean_max": [
+            3178496,
+            7025012.363636363,
+            8564736
+          ],
+          "observed_counter_resets": 0,
+          "io_and_network": {
+            "network_eth0_rx_bytes": {
+              "observed_delta": 577430,
+              "observed_seconds": 22.569149,
+              "per_second": 25584.925687716448,
+              "counter_resets": 0
+            },
+            "network_eth0_tx_bytes": {
+              "observed_delta": 253293,
+              "observed_seconds": 22.569149,
+              "per_second": 11222.975221617793,
+              "counter_resets": 0
+            }
+          },
+          "io_scope": "Kernel per-device and per-interface counters, with reset intervals excluded. Missing fields are unavailable, not zero. Do not sum stacked devices or both endpoints into physical traffic; raw counters remain authoritative.",
+          "sampled_disk_bytes_min_max": {},
+          "scope": "About 1s cadence. CPU covers deltas between usable native samples; restart/reset intervals and initial/final partial intervals are excluded, not estimated. Raw block I/O and all native fields remain in JSONL. This is not process RSS or a complete CPU total across crashes."
+        },
+        "writer": {
+          "samples": 22,
+          "unavailable_samples": 2,
+          "observed_cpu_core_seconds": 0.5550989999999999,
+          "average_cpu_percent_one_core_100_observed_intervals": 2.459485758749843,
+          "cpu_percent_one_core_100_min_max": [
+            0.0,
+            3.2890713358187074
+          ],
+          "sampled_charged_memory_bytes_min_mean_max": [
+            5423104,
+            8075822.545454546,
+            9592832
+          ],
+          "observed_counter_resets": 0,
+          "io_and_network": {
+            "network_eth0_rx_bytes": {
+              "observed_delta": 460354,
+              "observed_seconds": 22.569718,
+              "per_second": 20396.97616071233,
+              "counter_resets": 0
+            },
+            "network_eth0_tx_bytes": {
+              "observed_delta": 1150303,
+              "observed_seconds": 22.569718,
+              "per_second": 50966.6536374092,
+              "counter_resets": 0
+            }
+          },
+          "io_scope": "Kernel per-device and per-interface counters, with reset intervals excluded. Missing fields are unavailable, not zero. Do not sum stacked devices or both endpoints into physical traffic; raw counters remain authoritative.",
+          "sampled_disk_bytes_min_max": {},
+          "scope": "About 1s cadence. CPU covers deltas between usable native samples; restart/reset intervals and initial/final partial intervals are excluded, not estimated. Raw block I/O and all native fields remain in JSONL. This is not process RSS or a complete CPU total across crashes."
+        }
+      },
+      "actors": {
+        "writer": {
+          "native_process": {
+            "children_peak_rss_kib": 0,
+            "children_system_cpu_seconds": 0,
+            "children_user_cpu_seconds": 0,
+            "cpu.max": "100000 100000\n",
+            "cpu.stat": "usage_usec 607434\nuser_usec 266096\nsystem_usec 341337\nnice_usec 0\nnr_periods 223\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+            "cpu_percent_one_core_100_self_and_reaped_children": 2.479429747496229,
+            "io.stat": "",
+            "kind": "process-resources",
+            "main_cpu_seconds_self_and_reaped_children": 0.597255,
+            "main_wall_seconds": 24.088401803,
+            "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n",
+            "memory.max": "536870912\n",
+            "memory.peak": "10387456\n",
+            "memory.swap.max": "0\n",
+            "peak_rss_kib": 13884,
+            "scope": "Linux Docker process lifetime; CPU covers all Go threads. Native cgroup peaks include charged cache/kernel memory.",
+            "system_cpu_seconds": 0.339874,
+            "timing_scope": "Main wall time and CPU deltas bracket the operation and connection close; process-lifetime totals separately include runtime startup. Rusage/timer calls add small measurement overhead; native counters are sampled before final JSON/exit. Cgroup counters include parent/children; do not add them to process CPU again.",
+            "user_cpu_seconds": 0.266388
+          },
+          "operations": {
+            "delete-reinsert": {
+              "ok": {
+                "count": 460,
+                "rate": 19.145002171041998,
+                "p50_ms": 5.753313,
+                "p99_ms": 11.139709
+              },
+              "fail": {
+                "count": 91,
+                "rate": 3.787380864271352,
+                "p50_ms": 5.18725,
+                "p99_ms": 12.360083
+              },
+              "ambiguous": {
+                "count": 1,
+                "rate": 0.04161956993704782,
+                "p50_ms": 10.312375,
+                "p99_ms": 10.312375
+              },
+              "mismatch": {
+                "count": 0,
+                "rate": 0.0,
+                "p50_ms": null,
+                "p99_ms": null
+              }
+            },
+            "paired-update": {
+              "ok": {
+                "count": 461,
+                "rate": 19.15725692860715,
+                "p50_ms": 5.504291,
+                "p99_ms": 10.947375
+              },
+              "fail": {
+                "count": 92,
+                "rate": 3.8231402113489326,
+                "p50_ms": 5.172499999999999,
+                "p99_ms": 2003.355418
+              },
+              "ambiguous": {
+                "count": 0,
+                "rate": 0.0,
+                "p50_ms": null,
+                "p99_ms": null
+              },
+              "mismatch": {
+                "count": 0,
+                "rate": 0.0,
+                "p50_ms": null,
+                "p99_ms": null
+              }
+            }
+          }
+        },
+        "reader": {
+          "native_process": {
+            "children_peak_rss_kib": 0,
+            "children_system_cpu_seconds": 0,
+            "children_user_cpu_seconds": 0,
+            "cpu.max": "100000 100000\n",
+            "cpu.stat": "usage_usec 216946\nuser_usec 113108\nsystem_usec 103837\nnice_usec 0\nnr_periods 227\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+            "cpu_percent_one_core_100_self_and_reaped_children": 0.8544439706353093,
+            "io.stat": "",
+            "kind": "process-resources",
+            "main_cpu_seconds_self_and_reaped_children": 0.205795,
+            "main_wall_seconds": 24.085253928,
+            "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n",
+            "memory.max": "536870912\n",
+            "memory.peak": "9158656\n",
+            "memory.swap.max": "0\n",
+            "peak_rss_kib": 14176,
+            "scope": "Linux Docker process lifetime; CPU covers all Go threads. Native cgroup peaks include charged cache/kernel memory.",
+            "system_cpu_seconds": 0.101375,
+            "timing_scope": "Main wall time and CPU deltas bracket the operation and connection close; process-lifetime totals separately include runtime startup. Rusage/timer calls add small measurement overhead; native counters are sampled before final JSON/exit. Cgroup counters include parent/children; do not add them to process CPU again.",
+            "user_cpu_seconds": 0.114516
+          },
+          "operations": {
+            "snapshot-recent-and-historical": {
+              "ok": {
+                "count": 368,
+                "rate": 15.33293994950937,
+                "p50_ms": 1.6984785,
+                "p99_ms": 4.862375
+              },
+              "fail": {
+                "count": 113,
+                "rate": 4.7082125388439096,
+                "p50_ms": 5.334458,
+                "p99_ms": 9.609875
+              },
+              "ambiguous": {
+                "count": 0,
+                "rate": 0.0,
+                "p50_ms": null,
+                "p99_ms": null
+              },
+              "mismatch": {
+                "count": 0,
+                "rate": 0.0,
+                "p50_ms": null,
+                "p99_ms": null
+              }
+            }
+          }
+        }
+      },
+      "native_after": {
+        "pid1_memory_bytes": {
+          "VmRSS": 25309184,
+          "VmHWM": 25309184
+        },
+        "pid1_status": "Name:\tcedardb\nUmask:\t0022\nState:\tS (sleeping)\nTgid:\t1\nNgid:\t0\nPid:\t1\nPPid:\t0\nTracerPid:\t0\nUid:\t999\t999\t999\t999\nGid:\t999\t999\t999\t999\nFDSize:\t256\nGroups:\t \nNStgid:\t1\nNSpid:\t1\nNSpgid:\t1\nNSsid:\t1\nKthread:\t0\nVmPeak:\t  102792 kB\nVmSize:\t  102792 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t   24716 kB\nVmRSS:\t   24716 kB\nRssAnon:\t    4628 kB\nRssFile:\t   20088 kB\nRssShmem:\t       0 kB\nVmData:\t    4988 kB\nVmStk:\t     132 kB\nVmExe:\t   58368 kB\nVmLib:\t    2576 kB\nVmPTE:\t     180 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffff\nThreads:\t1\nSigQ:\t0/99998\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000000000000\nSigCgt:\t0000000000004003\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t00000000a80425fb\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t2\nSeccomp_filters:\t1\nSpeculation_Store_Bypass:\tvulnerable\nSpeculationIndirectBranch:\tunknown\nCpus_allowed:\t7ff\nCpus_allowed_list:\t0-10\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t30\nnonvoluntary_ctxt_switches:\t2\n",
+        "pid1_memory_scope": "Linux /proc/1/status snapshot and lifetime high-water RSS for PID 1 only. Both databases have additional processes: the live CedarDB audit found a much larger second cedardb process, and PostgreSQL has backend/worker processes. PID 1 RSS is not whole-engine RSS. Use cgroup charged memory for whole-database comparisons; RSS is not heap size.",
+        "database_logical_bytes": 29494267,
+        "database_allocated_bytes": 1630208000,
+        "cgroup_peak_memory_bytes_since_last_start": 145489920,
+        "native_compression": {
+          "available": true,
+          "query": "SELECT v.attributename,v.encoding,v.generalcompression,v.uncompressedsize,v.encodedsize,v.compressedsize FROM cedardb_compression_info v JOIN pg_class c ON c.oid=v.oid JOIN pg_namespace n ON n.oid=c.relnamespace WHERE c.relname='mutable_orders' AND n.nspname='mutable_7d1c8f1f825a43ed9b38f647a2902ed7'",
+          "scope": "Native cold-column statistics for this case's mutable_orders; empty rows do not establish no compression",
+          "records": [
+            {
+              "children_peak_rss_kib": 0,
+              "children_system_cpu_seconds": 0,
+              "children_user_cpu_seconds": 0,
+              "cpu.max": "100000 100000\n",
+              "cpu.stat": "usage_usec 11195\nuser_usec 6997\nsystem_usec 4198\nnice_usec 0\nnr_periods 1\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+              "cpu_percent_one_core_100_self_and_reaped_children": 4.892209112913728,
+              "io.stat": "",
+              "kind": "process-resources",
+              "main_cpu_seconds_self_and_reaped_children": 0.0015539999999999998,
+              "main_wall_seconds": 0.031764791,
+              "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n",
+              "memory.max": "536870912\n",
+              "memory.peak": "6979584\n",
+              "memory.swap.max": "0\n",
+              "peak_rss_kib": 13956,
+              "scope": "Linux Docker process lifetime; CPU covers all Go threads. Native cgroup peaks include charged cache/kernel memory.",
+              "system_cpu_seconds": 0.002906,
+              "timing_scope": "Main wall time and CPU deltas bracket the operation and connection close; process-lifetime totals separately include runtime startup. Rusage/timer calls add small measurement overhead; native counters are sampled before final JSON/exit. Cgroup counters include parent/children; do not add them to process CPU again.",
+              "user_cpu_seconds": 0.007267
+            }
+          ]
+        },
+        "native_counter_text": "__memory.peak\n145489920\n__cpu.stat\nusage_usec 2733010\nuser_usec 2145461\nsystem_usec 587548\nnice_usec 0\nnr_periods 144\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n__io.stat\n254:0 rbytes=31211520 wbytes=26042368 rios=289 wios=3957 dbytes=0 dios=0\n__memory.events\nlow 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n__DISK\n29494267\t/var/lib/cedardb/data/database\n1630208000\t/var/lib/cedardb/data/database\n__FILESYSTEM\nFilesystem        1-blocks        Used   Available Capacity Mounted on\n/dev/vda1      83954712576 31810584576 47832440832      40% /var/lib/cedardb/data\n",
+        "image_id": "sha256:1f9601c215afa8f9c0fa72a3d8b288364994e55abe8ef51cfff77921ea33c1d0",
+        "image_reference": "cedardb/cedardb:v2026-11-18@sha256:1f9601c215afa8f9c0fa72a3d8b288364994e55abe8ef51cfff77921ea33c1d0",
+        "cpus": 4.0,
+        "memory_limit_bytes": 6442450944
+      },
+      "native_controls": {
+        "kind": "mutable-negative-controls",
+        "passed": true,
+        "readonly_sqlstate": "25006",
+        "rollback_sqlstate": "22012"
+      },
+      "raw_result_sha256": "512610c4d5b83050e918478bf39e3a571845854e62856045ae04db49862585b8"
+    },
+    {
+      "source_directory": "results/mutable/b199bafeb5524ba49f58ed0f7ff04eb9",
+      "config": {
+        "created_ns": 1795309344055264000,
+        "backend": "postgres",
+        "identity": "b199bafeb5524ba49f58ed0f7ff04eb9",
+        "generation": "570e83ea57dd4059a0ece283e2a36c98",
+        "rows": 10000,
+        "pairs": 8,
+        "writer_rate": 50,
+        "reader_rate": 20,
+        "backend_contract": {
+          "operations": [
+            "paired row UPDATE",
+            "paired DELETE and reinsert",
+            "transactional native receipt",
+            "four-body repeatable-read snapshot",
+            "100-bucket analytical aggregate",
+            "ordered full-row and receipt export"
+          ],
+          "consistency": "CedarDB snapshot isolation and PostgreSQL REPEATABLE READ for mutation/read transactions. Analytical SELECTs are individually snapshot-consistent. No serializable, multi-writer conflict or general linearizability claim.",
+          "atomicity": "Each two-row change and its receipt are one synchronous database transaction. Group count, amount sum and payload length stay fixed, while stored bodies and revisions genuinely change.",
+          "durability": "Every connection sets/checks CedarDB async_commit=off or PostgreSQL synchronous_commit=on, fsync=on, full_page_writes=on. Retained-volume process/container crash is distinct from device/power loss.",
+          "retries": "No mutation replay. All submitted errors remain ambiguous until native receipts and complete bodies are reconciled with fsynced external intents. Later requests use new sequence IDs.",
+          "deletes": "Two rows are deleted and reinserted inside one transaction; readers must never see the transient missing pair. Permanent delete/TTL/reclamation workloads remain separate.",
+          "client": {
+            "driver": "pgx/v5 v5.7.6",
+            "protocol": "simple text",
+            "connections_per_actor": 1,
+            "statement_cache": "disabled",
+            "connect_timeout_s": 2,
+            "live_operation_timeout_s": 3,
+            "rollback_cleanup_timeout_s": 1,
+            "max_in_flight_per_actor": 1,
+            "write_rate_ceiling_per_s": 50,
+            "snapshot_read_rate_ceiling_per_s": 20,
+            "arrival": "ticker-paced closed loop; missed ticks under backpressure are not queued",
+            "tls": "disabled on the isolated lab network"
+          },
+          "data": {
+            "default_rows": 1000000,
+            "customers": 10000,
+            "groups": 100,
+            "payload_bytes": 256,
+            "types": "BIGINT PK id; INTEGER customer/amount; TEXT payload; BIGINT revision",
+            "nulls": false,
+            "mutable_pairs_default": 10000,
+            "pattern": "Each selected pair receives UPDATE then DELETE/reinsert; cycle through the configured pair window. Same analytical bucket, balanced signed amount adjustment, same payload length. One final pair remains historical and immutable.",
+            "payload": "192 bytes of repeated customer prefix plus 64 ASCII SHA256 hex characters; versioned suffix for actual mutations"
+          },
+          "oracle": "Native receipt set must include every ACK and only externally intended sequences. Replay committed sequences, then verify every seeded row/version/body and all 100 group invariants. Independent snapshots verify latest committed pair and an older untouched pair; UTC prior-ACK watermark check uses a documented 10ms guard.",
+          "namespace": "New UUID schema per case; preserve failed schemas. Drop a successful schema only after actors stop and complete external exports are fsynced/verified. Base orders fixture remains unchanged and independently verified.",
+          "resources": "One active backend per performance cell, 4 CPUs/6 GiB/no swap. Each Go actor has 1 CPU/512 MiB/no swap; 1 analytical actor alone or 3 actors with mutations. Whole-store counters include the retained immutable base fixture as well as mutable data, receipts, indexes, WAL and engine files.",
+          "limits": "Single Docker VM, no HA/replica/sharding claim. Same-key multi-writer conflicts, arbitrary update effects, permanent deletes, verified OS-cold access, open-loop saturation, disk EIO/full and physical power-loss recovery are unqualified. CedarDB engine source is closed; inspect versioned public APIs, shipped configuration and pinned pgx/PostgreSQL source."
+        },
+        "contract": "Synchronous repeatable-read transactions. Each paired UPDATE or DELETE/reinsert and its native receipt commit atomically. External intent/ACK journal; no mutation retries. Whole group totals stay fixed while actual queried bodies change.",
+        "source_sha256": {
+          "mutable_lab.py": "ed1c6086064bf1e89115f03c7b18507f7d0a7a4c0e38a1a50de85214a7895bb9",
+          "mutable_oracle.py": "3838c142113531416d133cc6586e185398829f76b753138a8b95a4659a622563",
+          "mutable-contract.json": "3d554f4ef76142c041499fce6134ee171f9be498e6900f81018320b8eb805eea",
+          "control.py": "1b5ba9c14c8be30b6962be5d1481c5b9593c02d61fb43fcc9075b68d72dbcb83",
+          "resources.py": "70e07d69204e91815a1739831ab998bec7efdb59f2c2042cbc3071be32fc72ea",
+          "docker-compose.yml": "04306e322b6d792f6eee0eba05c4b548808e4e4d77112e33ea0d1afb3b82f09b",
+          "orders-workload/analytics.go": "7c877b4ff3c713c7979f750abfe50f9b8cd7004e00da5691f9d724d653d4abaf",
+          "orders-workload/analytics_test.go": "0a40aeeb571efef90e3e3827bc80b8dd557bca1b4ada3838f41e88569c4d96a6",
+          "orders-workload/main.go": "240286bc6ddac85f525cc7d77ffe313f3f9602835b33c163e6e67b0da75af576",
+          "orders-workload/mutable.go": "adf0a77169041245785ee38ea414333d821af02bdeb70fbdf4451dd0fd657fad",
+          "orders-workload/mutable_test.go": "87872c937f2b206d350d772524129a004543fac521f6f0780064215e0d95d0e5",
+          "orders-workload/process_test.go": "178ba50732f8ae3f9b3701eff7de4f70098be3bcdbd9e022a482694f835eb4d6",
+          "orders-workload/go.mod": "640974387b995fa723f98e37f36c28ad67eba09cc0ddb5f13f24dbef24e46916",
+          "orders-workload/go.sum": "4e7e05768d607a1cc09d1dbe92d138751e9111200e8eadf2be5d7c99b189e834",
+          "orders-workload/Dockerfile": "25b508b62456be94d2e63608a3314c93aa46633e620837465a703e61ed0c5bc9"
+        }
+      },
+      "backend": "postgres",
+      "crash": true,
+      "proof": {
+        "seed_rows_verified": 10000,
+        "intents": 1101,
+        "acknowledged_transactions": 923,
+        "committed_transactions": 923,
+        "applied_unacknowledged_intents": 0,
+        "acknowledged_loss": 0,
+        "wrong_duplicate_or_partial_rows": 0,
+        "groups_verified": 100,
+        "last_committed_seq": 1100,
+        "row_export_sha256": "b723467e4e40cb57e22e708159df0615a1fa19935648acc9cafd7052f9d0506c",
+        "receipt_export_sha256": "702d76b04d3296d5d96b2403446bc2012946314be206b57dfa465ca3e9bd0cae",
+        "read_history": {
+          "successful_snapshots": 369,
+          "requests": 480,
+          "mismatches": 0,
+          "ack_lower_bound_clock_guard_ms": 10,
+          "scope": "Four-body repeatable-read snapshots and prior-ACK watermark lower bounds; shared-VM UTC with a conservative guard, not a general linearizability proof"
+        },
+        "compression": [
+          {
+            "file": "rows.csv",
+            "codec": "gzip",
+            "level": 1,
+            "source_bytes": 2746562,
+            "archive_bytes": 607319,
+            "ratio": 4.522437137649242,
+            "wall_ns": 8120166,
+            "cpu_ns": 8109000,
+            "scope": "Off-path CSV compressibility, not native engine compression"
+          },
+          {
+            "file": "receipts.csv",
+            "codec": "gzip",
+            "level": 1,
+            "source_bytes": 23098,
+            "archive_bytes": 3112,
+            "ratio": 7.422236503856041,
+            "wall_ns": 132500,
+            "cpu_ns": 133000,
+            "scope": "Off-path CSV compressibility, not native engine compression"
+          }
+        ]
+      },
+      "phases": {
+        "baseline": {
+          "writer": {
+            "ok": {
+              "count": 253,
+              "rate": 49.948915881484844,
+              "p50_ms": 1.145875,
+              "p99_ms": 3.321417
+            },
+            "fail": {
+              "count": 0,
+              "rate": 0.0,
+              "p50_ms": null,
+              "p99_ms": null
+            },
+            "ambiguous": {
+              "count": 0,
+              "rate": 0.0,
+              "p50_ms": null,
+              "p99_ms": null
+            },
+            "mismatch": {
+              "count": 0,
+              "rate": 0.0,
+              "p50_ms": null,
+              "p99_ms": null
+            }
+          },
+          "reader": {
+            "ok": {
+              "count": 101,
+              "rate": 19.940081043596717,
+              "p50_ms": 0.715583,
+              "p99_ms": 2.501708
+            },
+            "fail": {
+              "count": 0,
+              "rate": 0.0,
+              "p50_ms": null,
+              "p99_ms": null
+            },
+            "ambiguous": {
+              "count": 0,
+              "rate": 0.0,
+              "p50_ms": null,
+              "p99_ms": null
+            },
+            "mismatch": {
+              "count": 0,
+              "rate": 0.0,
+              "p50_ms": null,
+              "p99_ms": null
+            }
+          }
+        },
+        "outage": {
+          "writer": {
+            "ok": {
+              "count": 0,
+              "rate": 0.0,
+              "p50_ms": null,
+              "p99_ms": null
+            },
+            "fail": {
+              "count": 161,
+              "rate": 31.30293915155814,
+              "p50_ms": 5.408666,
+              "p99_ms": 9.346333
+            },
+            "ambiguous": {
+              "count": 0,
+              "rate": 0.0,
+              "p50_ms": null,
+              "p99_ms": null
+            },
+            "mismatch": {
+              "count": 0,
+              "rate": 0.0,
+              "p50_ms": null,
+              "p99_ms": null
+            }
+          },
+          "reader": {
+            "ok": {
+              "count": 0,
+              "rate": 0.0,
+              "p50_ms": null,
+              "p99_ms": null
+            },
+            "fail": {
+              "count": 102,
+              "rate": 19.831675735769753,
+              "p50_ms": 5.77225,
+              "p99_ms": 9.930833
+            },
+            "ambiguous": {
+              "count": 0,
+              "rate": 0.0,
+              "p50_ms": null,
+              "p99_ms": null
+            },
+            "mismatch": {
+              "count": 0,
+              "rate": 0.0,
+              "p50_ms": null,
+              "p99_ms": null
+            }
+          }
+        },
+        "recovered": {
+          "writer": {
+            "ok": {
+              "count": 502,
+              "rate": 50.01901120983832,
+              "p50_ms": 1.304062,
+              "p99_ms": 3.5015
+            },
+            "fail": {
+              "count": 0,
+              "rate": 0.0,
+              "p50_ms": null,
+              "p99_ms": null
+            },
+            "ambiguous": {
+              "count": 0,
+              "rate": 0.0,
+              "p50_ms": null,
+              "p99_ms": null
+            },
+            "mismatch": {
+              "count": 0,
+              "rate": 0.0,
+              "p50_ms": null,
+              "p99_ms": null
+            }
+          },
+          "reader": {
+            "ok": {
+              "count": 201,
+              "rate": 20.027532376847613,
+              "p50_ms": 0.776083,
+              "p99_ms": 2.126834
+            },
+            "fail": {
+              "count": 0,
+              "rate": 0.0,
+              "p50_ms": null,
+              "p99_ms": null
+            },
+            "ambiguous": {
+              "count": 0,
+              "rate": 0.0,
+              "p50_ms": null,
+              "p99_ms": null
+            },
+            "mismatch": {
+              "count": 0,
+              "rate": 0.0,
+              "p50_ms": null,
+              "p99_ms": null
+            }
+          }
+        }
+      },
+      "resources": {
+        "postgres": {
+          "samples": 26,
+          "unavailable_samples": 0,
+          "observed_cpu_core_seconds": 1.3680459999999999,
+          "average_cpu_percent_one_core_100_observed_intervals": 5.279039568158213,
+          "cpu_percent_one_core_100_min_max": [
+            0.0,
+            8.609390430020648
+          ],
+          "sampled_charged_memory_bytes_min_mean_max": [
+            79208448,
+            84728100.57142857,
+            90624000
+          ],
+          "observed_counter_resets": 1,
+          "io_and_network": {
+            "block_254:0_read_bytes": {
+              "observed_delta": 0,
+              "observed_seconds": 27.00588,
+              "per_second": 0.0,
+              "counter_resets": 0
+            },
+            "block_254:0_write_bytes": {
+              "observed_delta": 3788800,
+              "observed_seconds": 20.748849000000003,
+              "per_second": 182602.90004520246,
+              "counter_resets": 1
+            },
+            "network_eth0_rx_bytes": {
+              "observed_delta": 1481718,
+              "observed_seconds": 20.748849000000003,
+              "per_second": 71412.05760377357,
+              "counter_resets": 1
+            },
+            "network_eth0_tx_bytes": {
+              "observed_delta": 3927328,
+              "observed_seconds": 20.748849000000003,
+              "per_second": 189279.3185781052,
+              "counter_resets": 1
+            }
+          },
+          "io_scope": "Kernel per-device and per-interface counters, with reset intervals excluded. Missing fields are unavailable, not zero. Do not sum stacked devices or both endpoints into physical traffic; raw counters remain authoritative.",
+          "sampled_disk_bytes_min_max": {
+            "/var/lib/postgresql/data": {
+              "logical_bytes": [
+                64408979,
+                68144531
+              ],
+              "allocated_bytes": [
+                64471040,
+                68206592
+              ]
+            }
+          },
+          "scope": "About 1s cadence. CPU covers deltas between usable native samples; restart/reset intervals and initial/final partial intervals are excluded, not estimated. Raw block I/O and all native fields remain in JSONL. This is not process RSS or a complete CPU total across crashes."
+        },
+        "reader": {
+          "samples": 22,
+          "unavailable_samples": 2,
+          "observed_cpu_core_seconds": 0.21249899999999997,
+          "average_cpu_percent_one_core_100_observed_intervals": 0.9373502989389585,
+          "cpu_percent_one_core_100_min_max": [
+            0.7087327740474711,
+            1.5107323122063678
+          ],
+          "sampled_charged_memory_bytes_min_mean_max": [
+            3145728,
+            7021661.090909091,
+            8572928
+          ],
+          "observed_counter_resets": 0,
+          "io_and_network": {
+            "network_eth0_rx_bytes": {
+              "observed_delta": 586906,
+              "observed_seconds": 22.67018,
+              "per_second": 25888.898985363154,
+              "counter_resets": 0
+            },
+            "network_eth0_tx_bytes": {
+              "observed_delta": 257677,
+              "observed_seconds": 22.67018,
+              "per_second": 11366.341158296935,
+              "counter_resets": 0
+            }
+          },
+          "io_scope": "Kernel per-device and per-interface counters, with reset intervals excluded. Missing fields are unavailable, not zero. Do not sum stacked devices or both endpoints into physical traffic; raw counters remain authoritative.",
+          "sampled_disk_bytes_min_max": {},
+          "scope": "About 1s cadence. CPU covers deltas between usable native samples; restart/reset intervals and initial/final partial intervals are excluded, not estimated. Raw block I/O and all native fields remain in JSONL. This is not process RSS or a complete CPU total across crashes."
+        },
+        "writer": {
+          "samples": 22,
+          "unavailable_samples": 2,
+          "observed_cpu_core_seconds": 0.6472929999999998,
+          "average_cpu_percent_one_core_100_observed_intervals": 2.855099886350534,
+          "cpu_percent_one_core_100_min_max": [
+            0.0,
+            4.608455352652388
+          ],
+          "sampled_charged_memory_bytes_min_mean_max": [
+            3301376,
+            7975284.363636363,
+            9490432
+          ],
+          "observed_counter_resets": 0,
+          "io_and_network": {
+            "network_eth0_rx_bytes": {
+              "observed_delta": 467323,
+              "observed_seconds": 22.671465999999995,
+              "per_second": 20612.826713543804,
+              "counter_resets": 0
+            },
+            "network_eth0_tx_bytes": {
+              "observed_delta": 1165954,
+              "observed_seconds": 22.671465999999995,
+              "per_second": 51428.25788151504,
+              "counter_resets": 0
+            }
+          },
+          "io_scope": "Kernel per-device and per-interface counters, with reset intervals excluded. Missing fields are unavailable, not zero. Do not sum stacked devices or both endpoints into physical traffic; raw counters remain authoritative.",
+          "sampled_disk_bytes_min_max": {},
+          "scope": "About 1s cadence. CPU covers deltas between usable native samples; restart/reset intervals and initial/final partial intervals are excluded, not estimated. Raw block I/O and all native fields remain in JSONL. This is not process RSS or a complete CPU total across crashes."
+        }
+      },
+      "actors": {
+        "writer": {
+          "native_process": {
+            "children_peak_rss_kib": 0,
+            "children_system_cpu_seconds": 0,
+            "children_user_cpu_seconds": 0,
+            "cpu.max": "100000 100000\n",
+            "cpu.stat": "usage_usec 692935\nuser_usec 334568\nsystem_usec 358366\nnice_usec 0\nnr_periods 223\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+            "cpu_percent_one_core_100_self_and_reaped_children": 2.819258989303721,
+            "io.stat": "",
+            "kind": "process-resources",
+            "main_cpu_seconds_self_and_reaped_children": 0.6766960000000001,
+            "main_wall_seconds": 24.002619219,
+            "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n",
+            "memory.max": "536870912\n",
+            "memory.peak": "10285056\n",
+            "memory.swap.max": "0\n",
+            "peak_rss_kib": 14408,
+            "scope": "Linux Docker process lifetime; CPU covers all Go threads. Native cgroup peaks include charged cache/kernel memory.",
+            "system_cpu_seconds": 0.35531,
+            "timing_scope": "Main wall time and CPU deltas bracket the operation and connection close; process-lifetime totals separately include runtime startup. Rusage/timer calls add small measurement overhead; native counters are sampled before final JSON/exit. Cgroup counters include parent/children; do not add them to process CPU again.",
+            "user_cpu_seconds": 0.334658
+          },
+          "operations": {
+            "delete-reinsert": {
+              "ok": {
+                "count": 461,
+                "rate": 19.25342589566375,
+                "p50_ms": 1.269416,
+                "p99_ms": 4.682209
+              },
+              "fail": {
+                "count": 89,
+                "rate": 3.7170388388591618,
+                "p50_ms": 5.24425,
+                "p99_ms": 2002.025668
+              },
+              "ambiguous": {
+                "count": 0,
+                "rate": 0.0,
+                "p50_ms": null,
+                "p99_ms": null
+              },
+              "mismatch": {
+                "count": 0,
+                "rate": 0.0,
+                "p50_ms": null,
+                "p99_ms": null
+              }
+            },
+            "paired-update": {
+              "ok": {
+                "count": 462,
+                "rate": 19.26701026374597,
+                "p50_ms": 1.183875,
+                "p99_ms": 3.912333
+              },
+              "fail": {
+                "count": 89,
+                "rate": 3.711610202323358,
+                "p50_ms": 5.385791,
+                "p99_ms": 9.660583
+              },
+              "ambiguous": {
+                "count": 0,
+                "rate": 0.0,
+                "p50_ms": null,
+                "p99_ms": null
+              },
+              "mismatch": {
+                "count": 0,
+                "rate": 0.0,
+                "p50_ms": null,
+                "p99_ms": null
+              }
+            }
+          }
+        },
+        "reader": {
+          "native_process": {
+            "children_peak_rss_kib": 0,
+            "children_system_cpu_seconds": 0,
+            "children_user_cpu_seconds": 0,
+            "cpu.max": "100000 100000\n",
+            "cpu.stat": "usage_usec 232441\nuser_usec 100102\nsystem_usec 132338\nnice_usec 0\nnr_periods 232\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+            "cpu_percent_one_core_100_self_and_reaped_children": 0.9269414947439363,
+            "io.stat": "",
+            "kind": "process-resources",
+            "main_cpu_seconds_self_and_reaped_children": 0.222556,
+            "main_wall_seconds": 24.009713802,
+            "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n",
+            "memory.max": "536870912\n",
+            "memory.peak": "9236480\n",
+            "memory.swap.max": "0\n",
+            "peak_rss_kib": 13784,
+            "scope": "Linux Docker process lifetime; CPU covers all Go threads. Native cgroup peaks include charged cache/kernel memory.",
+            "system_cpu_seconds": 0.13018,
+            "timing_scope": "Main wall time and CPU deltas bracket the operation and connection close; process-lifetime totals separately include runtime startup. Rusage/timer calls add small measurement overhead; native counters are sampled before final JSON/exit. Cgroup counters include parent/children; do not add them to process CPU again.",
+            "user_cpu_seconds": 0.10106
+          },
+          "operations": {
+            "snapshot-recent-and-historical": {
+              "ok": {
+                "count": 369,
+                "rate": 15.406751658300005,
+                "p50_ms": 0.758584,
+                "p99_ms": 2.696
+              },
+              "fail": {
+                "count": 111,
+                "rate": 4.634551311846343,
+                "p50_ms": 5.738625,
+                "p99_ms": 9.930833
+              },
+              "ambiguous": {
+                "count": 0,
+                "rate": 0.0,
+                "p50_ms": null,
+                "p99_ms": null
+              },
+              "mismatch": {
+                "count": 0,
+                "rate": 0.0,
+                "p50_ms": null,
+                "p99_ms": null
+              }
+            }
+          }
+        }
+      },
+      "native_after": {
+        "pid1_memory_bytes": {
+          "VmRSS": 83632128,
+          "VmHWM": 83632128
+        },
+        "pid1_status": "Name:\tpostgres\nUmask:\t0077\nState:\tS (sleeping)\nTgid:\t1\nNgid:\t0\nPid:\t1\nPPid:\t0\nTracerPid:\t0\nUid:\t999\t999\t999\t999\nGid:\t999\t999\t999\t999\nFDSize:\t1024\nGroups:\t101 \nNStgid:\t1\nNSpid:\t1\nNSpgid:\t1\nNSsid:\t1\nKthread:\t0\nVmPeak:\t 2261692 kB\nVmSize:\t 2261692 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t   81672 kB\nVmRSS:\t   81672 kB\nRssAnon:\t    2384 kB\nRssFile:\t   15432 kB\nRssShmem:\t   63856 kB\nVmData:\t    1640 kB\nVmStk:\t     132 kB\nVmExe:\t    9396 kB\nVmLib:\t   57636 kB\nVmPTE:\t     284 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffff\nThreads:\t1\nSigQ:\t0/99998\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\t0000000000400000\nSigIgn:\t0000000001303000\nSigCgt:\t0000000000014a07\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t00000000a80425fb\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t2\nSeccomp_filters:\t1\nSpeculation_Store_Bypass:\tvulnerable\nSpeculationIndirectBranch:\tunknown\nCpus_allowed:\t7ff\nCpus_allowed_list:\t0-10\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t87\nnonvoluntary_ctxt_switches:\t4\n",
+        "pid1_memory_scope": "Linux /proc/1/status snapshot and lifetime high-water RSS for PID 1 only. Both databases have additional processes: the live CedarDB audit found a much larger second cedardb process, and PostgreSQL has backend/worker processes. PID 1 RSS is not whole-engine RSS. Use cgroup charged memory for whole-database comparisons; RSS is not heap size.",
+        "database_logical_bytes": 68144531,
+        "database_allocated_bytes": 68206592,
+        "cgroup_peak_memory_bytes_since_last_start": 88727552,
+        "native_compression": {
+          "available": true,
+          "query": "SELECT coalesce(pg_column_compression(payload),'none'),count(*),sum(pg_column_size(payload)) FROM \"mutable_b199bafeb5524ba49f58ed0f7ff04eb9\".mutable_orders GROUP BY pg_column_compression(payload)",
+          "scope": "Actual mutable payload storage/compression; tuple, index, receipt, WAL and base fixture bytes are separate",
+          "records": [
+            [
+              "none",
+              10000,
+              2600000
+            ],
+            {
+              "children_peak_rss_kib": 0,
+              "children_system_cpu_seconds": 0,
+              "children_user_cpu_seconds": 0,
+              "cpu.max": "100000 100000\n",
+              "cpu.stat": "usage_usec 11177\nuser_usec 5588\nsystem_usec 5588\nnice_usec 0\nnr_periods 1\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+              "cpu_percent_one_core_100_self_and_reaped_children": 33.31450153864254,
+              "io.stat": "",
+              "kind": "process-resources",
+              "main_cpu_seconds_self_and_reaped_children": 0.0018180000000000002,
+              "main_wall_seconds": 0.005457083,
+              "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n",
+              "memory.max": "536870912\n",
+              "memory.peak": "7479296\n",
+              "memory.swap.max": "0\n",
+              "peak_rss_kib": 14264,
+              "scope": "Linux Docker process lifetime; CPU covers all Go threads. Native cgroup peaks include charged cache/kernel memory.",
+              "system_cpu_seconds": 0.003408,
+              "timing_scope": "Main wall time and CPU deltas bracket the operation and connection close; process-lifetime totals separately include runtime startup. Rusage/timer calls add small measurement overhead; native counters are sampled before final JSON/exit. Cgroup counters include parent/children; do not add them to process CPU again.",
+              "user_cpu_seconds": 0.006817
+            }
+          ]
+        },
+        "native_counter_text": "__memory.peak\n88727552\n__cpu.stat\nusage_usec 984255\nuser_usec 635471\nsystem_usec 348784\nnice_usec 0\nnr_periods 140\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n__io.stat\n254:0 rbytes=0 wbytes=225280 rios=0 wios=1699 dbytes=0 dios=0\n__memory.events\nlow 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n__DISK\n68144531\t/var/lib/postgresql/data\n68206592\t/var/lib/postgresql/data\n__FILESYSTEM\nFilesystem        1-blocks        Used   Available Capacity Mounted on\n/dev/vda1      83954712576 31814324224 47828701184      40% /var/lib/postgresql/data\n",
+        "image_id": "sha256:f3bd19c606e442c3d7bdfa8002e03fe260a1023351e0ea4598032022b68dd6e3",
+        "image_reference": "postgres:17.6-bookworm@sha256:f3bd19c606e442c3d7bdfa8002e03fe260a1023351e0ea4598032022b68dd6e3",
+        "cpus": 4.0,
+        "memory_limit_bytes": 6442450944
+      },
+      "native_controls": {
+        "kind": "mutable-negative-controls",
+        "passed": true,
+        "readonly_sqlstate": "25006",
+        "rollback_sqlstate": "22012"
+      },
+      "raw_result_sha256": "891a5113498121593f13175c778e2ab51800f0cfb9b7b415f3b59aa7b393133d"
+    }
+  ],
+  "diagnostic_cohort": {
+    "source_directory": "results/mutable-benchmark/c6bc02ab203f412e931eebf24a3845c4",
+    "config": {
+      "created_ns": 1795309126736437000,
+      "trials": 1,
+      "warmup_s": 2,
+      "duration_s": 10,
+      "rows": 10000,
+      "pairs": 4999,
+      "rate": 50,
+      "diagnostic_only": true,
+      "base_generation": "570e83ea57dd4059a0ece283e2a36c98",
+      "source_sha256": {
+        "mutable_benchmark.py": "6c7ec017585821a6640329dde1593855879d657d60f005874fe8f3d7a7a19484",
+        "mutable_lab.py": "ed1c6086064bf1e89115f03c7b18507f7d0a7a4c0e38a1a50de85214a7895bb9",
+        "mutable_oracle.py": "3838c142113531416d133cc6586e185398829f76b753138a8b95a4659a622563",
+        "control.py": "1b5ba9c14c8be30b6962be5d1481c5b9593c02d61fb43fcc9075b68d72dbcb83",
+        "resources.py": "70e07d69204e91815a1739831ab998bec7efdb59f2c2042cbc3071be32fc72ea",
+        "htap.py": "84e5d773ef8936b73a29a63e62ce96246ee01255ca9c65ab621c4018933e581e",
+        "docker-compose.yml": "04306e322b6d792f6eee0eba05c4b548808e4e4d77112e33ea0d1afb3b82f09b",
+        "orders-workload/Dockerfile": "25b508b62456be94d2e63608a3314c93aa46633e620837465a703e61ed0c5bc9",
+        "orders-workload/analytics.go": "7c877b4ff3c713c7979f750abfe50f9b8cd7004e00da5691f9d724d653d4abaf",
+        "orders-workload/analytics_test.go": "0a40aeeb571efef90e3e3827bc80b8dd557bca1b4ada3838f41e88569c4d96a6",
+        "orders-workload/go.mod": "640974387b995fa723f98e37f36c28ad67eba09cc0ddb5f13f24dbef24e46916",
+        "orders-workload/go.sum": "4e7e05768d607a1cc09d1dbe92d138751e9111200e8eadf2be5d7c99b189e834",
+        "orders-workload/main.go": "240286bc6ddac85f525cc7d77ffe313f3f9602835b33c163e6e67b0da75af576",
+        "orders-workload/mutable.go": "adf0a77169041245785ee38ea414333d821af02bdeb70fbdf4451dd0fd657fad",
+        "orders-workload/mutable_test.go": "87872c937f2b206d350d772524129a004543fac521f6f0780064215e0d95d0e5",
+        "orders-workload/process_test.go": "178ba50732f8ae3f9b3701eff7de4f70098be3bcdbd9e022a482694f835eb4d6",
+        "mutable-contract.json": "3d554f4ef76142c041499fce6134ee171f9be498e6900f81018320b8eb805eea"
+      },
+      "backend_contract": {
+        "operations": [
+          "paired row UPDATE",
+          "paired DELETE and reinsert",
+          "transactional native receipt",
+          "four-body repeatable-read snapshot",
+          "100-bucket analytical aggregate",
+          "ordered full-row and receipt export"
+        ],
+        "consistency": "CedarDB snapshot isolation and PostgreSQL REPEATABLE READ for mutation/read transactions. Analytical SELECTs are individually snapshot-consistent. No serializable, multi-writer conflict or general linearizability claim.",
+        "atomicity": "Each two-row change and its receipt are one synchronous database transaction. Group count, amount sum and payload length stay fixed, while stored bodies and revisions genuinely change.",
+        "durability": "Every connection sets/checks CedarDB async_commit=off or PostgreSQL synchronous_commit=on, fsync=on, full_page_writes=on. Retained-volume process/container crash is distinct from device/power loss.",
+        "retries": "No mutation replay. All submitted errors remain ambiguous until native receipts and complete bodies are reconciled with fsynced external intents. Later requests use new sequence IDs.",
+        "deletes": "Two rows are deleted and reinserted inside one transaction; readers must never see the transient missing pair. Permanent delete/TTL/reclamation workloads remain separate.",
+        "client": {
+          "driver": "pgx/v5 v5.7.6",
+          "protocol": "simple text",
+          "connections_per_actor": 1,
+          "statement_cache": "disabled",
+          "connect_timeout_s": 2,
+          "live_operation_timeout_s": 3,
+          "rollback_cleanup_timeout_s": 1,
+          "max_in_flight_per_actor": 1,
+          "write_rate_ceiling_per_s": 50,
+          "snapshot_read_rate_ceiling_per_s": 20,
+          "arrival": "ticker-paced closed loop; missed ticks under backpressure are not queued",
+          "tls": "disabled on the isolated lab network"
+        },
+        "data": {
+          "default_rows": 1000000,
+          "customers": 10000,
+          "groups": 100,
+          "payload_bytes": 256,
+          "types": "BIGINT PK id; INTEGER customer/amount; TEXT payload; BIGINT revision",
+          "nulls": false,
+          "mutable_pairs_default": 10000,
+          "pattern": "Each selected pair receives UPDATE then DELETE/reinsert; cycle through the configured pair window. Same analytical bucket, balanced signed amount adjustment, same payload length. One final pair remains historical and immutable.",
+          "payload": "192 bytes of repeated customer prefix plus 64 ASCII SHA256 hex characters; versioned suffix for actual mutations"
+        },
+        "oracle": "Native receipt set must include every ACK and only externally intended sequences. Replay committed sequences, then verify every seeded row/version/body and all 100 group invariants. Independent snapshots verify latest committed pair and an older untouched pair; UTC prior-ACK watermark check uses a documented 10ms guard.",
+        "namespace": "New UUID schema per case; preserve failed schemas. Drop a successful schema only after actors stop and complete external exports are fsynced/verified. Base orders fixture remains unchanged and independently verified.",
+        "resources": "One active backend per performance cell, 4 CPUs/6 GiB/no swap. Each Go actor has 1 CPU/512 MiB/no swap; 1 analytical actor alone or 3 actors with mutations. Whole-store counters include the retained immutable base fixture as well as mutable data, receipts, indexes, WAL and engine files.",
+        "limits": "Single Docker VM, no HA/replica/sharding claim. Same-key multi-writer conflicts, arbitrary update effects, permanent deletes, verified OS-cold access, open-loop saturation, disk EIO/full and physical power-loss recovery are unqualified. CedarDB engine source is closed; inspect versioned public APIs, shipped configuration and pinned pgx/PostgreSQL source."
+      }
+    },
+    "cells": [
+      {
+        "backend": "cedar",
+        "concurrent": false,
+        "identity": "cfa2cbf361dd4d0cb3f53c8ffce512d3",
+        "verification": {
+          "seed_rows_verified": 10000,
+          "intents": 0,
+          "acknowledged_transactions": 0,
+          "committed_transactions": 0,
+          "applied_unacknowledged_intents": 0,
+          "acknowledged_loss": 0,
+          "wrong_duplicate_or_partial_rows": 0,
+          "groups_verified": 100,
+          "last_committed_seq": 0,
+          "row_export_sha256": "31777c29e9c736d8d2580ea6d5e8f905edc78995e90ceb40c6db350f1be53039",
+          "receipt_export_sha256": "447293f1bc8f4477f4fac547aca9901383f01fe58de19665ca248f884b086956",
+          "read_history": null,
+          "compression": [
+            {
+              "file": "rows.csv",
+              "codec": "gzip",
+              "level": 1,
+              "source_bytes": 2746508,
+              "archive_bytes": 607267,
+              "ratio": 4.522735468912357,
+              "wall_ns": 7753584,
+              "cpu_ns": 7748000,
+              "scope": "Off-path CSV compressibility, not native engine compression"
+            },
+            {
+              "file": "receipts.csv",
+              "codec": "gzip",
+              "level": 1,
+              "source_bytes": 31,
+              "archive_bytes": 48,
+              "ratio": 0.6458333333333334,
+              "wall_ns": 84791,
+              "cpu_ns": 85000,
+              "scope": "Off-path CSV compressibility, not native engine compression"
+            }
+          ]
+        }
+      },
+      {
+        "backend": "postgres",
+        "concurrent": false,
+        "identity": "2e3dd59ef6c04b058b9d5d4e96ff08d2",
+        "verification": {
+          "seed_rows_verified": 10000,
+          "intents": 0,
+          "acknowledged_transactions": 0,
+          "committed_transactions": 0,
+          "applied_unacknowledged_intents": 0,
+          "acknowledged_loss": 0,
+          "wrong_duplicate_or_partial_rows": 0,
+          "groups_verified": 100,
+          "last_committed_seq": 0,
+          "row_export_sha256": "31777c29e9c736d8d2580ea6d5e8f905edc78995e90ceb40c6db350f1be53039",
+          "receipt_export_sha256": "447293f1bc8f4477f4fac547aca9901383f01fe58de19665ca248f884b086956",
+          "read_history": null,
+          "compression": [
+            {
+              "file": "rows.csv",
+              "codec": "gzip",
+              "level": 1,
+              "source_bytes": 2746508,
+              "archive_bytes": 607267,
+              "ratio": 4.522735468912357,
+              "wall_ns": 7824417,
+              "cpu_ns": 7825000,
+              "scope": "Off-path CSV compressibility, not native engine compression"
+            },
+            {
+              "file": "receipts.csv",
+              "codec": "gzip",
+              "level": 1,
+              "source_bytes": 31,
+              "archive_bytes": 48,
+              "ratio": 0.6458333333333334,
+              "wall_ns": 67916,
+              "cpu_ns": 68000,
+              "scope": "Off-path CSV compressibility, not native engine compression"
+            }
+          ]
+        }
+      },
+      {
+        "backend": "cedar",
+        "concurrent": true,
+        "identity": "8ad23142504e45c8b87872525c007da4",
+        "verification": {
+          "seed_rows_verified": 10000,
+          "intents": 668,
+          "acknowledged_transactions": 668,
+          "committed_transactions": 668,
+          "applied_unacknowledged_intents": 0,
+          "acknowledged_loss": 0,
+          "wrong_duplicate_or_partial_rows": 0,
+          "groups_verified": 100,
+          "last_committed_seq": 668,
+          "row_export_sha256": "66ea03b9ce2d5c73467c4a938d9e55af2bf7758e97a73ef8b3e29f918f3b5101",
+          "receipt_export_sha256": "edaf12caad166eda2d947392c0ec7decc244ce3a03f049278cc128fca8c72360",
+          "read_history": {
+            "successful_snapshots": 267,
+            "requests": 267,
+            "mismatches": 0,
+            "ack_lower_bound_clock_guard_ms": 10,
+            "scope": "Four-body repeatable-read snapshots and prior-ACK watermark lower bounds; shared-VM UTC with a conservative guard, not a general linearizability proof"
+          },
+          "compression": [
+            {
+              "file": "rows.csv",
+              "codec": "gzip",
+              "level": 1,
+              "source_bytes": 2747733,
+              "archive_bytes": 609246,
+              "ratio": 4.510055051654012,
+              "wall_ns": 7761500,
+              "cpu_ns": 7763000,
+              "scope": "Off-path CSV compressibility, not native engine compression"
+            },
+            {
+              "file": "receipts.csv",
+              "codec": "gzip",
+              "level": 1,
+              "source_bytes": 17739,
+              "archive_bytes": 3749,
+              "ratio": 4.731661776473726,
+              "wall_ns": 119375,
+              "cpu_ns": 119000,
+              "scope": "Off-path CSV compressibility, not native engine compression"
+            }
+          ]
+        }
+      },
+      {
+        "backend": "postgres",
+        "concurrent": true,
+        "identity": "9dfde5de20584caca4a6198f9967de1a",
+        "verification": {
+          "seed_rows_verified": 10000,
+          "intents": 667,
+          "acknowledged_transactions": 667,
+          "committed_transactions": 667,
+          "applied_unacknowledged_intents": 0,
+          "acknowledged_loss": 0,
+          "wrong_duplicate_or_partial_rows": 0,
+          "groups_verified": 100,
+          "last_committed_seq": 667,
+          "row_export_sha256": "e97b80589ecabee0688afdf866effb5da56b0a628dc219b01e8b383418a4a188",
+          "receipt_export_sha256": "863fd489c0706e953fcfb742a3ed4cf00c3c8fd65961f6e8c64b1a3244df5024",
+          "read_history": {
+            "successful_snapshots": 266,
+            "requests": 266,
+            "mismatches": 0,
+            "ack_lower_bound_clock_guard_ms": 10,
+            "scope": "Four-body repeatable-read snapshots and prior-ACK watermark lower bounds; shared-VM UTC with a conservative guard, not a general linearizability proof"
+          },
+          "compression": [
+            {
+              "file": "rows.csv",
+              "codec": "gzip",
+              "level": 1,
+              "source_bytes": 2747733,
+              "archive_bytes": 609254,
+              "ratio": 4.509995830967052,
+              "wall_ns": 8499833,
+              "cpu_ns": 8491000,
+              "scope": "Off-path CSV compressibility, not native engine compression"
+            },
+            {
+              "file": "receipts.csv",
+              "codec": "gzip",
+              "level": 1,
+              "source_bytes": 17711,
+              "archive_bytes": 3743,
+              "ratio": 4.731765963131179,
+              "wall_ns": 162625,
+              "cpu_ns": 162000,
+              "scope": "Off-path CSV compressibility, not native engine compression"
+            }
+          ]
+        }
+      }
+    ],
+    "raw_result_sha256": "fc3a137625b090d157aec9109812aaf9a20f5a476dc02daed0bae1d253e7401a"
+  },
+  "sustained_million_row_comparison": "PENDING: 3 trials per backend/traffic condition, 60s warmup and >=300s measurement",
+  "preserved_failures": {
+    "results/mutable/49187fe4bdf449678beade1b4fbab6dd": {
+      "status": "FAILED",
+      "result": {
+        "passed": false,
+        "error": "RuntimeError('unexpected request errors in a healthy mutable phase')"
+      },
+      "diagnosis": {
+        "failure": "PostgreSQL SQLSTATE 42804 in paired-update CASE amount branches",
+        "cause": "Simple-protocol parameters resolve unknown CASE branches as text; assign explicit INTEGER casts. Delete/reinsert transactions committed, UPDATEs failed.",
+        "repair": "Explicit CAST on numeric CASE branches, rebuild and run new independent cases; preserve this schema and witness.",
+        "verdict": "FAILED healthy phase, not qualified"
+      }
+    },
+    "results/mutable/2ead2f4ef6a14734a7bae01a8ad10f55": {
+      "status": "INVALIDATED",
+      "result": {
+        "qualified": false,
+        "reason": "Prototype healthy gate checked progress only and allowed PostgreSQL paired-update SQLSTATE 42804 errors. Stronger gate correctly rejects this behavior. Raw result remains unchanged; do not use its passed field as qualification."
+      }
+    }
+  },
+  "limits": [
+    "single Docker VM, no HA/power-loss/independent-disk proof",
+    "one writer, no multi-writer conflict qualification",
+    "whole-store bytes include the immutable base fixture and retained prototype-failure schema",
+    "resource counter reset intervals excluded; CPU observations are not complete totals across a crash",
+    "PID 1 RSS is not whole-database memory; use cgroups",
+    "native compression covers cold data where exposed; CSV gzip is separate",
+    "block I/O is VM/kernel accounting; physical device latency/queue depth unavailable",
+    "snapshot reads combine recent and historical resident rows, not isolated hot/warm/cold read benchmarks"
+  ],
+  "publisher_sha256": "b45ce54ad9029a1f5a4a33387cb790d11962637de3c714f6858d64373573406a"
+}

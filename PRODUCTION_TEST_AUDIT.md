@@ -15,6 +15,14 @@ execution evidence.
 
 ## Fresh qualification in this follow-up
 
+- [CedarDB/PostgreSQL mutable workload](cedardb/backup-recovery/MUTABLE.md):
+  2026-11-22 checkpoint, four 10,000-row healthy/container-SIGKILL cases verify
+  **3,036 ACKed paired UPDATE/DELETE-reinsert transactions**, zero acknowledged
+  loss or wrong/partial rows. Native read-only/rollback controls, snapshot readers,
+  complete receipt/body replay, 19 host controls and legacy regressions pass.
+  Four short benchmark-harness cells pass; the sustained million-row comparison
+  is **pending**. Preserve the PostgreSQL CASE-typing failure and invalidated
+  weak prototype; resource/storage evidence is separate from a performance claim.
 - [Rayforce native AOF segments](rayforce/duckdb-comparison/AOF_SEGMENTS.md):
   2026-11-22, 159 native files; complete 10,000/10,003-event rotation/reopen/backup
   verification and known uncommitted-tail recovery. Full scan rejects one sealed

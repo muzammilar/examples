@@ -14,7 +14,7 @@ docker-up:
 up:
 	python3 control.py up
 check-controls:
-	python3 -m unittest test_control.py test_htap.py test_htap_report.py
+	python3 -m unittest test_control.py test_htap.py test_htap_report.py test_mutable.py
 test: check-controls
 	python3 control.py test
 	python3 driver_checks.py
@@ -30,6 +30,16 @@ report:
 	python3 report.py
 benchmark-htap:
 	python3 htap.py
+
+.PHONY: test-mutable test-mutable-recovery test-mutable-benchmark benchmark-mutable
+test-mutable: check-controls
+	python3 mutable_lab.py
+test-mutable-recovery: check-controls
+	python3 mutable_lab.py --crash
+test-mutable-benchmark: check-controls
+	TRIALS=1 ANALYTICS_WARMUP_S=2 ANALYTICS_DURATION_S=10 python3 mutable_benchmark.py
+benchmark-mutable: check-controls
+	python3 mutable_benchmark.py
 report-htap:
 	@test -n "$(HTAP_RESULTS_DIR)" || { echo 'Set HTAP_RESULTS_DIR=results/htap/<run-id> from the completed benchmark'; exit 1; }
 	python3 htap_report.py "$(HTAP_RESULTS_DIR)"
