@@ -137,6 +137,18 @@ continuous production availability. The historical storage service remained
 unchanged throughout the separate current runs. The recovery increment passed
 **207 host controls**; the cold-restore/cleanup follow-up passes **209**.
 
+## Native DuckDB compaction
+
+After `make up`, run `make duckdb-maintenance` for DuckDB **2.0.1** native
+Iceberg v2 rewriting. The fresh **2,000,000-row / 10,000-customer** baseline
+passes rollback, committed **20 → 1 file** replacement, retained-snapshot,
+no-op and wrong-body controls, with independent ClickHouse/REST verification.
+The committed CALL profile is **2,149.995 ms**; all **215 controls** pass.
+CPU/memory/disk/I/O, compression, source provenance and the two preserved harness
+failures are in [`DUCKDB_MAINTENANCE.md`](DUCKDB_MAINTENANCE.md).
+Native compaction under live writers/readers and injected faults remains unrun;
+the earlier live compactor-crash pass uses Spark.
+
 ## Historical cold backup and restore
 
 The following existing checkpoint/readback results use

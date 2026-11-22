@@ -1,0 +1,643 @@
+{
+  "date": "2026-11-22",
+  "stage": "Healthy native v2 compaction and transaction correctness; live-fault qualification unfinished",
+  "passed": true,
+  "production_qualified": false,
+  "run_id": "7cdc061e-42ff-43e4-b0d9-4cca84a9d286",
+  "versions": {
+    "duckdb_cli": [
+      {
+        "engine": "v2.0.1",
+        "platform": "linux_arm64"
+      }
+    ],
+    "extensions": [
+      {
+        "extension_name": "avro",
+        "extension_version": "4176191c96",
+        "install_path": "/opt/duckdb/extensions/v2.0.1/linux_arm64/avro.duckdb_extension",
+        "loaded": true
+      },
+      {
+        "extension_name": "httpfs",
+        "extension_version": "f71cfdb4bf",
+        "install_path": "/opt/duckdb/extensions/v2.0.1/linux_arm64/httpfs.duckdb_extension",
+        "loaded": true
+      },
+      {
+        "extension_name": "iceberg",
+        "extension_version": "f979b5b28a",
+        "install_path": "/opt/duckdb/extensions/v2.0.1/linux_arm64/iceberg.duckdb_extension",
+        "loaded": true
+      }
+    ],
+    "clickhouse": "26.10.10.3",
+    "seaweedfs": "4.54 / 5ef99c1d8"
+  },
+  "environment": {
+    "context": "desktop-linux",
+    "endpoint": "unix:///Users/muzammil/.docker/run/docker.sock",
+    "daemon": {
+      "ID": "172e5e0a-2d95-4fb5-a6b4-fb16552caec8",
+      "Name": "docker-desktop",
+      "ServerVersion": "29.5.3",
+      "Architecture": "aarch64",
+      "NCPU": 11,
+      "MemTotal": 26216296448,
+      "KernelVersion": "6.12.76-linuxkit",
+      "OperatingSystem": "Docker Desktop"
+    }
+  },
+  "effective_budgets": {
+    "scope": "Post-run inspection of exact recorded containers; core process identities stayed unchanged during execution.",
+    "services": {
+      "storage": {
+        "container_id": "3fe0aab231a51014cbc5758abd290814a210d05c36fb8712a3eaf661960b795c",
+        "image_id": "sha256:4b42c212543a0acd4c0e675215ecdcaf62a186ef98def76c7e12701871222d15",
+        "cpu_limit": 1.0,
+        "memory_limit_bytes": 1073741824,
+        "memory_swap_limit_bytes": 1073741824,
+        "state": "running"
+      },
+      "clickhouse": {
+        "container_id": "95665bd78d5d20eae59e4281653645453cdfd90dd22b5fc5895c770df852ecaa",
+        "image_id": "sha256:b0784219f1821b8a9918732b8e6728dbed9246e13949c46e40d7c2a084d9ef9d",
+        "cpu_limit": 2.0,
+        "memory_limit_bytes": 1610612736,
+        "memory_swap_limit_bytes": 1610612736,
+        "state": "running"
+      },
+      "duckdb-cli": {
+        "container_id": "7a537b3b9fbe9fc38fb9ab986289a2f744775fa77b6c56ff8e3ffdf8e42c3cda",
+        "image_id": "sha256:f0dd3bdc601806f2b55d5ffc47c513a3710d82b744767c5cf633f873ec0a37e1",
+        "cpu_limit": 2.0,
+        "memory_limit_bytes": 2147483648,
+        "memory_swap_limit_bytes": 2147483648,
+        "state": "exited"
+      }
+    },
+    "whole_active_cpu_limit": 5,
+    "whole_active_memory_limit_bytes": 4831838208,
+    "host": {
+      "cpu_model": "Apple M4 Pro",
+      "logical_cpus": 14,
+      "memory_bytes": 51539607552
+    },
+    "co_tenancy": "Historical storage and an unrelated local kind control plane remained running. Functional diagnostics, not an uncontended comparison."
+  },
+  "dataset": {
+    "rows": 2000000,
+    "customers": 10000,
+    "rows_per_customer": 200,
+    "insert_batch_rows": 100000,
+    "insert_batches": 20,
+    "schema": "event_id BIGINT, customer_id INTEGER, amount_cents BIGINT, payload_sha256 VARCHAR",
+    "generator": "IDs 0..1999999; customer = id % 10000; amount = id % 10000 + 1; payload = SHA256(decimal ID), stored as 64 ASCII hex characters. Deterministic, no RNG.",
+    "nulls": 0,
+    "input_file_bytes": null,
+    "input_scope": "SQL-generated values, no external corpus/input-file byte denominator. Persisted Parquet bytes and encoded chunk sizes are measured separately.",
+    "target_file_bytes": 134217728
+  },
+  "workflow": {
+    "exit_code": 0,
+    "duration_s": 21.77941449987702,
+    "infrastructure_preexisting": true,
+    "image_build_included": false
+  },
+  "checks": {
+    "snapshots": {
+      "before": 1671593671861882368,
+      "rolled-back": 1671593671861882368,
+      "committed": 5086138620824667367,
+      "noop": 5086138620824667367,
+      "negative-rolled-back": 5086138620824667367
+    },
+    "storage": {
+      "before": {
+        "files": 20,
+        "parquet": {
+          "rows": 2000000,
+          "file_bytes": 148637482,
+          "footer_bytes": 16800
+        },
+        "chunks": {
+          "column_chunks": 80,
+          "compressed_bytes": 147964402,
+          "uncompressed_bytes": 161425680
+        },
+        "encoded_chunk_compression_ratio": 1.090976463379347
+      },
+      "committed": {
+        "files": 1,
+        "parquet": {
+          "rows": 2000000,
+          "file_bytes": 146646713,
+          "footer_bytes": 1542
+        },
+        "chunks": {
+          "column_chunks": 8,
+          "compressed_bytes": 146579555,
+          "uncompressed_bytes": 159256426
+        },
+        "encoded_chunk_compression_ratio": 1.0864845782892436
+      }
+    },
+    "rewrites": [
+      {
+        "rewritten_data_files_count": 20,
+        "added_data_files_count": 1,
+        "rewritten_bytes_count": 148637482,
+        "failed_data_files_count": 0,
+        "removed_delete_files_count": 0
+      },
+      {
+        "rewritten_data_files_count": 20,
+        "added_data_files_count": 1,
+        "rewritten_bytes_count": 148637482,
+        "failed_data_files_count": 0,
+        "removed_delete_files_count": 0
+      },
+      {
+        "rewritten_data_files_count": 0,
+        "added_data_files_count": 0,
+        "rewritten_bytes_count": 0,
+        "failed_data_files_count": 0,
+        "removed_delete_files_count": 0
+      }
+    ],
+    "query_latency_seconds": {
+      "rollback": 2.376375085,
+      "committed": 2.149995375,
+      "noop": 0.017403167
+    },
+    "clickhouse_readback": {
+      "rows": {
+        "rows": 2000000,
+        "unique_ids": 2000000,
+        "first_id": 0,
+        "last_id": 1999999,
+        "amount_total_cents": 10001000000,
+        "invalid_bodies": 0
+      },
+      "duration_ns": 862858250,
+      "scope": "Docker exec, client connection, SQL, result transfer and JSON decode; not query-only latency"
+    },
+    "authoritative_catalog": {
+      "table_uuid": "66783245-c374-4ce9-af73-51b0e2448548",
+      "snapshot_id": 5086138620824667367,
+      "metadata_location": "s3://warehouse/lab/duck_compact_7cdc061e42ff43e4b0d94cca84a9d286-66783245-c374-4ce9-af73-51b0e2448548/metadata/v22.metadata.json"
+    }
+  },
+  "negative_control": [
+    {
+      "rows": 2000000,
+      "unique_ids": 2000000,
+      "first_id": 0,
+      "last_id": 1999999,
+      "amount_total_cents": 10001000000,
+      "invalid_bodies": 1
+    }
+  ],
+  "resources": {
+    "clickhouse": {
+      "samples": 14,
+      "unavailable_samples": 0,
+      "observed_seconds": 15.91,
+      "cpu_core_seconds": {
+        "total": 1.9237609999999998,
+        "user": 0.7258120000000001,
+        "system": 1.1979479999999998
+      },
+      "cpu_percent_one_core_100": 12.09152105593966,
+      "charged_memory_bytes_min_mean_max": [
+        1078128640,
+        1100405613.7142856,
+        1362264064
+      ],
+      "lifetime_peak_memory_bytes": 1614176256,
+      "allocated_disk_bytes_first_peak_last": [
+        264433664,
+        267689984,
+        259661824
+      ],
+      "native_block_io": {
+        "254:0": {
+          "observed_seconds": 15.91,
+          "rbytes": 0,
+          "wbytes": 9945088,
+          "rios": 0,
+          "wios": 679,
+          "rbytes_per_second": 0.0,
+          "wbytes_per_second": 625084.0980515399,
+          "rios_per_second": 0.0,
+          "wios_per_second": 42.677561282212444
+        }
+      },
+      "identity_or_counter_gaps": 0,
+      "memory_stat_bytes_min_mean_max": {
+        "anon": [
+          608948224,
+          631052580.5714285,
+          895549440
+        ],
+        "file": [
+          252035072,
+          257762742.85714287,
+          259751936
+        ],
+        "kernel": [
+          81637376,
+          81855341.71428572,
+          82067456
+        ]
+      },
+      "memory_stat_samples": 14
+    },
+    "duckdb-cli": {
+      "samples": 12,
+      "unavailable_samples": 1,
+      "observed_seconds": 13.509999999999998,
+      "cpu_core_seconds": {
+        "total": 5.151415,
+        "user": 4.072123,
+        "system": 1.079291
+      },
+      "cpu_percent_one_core_100": 38.13038490007403,
+      "charged_memory_bytes_min_mean_max": [
+        2211840,
+        517189290.6666667,
+        1135935488
+      ],
+      "lifetime_peak_memory_bytes": 1138196480,
+      "allocated_disk_bytes_first_peak_last": [
+        1089536,
+        1380352,
+        1380352
+      ],
+      "native_block_io": null,
+      "identity_or_counter_gaps": 0,
+      "memory_stat_bytes_min_mean_max": {
+        "anon": [
+          487424,
+          479973034.6666667,
+          1061691392
+        ],
+        "file": [
+          0,
+          13653.333333333334,
+          16384
+        ],
+        "kernel": [
+          1376256,
+          3098282.6666666665,
+          4558848
+        ]
+      },
+      "memory_stat_samples": 12
+    },
+    "storage": {
+      "samples": 14,
+      "unavailable_samples": 0,
+      "observed_seconds": 15.920000000000002,
+      "cpu_core_seconds": {
+        "total": 9.97876,
+        "user": 8.671171000000001,
+        "system": 1.3075890000000001
+      },
+      "cpu_percent_one_core_100": 62.680653266331646,
+      "charged_memory_bytes_min_mean_max": [
+        798253056,
+        1004502454.8571428,
+        1073618944
+      ],
+      "lifetime_peak_memory_bytes": 1079885824,
+      "allocated_disk_bytes_first_peak_last": [
+        2912256000,
+        3297554432,
+        3297554432
+      ],
+      "native_block_io": {
+        "254:0": {
+          "observed_seconds": 15.920000000000002,
+          "rbytes": 28672,
+          "wbytes": 385613824,
+          "rios": 7,
+          "wios": 2736,
+          "rbytes_per_second": 1801.005025125628,
+          "wbytes_per_second": 24221973.86934673,
+          "rios_per_second": 0.4396984924623115,
+          "wios_per_second": 171.85929648241205
+        }
+      },
+      "identity_or_counter_gaps": 0,
+      "memory_stat_bytes_min_mean_max": {
+        "anon": [
+          271007744,
+          474973915.4285714,
+          552988672
+        ],
+        "file": [
+          370036736,
+          402380800,
+          444346368
+        ],
+        "kernel": [
+          17936384,
+          19075657.14285714,
+          19836928
+        ]
+      },
+      "memory_stat_samples": 14
+    }
+  },
+  "native_query_profiles": {
+    "rollback": {
+      "query": {
+        "cpu_time": 0.3055906069999998,
+        "sql": "CALL iceberg_rewrite_data_files('lake.lab.duck_compact_7cdc061e42ff43e4b0d94cca84a9d286',target_file_size_bytes=>134217728,min_input_files=>2);",
+        "total_bytes_scanned": 147964402,
+        "total_intermediate_rows": 8000022,
+        "total_intermediate_size_bytes": 338385973,
+        "total_row_groups_scanned": 20,
+        "total_row_groups_to_scan": 20,
+        "total_rows_scanned": 2000000,
+        "total_time": 2.376375085
+      },
+      "system": {
+        "blocked_thread_time": 0.319334,
+        "peak_buffer_memory": 474995522,
+        "peak_streaming_buffer_size": 0,
+        "peak_temp_dir_size": 0,
+        "total_bytes_spilled": 0,
+        "total_memory_allocated": 262144000
+      },
+      "io": {
+        "total_bytes_read": 148080753,
+        "total_bytes_written": 146357106,
+        "total_read_operations": 103,
+        "total_read_time": 3.90882,
+        "total_write_operations": 5,
+        "total_write_time": 3.708643
+      }
+    },
+    "committed": {
+      "query": {
+        "cpu_time": 0.10585318799999995,
+        "sql": "CALL iceberg_rewrite_data_files('lake.lab.duck_compact_7cdc061e42ff43e4b0d94cca84a9d286',target_file_size_bytes=>134217728,min_input_files=>2);",
+        "total_bytes_scanned": 147964402,
+        "total_intermediate_rows": 8000022,
+        "total_intermediate_size_bytes": 338385973,
+        "total_row_groups_scanned": 20,
+        "total_row_groups_to_scan": 20,
+        "total_rows_scanned": 2000000,
+        "total_time": 2.149995375
+      },
+      "system": {
+        "blocked_thread_time": 2.028259,
+        "peak_buffer_memory": 646606469,
+        "peak_streaming_buffer_size": 0,
+        "peak_temp_dir_size": 0,
+        "total_bytes_spilled": 0,
+        "total_memory_allocated": 262144000
+      },
+      "io": {
+        "total_bytes_read": 7251,
+        "total_bytes_written": 146646713,
+        "total_read_operations": 3,
+        "total_read_time": 2.6e-05,
+        "total_write_operations": 5,
+        "total_write_time": 4.86346
+      }
+    },
+    "noop": {
+      "query": {
+        "cpu_time": 7.4579999999999996e-06,
+        "sql": "CALL iceberg_rewrite_data_files('lake.lab.duck_compact_7cdc061e42ff43e4b0d94cca84a9d286',target_file_size_bytes=>134217728,min_input_files=>2);",
+        "total_bytes_scanned": 0,
+        "total_intermediate_rows": 1,
+        "total_intermediate_size_bytes": 40,
+        "total_row_groups_scanned": 0,
+        "total_row_groups_to_scan": 0,
+        "total_rows_scanned": 0,
+        "total_time": 0.017403167
+      },
+      "system": {
+        "blocked_thread_time": 0.0,
+        "peak_buffer_memory": 297216916,
+        "peak_streaming_buffer_size": 0,
+        "peak_temp_dir_size": 0,
+        "total_bytes_spilled": 0,
+        "total_memory_allocated": 0
+      },
+      "io": {
+        "total_bytes_read": 74298,
+        "total_bytes_written": 0,
+        "total_read_operations": 22,
+        "total_read_time": 0.00019,
+        "total_write_operations": 0,
+        "total_write_time": 0.0
+      }
+    }
+  },
+  "failed_predecessors": [
+    {
+      "run_id": "38ba7bde-8f3d-435e-a6be-7724cc5a7c61",
+      "original_passed": false,
+      "classification": "harness failure; original verdict retained",
+      "cause": "Harness incorrectly required uppercase PARQUET; native metadata uses valid lowercase parquet.",
+      "error": "RuntimeError('invalid or duplicated live-file metadata')",
+      "evidence": [
+        {
+          "path": "results/current/duckdb-maintenance/38ba7bde-8f3d-435e-a6be-7724cc5a7c61/result.json",
+          "sha256": "9a43dd54b19cb6567160035d7b3a00ff4a14eb8fa1348d6c3de53075898faec1"
+        },
+        {
+          "path": "results/current/duckdb-maintenance/38ba7bde-8f3d-435e-a6be-7724cc5a7c61/preservation/source-manifest.json",
+          "sha256": "e6a3bcad1125897517d9457ac5f12781a6421eeb4847fef9e7a4af961bc75fb7"
+        }
+      ]
+    },
+    {
+      "run_id": "b1d45561-6d37-468d-8967-600b04c844a3",
+      "original_passed": false,
+      "classification": "harness failure; original verdict retained",
+      "cause": "Independent ClickHouse verifier used an aggregate alias colliding with its input column; code 184, not a native rewrite failure.",
+      "error": "RuntimeError(\"['docker', 'exec', '95665bd78d5d20eae59e4281653645453cdfd90dd22b5fc5895c770df852ecaa'] failed (184):  Received exception from server (version 26.10.10):\\nCode: 184. DB::Exception: Received from localhost:9000. DB::Exception: Aggregate function sum(amount_cents) AS amount_cents is found inside another aggregate function in query. (ILLEGAL_AGGREGATION)\\n(query: SELECT count() AS rows,uniqExact(event_id) AS unique_ids,\\nmin(event_id) AS first_id,max(event_id) AS last_id,sum(amount_cents) AS amount_cents,\\ncountIf(event_id IS NULL OR customer_id IS NULL OR amount_cents IS NULL OR payload_sha256 IS NULL\\n OR event_id < 0 OR event_id >= 2000000 OR customer_id != event_id % 10000\\n OR amount_cents != event_id % 10000 + 1 OR payload_sha256 != lower(hex(SHA256(toString(event_id))))) AS invalid_bodies\\nFROM lake.`lab.duck_compact_b1d455616d37468d8967600b04c844a3` SETTINGS max_execution_time=120,max_memory_usage=805306368,\\nmax_rows_to_read=100000000,max_bytes_to_read=17179869184,max_result_rows=1,\\nresult_overflow_mode='throw',output_format_json_quote_64bit_integers=0 FORMAT JSONEachRow)\\n\")",
+      "evidence": [
+        {
+          "path": "results/current/duckdb-maintenance/b1d45561-6d37-468d-8967-600b04c844a3/result.json",
+          "sha256": "6ab65cf77329e813307fba6773bb105c4ebd4bb0df555cfc93268dce46ea5bf1"
+        },
+        {
+          "path": "results/current/duckdb-maintenance/b1d45561-6d37-468d-8967-600b04c844a3/preservation/source-manifest.json",
+          "sha256": "641dd367b0a42b29e0ab424b2d21e64d072e933f64fead10e73fd75af63497fb"
+        }
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "path": "results/current/duckdb-maintenance/7cdc061e-42ff-43e4-b0d9-4cca84a9d286/result.json",
+      "sha256": "4a0b132788daec53e47cca0e6b0d3217fd67990121d3dc86c98d79f6fce1b584"
+    },
+    {
+      "path": "results/current/duckdb-maintenance/7cdc061e-42ff-43e4-b0d9-4cca84a9d286/invocation.json",
+      "sha256": "8d424130705df50c3ff1a33b2e4aaea25ea851b45b42e255fd052c3e07c7860e"
+    },
+    {
+      "path": "results/current/duckdb-maintenance/7cdc061e-42ff-43e4-b0d9-4cca84a9d286/native.json",
+      "sha256": "61e2934f66d6422b001459bad20ced4a1008f121f6073df42b729794f9f1773f"
+    },
+    {
+      "path": "results/current/duckdb-maintenance/7cdc061e-42ff-43e4-b0d9-4cca84a9d286/extensions.json",
+      "sha256": "726d4ca4fc0f04f42d07823300cda4311319fcce312f6eb7703e124a8d498862"
+    },
+    {
+      "path": "results/current/duckdb-maintenance/7cdc061e-42ff-43e4-b0d9-4cca84a9d286/native-sha256.txt",
+      "sha256": "3b224109f985229349b94235d4e92b7f12363182f1a490d80324bd63682e8296"
+    },
+    {
+      "path": "results/current/duckdb-maintenance/7cdc061e-42ff-43e4-b0d9-4cca84a9d286/run.sql",
+      "sha256": "2517cb13e8014d6a7a52415aa7c24c1e0170c4886a2aa5a8d4d62940a532da89"
+    },
+    {
+      "path": "results/current/duckdb-maintenance/7cdc061e-42ff-43e4-b0d9-4cca84a9d286/cli-stdout.jsonstream",
+      "sha256": "fab6d20360b596263bfba9993d7980ee691507bd09f23ef9d657ff5b4e3ac5f5"
+    },
+    {
+      "path": "results/current/duckdb-maintenance/7cdc061e-42ff-43e4-b0d9-4cca84a9d286/cli-stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "results/current/duckdb-maintenance/7cdc061e-42ff-43e4-b0d9-4cca84a9d286/resource-summary.json",
+      "sha256": "f1b2505cef245b435080e41e55894b56c4c9f351b236242692af5696d3c3c577"
+    },
+    {
+      "path": "results/current/duckdb-maintenance/7cdc061e-42ff-43e4-b0d9-4cca84a9d286/effective-budgets.json",
+      "sha256": "a61d21a19e9be8f3e0456a55b3625ad4be886a675bdd501741bdd0a41868c63e"
+    },
+    {
+      "path": "results/current/duckdb-maintenance/7cdc061e-42ff-43e4-b0d9-4cca84a9d286/authoritative-catalog.json",
+      "sha256": "af328041e84cedb27e61428bc23bd27762920cc258c9ba0091d27e264e300263"
+    },
+    {
+      "path": "results/current/duckdb-maintenance/7cdc061e-42ff-43e4-b0d9-4cca84a9d286/clickhouse-rows.json",
+      "sha256": "851f4066cebb05ba71263282b94b6298854b5355e79d9634751a9bf24b0c6060"
+    },
+    {
+      "path": "results/current/duckdb-maintenance/7cdc061e-42ff-43e4-b0d9-4cca84a9d286/clickhouse-query.sql",
+      "sha256": "e32cfbc2318b919cf5f8392c510fb9c2835553dfe7eab11138c494b81b857f0d"
+    },
+    {
+      "path": "results/current/duckdb-maintenance/7cdc061e-42ff-43e4-b0d9-4cca84a9d286/negative-body-rows.json",
+      "sha256": "8417df6821945dca9daf73ab0fabca10f60a838850b694ea45fd501ebd643784"
+    },
+    {
+      "path": "results/current/duckdb-maintenance/7cdc061e-42ff-43e4-b0d9-4cca84a9d286/final.json",
+      "sha256": "f88fe72744087340ab902e157af7db3bf6b51afeec94aa18a5638df640dd40d3"
+    },
+    {
+      "path": "results/current/duckdb-native-maintenance/workflow-a2c4a8aeaf1b4ad8a10f9784df92ab9e/invocation.json",
+      "sha256": "9d161d8098aa09d6413be0e85ced30cd25a88232206af9e8415ecc7b08eab6ba"
+    },
+    {
+      "path": "results/current/duckdb-native-maintenance/workflow-a2c4a8aeaf1b4ad8a10f9784df92ab9e/result.json",
+      "sha256": "867496bafbd709e00e1db3f797415dbf3dc55a77035b5417f0be9d7154c7d98d"
+    },
+    {
+      "path": "results/current/duckdb-native-maintenance/workflow-a2c4a8aeaf1b4ad8a10f9784df92ab9e/console.log",
+      "sha256": "04d783ae032208d1bd81b1d396bcfbf020fb7fdf5922b108b4a95d676c396d34"
+    },
+    {
+      "path": "results/current/duckdb-maintenance/7cdc061e-42ff-43e4-b0d9-4cca84a9d286/rollback-profile.json",
+      "sha256": "c9670fd6e6238fa181244703c3ff10ee7fcd902a27eeb6a813fc9ee2b547f7cf"
+    },
+    {
+      "path": "results/current/duckdb-maintenance/7cdc061e-42ff-43e4-b0d9-4cca84a9d286/committed-profile.json",
+      "sha256": "8f4d959cb262b04105993847380845376ec6c56e55b261a638c2c153fcc99320"
+    },
+    {
+      "path": "results/current/duckdb-maintenance/7cdc061e-42ff-43e4-b0d9-4cca84a9d286/noop-profile.json",
+      "sha256": "3a94b3276518dde83d407bee1922832d1d49d10990011dca6bd181a99fe5e7a2"
+    }
+  ],
+  "host_controls": 215,
+  "limitations": [
+    "One functional run of the current source. Three native calls have different transaction/cache states; they are not repeats or a capacity comparison.",
+    "Per-call times are DuckDB 2.0 query.total_time profiler observations. Durability/visibility is verified separately, without a latency-to-durable-commit claim; no tail percentiles from one call.",
+    "Operator CPU time in native query profiles omits work outside instrumented operators; sampled cgroup CPU totals are separate. Logical engine S3 I/O is not physical block I/O.",
+    "Sampled resource windows differ by role and omit unobserved startup/final edges. Probes consume resources. CLI block counters are unavailable, not zero.",
+    "Charged memory includes file cache/kernel. Lifetime peaks for reused backend cgroups can precede this run; sampled ranges describe the observed trial.",
+    "Allocated bytes under /data includes other retained fixtures, old snapshots and temporary/history files; it is not the single table live-file size.",
+    "Encoded Parquet chunk compression is not raw SQL/CSV/RAM compression. Codec settings were not compared; compression/HTTP-retry configuration needs explicit qualification before comparative or fault trials.",
+    "The 128 MiB rewrite target is approximate; output may exceed it at row-group boundaries. Snapshots/orphan cleanup and manifest rewrites are not qualified here.",
+    "No live independent readers/writers during rewrite, concurrent-append conflicts, committed deletes, partition evolution, process/S3/catalog interruption or power/disk-loss recovery in this baseline.",
+    "Pinned source rejects v3 rewrite and pending same-table changes; those exact rejection paths remain unrun here. Source inspection does not establish native test outcomes.",
+    "Single SeaweedFS mini process hosts S3 and catalog; no independent-host replication or HA claim. ClickHouse-written manifest conformance remains a separate open failure."
+  ],
+  "upstream_source": {
+    "revision": "f979b5b28a044c49c38a26636ac01bc1f7047fa5",
+    "files": {
+      "src/function/metadata/iceberg_rewrite_data_files.cpp": {
+        "url": "https://raw.githubusercontent.com/duckdb/duckdb-iceberg/f979b5b28a044c49c38a26636ac01bc1f7047fa5/src/function/metadata/iceberg_rewrite_data_files.cpp",
+        "sha256": "6fa5f5ab6330e0eb4ca4201c7cf6362dbc8b26370349e5a18991c13ab38c5cda",
+        "bytes": 12117
+      },
+      "src/maintenance/rewrite_data_files_executor.cpp": {
+        "url": "https://raw.githubusercontent.com/duckdb/duckdb-iceberg/f979b5b28a044c49c38a26636ac01bc1f7047fa5/src/maintenance/rewrite_data_files_executor.cpp",
+        "sha256": "744047ccd3920b8725697d2113add1a15a87c98ef1b7ef323d2d084b4ced93f3",
+        "bytes": 2388
+      },
+      "src/maintenance/rewrite_data_files_planner.cpp": {
+        "url": "https://raw.githubusercontent.com/duckdb/duckdb-iceberg/f979b5b28a044c49c38a26636ac01bc1f7047fa5/src/maintenance/rewrite_data_files_planner.cpp",
+        "sha256": "0557c87d51824778cf601e619258c058647a12188b383ae0da7d8eb8c77d142f",
+        "bytes": 25846
+      },
+      "src/maintenance/rewrite_data_files_operator.cpp": {
+        "url": "https://raw.githubusercontent.com/duckdb/duckdb-iceberg/f979b5b28a044c49c38a26636ac01bc1f7047fa5/src/maintenance/rewrite_data_files_operator.cpp",
+        "sha256": "15a8d367255e4bef5d0c53883f507e27ab4185ea9011b679a2df43824db15016",
+        "bytes": 7881
+      },
+      "test/sql/local/catalog_test_config_setup/catalog_agnostic/maintenance/rewrite_data_files_commit.test": {
+        "url": "https://raw.githubusercontent.com/duckdb/duckdb-iceberg/f979b5b28a044c49c38a26636ac01bc1f7047fa5/test/sql/local/catalog_test_config_setup/catalog_agnostic/maintenance/rewrite_data_files_commit.test",
+        "sha256": "3aa1be2378034ff8d0a3dc1b6706f4c7b865e9e499e4847dc9c392cc18c377b2",
+        "bytes": 4281
+      },
+      "test/sql/local/catalog_test_config_setup/catalog_agnostic/maintenance/rewrite_data_files_in_transaction.test": {
+        "url": "https://raw.githubusercontent.com/duckdb/duckdb-iceberg/f979b5b28a044c49c38a26636ac01bc1f7047fa5/test/sql/local/catalog_test_config_setup/catalog_agnostic/maintenance/rewrite_data_files_in_transaction.test",
+        "sha256": "3a57d39581718da86b9e027f834c2151b7214198059d1bcbf752a304eb1bbbb2",
+        "bytes": 2352
+      },
+      "test/sql/local/catalog_test_config_setup/catalog_agnostic/maintenance/rewrite_data_files_repeated.test": {
+        "url": "https://raw.githubusercontent.com/duckdb/duckdb-iceberg/f979b5b28a044c49c38a26636ac01bc1f7047fa5/test/sql/local/catalog_test_config_setup/catalog_agnostic/maintenance/rewrite_data_files_repeated.test",
+        "sha256": "9d68ecb648809ab3628fe07d765c1b1e1fb3e0684f9115fbce3ba1dfa1e77815",
+        "bytes": 4938
+      }
+    }
+  },
+  "earlier_successful_revisions": [
+    {
+      "run_id": "760cd296-e86c-4230-8f90-0f9de8f8ae41",
+      "passed": true,
+      "scope": "Successful predecessor before additional explicit query LIMIT/timeout guards. Not pooled with current revision.",
+      "evidence": {
+        "path": "results/current/duckdb-maintenance/760cd296-e86c-4230-8f90-0f9de8f8ae41/result.json",
+        "sha256": "50d48a2d1830230bf2a5df4b809736762a34c0366d1a6f60ec31663de26ffce8"
+      }
+    },
+    {
+      "run_id": "7aca29b4-49db-432c-b44d-606dfb0f6151",
+      "passed": true,
+      "scope": "Successful predecessor before explicit preservation of secondary cleanup errors. Not pooled with current revision.",
+      "evidence": {
+        "path": "results/current/duckdb-maintenance/7aca29b4-49db-432c-b44d-606dfb0f6151/result.json",
+        "sha256": "c689c653b5f18a5649c9361dc96804da618a3021a65dba399feff7132cd72702"
+      }
+    }
+  ],
+  "cleanup_failure_controls": {
+    "fencing_error_still_closes_sampler": true,
+    "combined_resource_and_survivor_failures_retained": true,
+    "cleanup_errors": []
+  }
+}

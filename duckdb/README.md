@@ -25,6 +25,12 @@ v2 manifests still omit required metadata, so the complete cross-engine matrix
 fails. The earlier memory-failed recovery remains failed; see
 [`current results and limitations`](../iceberg/multi-system/README.md#current-version-results-2026-11-22).
 
+The [native Iceberg compaction baseline](../iceberg/multi-system/DUCKDB_MAINTENANCE.md)
+also passes **2,000,000-row** rollback/rewrite/retained-snapshot checks,
+**20 → 1 files**, and independent body verification, with **215 controls**.
+Its **2,149.995 ms** rewrite profile is a functional observation; native live
+concurrency and fault recovery remain unfinished.
+
 ## Benchmark
 
 TPC-H SF1 on 4 CPUs / 6 GB (Apple M4 Pro, Docker VM aarch64, 2026-09-28): all 22 queries in 0.43 s

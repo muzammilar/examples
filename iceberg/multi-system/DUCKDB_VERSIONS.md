@@ -111,6 +111,16 @@ independent readers and writers live throughout. Both engines verify every body.
 These checks use Spark for maintenance; they do not qualify DuckDB-native
 compaction or every failure boundary.
 
+The separate `make duckdb-maintenance` baseline now passes healthy native
+v2 data-file rewriting on **2,000,000 rows / 10,000 customers**: rollback,
+**20 → 1 live files**, retained snapshot, no-op, a wrong-body control and
+independent ClickHouse/REST verification. Its current Make run passes **215
+controls**; the committed CALL profile is **2,149.995 ms**. These are functional
+observations, with CPU/memory/compression/disk/I/O in
+[`DUCKDB_MAINTENANCE.md`](DUCKDB_MAINTENANCE.md). Native live-fault recovery,
+concurrent-append conflicts and the source-observed v3/pending-write rejection
+paths remain unrun.
+
 The earlier current compactor case remains failed: its **3.8-million-row** final
 ClickHouse ordered export exceeded the **1 GiB native server cap**. Read-only
 controls against that exact snapshot establish external-sort spilling as the

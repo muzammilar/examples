@@ -191,7 +191,22 @@ During concurrent reads, query an explicitly selected committed snapshot when co
 
 ## Compaction owner and lifecycle
 
-Spark/Iceberg owns maintenance in every case:
+The five architecture cases use Spark/Iceberg for maintenance. The separate
+`make duckdb-maintenance` target now passes healthy native DuckDB 2.0.1 v2
+rewriting on a fresh two-million-row table: rollback, 20 → 1 files, retained
+snapshot, no-op and wrong-body controls, plus independent ClickHouse/REST
+verification. It passes 215 controls; resource and timing evidence is in
+`DUCKDB_MAINTENANCE_RESULTS.json`. Native live-fault recovery remains unfinished.
+
+Next native cases must verify v3 and pending-write rejection, then concurrent
+append behavior and process/S3/catalog interruption with independent writers and
+readers kept live. Pin/dump native client timeout/retry settings first. Do not
+pause writers or reduce offered load to make maintenance complete. Distinguish
+safe conflict rejection, progress/starvation, ambiguous commits and acknowledged
+loss through the durable witness; source snapshot checks do not prove which
+outcome will occur. Keep initial single-fault cases separate from combinations.
+
+The architecture maintenance workflow remains:
 
 1. Record current snapshot, data/delete/manifest file counts, file bytes and size distribution.
 2. Run Iceberg `rewrite_data_files` with bin packing and a configurable target size.

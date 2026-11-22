@@ -274,6 +274,8 @@ def sources():
         ROOT / "lab_profiles.py",
         *[ROOT / name for name in lab.CURRENT_FILES],
         ROOT / "maintenance_control.py",
+        ROOT / "duckdb_maintenance.py",
+        ROOT / "test_duckdb_maintenance.py",
         ROOT / "maintenance_smoke.py",
         ROOT / "test_maintenance_control.py",
         ROOT / "prefault_archive.py",
