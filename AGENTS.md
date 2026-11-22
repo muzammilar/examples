@@ -111,6 +111,19 @@ For kind examples, name the cluster `<system>-<example>` and always pass its ful
 
 Examples commonly use Docker Compose for single-node and local cluster setups, and kind plus an operator, Helm chart, or StatefulSet for Kubernetes scenarios. Keep deployment files and scripts beside the example that uses them. Give Compose projects and resources clear, example-specific names, document ports and prerequisites, and make cleanup limited to resources created by that example. See `FORMAT.md` for the detailed requirements.
 
+### Local isolation and credentials
+
+Run the current experiments in **local, isolated Docker/Docker Compose labs**.
+Do not inspect, load, mount or use the user's real AWS configuration, credentials,
+accounts or resources. Use explicit example-owned endpoints and lab-only static
+credentials; disable SDK default credential discovery, metadata-service lookup and
+fallback to public cloud endpoints. Keep workload and backend services on an
+internal Compose network where practical, and fail closed on an unexpected
+endpoint. Never substitute a real cloud bucket for a missing local dependency.
+Managed services without a local server, including Tigris, remain documented and
+unrun; a local S3-compatible reference is a different backend and must be labeled
+as such. Any future managed-service run requires a separate explicit user request.
+
 ## Non-functional / production tests
 
 For **all existing and future examples**, deliberately try to break the system in

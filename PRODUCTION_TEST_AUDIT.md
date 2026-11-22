@@ -407,6 +407,11 @@ Keep unobservable provider-internal faults and unrun cases explicit. Independent
 functional cases may run in parallel within the verified combined resource budget;
 comparative benchmarks need isolated, matched conditions.
 
+**Local-only scope:** use isolated Docker/Compose and lab-only credentials. Do not
+inspect/load host AWS configuration or credentials, or access real cloud resources.
+Managed Tigris execution is deferred; use the separately named local SeaweedFS S3
+reference for DuckDB/Iceberg tests. Its observations cannot qualify Tigris.
+
 The 2026-11-22 source inventory covers all **36 Makefiles in this recent cohort**;
 it is not a completed upstream/code review or a rerun of all systems. The detailed
 findings above remain the execution/gap record. The separate

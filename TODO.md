@@ -11,6 +11,12 @@ are documented below. Then focus on **Tigris, DuckDB and Iceberg-related
 projects** before other systems. Investigate production operations, failure mechanisms and verified
 recovery, with matched comparisons after correctness/recovery gates pass.
 
+**Local-only scope:** all current tests use isolated Docker/Compose services and
+lab-only credentials. Never use host AWS configuration/credentials or real cloud
+resources. Tigris's managed service remains deferred; use SeaweedFS as the explicitly
+named local S3 reference for DuckDB/Iceberg work, without attributing its results
+to Tigris.
+
 Apply the [production-test requirements](AGENTS.md#non-functional--production-tests) to every
 system, including older examples. Deliberately find how it breaks, measure the
 availability/data-loss boundary, and demonstrate recovery. Multiple replicas and
@@ -297,7 +303,8 @@ Planned as a `mysql/` folder, mirroring the Postgres section with the same `orde
   Use identical bodies, checksums, request mixes and client budgets; measure
   single/multipart upload, range reads, conditional writes, visibility and
   interrupted-upload recovery under independent live writers/readers. Account
-  and isolated bucket required. Distinguish managed-service observations from
+  and isolated bucket required for a separately requested managed run; currently
+  deferred under the local-only scope. Distinguish managed-service observations from
   local disk/node repair proofs; verify deployment availability before promising
   self-hosted Tigris or provider-internal fault injection. Planned, not run.
 

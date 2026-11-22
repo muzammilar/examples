@@ -110,6 +110,13 @@ cleanup from infrastructure teardown:
 
 ## Docker Compose
 
+Keep current experiments [local and isolated](AGENTS.md#local-isolation-and-credentials):
+explicit example-owned endpoints and lab-only credentials, no host AWS
+configuration/credentials or real cloud resources, and no SDK fallback to public
+cloud endpoints or metadata credentials. Use an internal Compose network where
+practical. A local reference for a managed service is a different backend; name
+and report it accurately.
+
 Verify required storage semantics on the actual mounted filesystem. When a
 database relies on file locks or atomic publication, test them across independent
 processes/containers; do not infer support from a mount path or syscall success.
