@@ -13,9 +13,12 @@ Enterprise Edition feature), so there is no multi-node example.
 The [mutable workload extension](backup-recovery/MUTABLE.md) adds Go UPDATE and
 DELETE/reinsert transactions, independent snapshot readers and complete versioned
 body/receipt checks. Four **million-row** healthy/crash cases verify **2,972 ACKed
-transactions** with zero ACK loss or wrong/partial rows; the sustained mutation
-comparison is still pending. CPU, memory, compression, storage and native IOPS
-are recorded separately from the earlier 10,000-row checkpoint.
+transactions** with zero ACK loss or wrong/partial rows. The [12-cell sustained
+mutation comparison](backup-recovery/MUTABLE_BENCHMARK.md) verifies another
+**108,440 ACKs**, with zero loss/corruption: CedarDB query throughput is **3.29×**
+PostgreSQL alone and **3.03×** under live mutations, while PostgreSQL uses less
+charged memory. CPU, memory, compression, storage and native IOPS are recorded.
+Explicit planner preparation, saturation and cold-cache comparisons remain unrun.
 
 ## Benchmark
 

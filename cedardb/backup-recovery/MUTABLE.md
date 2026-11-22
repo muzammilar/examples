@@ -7,12 +7,19 @@ before teardown:
 make test-mutable
 make test-mutable-recovery
 make test-mutable-benchmark  # four short harness checks, not performance qualification
-make benchmark-mutable     # full 3-trial, 60s-warmup / 300s-measurement matrix; pending
+make benchmark-mutable     # full 3-trial, 60s-warmup / 300s-measurement matrix
 make report-mutable-benchmark MUTABLE_RESULTS_DIR=results/mutable-benchmark/<run-id>
 ```
 
-**Current checkpoint: million-row correctness and recovery are tested. The sustained
-comparison is pending. No new performance winner is established.**
+**Million-row correctness, recovery and the sustained 12-cell comparison pass.**
+The [sustained report](MUTABLE_BENCHMARK.md) verifies **108,440 ACKed mutation
+transactions**, zero acknowledged loss or wrong/partial rows, and **83,243** complete
+analytical results. Three fresh-process trials per condition use 60 s warmup and
+at least 300 s measurement. CedarDB query throughput is **3.29×** PostgreSQL alone
+and **3.03×** under live mutations; PostgreSQL uses less charged memory. These
+results cover this fixed warm-query/automatic-statistics profile, not saturation
+or optimally prepared engines. Two additional shutdown intents committed without
+ACKs and remain separately reconciled, never counted as acknowledged.
 The earlier [10,000-row result document](MUTABLE_RESULTS.json) records case IDs, source/image
 hashes, full-body proofs, resources and preserved prototype failures. Existing
 [append-only HTAP results](HTAP.md) remain a separate million-row experiment.
@@ -176,6 +183,18 @@ UTC markers select operations and samples, with a 10 ms clock discrepancy guard.
 Native I/O captures must themselves fall inside the phase. A short diagnostic,
 unfinished cohort, missing trial, changed input or failed witness cannot be
 published as sustained results.
+
+The initial sustained profile relies on native automatic planner statistics;
+it does not issue explicit PostgreSQL `ANALYZE` after each table copy. During its
+first live-mutation cell, read-only catalog observations found auto-analyze
+completed **5.473 s before measurement**; its earlier empty-statistics observation
+was during warmup. This proves that case's timing, not all unobserved cases.
+The publisher preserves optional timestamped catalog/EXPLAIN observations and
+their small one-shot administrative-client costs. No settings or table statistics
+were changed by those observations. PostgreSQL [recommends analysis after bulk
+loads](https://www.postgresql.org/docs/17/populate.html#POPULATE-ANALYZE);
+explicit preparation and per-case query-plan capture remain a follow-up profile.
+Do not describe this run as optimally prepared engine capacity.
 
 Mutation latency covers connection work (when needed) and the database transaction
 through commit/rollback handling, excluding the external intent/ACK fsyncs.

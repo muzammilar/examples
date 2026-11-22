@@ -30,12 +30,16 @@ throughput was **3.33×** PostgreSQL alone and **2.69×** under live traffic;
 PostgreSQL used less charged memory. See the trial spread, resource costs and
 UTC/monotonic timing audit in that report.
 
-[Transactional updates and delete/reinsert](MUTABLE.md) now add a separate Go
-workload over data that analytical queries actually read. Four **10,000-row**
-healthy/SIGKILL cases pass with zero ACK loss or wrong/partial rows. A four-cell
-short benchmark-harness diagnostic passes; the repeated **million-row** mutation
-comparison is still pending. Its numbers must not be substituted for the
-append-only results above.
+[Transactional updates and delete/reinsert](MUTABLE.md) add a separate Go
+workload over data that analytical queries actually read. Four **million-row**
+healthy/SIGKILL cases verify **2,972 ACKed transactions** with zero loss or
+wrong/partial rows. The [sustained 12-cell comparison](MUTABLE_BENCHMARK.md)
+verifies another **108,440 ACKs** and 83,243 complete analytical results. CedarDB
+median query throughput is **3.29×** PostgreSQL alone and **3.03×** under live
+mutations; PostgreSQL uses less charged memory. See the automatic-statistics
+preparation and warm-cache limitations, per-trial distributions and complete
+CPU/memory/compression/disk/I/O costs. These are separate from the append-only
+results above.
 
 Run operational cases before cleanup, one command at a time:
 

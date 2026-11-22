@@ -15,6 +15,85 @@ import resources
 
 
 class MutableWitness(unittest.TestCase):
+    def test_summary_retains_limits_without_copying_environment_secrets(self):
+        value = {
+            key: "fixture"
+            for key in (
+                "created_ns",
+                "disk_class",
+                "kubernetes",
+                "topology",
+                "source_revision",
+            )
+        }
+        value.update(
+            host=["Darwin", "private-hostname", "kernel", "build", "arm64"],
+            docker_info={
+                key: "runtime"
+                for key in (
+                    "ServerVersion",
+                    "KernelVersion",
+                    "Architecture",
+                    "NCPU",
+                    "MemTotal",
+                    "Driver",
+                    "CgroupVersion",
+                )
+            },
+            versions={"postgres": [["version"], {"kind": "process-resources"}]},
+            images_and_limits={
+                "cedar": {
+                    "Image": "sha256:pinned",
+                    "HostConfig": {
+                        "NanoCpus": 4 * 10**9,
+                        "Memory": 6 * 1024**3,
+                        "MemorySwap": 6 * 1024**3,
+                    },
+                    "Config": {
+                        "Image": "pinned@sha256:digest",
+                        "Cmd": [],
+                        "Entrypoint": [],
+                        "Env": ["CEDAR_PASSWORD=secret-token", "PARALLEL=4"],
+                    },
+                    "Mounts": [],
+                }
+            },
+        )
+        result = publisher.compact_environment(value)
+        self.assertEqual(result["databases"]["cedar"]["cpus"], 4)
+        self.assertEqual(
+            result["databases"]["cedar"]["tuning_environment"], {"PARALLEL": "4"}
+        )
+        self.assertNotIn("secret-token", json.dumps(result))
+        self.assertNotIn("private-hostname", json.dumps(result))
+
+    def test_publisher_rejects_reused_database_process_generation(self):
+        cells = [
+            {"backend": backend, "database_started_at": f"start-{trial}"}
+            for backend in control.BACKENDS
+            for trial in range(6)
+        ]
+        publisher.verify_fresh_processes(cells, 3)
+        cells[-1]["database_started_at"] = cells[-2]["database_started_at"]
+        with self.assertRaisesRegex(RuntimeError, "generation was reused"):
+            publisher.verify_fresh_processes(cells, 3)
+
+    def test_publisher_does_not_skip_failed_or_incomplete_prerequisite(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            case = root / "mutable" / "interrupted"
+            case.mkdir(parents=True)
+            manifest = {"generation": "active", "rows": 1000000, "source_sha256": {}}
+            (case / "config.json").write_text(json.dumps(manifest))
+            (case / "failure.json").write_text(json.dumps({"passed": False}))
+            cohort = {"base_generation": "active", "rows": 1000000, "source_sha256": {}}
+            with mock.patch.object(control, "RESULTS", root):
+                with self.assertRaisesRegex(RuntimeError, "prerequisite failed"):
+                    publisher.functional_prerequisites(cohort)
+                (case / "failure.json").unlink()
+                with self.assertRaisesRegex(RuntimeError, "prerequisite incomplete"):
+                    publisher.functional_prerequisites(cohort)
+
     def test_teardown_preserves_unarchived_mutable_state(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

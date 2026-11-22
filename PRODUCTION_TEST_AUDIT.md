@@ -21,13 +21,16 @@ execution evidence.
   receipt/history reconciliation, native controls and 23 host controls. Native
   per-device IOPS now accompany byte counters. The failed prototype is externally
   archived before verified fixture replacement; its failed verdict remains intact.
-  The sustained comparison is still pending. Earlier evidence follows:
+  The [12-cell sustained comparison](cedardb/backup-recovery/MUTABLE_BENCHMARK.md)
+  independently verifies 108,440 ACKs and 83,243 complete query results with zero
+  loss/corruption. CedarDB throughput is 3.29×/3.03× alone/live; PostgreSQL uses
+  less charged memory. Warm-query/automatic-statistics limits and observer costs
+  remain explicit; current 26 controller tests pass. Earlier evidence follows:
   2026-11-22 checkpoint, four 10,000-row healthy/container-SIGKILL cases verify
   **3,036 ACKed paired UPDATE/DELETE-reinsert transactions**, zero acknowledged
   loss or wrong/partial rows. Native read-only/rollback controls, snapshot readers,
   complete receipt/body replay, 19 host controls and legacy regressions pass.
-  Four short benchmark-harness cells pass; the sustained million-row comparison
-  is **pending**. Preserve the PostgreSQL CASE-typing failure and invalidated
+  Four earlier short benchmark-harness cells pass. Preserve the PostgreSQL CASE-typing failure and invalidated
   weak prototype; resource/storage evidence is separate from a performance claim.
 - [Rayforce native AOF segments](rayforce/duckdb-comparison/AOF_SEGMENTS.md):
   2026-11-22, 159 native files; complete 10,000/10,003-event rotation/reopen/backup
@@ -400,7 +403,7 @@ candidates, outside this deployment count.
 
 | Work group | Present boundary | Next testing pass |
 |---|---|---|
-| CedarDB/PostgreSQL | Million-row mutation correctness/recovery passes; sustained matrix active | Finish and independently reconcile the twelve cells before publishing comparative results. Keep runtime sources/images fixed and avoid other heavy workloads meanwhile. |
+| CedarDB/PostgreSQL | Million-row mutation correctness/recovery and twelve sustained cells pass | Explicitly prepared statistics/plans, ingestion/cache variants and bounded storage pressure remain. Keep warm-query, automatic-statistics and single-node limits visible. |
 | Rayforce/DuckDB | Native DuckDB WAL recovery passes; Rayforce strict integrity cases remain failed | Keep failed cases visible. Diagnose/retest integrity before new qualified performance rankings; timing failed cases is diagnostic only. |
 | DuckDB/ZFS and ZFS storage | Historical individual storage/recovery tests exist; current observation/history gaps remain | Preserve prior witnesses before resetting storage, add fsynced intents/outcomes and keep independent readers/writers alive through recovery. In DuckDB/ZFS, `spawn()` removes matching journals, `writer()` truncates its journal and stops after its first request error, and `reset()` destroys datasets before those writers start. A filename-only fix cannot establish historical data preservation or continuous recovery observation. |
 | Iceberg/archive examples | Native data/shard checks and archive gates exist; continuous mutation/reader and commit-ambiguity gaps remain | Add external histories and continuous observation through catalog/object-store/compaction interruptions, then verify the committed snapshot and retained source before cleanup. Do not infer HA from queries on surviving copies. |
@@ -422,7 +425,7 @@ inventory with `python3 tools/audit-production-tests.py`; output is ignored unde
 
 | Example | Shape | Declared categories | No recognized target; review applicability | Evidence status |
 |---|---|---|---|---|
-| [cedardb/backup-recovery](cedardb/backup-recovery/) | Compose | suite, crash | disk, scale-out, scale-in, rolling, partition, pressure, restore, drain | four million-row healthy/SIGKILL mutation prerequisites pass; twelve-cell sustained matrix is in progress, not qualified; earlier append-only results remain separate |
+| [cedardb/backup-recovery](cedardb/backup-recovery/) | Compose | suite, crash | disk, scale-out, scale-in, rolling, partition, pressure, restore, drain | four million-row healthy/SIGKILL prerequisites and twelve sustained cells pass; 108,440 ACKs, zero loss/corruption, automatic-statistics/warm-query limits explicit; earlier append-only results remain separate |
 | [ceph/s3-cluster](ceph/s3-cluster/) | Compose | suite, crash, disk | scale-out, scale-in, rolling, partition, pressure, restore, drain | four live faults, benchmark, cold reopen and fresh lifecycle/cleanup qualified above; extended categories remain unrun |
 | [clickhouse/iceberg](clickhouse/iceberg/) | Compose | none | suite, crash, disk, scale-out, scale-in, rolling, partition, pressure, restore, drain | declaration inventory only |
 | [clickhouse/s3-tiered-storage](clickhouse/s3-tiered-storage/) | Compose | crash, disk | suite, scale-out, scale-in, rolling, partition, pressure, restore, drain | declaration inventory only |

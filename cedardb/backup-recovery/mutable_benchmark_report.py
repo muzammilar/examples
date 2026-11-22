@@ -24,6 +24,71 @@ def number(value, divisor=1):
     return "unavailable" if value is None else f"{value / divisor:.3f}"
 
 
+def compact_environment(value):
+    result = {
+        key: value[key]
+        for key in (
+            "created_ns",
+            "disk_class",
+            "kubernetes",
+            "topology",
+            "source_revision",
+        )
+    }
+    result["host"] = dict(
+        zip(
+            ("system", "kernel", "architecture"),
+            (value["host"][0], value["host"][2], value["host"][4]),
+        )
+    )
+    result["docker"] = {
+        key: value["docker_info"][key]
+        for key in (
+            "ServerVersion",
+            "KernelVersion",
+            "Architecture",
+            "NCPU",
+            "MemTotal",
+            "Driver",
+            "CgroupVersion",
+        )
+    }
+    result["versions"] = {
+        backend: [row for row in records if isinstance(row, list)]
+        for backend, records in value["versions"].items()
+    }
+    result["databases"] = {}
+    for backend, info in value["images_and_limits"].items():
+        limits, configuration = info["HostConfig"], info["Config"]
+        result["databases"][backend] = {
+            "image_id": info["Image"],
+            "image_reference": configuration["Image"],
+            "cpus": limits["NanoCpus"] / 1e9,
+            "memory_limit_bytes": limits["Memory"],
+            "memory_swap_limit_bytes": limits["MemorySwap"],
+            "command": configuration["Cmd"],
+            "entrypoint": configuration["Entrypoint"],
+            "tuning_environment": {
+                key: val
+                for item in configuration["Env"]
+                for key, _, val in [item.partition("=")]
+                if key in {"PARALLEL", "BUFFERSIZE", "WORKMEMSIZE"}
+            },
+            "storage": [
+                {
+                    "type": mount["Type"],
+                    "destination": mount["Destination"],
+                    "read_write": mount["RW"],
+                }
+                for mount in info["Mounts"]
+            ],
+        }
+    result["scope"] = (
+        "Selected environment/version/limit fields. The cohort config contains actual hardware, mutable contract and runtime source hashes; full inspection dumps remain in the ignored environment artifact. Source revision here is the initial capture revision, not a substitute for the cohort's tested file hashes."
+    )
+    return result
+
+
 def cohort_gate(raw):
     config, cells = raw["config"], raw["cells"]
     expected = {
@@ -86,6 +151,13 @@ def operation_timings(events):
                 if values
             }
     return output
+
+
+def verify_fresh_processes(cells, trials):
+    for backend in control.BACKENDS:
+        starts = [c["database_started_at"] for c in cells if c["backend"] == backend]
+        if len(starts) != trials * 2 or len(set(starts)) != len(starts):
+            raise RuntimeError("database process generation was reused across cells")
 
 
 def verify_cell(cell, config):
@@ -252,9 +324,15 @@ def verify_cell(cell, config):
             ):
                 raise RuntimeError("one declared mutation type never succeeded")
     normalized = dict(cell)
+    started_at = cell["native_before"]["container"]["State"]["StartedAt"]
     for name in ("native_before", "native_initialized", "native_after"):
         native = cell[name]
+        if native["container"]["State"]["StartedAt"] != started_at:
+            raise RuntimeError("database process generation changed inside cell")
         normalized[name] = native_values(native)
+        normalized[name].pop(
+            "pid1_status"
+        )  # Selected RSS/HWM and cgroup counters remain.
         if (
             normalized[name]["cpus"] != 4
             or normalized[name]["memory_limit_bytes"] != 6 * 1024**3
@@ -264,15 +342,28 @@ def verify_cell(cell, config):
         ):
             raise RuntimeError("database image/budget differs")
     stopped = load(root / "completed-backend-stopped.json")
-    if stopped["State"]["Running"] or stopped["State"]["ExitCode"]:
+    if (
+        stopped["State"]["Running"]
+        or stopped["State"]["ExitCode"]
+        or stopped["State"]["StartedAt"] != started_at
+    ):
         raise RuntimeError("database did not stop cleanly after verification")
     normalized.update(
         actors=actors,
+        database_started_at=started_at,
         clock_audit=clock,
         controller=load(root / "controller.json"),
         raw_result_sha256=hashlib.sha256(
             (root / "benchmark-result.json").read_bytes()
         ).hexdigest(),
+        planner_observations=[
+            {
+                "source_file": str(path.relative_to(control.ROOT)),
+                "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+                "observation": load(path),
+            }
+            for path in sorted(root.glob("postgres-statistics-*.json"))
+        ],
     )
     query_times = sorted(
         r["query_fetch_ms"]
@@ -300,18 +391,20 @@ def functional_prerequisites(config):
     ):
         case = load(path)
         result_path = path.parent / "result.json"
-        if case["generation"] != config["base_generation"] or not result_path.exists():
+        if case["generation"] != config["base_generation"] or "concurrent" in case:
             continue
-        result = load(result_path)
         if case["rows"] != config["rows"] or any(
             config["source_sha256"].get(name) != digest
             for name, digest in case["source_sha256"].items()
         ):
             continue
         root = path.parent
-        if not result["passed"] or any(
-            (root / name).exists() for name in ("failure.json", "invalidated.json")
-        ):
+        if any((root / name).exists() for name in ("failure.json", "invalidated.json")):
+            raise RuntimeError("current-generation functional prerequisite failed")
+        if not result_path.exists():
+            raise RuntimeError("current-generation functional prerequisite incomplete")
+        result = load(result_path)
+        if not result["passed"]:
             raise RuntimeError("current-generation functional prerequisite failed")
         if not load(root / "cleanup.json")["schema_dropped_after_verification"]:
             raise RuntimeError("functional cleanup missing")
@@ -344,7 +437,11 @@ def functional_prerequisites(config):
             "proof": result["proof"],
             "phases": result["phases"],
             "resources": result["resources"],
-            "native_after": native_values(result["native_after"]),
+            "native_after": {
+                key: value
+                for key, value in native_values(result["native_after"]).items()
+                if key != "pid1_status"
+            },
             "raw_result_sha256": hashlib.sha256(result_path.read_bytes()).hexdigest(),
         }
     if set(selected) != {(b, c) for b in control.BACKENDS for c in (False, True)}:
@@ -365,6 +462,7 @@ def publish(folder):
         if hashlib.sha256((control.ROOT / name).read_bytes()).hexdigest() != digest:
             raise RuntimeError("runtime source differs from tested source: " + name)
     cells = [verify_cell(cell, config) for cell in raw["cells"]]
+    verify_fresh_processes(cells, config["trials"])
     prerequisites = functional_prerequisites(config)
     summaries = []
     for backend in control.BACKENDS:
@@ -410,12 +508,16 @@ def publish(folder):
         "publisher_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
         "source_directory": str(folder.relative_to(control.ROOT)),
         "config": config,
-        "environment": load(folder / "environment.json"),
+        "environment": compact_environment(load(folder / "environment.json")),
+        "raw_environment_sha256": hashlib.sha256(
+            (folder / "environment.json").read_bytes()
+        ).hexdigest(),
         "cells": cells,
         "functional_prerequisites": prerequisites,
         "summaries": summaries,
         "workload_comparisons": comparisons,
         "concurrency_impact": interference,
+        "statistics_preparation": "This cohort does not issue explicit ANALYZE after copying each mutable table; native automatic statistics preparation remains enabled. Optional read-only catalog/EXPLAIN observations are retained per case with timestamp and administrative-client costs. The first PostgreSQL live cell briefly used additional 1-CPU/512-MiB one-shot observation clients; their actual CPU/RSS/cgroup costs are preserved in those observations. Later psql probes execute inside the existing database cap. Unobserved cases have no direct readiness proof. Results describe this preparation profile, not a comparison of optimally prepared engines.",
         "scope": "Single-node, warm-query, ticker-paced one-writer/one-reader HTAP; not saturation, arbitrary changing aggregates, serializability, independent-host durability or a universal ranking. Each cell restarts its database process and creates a fresh schema; base volumes/OS caches remain. Median of independent trial summaries, not pooled percentiles. CPU includes observers and excludes unsampled edges; native peaks cover full process lifetime. Native block counters are per-device VM/cgroup accounting, not host physical IO; do not sum duplicate device layers or Docker/native counters. Physical disk IO latency/queue depth unavailable.",
     }
     control.save(control.ROOT / "MUTABLE_BENCHMARK_RESULTS.json", report)
@@ -423,6 +525,8 @@ def publish(folder):
         "# Sustained mutable-order analytical comparison",
         "",
         report["scope"],
+        "",
+        report["statistics_preparation"],
         "",
         f"{config['rows']:,} rows; {config['trials']} fresh-process trials per cell; {config['warmup_s']} s warmup and ≥{config['duration_s']} s monotonic measurement. 4 CPUs / 6 GiB per database; 1 CPU / 512 MiB per actor, swap disabled. The inactive database is stopped.",
         "",
