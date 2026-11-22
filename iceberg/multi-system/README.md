@@ -122,8 +122,11 @@ Lowering the Parquet reader watermark alone failed. The subsequent fresh
 budget**, with a **1 GiB temporary-query-disk cap**. See
 [`CLICKHOUSE_READ_MEMORY_RESULTS.json`](CLICKHOUSE_READ_MEMORY_RESULTS.json).
 The original operational failure stays failed; a diagnostic readback cannot
-reclassify it. Its preservation/all-history closure and current cold restore
-remain unfinished, so teardown must retain its state and refuse unsafe cleanup.
+reclassify it. Current cold restore now passes all three witnessed tables
+(**10.11 million acknowledged rows per engine**) on separate restored storage;
+see [`CURRENT_COLD_RESULTS.json`](CURRENT_COLD_RESULTS.json). Its failed-case
+preservation/all-history closure remains unfinished, so teardown must retain its
+state and refuse unsafe cleanup.
 
 All 13 ClickHouse roles use the same current release. The native-serving test
 used **0.25 CPU / 1,280 MiB per data replica**, **0.5 CPU / 256 MiB per Keeper**,
@@ -131,7 +134,8 @@ plus the **2 CPU / 1,536 MiB query coordinator** and **1 CPU / 1 GiB storage**.
 With a running 2 CPU / 2 GiB tool, this is **8.75 CPUs / 16.5 GiB** in configured
 caps. It tests one-host retained-volume replica recovery, not host/disk loss or
 continuous production availability. The historical storage service remained
-unchanged throughout the separate current runs. All **207 host controls** pass.
+unchanged throughout the separate current runs. The recovery increment passed
+**207 host controls**; the cold-restore/cleanup follow-up passes **209**.
 
 ## Historical cold backup and restore
 

@@ -1,6 +1,62 @@
 # Cold storage checkpoint and restoration
 
-The executed results and commands here belong to the **historical storage
+## Current fixture (2026-11-22)
+
+The default current profile now passes `make cold-storage` and three separate
+`make cold-readback` invocations. A new owned volume receives the whole archive;
+all **140 files** match their hashes and path/type/mode/UID/GID inventory before
+native storage opens it. The archive is **1,194,022,727 bytes**. Source allocation
+is **1,674,510,336 bytes**; gzip archive size is not Parquet column compression.
+
+| Witnessed table | Acknowledged bodies verified per engine | Restore workflow | Original operational qualification |
+|---|---:|---:|---|
+| Retained-volume storage crash | 2,400,000 | 34.536 s | Passed |
+| Ordered-export memory failure | 3,800,000 | 42.928 s | **Failed; retained as diagnostic** |
+| Fresh compactor-output crash | 3,910,000 | 41.689 s | Passed |
+
+Both DuckDB **2.0.1** and ClickHouse **26.10.10.3** reproduce the complete expected
+bodies, snapshot identities and hashes: **10.11 million acknowledged rows per
+engine** in total. The two ambiguous storage-crash batches remain absent.
+The restore uses the pinned SeaweedFS **4.54** image and the current **600 MiB
+Go memory limit, 256 MiB reader budget and 16 volume slots**; actual native
+settings are checked. The 3.8-million-row diagnostic remains `qualified=false`
+and exits with its expected failed-operational status despite passing integrity.
+
+Backup/restore helpers observed **42.057 / 18.417 CPU core-s**, with approximately
+**512 MiB** peak charged memory each. They recorded **2,428,452,864 / 0**
+read/write block bytes during backup and **2,839,322,624 / 1,319,059,456** during
+restore. These sampled Docker-VM counters exclude unobserved edges and do not
+measure physical SSD latency or all host-bind writes. Per-table CPU/memory,
+disk/I/O, export durations, snapshot-bound compression and provenance are in
+[`CURRENT_COLD_RESULTS.json`](CURRENT_COLD_RESULTS.json).
+
+Current commands, after preparing a witnessed recovery table:
+
+```sh
+make cold-storage
+make cold-readback COLD_CHECKPOINT=results/current/cold-storage/<checkpoint-UUID> COLD_CASE=results/current/<run>/production/<case-UUID> COLD_VERIFICATION=<verification-UUID>
+make cold-readback-cleanup COLD_READBACK=results/current/cold-storage/<checkpoint-UUID>/native-readback/<readback-UUID>
+make cold-checkpoint-cleanup COLD_CHECKPOINT=results/current/cold-storage/<checkpoint-UUID>
+```
+
+Temporary cleanup passed for all three readback projects and the checkpoint
+helpers, with **209 host controls**. It removes their fenced containers/private
+networks/query-cache volumes and retains the source volume, restored volume,
+archive and all witnesses. Current source services and the historical storage
+service remained unchanged during replay/cleanup. The earlier outer wrapper's
+ignored generated-config comparison and cleanup's initial image-reference
+spelling rejection remain recorded; neither changed data or qualified a failed
+operational case. Cleanup still requires exact recorded native image/container
+identities, even when configuration spells an immutable image as `name@digest`.
+
+This is offline same-host recovery of three witnessed tables. It does not qualify
+online backup, host/disk loss or every catalog table. **All-history preservation
+and closure for the memory-failed operational case remain unfinished**, so the
+main fixture's teardown guard still refuses cleanup.
+
+## Historical fixture
+
+The remaining executed results and commands here belong to the **historical storage
 fixture**, including its separate 4.53→4.54 restored-copy upgrade. Before using
 them, select that fixture explicitly:
 
@@ -10,7 +66,7 @@ export LAB_PROFILE=historical DUCKDB_VERSION=2.0.1
 
 The main Makefile now defaults to the separate current fixture. Do not point its
 results at these historical paths or treat this backup as a checkpoint of the
-new current volume. Current-fixture cold restoration remains unqualified.
+new current volume; its qualification is recorded separately above.
 
 `make cold-storage` runs with only this example's storage and query services
 active. It takes the controller lock, verifies the actual PID 1 and stop signal,

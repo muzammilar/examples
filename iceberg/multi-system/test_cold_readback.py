@@ -142,6 +142,21 @@ class SourceFixture(unittest.TestCase):
 
 
 class CheckpointDecisions(unittest.TestCase):
+    def test_current_restore_keeps_pinned_bounded_storage_and_rejects_downgrade(self):
+        with patch.object(readback.control.lab, "PROFILE", "current"):
+            self.assertEqual(
+                readback.restore_files(readback.UPGRADE_454_IMAGE),
+                ["-f", readback.TEMPLATE, "-f", "docker-compose.storage-current.yml"],
+            )
+            for image in (readback.BASELINE_453_IMAGE, "unverified:latest"):
+                with self.subTest(image=image), self.assertRaisesRegex(RuntimeError, "4.54"):
+                    readback.restore_files(image)
+        with patch.object(readback.control.lab, "PROFILE", "historical"):
+            self.assertEqual(
+                readback.restore_files(readback.BASELINE_453_IMAGE),
+                ["-f", readback.TEMPLATE],
+            )
+
     def test_changed_archive_inventory_and_lineage_are_rejected(self):
         with tempfile.TemporaryDirectory() as temporary:
             lab = Path(temporary).resolve()

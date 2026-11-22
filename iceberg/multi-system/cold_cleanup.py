@@ -72,6 +72,14 @@ def storage_image(path, parent, checkpoint, restored, invocation):
     return selected
 
 
+def pinned_digest(reference):
+    if not isinstance(reference, str) or not re.fullmatch(
+        r"(?:[^@\s]+@)?sha256:[0-9a-f]{64}", reference
+    ):
+        raise RuntimeError("rendered restore image is not digest-pinned")
+    return reference.rsplit("@", 1)[-1]
+
+
 def plan(path, mode):
     path = owned(path)
     run_id = cleanup.valid_uuid(path.name)
@@ -144,7 +152,9 @@ def plan(path, mode):
         )
         if invocation.get("storage_image_intent") is not None:
             evidence("storage-image-transition.json")
-        if any(compose["services"][r]["image"] != images[r] for r in images):
+        # Accept the immutable name@digest form too. Runtime preflight still
+        # requires every exact container Image ID to match the recorded ID.
+        if any(pinned_digest(compose["services"][r]["image"]) != images[r] for r in images):
             raise RuntimeError("rendered service images differ from checkpoint")
         images["verifier"] = planned["image"]
         query, network = project + "_query", project + "_default"

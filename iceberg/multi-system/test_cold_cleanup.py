@@ -140,6 +140,24 @@ class CleanupSafety(unittest.TestCase):
     def selected(self):
         return subject.plan(self.path, "readback")
 
+    def test_immutable_image_reference_keeps_exact_digest_and_runtime_id_checks(self):
+        compose = json.loads((self.path / "compose.json").read_text())
+        expected = record()["image_id"]
+        compose["services"]["storage"]["image"] = "local/storage:4.54@" + expected
+        self.write("compose.json", compose)
+        selected = self.selected()
+        raw = self.raw(selected, "storage")
+        spec = next(s for s in selected["specs"] if s["role"] == "storage")
+        subject.validate_container(raw, spec, selected)
+        raw["Image"] = "sha256:" + "b" * 64
+        with self.assertRaises(RuntimeError):
+            subject.validate_container(raw, spec, selected)
+        for invalid in ("local/storage:latest", "local/storage@sha256:" + "b" * 64):
+            compose["services"]["storage"]["image"] = invalid
+            self.write("compose.json", compose)
+            with self.subTest(image=invalid), self.assertRaises(RuntimeError):
+                self.selected()
+
     def raw(self, selected, role="verifier"):
         spec = next(s for s in selected["specs"] if s["role"] == role)
         final = spec["final"]

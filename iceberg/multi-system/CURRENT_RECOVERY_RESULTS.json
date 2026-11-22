@@ -5617,7 +5617,7 @@
   ],
   "limits": [
     "First production sequence remains failed; fresh bounded-query compactor retry passed independently. No resetting or reclassification of earlier failures.",
-    "All-history closure and current cold-backup/restore of the memory-failed case remain unfinished; teardown must remain fail-closed.",
+    "Current cold-backup/restore now passes for all three witnessed tables; see CURRENT_COLD_RESULTS.json. All-history preservation/closure of the memory-failed case remains unfinished; teardown must remain fail-closed.",
     "One run per fault configuration, fixed-rate10k-row batches and1s actor delay; phase rates/latencies are functional observations, not saturation or capacity.",
     "Read journals record completed requests; interrupted in-flight reads can be absent. Percentiles are empirical and retain sample counts.",
     "CPU/memory/allocated disk and per-device read/write bytes/IOPS include observation probes; missing counters remain unavailable.",

@@ -1,0 +1,1133 @@
+{
+  "date": "2026-11-22",
+  "profile": "current",
+  "checkpoint_passed": true,
+  "all_three_restore_checks_passed": true,
+  "temporary_cleanup_passed": true,
+  "scope": "Offline same-host whole-volume checkpoint with serial shutdown, byte/metadata restore and complete witnessed-table replay through DuckDB and ClickHouse. No online-backup, independent-host durability or performance ranking claim.",
+  "environment": {
+    "context": "desktop-linux",
+    "endpoint": "unix:///Users/muzammil/.docker/run/docker.sock",
+    "daemon": {
+      "ID": "172e5e0a-2d95-4fb5-a6b4-fb16552caec8",
+      "Name": "docker-desktop",
+      "ServerVersion": "29.5.3",
+      "Architecture": "aarch64",
+      "NCPU": 11,
+      "MemTotal": 26216296448,
+      "KernelVersion": "6.12.76-linuxkit",
+      "OperatingSystem": "Docker Desktop"
+    }
+  },
+  "checkpoint": {
+    "run_id": "632744d8-a60b-4236-8253-d7a0d9748e6f",
+    "source_volume": "iceberg-multi-system-current_storage",
+    "restore_volume": "iceberg-cold-632744d8a60b42368253d7a0d9748e6f",
+    "files": 140,
+    "archive": {
+      "sha256": "fb95b2098ace31c81f448de40d20ab27875564e15959047e6f3ef47e2190ca10",
+      "bytes": 1194022727,
+      "files_manifest_sha256": "ead0929cdb02309807826e12c9d9acc18dba6f26631a76d4226891809dd2a392",
+      "metadata_manifest_sha256": "77c4f8731a56c5f480eb176b93c6613346653f7d830e06c313250bfee387b73c"
+    },
+    "native_images": {
+      "storage": "sha256:4b42c212543a0acd4c0e675215ecdcaf62a186ef98def76c7e12701871222d15",
+      "clickhouse": "sha256:b0784219f1821b8a9918732b8e6728dbed9246e13949c46e40d7c2a084d9ef9d"
+    },
+    "source_allocated_kib": 1635264,
+    "restore_allocated_kib": 1635244,
+    "archive_duration_s": 38.733996379,
+    "backup_resources": {
+      "backup": {
+        "samples": 42,
+        "unavailable_samples": 1,
+        "observed_seconds": 43.660000000000004,
+        "cpu_core_seconds": {
+          "total": 42.057331000000005,
+          "user": 38.668896000000004,
+          "system": 3.3884350000000008
+        },
+        "cpu_percent_one_core_100": 96.32920522217134,
+        "charged_memory_bytes_min_mean_max": [
+          2351104,
+          499310494.47619045,
+          536870912
+        ],
+        "lifetime_peak_memory_bytes": 536870912,
+        "allocated_disk_bytes_first_peak_last": [
+          1674510336,
+          1674510336,
+          1674510336
+        ],
+        "native_block_io": {
+          "254:0": {
+            "observed_seconds": 41.51,
+            "rbytes": 2428452864,
+            "wbytes": 0,
+            "rios": 17472,
+            "wios": 0,
+            "rbytes_per_second": 58502839.412189834,
+            "wbytes_per_second": 0.0,
+            "rios_per_second": 420.9106239460371,
+            "wios_per_second": 0.0
+          }
+        },
+        "identity_or_counter_gaps": 0,
+        "memory_stat_bytes_min_mean_max": {
+          "anon": [
+            655360,
+            1368064,
+            1527808
+          ],
+          "file": [
+            0,
+            494541872.7619048,
+            533790720
+          ],
+          "kernel": [
+            1441792,
+            2889142.8571428573,
+            4382720
+          ]
+        },
+        "memory_stat_samples": 42
+      }
+    },
+    "restore_resources": {
+      "restore": {
+        "samples": 22,
+        "unavailable_samples": 1,
+        "observed_seconds": 22.39,
+        "cpu_core_seconds": {
+          "total": 18.417331,
+          "user": 15.015229999999999,
+          "system": 3.402101
+        },
+        "cpu_percent_one_core_100": 82.25694953104065,
+        "charged_memory_bytes_min_mean_max": [
+          2531328,
+          462861218.90909094,
+          536870912
+        ],
+        "lifetime_peak_memory_bytes": 536875008,
+        "allocated_disk_bytes_first_peak_last": [
+          4096,
+          1674489856,
+          1674489856
+        ],
+        "native_block_io": {
+          "254:0": {
+            "observed_seconds": 17.090000000000003,
+            "rbytes": 2839322624,
+            "wbytes": 1319059456,
+            "rios": 11411,
+            "wios": 3728,
+            "rbytes_per_second": 166139416.26682267,
+            "wbytes_per_second": 77183116.20830894,
+            "rios_per_second": 667.700409596255,
+            "wios_per_second": 218.13926272674075
+          }
+        },
+        "identity_or_counter_gaps": 0,
+        "memory_stat_bytes_min_mean_max": {
+          "anon": [
+            647168,
+            962560,
+            1159168
+          ],
+          "file": [
+            0,
+            450799243.6363636,
+            532090880
+          ],
+          "kernel": [
+            1404928,
+            10491717.818181818,
+            16891904
+          ]
+        },
+        "memory_stat_samples": 22
+      }
+    }
+  },
+  "cases": [
+    {
+      "label": "compactor",
+      "readback_id": "494c77e1-b28b-49ee-86f5-8359398f4187",
+      "case_id": "566da3e3-9683-47db-81e7-13d66657df2d",
+      "restore_passed": true,
+      "original_operational_qualified": true,
+      "diagnostic": false,
+      "proof": {
+        "rows_verified": 3910000,
+        "acknowledged_batches": 391,
+        "acknowledged_rows": 3910000,
+        "ambiguous_batches_applied": 0,
+        "ambiguous_batches_absent": 0,
+        "known_failed_batches_absent": 0,
+        "canonical_body_sha256": "c6b73c29b73beb9199319121b75a084a5eecf5d5622cf197ba380797ab5f1734",
+        "ambiguous_batches": null
+      },
+      "snapshot": {
+        "table_uuid": "be77bd65-39f9-4346-a7b6-1fbdf5fb9023",
+        "snapshot_id": 3820531083589864940,
+        "metadata_location": "s3://warehouse/lab/recovery_566da3e3968347db81e713d66657df2d-be77bd65-39f9-4346-a7b6-1fbdf5fb9023/metadata/v394.metadata.json"
+      },
+      "workflow": {
+        "exit_code": 0,
+        "duration_s": 41.68871820811182,
+        "sources_unchanged": true
+      },
+      "export_and_reconciliation_duration_s": {
+        "duckdb": 10.347509713,
+        "clickhouse": 8.633466879
+      },
+      "storage": {
+        "totals": {
+          "files": 42,
+          "rows": 3910000,
+          "file_bytes": 177116908,
+          "footer_bytes": 50430,
+          "column_chunks": 294,
+          "compressed_chunk_bytes": 176990664,
+          "uncompressed_chunk_bytes": 314566791
+        },
+        "encoded_parquet_chunk_compression_ratio": 1.7773072539012567
+      },
+      "resources": {
+        "clickhouse": {
+          "samples": 23,
+          "unavailable_samples": 1,
+          "observed_seconds": 25.580000000000002,
+          "cpu_core_seconds": {
+            "total": 3.0728090000000003,
+            "user": 2.1070830000000003,
+            "system": 0.965725
+          },
+          "cpu_percent_one_core_100": 12.012544956997655,
+          "charged_memory_bytes_min_mean_max": [
+            304766976,
+            633428057.0434783,
+            1133727744
+          ],
+          "lifetime_peak_memory_bytes": 1182978048,
+          "allocated_disk_bytes_first_peak_last": [
+            319488,
+            140582912,
+            6201344
+          ],
+          "native_block_io": {
+            "254:0": {
+              "observed_seconds": 25.580000000000002,
+              "rbytes": 0,
+              "wbytes": 140455936,
+              "rios": 0,
+              "wios": 531,
+              "rbytes_per_second": 0.0,
+              "wbytes_per_second": 5490849.726348709,
+              "rios_per_second": 0.0,
+              "wios_per_second": 20.758405003909303
+            }
+          },
+          "identity_or_counter_gaps": 0,
+          "memory_stat_bytes_min_mean_max": {
+            "anon": [
+              269824000,
+              409886007.65217394,
+              722726912
+            ],
+            "file": [
+              266240,
+              26838238.608695652,
+              140345344
+            ],
+            "kernel": [
+              7966720,
+              10781562.43478261,
+              15409152
+            ]
+          },
+          "memory_stat_samples": 23
+        },
+        "storage": {
+          "samples": 25,
+          "unavailable_samples": 0,
+          "observed_seconds": 27.769999999999992,
+          "cpu_core_seconds": {
+            "total": 1.325194,
+            "user": 0.7573449999999999,
+            "system": 0.56785
+          },
+          "cpu_percent_one_core_100": 4.772034569679511,
+          "charged_memory_bytes_min_mean_max": [
+            155598848,
+            261174558.72,
+            343674880
+          ],
+          "lifetime_peak_memory_bytes": 344612864,
+          "allocated_disk_bytes_first_peak_last": [
+            1644707840,
+            1644707840,
+            1644707840
+          ],
+          "native_block_io": {
+            "254:0": {
+              "observed_seconds": 27.769999999999992,
+              "rbytes": 0,
+              "wbytes": 258048,
+              "rios": 0,
+              "wios": 45,
+              "rbytes_per_second": 0.0,
+              "wbytes_per_second": 9292.329852358664,
+              "rios_per_second": 0.0,
+              "wios_per_second": 1.6204537270435726
+            }
+          },
+          "identity_or_counter_gaps": 0,
+          "memory_stat_bytes_min_mean_max": {
+            "anon": [
+              152240128,
+              256898170.88,
+              338653184
+            ],
+            "file": [
+              376832,
+              382402.56,
+              516096
+            ],
+            "kernel": [
+              2789376,
+              3344629.76,
+              3776512
+            ]
+          },
+          "memory_stat_samples": 25
+        },
+        "verifier": {
+          "samples": 19,
+          "unavailable_samples": 4,
+          "observed_seconds": 21.03,
+          "cpu_core_seconds": {
+            "total": 13.698593,
+            "user": 11.617978000000003,
+            "system": 2.080615
+          },
+          "cpu_percent_one_core_100": 65.13834046600095,
+          "charged_memory_bytes_min_mean_max": [
+            2244608,
+            687894312.4210526,
+            1010442240
+          ],
+          "lifetime_peak_memory_bytes": 1484701696,
+          "allocated_disk_bytes_first_peak_last": [
+            856064,
+            808611840,
+            808611840
+          ],
+          "native_block_io": null,
+          "identity_or_counter_gaps": 0,
+          "memory_stat_bytes_min_mean_max": {
+            "anon": [
+              491520,
+              300164581.05263156,
+              616943616
+            ],
+            "file": [
+              0,
+              310999363.3684211,
+              776036352
+            ],
+            "kernel": [
+              1372160,
+              4693153.684210527,
+              7761920
+            ]
+          },
+          "memory_stat_samples": 19
+        }
+      },
+      "cleanup": {
+        "passed": true,
+        "error": null,
+        "mode": "readback",
+        "removed": [
+          {
+            "container": "be0bda51d7fb7b4503bd20fdabac7e52834315bf8d4fac8b1d3510ae56e3d9c6"
+          },
+          {
+            "container": "92981f3c6487e49b5984675300c4d27697c26baac9ed7910dc7cba94297b5c19"
+          },
+          {
+            "container": "f9928b42151cad9ee8254e24a4251461233d5ea0cf8ebdebe2c908d7003a2f7b"
+          },
+          {
+            "network": "1d41e0b940b6ee4f56cfb59ab7b76427e1552e4fd6cf5d2702f84302fe11704e"
+          },
+          {
+            "query_volume": "iceberg-cold-readback-494c77e1b28b49ee86f58359398f4187_query"
+          }
+        ],
+        "observed_retained_volumes": {
+          "iceberg-multi-system-current_storage": {
+            "CreatedAt": "2026-11-22T19:23:29Z",
+            "Driver": "local",
+            "Labels": {
+              "com.docker.compose.config-hash": "fcbf9065e65b2c75d448c5b1413366922837cea3c0e04891edd585e0854d4653",
+              "com.docker.compose.project": "iceberg-multi-system-current",
+              "com.docker.compose.version": "5.1.4",
+              "com.docker.compose.volume": "storage"
+            },
+            "Mountpoint": "/var/lib/docker/volumes/iceberg-multi-system-current_storage/_data",
+            "Name": "iceberg-multi-system-current_storage",
+            "Options": null,
+            "Scope": "local"
+          },
+          "iceberg-cold-632744d8a60b42368253d7a0d9748e6f": {
+            "CreatedAt": "2026-11-22T20:53:23Z",
+            "Driver": "local",
+            "Labels": {
+              "org.examples.cold-storage": "632744d8-a60b-4236-8253-d7a0d9748e6f"
+            },
+            "Mountpoint": "/var/lib/docker/volumes/iceberg-cold-632744d8a60b42368253d7a0d9748e6f/_data",
+            "Name": "iceberg-cold-632744d8a60b42368253d7a0d9748e6f",
+            "Options": null,
+            "Scope": "local"
+          }
+        },
+        "already_absent_retained_volumes": [],
+        "completed_ns": 1795381135711108000,
+        "scope": "Temporary fenced resources only; checkpoint/source volumes and evidence retained."
+      },
+      "evidence": [
+        {
+          "path": "results/current/cold-storage/632744d8-a60b-4236-8253-d7a0d9748e6f/native-readback/494c77e1-b28b-49ee-86f5-8359398f4187/result.json",
+          "sha256": "035e62ddf1bfc8c1407efc306d8532efd69cb7bc508047575183c4aebd1a8fb8"
+        },
+        {
+          "path": "results/current/cold-storage/632744d8-a60b-4236-8253-d7a0d9748e6f/native-readback/494c77e1-b28b-49ee-86f5-8359398f4187/native-settings.json",
+          "sha256": "c034a3d03420d34f610aaf9f7dec0b8b06208b577bc4b952aca84f7a490d8ed4"
+        },
+        {
+          "path": "results/current/cold-storage/632744d8-a60b-4236-8253-d7a0d9748e6f/native-readback/494c77e1-b28b-49ee-86f5-8359398f4187/resource-summary.json",
+          "sha256": "55778b45d7c8ed3f6b232b5de78516fbe6ee0afb8714c5691cdefe77b37247ce"
+        },
+        {
+          "path": "results/current/cold-storage/632744d8-a60b-4236-8253-d7a0d9748e6f/native-readback/494c77e1-b28b-49ee-86f5-8359398f4187/invocation.json",
+          "sha256": "225f0a9d1f4112f8bcbfa6339a12f80010affb0d0823b4448207727cd0fc9c57"
+        },
+        {
+          "path": "results/current/cold-storage/632744d8-a60b-4236-8253-d7a0d9748e6f/native-readback/494c77e1-b28b-49ee-86f5-8359398f4187/verifier-final.json",
+          "sha256": "0965eff40a18f752c8e6fb91e3dfa23e1a67ef15533c1c200561cc9d7c601853"
+        },
+        {
+          "path": "results/current/cold-storage/632744d8-a60b-4236-8253-d7a0d9748e6f/native-readback/494c77e1-b28b-49ee-86f5-8359398f4187/storage-stopped.json",
+          "sha256": "e76e7a249cef7225a4aa102530d51165342248ffb644d11b3d8b028f109851a6"
+        },
+        {
+          "path": "results/current/cold-storage/632744d8-a60b-4236-8253-d7a0d9748e6f/native-readback/494c77e1-b28b-49ee-86f5-8359398f4187/clickhouse-stopped.json",
+          "sha256": "255132e517e45287d802e8d374827f1c674f5e2b095b8981030a60cf3a4b6701"
+        },
+        {
+          "path": "results/current/cold-storage/632744d8-a60b-4236-8253-d7a0d9748e6f/native-readback/494c77e1-b28b-49ee-86f5-8359398f4187/cleanup-preflight-failure.json",
+          "sha256": "3ad63e8f2e35fbf9ab9cc162c8e31bf5927b844ca3322f432437c82a405c8084"
+        },
+        {
+          "path": "results/current/cold-storage/632744d8-a60b-4236-8253-d7a0d9748e6f/native-readback/494c77e1-b28b-49ee-86f5-8359398f4187/recovery-566da3e3-9683-47db-81e7-13d66657df2d/verifications/e489ac89-f0d4-497f-8c77-e95df54b8763/verified.json",
+          "sha256": "764d9731779287017087764361f6e3a6d7b3af7fa1d901642e7fab29b995621a"
+        },
+        {
+          "path": "results/current/cold-storage/632744d8-a60b-4236-8253-d7a0d9748e6f/native-readback/494c77e1-b28b-49ee-86f5-8359398f4187/recovery-566da3e3-9683-47db-81e7-13d66657df2d/verifications/e489ac89-f0d4-497f-8c77-e95df54b8763/storage-metrics.json",
+          "sha256": "37bbf442fc262d0bca5e352f6c6974656aa69d087f25533eeecef43bd5a80eac"
+        },
+        {
+          "path": "results/current/cold-storage/632744d8-a60b-4236-8253-d7a0d9748e6f/native-readback/494c77e1-b28b-49ee-86f5-8359398f4187/recovery-566da3e3-9683-47db-81e7-13d66657df2d/verifications/e489ac89-f0d4-497f-8c77-e95df54b8763/native-versions.json",
+          "sha256": "4db29bf7c26eaf71717bbf0e11c4b15233e5a240b60479419594f93ab71f5d5e"
+        },
+        {
+          "path": "results/current/cold-storage/632744d8-a60b-4236-8253-d7a0d9748e6f/native-readback/494c77e1-b28b-49ee-86f5-8359398f4187/cleanup/9a47c56b-7897-4f34-a897-e14967a71efe/result.json",
+          "sha256": "10bc0fcfaba666cf45b98bbf585e095e66670aa1ca03cdaee8e2e4f954c4f365"
+        },
+        {
+          "path": "results/current/qualification-20261122/cold-replay-b51eeef527b542c98d28a58fb93a04be/compactor-result.json",
+          "sha256": "2b5f452ee30c1619a2c15a2b57ec22ac6f69a2768335ae2ed5e2e089d6d83c26"
+        }
+      ]
+    },
+    {
+      "label": "memory-failed",
+      "readback_id": "8004f496-5ecb-4f3a-b5b8-1342ded3f53e",
+      "case_id": "6191b730-b1aa-4cbf-8371-13952cf26a54",
+      "restore_passed": true,
+      "original_operational_qualified": false,
+      "diagnostic": true,
+      "proof": {
+        "rows_verified": 3800000,
+        "acknowledged_batches": 380,
+        "acknowledged_rows": 3800000,
+        "ambiguous_batches_applied": 0,
+        "ambiguous_batches_absent": 0,
+        "known_failed_batches_absent": 0,
+        "canonical_body_sha256": "f6a5030dc86070c81d9ba72f543bc0b032a8c6eb12869f89ea4110bcc681c2b2",
+        "ambiguous_batches": null
+      },
+      "snapshot": {
+        "table_uuid": "d9c95d1e-f660-44df-aa1e-a93ab324a041",
+        "snapshot_id": 1075081727671484799,
+        "metadata_location": "s3://warehouse/lab/recovery_6191b730b1aa4cbf837113952cf26a54-d9c95d1e-f660-44df-aa1e-a93ab324a041/metadata/v383.metadata.json"
+      },
+      "workflow": {
+        "exit_code": 0,
+        "duration_s": 42.92814870807342,
+        "sources_unchanged": true
+      },
+      "export_and_reconciliation_duration_s": {
+        "duckdb": 10.787168922,
+        "clickhouse": 8.683347629
+      },
+      "storage": {
+        "totals": {
+          "files": 43,
+          "rows": 3800000,
+          "file_bytes": 172912140,
+          "footer_bytes": 51602,
+          "column_chunks": 301,
+          "compressed_chunk_bytes": 172786863,
+          "uncompressed_chunk_bytes": 305904664
+        },
+        "encoded_parquet_chunk_compression_ratio": 1.7704162150336626
+      },
+      "resources": {
+        "clickhouse": {
+          "samples": 23,
+          "unavailable_samples": 2,
+          "observed_seconds": 25.79,
+          "cpu_core_seconds": {
+            "total": 3.210387999999999,
+            "user": 2.1698749999999998,
+            "system": 1.040512
+          },
+          "cpu_percent_one_core_100": 12.448189220628148,
+          "charged_memory_bytes_min_mean_max": [
+            304807936,
+            586604365.9130435,
+            1074638848
+          ],
+          "lifetime_peak_memory_bytes": 1120055296,
+          "allocated_disk_bytes_first_peak_last": [
+            319488,
+            140537856,
+            6197248
+          ],
+          "native_block_io": {
+            "254:0": {
+              "observed_seconds": 25.79,
+              "rbytes": 0,
+              "wbytes": 140570624,
+              "rios": 0,
+              "wios": 547,
+              "rbytes_per_second": 0.0,
+              "wbytes_per_second": 5450586.428848391,
+              "rios_per_second": 0.0,
+              "wios_per_second": 21.20977122915859
+            }
+          },
+          "identity_or_counter_gaps": 0,
+          "memory_stat_bytes_min_mean_max": {
+            "anon": [
+              266166272,
+              391516694.26086956,
+              708968448
+            ],
+            "file": [
+              315392,
+              32890345.739130434,
+              140476416
+            ],
+            "kernel": [
+              7962624,
+              10735081.739130436,
+              15339520
+            ]
+          },
+          "memory_stat_samples": 23
+        },
+        "storage": {
+          "samples": 26,
+          "unavailable_samples": 0,
+          "observed_seconds": 29.12,
+          "cpu_core_seconds": {
+            "total": 1.3236359999999998,
+            "user": 0.7928989999999999,
+            "system": 0.530737
+          },
+          "cpu_percent_one_core_100": 4.545453296703296,
+          "charged_memory_bytes_min_mean_max": [
+            200052736,
+            473309499.0769231,
+            643727360
+          ],
+          "lifetime_peak_memory_bytes": 644612096,
+          "allocated_disk_bytes_first_peak_last": [
+            1644703744,
+            1644703744,
+            1644703744
+          ],
+          "native_block_io": {
+            "254:0": {
+              "observed_seconds": 29.12,
+              "rbytes": 173543424,
+              "wbytes": 258048,
+              "rios": 303,
+              "wios": 45,
+              "rbytes_per_second": 5959595.604395604,
+              "wbytes_per_second": 8861.538461538461,
+              "rios_per_second": 10.40521978021978,
+              "wios_per_second": 1.5453296703296702
+            }
+          },
+          "identity_or_counter_gaps": 0,
+          "memory_stat_bytes_min_mean_max": {
+            "anon": [
+              196059136,
+              328655950.7692308,
+              464756736
+            ],
+            "file": [
+              376832,
+              140551876.92307693,
+              174059520
+            ],
+            "kernel": [
+              2891776,
+              3502080,
+              4022272
+            ]
+          },
+          "memory_stat_samples": 26
+        },
+        "verifier": {
+          "samples": 19,
+          "unavailable_samples": 5,
+          "observed_seconds": 21.189999999999994,
+          "cpu_core_seconds": {
+            "total": 13.843188999999999,
+            "user": 11.579722,
+            "system": 2.263467
+          },
+          "cpu_percent_one_core_100": 65.3288768286928,
+          "charged_memory_bytes_min_mean_max": [
+            2150400,
+            672459937.6842105,
+            959811584
+          ],
+          "lifetime_peak_memory_bytes": 1437204480,
+          "allocated_disk_bytes_first_peak_last": [
+            839680,
+            774631424,
+            774631424
+          ],
+          "native_block_io": null,
+          "identity_or_counter_gaps": 0,
+          "memory_stat_bytes_min_mean_max": {
+            "anon": [
+              495616,
+              308932392.42105263,
+              556650496
+            ],
+            "file": [
+              0,
+              288672282.94736844,
+              722841600
+            ],
+            "kernel": [
+              1376256,
+              4653487.157894737,
+              8007680
+            ]
+          },
+          "memory_stat_samples": 19
+        }
+      },
+      "cleanup": {
+        "passed": true,
+        "error": null,
+        "mode": "readback",
+        "removed": [
+          {
+            "container": "bb5ccca663313449d52e2695b3c879e25f3d7c2969a4e9a4c1dddd6f97db87c5"
+          },
+          {
+            "container": "776cae57c0cd6f1bd29a071bb3116cb7712bc5079c7b6e8b0388c2110cb668cd"
+          },
+          {
+            "container": "4c57ade1691c11d5a93d3565f576f002cc59836449440c2cc14f5389c32842e3"
+          },
+          {
+            "network": "a201736efacebe43debde30f509fee014dbdf5b5a8e41442c2b7cb7210bc8fa6"
+          },
+          {
+            "query_volume": "iceberg-cold-readback-8004f4965ecb4f3ab5b81342ded3f53e_query"
+          }
+        ],
+        "observed_retained_volumes": {
+          "iceberg-multi-system-current_storage": {
+            "CreatedAt": "2026-11-22T19:23:29Z",
+            "Driver": "local",
+            "Labels": {
+              "com.docker.compose.config-hash": "fcbf9065e65b2c75d448c5b1413366922837cea3c0e04891edd585e0854d4653",
+              "com.docker.compose.project": "iceberg-multi-system-current",
+              "com.docker.compose.version": "5.1.4",
+              "com.docker.compose.volume": "storage"
+            },
+            "Mountpoint": "/var/lib/docker/volumes/iceberg-multi-system-current_storage/_data",
+            "Name": "iceberg-multi-system-current_storage",
+            "Options": null,
+            "Scope": "local"
+          },
+          "iceberg-cold-632744d8a60b42368253d7a0d9748e6f": {
+            "CreatedAt": "2026-11-22T20:53:23Z",
+            "Driver": "local",
+            "Labels": {
+              "org.examples.cold-storage": "632744d8-a60b-4236-8253-d7a0d9748e6f"
+            },
+            "Mountpoint": "/var/lib/docker/volumes/iceberg-cold-632744d8a60b42368253d7a0d9748e6f/_data",
+            "Name": "iceberg-cold-632744d8a60b42368253d7a0d9748e6f",
+            "Options": null,
+            "Scope": "local"
+          }
+        },
+        "already_absent_retained_volumes": [],
+        "completed_ns": 1795381142655689000,
+        "scope": "Temporary fenced resources only; checkpoint/source volumes and evidence retained."
+      },
+      "evidence": [
+        {
+          "path": "results/current/cold-storage/632744d8-a60b-4236-8253-d7a0d9748e6f/native-readback/8004f496-5ecb-4f3a-b5b8-1342ded3f53e/result.json",
+          "sha256": "c67cc6aa01dbfff72bb5600609ba6713dcf9267531b05bc4dc3e9dc599fd183f"
+        },
+        {
+          "path": "results/current/cold-storage/632744d8-a60b-4236-8253-d7a0d9748e6f/native-readback/8004f496-5ecb-4f3a-b5b8-1342ded3f53e/native-settings.json",
+          "sha256": "b9ddc697906b679563857b1ad3264a02b32fbfb1221b527e2f52fd43b6e6ba43"
+        },
+        {
+          "path": "results/current/cold-storage/632744d8-a60b-4236-8253-d7a0d9748e6f/native-readback/8004f496-5ecb-4f3a-b5b8-1342ded3f53e/resource-summary.json",
+          "sha256": "ba1af867e582633191a3312252554babfbd9352e95dd3dea6d799da568acae3b"
+        },
+        {
+          "path": "results/current/cold-storage/632744d8-a60b-4236-8253-d7a0d9748e6f/native-readback/8004f496-5ecb-4f3a-b5b8-1342ded3f53e/invocation.json",
+          "sha256": "2167776978caace46897922fe64de902775fc8f1d2dd1734f694f23a490b1224"
+        },
+        {
+          "path": "results/current/cold-storage/632744d8-a60b-4236-8253-d7a0d9748e6f/native-readback/8004f496-5ecb-4f3a-b5b8-1342ded3f53e/verifier-final.json",
+          "sha256": "5ede5f4e7469e7bbed982987b5f36db5a16a89fbb0aa3b217de6f359fefc36d9"
+        },
+        {
+          "path": "results/current/cold-storage/632744d8-a60b-4236-8253-d7a0d9748e6f/native-readback/8004f496-5ecb-4f3a-b5b8-1342ded3f53e/storage-stopped.json",
+          "sha256": "f42ffef75382e9a27466951aad05de922bb33de72785a7d871051f68235eb802"
+        },
+        {
+          "path": "results/current/cold-storage/632744d8-a60b-4236-8253-d7a0d9748e6f/native-readback/8004f496-5ecb-4f3a-b5b8-1342ded3f53e/clickhouse-stopped.json",
+          "sha256": "de82886568f129953ff6dcb1c7143d35b6fbe4a43be4ff9186788b53b8853063"
+        },
+        {
+          "path": "results/current/cold-storage/632744d8-a60b-4236-8253-d7a0d9748e6f/native-readback/8004f496-5ecb-4f3a-b5b8-1342ded3f53e/cleanup-preflight-failure.json",
+          "sha256": "3ad63e8f2e35fbf9ab9cc162c8e31bf5927b844ca3322f432437c82a405c8084"
+        },
+        {
+          "path": "results/current/cold-storage/632744d8-a60b-4236-8253-d7a0d9748e6f/native-readback/8004f496-5ecb-4f3a-b5b8-1342ded3f53e/recovery-6191b730-b1aa-4cbf-8371-13952cf26a54/verifications/608c17ea-a4eb-4976-a574-b6e2d40dd70e/verified.json",
+          "sha256": "58407a7ea065da3424b875c26bc54ea8bcf61a7610ef388d466a02011e7d4a89"
+        },
+        {
+          "path": "results/current/cold-storage/632744d8-a60b-4236-8253-d7a0d9748e6f/native-readback/8004f496-5ecb-4f3a-b5b8-1342ded3f53e/recovery-6191b730-b1aa-4cbf-8371-13952cf26a54/verifications/608c17ea-a4eb-4976-a574-b6e2d40dd70e/storage-metrics.json",
+          "sha256": "6ef8f9da5078996e03499d7731827b1158f87357b8dd9a309155af7f802ff84d"
+        },
+        {
+          "path": "results/current/cold-storage/632744d8-a60b-4236-8253-d7a0d9748e6f/native-readback/8004f496-5ecb-4f3a-b5b8-1342ded3f53e/recovery-6191b730-b1aa-4cbf-8371-13952cf26a54/verifications/608c17ea-a4eb-4976-a574-b6e2d40dd70e/native-versions.json",
+          "sha256": "4db29bf7c26eaf71717bbf0e11c4b15233e5a240b60479419594f93ab71f5d5e"
+        },
+        {
+          "path": "results/current/cold-storage/632744d8-a60b-4236-8253-d7a0d9748e6f/native-readback/8004f496-5ecb-4f3a-b5b8-1342ded3f53e/cleanup/7353f777-8397-489c-933c-78107416fd2d/result.json",
+          "sha256": "3709bd4bd11bda3ae556fa76b8ee4f2e10e6e87749f4b6b134f1550cb4d8051f"
+        },
+        {
+          "path": "results/current/qualification-20261122/cold-replay-b51eeef527b542c98d28a58fb93a04be/memory-failed-result.json",
+          "sha256": "3fa182a93ae8ecea97e186ab80309dfb572a32240c3fbfee1e9b1bd7aaa48852"
+        }
+      ]
+    },
+    {
+      "label": "storage",
+      "readback_id": "e4e99b0b-0f25-4b22-9423-f4f23a119bb6",
+      "case_id": "b183b02d-279f-4136-8da5-dcc28de19114",
+      "restore_passed": true,
+      "original_operational_qualified": true,
+      "diagnostic": false,
+      "proof": {
+        "rows_verified": 2400000,
+        "acknowledged_batches": 240,
+        "acknowledged_rows": 2400000,
+        "ambiguous_batches_applied": 0,
+        "ambiguous_batches_absent": 2,
+        "known_failed_batches_absent": 32,
+        "canonical_body_sha256": "081bceeb847b89aae2c6ca186c6f9f69ea5248f5c2d329685312fe2a4c07f02e",
+        "ambiguous_batches": [
+          {
+            "operation_id": "b183b02d-279f-4136-8da5-dcc28de19114:writer-001:22",
+            "applied": false,
+            "rows": 0
+          },
+          {
+            "operation_id": "b183b02d-279f-4136-8da5-dcc28de19114:writer-000:30",
+            "applied": false,
+            "rows": 0
+          }
+        ]
+      },
+      "snapshot": {
+        "table_uuid": "bc820c31-b194-47aa-bda0-790b4ae433b7",
+        "snapshot_id": 547903107976416849,
+        "metadata_location": "s3://warehouse/lab/recovery_b183b02d279f41368da5dcc28de19114-bc820c31-b194-47aa-bda0-790b4ae433b7/metadata/v241.metadata.json"
+      },
+      "workflow": {
+        "exit_code": 0,
+        "duration_s": 34.53630837495439,
+        "sources_unchanged": true
+      },
+      "export_and_reconciliation_duration_s": {
+        "duckdb": 6.509978711,
+        "clickhouse": 5.59112071
+      },
+      "storage": {
+        "totals": {
+          "files": 240,
+          "rows": 2400000,
+          "file_bytes": 186833890,
+          "footer_bytes": 282000,
+          "column_chunks": 1680,
+          "compressed_chunk_bytes": 186515170,
+          "uncompressed_chunk_bytes": 211266960
+        },
+        "encoded_parquet_chunk_compression_ratio": 1.132706578237041
+      },
+      "resources": {
+        "clickhouse": {
+          "samples": 17,
+          "unavailable_samples": 1,
+          "observed_seconds": 18.79,
+          "cpu_core_seconds": {
+            "total": 2.4312310000000004,
+            "user": 1.4515729999999998,
+            "system": 0.9796579999999998
+          },
+          "cpu_percent_one_core_100": 12.938962213943588,
+          "charged_memory_bytes_min_mean_max": [
+            293330944,
+            530497295.0588235,
+            779350016
+          ],
+          "lifetime_peak_memory_bytes": 1171243008,
+          "allocated_disk_bytes_first_peak_last": [
+            233472,
+            173686784,
+            4984832
+          ],
+          "native_block_io": {
+            "254:0": {
+              "observed_seconds": 18.79,
+              "rbytes": 0,
+              "wbytes": 127262720,
+              "rios": 0,
+              "wios": 474,
+              "rbytes_per_second": 0.0,
+              "wbytes_per_second": 6772896.221394359,
+              "rios_per_second": 0.0,
+              "wios_per_second": 25.226184140500266
+            }
+          },
+          "identity_or_counter_gaps": 0,
+          "memory_stat_bytes_min_mean_max": {
+            "anon": [
+              266153984,
+              345392549.64705884,
+              421265408
+            ],
+            "file": [
+              196608,
+              32726317.17647059,
+              173506560
+            ],
+            "kernel": [
+              7901184,
+              10719713.88235294,
+              15753216
+            ]
+          },
+          "memory_stat_samples": 17
+        },
+        "storage": {
+          "samples": 19,
+          "unavailable_samples": 0,
+          "observed_seconds": 20.97,
+          "cpu_core_seconds": {
+            "total": 1.4807099999999997,
+            "user": 0.9201980000000002,
+            "system": 0.5605119999999999
+          },
+          "cpu_percent_one_core_100": 7.061087267525035,
+          "charged_memory_bytes_min_mean_max": [
+            219340800,
+            526024057.2631579,
+            647593984
+          ],
+          "lifetime_peak_memory_bytes": 648990720,
+          "allocated_disk_bytes_first_peak_last": [
+            1644711936,
+            1644716032,
+            1644716032
+          ],
+          "native_block_io": {
+            "254:0": {
+              "observed_seconds": 20.97,
+              "rbytes": 188391424,
+              "wbytes": 331776,
+              "rios": 330,
+              "wios": 47,
+              "rbytes_per_second": 8983854.268001908,
+              "wbytes_per_second": 15821.459227467813,
+              "rios_per_second": 15.736766809728184,
+              "wios_per_second": 2.2412970910824987
+            }
+          },
+          "identity_or_counter_gaps": 0,
+          "memory_stat_bytes_min_mean_max": {
+            "anon": [
+              206888960,
+              367734999.57894737,
+              445771776
+            ],
+            "file": [
+              8822784,
+              154026199.57894737,
+              197218304
+            ],
+            "kernel": [
+              3272704,
+              3797207.5789473685,
+              4263936
+            ]
+          },
+          "memory_stat_samples": 19
+        },
+        "verifier": {
+          "samples": 13,
+          "unavailable_samples": 4,
+          "observed_seconds": 14.09,
+          "cpu_core_seconds": {
+            "total": 8.784557,
+            "user": 7.160003,
+            "system": 1.6245550000000002
+          },
+          "cpu_percent_one_core_100": 62.346039744499635,
+          "charged_memory_bytes_min_mean_max": [
+            2523136,
+            677380726.1538461,
+            1283178496
+          ],
+          "lifetime_peak_memory_bytes": 1331146752,
+          "allocated_disk_bytes_first_peak_last": [
+            684032,
+            506155008,
+            506155008
+          ],
+          "native_block_io": null,
+          "identity_or_counter_gaps": 0,
+          "memory_stat_bytes_min_mean_max": {
+            "anon": [
+              499712,
+              354233422.7692308,
+              848703488
+            ],
+            "file": [
+              0,
+              198150931.69230768,
+              481439744
+            ],
+            "kernel": [
+              1384448,
+              3775251.6923076925,
+              4644864
+            ]
+          },
+          "memory_stat_samples": 13
+        }
+      },
+      "cleanup": {
+        "passed": true,
+        "error": null,
+        "mode": "readback",
+        "removed": [
+          {
+            "container": "6e55e12aeb48f5febf05daa474d791f852e1838b067b01e7bd99737ef614607b"
+          },
+          {
+            "container": "908d2d19d9641f3b16f8ac7ec4cec56f7ae15787c9bb68ddaf3de28196976226"
+          },
+          {
+            "container": "7c250c11f2594afd45ca2f49c09b7c466bfbd8503e88e0e7a9747f1fc8c7fbf3"
+          },
+          {
+            "network": "67f669f6c371e3fedfcc26efbdfb9749941fbd725c285141eddf206dacfe1fc8"
+          },
+          {
+            "query_volume": "iceberg-cold-readback-e4e99b0b0f254b229423f4f23a119bb6_query"
+          }
+        ],
+        "observed_retained_volumes": {
+          "iceberg-multi-system-current_storage": {
+            "CreatedAt": "2026-11-22T19:23:29Z",
+            "Driver": "local",
+            "Labels": {
+              "com.docker.compose.config-hash": "fcbf9065e65b2c75d448c5b1413366922837cea3c0e04891edd585e0854d4653",
+              "com.docker.compose.project": "iceberg-multi-system-current",
+              "com.docker.compose.version": "5.1.4",
+              "com.docker.compose.volume": "storage"
+            },
+            "Mountpoint": "/var/lib/docker/volumes/iceberg-multi-system-current_storage/_data",
+            "Name": "iceberg-multi-system-current_storage",
+            "Options": null,
+            "Scope": "local"
+          },
+          "iceberg-cold-632744d8a60b42368253d7a0d9748e6f": {
+            "CreatedAt": "2026-11-22T20:53:23Z",
+            "Driver": "local",
+            "Labels": {
+              "org.examples.cold-storage": "632744d8-a60b-4236-8253-d7a0d9748e6f"
+            },
+            "Mountpoint": "/var/lib/docker/volumes/iceberg-cold-632744d8a60b42368253d7a0d9748e6f/_data",
+            "Name": "iceberg-cold-632744d8a60b42368253d7a0d9748e6f",
+            "Options": null,
+            "Scope": "local"
+          }
+        },
+        "already_absent_retained_volumes": [],
+        "completed_ns": 1795381149278013000,
+        "scope": "Temporary fenced resources only; checkpoint/source volumes and evidence retained."
+      },
+      "evidence": [
+        {
+          "path": "results/current/cold-storage/632744d8-a60b-4236-8253-d7a0d9748e6f/native-readback/e4e99b0b-0f25-4b22-9423-f4f23a119bb6/result.json",
+          "sha256": "819f6d9ce7f9882f563f1ba53733c97e7143af8d5f0473866fc975deb9d3c4bf"
+        },
+        {
+          "path": "results/current/cold-storage/632744d8-a60b-4236-8253-d7a0d9748e6f/native-readback/e4e99b0b-0f25-4b22-9423-f4f23a119bb6/native-settings.json",
+          "sha256": "254b23b6ef1b28c72c2bad0dfc7bd6e1834ff024236b5042363a3e4a8547a2f5"
+        },
+        {
+          "path": "results/current/cold-storage/632744d8-a60b-4236-8253-d7a0d9748e6f/native-readback/e4e99b0b-0f25-4b22-9423-f4f23a119bb6/resource-summary.json",
+          "sha256": "2a8c9fc0ba997228088ffdc2bd3fa606b8b32942817abc073266de7d923e2f10"
+        },
+        {
+          "path": "results/current/cold-storage/632744d8-a60b-4236-8253-d7a0d9748e6f/native-readback/e4e99b0b-0f25-4b22-9423-f4f23a119bb6/invocation.json",
+          "sha256": "7dad0f0ed353d8e9b3f88b4efb77ad5b0d799850847716bb713a496a40bda18e"
+        },
+        {
+          "path": "results/current/cold-storage/632744d8-a60b-4236-8253-d7a0d9748e6f/native-readback/e4e99b0b-0f25-4b22-9423-f4f23a119bb6/verifier-final.json",
+          "sha256": "952dbfcf292fbb5bf9a0ebce38f8b4d81f63c2956ab3aa2272d01a3fcedcd448"
+        },
+        {
+          "path": "results/current/cold-storage/632744d8-a60b-4236-8253-d7a0d9748e6f/native-readback/e4e99b0b-0f25-4b22-9423-f4f23a119bb6/storage-stopped.json",
+          "sha256": "00d41b7f00897d36bd54aabd7630b2db9839947857997f998313e5f6437d280c"
+        },
+        {
+          "path": "results/current/cold-storage/632744d8-a60b-4236-8253-d7a0d9748e6f/native-readback/e4e99b0b-0f25-4b22-9423-f4f23a119bb6/clickhouse-stopped.json",
+          "sha256": "1c6f2a996884f0c96f181360fed85ede20597e608ca24cdf0ea281bdf5efdbc8"
+        },
+        {
+          "path": "results/current/cold-storage/632744d8-a60b-4236-8253-d7a0d9748e6f/native-readback/e4e99b0b-0f25-4b22-9423-f4f23a119bb6/cleanup-preflight-failure.json",
+          "sha256": "3ad63e8f2e35fbf9ab9cc162c8e31bf5927b844ca3322f432437c82a405c8084"
+        },
+        {
+          "path": "results/current/cold-storage/632744d8-a60b-4236-8253-d7a0d9748e6f/native-readback/e4e99b0b-0f25-4b22-9423-f4f23a119bb6/recovery-b183b02d-279f-4136-8da5-dcc28de19114/verifications/44b18f39-528e-4987-938c-1522e516ae0f/verified.json",
+          "sha256": "d1ec961a01dbc87fae5d3a2ce6958aadd6c604fe43916d5900408b1449a26fa7"
+        },
+        {
+          "path": "results/current/cold-storage/632744d8-a60b-4236-8253-d7a0d9748e6f/native-readback/e4e99b0b-0f25-4b22-9423-f4f23a119bb6/recovery-b183b02d-279f-4136-8da5-dcc28de19114/verifications/44b18f39-528e-4987-938c-1522e516ae0f/storage-metrics.json",
+          "sha256": "473e3647a3c706a3986677094ba5483434571bcdeecdadea53888c1b51a99c0f"
+        },
+        {
+          "path": "results/current/cold-storage/632744d8-a60b-4236-8253-d7a0d9748e6f/native-readback/e4e99b0b-0f25-4b22-9423-f4f23a119bb6/recovery-b183b02d-279f-4136-8da5-dcc28de19114/verifications/44b18f39-528e-4987-938c-1522e516ae0f/native-versions.json",
+          "sha256": "4db29bf7c26eaf71717bbf0e11c4b15233e5a240b60479419594f93ab71f5d5e"
+        },
+        {
+          "path": "results/current/cold-storage/632744d8-a60b-4236-8253-d7a0d9748e6f/native-readback/e4e99b0b-0f25-4b22-9423-f4f23a119bb6/cleanup/e914efde-7e70-407f-898c-9227c45e3002/result.json",
+          "sha256": "f6dab6b6262e1d0c40bd8cc84962f3761e1887ad55603b65745ab20c72b95f2b"
+        },
+        {
+          "path": "results/current/qualification-20261122/cold-replay-b51eeef527b542c98d28a58fb93a04be/storage-result.json",
+          "sha256": "ec56b67cee35d3fc1021416edf8709cf238c36e3129f339d2c8cb5faed1d11c6"
+        }
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "path": "results/current/cold-storage/632744d8-a60b-4236-8253-d7a0d9748e6f/result.json",
+      "sha256": "b9de6990cfa689241754788d102baff9a0b48a9835c83b9a65b40eee1fda3d8e"
+    },
+    {
+      "path": "results/current/cold-storage/632744d8-a60b-4236-8253-d7a0d9748e6f/invocation.json",
+      "sha256": "cf23fa0956496c0cf58cc45bc7c4ffe8c3da96226c92bb4f8ffe817df98ebfc4"
+    },
+    {
+      "path": "results/current/cold-storage/632744d8-a60b-4236-8253-d7a0d9748e6f/archive-proof.json",
+      "sha256": "c978098a94857778f564d2d33335e8094cada7eb24987b7bf935165f5504a55d"
+    },
+    {
+      "path": "results/current/cold-storage/632744d8-a60b-4236-8253-d7a0d9748e6f/backup-resources.json",
+      "sha256": "d74519a16e82a9448dffd98ec299054ba96297933495c5176e66c36687ded496"
+    },
+    {
+      "path": "results/current/cold-storage/632744d8-a60b-4236-8253-d7a0d9748e6f/restore-resources.json",
+      "sha256": "c6ccdd338c485f6b97e88388037f893783ea1753f591f13d37d9dcd7b25fd0ad"
+    },
+    {
+      "path": "results/current/cold-storage/632744d8-a60b-4236-8253-d7a0d9748e6f/files.sha256",
+      "sha256": "ead0929cdb02309807826e12c9d9acc18dba6f26631a76d4226891809dd2a392"
+    },
+    {
+      "path": "results/current/cold-storage/632744d8-a60b-4236-8253-d7a0d9748e6f/restored-files.sha256",
+      "sha256": "ead0929cdb02309807826e12c9d9acc18dba6f26631a76d4226891809dd2a392"
+    },
+    {
+      "path": "results/current/cold-storage/632744d8-a60b-4236-8253-d7a0d9748e6f/metadata.txt",
+      "sha256": "77c4f8731a56c5f480eb176b93c6613346653f7d830e06c313250bfee387b73c"
+    },
+    {
+      "path": "results/current/cold-storage/632744d8-a60b-4236-8253-d7a0d9748e6f/restored-metadata.txt",
+      "sha256": "77c4f8731a56c5f480eb176b93c6613346653f7d830e06c313250bfee387b73c"
+    },
+    {
+      "path": "results/current/qualification-20261122/cold-cleanup-4dc976549c7d46899c38ea261754c97d/result.json",
+      "sha256": "865510370b47bcc5e248a6aace2ebde123850e9ec1bb0a8f180bc5cac1158479"
+    }
+  ],
+  "retained": [
+    "source volume",
+    "independent restored volume",
+    "whole-volume archive",
+    "all original witnesses, failed reports and raw resources"
+  ],
+  "limits": [
+    "Stopped writers/readers during maintenance; this does not establish availability or consistency during online backup.",
+    "Three witnessed tables, 10.11M ACK rows per engine; not every table in the catalog is verified.",
+    "Original memory-failed operational verdict remains false; restored body integrity does not reclassify that failure.",
+    "Current all-history preservation/closure for that failed operational case remains unfinished; main-lab teardown stays fail-closed.",
+    "One run per table, warmup/cold OS cache not controlled; workflow and export timings are diagnostics, not sustained throughput or tail-latency benchmarks.",
+    "CPU values are sampled native cgroup deltas, excluding unobserved start/exit edges. Memory includes charged file cache/kernel; block I/O counters belong to the Docker VM, not physical SSD latency.",
+    "Parquet chunk compression is separate from archive gzip size and filesystem allocation.",
+    "Historical original volume and database service were not changed; current source services deliberately restarted during checkpoint, then remained unchanged throughout replay and temporary cleanup.",
+    "The first outer checkpoint wrapper failed its pre-Make source comparison because config regenerated an ignored serving CPU setting from0.25 to0.5. Native checkpoint source freeze after config passed; no source data reset or duplicate backup.",
+    "Initial cleanup planning rejected the current immutable tag@digest spelling. Cleanup now accepts the matching pinned digest while still requiring exact recorded native container Image IDs; mutable tags or mismatching digests are rejected."
+  ],
+  "host_controls_at_cleanup": 209
+}

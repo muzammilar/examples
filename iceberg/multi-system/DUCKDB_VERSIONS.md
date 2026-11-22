@@ -140,9 +140,11 @@ with matching release references, instead of a hardcoded version string.
 
 - Resolve/retest ClickHouse-written manifest compatibility before qualifying the
   complete current-version normal architecture matrix.
-- Preserve the earlier current memory-failed case, close all-history verification
-  and qualify current-fixture cold backup/restore; keep teardown fail-closed until
-  the required evidence exists. Do not assume in-place downgrade compatibility.
+- Preserve the earlier current memory-failed case and close all-history
+  verification; keep teardown fail-closed until the required evidence exists.
+  Current-fixture cold backup/restore now passes 10.11 million acknowledged rows
+  per engine across all three witnessed tables, retaining the failed verdict;
+  see `CURRENT_COLD_RESULTS.json`. Do not assume in-place downgrade compatibility.
 - Rerun Quack deadlines, native WAL recovery and owned-copy file-format migration
   on 2.0.1. Historical 1.5.5 timeout and beta-protocol findings do not establish
   current Quack behavior.

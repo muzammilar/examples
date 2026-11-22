@@ -283,6 +283,16 @@ def storage_selection(parent, invocation, restored, image=None, transition=None)
     }
 
 
+def restore_files(storage_image):
+    files = ["-f", TEMPLATE]
+    if control.lab.PROFILE == "current":
+        if storage_image != UPGRADE_454_IMAGE:
+            raise RuntimeError("current restore requires the checkpoint's pinned 4.54 image")
+        # Reopen with the same bounded reader/cache/capacity configuration.
+        files += ["-f", "docker-compose.storage-current.yml"]
+    return files
+
+
 def run(
     checkpoint_path, case_path, verification, *, storage_image=None, transition=None
 ):
@@ -291,6 +301,7 @@ def run(
     storage_image, image_intent = storage_selection(
         parent, invocation, restored, storage_image, transition
     )
+    compose_files = restore_files(storage_image)
     case, workload, baseline_path, baseline, files = fixture(
         case_path, verification, invocation["source_volume"]
     )
@@ -336,8 +347,7 @@ def run(
         "/dev/null",
         "--project-directory",
         str(control.ROOT),
-        "-f",
-        TEMPLATE,
+        *compose_files,
     ]
     frozen = control.sources()
     baseline_sha = cleanup.digest(baseline_path)
@@ -388,6 +398,14 @@ def run(
             control.check_networks(value, networks)
             control.save(root / (role + "-started.json"), control.state(value))
             sampler.bind(role, value["Id"], disk)
+        if control.lab.PROFILE == "current":
+            control.save(
+                root / "native-settings.json",
+                control.current_settings(
+                    service(compose, env, project, "storage"),
+                    service(compose, env, project, "clickhouse"),
+                ),
+            )
         if cold.volume_users(name) != {service(compose, env, project, "storage")["Id"]}:
             raise RuntimeError("restore volume ownership changed")
         control.call(

@@ -13,8 +13,10 @@ The previous current compactor case remains failed at its 3.8-million-row final
 ordered ClickHouse export: native memory was exhausted with external sorting
 disabled. Exact-snapshot controls pass with bounded sort spilling; lowering only
 the Parquet budget fails. The fresh 3.91-million-row retry passes without raising
-caps. Preserve that predecessor, finish its all-history closure and qualify a
-current cold restore before teardown. Remaining useful cases are archive
+caps. Preserve that predecessor, finish its all-history closure before teardown. A current cold checkpoint and
+three native readbacks now verify all 10.11 million acknowledged rows per engine;
+see `CURRENT_COLD_RESULTS.json`. Temporary cleanup and 209 controls pass, while
+the original failed qualification stays false. Remaining useful cases are archive
 interruption/resume, isolated catalog/S3/network failures, DuckDB 2.0.1 WAL and
 file-format recovery, then repeated comparative benchmarks on stable paths.
 
