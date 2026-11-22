@@ -3,7 +3,7 @@ WORKDIR /src
 COPY go.mod go.sum ./
 RUN go mod download
 COPY . .
-RUN CGO_ENABLED=1 go build -trimpath -o /out/lab .
+RUN CGO_ENABLED=1 go test ./... && CGO_ENABLED=1 go build -trimpath -o /out/lab .
 FROM debian:bookworm-slim
 RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates libstdc++6 \
  && rm -rf /var/lib/apt/lists/* && useradd --uid 10001 --create-home app \

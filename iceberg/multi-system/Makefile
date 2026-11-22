@@ -33,7 +33,8 @@ up: config prepare
 ARCH ?= all
 export ARCH
 
-unit-test: prepare
+unit-test: config prepare
+	$(COMPOSE) build runner
 	docker run --rm --network none --cpus=2 --memory=1g --memory-swap=1g --user $(LOCAL_USER) -e GOMAXPROCS=2 -e GOCACHE=/tmp/go-cache -e GOMODCACHE=/tmp/go-mod-cache -v "$(CURDIR)/.build/clickhouse-archive-workload:/src:ro" -w /src golang:1.27.4-bookworm go test ./...
 
 test: config unit-test

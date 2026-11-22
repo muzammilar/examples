@@ -43,6 +43,7 @@ services:
     image: iceberg-multi-ch-workload:dev
     build: ./.build/clickhouse-archive-workload
     environment:
+      AWS_EC2_METADATA_DISABLED: 'true'
       ROWS: ${ROWS:-2000000}
       CUSTOMERS: ${CUSTOMERS:-10000}
       BATCH_ROWS: ${BATCH_ROWS:-100000}
@@ -75,6 +76,7 @@ services:
     image: iceberg-multi-runner:dev
     build: ./app
     environment:
+      AWS_EC2_METADATA_DISABLED: 'true'
       CATALOG_URL: http://storage:8181
       S3_ENDPOINT: storage:8333
       CLICKHOUSE_ADDR: clickhouse:9000
@@ -93,3 +95,6 @@ services:
 volumes:
   storage:
   clickhouse:
+networks:
+  default:
+    internal: true

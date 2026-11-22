@@ -103,6 +103,17 @@ Go unit suite passes from this local context with networking disabled and
 This validates preparation and existing controls, not a rerun of the five live
 data paths or the still-unrun production fault/concurrency matrix below.
 
+Local isolation follow-up (2026-11-22, live qualification pending): the Compose
+network is now internal, workload metadata discovery is disabled, and the Go
+runner rejects endpoint/profile/credential-discovery overrides before opening
+an engine. Credentials remain explicit lab values; host AWS configuration is
+never mounted or used. Standalone standard-library guard tests pass, and all
+**17 rendered services** remain on the internal network without forwarding
+synthetic host credential variables. The full Docker build, native network
+isolation checks and five-path rerun are still pending; these preflight checks
+do not establish them. Runtime extensions/JARs must be installed during image
+build, since the running lab has no outbound network.
+
 ## Limitations by architecture
 
 | Case | Useful for | Limitation |

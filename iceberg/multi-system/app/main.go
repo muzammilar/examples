@@ -136,6 +136,9 @@ func probe() error {
 }
 func main() {
 	log.SetFlags(log.LstdFlags | log.LUTC)
+	if err := validateLocalTargets(os.Getenv); err != nil {
+		log.Fatal(err)
+	}
 	if len(os.Args) != 2 {
 		log.Fatal("usage: lab extensions|probe|load|verify")
 	}
