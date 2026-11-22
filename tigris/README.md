@@ -6,6 +6,16 @@ Compare S3 application behavior with [Garage](../garage/s3-cluster/),
 [object-storage results and their limits](../object-storage/).
 **No implementation or benchmark has run yet.**
 
+**Requested deployment: self-hosted only (2026-11-22).** A review of the current
+[official documentation](https://www.tigrisdata.com/docs/) and public repositories
+did not find a supported, publicly released Tigris object-storage server to run
+in Docker/Compose or kind. This example is blocked on an actual self-hosted server
+distribution, source and deployment/license terms. Do not request managed-service
+credentials or create cloud buckets to work around this requirement.
+[`storage`](https://github.com/tigrisdata/storage) contains SDKs;
+[`TAG`](https://github.com/tigrisdata/tag) is a caching proxy backed by an object
+store, not the Tigris storage engine. Neither establishes self-hosted Tigris.
+
 **Current scope (2026-11-22): local isolated Docker/Compose only.** Do not use
 host AWS configuration, credentials or real cloud resources. Managed Tigris runs
 are deferred. Use the separately named [SeaweedFS lab](../seaweedfs/s3-cluster/)
