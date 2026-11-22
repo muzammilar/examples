@@ -5,6 +5,9 @@ and commit-marker edits can produce successful opens/scans with acknowledged
 records missing. This strict integrity evaluation remains **FAILED** under its
 explicit logical file-edit fault model. Safe recovery of a known uncommitted
 trailer and successful intact-backup verification do not erase those failures.
+The separate [multi-segment diagnostic](AOF_SEGMENTS.md) covers rotation, sealed
+CRC damage, deliberate tail-file loss and complete-backup recovery; its successful
+expected-loss observations do not qualify these single-tail corruption cases.
 
 Scope: one fenced segment containing opaque application events, changed through
 the file API after all commit acknowledgements. This is not physical bit rot,

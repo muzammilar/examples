@@ -131,6 +131,17 @@ report-journal-header:
 test-aof-integrity: check-controls
 	python3 aof.py
 
+AOF_SEGMENT_BYTES ?= 65536
+.PHONY: test-aof-segments
+test-aof-segments: check-controls
+	AOF_SEGMENT_LIMIT=$(AOF_SEGMENT_BYTES) python3 aof_segments.py
+
+AOF_SEGMENT_RESULT ?=
+.PHONY: report-aof-segments
+report-aof-segments:
+	@test -n "$(AOF_SEGMENT_RESULT)" || { echo 'Set AOF_SEGMENT_RESULT to an explicit aof-segments result directory'; exit 1; }
+	python3 publish_aof_segments.py "$(AOF_SEGMENT_RESULT)"
+
 AOF_RESULT ?=
 .PHONY: report-aof
 report-aof:

@@ -95,7 +95,12 @@ and commit-marker edits yield successful opens/scans missing **5,000 / 5,000 /
 **FAILED**; an intact native backup verifies every body. CPU, memory, I/O,
 compression, disk and native API timing are reported separately from buffered
 admission versus commit barriers. This is an application event-log API, not
-automatic database persistence; live AOF process-crash and rotation tests remain open.
+automatic database persistence. The [multi-segment diagnostic](duckdb-comparison/AOF_SEGMENTS.md)
+now verifies 159-segment rotation/reopen, sealed CRC scan rejection and intact-backup
+recovery. Removing the tail loses **46/49 ACK bodies** in two fixtures; the external
+witness rejects while native open succeeds. Live AOF process-crash and interrupted
+rotation tests remain open; expected file-loss detection does not erase the
+existing integrity failures.
 
 The matching [DuckDB live WAL profile](duckdb-comparison/DUCKDB_RECOVERY.md),
 qualified on 2026-11-22, uses native C++ Quack sessions with TLS and the same

@@ -15,6 +15,16 @@ execution evidence.
 
 ## Fresh qualification in this follow-up
 
+- [Rayforce native AOF segments](rayforce/duckdb-comparison/AOF_SEGMENTS.md):
+  2026-11-22, 159 native files; complete 10,000/10,003-event rotation/reopen/backup
+  verification and known uncommitted-tail recovery. Full scan rejects one sealed
+  CRC edit while native open checks only the tail. Deliberate final-file deletion
+  loses **46/49 ACK bodies**, detected by the external witness before new writes;
+  intact backups restore every body. All resource/storage and native timing costs
+  are recorded. Expanded 12-case production workflow completes with both existing
+  strict payload/AOF integrity failures still nonzero. This expected-loss offline
+  diagnostic does not qualify live concurrent scans, interrupted rotation or
+  physical disk recovery.
 - [DuckDB native WAL recovery](rayforce/duckdb-comparison/DUCKDB_RECOVERY.md):
   2026-11-22, two retained-volume SIGKILLs with independent C++ Quack writer/reader
   sessions and checkpoint under load. Final strict-phase run verifies **2,000,000

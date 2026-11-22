@@ -34,6 +34,9 @@ if __name__ == "__main__":
         command("journal_restore.py", str(source))
         command("journal_tail.py", str(source))
         if args.profile == "all":
+            subprocess.run(
+                ["make", "test-aof-segments"], cwd=bench.ROOT, check=True, timeout=600
+            )
             command("journal_header.py", str(source))
             # These independent offline fault models do not consume each other's
             # outputs. Preserve both outcomes without qualifying either failure.

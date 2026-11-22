@@ -1,0 +1,50 @@
+{
+  "utc": "2026-11-22",
+  "profile_results": "AOF_SEGMENT_RESULTS.json",
+  "default_run": "results/aof-segments/7c13172e506b4826a68d78ad2cdce07c",
+  "partial_batch_run": "results/aof-segments/3eedc2d412474eda998301441dacfc18",
+  "partial_batch": {
+    "rows": 10003,
+    "explicit_commits": 101,
+    "missing_after_tail_deletion": 49,
+    "backup_bodies_verified": 10003
+  },
+  "controller_tests_passed": 33,
+  "language_engine_cases_passed": 6,
+  "negative_controls_passed": 18,
+  "five_command_lifecycle_passed": true,
+  "lifecycle_regression": "results/runs/590be243267244c088dae3399cfe2993",
+  "production": {
+    "workflow_cases": 12,
+    "make_exit_code": 2,
+    "strict_integrity_passed": false,
+    "failed_diagnostics": [
+      "journal_corruption.py",
+      "aof.py"
+    ],
+    "included_segment_case": "results/aof-segments/efdd3268d30c4d47a020670c2accbad2",
+    "rayforce_live_source": "results/journal-live/fcb2a4d00b994d3bb9777c54e5bdd1cf",
+    "rayforce_live_acknowledged": 2258,
+    "header_case": "results/journal-header/121bfb3ddf5541d8b12217ce156ccf90",
+    "payload_case": "results/journal-corruption/04f116ff0bff4af4b2fca5893fd2c31a",
+    "aof_case": "results/aof/475dd6e16c524b4d8d33c188fb637e18"
+  },
+  "cleanup": {
+    "owned_projects_empty": true,
+    "owned_image_absent": true,
+    "unrelated_resources_untouched": true
+  },
+  "log_sha256": {
+    "aof-segments.log": "67f4d8a559274a2957c320c3d0b2632ea1059eab3a0a77d13d85fcbc555856e2",
+    "aof-segments-partial-batch.log": "5406e9f774801eff67b42506ed27411b7529f81c1a626e103b0a501a93aed030",
+    "production-with-aof-segments.log": "c63963a6ef4dc82da445a5c6d1a76fb6ed3ce5bc37e47c809902d6baedf12078",
+    "aof-segments-final-lifecycle.log": "0073a80e6badd77af321632b8c2695e32cf5d58d847a1a5f0aeb5e5ed40f0596",
+    "aof-segments-build.log": "968450655839671aa94ea34a8c13f239cbb2061c82945f29dc48f926c9943adb"
+  },
+  "source_file_hashes": {
+    "aof_segments.py": "70173e3240e1156fabf40167804a59e2243646056b0ed1c219862daa42c8ede6",
+    "publish_aof_segments.py": "b9bb785375408bb4c345786488682820c0a650f66c38c9c8eee76fd780e3cf95",
+    "production.py": "914bf8df69920d8a201aa5b3f8957bab985460ab64313f142cdfde25a7d6323e",
+    "Makefile": "d9fcbb2a619d51512cfec1804077a8a00f62ab342dcdc2ace96011cf16909367"
+  }
+}

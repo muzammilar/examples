@@ -37,6 +37,7 @@ make test-journal-capability
 make test-journal-recovery
 make test-journal-writer-lock
 make test-aof-integrity                 # strict offline integrity probe; known failure
+make test-aof-segments                  # rotation, full-scan CRC guard and file-loss/backup diagnostic
 make test-production
 ```
 
@@ -68,6 +69,9 @@ payload edits are rejected, but length/commit-marker edits yield successful nati
 results with 5,000/5,000/100 missing acknowledged records. Intact-backup verification
 passes. The full production runner records both independent payload/AOF failures
 and returns nonzero; neither is hidden by the other's failure.
+The [multi-segment profile](AOF_SEGMENTS.md) additionally exercises native rotation,
+sealed-file CRC rejection, exact witness detection after tail deletion and intact
+backup restore. It does not turn the separate strict-integrity failures green.
 Changing `ROWS` requires archiving the old `results/`
 directory first. Failed runs remain evidence; no automatic data reset or retry.
 An example-local lock prevents concurrent controllers. Other examples must be

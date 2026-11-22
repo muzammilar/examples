@@ -1,0 +1,2961 @@
+{
+  "source_directory": "results/aof-segments/7c13172e506b4826a68d78ad2cdce07c",
+  "environment": {
+    "utc": "2026-11-22T00:17:01Z",
+    "source_sha256": {
+      "aof_segments.py": "70173e3240e1156fabf40167804a59e2243646056b0ed1c219862daa42c8ede6",
+      "aof.py": "f21526e29bdb6931ac9d17cb95940bf9c9e17f52cbfe19e73912427d6f5a6d42",
+      "journal_tail.py": "c8da0071841f047dd689d2da74c8e3d5ccfe8ae7b8553aa0abfc8a95cf1cf2d8",
+      "journal_volume.py": "aa8a468e797c4ba795fc7a9af52191aa9532c04391c5c4e85ac4a60a88645071",
+      "journal_restore.py": "37afc7a5d575ef4c3f51b52f88f7b9726a5dbaa8250230f3bfa35146574c2104",
+      "experiment.py": "02be7832b7ebd4df063fd928937a503daf04f22706f657972aab1d43de4d61bb",
+      "analytics-workload/cpp/aof.cpp": "80d03f24a1862e979fb9e44350d4b717bee8d2f6fde3e12b736e975b20ef925b",
+      "analytics-workload/python/measure_aof.py": "5b32c95c51ad7b1c9844eb70e7d1685861c7c2a304b291c85fab7b9df6ef3887",
+      "docker/Dockerfile": "2036ca4ab3a3ea027fe0493ff16d93b8bb4318edcaf49a69e18295ad44bc8f4b",
+      "docker-compose.aof.yml": "0104fe000e897f35a9d9239f253eadb5fa9ac8dfc8413a50ced0a508377053dc",
+      "docker-compose.duckdb-live.yml": "e24b2fde0b6e80e06c66e608cfffd026169673e116aab75dcaa61ffd192aecd3",
+      "docker-compose.journal-tail.yml": "fb971ebb4f2318a56657ac1097421160a6fce4414f48b58a1540ce0f99a5c54b",
+      "docker-compose.journal-volume.yml": "f97301b164eb3a70ae88713c437712f8ea97d8065a3eecfb953670947a3411a7",
+      "docker-compose.journal.yml": "665a59f9754ce307ae6a3c3398d815f25d03a7134a17be56cc502ca984fa4ffd",
+      "docker-compose.yml": "27edb716dfec74c43bf44000a5d5f5fd4e0856b727cb4db5ea1e692428cca80b"
+    },
+    "sources": {
+      "rayforce.tar.gz": {
+        "url": "https://codeload.github.com/RayforceDB/rayforce/tar.gz/38fd4be3560d63a5514c1e6883685fe496d45e1a",
+        "sha256": "6c6d08467bef24d372ae076bc4abfba7d09fc1658d15e0b8ca992e64509bb1d6"
+      },
+      "duckdb-arm64.tar.gz": {
+        "url": "https://github.com/duckdb/duckdb/releases/download/v2.0.0/duckdb-shared-libs-linux-arm64.tar.gz",
+        "sha256": "c60eecf91143ca6bbac55c4f4d40dc22520488b0ac257c86e0fe9a2b451cf2b7"
+      },
+      "duckdb-amd64.tar.gz": {
+        "url": "https://github.com/duckdb/duckdb/releases/download/v2.0.0/duckdb-shared-libs-linux-amd64.tar.gz",
+        "sha256": "993ad89e7dfca66cd6da994c2cad090c2fc160ddf9f550498a098ab4bb13cfb1"
+      }
+    },
+    "host": [
+      "Darwin",
+      "Muzammils-MacBook-Pro.local",
+      "25.5.0",
+      "Darwin Kernel Version 25.5.0: Mon Apr 27 20:41:15 PDT 2026; root:xnu-12377.121.6~2/RELEASE_ARM64_T6041",
+      "arm64"
+    ],
+    "cpu_model": "Apple M4 Pro",
+    "docker_info": {
+      "ID": "172e5e0a-2d95-4fb5-a6b4-fb16552caec8",
+      "Containers": 9,
+      "ContainersRunning": 0,
+      "ContainersPaused": 0,
+      "ContainersStopped": 9,
+      "Images": 10,
+      "Driver": "overlayfs",
+      "DriverStatus": [
+        [
+          "driver-type",
+          "io.containerd.snapshotter.v1"
+        ]
+      ],
+      "Plugins": {
+        "Volume": [
+          "local"
+        ],
+        "Network": [
+          "bridge",
+          "host",
+          "ipvlan",
+          "macvlan",
+          "null",
+          "overlay"
+        ],
+        "Authorization": null,
+        "Log": [
+          "awslogs",
+          "fluentd",
+          "gcplogs",
+          "gelf",
+          "journald",
+          "json-file",
+          "local",
+          "splunk",
+          "syslog"
+        ]
+      },
+      "MemoryLimit": true,
+      "SwapLimit": true,
+      "CpuCfsPeriod": true,
+      "CpuCfsQuota": true,
+      "CPUShares": true,
+      "CPUSet": true,
+      "PidsLimit": true,
+      "IPv4Forwarding": true,
+      "Debug": false,
+      "NFd": 45,
+      "OomKillDisable": false,
+      "NGoroutines": 112,
+      "SystemTime": "2026-11-22T00:17:01.878394084Z",
+      "LoggingDriver": "json-file",
+      "CgroupDriver": "cgroupfs",
+      "CgroupVersion": "2",
+      "NEventsListener": 13,
+      "KernelVersion": "6.12.76-linuxkit",
+      "OperatingSystem": "Docker Desktop",
+      "OSVersion": "",
+      "OSType": "linux",
+      "Architecture": "aarch64",
+      "IndexServerAddress": "https://index.docker.io/v1/",
+      "RegistryConfig": {
+        "InsecureRegistryCIDRs": [
+          "::1/128",
+          "127.0.0.0/8"
+        ],
+        "IndexConfigs": {
+          "docker.io": {
+            "Name": "docker.io",
+            "Mirrors": [],
+            "Secure": true,
+            "Official": true
+          },
+          "hubproxy.docker.internal:5555": {
+            "Name": "hubproxy.docker.internal:5555",
+            "Mirrors": [],
+            "Secure": false,
+            "Official": false
+          }
+        },
+        "Mirrors": []
+      },
+      "NCPU": 11,
+      "MemTotal": 26216296448,
+      "GenericResources": null,
+      "DockerRootDir": "/var/lib/docker",
+      "HttpProxy": "http.docker.internal:3128",
+      "HttpsProxy": "http.docker.internal:3128",
+      "NoProxy": "hubproxy.docker.internal",
+      "Name": "docker-desktop",
+      "Labels": [
+        "com.docker.desktop.address=unix:///Users/muzammil/Library/Containers/com.docker.docker/Data/docker-cli.sock"
+      ],
+      "ExperimentalBuild": false,
+      "ServerVersion": "29.5.3",
+      "Runtimes": {
+        "io.containerd.runc.v2": {
+          "path": "runc",
+          "status": {
+            "org.opencontainers.runtime-spec.features": "{\"ociVersionMin\":\"1.0.0\",\"ociVersionMax\":\"1.2.1\",\"hooks\":[\"prestart\",\"createRuntime\",\"createContainer\",\"startContainer\",\"poststart\",\"poststop\"],\"mountOptions\":[\"async\",\"atime\",\"bind\",\"defaults\",\"dev\",\"diratime\",\"dirsync\",\"exec\",\"iversion\",\"lazytime\",\"loud\",\"mand\",\"noatime\",\"nodev\",\"nodiratime\",\"noexec\",\"noiversion\",\"nolazytime\",\"nomand\",\"norelatime\",\"nostrictatime\",\"nosuid\",\"nosymfollow\",\"private\",\"ratime\",\"rbind\",\"rdev\",\"rdiratime\",\"relatime\",\"remount\",\"rexec\",\"rnoatime\",\"rnodev\",\"rnodiratime\",\"rnoexec\",\"rnorelatime\",\"rnostrictatime\",\"rnosuid\",\"rnosymfollow\",\"ro\",\"rprivate\",\"rrelatime\",\"rro\",\"rrw\",\"rshared\",\"rslave\",\"rstrictatime\",\"rsuid\",\"rsymfollow\",\"runbindable\",\"rw\",\"shared\",\"silent\",\"slave\",\"strictatime\",\"suid\",\"symfollow\",\"sync\",\"tmpcopyup\",\"unbindable\"],\"linux\":{\"namespaces\":[\"cgroup\",\"ipc\",\"mount\",\"network\",\"pid\",\"time\",\"user\",\"uts\"],\"capabilities\":[\"CAP_CHOWN\",\"CAP_DAC_OVERRIDE\",\"CAP_DAC_READ_SEARCH\",\"CAP_FOWNER\",\"CAP_FSETID\",\"CAP_KILL\",\"CAP_SETGID\",\"CAP_SETUID\",\"CAP_SETPCAP\",\"CAP_LINUX_IMMUTABLE\",\"CAP_NET_BIND_SERVICE\",\"CAP_NET_BROADCAST\",\"CAP_NET_ADMIN\",\"CAP_NET_RAW\",\"CAP_IPC_LOCK\",\"CAP_IPC_OWNER\",\"CAP_SYS_MODULE\",\"CAP_SYS_RAWIO\",\"CAP_SYS_CHROOT\",\"CAP_SYS_PTRACE\",\"CAP_SYS_PACCT\",\"CAP_SYS_ADMIN\",\"CAP_SYS_BOOT\",\"CAP_SYS_NICE\",\"CAP_SYS_RESOURCE\",\"CAP_SYS_TIME\",\"CAP_SYS_TTY_CONFIG\",\"CAP_MKNOD\",\"CAP_LEASE\",\"CAP_AUDIT_WRITE\",\"CAP_AUDIT_CONTROL\",\"CAP_SETFCAP\",\"CAP_MAC_OVERRIDE\",\"CAP_MAC_ADMIN\",\"CAP_SYSLOG\",\"CAP_WAKE_ALARM\",\"CAP_BLOCK_SUSPEND\",\"CAP_AUDIT_READ\",\"CAP_PERFMON\",\"CAP_BPF\",\"CAP_CHECKPOINT_RESTORE\"],\"cgroup\":{\"v1\":true,\"v2\":true,\"systemd\":true,\"systemdUser\":true,\"rdma\":true},\"seccomp\":{\"enabled\":true,\"actions\":[\"SCMP_ACT_ALLOW\",\"SCMP_ACT_ERRNO\",\"SCMP_ACT_KILL\",\"SCMP_ACT_KILL_PROCESS\",\"SCMP_ACT_KILL_THREAD\",\"SCMP_ACT_LOG\",\"SCMP_ACT_NOTIFY\",\"SCMP_ACT_TRACE\",\"SCMP_ACT_TRAP\"],\"operators\":[\"SCMP_CMP_EQ\",\"SCMP_CMP_GE\",\"SCMP_CMP_GT\",\"SCMP_CMP_LE\",\"SCMP_CMP_LT\",\"SCMP_CMP_MASKED_EQ\",\"SCMP_CMP_NE\"],\"archs\":[\"SCMP_ARCH_AARCH64\",\"SCMP_ARCH_ARM\",\"SCMP_ARCH_MIPS\",\"SCMP_ARCH_MIPS64\",\"SCMP_ARCH_MIPS64N32\",\"SCMP_ARCH_MIPSEL\",\"SCMP_ARCH_MIPSEL64\",\"SCMP_ARCH_MIPSEL64N32\",\"SCMP_ARCH_PPC\",\"SCMP_ARCH_PPC64\",\"SCMP_ARCH_PPC64LE\",\"SCMP_ARCH_RISCV64\",\"SCMP_ARCH_S390\",\"SCMP_ARCH_S390X\",\"SCMP_ARCH_X32\",\"SCMP_ARCH_X86\",\"SCMP_ARCH_X86_64\"],\"knownFlags\":[\"SECCOMP_FILTER_FLAG_TSYNC\",\"SECCOMP_FILTER_FLAG_SPEC_ALLOW\",\"SECCOMP_FILTER_FLAG_LOG\"],\"supportedFlags\":[\"SECCOMP_FILTER_FLAG_TSYNC\",\"SECCOMP_FILTER_FLAG_SPEC_ALLOW\",\"SECCOMP_FILTER_FLAG_LOG\"]},\"apparmor\":{\"enabled\":true},\"selinux\":{\"enabled\":true},\"intelRdt\":{\"enabled\":true},\"mountExtensions\":{\"idmap\":{\"enabled\":true}}},\"annotations\":{\"io.github.seccomp.libseccomp.version\":\"2.5.4\",\"org.opencontainers.runc.checkpoint.enabled\":\"true\",\"org.opencontainers.runc.commit\":\"v1.3.6-0-g491b69ba\",\"org.opencontainers.runc.version\":\"1.3.6\\n\"},\"potentiallyUnsafeConfigAnnotations\":[\"bundle\",\"org.systemd.property.\",\"org.criu.config\"]}"
+          }
+        },
+        "runc": {
+          "path": "runc",
+          "status": {
+            "org.opencontainers.runtime-spec.features": "{\"ociVersionMin\":\"1.0.0\",\"ociVersionMax\":\"1.2.1\",\"hooks\":[\"prestart\",\"createRuntime\",\"createContainer\",\"startContainer\",\"poststart\",\"poststop\"],\"mountOptions\":[\"async\",\"atime\",\"bind\",\"defaults\",\"dev\",\"diratime\",\"dirsync\",\"exec\",\"iversion\",\"lazytime\",\"loud\",\"mand\",\"noatime\",\"nodev\",\"nodiratime\",\"noexec\",\"noiversion\",\"nolazytime\",\"nomand\",\"norelatime\",\"nostrictatime\",\"nosuid\",\"nosymfollow\",\"private\",\"ratime\",\"rbind\",\"rdev\",\"rdiratime\",\"relatime\",\"remount\",\"rexec\",\"rnoatime\",\"rnodev\",\"rnodiratime\",\"rnoexec\",\"rnorelatime\",\"rnostrictatime\",\"rnosuid\",\"rnosymfollow\",\"ro\",\"rprivate\",\"rrelatime\",\"rro\",\"rrw\",\"rshared\",\"rslave\",\"rstrictatime\",\"rsuid\",\"rsymfollow\",\"runbindable\",\"rw\",\"shared\",\"silent\",\"slave\",\"strictatime\",\"suid\",\"symfollow\",\"sync\",\"tmpcopyup\",\"unbindable\"],\"linux\":{\"namespaces\":[\"cgroup\",\"ipc\",\"mount\",\"network\",\"pid\",\"time\",\"user\",\"uts\"],\"capabilities\":[\"CAP_CHOWN\",\"CAP_DAC_OVERRIDE\",\"CAP_DAC_READ_SEARCH\",\"CAP_FOWNER\",\"CAP_FSETID\",\"CAP_KILL\",\"CAP_SETGID\",\"CAP_SETUID\",\"CAP_SETPCAP\",\"CAP_LINUX_IMMUTABLE\",\"CAP_NET_BIND_SERVICE\",\"CAP_NET_BROADCAST\",\"CAP_NET_ADMIN\",\"CAP_NET_RAW\",\"CAP_IPC_LOCK\",\"CAP_IPC_OWNER\",\"CAP_SYS_MODULE\",\"CAP_SYS_RAWIO\",\"CAP_SYS_CHROOT\",\"CAP_SYS_PTRACE\",\"CAP_SYS_PACCT\",\"CAP_SYS_ADMIN\",\"CAP_SYS_BOOT\",\"CAP_SYS_NICE\",\"CAP_SYS_RESOURCE\",\"CAP_SYS_TIME\",\"CAP_SYS_TTY_CONFIG\",\"CAP_MKNOD\",\"CAP_LEASE\",\"CAP_AUDIT_WRITE\",\"CAP_AUDIT_CONTROL\",\"CAP_SETFCAP\",\"CAP_MAC_OVERRIDE\",\"CAP_MAC_ADMIN\",\"CAP_SYSLOG\",\"CAP_WAKE_ALARM\",\"CAP_BLOCK_SUSPEND\",\"CAP_AUDIT_READ\",\"CAP_PERFMON\",\"CAP_BPF\",\"CAP_CHECKPOINT_RESTORE\"],\"cgroup\":{\"v1\":true,\"v2\":true,\"systemd\":true,\"systemdUser\":true,\"rdma\":true},\"seccomp\":{\"enabled\":true,\"actions\":[\"SCMP_ACT_ALLOW\",\"SCMP_ACT_ERRNO\",\"SCMP_ACT_KILL\",\"SCMP_ACT_KILL_PROCESS\",\"SCMP_ACT_KILL_THREAD\",\"SCMP_ACT_LOG\",\"SCMP_ACT_NOTIFY\",\"SCMP_ACT_TRACE\",\"SCMP_ACT_TRAP\"],\"operators\":[\"SCMP_CMP_EQ\",\"SCMP_CMP_GE\",\"SCMP_CMP_GT\",\"SCMP_CMP_LE\",\"SCMP_CMP_LT\",\"SCMP_CMP_MASKED_EQ\",\"SCMP_CMP_NE\"],\"archs\":[\"SCMP_ARCH_AARCH64\",\"SCMP_ARCH_ARM\",\"SCMP_ARCH_MIPS\",\"SCMP_ARCH_MIPS64\",\"SCMP_ARCH_MIPS64N32\",\"SCMP_ARCH_MIPSEL\",\"SCMP_ARCH_MIPSEL64\",\"SCMP_ARCH_MIPSEL64N32\",\"SCMP_ARCH_PPC\",\"SCMP_ARCH_PPC64\",\"SCMP_ARCH_PPC64LE\",\"SCMP_ARCH_RISCV64\",\"SCMP_ARCH_S390\",\"SCMP_ARCH_S390X\",\"SCMP_ARCH_X32\",\"SCMP_ARCH_X86\",\"SCMP_ARCH_X86_64\"],\"knownFlags\":[\"SECCOMP_FILTER_FLAG_TSYNC\",\"SECCOMP_FILTER_FLAG_SPEC_ALLOW\",\"SECCOMP_FILTER_FLAG_LOG\"],\"supportedFlags\":[\"SECCOMP_FILTER_FLAG_TSYNC\",\"SECCOMP_FILTER_FLAG_SPEC_ALLOW\",\"SECCOMP_FILTER_FLAG_LOG\"]},\"apparmor\":{\"enabled\":true},\"selinux\":{\"enabled\":true},\"intelRdt\":{\"enabled\":true},\"mountExtensions\":{\"idmap\":{\"enabled\":true}}},\"annotations\":{\"io.github.seccomp.libseccomp.version\":\"2.5.4\",\"org.opencontainers.runc.checkpoint.enabled\":\"true\",\"org.opencontainers.runc.commit\":\"v1.3.6-0-g491b69ba\",\"org.opencontainers.runc.version\":\"1.3.6\\n\"},\"potentiallyUnsafeConfigAnnotations\":[\"bundle\",\"org.systemd.property.\",\"org.criu.config\"]}"
+          }
+        }
+      },
+      "DefaultRuntime": "runc",
+      "Swarm": {
+        "NodeID": "",
+        "NodeAddr": "",
+        "LocalNodeState": "inactive",
+        "ControlAvailable": false,
+        "Error": "",
+        "RemoteManagers": null
+      },
+      "LiveRestoreEnabled": false,
+      "Isolation": "",
+      "InitBinary": "docker-init",
+      "ContainerdCommit": {
+        "ID": "e53c7c1516c3b2bff98eb76f1f4117477e6f4e66"
+      },
+      "RuncCommit": {
+        "ID": "v1.3.6-0-g491b69ba"
+      },
+      "InitCommit": {
+        "ID": "de40ad0"
+      },
+      "SecurityOptions": [
+        "name=seccomp,profile=builtin",
+        "name=cgroupns"
+      ],
+      "FirewallBackend": {
+        "Driver": "iptables"
+      },
+      "CDISpecDirs": [
+        "/etc/cdi",
+        "/var/run/cdi"
+      ],
+      "DiscoveredDevices": [
+        {
+          "Source": "cdi",
+          "ID": "docker.com/gpu=webgpu"
+        }
+      ],
+      "Containerd": {
+        "Address": "/run/containerd/containerd.sock",
+        "Namespaces": {
+          "Containers": "moby",
+          "Plugins": "plugins.moby"
+        }
+      },
+      "Warnings": null,
+      "ClientInfo": {
+        "Debug": false,
+        "Version": "29.5.3",
+        "DefaultAPIVersion": "1.54",
+        "GitCommit": "d1c06ef",
+        "GoVersion": "go1.26.4",
+        "Os": "darwin",
+        "Arch": "arm64",
+        "BuildTime": "Wed Jun  3 17:59:08 2026",
+        "Context": "desktop-linux",
+        "Plugins": [
+          {
+            "SchemaVersion": "0.1.0",
+            "Vendor": "Docker Inc.",
+            "Version": "v1.79.0",
+            "ShortDescription": "Docker AI Agent Runner",
+            "Name": "agent",
+            "Path": "/Users/muzammil/.docker/cli-plugins/docker-agent"
+          },
+          {
+            "SchemaVersion": "0.1.0",
+            "Vendor": "Docker Inc.",
+            "Version": "v1.25.0",
+            "ShortDescription": "Docker AI Agent - Ask Gordon",
+            "Name": "ai",
+            "Path": "/Users/muzammil/.docker/cli-plugins/docker-ai"
+          },
+          {
+            "SchemaVersion": "0.1.0",
+            "Vendor": "Docker Inc.",
+            "Version": "v0.34.1-desktop.1",
+            "ShortDescription": "Docker Buildx",
+            "Name": "buildx",
+            "Path": "/Users/muzammil/.docker/cli-plugins/docker-buildx"
+          },
+          {
+            "SchemaVersion": "0.1.0",
+            "Vendor": "Docker Inc.",
+            "Version": "v5.1.4",
+            "ShortDescription": "Docker Compose",
+            "Name": "compose",
+            "Path": "/Users/muzammil/.docker/cli-plugins/docker-compose"
+          },
+          {
+            "SchemaVersion": "0.1.0",
+            "Vendor": "Docker Inc.",
+            "Version": "0.0.47",
+            "ShortDescription": "Get a shell into any image or container",
+            "Name": "debug",
+            "Path": "/Users/muzammil/.docker/cli-plugins/docker-debug"
+          },
+          {
+            "SchemaVersion": "0.1.0",
+            "Vendor": "Docker Inc.",
+            "Version": "v0.4.1",
+            "ShortDescription": "Docker Desktop commands",
+            "Name": "desktop",
+            "Path": "/Users/muzammil/.docker/cli-plugins/docker-desktop"
+          },
+          {
+            "SchemaVersion": "0.1.0",
+            "Vendor": "Docker Inc.",
+            "Version": "v0.0.4",
+            "ShortDescription": "CLI for managing Docker Hardened Images",
+            "Name": "dhi",
+            "Path": "/Users/muzammil/.docker/cli-plugins/docker-dhi"
+          },
+          {
+            "SchemaVersion": "0.1.0",
+            "Vendor": "Docker Inc.",
+            "Version": "v0.2.31",
+            "ShortDescription": "Manages Docker extensions",
+            "Name": "extension",
+            "Path": "/Users/muzammil/.docker/cli-plugins/docker-extension"
+          },
+          {
+            "SchemaVersion": "0.1.0",
+            "Vendor": "Docker Inc.",
+            "Version": "v1.4.0",
+            "ShortDescription": "Creates Docker-related starter files for your project",
+            "Name": "init",
+            "Path": "/Users/muzammil/.docker/cli-plugins/docker-init"
+          },
+          {
+            "SchemaVersion": "0.1.0",
+            "Vendor": "Docker Inc.",
+            "Version": "v0.42.2",
+            "ShortDescription": "Docker MCP Plugin",
+            "Name": "mcp",
+            "Path": "/Users/muzammil/.docker/cli-plugins/docker-mcp"
+          },
+          {
+            "SchemaVersion": "0.1.0",
+            "Vendor": "Docker Inc.",
+            "Version": "v1.2.1",
+            "ShortDescription": "Docker Model Runner",
+            "Name": "model",
+            "Path": "/Users/muzammil/.docker/cli-plugins/docker-model"
+          },
+          {
+            "SchemaVersion": "0.1.0",
+            "Vendor": "Docker Inc.",
+            "Version": "v0.6.4",
+            "ShortDescription": "Docker Offload",
+            "Name": "offload",
+            "Path": "/Users/muzammil/.docker/cli-plugins/docker-offload"
+          },
+          {
+            "SchemaVersion": "0.1.0",
+            "Vendor": "Docker Inc.",
+            "Version": "v0.1.5",
+            "ShortDescription": "Docker Pass Secrets Manager Plugin (beta)",
+            "Name": "pass",
+            "Path": "/Users/muzammil/.docker/cli-plugins/docker-pass"
+          },
+          {
+            "SchemaVersion": "0.1.0",
+            "Vendor": "Docker Inc.",
+            "Version": "v0.12.0",
+            "ShortDescription": "Docker Sandbox",
+            "Name": "sandbox",
+            "Path": "/Users/muzammil/.docker/cli-plugins/docker-sandbox"
+          },
+          {
+            "SchemaVersion": "0.1.0",
+            "Vendor": "Docker Inc.",
+            "Version": "v1.22.0",
+            "ShortDescription": "Docker Scout",
+            "Name": "scout",
+            "Path": "/Users/muzammil/.docker/cli-plugins/docker-scout"
+          }
+        ],
+        "Warnings": null
+      }
+    },
+    "config": {
+      "rows": 10000,
+      "payload_bytes": 1024,
+      "segment_limit_bytes": 65536,
+      "explicit_commit_batch": 100
+    },
+    "expected": {
+      "healthy_and_backup": "every committed body/LSN survives reopen and scan",
+      "known_tail_trailer": "open discards only the known uncommitted three-byte suffix",
+      "sealed_crc_damage": "full scan rejects corrupt committed segment; open is not a full scan",
+      "deleted_tail": "single-copy records are lost; witness must reject before further writes; intact backup restores all"
+    },
+    "scope": "Fenced offline logical file edits/deletion on independent copies, not process/power/device faults or live availability; this does not qualify the known failing single-tail integrity contract"
+  },
+  "diagnostic_passed": true,
+  "original_integrity_failures_still_open": true,
+  "observations": {
+    "inventory": {
+      "segments": 159,
+      "first_lsn": 0,
+      "tail_first_lsn": 9954,
+      "files": {
+        "00000000000000000000.aof": {
+          "bytes": 65024,
+          "sha256": "a986b075fbe917e24c0cad668bc4895afd9ac14de6aa45bdcada8ba8d9fdc2d8"
+        },
+        "00000000000000000063.aof": {
+          "bytes": 65032,
+          "sha256": "5a6ed61d06f119d44d840fbc40a59a8838674bec1d7c876aee46cd2da8a5793c"
+        },
+        "00000000000000000126.aof": {
+          "bytes": 65024,
+          "sha256": "a7f6160dec9c7d3ee845de167d54a47abc07bb05d1ff32f69e84b7db2ea1cd99"
+        },
+        "00000000000000000189.aof": {
+          "bytes": 65032,
+          "sha256": "0ef31c08d017604dfbb00642a959320a7825c069c940f81a16030b8d2afbcebd"
+        },
+        "00000000000000000252.aof": {
+          "bytes": 65032,
+          "sha256": "0cdd43d78f4846bc25a0893272742c2ced343af127ddc316d6643cf54787cc0e"
+        },
+        "00000000000000000315.aof": {
+          "bytes": 65024,
+          "sha256": "ef1961730766482835c85a986e500d5bd54b2c094ff9fefbbd394bcf63a57646"
+        },
+        "00000000000000000378.aof": {
+          "bytes": 65032,
+          "sha256": "0c09fff9c522ff86bf541c248a4c5688d24ee3c972edc04f521afa0a7263546b"
+        },
+        "00000000000000000441.aof": {
+          "bytes": 65032,
+          "sha256": "0ed720c76162e6dcf80ac14126746edbfe90b0d27746635c010dc73cc94b7315"
+        },
+        "00000000000000000504.aof": {
+          "bytes": 65024,
+          "sha256": "4318016a2f7c3ae202a04cbc8a76171f73ebe3a7f283f557e0a878bfa9753091"
+        },
+        "00000000000000000567.aof": {
+          "bytes": 65032,
+          "sha256": "7b58a9816c13f0e57f83474b8ae6aefcdcf1c859e82aa6fad6d5164e4701299f"
+        },
+        "00000000000000000630.aof": {
+          "bytes": 65024,
+          "sha256": "185a19e0cd6209b187c45b1b7f0796bcbeabaf16700d473745f4c60acfc5347e"
+        },
+        "00000000000000000693.aof": {
+          "bytes": 65032,
+          "sha256": "20785e69c896f1e05fe4b1cbe0f10f58e421a6f49dea831c56f6fa1cbc9b99d6"
+        },
+        "00000000000000000756.aof": {
+          "bytes": 65032,
+          "sha256": "8bac07fc2037f0efffc4c349086eabd366081d5100aa84a90c1a725e9fec47bf"
+        },
+        "00000000000000000819.aof": {
+          "bytes": 65024,
+          "sha256": "3e221409e4ec7de31c211cb5b682cfd36d0cc751182147ae9212a0a02607dadf"
+        },
+        "00000000000000000882.aof": {
+          "bytes": 65032,
+          "sha256": "ca9968801196817679a3737770817ab8988b8fc411bec2e113a00e24e8903d1c"
+        },
+        "00000000000000000945.aof": {
+          "bytes": 65032,
+          "sha256": "4b20a83e9de54ad843e490fe3a4445237fe2d89ef1285cddb2c3eb533dc27e71"
+        },
+        "00000000000000001008.aof": {
+          "bytes": 65024,
+          "sha256": "f58769139e6cd75a265c95fbfbf74f8eabba43a64b1f973db83474f2e3cbd7f1"
+        },
+        "00000000000000001071.aof": {
+          "bytes": 65032,
+          "sha256": "7f571e5c037de3b52def323d608fac652ad38a161b0d4f979aaf38f64214c3d1"
+        },
+        "00000000000000001134.aof": {
+          "bytes": 65024,
+          "sha256": "d072a40b66dd4270622b7dd6fff6ada5bcde2a4230098bc0aa62e26463950048"
+        },
+        "00000000000000001197.aof": {
+          "bytes": 65032,
+          "sha256": "f21dd14bca5a78cccb7bd79d3892890d46c49057aa2ffa38396e6f4c49141a9a"
+        },
+        "00000000000000001260.aof": {
+          "bytes": 65032,
+          "sha256": "e63a26907783da50df24ac7e197e75cd838c326336b0452c8c588d05b430f25b"
+        },
+        "00000000000000001323.aof": {
+          "bytes": 65024,
+          "sha256": "6cb349fa4707003a88c23202c8265a257674fa50cc1bda164a51e367b55f8d67"
+        },
+        "00000000000000001386.aof": {
+          "bytes": 65032,
+          "sha256": "c2729193c616d61bec2dbdf9cbe9ccc395f56abe19030e33aa97794f2e98bcc6"
+        },
+        "00000000000000001449.aof": {
+          "bytes": 65032,
+          "sha256": "e2641a029de106383e5e1af468c2d95b058fb2b2f426359977c3db9c04bf7363"
+        },
+        "00000000000000001512.aof": {
+          "bytes": 65024,
+          "sha256": "13195095bbb9c712e74b47521c64f774413c39d830b034ea283379857932ba40"
+        },
+        "00000000000000001575.aof": {
+          "bytes": 65032,
+          "sha256": "f3427c9cbde29f0a643874d9adb374647d1a240deb5d8d2d9de01834809b5fa9"
+        },
+        "00000000000000001638.aof": {
+          "bytes": 65032,
+          "sha256": "39fbbf9f4221888d1fc27e341c0f3d9c3d10ca511637c6c04d897f55debb9718"
+        },
+        "00000000000000001701.aof": {
+          "bytes": 65024,
+          "sha256": "75e0cc4a71c64fecbe408d1b3bd3d2ad7ea7f002b4f3566a5a8479b2ddb4f32a"
+        },
+        "00000000000000001764.aof": {
+          "bytes": 65032,
+          "sha256": "63ba70908876b053c3c6f42b91418e8dd42a3878c7bae7e32fec1eb6367faf3c"
+        },
+        "00000000000000001827.aof": {
+          "bytes": 65024,
+          "sha256": "d544590c5664dea79d040dc891e2dafcbcd79fedfd13ed88f92c6528901afe7f"
+        },
+        "00000000000000001890.aof": {
+          "bytes": 65032,
+          "sha256": "9eeaba6e2411fd775cdaec94290e707daf8f72e8ef01b957fb51574d8d41b56b"
+        },
+        "00000000000000001953.aof": {
+          "bytes": 65032,
+          "sha256": "216491299f08d9f5484a6c04c359aa3fcfe7c5a1e9451ecbc34c2d67a9437875"
+        },
+        "00000000000000002016.aof": {
+          "bytes": 65024,
+          "sha256": "280ba80608b4e9774ed2162d8f8a9ef34803eaf766761d9b640919b0ca608358"
+        },
+        "00000000000000002079.aof": {
+          "bytes": 65032,
+          "sha256": "a9968190f5727e45c3ee002479981eb5df12a6b0d2724349ff97eabe4fe6d153"
+        },
+        "00000000000000002142.aof": {
+          "bytes": 65032,
+          "sha256": "344d7951ed4ed788086182483a102317be94759ee2913b874791de751d80eac5"
+        },
+        "00000000000000002205.aof": {
+          "bytes": 65024,
+          "sha256": "eba60df989a78ced95ccec4a6077d90590c97fedecc76290696851c155594181"
+        },
+        "00000000000000002268.aof": {
+          "bytes": 65032,
+          "sha256": "9499ac464baec58e37b95021894cf6a448128dd1a098d071b48649602836ca1d"
+        },
+        "00000000000000002331.aof": {
+          "bytes": 65024,
+          "sha256": "024e13aa603444cedff819f1598705c8a3646b888242610cc0aaacc82024be36"
+        },
+        "00000000000000002394.aof": {
+          "bytes": 65032,
+          "sha256": "a544f5b5bda4253c4b8179651b25c796d7aa101bb7dfcad42d945fbe66183664"
+        },
+        "00000000000000002457.aof": {
+          "bytes": 65032,
+          "sha256": "424e8f159a14123cd1f9e57c91f7bc5452e4ae48dfe34e82bc981cc17c47049b"
+        },
+        "00000000000000002520.aof": {
+          "bytes": 65024,
+          "sha256": "5dee441a5e5f305754db6639d457e0fe0de2626e696eb473956a71ccddcc25eb"
+        },
+        "00000000000000002583.aof": {
+          "bytes": 65032,
+          "sha256": "3558052efc4190601af04ef5f20751f79238e7f00fa3b82d6466f9e7b7f27d6e"
+        },
+        "00000000000000002646.aof": {
+          "bytes": 65032,
+          "sha256": "e241bbded379d19554a502e75b1e9839aa2483652519afdbc9e4df67882ccba6"
+        },
+        "00000000000000002709.aof": {
+          "bytes": 65024,
+          "sha256": "a60f0f2ddea3ed59b61db2e7b7e076845de46fff7a3cf7ce7fc51aec73557b2e"
+        },
+        "00000000000000002772.aof": {
+          "bytes": 65032,
+          "sha256": "4d323f33e8cc043f06575d053e19fc55eec3fc4b28aa9a3241ec223622cea47a"
+        },
+        "00000000000000002835.aof": {
+          "bytes": 65024,
+          "sha256": "858bd78934919ede677c5da2be94850213ac4717de1eecc57132de9321a5d4b9"
+        },
+        "00000000000000002898.aof": {
+          "bytes": 65032,
+          "sha256": "d81b90abf9b16350fcc6d62683984651481602e4481f1876d855f6cc4cb2eac7"
+        },
+        "00000000000000002961.aof": {
+          "bytes": 65032,
+          "sha256": "3e9cb63268b3833ab131ad48ee9bb0c1e3ff81706fbc73ba436ad3c5be5e0fc9"
+        },
+        "00000000000000003024.aof": {
+          "bytes": 65024,
+          "sha256": "e2cc19ea6299c7f36020eaa68a7232173147e645a869772dec46c2433c9bba58"
+        },
+        "00000000000000003087.aof": {
+          "bytes": 65032,
+          "sha256": "baa896b235a000efb96165ae576891c0b6796e6216e763b6d10394d6c1a2aba2"
+        },
+        "00000000000000003150.aof": {
+          "bytes": 65032,
+          "sha256": "b306fc4013fef0d8b6db0338804423f4028ee50a28b2384b7f6a0337584110d9"
+        },
+        "00000000000000003213.aof": {
+          "bytes": 65024,
+          "sha256": "aa59af682ba2a4e129aebf4910a419c40266726d03811ec3bc70504929cc0d4b"
+        },
+        "00000000000000003276.aof": {
+          "bytes": 65032,
+          "sha256": "8f49e537305401c8c740b0c09c188b3093ae2194f52142a2db90a2f24b22fad5"
+        },
+        "00000000000000003339.aof": {
+          "bytes": 65032,
+          "sha256": "240379869209cedde763539679632ad79b82a2a0b91a5332239e2471d3aa57ca"
+        },
+        "00000000000000003402.aof": {
+          "bytes": 65024,
+          "sha256": "9141ae07c6a1405ffff9892825dd42ce69657701df81fdaa6c1acd5a374bbcd4"
+        },
+        "00000000000000003465.aof": {
+          "bytes": 65032,
+          "sha256": "4b5732df14bc68b393389e7558924ce445b9532d695b8e721f66b2825314067a"
+        },
+        "00000000000000003528.aof": {
+          "bytes": 65024,
+          "sha256": "1830a7be5df72e7e67d6f7dadc226f52b1ecadc6ea4a07eef07fc0dd07bb9ede"
+        },
+        "00000000000000003591.aof": {
+          "bytes": 65032,
+          "sha256": "be982357f6aea90c704bd090ad89e2a27fa6358e0c29abe460caffbada2d0b2e"
+        },
+        "00000000000000003654.aof": {
+          "bytes": 65032,
+          "sha256": "e8bb0d8285cba23046276c86c029595b17a92b49e2c0451a0a8042817b458ef1"
+        },
+        "00000000000000003717.aof": {
+          "bytes": 65024,
+          "sha256": "7bc78044f283da3c7a4470689e2a89b22de7b4e0a52026c24edd0a0f699d4739"
+        },
+        "00000000000000003780.aof": {
+          "bytes": 65032,
+          "sha256": "e36be8c67e3676497ab606a8a3fe9a5ca10f908a642d93f6770be71d68b32237"
+        },
+        "00000000000000003843.aof": {
+          "bytes": 65032,
+          "sha256": "1853269e78d35dd0f37ecf9fea15d2a9ee4b60ac9526910c8e90f051790ec7f1"
+        },
+        "00000000000000003906.aof": {
+          "bytes": 65024,
+          "sha256": "e3e7f17e10969ab04e0673c09f39ae3baf6bd21020c55f3ab0fe59d133c68440"
+        },
+        "00000000000000003969.aof": {
+          "bytes": 65032,
+          "sha256": "76b1f53aaddb1e1709e66fbd41c963f903499a16130f41c2aa18933b7ddaec89"
+        },
+        "00000000000000004032.aof": {
+          "bytes": 65024,
+          "sha256": "5d6129286af18951bb2662aea1a2eaee05eb98ad1e61a9d5fc181d71e27c208a"
+        },
+        "00000000000000004095.aof": {
+          "bytes": 65032,
+          "sha256": "5f856a289468e6e211696f18125a6512e2b69280c33631594f1794bbdcc35ccb"
+        },
+        "00000000000000004158.aof": {
+          "bytes": 65032,
+          "sha256": "6a3231ae2247a808db4a30fa2b372c0378340f27fda0a17108a62f46955d5f8d"
+        },
+        "00000000000000004221.aof": {
+          "bytes": 65024,
+          "sha256": "d0675b432ea47de58115a6b35d7d8d976d38ee9e53faa2ca5a48bf0b97e797d8"
+        },
+        "00000000000000004284.aof": {
+          "bytes": 65032,
+          "sha256": "0ac5e0fba798083519a92409c7775c2149c5113a97c493500cc1b4c01daab092"
+        },
+        "00000000000000004347.aof": {
+          "bytes": 65032,
+          "sha256": "15554c008165943a3ccf5050e4f1add0d56ab5f6e13276d9a53ace0dac814049"
+        },
+        "00000000000000004410.aof": {
+          "bytes": 65024,
+          "sha256": "b5a4670964992b66d45e76e359fa97229c1b93639391c3db3633452de89257bb"
+        },
+        "00000000000000004473.aof": {
+          "bytes": 65032,
+          "sha256": "d397d7acef5c1af246714cfde65123af40c0f5c066becf1a7c642ab5523d73c4"
+        },
+        "00000000000000004536.aof": {
+          "bytes": 65024,
+          "sha256": "d7a05c2fe193212a6e2cc5ac7c285038dec427af4be8e8d84b6ae67a85582b14"
+        },
+        "00000000000000004599.aof": {
+          "bytes": 65032,
+          "sha256": "5c50adc164cf0dac5a495079b76dd50349a0ad477f8dfab1be32ab4060a693c4"
+        },
+        "00000000000000004662.aof": {
+          "bytes": 65032,
+          "sha256": "ad2146e88cd738cf93faecc9a0a54fa26baf0b1dd2d4fb5ede35f515636d8a0a"
+        },
+        "00000000000000004725.aof": {
+          "bytes": 65024,
+          "sha256": "5fa579fb830e60ed7796cd574781c97b4e501161eb6adb4b5249364311062dec"
+        },
+        "00000000000000004788.aof": {
+          "bytes": 65032,
+          "sha256": "293ab806ac93d4eb7e2df48ec6d0961cd85a6e5008d1bfeea339b6f7bdd364b8"
+        },
+        "00000000000000004851.aof": {
+          "bytes": 65032,
+          "sha256": "ad947529971cb21e7c63a55ee3b447fcdeeeb1d01353a34408942863ad6d8eb2"
+        },
+        "00000000000000004914.aof": {
+          "bytes": 65024,
+          "sha256": "433b7a537eef52a9562a176a31492cff0ac79a0bf28aee0bf088b6b0050c7436"
+        },
+        "00000000000000004977.aof": {
+          "bytes": 65032,
+          "sha256": "c21aa7dc1a18e7deb611439b438e66ff463586b0156bcdc9d1ab79832c41c3cc"
+        },
+        "00000000000000005040.aof": {
+          "bytes": 65032,
+          "sha256": "48b9c2d7d9dd07014df86c7cc1149a22936814e2b2bc01cf1158d89ad1deb20d"
+        },
+        "00000000000000005103.aof": {
+          "bytes": 65024,
+          "sha256": "50910b14768bfb024275b172cfcf7ba71d1a39eaf104b9fa3f4116c290f2aa5a"
+        },
+        "00000000000000005166.aof": {
+          "bytes": 65032,
+          "sha256": "bcbc297c6d74c1e4861b2dbeefdf2585fa542cedf11b94b75c89c02bb936f977"
+        },
+        "00000000000000005229.aof": {
+          "bytes": 65024,
+          "sha256": "13ac3eeb6a8ed6d42167a2859c82ab9cb0f3d5e914fc17e6bc7e9d011a3289e8"
+        },
+        "00000000000000005292.aof": {
+          "bytes": 65032,
+          "sha256": "8aa720799d50e07679756166956b875abe98102aa80c763523a4bbce49be6591"
+        },
+        "00000000000000005355.aof": {
+          "bytes": 65032,
+          "sha256": "81f6482504cf86fa3c4bdfb6cf1f811c54ee5c0835a9d1511a6f50589a3a43c4"
+        },
+        "00000000000000005418.aof": {
+          "bytes": 65024,
+          "sha256": "a5e81a9fb0017e6f996d552f88faba2a3d9f560d141afdc759390b31fa1f0230"
+        },
+        "00000000000000005481.aof": {
+          "bytes": 65032,
+          "sha256": "af9ea9fac302f3bfcbc19bc65dbcab429008912db4bc3dc518fe6b2c17a75ae7"
+        },
+        "00000000000000005544.aof": {
+          "bytes": 65032,
+          "sha256": "4092616b34e1c353d1ea685a4e2972c58cacd66b1545df06ed00656da8705704"
+        },
+        "00000000000000005607.aof": {
+          "bytes": 65024,
+          "sha256": "04e75091f47ee2252b830776b0c012ee35adf1acd5fb3ce3ecc368e480f30a78"
+        },
+        "00000000000000005670.aof": {
+          "bytes": 65032,
+          "sha256": "7b14fcac4bc0bca6a1977bac360c9e9ce3781af28b1bebdd9c84805afc840f68"
+        },
+        "00000000000000005733.aof": {
+          "bytes": 65024,
+          "sha256": "5f355fa42fe80d18b183e4e8d398a7f03039edbb67b4d4e09c768396a6253ea7"
+        },
+        "00000000000000005796.aof": {
+          "bytes": 65032,
+          "sha256": "c41f84b9b11f5d06c9d5f0ac336761301efa12dc8d127028868e69e68242c49b"
+        },
+        "00000000000000005859.aof": {
+          "bytes": 65032,
+          "sha256": "7ad0c49266097461400c62c38b3a9154f1b7c81ce21ee967d09917aa91b811a6"
+        },
+        "00000000000000005922.aof": {
+          "bytes": 65024,
+          "sha256": "1143e0c2ab0f9000c5d2e61af63eacd58d05778bfe41782f12e88c8193238aaf"
+        },
+        "00000000000000005985.aof": {
+          "bytes": 65032,
+          "sha256": "ac7fd042e2ccf981225b7e422d780d009679a9dfb8cc250e178a4cb9eda3d7ee"
+        },
+        "00000000000000006048.aof": {
+          "bytes": 65032,
+          "sha256": "11958e8501ab5154a20b1952a9a14dce22c9536566db563d1c9e9d3d5eaf33e7"
+        },
+        "00000000000000006111.aof": {
+          "bytes": 65024,
+          "sha256": "18bcf48e3b4c2e870ed28d0b78f3e2b104119d6142c012d3f865eff31204ad38"
+        },
+        "00000000000000006174.aof": {
+          "bytes": 65032,
+          "sha256": "b89a391760bb990a8d04eb7046642fe85b6a4dab92c25f44d9d0452380ffb29f"
+        },
+        "00000000000000006237.aof": {
+          "bytes": 65024,
+          "sha256": "6cb0a2ac356a179c64b78ceb7483d7aa0054a46178a649f902880edea11b074e"
+        },
+        "00000000000000006300.aof": {
+          "bytes": 65024,
+          "sha256": "575d8925efea382b0df6ca94f5601106525dc00cb6df91ef2ad5be0a7cb0bc46"
+        },
+        "00000000000000006363.aof": {
+          "bytes": 65032,
+          "sha256": "e4ce6b8ce0bdc00c235cc0ff4bc7290e9e810a1501c94d2984d72756fa45005b"
+        },
+        "00000000000000006426.aof": {
+          "bytes": 65024,
+          "sha256": "fa673ecd17e523bbc984e9e61fc3c48d872e3ffc929245c8b71fd98e23863cab"
+        },
+        "00000000000000006489.aof": {
+          "bytes": 65032,
+          "sha256": "72ec1365bc019c04f7e3cfa8bcaf042f6bc80667839ee1584738252a9cc9f850"
+        },
+        "00000000000000006552.aof": {
+          "bytes": 65032,
+          "sha256": "cd049a08fdc70b9b6d028f07361c70b2409a60bf612de87123da72adca05976b"
+        },
+        "00000000000000006615.aof": {
+          "bytes": 65024,
+          "sha256": "c27e9a66154e9c8ee2cbc87ec7399ffebba7c428504f4f027e4f68591eb740d4"
+        },
+        "00000000000000006678.aof": {
+          "bytes": 65032,
+          "sha256": "54677c77d668606c01a886be75e2d8e4aefc0d7703308dc00f9b211ec22deda0"
+        },
+        "00000000000000006741.aof": {
+          "bytes": 65032,
+          "sha256": "ecbec36b5a1095166ca0dbd76a1c06c5c044441c5383f1d8bc72b26ab782613b"
+        },
+        "00000000000000006804.aof": {
+          "bytes": 65024,
+          "sha256": "8cb71ea6c493725a226555e165fc652cbc47ef648a38604a8256b4ad9bffc6cc"
+        },
+        "00000000000000006867.aof": {
+          "bytes": 65032,
+          "sha256": "ae0c94dbe1d5859a65407ea4bf162f7a413c6cb7ee55d9198738adcd9b8a47d3"
+        },
+        "00000000000000006930.aof": {
+          "bytes": 65024,
+          "sha256": "c58f5cb3e93765680732e749cca2c4eda56d708db9bde6cf2e8f9505604a253d"
+        },
+        "00000000000000006993.aof": {
+          "bytes": 65032,
+          "sha256": "1563a1b88ecd292206f571225582fec09f7b3d8ab026fed276b5966c5382e873"
+        },
+        "00000000000000007056.aof": {
+          "bytes": 65032,
+          "sha256": "034b3180202baf5283131fa1d48377faf8e0e29437fb3a26c898663b5000e536"
+        },
+        "00000000000000007119.aof": {
+          "bytes": 65024,
+          "sha256": "a07065a5c10f1186d4b862dd1bdd52ae3d497a5597b2471082901bd93d4ed095"
+        },
+        "00000000000000007182.aof": {
+          "bytes": 65032,
+          "sha256": "e051bc0b90bdd885700469fde3ce68a35e262f9fc430efa5bbdc8e47c6059e67"
+        },
+        "00000000000000007245.aof": {
+          "bytes": 65032,
+          "sha256": "277fdb1f5db6fa9cee38a39442d89f9b3104e7ebe168737374859f669ed6973d"
+        },
+        "00000000000000007308.aof": {
+          "bytes": 65024,
+          "sha256": "13c17debeddd70eb962a17199273f3e4640422dfa77fefb54402d038b6ca7175"
+        },
+        "00000000000000007371.aof": {
+          "bytes": 65032,
+          "sha256": "a0ade05cefac4e7500cb5521b10218752b3c0a6193f8064374591ca514fa3b01"
+        },
+        "00000000000000007434.aof": {
+          "bytes": 65024,
+          "sha256": "d482b00bf72d6bbf2ad7a9b521013771b390df92c3d4a8d4839447af18197158"
+        },
+        "00000000000000007497.aof": {
+          "bytes": 65032,
+          "sha256": "9c53343377c4a7ca936e9dd9a9906dad68bfc53658ba4b4ad8793901d3b4fd78"
+        },
+        "00000000000000007560.aof": {
+          "bytes": 65032,
+          "sha256": "d4b52423fd3db3a0f0f0a0c281cdaeb0b710719d3615611e4f1c70d2956f2bf9"
+        },
+        "00000000000000007623.aof": {
+          "bytes": 65024,
+          "sha256": "aceb4ab5a443cc3cfd553cc8b98d404a249399c117cc68bb7d5df8660bbc473a"
+        },
+        "00000000000000007686.aof": {
+          "bytes": 65032,
+          "sha256": "1edaa675b0b3a3fcb7c4d9b438b5c3093c4f44444687279d2bbee1aac2e13538"
+        },
+        "00000000000000007749.aof": {
+          "bytes": 65032,
+          "sha256": "89da74b296be796ea56db7a7bab1beaee52b943a3712d43a07e4a475b0e3c84b"
+        },
+        "00000000000000007812.aof": {
+          "bytes": 65024,
+          "sha256": "e0ee24e494304d9d192d4cfb1d7e9d6187efe506aaabc3a52d2485aaa1cc1a1b"
+        },
+        "00000000000000007875.aof": {
+          "bytes": 65032,
+          "sha256": "8fdcd91c205917f3c274fe058a620e640a60cc81266cd43ccc006cfd9ba998c3"
+        },
+        "00000000000000007938.aof": {
+          "bytes": 65032,
+          "sha256": "1b5cb92bcf7428773ddfda551dc92e6bf906bbf29e4d7f4d8628bd168a053bdd"
+        },
+        "00000000000000008001.aof": {
+          "bytes": 65024,
+          "sha256": "3dcb0c8cdf51e665140558d4229f1da7be54e25665cfe60b7fa667f8991e802d"
+        },
+        "00000000000000008064.aof": {
+          "bytes": 65032,
+          "sha256": "290be2ca30284a0e9d1096178538ce74da27e7c520e41cb27f623a52065e92cb"
+        },
+        "00000000000000008127.aof": {
+          "bytes": 65024,
+          "sha256": "948a3e92dfff41632c5343a6f248a58e014df53f5c1f2dd4c45e4aacf23a6d77"
+        },
+        "00000000000000008190.aof": {
+          "bytes": 65032,
+          "sha256": "4889166d5336c6791ff42913fec5992c900e91cfe6a02b3b38cc82cdb741bb46"
+        },
+        "00000000000000008253.aof": {
+          "bytes": 65032,
+          "sha256": "64b27df2f845ef0e4e6a8c69470a524be404ebcd8115106a769fc320a3381728"
+        },
+        "00000000000000008316.aof": {
+          "bytes": 65024,
+          "sha256": "0532eb50bbbbe56a605078f6ae6041c20285dd7e2d616df81483c7bde62f044a"
+        },
+        "00000000000000008379.aof": {
+          "bytes": 65032,
+          "sha256": "b79ead0619784652b9267855f8c939ca361dca5b39ec117c5a239f008c1584ae"
+        },
+        "00000000000000008442.aof": {
+          "bytes": 65032,
+          "sha256": "aea7eb16a9cacdf6a636ac63e0afb5231f22790b1ad69a6a204df77afa11ac5b"
+        },
+        "00000000000000008505.aof": {
+          "bytes": 65024,
+          "sha256": "315328c1625516a395b183a2b8da83f5e3b89fe7d6ed54f98d48d5fec9604330"
+        },
+        "00000000000000008568.aof": {
+          "bytes": 65032,
+          "sha256": "cbbd48fbf6698ac6aa40d68068dac9dbe81c83aa643d839aec3434112f93dd97"
+        },
+        "00000000000000008631.aof": {
+          "bytes": 65024,
+          "sha256": "a7b25fa60121daece5934b225cb4fca73fdfee32a4173af1d16786653b72a795"
+        },
+        "00000000000000008694.aof": {
+          "bytes": 65032,
+          "sha256": "2caf7ed464c7dea0c34ee8b5da3dd3fce5bc97a8ff219405dd1ac5a74cbefac9"
+        },
+        "00000000000000008757.aof": {
+          "bytes": 65032,
+          "sha256": "5ac573d747342b57953f13ec7ab5d30260568d5516e4af96426e70daca80c2e2"
+        },
+        "00000000000000008820.aof": {
+          "bytes": 65024,
+          "sha256": "244d0b38be4053dcd086843d510abf7cfaee5dc0a73a87289933ccf3beea6c91"
+        },
+        "00000000000000008883.aof": {
+          "bytes": 65032,
+          "sha256": "d670255f67e4ff7c1eedc1837f7aa60a3398099cd1a7331bb5e71e07b0b0d873"
+        },
+        "00000000000000008946.aof": {
+          "bytes": 65032,
+          "sha256": "203b4b6645798b72f600b74fb4ff11a61fba51cd6418ec9597f4f5dcbd86272d"
+        },
+        "00000000000000009009.aof": {
+          "bytes": 65024,
+          "sha256": "0e6ab03b6567a0dae7eda019e2312d064d86580bb8b39b1239d259c97e7272fe"
+        },
+        "00000000000000009072.aof": {
+          "bytes": 65032,
+          "sha256": "8276671d104a77ae52b40070140de8ca359c50083c77f35ad2845d43413a0c92"
+        },
+        "00000000000000009135.aof": {
+          "bytes": 65024,
+          "sha256": "3b6dd803428ccde2c7af5ffcbce8641b7f1395a5a36cffa31a12aaad68935218"
+        },
+        "00000000000000009198.aof": {
+          "bytes": 65032,
+          "sha256": "4f4fcfa156f6d74359d267bbc18bbbbb4217ee25b8869665dc293a48ad66c1e5"
+        },
+        "00000000000000009261.aof": {
+          "bytes": 65032,
+          "sha256": "69e62bfb6200bf094b2113d48239ac9fe310e90d7c3868d4fb204d64b67b72b4"
+        },
+        "00000000000000009324.aof": {
+          "bytes": 65024,
+          "sha256": "3f762cd25e65fff4c696778586c1bd962c2588440c7b572f1bd1885da9d26a95"
+        },
+        "00000000000000009387.aof": {
+          "bytes": 65032,
+          "sha256": "ef9601b41f2924c10ef0e18769176b221e1c003430380308ac4fea590a311bc5"
+        },
+        "00000000000000009450.aof": {
+          "bytes": 65032,
+          "sha256": "cb9f6272cf453c9461f37d8bfcc15334ea4cdda3724c4fdafaed7a670b0fcf72"
+        },
+        "00000000000000009513.aof": {
+          "bytes": 65024,
+          "sha256": "ffa3781aa7bea036380d1076cdf7c2deb7f4734bb94746a55bb3967dab005d91"
+        },
+        "00000000000000009576.aof": {
+          "bytes": 65032,
+          "sha256": "bb3c2251b0c0eb6674799bed39698911f4721b2222ffdc3dda58777c4607c3b9"
+        },
+        "00000000000000009639.aof": {
+          "bytes": 65032,
+          "sha256": "46e4c9c2d3c2eac4199b622bdb0cdcf58e15de631314409cc986b260ffe2881f"
+        },
+        "00000000000000009702.aof": {
+          "bytes": 65024,
+          "sha256": "c124339894c8efd0dc215717a2c0c882393fea9ae5f3150f05c958c8da3ac5cc"
+        },
+        "00000000000000009765.aof": {
+          "bytes": 65032,
+          "sha256": "4bed047344de3203edc8149c72639f4e146db3f2b3c4d8e10621140f84557f41"
+        },
+        "00000000000000009828.aof": {
+          "bytes": 65024,
+          "sha256": "284d8ffb128606e86ce39575370b235c0907a89edbb34a365384b88186bfcca4"
+        },
+        "00000000000000009891.aof": {
+          "bytes": 65032,
+          "sha256": "fb64b369b3321b2757a05e470d78f23a61182ed6d0a3e967abc99461be4d65fb"
+        },
+        "00000000000000009954.aof": {
+          "bytes": 47480,
+          "sha256": "9253129c11da206e870e47c85c212b24d854f51d439d9529a9eaa97196c98204"
+        }
+      }
+    },
+    "healthy_scan": {
+      "acknowledged": 10000,
+      "bodies_verified": 10000,
+      "missing_acknowledged": 0,
+      "missing_ids": [],
+      "wrong_bodies": 0,
+      "wrong_ids": [],
+      "duplicate_ids": 0
+    },
+    "tail-trailer": {
+      "fault": {
+        "file": "00000000000000009954.aof",
+        "appended_hex": "010203"
+      },
+      "scan": {
+        "native_status": [
+          0,
+          10000,
+          10000
+        ],
+        "exit_code": 0,
+        "files_changed": false,
+        "proof": {
+          "acknowledged": 10000,
+          "bodies_verified": 10000,
+          "missing_acknowledged": 0,
+          "missing_ids": [],
+          "wrong_bodies": 0,
+          "wrong_ids": [],
+          "duplicate_ids": 0
+        }
+      },
+      "open": {
+        "native_status": [
+          0,
+          10000
+        ],
+        "exit_code": 0,
+        "files_changed": true
+      },
+      "input_manifest_sha256": "df536139a377e4fe6e28f7de6ea6b8472c3dc989c83bfc5eabb90583776fdcec",
+      "input_file_count": 159,
+      "changed_native_files": {
+        "00000000000000009954.aof": {
+          "bytes": 47483,
+          "sha256": "769ce4143be464eef04bee065a2778eaf92d9faf33798e46dbb595feae29682f"
+        }
+      },
+      "missing_native_files": []
+    },
+    "sealed-crc": {
+      "fault": {
+        "file": "00000000000000004977.aof",
+        "offset": 1031,
+        "old_byte": 111,
+        "new_byte": 110,
+        "bits_changed": 1
+      },
+      "scan": {
+        "native_status": [
+          10,
+          -1,
+          4977
+        ],
+        "exit_code": 2,
+        "files_changed": false,
+        "verdict": "Native full scan rejected corrupt committed data"
+      },
+      "open": {
+        "native_status": [
+          0,
+          10000
+        ],
+        "exit_code": 0,
+        "files_changed": false
+      },
+      "input_manifest_sha256": "62ead5c49d967cfa563986f30a344775354f02269fb23dae03d8a27cc27ae61d",
+      "input_file_count": 159,
+      "changed_native_files": {
+        "00000000000000004977.aof": {
+          "bytes": 65032,
+          "sha256": "2c6ebacea001931df730c798d12196a326b27d20df80d9d16aab6a6b8f7f6035"
+        }
+      },
+      "missing_native_files": []
+    },
+    "missing-tail": {
+      "fault": {
+        "file": "00000000000000009954.aof",
+        "deleted_acknowledged_records": 46
+      },
+      "scan": {
+        "native_status": [
+          0,
+          9954,
+          9954
+        ],
+        "exit_code": 0,
+        "files_changed": false,
+        "proof": {
+          "acknowledged": 10000,
+          "bodies_verified": 9954,
+          "missing_acknowledged": 46,
+          "missing_ids": [
+            9954,
+            9955,
+            9956,
+            9957,
+            9958,
+            9959,
+            9960,
+            9961,
+            9962,
+            9963,
+            9964,
+            9965,
+            9966,
+            9967,
+            9968,
+            9969,
+            9970,
+            9971,
+            9972,
+            9973,
+            9974,
+            9975,
+            9976,
+            9977,
+            9978,
+            9979,
+            9980,
+            9981,
+            9982,
+            9983,
+            9984,
+            9985,
+            9986,
+            9987,
+            9988,
+            9989,
+            9990,
+            9991,
+            9992,
+            9993,
+            9994,
+            9995,
+            9996,
+            9997,
+            9998,
+            9999
+          ],
+          "wrong_bodies": 0,
+          "wrong_ids": [],
+          "duplicate_ids": 0
+        },
+        "witness_rejected": true
+      },
+      "open": {
+        "native_status": [
+          0,
+          9954
+        ],
+        "exit_code": 0,
+        "files_changed": false
+      },
+      "input_manifest_sha256": "f9c818d3d10b3242c6f7eaff34ce161241202f1d50188b516bb631dabc4ee26b",
+      "input_file_count": 158,
+      "changed_native_files": {},
+      "missing_native_files": [
+        "00000000000000009954.aof"
+      ]
+    },
+    "backup": {
+      "acknowledged": 10000,
+      "bodies_verified": 10000,
+      "missing_acknowledged": 0,
+      "missing_ids": [],
+      "wrong_bodies": 0,
+      "wrong_ids": [],
+      "duplicate_ids": 0
+    }
+  },
+  "jobs": {
+    "seed": {
+      "exit_code": 0,
+      "command": [
+        "/opt/bench/rayforce_aof",
+        "seed",
+        "/state",
+        "10000",
+        "1024",
+        "65536"
+      ],
+      "wall_ns": 278873500,
+      "container_lifetime_seconds": 0.42468,
+      "process_cpu_core_seconds": 0.03887,
+      "native_process_cpu_percent_one_core_100": 13.938219300148633,
+      "process_peak_rss_bytes": 15806464,
+      "native_cgroup": {
+        "cpu.stat": "usage_usec 184464\nuser_usec 153720\nsystem_usec 30744\nnice_usec 0\nnr_periods 3\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "memory.peak": "25628672\n",
+        "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n",
+        "io.stat": "254:0 rbytes=0 wbytes=10805248 rios=0 wios=351 dbytes=0 dios=0\n"
+      },
+      "block_io": {
+        "available": true,
+        "devices": {
+          "254:0": {
+            "rbytes": 0,
+            "wbytes": 10805248,
+            "wios": 351,
+            "rios": 0
+          }
+        },
+        "raw": "254:0 rbytes=0 wbytes=10805248 rios=0 wios=351 dbytes=0 dios=0\n",
+        "totals": {
+          "rbytes": 0,
+          "rios": 0,
+          "wbytes": 10805248,
+          "wios": 351
+        },
+        "per_second": {
+          "rbytes": 0.0,
+          "rios": 0.0,
+          "wbytes": 25443270.226994444,
+          "wios": 826.5046623339927
+        },
+        "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth.",
+        "rate_scope": "Whole-container counters over StartedAt-to-FinishedAt lifetime; native-child wall is narrower."
+      },
+      "sampled_resources": {
+        "available": true,
+        "sample_count": 2,
+        "sampled_mean_charged_memory_bytes": 16019456,
+        "sampled_max_charged_memory_bytes": 21372928,
+        "sampled_peak_cpu_percent_one_core_100": 39.86822962497732,
+        "scope": "Approximately 100 ms plus API/inspection overhead; arithmetic sample mean, not heap or time-weighted mean. Sampling can miss short peaks; use native cgroup memory.peak and process RSS too. Docker daemon/VM overhead excluded."
+      },
+      "native_timings": {
+        "open": {
+          "count": 1,
+          "mean_ns": 738500,
+          "min_ns": 738500,
+          "max_ns": 738500,
+          "p50_ns": 738500,
+          "p99_ns": 738500
+        },
+        "buffered_append": {
+          "count": 10000,
+          "mean_ns": 18324.3336,
+          "min_ns": 375,
+          "max_ns": 6805083,
+          "p50_ns": 458,
+          "p99_ns": 866750
+        },
+        "commit_barrier": {
+          "count": 100,
+          "mean_ns": 770641.25,
+          "min_ns": 353250,
+          "max_ns": 17265417,
+          "p50_ns": 523417,
+          "p99_ns": 3261958
+        },
+        "close": {
+          "count": 1,
+          "mean_ns": 10875,
+          "min_ns": 10875,
+          "max_ns": 10875,
+          "p50_ns": 10875,
+          "p99_ns": 10875
+        }
+      },
+      "compressibility": {
+        "codec": "gzip",
+        "level": 1,
+        "source_bytes": 10322056,
+        "archive_bytes": 208877,
+        "ratio": 49.41691043054046,
+        "allocated_bytes": 10403840,
+        "wall_ns": 11245292,
+        "cpu_ns": 11218000,
+        "zlib": "1.3.2",
+        "scope": "Host-side streamed gzip compressibility of stable native files, not native engine compression"
+      },
+      "native_file_count": 159,
+      "native_file_bytes": 10322056,
+      "native_result_sha256": "97d49e83f39b1b3d03b1ad669c48055060072d4477e55bb13cc8ac0f3b49b119"
+    },
+    "healthy-open": {
+      "exit_code": 0,
+      "command": [
+        "/opt/bench/rayforce_aof",
+        "open",
+        "/state",
+        "10000",
+        "1024",
+        "65536"
+      ],
+      "wall_ns": 1193917,
+      "container_lifetime_seconds": 0.138572,
+      "process_cpu_core_seconds": 0.0009739999999999999,
+      "native_process_cpu_percent_one_core_100": 81.58021034963065,
+      "process_peak_rss_bytes": 15802368,
+      "native_cgroup": {
+        "cpu.stat": "usage_usec 86658\nuser_usec 77373\nsystem_usec 9284\nnice_usec 0\nnr_periods 1\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "memory.peak": "11698176\n",
+        "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n",
+        "io.stat": ""
+      },
+      "block_io": {
+        "available": true,
+        "devices": {},
+        "raw": "",
+        "totals": {
+          "rbytes": 0,
+          "rios": 0,
+          "wbytes": 0,
+          "wios": 0
+        },
+        "per_second": {
+          "rbytes": 0.0,
+          "rios": 0.0,
+          "wbytes": 0.0,
+          "wios": 0.0
+        },
+        "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth.",
+        "rate_scope": "Whole-container counters over StartedAt-to-FinishedAt lifetime; native-child wall is narrower."
+      },
+      "sampled_resources": {
+        "available": true,
+        "sample_count": 1,
+        "sampled_mean_charged_memory_bytes": 11685888,
+        "sampled_max_charged_memory_bytes": 11685888,
+        "sampled_peak_cpu_percent_one_core_100": null,
+        "scope": "Approximately 100 ms plus API/inspection overhead; arithmetic sample mean, not heap or time-weighted mean. Sampling can miss short peaks; use native cgroup memory.peak and process RSS too. Docker daemon/VM overhead excluded."
+      },
+      "native_timings": {
+        "open": {
+          "count": 1,
+          "mean_ns": 130792,
+          "min_ns": 130792,
+          "max_ns": 130792,
+          "p50_ns": 130792,
+          "p99_ns": 130792
+        },
+        "close": {
+          "count": 1,
+          "mean_ns": 4750,
+          "min_ns": 4750,
+          "max_ns": 4750,
+          "p50_ns": 4750,
+          "p99_ns": 4750
+        }
+      },
+      "compressibility": {
+        "codec": "gzip",
+        "level": 1,
+        "source_bytes": 10322056,
+        "archive_bytes": 208877,
+        "ratio": 49.41691043054046,
+        "allocated_bytes": 10403840,
+        "wall_ns": 11617000,
+        "cpu_ns": 11605000,
+        "zlib": "1.3.2",
+        "scope": "Host-side streamed gzip compressibility of stable native files, not native engine compression"
+      },
+      "native_file_count": 159,
+      "native_file_bytes": 10322056,
+      "native_result_sha256": "4bb6a3d30da648cff19f01311ac396ffd5e1ccaab83e851f6c7b2f36d75d43ca"
+    },
+    "healthy-scan": {
+      "exit_code": 0,
+      "command": [
+        "/opt/bench/rayforce_aof",
+        "scan",
+        "/state",
+        "10000",
+        "1024",
+        "65536"
+      ],
+      "wall_ns": 14633708,
+      "container_lifetime_seconds": 0.173803,
+      "process_cpu_core_seconds": 0.014466999999999999,
+      "native_process_cpu_percent_one_core_100": 98.86079454366589,
+      "process_peak_rss_bytes": 15781888,
+      "native_cgroup": {
+        "cpu.stat": "usage_usec 102810\nuser_usec 80191\nsystem_usec 22618\nnice_usec 0\nnr_periods 2\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "memory.peak": "21991424\n",
+        "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n",
+        "io.stat": ""
+      },
+      "block_io": {
+        "available": true,
+        "devices": {},
+        "raw": "",
+        "totals": {
+          "rbytes": 0,
+          "rios": 0,
+          "wbytes": 0,
+          "wios": 0
+        },
+        "per_second": {
+          "rbytes": 0.0,
+          "rios": 0.0,
+          "wbytes": 0.0,
+          "wios": 0.0
+        },
+        "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth.",
+        "rate_scope": "Whole-container counters over StartedAt-to-FinishedAt lifetime; native-child wall is narrower."
+      },
+      "sampled_resources": {
+        "available": true,
+        "sample_count": 1,
+        "sampled_mean_charged_memory_bytes": 10665984,
+        "sampled_max_charged_memory_bytes": 10665984,
+        "sampled_peak_cpu_percent_one_core_100": null,
+        "scope": "Approximately 100 ms plus API/inspection overhead; arithmetic sample mean, not heap or time-weighted mean. Sampling can miss short peaks; use native cgroup memory.peak and process RSS too. Docker daemon/VM overhead excluded."
+      },
+      "native_timings": {
+        "scan_with_export_callbacks": {
+          "count": 1,
+          "mean_ns": 13514458,
+          "min_ns": 13514458,
+          "max_ns": 13514458,
+          "p50_ns": 13514458,
+          "p99_ns": 13514458
+        }
+      },
+      "compressibility": {
+        "codec": "gzip",
+        "level": 1,
+        "source_bytes": 10322056,
+        "archive_bytes": 208877,
+        "ratio": 49.41691043054046,
+        "allocated_bytes": 10403840,
+        "wall_ns": 10337166,
+        "cpu_ns": 10332000,
+        "zlib": "1.3.2",
+        "scope": "Host-side streamed gzip compressibility of stable native files, not native engine compression"
+      },
+      "native_file_count": 159,
+      "native_file_bytes": 10322056,
+      "native_result_sha256": "aa78cb4905e46aa5e0ce19f2793a7194048fdad777f55e01b245a867ce025e11"
+    },
+    "tail-trailer-scan": {
+      "exit_code": 0,
+      "command": [
+        "/opt/bench/rayforce_aof",
+        "scan",
+        "/state",
+        "10000",
+        "1024",
+        "65536"
+      ],
+      "wall_ns": 14661875,
+      "container_lifetime_seconds": 0.172951,
+      "process_cpu_core_seconds": 0.014417,
+      "native_process_cpu_percent_one_core_100": 98.32985208235645,
+      "process_peak_rss_bytes": 15810560,
+      "native_cgroup": {
+        "cpu.stat": "usage_usec 100548\nuser_usec 82266\nsystem_usec 18281\nnice_usec 0\nnr_periods 1\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "memory.peak": "21962752\n",
+        "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n",
+        "io.stat": ""
+      },
+      "block_io": {
+        "available": true,
+        "devices": {},
+        "raw": "",
+        "totals": {
+          "rbytes": 0,
+          "rios": 0,
+          "wbytes": 0,
+          "wios": 0
+        },
+        "per_second": {
+          "rbytes": 0.0,
+          "rios": 0.0,
+          "wbytes": 0.0,
+          "wios": 0.0
+        },
+        "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth.",
+        "rate_scope": "Whole-container counters over StartedAt-to-FinishedAt lifetime; native-child wall is narrower."
+      },
+      "sampled_resources": {
+        "available": true,
+        "sample_count": 1,
+        "sampled_mean_charged_memory_bytes": 10715136,
+        "sampled_max_charged_memory_bytes": 10715136,
+        "sampled_peak_cpu_percent_one_core_100": null,
+        "scope": "Approximately 100 ms plus API/inspection overhead; arithmetic sample mean, not heap or time-weighted mean. Sampling can miss short peaks; use native cgroup memory.peak and process RSS too. Docker daemon/VM overhead excluded."
+      },
+      "native_timings": {
+        "scan_with_export_callbacks": {
+          "count": 1,
+          "mean_ns": 13330292,
+          "min_ns": 13330292,
+          "max_ns": 13330292,
+          "p50_ns": 13330292,
+          "p99_ns": 13330292
+        }
+      },
+      "compressibility": {
+        "codec": "gzip",
+        "level": 1,
+        "source_bytes": 10322059,
+        "archive_bytes": 208880,
+        "ratio": 49.41621505170433,
+        "allocated_bytes": 10403840,
+        "wall_ns": 10626875,
+        "cpu_ns": 10619000,
+        "zlib": "1.3.2",
+        "scope": "Host-side streamed gzip compressibility of stable native files, not native engine compression"
+      },
+      "native_file_count": 159,
+      "native_file_bytes": 10322059,
+      "native_result_sha256": "89ce5fcbf31f6af05da41d8fd392159bfb903394e7aab879a992ad338db1bb34"
+    },
+    "tail-trailer-open": {
+      "exit_code": 0,
+      "command": [
+        "/opt/bench/rayforce_aof",
+        "open",
+        "/state",
+        "10000",
+        "1024",
+        "65536"
+      ],
+      "wall_ns": 1212333,
+      "container_lifetime_seconds": 0.138023,
+      "process_cpu_core_seconds": 0.000998,
+      "native_process_cpu_percent_one_core_100": 82.32061653027675,
+      "process_peak_rss_bytes": 15810560,
+      "native_cgroup": {
+        "cpu.stat": "usage_usec 81297\nuser_usec 71135\nsystem_usec 10162\nnice_usec 0\nnr_periods 1\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "memory.peak": "11493376\n",
+        "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n",
+        "io.stat": ""
+      },
+      "block_io": {
+        "available": true,
+        "devices": {},
+        "raw": "",
+        "totals": {
+          "rbytes": 0,
+          "rios": 0,
+          "wbytes": 0,
+          "wios": 0
+        },
+        "per_second": {
+          "rbytes": 0.0,
+          "rios": 0.0,
+          "wbytes": 0.0,
+          "wios": 0.0
+        },
+        "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth.",
+        "rate_scope": "Whole-container counters over StartedAt-to-FinishedAt lifetime; native-child wall is narrower."
+      },
+      "sampled_resources": {
+        "available": false,
+        "reason": "workload completed before the first resource snapshot"
+      },
+      "native_timings": {
+        "open": {
+          "count": 1,
+          "mean_ns": 134250,
+          "min_ns": 134250,
+          "max_ns": 134250,
+          "p50_ns": 134250,
+          "p99_ns": 134250
+        },
+        "close": {
+          "count": 1,
+          "mean_ns": 2750,
+          "min_ns": 2750,
+          "max_ns": 2750,
+          "p50_ns": 2750,
+          "p99_ns": 2750
+        }
+      },
+      "compressibility": {
+        "codec": "gzip",
+        "level": 1,
+        "source_bytes": 10322056,
+        "archive_bytes": 208877,
+        "ratio": 49.41691043054046,
+        "allocated_bytes": 10403840,
+        "wall_ns": 11152292,
+        "cpu_ns": 11127000,
+        "zlib": "1.3.2",
+        "scope": "Host-side streamed gzip compressibility of stable native files, not native engine compression"
+      },
+      "native_file_count": 159,
+      "native_file_bytes": 10322056,
+      "native_result_sha256": "94890d4188a58c1e8beec7837c270aa2436cc13d5e74e8a0ca7154c66800c6d9"
+    },
+    "sealed-crc-scan": {
+      "exit_code": 2,
+      "command": [
+        "/opt/bench/rayforce_aof",
+        "scan",
+        "/state",
+        "10000",
+        "1024",
+        "65536"
+      ],
+      "wall_ns": 7289541,
+      "container_lifetime_seconds": 0.144919,
+      "process_cpu_core_seconds": 0.007093,
+      "native_process_cpu_percent_one_core_100": 97.30379457362268,
+      "process_peak_rss_bytes": 15814656,
+      "native_cgroup": {
+        "cpu.stat": "usage_usec 92670\nuser_usec 79739\nsystem_usec 12930\nnice_usec 0\nnr_periods 1\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "memory.peak": "16867328\n",
+        "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n",
+        "io.stat": ""
+      },
+      "block_io": {
+        "available": true,
+        "devices": {},
+        "raw": "",
+        "totals": {
+          "rbytes": 0,
+          "rios": 0,
+          "wbytes": 0,
+          "wios": 0
+        },
+        "per_second": {
+          "rbytes": 0.0,
+          "rios": 0.0,
+          "wbytes": 0.0,
+          "wios": 0.0
+        },
+        "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth.",
+        "rate_scope": "Whole-container counters over StartedAt-to-FinishedAt lifetime; native-child wall is narrower."
+      },
+      "sampled_resources": {
+        "available": true,
+        "sample_count": 1,
+        "sampled_mean_charged_memory_bytes": 13119488,
+        "sampled_max_charged_memory_bytes": 13119488,
+        "sampled_peak_cpu_percent_one_core_100": null,
+        "scope": "Approximately 100 ms plus API/inspection overhead; arithmetic sample mean, not heap or time-weighted mean. Sampling can miss short peaks; use native cgroup memory.peak and process RSS too. Docker daemon/VM overhead excluded."
+      },
+      "native_timings": {
+        "scan_with_export_callbacks": {
+          "count": 1,
+          "mean_ns": 6247375,
+          "min_ns": 6247375,
+          "max_ns": 6247375,
+          "p50_ns": 6247375,
+          "p99_ns": 6247375
+        }
+      },
+      "compressibility": {
+        "codec": "gzip",
+        "level": 1,
+        "source_bytes": 10322056,
+        "archive_bytes": 208901,
+        "ratio": 49.41123307212507,
+        "allocated_bytes": 10403840,
+        "wall_ns": 10732166,
+        "cpu_ns": 10727000,
+        "zlib": "1.3.2",
+        "scope": "Host-side streamed gzip compressibility of stable native files, not native engine compression"
+      },
+      "native_file_count": 159,
+      "native_file_bytes": 10322056,
+      "native_result_sha256": "7107b67167eb6b60471917326f93667f670970701c39e80cbd9acbe5bee9fbbc"
+    },
+    "sealed-crc-open": {
+      "exit_code": 0,
+      "command": [
+        "/opt/bench/rayforce_aof",
+        "open",
+        "/state",
+        "10000",
+        "1024",
+        "65536"
+      ],
+      "wall_ns": 1014208,
+      "container_lifetime_seconds": 0.137755,
+      "process_cpu_core_seconds": 0.000886,
+      "native_process_cpu_percent_one_core_100": 87.35880608317032,
+      "process_peak_rss_bytes": 15806464,
+      "native_cgroup": {
+        "cpu.stat": "usage_usec 83357\nuser_usec 75418\nsystem_usec 7938\nnice_usec 0\nnr_periods 1\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "memory.peak": "11681792\n",
+        "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n",
+        "io.stat": ""
+      },
+      "block_io": {
+        "available": true,
+        "devices": {},
+        "raw": "",
+        "totals": {
+          "rbytes": 0,
+          "rios": 0,
+          "wbytes": 0,
+          "wios": 0
+        },
+        "per_second": {
+          "rbytes": 0.0,
+          "rios": 0.0,
+          "wbytes": 0.0,
+          "wios": 0.0
+        },
+        "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth.",
+        "rate_scope": "Whole-container counters over StartedAt-to-FinishedAt lifetime; native-child wall is narrower."
+      },
+      "sampled_resources": {
+        "available": true,
+        "sample_count": 1,
+        "sampled_mean_charged_memory_bytes": 11296768,
+        "sampled_max_charged_memory_bytes": 11296768,
+        "sampled_peak_cpu_percent_one_core_100": null,
+        "scope": "Approximately 100 ms plus API/inspection overhead; arithmetic sample mean, not heap or time-weighted mean. Sampling can miss short peaks; use native cgroup memory.peak and process RSS too. Docker daemon/VM overhead excluded."
+      },
+      "native_timings": {
+        "open": {
+          "count": 1,
+          "mean_ns": 99083,
+          "min_ns": 99083,
+          "max_ns": 99083,
+          "p50_ns": 99083,
+          "p99_ns": 99083
+        },
+        "close": {
+          "count": 1,
+          "mean_ns": 2166,
+          "min_ns": 2166,
+          "max_ns": 2166,
+          "p50_ns": 2166,
+          "p99_ns": 2166
+        }
+      },
+      "compressibility": {
+        "codec": "gzip",
+        "level": 1,
+        "source_bytes": 10322056,
+        "archive_bytes": 208901,
+        "ratio": 49.41123307212507,
+        "allocated_bytes": 10403840,
+        "wall_ns": 11446125,
+        "cpu_ns": 11376000,
+        "zlib": "1.3.2",
+        "scope": "Host-side streamed gzip compressibility of stable native files, not native engine compression"
+      },
+      "native_file_count": 159,
+      "native_file_bytes": 10322056,
+      "native_result_sha256": "db729f5ad90d2cfa409eaa467b16b5032f6e12ad18a7662f5d185c8dfe5dd39b"
+    },
+    "missing-tail-scan": {
+      "exit_code": 0,
+      "command": [
+        "/opt/bench/rayforce_aof",
+        "scan",
+        "/state",
+        "10000",
+        "1024",
+        "65536"
+      ],
+      "wall_ns": 15616375,
+      "container_lifetime_seconds": 0.15793,
+      "process_cpu_core_seconds": 0.015185999999999998,
+      "native_process_cpu_percent_one_core_100": 97.24407873145975,
+      "process_peak_rss_bytes": 15814656,
+      "native_cgroup": {
+        "cpu.stat": "usage_usec 95407\nuser_usec 78334\nsystem_usec 17072\nnice_usec 0\nnr_periods 1\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "memory.peak": "21995520\n",
+        "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n",
+        "io.stat": ""
+      },
+      "block_io": {
+        "available": true,
+        "devices": {},
+        "raw": "",
+        "totals": {
+          "rbytes": 0,
+          "rios": 0,
+          "wbytes": 0,
+          "wios": 0
+        },
+        "per_second": {
+          "rbytes": 0.0,
+          "rios": 0.0,
+          "wbytes": 0.0,
+          "wios": 0.0
+        },
+        "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth.",
+        "rate_scope": "Whole-container counters over StartedAt-to-FinishedAt lifetime; native-child wall is narrower."
+      },
+      "sampled_resources": {
+        "available": true,
+        "sample_count": 1,
+        "sampled_mean_charged_memory_bytes": 10874880,
+        "sampled_max_charged_memory_bytes": 10874880,
+        "sampled_peak_cpu_percent_one_core_100": null,
+        "scope": "Approximately 100 ms plus API/inspection overhead; arithmetic sample mean, not heap or time-weighted mean. Sampling can miss short peaks; use native cgroup memory.peak and process RSS too. Docker daemon/VM overhead excluded."
+      },
+      "native_timings": {
+        "scan_with_export_callbacks": {
+          "count": 1,
+          "mean_ns": 14248709,
+          "min_ns": 14248709,
+          "max_ns": 14248709,
+          "p50_ns": 14248709,
+          "p99_ns": 14248709
+        }
+      },
+      "compressibility": {
+        "codec": "gzip",
+        "level": 1,
+        "source_bytes": 10274576,
+        "archive_bytes": 207884,
+        "ratio": 49.42456369898597,
+        "allocated_bytes": 10354688,
+        "wall_ns": 11229959,
+        "cpu_ns": 11213000,
+        "zlib": "1.3.2",
+        "scope": "Host-side streamed gzip compressibility of stable native files, not native engine compression"
+      },
+      "native_file_count": 158,
+      "native_file_bytes": 10274576,
+      "native_result_sha256": "76372ecbc3c40428a5229b261a1cf022ca69d5c67132455b3c4b83955253f56e"
+    },
+    "missing-tail-open": {
+      "exit_code": 0,
+      "command": [
+        "/opt/bench/rayforce_aof",
+        "open",
+        "/state",
+        "10000",
+        "1024",
+        "65536"
+      ],
+      "wall_ns": 1211083,
+      "container_lifetime_seconds": 0.148019,
+      "process_cpu_core_seconds": 0.001045,
+      "native_process_cpu_percent_one_core_100": 86.28640646429683,
+      "process_peak_rss_bytes": 15806464,
+      "native_cgroup": {
+        "cpu.stat": "usage_usec 89212\nuser_usec 78591\nsystem_usec 10620\nnice_usec 0\nnr_periods 1\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "memory.peak": "11505664\n",
+        "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n",
+        "io.stat": ""
+      },
+      "block_io": {
+        "available": true,
+        "devices": {},
+        "raw": "",
+        "totals": {
+          "rbytes": 0,
+          "rios": 0,
+          "wbytes": 0,
+          "wios": 0
+        },
+        "per_second": {
+          "rbytes": 0.0,
+          "rios": 0.0,
+          "wbytes": 0.0,
+          "wios": 0.0
+        },
+        "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth.",
+        "rate_scope": "Whole-container counters over StartedAt-to-FinishedAt lifetime; native-child wall is narrower."
+      },
+      "sampled_resources": {
+        "available": true,
+        "sample_count": 1,
+        "sampled_mean_charged_memory_bytes": 10911744,
+        "sampled_max_charged_memory_bytes": 10911744,
+        "sampled_peak_cpu_percent_one_core_100": null,
+        "scope": "Approximately 100 ms plus API/inspection overhead; arithmetic sample mean, not heap or time-weighted mean. Sampling can miss short peaks; use native cgroup memory.peak and process RSS too. Docker daemon/VM overhead excluded."
+      },
+      "native_timings": {
+        "open": {
+          "count": 1,
+          "mean_ns": 109667,
+          "min_ns": 109667,
+          "max_ns": 109667,
+          "p50_ns": 109667,
+          "p99_ns": 109667
+        },
+        "close": {
+          "count": 1,
+          "mean_ns": 2125,
+          "min_ns": 2125,
+          "max_ns": 2125,
+          "p50_ns": 2125,
+          "p99_ns": 2125
+        }
+      },
+      "compressibility": {
+        "codec": "gzip",
+        "level": 1,
+        "source_bytes": 10274576,
+        "archive_bytes": 207884,
+        "ratio": 49.42456369898597,
+        "allocated_bytes": 10354688,
+        "wall_ns": 11691125,
+        "cpu_ns": 11568000,
+        "zlib": "1.3.2",
+        "scope": "Host-side streamed gzip compressibility of stable native files, not native engine compression"
+      },
+      "native_file_count": 158,
+      "native_file_bytes": 10274576,
+      "native_result_sha256": "8699c7fc86f512d02b67c84c91787fc97f5b1f23b89cb81ef07913c882ad01d5"
+    },
+    "intact-backup": {
+      "exit_code": 0,
+      "command": [
+        "/opt/bench/rayforce_aof",
+        "scan",
+        "/state",
+        "10000",
+        "1024",
+        "65536"
+      ],
+      "wall_ns": 15303417,
+      "container_lifetime_seconds": 0.157472,
+      "process_cpu_core_seconds": 0.015102999999999998,
+      "native_process_cpu_percent_one_core_100": 98.69037744968982,
+      "process_peak_rss_bytes": 15806464,
+      "native_cgroup": {
+        "cpu.stat": "usage_usec 97511\nuser_usec 78411\nsystem_usec 19100\nnice_usec 0\nnr_periods 2\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "memory.peak": "22228992\n",
+        "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n",
+        "io.stat": ""
+      },
+      "block_io": {
+        "available": true,
+        "devices": {},
+        "raw": "",
+        "totals": {
+          "rbytes": 0,
+          "rios": 0,
+          "wbytes": 0,
+          "wios": 0
+        },
+        "per_second": {
+          "rbytes": 0.0,
+          "rios": 0.0,
+          "wbytes": 0.0,
+          "wios": 0.0
+        },
+        "scope": "Whole-container kernel block-I/O accounting, including wrapper. Empty counters/cached reads do not establish zero physical host I/O; Docker Desktop file sharing can perform work outside this cgroup. Not logical engine bytes, device latency or queue depth.",
+        "rate_scope": "Whole-container counters over StartedAt-to-FinishedAt lifetime; native-child wall is narrower."
+      },
+      "sampled_resources": {
+        "available": true,
+        "sample_count": 1,
+        "sampled_mean_charged_memory_bytes": 10915840,
+        "sampled_max_charged_memory_bytes": 10915840,
+        "sampled_peak_cpu_percent_one_core_100": null,
+        "scope": "Approximately 100 ms plus API/inspection overhead; arithmetic sample mean, not heap or time-weighted mean. Sampling can miss short peaks; use native cgroup memory.peak and process RSS too. Docker daemon/VM overhead excluded."
+      },
+      "native_timings": {
+        "scan_with_export_callbacks": {
+          "count": 1,
+          "mean_ns": 14145708,
+          "min_ns": 14145708,
+          "max_ns": 14145708,
+          "p50_ns": 14145708,
+          "p99_ns": 14145708
+        }
+      },
+      "compressibility": {
+        "codec": "gzip",
+        "level": 1,
+        "source_bytes": 10322056,
+        "archive_bytes": 208877,
+        "ratio": 49.41691043054046,
+        "allocated_bytes": 10403840,
+        "wall_ns": 10880209,
+        "cpu_ns": 10880000,
+        "zlib": "1.3.2",
+        "scope": "Host-side streamed gzip compressibility of stable native files, not native engine compression"
+      },
+      "native_file_count": 159,
+      "native_file_bytes": 10322056,
+      "native_result_sha256": "4289e2d38f3155422359de639b549282ecbf60d937dacab788ffe5e7bad2cff9"
+    }
+  },
+  "compression": {
+    "files": [
+      {
+        "name": "00000000000000000000.aof",
+        "bytes": 65024,
+        "gzip_level_1_bytes": 1297,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000000063.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1275,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000000126.aof",
+        "bytes": 65024,
+        "gzip_level_1_bytes": 1320,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000000189.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1335,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000000252.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1333,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000000315.aof",
+        "bytes": 65024,
+        "gzip_level_1_bytes": 1322,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000000378.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1334,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000000441.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1314,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000000504.aof",
+        "bytes": 65024,
+        "gzip_level_1_bytes": 1315,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000000567.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1333,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000000630.aof",
+        "bytes": 65024,
+        "gzip_level_1_bytes": 1318,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000000693.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1331,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000000756.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1333,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000000819.aof",
+        "bytes": 65024,
+        "gzip_level_1_bytes": 1327,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000000882.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1339,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000000945.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1308,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000001008.aof",
+        "bytes": 65024,
+        "gzip_level_1_bytes": 1329,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000001071.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1313,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000001134.aof",
+        "bytes": 65024,
+        "gzip_level_1_bytes": 1318,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000001197.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1317,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000001260.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1310,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000001323.aof",
+        "bytes": 65024,
+        "gzip_level_1_bytes": 1306,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000001386.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1318,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000001449.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1315,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000001512.aof",
+        "bytes": 65024,
+        "gzip_level_1_bytes": 1306,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000001575.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1315,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000001638.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1329,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000001701.aof",
+        "bytes": 65024,
+        "gzip_level_1_bytes": 1316,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000001764.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1310,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000001827.aof",
+        "bytes": 65024,
+        "gzip_level_1_bytes": 1309,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000001890.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1314,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000001953.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1306,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000002016.aof",
+        "bytes": 65024,
+        "gzip_level_1_bytes": 1316,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000002079.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1317,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000002142.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1308,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000002205.aof",
+        "bytes": 65024,
+        "gzip_level_1_bytes": 1315,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000002268.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1314,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000002331.aof",
+        "bytes": 65024,
+        "gzip_level_1_bytes": 1305,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000002394.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1315,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000002457.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1315,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000002520.aof",
+        "bytes": 65024,
+        "gzip_level_1_bytes": 1307,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000002583.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1311,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000002646.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1319,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000002709.aof",
+        "bytes": 65024,
+        "gzip_level_1_bytes": 1306,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000002772.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1324,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000002835.aof",
+        "bytes": 65024,
+        "gzip_level_1_bytes": 1309,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000002898.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1328,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000002961.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1308,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000003024.aof",
+        "bytes": 65024,
+        "gzip_level_1_bytes": 1328,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000003087.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1321,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000003150.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1316,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000003213.aof",
+        "bytes": 65024,
+        "gzip_level_1_bytes": 1306,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000003276.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1315,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000003339.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1333,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000003402.aof",
+        "bytes": 65024,
+        "gzip_level_1_bytes": 1304,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000003465.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1315,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000003528.aof",
+        "bytes": 65024,
+        "gzip_level_1_bytes": 1303,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000003591.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1331,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000003654.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1315,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000003717.aof",
+        "bytes": 65024,
+        "gzip_level_1_bytes": 1315,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000003780.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1315,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000003843.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1311,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000003906.aof",
+        "bytes": 65024,
+        "gzip_level_1_bytes": 1308,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000003969.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1316,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000004032.aof",
+        "bytes": 65024,
+        "gzip_level_1_bytes": 1305,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000004095.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1314,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000004158.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1310,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000004221.aof",
+        "bytes": 65024,
+        "gzip_level_1_bytes": 1301,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000004284.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1313,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000004347.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1313,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000004410.aof",
+        "bytes": 65024,
+        "gzip_level_1_bytes": 1307,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000004473.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1318,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000004536.aof",
+        "bytes": 65024,
+        "gzip_level_1_bytes": 1311,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000004599.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1323,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000004662.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1327,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000004725.aof",
+        "bytes": 65024,
+        "gzip_level_1_bytes": 1311,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000004788.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1331,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000004851.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1308,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000004914.aof",
+        "bytes": 65024,
+        "gzip_level_1_bytes": 1308,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000004977.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1329,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000005040.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1316,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000005103.aof",
+        "bytes": 65024,
+        "gzip_level_1_bytes": 1308,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000005166.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1307,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000005229.aof",
+        "bytes": 65024,
+        "gzip_level_1_bytes": 1308,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000005292.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1323,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000005355.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1316,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000005418.aof",
+        "bytes": 65024,
+        "gzip_level_1_bytes": 1322,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000005481.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1315,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000005544.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1312,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000005607.aof",
+        "bytes": 65024,
+        "gzip_level_1_bytes": 1308,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000005670.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1316,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000005733.aof",
+        "bytes": 65024,
+        "gzip_level_1_bytes": 1304,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000005796.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1314,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000005859.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1307,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000005922.aof",
+        "bytes": 65024,
+        "gzip_level_1_bytes": 1326,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000005985.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1325,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000006048.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1305,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000006111.aof",
+        "bytes": 65024,
+        "gzip_level_1_bytes": 1323,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000006174.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1317,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000006237.aof",
+        "bytes": 65024,
+        "gzip_level_1_bytes": 1307,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000006300.aof",
+        "bytes": 65024,
+        "gzip_level_1_bytes": 1315,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000006363.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1316,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000006426.aof",
+        "bytes": 65024,
+        "gzip_level_1_bytes": 1309,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000006489.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1320,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000006552.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1312,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000006615.aof",
+        "bytes": 65024,
+        "gzip_level_1_bytes": 1314,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000006678.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1332,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000006741.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1330,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000006804.aof",
+        "bytes": 65024,
+        "gzip_level_1_bytes": 1317,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000006867.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1305,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000006930.aof",
+        "bytes": 65024,
+        "gzip_level_1_bytes": 1316,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000006993.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1332,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000007056.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1314,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000007119.aof",
+        "bytes": 65024,
+        "gzip_level_1_bytes": 1324,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000007182.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1304,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000007245.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1312,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000007308.aof",
+        "bytes": 65024,
+        "gzip_level_1_bytes": 1309,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000007371.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1311,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000007434.aof",
+        "bytes": 65024,
+        "gzip_level_1_bytes": 1308,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000007497.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1316,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000007560.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1312,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000007623.aof",
+        "bytes": 65024,
+        "gzip_level_1_bytes": 1310,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000007686.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1322,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000007749.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1317,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000007812.aof",
+        "bytes": 65024,
+        "gzip_level_1_bytes": 1306,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000007875.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1313,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000007938.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1333,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000008001.aof",
+        "bytes": 65024,
+        "gzip_level_1_bytes": 1326,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000008064.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1322,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000008127.aof",
+        "bytes": 65024,
+        "gzip_level_1_bytes": 1310,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000008190.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1322,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000008253.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1312,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000008316.aof",
+        "bytes": 65024,
+        "gzip_level_1_bytes": 1304,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000008379.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1331,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000008442.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1309,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000008505.aof",
+        "bytes": 65024,
+        "gzip_level_1_bytes": 1307,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000008568.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1335,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000008631.aof",
+        "bytes": 65024,
+        "gzip_level_1_bytes": 1314,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000008694.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1316,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000008757.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1313,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000008820.aof",
+        "bytes": 65024,
+        "gzip_level_1_bytes": 1304,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000008883.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1316,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000008946.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1325,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000009009.aof",
+        "bytes": 65024,
+        "gzip_level_1_bytes": 1311,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000009072.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1333,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000009135.aof",
+        "bytes": 65024,
+        "gzip_level_1_bytes": 1305,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000009198.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1338,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000009261.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1316,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000009324.aof",
+        "bytes": 65024,
+        "gzip_level_1_bytes": 1306,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000009387.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1329,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000009450.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1327,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000009513.aof",
+        "bytes": 65024,
+        "gzip_level_1_bytes": 1308,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000009576.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1318,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000009639.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1310,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000009702.aof",
+        "bytes": 65024,
+        "gzip_level_1_bytes": 1307,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000009765.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1311,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000009828.aof",
+        "bytes": 65024,
+        "gzip_level_1_bytes": 1311,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000009891.aof",
+        "bytes": 65032,
+        "gzip_level_1_bytes": 1317,
+        "allocated_bytes": 65536
+      },
+      {
+        "name": "00000000000000009954.aof",
+        "bytes": 47480,
+        "gzip_level_1_bytes": 993,
+        "allocated_bytes": 49152
+      }
+    ],
+    "wall_ns": 10639042,
+    "cpu_ns": 10640000,
+    "zlib": "1.3.2",
+    "scope": "Host-side streamed gzip compressibility of stable native files, not native engine compression"
+  },
+  "controller": {
+    "wall_ns": 19109224209,
+    "cpu_ns": 1615250000,
+    "peak_rss_bytes": 38404096
+  },
+  "witness_sha256": "18e3fa1b98d4fe1337700dcfc3da698b350114f7d5bea38b7687f1a1ed193b45",
+  "image_id": "sha256:9989fb38ac4db2026a79446721495309125fb20547f1db234447c5ca75f0f048",
+  "retained_host_artifact_storage": {
+    "logical_bytes": 182881459,
+    "allocated_bytes": 184152064
+  },
+  "limits": [
+    "fenced offline copies, no live availability or process crash qualification",
+    "single-copy tail deletion causes expected irreversible local loss, not proof of recovery from device loss",
+    "open validates the last segment; full scan and an external ACK/inventory oracle are necessary",
+    "separate single-tail length/commit-marker integrity failures remain failed",
+    "tiny operations may finish before sampling; native cumulative/high-water counters retained",
+    "copy/export/host CLI and Docker VM costs excluded from native-child timings",
+    "block counters are Linux VM cgroup observations; physical I/O latency/queue depth unavailable"
+  ],
+  "publisher_sha256": "b9bb785375408bb4c345786488682820c0a650f66c38c9c8eee76fd780e3cf95"
+}
