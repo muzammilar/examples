@@ -10,6 +10,9 @@ The [connector findings](DUCKDB_CLICKHOUSE_FINDINGS.md) record an Iceberg
 catalog-discovery failure, non-rollbackable remote writes and nanosecond precision
 loss. This connector architecture is not yet qualified; its next pass has five
 explicit test groups. Existing direct DuckDB–Iceberg results cover another path.
+The [two-million-row round trip](DUCKDB_CLICKHOUSE_ROUNDTRIP.md) and generated
+read regression now run through Make and fail on intermittent wrong answers;
+native full-body checks verify all stored copies remain correct.
 
 ## Quick start
 

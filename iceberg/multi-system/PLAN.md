@@ -4,6 +4,11 @@ Current priority is **DuckDB as the application SQL client → ClickHouse ↔
 Iceberg**, rather than a direct DuckDB S3 client. See
 `DUCKDB_CLICKHOUSE_FINDINGS.md` for measured connector boundaries and the five
 remaining test groups. The new connector architecture remains unqualified.
+Group 1 now has a measured two-million-row failed round trip and a generated-row
+wrong-answer reproducer; see `DUCKDB_CLICKHOUSE_ROUNDTRIP.md`. Both thread counts
+have failed across trials, while independent native stored-body checks pass.
+Continue groups 2–5 as explicitly unqualified failure exploration; defer capacity
+ranking until the healthy read contract passes. Do not reset the failed fixtures.
 
 Current checkpoint (2026-11-22): the default `LAB_PROFILE=current` uses isolated
 project/image/volume/result names and DuckDB 2.0.1, SeaweedFS 4.54, ClickHouse

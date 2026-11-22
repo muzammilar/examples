@@ -403,14 +403,24 @@ def finish_cli(root, planned, sampler, originals):
 
 
 def run(mode="baseline"):
+    import duckdb_clickhouse
     import duckdb_conflicts
     import duckdb_rejections
 
-    if mode not in {"baseline", "rejections", "conflicts"}:
+    if mode not in {
+        "baseline",
+        "rejections",
+        "conflicts",
+        "connector",
+        "connector-read",
+    }:
         raise ValueError("unknown native maintenance scenario")
-    scenario = {"rejections": duckdb_rejections, "conflicts": duckdb_conflicts}.get(
-        mode
-    )
+    scenario = {
+        "rejections": duckdb_rejections,
+        "conflicts": duckdb_conflicts,
+        "connector": duckdb_clickhouse,
+        "connector-read": duckdb_clickhouse,
+    }.get(mode)
     if control.lab.PROFILE != "current":
         raise RuntimeError("DuckDB-native maintenance requires the current profile")
     context = control.local_docker()
@@ -434,9 +444,14 @@ def run(mode="baseline"):
             duckdb_conflicts.APPEND_ROWS,
         )
     run_id = uuid.uuid4()
-    table = "duck_compact_" + run_id.hex
-    sql = program(table, rows, customers, batch)
-    artifacts = scenario.artifacts(table) if scenario else {"run.sql": sql}
+    table = ("duck_frontend_" if mode == "connector" else "duck_compact_") + run_id.hex
+    if mode == "connector":
+        artifacts = scenario.artifacts(table, rows, customers, batch)
+    elif mode == "connector-read":
+        artifacts = scenario.read_artifacts(rows)
+    else:
+        sql = program(table, rows, customers, batch)
+        artifacts = scenario.artifacts(table) if scenario else {"run.sql": sql}
     root = cleanup.regular(
         cleanup.results_root()
         / ("duckdb-" + mode if scenario else "duckdb-maintenance")
@@ -451,6 +466,10 @@ def run(mode="baseline"):
     # Reserve room for seed, rollback output and committed replacement. This
     # healthy test must not accidentally become a storage-capacity experiment.
     required_slots = 1 if scenario else max(3, (rows * 384 + 255999999) // 256000000)
+    if mode == "connector":
+        required_slots = (rows * 128 + 255999999) // 256000000 + 1
+    elif mode == "connector-read":
+        required_slots = 0
     free_slots = settings["topology"]["Topology"].get("Free")
     if type(free_slots) is not int or free_slots < required_slots:
         raise RuntimeError(
@@ -464,6 +483,8 @@ def run(mode="baseline"):
     )
     if image["Config"].get("Labels", {}).get("org.examples.owner") != control.OWNER:
         raise RuntimeError("native CLI image lacks repository ownership")
+    if mode in {"connector", "connector-read"}:
+        scenario.prepare(root, image)
     frozen = control.sources()
     for relative, expected_sha in frozen.items():
         data = (control.ROOT / relative).read_bytes()
@@ -585,6 +606,8 @@ def run(mode="baseline"):
         control.wait_coverage(
             sampler, ["storage", "clickhouse", "duckdb-cli"], time.time_ns()
         )
+        if mode == "connector":
+            scenario.setup(root, table, storage)
         control.save_text(root / "release", "release\n")
         if scenario:
             deadline = time.monotonic() + 120
@@ -612,10 +635,15 @@ def run(mode="baseline"):
         if logs.returncode:
             raise RuntimeError("native CLI logs could not be retained")
         cold_storage.stopped(value)
-        result = scenario.verify(root, rows) if scenario else verify(root, rows)
-        result["clickhouse_readback"] = independent_readback(
-            root, table, rows, customers, query
-        )
+        if mode == "connector-read":
+            result = scenario.verify_read(root, rows)
+        else:
+            result = scenario.verify(root, rows) if scenario else verify(root, rows)
+            result["clickhouse_readback"] = independent_readback(
+                root, table, rows, customers, query
+            )
+        if mode == "connector":
+            result["published_catalog"] = scenario.finalize(root, table, storage, rows)
         if not scenario:
             result["authoritative_catalog"] = authoritative_catalog(
                 root, table, storage, result
@@ -637,7 +665,9 @@ def run(mode="baseline"):
                 "cleanup_errors": cleanup_errors,
                 "completed_ns": time.time_ns(),
                 "scope": (
-                    "Native "
+                    "Read-only generated-row connector regression; no persisted fixture, independent engine export or capacity qualification."
+                    if mode == "connector-read"
+                    else "Native "
                     + mode
                     + " controls; independent body readback; no live-fault or performance qualification."
                     if scenario
@@ -658,6 +688,12 @@ if __name__ == "__main__":
     )
     group.add_argument(
         "--conflicts", dest="mode", action="store_const", const="conflicts"
+    )
+    group.add_argument(
+        "--connector", dest="mode", action="store_const", const="connector"
+    )
+    group.add_argument(
+        "--connector-read", dest="mode", action="store_const", const="connector-read"
     )
     parser.set_defaults(mode="baseline")
     args = parser.parse_args()

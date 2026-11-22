@@ -12,6 +12,12 @@ CLI image, with Python only controlling Docker and collecting evidence.
 
 ## Confirmed observations
 
+The later [two-million-row round trip](DUCKDB_CLICKHOUSE_ROUNDTRIP.md) also found
+intermittent wrong answers in the DuckDB/connector read-query path. A generated-
+row regression reproduces it without object storage; both one and two threads
+have failed across trials. Independent native full-body checks find the stored
+hot, cold and restored data correct. This remains a failed qualification.
+
 | Boundary | Measured result | Classification |
 |---|---|---|
 | Iceberg catalog discovery | Ordinary `ch.lake."lab.probe"` lookup fails; explicit `clickhouse_scan` also reports table not found. A native query through `clickhouse_query` reads the same 10,000-row table, sum 50,005,000. | Integration failure; architecture remains unqualified |
@@ -64,10 +70,12 @@ fences the holding shell; its termination is not a DuckDB native abort. Resource
 windows include that hold/fencing interval. These probes provide no request
 latency distribution, compression result or capacity ranking.
 
-There is not yet a complete Make target/lifecycle for this connector architecture;
-the existing five-command lifecycle and direct-Iceberg targets do not substitute
-for it. Reproduction SQL and exact controller source are retained in raw probes.
-The next pass is limited to these five test groups:
+`make duckdb-clickhouse` now exercises the two-million-row round trip and fails
+closed before advancing past a wrong body summary. The independent
+`make duckdb-clickhouse-read-repro` also returns nonzero on the observed generated
+read-query mismatch. Both run within this example's existing infrastructure
+lifecycle; their execution does not qualify the architecture. Group 1 has been
+exercised and failed; the five-group scope remains:
 
 1. **Full round trip:** two million rows through DuckDB → ClickHouse → Iceberg →
    ClickHouse, complete body/type oracle and ordinary versus pass-through queries.
