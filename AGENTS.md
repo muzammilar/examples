@@ -719,6 +719,31 @@ verdict/provenance rather than the archive, and never relabel the failure.
 
 Before adding or materially changing an example for a technology, and before describing what it is good or bad at, read the relevant official manpages and inspect the corresponding source code. Use the documentation and source for the version actually used by the example when possible. Follow the execution path relevant to the example (configuration, query or API behavior, storage, replication, scheduling, or failure handling) rather than relying only on a project overview or benchmark headline. Use this research to choose representative workloads and explain tradeoffs; distinguish behavior confirmed in source from behavior measured by this repository's example, and cite useful upstream references in the README.
 
+### Stable release selection
+
+Use the **latest stable upstream release** for new evaluations and when returning
+to an existing system. Check official release notes and supported deployment/
+client compatibility at the start of the work; do not reuse an old repository pin
+without checking. Prefer stable releases over nightly, preview, beta or release
+candidates. Pin the verified version, image digest, client and extension artifacts
+for the run; do not change them midway through a trial.
+
+Verify the **actual native engine version**, not only a wrapper, package or image
+tag. Language bindings may bundle an older engine. Record native versions and
+extension/plugin revisions and checksums, and use documentation/source matching
+those builds. If the newest engine is unavailable through a binding, investigate
+an official native library, CLI or supported integration; disclose any remaining
+blocker rather than silently substituting an old engine or claiming latest-version
+coverage. Operators/charts must form a supported stable combination with the engine.
+
+Older versions belong in explicitly labeled historical baselines, regressions or
+upgrade/compatibility tests. Preserve their data and original failed evidence.
+Recheck known failures and limitations on the current stable release before
+presenting them as current system limitations; do not assume an upgrade fixes them.
+Compare versions with equivalent workloads, resources, durability and correctness
+checks. Test file-format and rollback compatibility on separate owned copies, never
+by opening the sole historical database with a newer writer.
+
 ## Programming language practices
 
 - Do not submit the first generated draft. Make **2–3 implementation/review passes**:

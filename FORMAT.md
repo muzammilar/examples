@@ -132,7 +132,14 @@ failed state only after fencing its owner, and retain storage if export fails.
 
 - `name: <system>-<example>` at the top: a unique project name, so examples run side by side.
 - Container names prefixed with the system (`rondb-fs-ndbd-1`).
-- Pin every image tag (no `latest`); note why a version was chosen if not the newest.
+- Use the latest stable upstream release for new and revisited evaluations;
+  verify official releases and supported engine/operator/client combinations.
+  Pin exact versions and image digests, never a floating `latest` tag. Confirm
+  the native engine and extension versions: a newer binding can bundle an older
+  engine. Keep old versions only as labeled historical/regression/upgrade cases;
+  recheck their failures on current stable builds. Document unavailable latest-
+  version integrations and keep that coverage pending. See `AGENTS.md` for the
+  stable-release and historical-data preservation rules.
 - Host ports overridable: `"${KDB_PORT:-5102}:5000"`. Bind `127.0.0.1` when there is no auth.
 - `healthcheck:` on every long-running service; `depends_on: { condition: service_healthy }`.
 - One-shot init/setup services with `service_completed_successfully` (bucket creation, `sysctl`, bootstrap).
