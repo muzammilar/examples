@@ -1,0 +1,26 @@
+{
+  "archive": "results-archives/88201ad3534e44ea9e63e6253fb6c205.tar.gz",
+  "archive_sha256": "26b63ba334e6e162720cfbe43d711e87d6fe7b4c96ae7fe22f58aa2132cbb05a",
+  "file_count": 330,
+  "source_logical_bytes": 11588620132,
+  "source_allocated_bytes_counted": 11751354368,
+  "archive_bytes": 2523001736,
+  "archive_allocated_bytes": 2534277120,
+  "purged": true,
+  "wall_seconds": 58.54814104200341,
+  "cpu_core_seconds": 57.169290999999994,
+  "children_cpu_core_seconds": 0.07973,
+  "cpu_percent_one_core_100": 97.64492819227762,
+  "peak_rss_bytes": 46497792,
+  "filesystem_available_bytes_before": 24952147968,
+  "filesystem_available_bytes_after": 21836013568,
+  "scope": "Off-path evidence housekeeping, not benchmark capacity. Every raw file, including failed-state bytes, preserved and independently streamed/SHA256/CRC verified before removal. Sparse allocation/inode relationships are not restored. Physical device IO/latency unavailable; source bytes, archive bytes and observed filesystem free space are distinct.",
+  "date_utc": "2026-11-22",
+  "verification": {
+    "archive_sha256": "26b63ba334e6e162720cfbe43d711e87d6fe7b4c96ae7fe22f58aa2132cbb05a",
+    "every_member_sha256_verified": true,
+    "entries": 406
+  },
+  "compression": "gzip level1 tar stream; every member independently re-read and SHA256/CRC checked before removal",
+  "reproducibility": "The local ignored archive retains raw100k/million-pair histories, full exports and byte-checked native copies. Published source and lifecycle regenerate fresh experiments; tar does not restore original sparse/inode relationships. Visible source reduction is distinct from host physical-space reclamation."
+}

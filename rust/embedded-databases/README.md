@@ -178,6 +178,24 @@ ACK reconciliation and byte-checked external native-state preservation before
 volume deletion; cleanup fails closed on errors. Raw archives stay local and
 ignored; only source, this README and compact curated results belong in Git.
 
+## Local raw-evidence archive
+
+After both lifecycle teardowns and publication, **330** raw files containing
+**11,588,620,132 logical bytes** were archived into **2,523,001,736 bytes** of gzip
+compressed tar. Every member's SHA-256 and the gzip CRC were independently checked
+before removing the originals, under the same host controller lock and with no
+owned Docker resources remaining. The lock inode is preserved; source `results/`
+now contains only that lock.
+
+The local archive, manifest, verification record and one-off archiver are ignored
+under `results-archives/88201ad3534e44ea9e63e6253fb6c205.*`. Both fixture sizes'
+histories, diagnostic logs, full exports and native-state copies remain there;
+only the compact [archive summary](ARCHIVE_RESULTS.json) is tracked. The source
+and five-command lifecycle reproduce new experiments. This reduction of visible
+source files does not establish exact host physical-block reclamation.
+Archiving/verification took **58.548 s**, **57.169 CPU core-s** and **44.34 MiB**
+peak RSS: off-path housekeeping costs, not database performance.
+
 ## Upstream references and inspected paths
 
 - [Fjall 3.1.13 API/source](https://github.com/fjall-rs/fjall/tree/3.1.13):
