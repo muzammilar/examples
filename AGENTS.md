@@ -543,6 +543,14 @@ maxima can miss peaks. Report phase summaries and raw samples under ignored
 each README. Efficiency measures such as CPU-seconds per successful operation,
 bytes per record and completed operations per assigned core help explain tradeoffs.
 
+One-shot tools must persist native counters before automatic container removal;
+retain exit status and use runtime events for whole-container lifetime. Measure
+the actual engine process (for example, Spark's JVM as well as its Python driver).
+Respect counter resolution: very short intervals between coarse process-CPU ticks
+can fabricate utilization spikes. Retain raw samples and CPU totals, state the
+minimum interpretable interval and count suppressed utilization estimates instead
+of publishing those spikes as peaks. Keep original and corrected reports separate.
+
 If a metric cannot be collected, state **unavailable**, why, and the measurement
 gap; never use zero or infer it from a resource limit. Use **not applicable** only
 with a concrete reason (for example, no persisted data or no compression layer).
