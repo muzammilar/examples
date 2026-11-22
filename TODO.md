@@ -10,6 +10,14 @@ system, including older examples. Deliberately find how it breaks, measure the
 availability/data-loss boundary, and demonstrate recovery. Multiple replicas and
 healthy pods alone do not qualify an example as production ready.
 
+- [ ] Follow the [two- or three-pass testing approach](AGENTS.md#progressive-testing-across-systems):
+  first survey every system in the agreed scope and record existing evidence/gaps;
+  then establish runnable correctness, representative workloads, holistic measurements
+  and initial recovery coverage across them; return in later rounds for deeper
+  production/failure tests and repeated fair comparisons. Update README/TODO/audit
+  after each pass; keep unrun cases and failed results explicit.
+  Prioritize sustained performance comparisons once the evaluated configurations
+  pass relevant correctness/recovery gates; failing systems need diagnosis first.
 - [ ] Audit older examples for operational coverage; record missing, failed,
   blocked and unsupported cases without reclassifying them as passing.
 - [ ] Audit and backfill holistic measurements for all experiments: CPU utilization

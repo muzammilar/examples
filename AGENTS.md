@@ -139,6 +139,48 @@ applicable matrix and exits nonzero on failure. Do not run destructive cases in
 parallel or hide them inside a benchmark. List unsupported, blocked and unrun
 cases explicitly, with version-specific upstream reasons for unsupported cases.
 
+### Progressive testing across systems
+
+Evaluate the repository's systems in **two or three passes**, returning to each
+system to deepen coverage rather than exhaustively expanding one while the others
+remain unexplored. State the systems in the current pass and respect the user's
+priority order and scope.
+
+1. **Survey every system in scope.** Read its upstream documentation and relevant
+   source, intended strengths/limitations, deployment shapes, configuration and
+   competing systems. Inspect existing examples and actual result files. Record
+   what ran, known failures, missing evidence and the next useful tests. This is
+   high-level analysis, not an execution or production-readiness claim.
+2. **Establish runnable coverage across that scope.** Run each example's lifecycle,
+   declared-operation correctness and representative workload; add the live
+   writer/reader, durable witness, resource measurements and initial failure/
+   recovery tests where missing. Verify routing/replicas where applicable. Record
+   baseline results and gaps before moving on to the next system.
+3. **Return for deeper production testing.** Revisit systems for applicable scaling,
+   native repair, disk/dependency/quorum failures, partitions, upgrades, independent
+   restore, pressure/soak and repeated comparative benchmarks. Vary workload and
+   insert/query/cache approaches, guided by earlier results and system-specific
+   failure boundaries. Continue subsequent rounds as new gaps or bugs emerge.
+
+Prioritize sustained **performance comparisons for stable evaluated configurations**:
+require the relevant correctness and recovery gates to pass first. For systems
+with unresolved failures, investigate correctness/recovery before spending time
+ranking throughput. Diagnostic timing/resource measurements remain useful, but
+must be labelled as diagnostics and cannot establish a qualified performance winner.
+
+For a smaller scope, combine the second and third passes into one follow-up pass;
+keep the remaining coverage explicit. After each pass, update the per-example
+README and TODO/audit with executed evidence, limitations and the next tests so a
+future agent can resume. Prioritize genuine correctness/durability failures and
+unvisited systems over repeatedly polishing an already well-covered example.
+Finish and preserve an active experiment before switching its lab to another
+system; avoid overlapping heavyweight benchmarks that spoil comparisons.
+
+These passes schedule the work; the evaluation stages and evidence requirements
+below still gate qualification. An early pass does not waive missing production
+tests, establish an unmeasured performance winner or turn a failed result into a
+pass. Keep implementation/review passes separate from these testing rounds.
+
 ### Evaluation stages and backend contract
 
 Use these stages to decide what evidence is needed, not to build a repository-wide

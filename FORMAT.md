@@ -206,6 +206,11 @@ cases and performance checks. Implement applicable cases as independent Make
 targets and a documented serial `test-production` aggregate. Existing examples do
 not become qualified merely because these requirements were added.
 
+Work across systems in [two or three testing passes](AGENTS.md#progressive-testing-across-systems):
+survey the agreed scope first, establish runnable correctness/recovery coverage,
+then return for deeper production tests. Prioritize sustained performance
+comparisons for stable evaluated configurations that pass their relevant gates.
+
 - Keep load running through the outage and native repair. Distinguish graceful
   restart, crash, node outage, network partition and permanent disk loss.
 - Reconcile external acknowledged IDs and complete expected values/versions;
