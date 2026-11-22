@@ -1,8 +1,8 @@
 # Recent distributed-example production-test audit
 
-Scope: **2026-10-16 through 2026-11-16** first-added deployment examples: 33
-existing directories plus the new minimal Greptime WAL reproducer. Single-node
-comparison fixtures are included; older systems and legacy ClickHouse are excluded.
+Scope: **2026-10-16 through 2026-11-22** first-added deployment examples: 35
+existing directories plus the minimal Greptime WAL reproducer (36 Makefiles).
+Single-node comparison fixtures are included; older systems and legacy ClickHouse are excluded.
 This is a source audit, not a claim that every example was rerun. The per-example
 READMEs retain dated execution results and limitations.
 
@@ -390,6 +390,28 @@ The backfill is **not complete**. Prioritize independent observation and preserv
 historical witnesses before adding more fault names. Preserve failed data/evidence;
 never reset a failed fixture to make a report pass. Run destructive cases serially.
 
+## Current testing pass and next work
+
+The 2026-11-22 source inventory covers all **36 Makefiles in this recent cohort**;
+it is not a completed upstream/code review or a rerun of all systems. The detailed
+findings above remain the execution/gap record. The separate
+[Rust embedded survey](rust/EMBEDDED_DATABASE_SURVEY.md) is research for deferred
+candidates, outside this deployment count.
+
+| Work group | Present boundary | Next testing pass |
+|---|---|---|
+| CedarDB/PostgreSQL | Million-row mutation correctness/recovery passes; sustained matrix active | Finish and independently reconcile the twelve cells before publishing comparative results. Keep runtime sources/images fixed and avoid other heavy workloads meanwhile. |
+| Rayforce/DuckDB | Native DuckDB WAL recovery passes; Rayforce strict integrity cases remain failed | Keep failed cases visible. Diagnose/retest integrity before new qualified performance rankings; timing failed cases is diagnostic only. |
+| DuckDB/ZFS and ZFS storage | Historical individual storage/recovery tests exist; current observation/history gaps remain | Preserve prior witnesses before resetting storage, add fsynced intents/outcomes and keep independent readers/writers alive through recovery. In DuckDB/ZFS, `spawn()` removes matching journals, `writer()` truncates its journal and stops after its first request error, and `reset()` destroys datasets before those writers start. A filename-only fix cannot establish historical data preservation or continuous recovery observation. |
+| Iceberg/archive examples | Native data/shard checks and archive gates exist; continuous mutation/reader and commit-ambiguity gaps remain | Add external histories and continuous observation through catalog/object-store/compaction interruptions, then verify the committed snapshot and retained source before cleanup. Do not infer HA from queries on surviving copies. |
+| Recent relational, search and S3 clusters | Core per-example proofs above pass on their recorded configurations; extended matrices and new holistic measurement requirements are incomplete | Revisit applicable quorum/partition, scaling, maintenance/upgrade, pressure and independent-restore cases across the cohort. Preserve version-specific qualification and every earlier failed attempt. |
+| GreptimeDB/Victoria | Metrics/log baselines and guarded Greptime recovery have results; normalized complete-stack comparison is unqualified | Verify equivalent contracts/budgets and stable configurations first, then follow the single/batch/native-ingestion and cold/warm-query matrix in the [observability plan](observability/README.md#greptimedb-vs-victoria-after-the-recovery-backfills). Do not extrapolate tracing support or a whole-stack winner. |
+
+This queue implements the [progressive passes](AGENTS.md#progressive-testing-across-systems):
+survey breadth first, establish missing correctness/recovery evidence, then deepen
+tests and compare stable configurations. No new live coverage is established by
+this inventory refresh. Do not start another lab while the active comparison runs.
+
 ## Declared-target inventory
 
 The snapshot below is only a triage aid. Aliases can miss tests implemented under
@@ -400,6 +422,7 @@ inventory with `python3 tools/audit-production-tests.py`; output is ignored unde
 
 | Example | Shape | Declared categories | No recognized target; review applicability | Evidence status |
 |---|---|---|---|---|
+| [cedardb/backup-recovery](cedardb/backup-recovery/) | Compose | suite | crash, disk, scale-out, scale-in, rolling, partition, pressure, restore, drain | four million-row healthy/SIGKILL mutation prerequisites pass; twelve-cell sustained matrix is in progress, not qualified; earlier append-only results remain separate |
 | [ceph/s3-cluster](ceph/s3-cluster/) | Compose | suite, crash, disk | scale-out, scale-in, rolling, partition, pressure, restore, drain | four live faults, benchmark, cold reopen and fresh lifecycle/cleanup qualified above; extended categories remain unrun |
 | [clickhouse/iceberg](clickhouse/iceberg/) | Compose | none | suite, crash, disk, scale-out, scale-in, rolling, partition, pressure, restore, drain | declaration inventory only |
 | [clickhouse/s3-tiered-storage](clickhouse/s3-tiered-storage/) | Compose | crash, disk | suite, scale-out, scale-in, rolling, partition, pressure, restore, drain | declaration inventory only |
@@ -408,11 +431,12 @@ inventory with `python3 tools/audit-production-tests.py`; output is ignored unde
 | [greptimedb/docker-compose-cluster](greptimedb/docker-compose-cluster/) | Compose | suite, crash, disk, scale-out, scale-in | rolling, partition, pressure, restore, drain | declaration inventory only |
 | [greptimedb/kubernetes-operator](greptimedb/kubernetes-operator/) | Kubernetes | suite, crash, disk, scale-out, scale-in, rolling, partition, pressure, drain | restore | declaration inventory only |
 | [greptimedb/single-node](greptimedb/single-node/) | Compose | none | suite, crash, disk, scale-out, scale-in, rolling, partition, pressure, restore, drain | declaration inventory only |
+| [greptimedb/wal-bootstrap-reproducer](greptimedb/wal-bootstrap-reproducer/) | Compose | none | suite, crash, disk, scale-out, scale-in, rolling, partition, pressure, restore, drain | declaration inventory only |
 | [iceberg/multi-system](iceberg/multi-system/) | Compose | none | suite, crash, disk, scale-out, scale-in, rolling, partition, pressure, restore, drain | declaration inventory only |
 | [iceberg/trino-minio](iceberg/trino-minio/) | Compose | crash | suite, disk, scale-out, scale-in, rolling, partition, pressure, restore, drain | declaration inventory only |
 | [kafka/connect-postgres-enrichment](kafka/connect-postgres-enrichment/) | Compose | core broker/Connect/processor/PostgreSQL crashes, three diagnostics, fresh lifecycle and retained setup/recreation | disk, scale-out, scale-in, rolling, partition/quorum, pressure, restore, drain | individual core cases and independent fresh/retained lifecycles verified 2026-11-21; full aggregate invocation and extended matrix unrun |
 | [kafka/cross-cluster-mirroring](kafka/cross-cluster-mirroring/) | Kubernetes | suite, crash, disk | scale-out, scale-in, rolling, partition, pressure, restore, drain | core live recovery, exact cutover, retained-state replay and scoped lifecycle qualified above; private kubeconfig and explicit contexts verified; four-case aggregate invocation remains unrun |
-| [kafka/strimzi-jbod](kafka/strimzi-jbod/) | Kubernetes | none | suite, crash, disk, scale-out, scale-in, rolling, partition, pressure, restore, drain | declaration inventory only |
+| [kafka/strimzi-jbod](kafka/strimzi-jbod/) | Kubernetes | suite | crash, disk, scale-out, scale-in, rolling, partition, pressure, restore, drain | declaration inventory only |
 | [lancedb/versioned-product-search](lancedb/versioned-product-search/) | Compose | test-production, writer-crash, reader-crash, maintenance, rolling-restart, cold-reopen, crash-reopen | partition, pressure, restore, SDK upgrade; native replication/sharding unsupported | core execution verified 2026-11-19; extended gaps above |
 | [mysql/customer-sharding](mysql/customer-sharding/) | Compose | suite, crash | disk, scale-out, scale-in, rolling, partition, pressure, restore, drain | eight live fault cases qualified above; other categories require separate work |
 | [mysql/ndb-cluster-docker-compose-cluster](mysql/ndb-cluster-docker-compose-cluster/) | Compose | suite, crash | disk, scale-out, scale-in, rolling, partition, pressure, restore, drain | eight live role cases qualified above; extended categories require separate work |
@@ -425,12 +449,12 @@ inventory with `python3 tools/audit-production-tests.py`; output is ignored unde
 | [postgres/pgdog-docker-compose-cluster](postgres/pgdog-docker-compose-cluster/) | Compose | suite, crash | disk, scale-out, scale-in, rolling, partition, pressure, restore, drain | five live role/configuration cases qualified above; other categories require separate work |
 | [postgres/pgvector-product-search](postgres/pgvector-product-search/) | Compose | test-production, failover, replica-crash, disk-failure, rebuilt-crash, cold-reopen, crash-reopen | scale-out, scale-in, rolling, partition, pressure, restore, drain | core execution verified 2026-11-19; extended gaps above |
 | [qdrant/turboquant](qdrant/turboquant/) | Compose | suite, crash, disk | scale-out, scale-in, rolling, partition, pressure, restore, drain | declaration inventory only |
+| [rayforce/duckdb-comparison](rayforce/duckdb-comparison/) | Compose | suite | crash, disk, scale-out, scale-in, rolling, partition, pressure, restore, drain | DuckDB native WAL recovery passes; strict Rayforce payload/AOF integrity cases remain FAILED; do not infer a performance winner from diagnostic timings |
 | [rustfs/s3-cluster](rustfs/s3-cluster/) | Compose | suite, crash, disk | scale-out, scale-in, rolling, partition, pressure, restore, drain | full fresh live fault aggregate, corrected cold reopen and two fresh lifecycles qualified above; extended categories remain unrun |
 | [seaweedfs/s3-cluster](seaweedfs/s3-cluster/) | Compose | suite, crash, disk | scale-out, scale-in, rolling, partition, pressure, restore, drain | live faults, cold reopen and fresh lifecycle qualified above; extended categories remain unrun |
 | [starrocks/docker-compose-cluster](starrocks/docker-compose-cluster/) | Compose | suite, crash, disk | scale-out, scale-in, rolling, partition, pressure, restore, drain | declaration inventory only |
 | [starrocks/kubernetes-operator](starrocks/kubernetes-operator/) | Kubernetes | suite, crash, disk, scale-out, scale-in, rolling, partition | pressure, restore, drain | declaration inventory only |
 | [starrocks/single-node](starrocks/single-node/) | Compose | none | suite, crash, disk, scale-out, scale-in, rolling, partition, pressure, restore, drain | declaration inventory only |
-| [typesense/product-search](typesense/product-search/) | Compose | crash | suite, disk, scale-out, scale-in, rolling, partition, pressure, restore, drain | declaration inventory only |
-| [vespa/phased-product-search](vespa/phased-product-search/) | Compose | crash | suite, disk, scale-out, scale-in, rolling, partition, pressure, restore, drain | declaration inventory only |
+| [typesense/product-search](typesense/product-search/) | Compose | suite, crash, disk | scale-out, scale-in, rolling, partition, pressure, restore, drain | declaration inventory only |
+| [vespa/phased-product-search](vespa/phased-product-search/) | Compose | suite, crash, disk | scale-out, scale-in, rolling, partition, pressure, restore, drain | declaration inventory only |
 | [zfs/storage-lab](zfs/storage-lab/) | Compose | none | suite, crash, disk, scale-out, scale-in, rolling, partition, pressure, restore, drain | declaration inventory only |
-| [greptimedb/wal-bootstrap-reproducer](greptimedb/wal-bootstrap-reproducer/) | Compose | none | suite, crash, disk, scale-out, scale-in, rolling, partition, pressure, restore, drain | declaration inventory only |

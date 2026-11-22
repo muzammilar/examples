@@ -10,6 +10,10 @@ system, including older examples. Deliberately find how it breaks, measure the
 availability/data-loss boundary, and demonstrate recovery. Multiple replicas and
 healthy pods alone do not qualify an example as production ready.
 
+The [current pass and execution queue](PRODUCTION_TEST_AUDIT.md#current-testing-pass-and-next-work)
+distinguish the 36 recent Makefile declarations, inspected coverage gaps and
+actually executed evidence. The inventory refresh is not a passing-test report.
+
 - [ ] Follow the [two- or three-pass testing approach](AGENTS.md#progressive-testing-across-systems):
   first survey every system in the agreed scope and record existing evidence/gaps;
   then establish runnable correctness, representative workloads, holistic measurements
