@@ -77,6 +77,16 @@ changed after the full five-path run. Cleanup passed and nine unrelated
 containers stayed unchanged. Normal-path encoded compression, full startup/exit
 cost and repeated cold/warm capacity trials remain incomplete.
 
+## Cold backup and restore
+
+`make cold-storage` takes a deliberate maintenance outage with workload actors
+stopped. The reviewed run restored **146 files** from a **569,685,468-byte**
+whole-volume archive and restarted the original services. Independent readback
+reconciled **6.06 million acknowledged rows per engine**. Concurrent shutdown failed; a retained-state
+rerun passed after changing to serial query-before-storage shutdown.
+See [`COLD_STORAGE.md`](COLD_STORAGE.md) for commands, failure boundaries and
+remaining native-readback/cleanup work.
+
 ## Current and historical DuckDB versions
 
 New commands default to **DuckDB 2.0.1**, using the official shared C library

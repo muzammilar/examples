@@ -1,0 +1,261 @@
+{
+  "date": "2026-11-22",
+  "scope": "Cold whole-volume checkpoint, filesystem restore, and independent readback of two retained witnessed tables. No cloud resources; no HA or power-loss claim. Original failed live qualifications remain failed.",
+  "checkpoint_id": "c5f56820-970c-4eb3-82b1-a783ab526c06",
+  "checkpoint_passed": true,
+  "native_restore_scope": "Two witnessed recovery tables; not every historical table in the catalog",
+  "native_readback_exposed_as_make_target": false,
+  "file_count": 146,
+  "archive": {
+    "sha256": "db3d7b51ca0fd33f4d05b80d35f472df3a0f35d94470d27d526bc07234a0cb0c",
+    "bytes": 569685468,
+    "files_manifest_sha256": "4ba498619af34aa80abe500e4e48fd680f0b0d520aef66ea67f9f67aa5c74d14",
+    "metadata_manifest_sha256": "233ce569e5278316ca3034bbe96ab1d2be17e6887b663828f5fbadd15651ee2d"
+  },
+  "source_allocated_bytes": 1004367872,
+  "archive_write_seconds": 20.132249037,
+  "actual_make_workflow_seconds": 74.372665,
+  "host_controls_passed": 134,
+  "file_helpers": {
+    "backup": {
+      "cpu_core_seconds_through_command_completion": 21.936959,
+      "container_lifetime_charged_memory_peak_bytes_through_command_completion": 536870912,
+      "cpu_limit": 1,
+      "memory_limit_bytes": 536870912,
+      "native_io_stat": "254:0 rbytes=287756288 wbytes=0 rios=1180 wios=0 dbytes=0 dios=0",
+      "scope": "Counters include startup/coverage wait, hashing and file operations; charged file cache is not heap. Native io.stat is Docker-VM device accounting, not physical SSD I/O."
+    },
+    "restore": {
+      "cpu_core_seconds_through_command_completion": 10.086612,
+      "container_lifetime_charged_memory_peak_bytes_through_command_completion": 536875008,
+      "cpu_limit": 1,
+      "memory_limit_bytes": 536870912,
+      "native_io_stat": "254:0 rbytes=1666801664 wbytes=834990080 rios=7020 wios=2397 dbytes=0 dios=0",
+      "scope": "Counters include startup/coverage wait, hashing and file operations; charged file cache is not heap. Native io.stat is Docker-VM device accounting, not physical SSD I/O."
+    }
+  },
+  "evidence": [
+    {
+      "path": "results/cold-storage/c5f56820-970c-4eb3-82b1-a783ab526c06/result.json",
+      "sha256": "16017f3698631f68416b65e42d98f9fce7a73d90c2868d50b3dbc257ca4e9ec0"
+    },
+    {
+      "path": "results/cold-storage/c5f56820-970c-4eb3-82b1-a783ab526c06/invocation.json",
+      "sha256": "91cdd167c27e8f42907b0998df7e5c05cfb44fdf3814ff25ed93357a7a7c493c"
+    },
+    {
+      "path": "results/cold-storage/c5f56820-970c-4eb3-82b1-a783ab526c06/archive-proof.json",
+      "sha256": "37b2daf049fcc1dff7966c7c297a9786800bc2e4cef9be9625a15157f0a8613f"
+    },
+    {
+      "path": "results/qualification-20261122/23-cold-checkpoint-reviewed.result.json",
+      "sha256": "6c5e61be0153c9366be9739a8e87b5d0b794e650a740753547a7c2f97266ad52"
+    }
+  ],
+  "native_trials": [
+    {
+      "trial_id": "8881f6b2-bcd5-45ae-8e6c-2c9903412b86",
+      "passed": false,
+      "shutdown_order": "concurrent query/storage",
+      "error": "AssertionError()",
+      "cases": [
+        {
+          "run_id": "f1b2af24-f6c2-4bd2-8e44-a35392666f23",
+          "verification_id": "85175e8c-f566-4ca5-94e0-d35ada2a2a16",
+          "integrity_passed": true,
+          "original_live_qualification_unchanged": true,
+          "snapshot": {
+            "table_uuid": "1fc2ed32-ff57-4799-93c8-e8f64ae113a1",
+            "snapshot_id": 3246169348701310691,
+            "metadata_location": "s3://warehouse/lab/recovery_f1b2af24f6c24bd28e44a35392666f23-1fc2ed32-ff57-4799-93c8-e8f64ae113a1/metadata/v268.metadata.json"
+          },
+          "acknowledged_rows_per_engine": 2670000,
+          "canonical_body_sha256": "362e1e11b5ae1ec4e2da8ff038a86636be708a64e73ba73ea5ef3439be2eb1cf"
+        },
+        {
+          "run_id": "2b463a19-1a8c-43bf-b84d-5a0fa03f5836",
+          "verification_id": "0c0e6b7e-a2fa-41e4-b837-c93634d3ce86",
+          "integrity_passed": true,
+          "original_live_qualification_unchanged": true,
+          "snapshot": {
+            "table_uuid": "f4bf9a2a-70e7-4668-ac30-112a8acd9b94",
+            "snapshot_id": 2119811354969392301,
+            "metadata_location": "s3://warehouse/lab/recovery_2b463a191a8c43bfb84d5a0fa03f5836-f4bf9a2a-70e7-4668-ac30-112a8acd9b94/metadata/v341.metadata.json"
+          },
+          "acknowledged_rows_per_engine": 3390000,
+          "canonical_body_sha256": "404308f8e350e15a3ca87416cd1f712b66f2506aed41b9d38eb1c41ba432b1c0"
+        }
+      ],
+      "service_exit_codes": {
+        "storage": 0,
+        "clickhouse": 137
+      },
+      "evidence": [
+        {
+          "path": "results/cold-storage/c5f56820-970c-4eb3-82b1-a783ab526c06/native-readback/8881f6b2-bcd5-45ae-8e6c-2c9903412b86/result.json",
+          "sha256": "5ea6631e2bb8dc11fdf6ea73b1deaa904212f382a031a4ddc0011a9de138821c"
+        },
+        {
+          "path": "results/cold-storage/c5f56820-970c-4eb3-82b1-a783ab526c06/native-readback/8881f6b2-bcd5-45ae-8e6c-2c9903412b86/invocation.json",
+          "sha256": "cd67850df5f124b4d3f9a08b957046d5cb81b24335dc8c708d60a4c81de850ec"
+        },
+        {
+          "path": "results/cold-storage/c5f56820-970c-4eb3-82b1-a783ab526c06/native-readback/8881f6b2-bcd5-45ae-8e6c-2c9903412b86/run.py",
+          "sha256": "d5db8ea2b0280ac127222aa2ef8d6f1d8741a63e08877271bb2fdce045e0529b"
+        },
+        {
+          "path": "results/cold-storage/c5f56820-970c-4eb3-82b1-a783ab526c06/native-readback/8881f6b2-bcd5-45ae-8e6c-2c9903412b86/resource-summary.json",
+          "sha256": "5a03cf29d328f5064347c571d2fb81315d07081e7a7d42361cabf073e523f3b3"
+        }
+      ]
+    },
+    {
+      "trial_id": "b7db4203-f789-44b2-b573-8de5053c40cd",
+      "passed": true,
+      "shutdown_order": "serial query then storage",
+      "error": null,
+      "cases": [
+        {
+          "run_id": "f1b2af24-f6c2-4bd2-8e44-a35392666f23",
+          "verification_id": "bb0b707f-0e02-42fd-9ccb-a047c8dc0b09",
+          "integrity_passed": true,
+          "original_live_qualification_unchanged": true,
+          "snapshot": {
+            "table_uuid": "1fc2ed32-ff57-4799-93c8-e8f64ae113a1",
+            "snapshot_id": 3246169348701310691,
+            "metadata_location": "s3://warehouse/lab/recovery_f1b2af24f6c24bd28e44a35392666f23-1fc2ed32-ff57-4799-93c8-e8f64ae113a1/metadata/v268.metadata.json"
+          },
+          "acknowledged_rows_per_engine": 2670000,
+          "canonical_body_sha256": "362e1e11b5ae1ec4e2da8ff038a86636be708a64e73ba73ea5ef3439be2eb1cf"
+        },
+        {
+          "run_id": "2b463a19-1a8c-43bf-b84d-5a0fa03f5836",
+          "verification_id": "f6fce0e5-adef-4f98-ba6d-bceccaa14b82",
+          "integrity_passed": true,
+          "original_live_qualification_unchanged": true,
+          "snapshot": {
+            "table_uuid": "f4bf9a2a-70e7-4668-ac30-112a8acd9b94",
+            "snapshot_id": 2119811354969392301,
+            "metadata_location": "s3://warehouse/lab/recovery_2b463a191a8c43bfb84d5a0fa03f5836-f4bf9a2a-70e7-4668-ac30-112a8acd9b94/metadata/v341.metadata.json"
+          },
+          "acknowledged_rows_per_engine": 3390000,
+          "canonical_body_sha256": "404308f8e350e15a3ca87416cd1f712b66f2506aed41b9d38eb1c41ba432b1c0"
+        }
+      ],
+      "service_exit_codes": {
+        "storage": 0,
+        "clickhouse": 0
+      },
+      "evidence": [
+        {
+          "path": "results/cold-storage/c5f56820-970c-4eb3-82b1-a783ab526c06/native-readback/b7db4203-f789-44b2-b573-8de5053c40cd/result.json",
+          "sha256": "d6dea8f43d820671380ce13f629d42bf9529b4a4fd1071853e64ae5b4d4a7641"
+        },
+        {
+          "path": "results/cold-storage/c5f56820-970c-4eb3-82b1-a783ab526c06/native-readback/b7db4203-f789-44b2-b573-8de5053c40cd/invocation.json",
+          "sha256": "06b76bb44435e59fc8acb0ecabf32f0f001ab5fae89a67a0c4c53108855d65e8"
+        },
+        {
+          "path": "results/cold-storage/c5f56820-970c-4eb3-82b1-a783ab526c06/native-readback/b7db4203-f789-44b2-b573-8de5053c40cd/run.py",
+          "sha256": "257fe0370c595fe665d1527129928c3f748b9344f4cb4a2a47d08aac76ec88a5"
+        },
+        {
+          "path": "results/cold-storage/c5f56820-970c-4eb3-82b1-a783ab526c06/native-readback/b7db4203-f789-44b2-b573-8de5053c40cd/resource-summary.json",
+          "sha256": "11aa1192cc34bb4e45183b96647933b690bb1b11e02a2a2a01096a82eac8d896"
+        }
+      ],
+      "resources": {
+        "clickhouse": {
+          "observed_seconds": 31.050000000000004,
+          "cpu_core_seconds": {
+            "total": 3.681767,
+            "user": 2.4484690000000002,
+            "system": 1.233298
+          },
+          "charged_memory_bytes_min_mean_max": [
+            485265408,
+            699969991.1111112,
+            1206513664
+          ],
+          "lifetime_peak_memory_bytes": 1279377408,
+          "allocated_disk_bytes_first_peak_last": [
+            9576448,
+            14774272,
+            14774272
+          ],
+          "native_block_io": {
+            "254:0": {
+              "observed_seconds": 31.050000000000004,
+              "rbytes": 1667072,
+              "wbytes": 2486272,
+              "rios": 21,
+              "wios": 290,
+              "rbytes_per_second": 53689.919484702084,
+              "wbytes_per_second": 80073.17230273751,
+              "rios_per_second": 0.6763285024154588,
+              "wios_per_second": 9.33977455716586
+            }
+          }
+        },
+        "storage": {
+          "observed_seconds": 31.05,
+          "cpu_core_seconds": {
+            "total": 2.0946689999999997,
+            "user": 1.345562,
+            "system": 0.7491069999999999
+          },
+          "charged_memory_bytes_min_mean_max": [
+            168394752,
+            393634095.4074074,
+            416026624
+          ],
+          "lifetime_peak_memory_bytes": 423813120,
+          "allocated_disk_bytes_first_peak_last": [
+            1004363776,
+            1004363776,
+            1004363776
+          ],
+          "native_block_io": {
+            "254:0": {
+              "observed_seconds": 31.05,
+              "rbytes": 0,
+              "wbytes": 90112,
+              "rios": 0,
+              "wios": 22,
+              "rbytes_per_second": 0.0,
+              "wbytes_per_second": 2902.157809983897,
+              "rios_per_second": 0.0,
+              "wios_per_second": 0.7085346215780999
+            }
+          }
+        }
+      }
+    }
+  ],
+  "remaining": [
+    "Expose the native replay as a tracked repeatable Make target; diagnostic controllers and Compose files remain in ignored local evidence",
+    "Add guarded cleanup for checkpoint helpers and temporary restore volumes, preserving archives and failed evidence",
+    "Test newer pinned SeaweedFS using the retained checkpoint; do not assume downgrade compatibility",
+    "Native data readback does not clear the older reader-abort/combined-fault qualification failures",
+    "Final helper shell now propagates pipeline errors; tiny native helper controls separately verify normal completion and failure propagation after the full checkpoint run"
+  ],
+  "final_helper_controls": {
+    "passed": true,
+    "cases": [
+      {
+        "mode": "healthy",
+        "expected_error_observed": false,
+        "exit_code": 0
+      },
+      {
+        "mode": "pipeline-error",
+        "expected_error_observed": true,
+        "exit_code": 1
+      }
+    ],
+    "evidence": {
+      "path": "results/cold-storage-helper-controls/a0b53615-712c-484d-8990-c38e85e602e9/result.json",
+      "sha256": "d2892b01f0201aac727a374934319d866505a173d5db7f1606c4d507e356ad38"
+    }
+  }
+}

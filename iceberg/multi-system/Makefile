@@ -64,7 +64,7 @@ unit-test: config prepare
 
 recovery-unit-test:
 	python3 -c 'import sys; assert sys.version_info >= (3, 11), "Recovery controls require Python 3.11+; check the python3 selected by Make"'
-	python3 -m unittest test_recovery_resources.py test_recovery_control.py test_recovery_report.py test_recovery_cleanup.py test_recovery_retirement.py test_compactor_cleanup.py test_compactor_control.py test_prefault_archive.py test_manifest_control.py
+	python3 -m unittest test_recovery_resources.py test_recovery_control.py test_recovery_report.py test_recovery_cleanup.py test_recovery_retirement.py test_compactor_cleanup.py test_compactor_control.py test_prefault_archive.py test_manifest_control.py test_cold_storage.py
 
 storage-crash: config recovery-unit-test
 	python3 recovery_control.py storage-crash
@@ -178,3 +178,7 @@ else
 	$(MAKE) test-case ARCH="$(ARCH)"
 	$(RUN) -e ROWS=$$(( $(ROWS) $(if $(filter ch-archive duck-archive,$(ARCH)),/ 2,+ 0) )) runner benchmark
 endif
+
+.PHONY: cold-storage
+cold-storage: config recovery-unit-test ## Cold checkpoint and byte-identical restore, retaining original state
+	python3 cold_storage.py

@@ -200,6 +200,19 @@ Reconcile file row counts with the complete body oracle and recheck the snapshot
 after inspection. [DuckDB 1.5.5 footer metadata](https://github.com/duckdb/duckdb/blob/v1.5.5/extension/parquet/parquet_metadata.cpp),
 [Parquet byte definitions](https://github.com/apache/parquet-format/blob/master/src/main/thrift/parquet.thrift#L861-L881).
 
+## Whole-volume cold recovery
+
+The example-owned `make cold-storage` now performs serial clean shutdown,
+read-only whole-volume checkpoint, byte/metadata verification on a fresh owned
+volume and original-service restart. The reviewed Make run passed 134 controls
+and restored 146 files. The separate two-table native audit preserved all 6.06
+million acknowledged rows per engine but failed its simultaneous dependency
+shutdown. The retained-state rerun passed serial query-before-storage shutdown
+with both services exiting zero; keep both outcomes. Keep the archive,
+original volume, native witnesses and that failed verdict. See `COLD_STORAGE.md`.
+Track native replay and cleanup before upgrading the restore to a newer pinned
+SeaweedFS release; never change the sole historical storage volume first.
+
 ## Archive safety
 
 ### ClickHouse hot data to Iceberg
