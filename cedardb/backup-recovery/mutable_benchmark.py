@@ -12,7 +12,7 @@ import uuid
 
 import control
 from htap import bounded_setting, host_rss_bytes, query_summary
-from mutable_lab import MutableCase
+from mutable_lab import MutableCase, sample_disk
 from resources import Recorder, summarize_records
 
 
@@ -85,7 +85,7 @@ def cell(backend, concurrent, trial, warmup, duration, pairs):
             case.root / "analytics-resources.jsonl",
             endpoint,
             targets,
-            control.sample_disk,
+            sample_disk,
         ) as recorder:
             case.seed()
             initialized = case.snapshot()

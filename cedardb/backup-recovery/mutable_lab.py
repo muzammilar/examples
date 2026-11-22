@@ -13,7 +13,19 @@ import zlib
 
 import control
 import mutable_oracle
-from resources import Recorder, summarize
+from resources import Recorder, summarize, parse_native_io
+
+
+def sample_disk(role, identity):
+    result = control.sample_disk(role, identity)
+    if result is not None:
+        raw = control.run(["docker", "exec", identity, "cat", "/sys/fs/cgroup/io.stat"])
+        result.update(
+            native_io=parse_native_io(raw),
+            native_io_captured_ns=time.time_ns(),
+            native_io_raw=raw,
+        )
+    return result
 
 
 class MutableCase:
@@ -315,7 +327,7 @@ def run_case(backend, crash=False):
     passed = False
     try:
         with Recorder(
-            case.root / "resources.jsonl", endpoint, targets, control.sample_disk
+            case.root / "resources.jsonl", endpoint, targets, sample_disk
         ) as recorder:
             case.seed()
             case.start()

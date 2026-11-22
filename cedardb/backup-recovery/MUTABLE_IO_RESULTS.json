@@ -1,0 +1,1499 @@
+{
+  "scope": "Two 10000-row healthy functional collector checks; not comparative performance qualification. Historical checkpoint remains in MUTABLE_RESULTS.json. Native cgroup block endpoints are not host physical device measurements.",
+  "date": "2026-11-22",
+  "controller_tests": 20,
+  "cases": [
+    {
+      "identity": "8f52f3cbc7604fe5ade245193c3de263",
+      "config": {
+        "created_ns": 1795310007534626000,
+        "backend": "cedar",
+        "identity": "8f52f3cbc7604fe5ade245193c3de263",
+        "generation": "570e83ea57dd4059a0ece283e2a36c98",
+        "rows": 10000,
+        "pairs": 8,
+        "writer_rate": 50,
+        "reader_rate": 20,
+        "backend_contract": {
+          "operations": [
+            "paired row UPDATE",
+            "paired DELETE and reinsert",
+            "transactional native receipt",
+            "four-body repeatable-read snapshot",
+            "100-bucket analytical aggregate",
+            "ordered full-row and receipt export"
+          ],
+          "consistency": "CedarDB snapshot isolation and PostgreSQL REPEATABLE READ for mutation/read transactions. Analytical SELECTs are individually snapshot-consistent. No serializable, multi-writer conflict or general linearizability claim.",
+          "atomicity": "Each two-row change and its receipt are one synchronous database transaction. Group count, amount sum and payload length stay fixed, while stored bodies and revisions genuinely change.",
+          "durability": "Every connection sets/checks CedarDB async_commit=off or PostgreSQL synchronous_commit=on, fsync=on, full_page_writes=on. Retained-volume process/container crash is distinct from device/power loss.",
+          "retries": "No mutation replay. All submitted errors remain ambiguous until native receipts and complete bodies are reconciled with fsynced external intents. Later requests use new sequence IDs.",
+          "deletes": "Two rows are deleted and reinserted inside one transaction; readers must never see the transient missing pair. Permanent delete/TTL/reclamation workloads remain separate.",
+          "client": {
+            "driver": "pgx/v5 v5.7.6",
+            "protocol": "simple text",
+            "connections_per_actor": 1,
+            "statement_cache": "disabled",
+            "connect_timeout_s": 2,
+            "live_operation_timeout_s": 3,
+            "rollback_cleanup_timeout_s": 1,
+            "max_in_flight_per_actor": 1,
+            "write_rate_ceiling_per_s": 50,
+            "snapshot_read_rate_ceiling_per_s": 20,
+            "arrival": "ticker-paced closed loop; missed ticks under backpressure are not queued",
+            "tls": "disabled on the isolated lab network"
+          },
+          "data": {
+            "default_rows": 1000000,
+            "customers": 10000,
+            "groups": 100,
+            "payload_bytes": 256,
+            "types": "BIGINT PK id; INTEGER customer/amount; TEXT payload; BIGINT revision",
+            "nulls": false,
+            "mutable_pairs_default": 10000,
+            "pattern": "Each selected pair receives UPDATE then DELETE/reinsert; cycle through the configured pair window. Same analytical bucket, balanced signed amount adjustment, same payload length. One final pair remains historical and immutable.",
+            "payload": "192 bytes of repeated customer prefix plus 64 ASCII SHA256 hex characters; versioned suffix for actual mutations"
+          },
+          "oracle": "Native receipt set must include every ACK and only externally intended sequences. Replay committed sequences, then verify every seeded row/version/body and all 100 group invariants. Independent snapshots verify latest committed pair and an older untouched pair; UTC prior-ACK watermark check uses a documented 10ms guard.",
+          "namespace": "New UUID schema per case; preserve failed schemas. Drop a successful schema only after actors stop and complete external exports are fsynced/verified. Base orders fixture remains unchanged and independently verified.",
+          "resources": "One active backend per performance cell, 4 CPUs/6 GiB/no swap. Each Go actor has 1 CPU/512 MiB/no swap; 1 analytical actor alone or 3 actors with mutations. Whole-store counters include the retained immutable base fixture as well as mutable data, receipts, indexes, WAL and engine files.",
+          "limits": "Single Docker VM, no HA/replica/sharding claim. Same-key multi-writer conflicts, arbitrary update effects, permanent deletes, verified OS-cold access, open-loop saturation, disk EIO/full and physical power-loss recovery are unqualified. CedarDB engine source is closed; inspect versioned public APIs, shipped configuration and pinned pgx/PostgreSQL source."
+        },
+        "contract": "Synchronous repeatable-read transactions. Each paired UPDATE or DELETE/reinsert and its native receipt commit atomically. External intent/ACK journal; no mutation retries. Whole group totals stay fixed while actual queried bodies change.",
+        "source_sha256": {
+          "mutable_lab.py": "147be8d375df988f750764413bb7bd1cf8469e7bb14f609d9d436c65e01d15ca",
+          "mutable_oracle.py": "3838c142113531416d133cc6586e185398829f76b753138a8b95a4659a622563",
+          "mutable-contract.json": "3d554f4ef76142c041499fce6134ee171f9be498e6900f81018320b8eb805eea",
+          "control.py": "1b5ba9c14c8be30b6962be5d1481c5b9593c02d61fb43fcc9075b68d72dbcb83",
+          "resources.py": "7a97bb30474d9aec30c5ea64f8507a0ba3bfc0ce388ca0db7cb8a196ce48f459",
+          "docker-compose.yml": "04306e322b6d792f6eee0eba05c4b548808e4e4d77112e33ea0d1afb3b82f09b",
+          "orders-workload/analytics.go": "7c877b4ff3c713c7979f750abfe50f9b8cd7004e00da5691f9d724d653d4abaf",
+          "orders-workload/analytics_test.go": "0a40aeeb571efef90e3e3827bc80b8dd557bca1b4ada3838f41e88569c4d96a6",
+          "orders-workload/main.go": "240286bc6ddac85f525cc7d77ffe313f3f9602835b33c163e6e67b0da75af576",
+          "orders-workload/mutable.go": "adf0a77169041245785ee38ea414333d821af02bdeb70fbdf4451dd0fd657fad",
+          "orders-workload/mutable_test.go": "87872c937f2b206d350d772524129a004543fac521f6f0780064215e0d95d0e5",
+          "orders-workload/process_test.go": "178ba50732f8ae3f9b3701eff7de4f70098be3bcdbd9e022a482694f835eb4d6",
+          "orders-workload/go.mod": "640974387b995fa723f98e37f36c28ad67eba09cc0ddb5f13f24dbef24e46916",
+          "orders-workload/go.sum": "4e7e05768d607a1cc09d1dbe92d138751e9111200e8eadf2be5d7c99b189e834",
+          "orders-workload/Dockerfile": "25b508b62456be94d2e63608a3314c93aa46633e620837465a703e61ed0c5bc9"
+        }
+      },
+      "proof": {
+        "seed_rows_verified": 10000,
+        "intents": 600,
+        "acknowledged_transactions": 600,
+        "committed_transactions": 600,
+        "applied_unacknowledged_intents": 0,
+        "acknowledged_loss": 0,
+        "wrong_duplicate_or_partial_rows": 0,
+        "groups_verified": 100,
+        "last_committed_seq": 600,
+        "row_export_sha256": "b2fce7e42e1f3fb66aaf30ca7fdad44be3164213949a426cd7165d6717e617fb",
+        "receipt_export_sha256": "c8a75be1127a3303c9c058ba94c10bc18e9553f0d521c594237d9e25f37b98b6",
+        "read_history": {
+          "successful_snapshots": 240,
+          "requests": 240,
+          "mismatches": 0,
+          "ack_lower_bound_clock_guard_ms": 10,
+          "scope": "Four-body repeatable-read snapshots and prior-ACK watermark lower bounds; shared-VM UTC with a conservative guard, not a general linearizability proof"
+        },
+        "compression": [
+          {
+            "file": "rows.csv",
+            "codec": "gzip",
+            "level": 1,
+            "source_bytes": 2746547,
+            "archive_bytes": 607323,
+            "ratio": 4.522382653052824,
+            "wall_ns": 7914792,
+            "cpu_ns": 7915000,
+            "scope": "Off-path CSV compressibility, not native engine compression"
+          },
+          {
+            "file": "receipts.csv",
+            "codec": "gzip",
+            "level": 1,
+            "source_bytes": 14923,
+            "archive_bytes": 2023,
+            "ratio": 7.3766683143845775,
+            "wall_ns": 106458,
+            "cpu_ns": 107000,
+            "scope": "Off-path CSV compressibility, not native engine compression"
+          }
+        ]
+      },
+      "phases": {
+        "baseline": {
+          "writer": {
+            "ok": {
+              "count": 257,
+              "rate": 49.983283800612206,
+              "p50_ms": 5.686875,
+              "p99_ms": 14.253042
+            },
+            "fail": {
+              "count": 0,
+              "rate": 0.0,
+              "p50_ms": null,
+              "p99_ms": null
+            },
+            "ambiguous": {
+              "count": 0,
+              "rate": 0.0,
+              "p50_ms": null,
+              "p99_ms": null
+            },
+            "mismatch": {
+              "count": 0,
+              "rate": 0.0,
+              "p50_ms": null,
+              "p99_ms": null
+            }
+          },
+          "reader": {
+            "ok": {
+              "count": 103,
+              "rate": 20.03221101736598,
+              "p50_ms": 1.663209,
+              "p99_ms": 3.684625
+            },
+            "fail": {
+              "count": 0,
+              "rate": 0.0,
+              "p50_ms": null,
+              "p99_ms": null
+            },
+            "ambiguous": {
+              "count": 0,
+              "rate": 0.0,
+              "p50_ms": null,
+              "p99_ms": null
+            },
+            "mismatch": {
+              "count": 0,
+              "rate": 0.0,
+              "p50_ms": null,
+              "p99_ms": null
+            }
+          }
+        }
+      },
+      "resources": {
+        "cedar": {
+          "samples": 14,
+          "unavailable_samples": 0,
+          "observed_cpu_core_seconds": 14.613217,
+          "average_cpu_percent_one_core_100_observed_intervals": 98.81712658696408,
+          "cpu_percent_one_core_100_min_max": [
+            5.63648546736345,
+            224.7555335491382
+          ],
+          "sampled_charged_memory_bytes_min_mean_max": [
+            155811840,
+            176163108.57142857,
+            179052544
+          ],
+          "observed_counter_resets": 0,
+          "io_and_network": {
+            "block_254:0_read_bytes": {
+              "observed_delta": 983040,
+              "observed_seconds": 14.788141999999999,
+              "per_second": 66474.88237535182,
+              "counter_resets": 0
+            },
+            "block_254:0_write_bytes": {
+              "observed_delta": 18817024,
+              "observed_seconds": 14.788141999999999,
+              "per_second": 1272440.0401348595,
+              "counter_resets": 0
+            },
+            "network_eth0_rx_bytes": {
+              "observed_delta": 3693034,
+              "observed_seconds": 14.788141999999999,
+              "per_second": 249729.4115785472,
+              "counter_resets": 0
+            },
+            "network_eth0_tx_bytes": {
+              "observed_delta": 36856518,
+              "observed_seconds": 14.788141999999999,
+              "per_second": 2492302.143163083,
+              "counter_resets": 0
+            },
+            "native_block_254:0_read_bytes": {
+              "observed_delta": 983040,
+              "observed_seconds": 14.765171,
+              "per_second": 66578.3010572651,
+              "counter_resets": 0
+            },
+            "native_block_254:0_write_bytes": {
+              "observed_delta": 18817024,
+              "observed_seconds": 14.765171,
+              "per_second": 1274419.6460711495,
+              "counter_resets": 0
+            },
+            "native_block_254:0_read_operations": {
+              "observed_delta": 15,
+              "observed_seconds": 14.765171,
+              "per_second": 1.0159042519724288,
+              "counter_resets": 0
+            },
+            "native_block_254:0_write_operations": {
+              "observed_delta": 3969,
+              "observed_seconds": 14.765171,
+              "per_second": 268.80826507190466,
+              "counter_resets": 0
+            }
+          },
+          "io_scope": "Kernel per-device and per-interface counters, with reset intervals excluded. Missing fields are unavailable, not zero. Do not sum stacked devices or both endpoints into physical traffic; raw counters remain authoritative.",
+          "sampled_disk_bytes_min_max": {
+            "/var/lib/cedardb/data/database": {
+              "logical_bytes": [
+                29551611,
+                45214222
+              ],
+              "allocated_bytes": [
+                1630208000,
+                1630580736
+              ]
+            },
+            "/backups": {
+              "logical_bytes": [
+                0,
+                0
+              ],
+              "allocated_bytes": [
+                4096,
+                4096
+              ]
+            }
+          },
+          "scope": "About 1s cadence. CPU covers deltas between usable native samples; restart/reset intervals and initial/final partial intervals are excluded, not estimated. Raw block I/O and all native fields remain in JSONL. This is not process RSS or a complete CPU total across crashes."
+        },
+        "reader": {
+          "samples": 11,
+          "unavailable_samples": 2,
+          "observed_cpu_core_seconds": 0.066508,
+          "average_cpu_percent_one_core_100_observed_intervals": 0.5863097019586472,
+          "cpu_percent_one_core_100_min_max": [
+            0.4288474458637789,
+            0.7757297000604465
+          ],
+          "sampled_charged_memory_bytes_min_mean_max": [
+            3108864,
+            5159470.545454546,
+            7520256
+          ],
+          "observed_counter_resets": 0,
+          "io_and_network": {
+            "network_eth0_rx_bytes": {
+              "observed_delta": 386984,
+              "observed_seconds": 11.343492999999999,
+              "per_second": 34115.064909900335,
+              "counter_resets": 0
+            },
+            "network_eth0_tx_bytes": {
+              "observed_delta": 169199,
+              "observed_seconds": 11.343492999999999,
+              "per_second": 14915.952255623557,
+              "counter_resets": 0
+            }
+          },
+          "io_scope": "Kernel per-device and per-interface counters, with reset intervals excluded. Missing fields are unavailable, not zero. Do not sum stacked devices or both endpoints into physical traffic; raw counters remain authoritative.",
+          "sampled_disk_bytes_min_max": {},
+          "scope": "About 1s cadence. CPU covers deltas between usable native samples; restart/reset intervals and initial/final partial intervals are excluded, not estimated. Raw block I/O and all native fields remain in JSONL. This is not process RSS or a complete CPU total across crashes."
+        },
+        "writer": {
+          "samples": 11,
+          "unavailable_samples": 2,
+          "observed_cpu_core_seconds": 0.23990200000000003,
+          "average_cpu_percent_one_core_100_observed_intervals": 2.114720935412871,
+          "cpu_percent_one_core_100_min_max": [
+            1.53459415969916,
+            2.7315098960263975
+          ],
+          "sampled_charged_memory_bytes_min_mean_max": [
+            3436544,
+            6812765.090909091,
+            8695808
+          ],
+          "observed_counter_resets": 0,
+          "io_and_network": {
+            "network_eth0_rx_bytes": {
+              "observed_delta": 307498,
+              "observed_seconds": 11.344381000000002,
+              "per_second": 27105.753941092065,
+              "counter_resets": 0
+            },
+            "network_eth0_tx_bytes": {
+              "observed_delta": 769652,
+              "observed_seconds": 11.344381000000002,
+              "per_second": 67844.33632826681,
+              "counter_resets": 0
+            }
+          },
+          "io_scope": "Kernel per-device and per-interface counters, with reset intervals excluded. Missing fields are unavailable, not zero. Do not sum stacked devices or both endpoints into physical traffic; raw counters remain authoritative.",
+          "sampled_disk_bytes_min_max": {},
+          "scope": "About 1s cadence. CPU covers deltas between usable native samples; restart/reset intervals and initial/final partial intervals are excluded, not estimated. Raw block I/O and all native fields remain in JSONL. This is not process RSS or a complete CPU total across crashes."
+        }
+      },
+      "native_after": {
+        "container": {
+          "Id": "234ff70a66287da470e39d0495957e81efc3ec77ab26e97c548f299b39daf881",
+          "Created": "2026-11-22T00:36:37.66172542Z",
+          "Path": "/usr/local/bin/docker-entrypoint.sh",
+          "Args": [],
+          "State": {
+            "Status": "running",
+            "Running": true,
+            "Paused": false,
+            "Restarting": false,
+            "OOMKilled": false,
+            "Dead": false,
+            "Pid": 83013,
+            "ExitCode": 0,
+            "Error": "",
+            "StartedAt": "2026-11-22T01:02:08.588827628Z",
+            "FinishedAt": "2026-11-22T01:02:03.243316292Z",
+            "Health": {
+              "Status": "healthy",
+              "FailingStreak": 0,
+              "Log": [
+                {
+                  "Start": "2026-11-22T01:13:33.974195584Z",
+                  "End": "2026-11-22T01:13:34.003160834Z",
+                  "ExitCode": 0,
+                  "Output": "[Note]: pg_isready is a wrapper for 'cedardb -isready' and ignores all options\n2026-11-22 01:13:34.002071459 UTC\tLOG:     Initialized buffersize=\"2147483648\" from environment variable\n2026-11-22 01:13:34.002099251 UTC\tLOG:     Initialized workmemsize=\"2147483648\" from environment variable\n2026-11-22 01:13:34.002101834 UTC\tLOG:     Initialized parallel=\"4\" from environment variable\n"
+                },
+                {
+                  "Start": "2026-11-22T01:13:36.00384921Z",
+                  "End": "2026-11-22T01:13:36.039578627Z",
+                  "ExitCode": 0,
+                  "Output": "[Note]: pg_isready is a wrapper for 'cedardb -isready' and ignores all options\n2026-11-22 01:13:36.037849544 UTC\tLOG:     Initialized buffersize=\"2147483648\" from environment variable\n2026-11-22 01:13:36.037890044 UTC\tLOG:     Initialized workmemsize=\"2147483648\" from environment variable\n2026-11-22 01:13:36.037892710 UTC\tLOG:     Initialized parallel=\"4\" from environment variable\n"
+                },
+                {
+                  "Start": "2026-11-22T01:13:38.03988267Z",
+                  "End": "2026-11-22T01:13:38.061094503Z",
+                  "ExitCode": 0,
+                  "Output": "[Note]: pg_isready is a wrapper for 'cedardb -isready' and ignores all options\n2026-11-22 01:13:38.059824878 UTC\tLOG:     Initialized buffersize=\"2147483648\" from environment variable\n2026-11-22 01:13:38.059848253 UTC\tLOG:     Initialized workmemsize=\"2147483648\" from environment variable\n2026-11-22 01:13:38.059850545 UTC\tLOG:     Initialized parallel=\"4\" from environment variable\n"
+                },
+                {
+                  "Start": "2026-11-22T01:13:40.061419796Z",
+                  "End": "2026-11-22T01:13:40.091532546Z",
+                  "ExitCode": 0,
+                  "Output": "[Note]: pg_isready is a wrapper for 'cedardb -isready' and ignores all options\n2026-11-22 01:13:40.090274504 UTC\tLOG:     Initialized buffersize=\"2147483648\" from environment variable\n2026-11-22 01:13:40.090298129 UTC\tLOG:     Initialized workmemsize=\"2147483648\" from environment variable\n2026-11-22 01:13:40.090300462 UTC\tLOG:     Initialized parallel=\"4\" from environment variable\n"
+                },
+                {
+                  "Start": "2026-11-22T01:13:42.093094588Z",
+                  "End": "2026-11-22T01:13:42.121786338Z",
+                  "ExitCode": 0,
+                  "Output": "[Note]: pg_isready is a wrapper for 'cedardb -isready' and ignores all options\n2026-11-22 01:13:42.120382713 UTC\tLOG:     Initialized buffersize=\"2147483648\" from environment variable\n2026-11-22 01:13:42.120410547 UTC\tLOG:     Initialized workmemsize=\"2147483648\" from environment variable\n2026-11-22 01:13:42.120413005 UTC\tLOG:     Initialized parallel=\"4\" from environment variable\n"
+                }
+              ]
+            }
+          },
+          "Image": "sha256:1f9601c215afa8f9c0fa72a3d8b288364994e55abe8ef51cfff77921ea33c1d0",
+          "ResolvConfPath": "/var/lib/docker/containers/234ff70a66287da470e39d0495957e81efc3ec77ab26e97c548f299b39daf881/resolv.conf",
+          "HostnamePath": "/var/lib/docker/containers/234ff70a66287da470e39d0495957e81efc3ec77ab26e97c548f299b39daf881/hostname",
+          "HostsPath": "/var/lib/docker/containers/234ff70a66287da470e39d0495957e81efc3ec77ab26e97c548f299b39daf881/hosts",
+          "LogPath": "/var/lib/docker/containers/234ff70a66287da470e39d0495957e81efc3ec77ab26e97c548f299b39daf881/234ff70a66287da470e39d0495957e81efc3ec77ab26e97c548f299b39daf881-json.log",
+          "Name": "/cedardb-backup-recovery-cedar-1",
+          "RestartCount": 0,
+          "Driver": "overlayfs",
+          "Platform": "linux",
+          "MountLabel": "",
+          "ProcessLabel": "",
+          "AppArmorProfile": "",
+          "ExecIDs": null,
+          "HostConfig": {
+            "Binds": [
+              "cedardb-backup-recovery_cedar-data:/var/lib/cedardb/data:rw",
+              "cedardb-backup-recovery_backups:/backups:rw"
+            ],
+            "ContainerIDFile": "",
+            "LogConfig": {
+              "Type": "json-file",
+              "Config": {}
+            },
+            "NetworkMode": "cedardb-backup-recovery_default",
+            "PortBindings": {},
+            "RestartPolicy": {
+              "Name": "no",
+              "MaximumRetryCount": 0
+            },
+            "AutoRemove": false,
+            "VolumeDriver": "",
+            "VolumesFrom": null,
+            "ConsoleSize": [
+              0,
+              0
+            ],
+            "CapAdd": null,
+            "CapDrop": null,
+            "CgroupnsMode": "private",
+            "Dns": null,
+            "DnsOptions": null,
+            "DnsSearch": null,
+            "ExtraHosts": [],
+            "GroupAdd": null,
+            "IpcMode": "private",
+            "Cgroup": "",
+            "Links": null,
+            "OomScoreAdj": 0,
+            "PidMode": "",
+            "Privileged": false,
+            "PublishAllPorts": false,
+            "ReadonlyRootfs": false,
+            "SecurityOpt": null,
+            "UTSMode": "",
+            "UsernsMode": "",
+            "ShmSize": 67108864,
+            "Runtime": "runc",
+            "Isolation": "",
+            "CpuShares": 0,
+            "Memory": 6442450944,
+            "NanoCpus": 4000000000,
+            "CgroupParent": "",
+            "BlkioWeight": 0,
+            "BlkioWeightDevice": null,
+            "BlkioDeviceReadBps": null,
+            "BlkioDeviceWriteBps": null,
+            "BlkioDeviceReadIOps": null,
+            "BlkioDeviceWriteIOps": null,
+            "CpuPeriod": 0,
+            "CpuQuota": 0,
+            "CpuRealtimePeriod": 0,
+            "CpuRealtimeRuntime": 0,
+            "CpusetCpus": "",
+            "CpusetMems": "",
+            "Devices": null,
+            "DeviceCgroupRules": null,
+            "DeviceRequests": null,
+            "MemoryReservation": 0,
+            "MemorySwap": 6442450944,
+            "MemorySwappiness": null,
+            "OomKillDisable": null,
+            "PidsLimit": null,
+            "Ulimits": null,
+            "CpuCount": 0,
+            "CpuPercent": 0,
+            "IOMaximumIOps": 0,
+            "IOMaximumBandwidth": 0,
+            "MaskedPaths": [
+              "/proc/acpi",
+              "/proc/asound",
+              "/proc/interrupts",
+              "/proc/kcore",
+              "/proc/keys",
+              "/proc/latency_stats",
+              "/proc/sched_debug",
+              "/proc/scsi",
+              "/proc/timer_list",
+              "/proc/timer_stats",
+              "/sys/devices/virtual/powercap",
+              "/sys/firmware"
+            ],
+            "ReadonlyPaths": [
+              "/proc/bus",
+              "/proc/fs",
+              "/proc/irq",
+              "/proc/sys",
+              "/proc/sysrq-trigger"
+            ]
+          },
+          "Storage": {
+            "RootFS": {
+              "Snapshot": {
+                "Name": "overlayfs"
+              }
+            }
+          },
+          "Mounts": [
+            {
+              "Type": "volume",
+              "Name": "cedardb-backup-recovery_cedar-data",
+              "Source": "/var/lib/docker/volumes/cedardb-backup-recovery_cedar-data/_data",
+              "Destination": "/var/lib/cedardb/data",
+              "Driver": "local",
+              "Mode": "rw",
+              "RW": true,
+              "Propagation": ""
+            },
+            {
+              "Type": "volume",
+              "Name": "cedardb-backup-recovery_backups",
+              "Source": "/var/lib/docker/volumes/cedardb-backup-recovery_backups/_data",
+              "Destination": "/backups",
+              "Driver": "local",
+              "Mode": "rw",
+              "RW": true,
+              "Propagation": ""
+            }
+          ],
+          "Config": {
+            "Hostname": "234ff70a6628",
+            "Domainname": "",
+            "User": "",
+            "AttachStdin": false,
+            "AttachStdout": true,
+            "AttachStderr": true,
+            "ExposedPorts": {
+              "5432/tcp": {}
+            },
+            "Tty": false,
+            "OpenStdin": false,
+            "StdinOnce": false,
+            "Env": [
+              "CEDAR_DB=postgres",
+              "PARALLEL=4",
+              "BUFFERSIZE=2G",
+              "WORKMEMSIZE=2G",
+              "CEDAR_PASSWORD=Cedar-Lab-1",
+              "CEDAR_USER=postgres",
+              "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+              "CEDARDB_DATA=/var/lib/cedardb/data",
+              "CEDARDB_PORT=5432"
+            ],
+            "Cmd": null,
+            "Healthcheck": {
+              "Test": [
+                "CMD",
+                "pg_isready",
+                "-h",
+                "localhost",
+                "-U",
+                "postgres"
+              ],
+              "Interval": 2000000000,
+              "Timeout": 3000000000,
+              "Retries": 60
+            },
+            "Image": "cedardb/cedardb:v2026-11-18@sha256:1f9601c215afa8f9c0fa72a3d8b288364994e55abe8ef51cfff77921ea33c1d0",
+            "Volumes": {
+              "/var/lib/cedardb/data": {}
+            },
+            "WorkingDir": "",
+            "Entrypoint": [
+              "/usr/local/bin/docker-entrypoint.sh"
+            ],
+            "Labels": {
+              "com.docker.compose.config-hash": "91cc5eb13523108f6d999b3790a64aaa221819e4a01366f4269440fe1cc11f3c",
+              "com.docker.compose.container-number": "1",
+              "com.docker.compose.depends_on": "",
+              "com.docker.compose.image": "sha256:1f9601c215afa8f9c0fa72a3d8b288364994e55abe8ef51cfff77921ea33c1d0",
+              "com.docker.compose.oneoff": "False",
+              "com.docker.compose.project": "cedardb-backup-recovery",
+              "com.docker.compose.project.config_files": "/Users/muzammil/github.com/muzammilar/examples/cedardb/backup-recovery/docker-compose.yml",
+              "com.docker.compose.project.working_dir": "/Users/muzammil/github.com/muzammilar/examples/cedardb/backup-recovery",
+              "com.docker.compose.service": "cedar",
+              "com.docker.compose.version": "5.1.4",
+              "org.opencontainers.image.created": "2026-11-06T10:31:00.336187+00:00",
+              "org.opencontainers.image.description": "The Ubuntu container image maintained by Canonical\n\nUbuntu is a Debian-based Linux operating system that runs from the desktop to the cloud, to all your internet connected things.\nIt is the world's most popular operating system across public clouds and OpenStack clouds.\nIt is the number one platform for containers; from Docker to Kubernetes to LXD, Ubuntu can run your containers at scale.\nFast, secure and simple, Ubuntu powers millions of PCs worldwide.\n",
+              "org.opencontainers.image.title": "ubuntu",
+              "org.opencontainers.image.version": "26.04"
+            },
+            "StopTimeout": 60
+          },
+          "NetworkSettings": {
+            "SandboxID": "a21f0817e384906df201a8cc36ed8f5874f04b439e923e507eedcf5681b3bc04",
+            "SandboxKey": "/var/run/docker/netns/a21f0817e384",
+            "Ports": {
+              "5432/tcp": null
+            },
+            "Networks": {
+              "cedardb-backup-recovery_default": {
+                "IPAMConfig": null,
+                "Links": null,
+                "Aliases": [
+                  "cedardb-backup-recovery-cedar-1",
+                  "cedar"
+                ],
+                "DriverOpts": null,
+                "GwPriority": 0,
+                "NetworkID": "ad2b1ba148e8b1aa1fc3192ca9a932c0bcbaae8d5851f0f3096ee34476a80c95",
+                "EndpointID": "0a1c614342a1872f6ad35281ff8df82ec700f43a07632764d306858878014ee9",
+                "Gateway": "172.21.0.1",
+                "IPAddress": "172.21.0.2",
+                "MacAddress": "b2:73:bb:43:72:34",
+                "IPPrefixLen": 16,
+                "IPv6Gateway": "",
+                "GlobalIPv6Address": "",
+                "GlobalIPv6PrefixLen": 0,
+                "DNSNames": [
+                  "cedardb-backup-recovery-cedar-1",
+                  "cedar",
+                  "234ff70a6628"
+                ]
+              }
+            }
+          },
+          "ImageManifestDescriptor": {
+            "mediaType": "application/vnd.oci.image.manifest.v1+json",
+            "digest": "sha256:b2829005c4deb56a574ccdb6c18b6abd44b0b90260626700c5634993257d1394",
+            "size": 2002,
+            "platform": {
+              "architecture": "arm64",
+              "os": "linux"
+            }
+          }
+        },
+        "native_counters_disk_and_main_process": "__memory.peak\n185327616\n__cpu.stat\nusage_usec 29090007\nuser_usec 24441352\nsystem_usec 4648655\nnice_usec 0\nnr_periods 6672\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n__io.stat\n254:0 rbytes=32870400 wbytes=44924928 rios=309 wios=7942 dbytes=0 dios=0\n__memory.events\nlow 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n__DISK\n45214222\t/var/lib/cedardb/data/database\n1630580736\t/var/lib/cedardb/data/database\n__FILESYSTEM\nFilesystem        1-blocks        Used   Available Capacity Mounted on\n/dev/vda1      83954712576 31810969600 47832055808      40% /var/lib/cedardb/data\n__PROCESS\nName:\tcedardb\nUmask:\t0022\nState:\tS (sleeping)\nTgid:\t1\nNgid:\t0\nPid:\t1\nPPid:\t0\nTracerPid:\t0\nUid:\t999\t999\t999\t999\nGid:\t999\t999\t999\t999\nFDSize:\t256\nGroups:\t \nNStgid:\t1\nNSpid:\t1\nNSpgid:\t1\nNSsid:\t1\nKthread:\t0\nVmPeak:\t  102792 kB\nVmSize:\t  102792 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t   24716 kB\nVmRSS:\t   24716 kB\nRssAnon:\t    4628 kB\nRssFile:\t   20088 kB\nRssShmem:\t       0 kB\nVmData:\t    4988 kB\nVmStk:\t     132 kB\nVmExe:\t   58368 kB\nVmLib:\t    2576 kB\nVmPTE:\t     180 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffff\nThreads:\t1\nSigQ:\t0/99998\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000000000000\nSigCgt:\t0000000000004003\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t00000000a80425fb\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t2\nSeccomp_filters:\t1\nSpeculation_Store_Bypass:\tvulnerable\nSpeculationIndirectBranch:\tunknown\nCpus_allowed:\t7ff\nCpus_allowed_list:\t0-10\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t30\nnonvoluntary_ctxt_switches:\t2\n",
+        "base_table_compression": {
+          "available": true,
+          "scope": "Native per-column cold-data statistics only; empty rows do not establish absence of compression. Whole-database allocated bytes are separate.",
+          "query": "SELECT attributename,encoding,generalcompression,uncompressedsize,encodedsize,compressedsize FROM cedardb_compression_info WHERE tablename='orders'",
+          "records": [
+            [
+              "payload",
+              "single",
+              "none",
+              0,
+              0,
+              0
+            ],
+            [
+              "customer",
+              "single",
+              "none",
+              0,
+              0,
+              0
+            ],
+            [
+              "tid",
+              "truncate",
+              "none",
+              80000,
+              40000,
+              40960
+            ],
+            [
+              "id",
+              "single",
+              "none",
+              0,
+              0,
+              0
+            ],
+            [
+              "payload",
+              "simple dictionary",
+              "zstd",
+              2719762,
+              2660016,
+              495616
+            ],
+            [
+              "tid",
+              "uncompressed",
+              "none",
+              0,
+              0,
+              0
+            ],
+            [
+              "amount",
+              "frameofreferencetinyblocks",
+              "zstd",
+              40000,
+              22784,
+              8192
+            ],
+            [
+              "customer",
+              "increment",
+              "none",
+              40000,
+              0,
+              0
+            ],
+            [
+              "amount",
+              "single",
+              "none",
+              0,
+              0,
+              0
+            ],
+            [
+              "id",
+              "increment",
+              "none",
+              80000,
+              0,
+              0
+            ],
+            {
+              "children_peak_rss_kib": 0,
+              "children_system_cpu_seconds": 0,
+              "children_user_cpu_seconds": 0,
+              "cpu.max": "100000 100000\n",
+              "cpu.stat": "usage_usec 11100\nuser_usec 8072\nsystem_usec 3027\nnice_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+              "cpu_percent_one_core_100_self_and_reaped_children": 58.53524607042351,
+              "io.stat": "",
+              "kind": "process-resources",
+              "main_cpu_seconds_self_and_reaped_children": 0.002132,
+              "main_wall_seconds": 0.00364225,
+              "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n",
+              "memory.max": "536870912\n",
+              "memory.peak": "4603904\n",
+              "memory.swap.max": "0\n",
+              "peak_rss_kib": 11900,
+              "scope": "Linux Docker process lifetime; CPU covers all Go threads. Native cgroup peaks include charged cache/kernel memory.",
+              "system_cpu_seconds": 0.002132,
+              "timing_scope": "Main wall time and CPU deltas bracket the operation and connection close; process-lifetime totals separately include runtime startup. Rusage/timer calls add small measurement overhead; native counters are sampled before final JSON/exit. Cgroup counters include parent/children; do not add them to process CPU again.",
+              "user_cpu_seconds": 0.00792
+            }
+          ]
+        },
+        "native_compression": {
+          "available": true,
+          "query": "SELECT v.attributename,v.encoding,v.generalcompression,v.uncompressedsize,v.encodedsize,v.compressedsize FROM cedardb_compression_info v JOIN pg_class c ON c.oid=v.oid JOIN pg_namespace n ON n.oid=c.relnamespace WHERE c.relname='mutable_orders' AND n.nspname='mutable_8f52f3cbc7604fe5ade245193c3de263'",
+          "scope": "Native cold-column statistics for this case's mutable_orders; empty rows do not establish no compression",
+          "records": [
+            {
+              "children_peak_rss_kib": 0,
+              "children_system_cpu_seconds": 0,
+              "children_user_cpu_seconds": 0,
+              "cpu.max": "100000 100000\n",
+              "cpu.stat": "usage_usec 12022\nuser_usec 7650\nsystem_usec 4371\nnice_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+              "cpu_percent_one_core_100_self_and_reaped_children": 40.777349710665376,
+              "io.stat": "",
+              "kind": "process-resources",
+              "main_cpu_seconds_self_and_reaped_children": 0.0021209999999999996,
+              "main_wall_seconds": 0.005201417,
+              "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n",
+              "memory.max": "536870912\n",
+              "memory.peak": "7647232\n",
+              "memory.swap.max": "0\n",
+              "peak_rss_kib": 14060,
+              "scope": "Linux Docker process lifetime; CPU covers all Go threads. Native cgroup peaks include charged cache/kernel memory.",
+              "system_cpu_seconds": 0.003278,
+              "timing_scope": "Main wall time and CPU deltas bracket the operation and connection close; process-lifetime totals separately include runtime startup. Rusage/timer calls add small measurement overhead; native counters are sampled before final JSON/exit. Cgroup counters include parent/children; do not add them to process CPU again.",
+              "user_cpu_seconds": 0.007649
+            }
+          ]
+        }
+      },
+      "passed": true
+    },
+    {
+      "identity": "c8b6f82d97d1465e8430eb479d2f5ad7",
+      "config": {
+        "created_ns": 1795310023353516000,
+        "backend": "postgres",
+        "identity": "c8b6f82d97d1465e8430eb479d2f5ad7",
+        "generation": "570e83ea57dd4059a0ece283e2a36c98",
+        "rows": 10000,
+        "pairs": 8,
+        "writer_rate": 50,
+        "reader_rate": 20,
+        "backend_contract": {
+          "operations": [
+            "paired row UPDATE",
+            "paired DELETE and reinsert",
+            "transactional native receipt",
+            "four-body repeatable-read snapshot",
+            "100-bucket analytical aggregate",
+            "ordered full-row and receipt export"
+          ],
+          "consistency": "CedarDB snapshot isolation and PostgreSQL REPEATABLE READ for mutation/read transactions. Analytical SELECTs are individually snapshot-consistent. No serializable, multi-writer conflict or general linearizability claim.",
+          "atomicity": "Each two-row change and its receipt are one synchronous database transaction. Group count, amount sum and payload length stay fixed, while stored bodies and revisions genuinely change.",
+          "durability": "Every connection sets/checks CedarDB async_commit=off or PostgreSQL synchronous_commit=on, fsync=on, full_page_writes=on. Retained-volume process/container crash is distinct from device/power loss.",
+          "retries": "No mutation replay. All submitted errors remain ambiguous until native receipts and complete bodies are reconciled with fsynced external intents. Later requests use new sequence IDs.",
+          "deletes": "Two rows are deleted and reinserted inside one transaction; readers must never see the transient missing pair. Permanent delete/TTL/reclamation workloads remain separate.",
+          "client": {
+            "driver": "pgx/v5 v5.7.6",
+            "protocol": "simple text",
+            "connections_per_actor": 1,
+            "statement_cache": "disabled",
+            "connect_timeout_s": 2,
+            "live_operation_timeout_s": 3,
+            "rollback_cleanup_timeout_s": 1,
+            "max_in_flight_per_actor": 1,
+            "write_rate_ceiling_per_s": 50,
+            "snapshot_read_rate_ceiling_per_s": 20,
+            "arrival": "ticker-paced closed loop; missed ticks under backpressure are not queued",
+            "tls": "disabled on the isolated lab network"
+          },
+          "data": {
+            "default_rows": 1000000,
+            "customers": 10000,
+            "groups": 100,
+            "payload_bytes": 256,
+            "types": "BIGINT PK id; INTEGER customer/amount; TEXT payload; BIGINT revision",
+            "nulls": false,
+            "mutable_pairs_default": 10000,
+            "pattern": "Each selected pair receives UPDATE then DELETE/reinsert; cycle through the configured pair window. Same analytical bucket, balanced signed amount adjustment, same payload length. One final pair remains historical and immutable.",
+            "payload": "192 bytes of repeated customer prefix plus 64 ASCII SHA256 hex characters; versioned suffix for actual mutations"
+          },
+          "oracle": "Native receipt set must include every ACK and only externally intended sequences. Replay committed sequences, then verify every seeded row/version/body and all 100 group invariants. Independent snapshots verify latest committed pair and an older untouched pair; UTC prior-ACK watermark check uses a documented 10ms guard.",
+          "namespace": "New UUID schema per case; preserve failed schemas. Drop a successful schema only after actors stop and complete external exports are fsynced/verified. Base orders fixture remains unchanged and independently verified.",
+          "resources": "One active backend per performance cell, 4 CPUs/6 GiB/no swap. Each Go actor has 1 CPU/512 MiB/no swap; 1 analytical actor alone or 3 actors with mutations. Whole-store counters include the retained immutable base fixture as well as mutable data, receipts, indexes, WAL and engine files.",
+          "limits": "Single Docker VM, no HA/replica/sharding claim. Same-key multi-writer conflicts, arbitrary update effects, permanent deletes, verified OS-cold access, open-loop saturation, disk EIO/full and physical power-loss recovery are unqualified. CedarDB engine source is closed; inspect versioned public APIs, shipped configuration and pinned pgx/PostgreSQL source."
+        },
+        "contract": "Synchronous repeatable-read transactions. Each paired UPDATE or DELETE/reinsert and its native receipt commit atomically. External intent/ACK journal; no mutation retries. Whole group totals stay fixed while actual queried bodies change.",
+        "source_sha256": {
+          "mutable_lab.py": "147be8d375df988f750764413bb7bd1cf8469e7bb14f609d9d436c65e01d15ca",
+          "mutable_oracle.py": "3838c142113531416d133cc6586e185398829f76b753138a8b95a4659a622563",
+          "mutable-contract.json": "3d554f4ef76142c041499fce6134ee171f9be498e6900f81018320b8eb805eea",
+          "control.py": "1b5ba9c14c8be30b6962be5d1481c5b9593c02d61fb43fcc9075b68d72dbcb83",
+          "resources.py": "7a97bb30474d9aec30c5ea64f8507a0ba3bfc0ce388ca0db7cb8a196ce48f459",
+          "docker-compose.yml": "04306e322b6d792f6eee0eba05c4b548808e4e4d77112e33ea0d1afb3b82f09b",
+          "orders-workload/analytics.go": "7c877b4ff3c713c7979f750abfe50f9b8cd7004e00da5691f9d724d653d4abaf",
+          "orders-workload/analytics_test.go": "0a40aeeb571efef90e3e3827bc80b8dd557bca1b4ada3838f41e88569c4d96a6",
+          "orders-workload/main.go": "240286bc6ddac85f525cc7d77ffe313f3f9602835b33c163e6e67b0da75af576",
+          "orders-workload/mutable.go": "adf0a77169041245785ee38ea414333d821af02bdeb70fbdf4451dd0fd657fad",
+          "orders-workload/mutable_test.go": "87872c937f2b206d350d772524129a004543fac521f6f0780064215e0d95d0e5",
+          "orders-workload/process_test.go": "178ba50732f8ae3f9b3701eff7de4f70098be3bcdbd9e022a482694f835eb4d6",
+          "orders-workload/go.mod": "640974387b995fa723f98e37f36c28ad67eba09cc0ddb5f13f24dbef24e46916",
+          "orders-workload/go.sum": "4e7e05768d607a1cc09d1dbe92d138751e9111200e8eadf2be5d7c99b189e834",
+          "orders-workload/Dockerfile": "25b508b62456be94d2e63608a3314c93aa46633e620837465a703e61ed0c5bc9"
+        }
+      },
+      "proof": {
+        "seed_rows_verified": 10000,
+        "intents": 601,
+        "acknowledged_transactions": 601,
+        "committed_transactions": 601,
+        "applied_unacknowledged_intents": 0,
+        "acknowledged_loss": 0,
+        "wrong_duplicate_or_partial_rows": 0,
+        "groups_verified": 100,
+        "last_committed_seq": 601,
+        "row_export_sha256": "00d96793d138b5cc6fb9ad1e39e0890ba15a0eaf36658ce5003b988dd6942fd1",
+        "receipt_export_sha256": "e7f62387c1d5ad4cc1182e3d1654fb5f24fa89704a2900a3ade74f2e5766318c",
+        "read_history": {
+          "successful_snapshots": 238,
+          "requests": 238,
+          "mismatches": 0,
+          "ack_lower_bound_clock_guard_ms": 10,
+          "scope": "Four-body repeatable-read snapshots and prior-ACK watermark lower bounds; shared-VM UTC with a conservative guard, not a general linearizability proof"
+        },
+        "compression": [
+          {
+            "file": "rows.csv",
+            "codec": "gzip",
+            "level": 1,
+            "source_bytes": 2746547,
+            "archive_bytes": 607328,
+            "ratio": 4.522345421255071,
+            "wall_ns": 8042584,
+            "cpu_ns": 8042000,
+            "scope": "Off-path CSV compressibility, not native engine compression"
+          },
+          {
+            "file": "receipts.csv",
+            "codec": "gzip",
+            "level": 1,
+            "source_bytes": 14947,
+            "archive_bytes": 2026,
+            "ratio": 7.3775913129318855,
+            "wall_ns": 139542,
+            "cpu_ns": 140000,
+            "scope": "Off-path CSV compressibility, not native engine compression"
+          }
+        ]
+      },
+      "phases": {
+        "baseline": {
+          "writer": {
+            "ok": {
+              "count": 253,
+              "rate": 50.08185314733765,
+              "p50_ms": 1.226541,
+              "p99_ms": 3.183334
+            },
+            "fail": {
+              "count": 0,
+              "rate": 0.0,
+              "p50_ms": null,
+              "p99_ms": null
+            },
+            "ambiguous": {
+              "count": 0,
+              "rate": 0.0,
+              "p50_ms": null,
+              "p99_ms": null
+            },
+            "mismatch": {
+              "count": 0,
+              "rate": 0.0,
+              "p50_ms": null,
+              "p99_ms": null
+            }
+          },
+          "reader": {
+            "ok": {
+              "count": 101,
+              "rate": 19.993150861190127,
+              "p50_ms": 0.703125,
+              "p99_ms": 1.855375
+            },
+            "fail": {
+              "count": 0,
+              "rate": 0.0,
+              "p50_ms": null,
+              "p99_ms": null
+            },
+            "ambiguous": {
+              "count": 0,
+              "rate": 0.0,
+              "p50_ms": null,
+              "p99_ms": null
+            },
+            "mismatch": {
+              "count": 0,
+              "rate": 0.0,
+              "p50_ms": null,
+              "p99_ms": null
+            }
+          }
+        }
+      },
+      "resources": {
+        "postgres": {
+          "samples": 14,
+          "unavailable_samples": 0,
+          "observed_cpu_core_seconds": 6.638451,
+          "average_cpu_percent_one_core_100_observed_intervals": 45.09447799317529,
+          "cpu_percent_one_core_100_min_max": [
+            4.534674445773707,
+            102.34864839831282
+          ],
+          "sampled_charged_memory_bytes_min_mean_max": [
+            82759680,
+            90496146.28571428,
+            93675520
+          ],
+          "observed_counter_resets": 0,
+          "io_and_network": {
+            "block_254:0_read_bytes": {
+              "observed_delta": 0,
+              "observed_seconds": 14.721206,
+              "per_second": 0.0,
+              "counter_resets": 0
+            },
+            "block_254:0_write_bytes": {
+              "observed_delta": 3694592,
+              "observed_seconds": 14.721206,
+              "per_second": 250970.74247857137,
+              "counter_resets": 0
+            },
+            "network_eth0_rx_bytes": {
+              "observed_delta": 1642990,
+              "observed_seconds": 14.721206,
+              "per_second": 111607.0245875236,
+              "counter_resets": 0
+            },
+            "network_eth0_tx_bytes": {
+              "observed_delta": 11424586,
+              "observed_seconds": 14.721206,
+              "per_second": 776063.1839538147,
+              "counter_resets": 0
+            },
+            "native_block_254:0_read_bytes": {
+              "observed_delta": 0,
+              "observed_seconds": 14.708761000000003,
+              "per_second": 0.0,
+              "counter_resets": 0
+            },
+            "native_block_254:0_write_bytes": {
+              "observed_delta": 3694592,
+              "observed_seconds": 14.708761000000003,
+              "per_second": 251183.08741300504,
+              "counter_resets": 0
+            },
+            "native_block_254:0_read_operations": {
+              "observed_delta": 0,
+              "observed_seconds": 14.708761000000003,
+              "per_second": 0.0,
+              "counter_resets": 0
+            },
+            "native_block_254:0_write_operations": {
+              "observed_delta": 630,
+              "observed_seconds": 14.708761000000003,
+              "per_second": 42.831615796870985,
+              "counter_resets": 0
+            }
+          },
+          "io_scope": "Kernel per-device and per-interface counters, with reset intervals excluded. Missing fields are unavailable, not zero. Do not sum stacked devices or both endpoints into physical traffic; raw counters remain authoritative.",
+          "sampled_disk_bytes_min_max": {
+            "/var/lib/postgresql/data": {
+              "logical_bytes": [
+                64417171,
+                68119955
+              ],
+              "allocated_bytes": [
+                64479232,
+                68182016
+              ]
+            }
+          },
+          "scope": "About 1s cadence. CPU covers deltas between usable native samples; restart/reset intervals and initial/final partial intervals are excluded, not estimated. Raw block I/O and all native fields remain in JSONL. This is not process RSS or a complete CPU total across crashes."
+        },
+        "reader": {
+          "samples": 10,
+          "unavailable_samples": 2,
+          "observed_cpu_core_seconds": 0.05880600000000001,
+          "average_cpu_percent_one_core_100_observed_intervals": 0.5759030325252125,
+          "cpu_percent_one_core_100_min_max": [
+            0.2967392767428079,
+            0.9848862286597928
+          ],
+          "sampled_charged_memory_bytes_min_mean_max": [
+            3178496,
+            5363712.0,
+            7516160
+          ],
+          "observed_counter_resets": 0,
+          "io_and_network": {
+            "network_eth0_rx_bytes": {
+              "observed_delta": 349131,
+              "observed_seconds": 10.211094,
+              "per_second": 34191.34129996257,
+              "counter_resets": 0
+            },
+            "network_eth0_tx_bytes": {
+              "observed_delta": 152569,
+              "observed_seconds": 10.211094,
+              "per_second": 14941.4940260074,
+              "counter_resets": 0
+            }
+          },
+          "io_scope": "Kernel per-device and per-interface counters, with reset intervals excluded. Missing fields are unavailable, not zero. Do not sum stacked devices or both endpoints into physical traffic; raw counters remain authoritative.",
+          "sampled_disk_bytes_min_max": {},
+          "scope": "About 1s cadence. CPU covers deltas between usable native samples; restart/reset intervals and initial/final partial intervals are excluded, not estimated. Raw block I/O and all native fields remain in JSONL. This is not process RSS or a complete CPU total across crashes."
+        },
+        "writer": {
+          "samples": 10,
+          "unavailable_samples": 2,
+          "observed_cpu_core_seconds": 0.19834700000000002,
+          "average_cpu_percent_one_core_100_observed_intervals": 1.9411977023544487,
+          "cpu_percent_one_core_100_min_max": [
+            1.059382991613218,
+            3.412723929838837
+          ],
+          "sampled_charged_memory_bytes_min_mean_max": [
+            5431296,
+            7145472.0,
+            8577024
+          ],
+          "observed_counter_resets": 0,
+          "io_and_network": {
+            "network_eth0_rx_bytes": {
+              "observed_delta": 276456,
+              "observed_seconds": 10.217764,
+              "per_second": 27056.408818994056,
+              "counter_resets": 0
+            },
+            "network_eth0_tx_bytes": {
+              "observed_delta": 692645,
+              "observed_seconds": 10.217764,
+              "per_second": 67788.3145470966,
+              "counter_resets": 0
+            }
+          },
+          "io_scope": "Kernel per-device and per-interface counters, with reset intervals excluded. Missing fields are unavailable, not zero. Do not sum stacked devices or both endpoints into physical traffic; raw counters remain authoritative.",
+          "sampled_disk_bytes_min_max": {},
+          "scope": "About 1s cadence. CPU covers deltas between usable native samples; restart/reset intervals and initial/final partial intervals are excluded, not estimated. Raw block I/O and all native fields remain in JSONL. This is not process RSS or a complete CPU total across crashes."
+        }
+      },
+      "native_after": {
+        "container": {
+          "Id": "094947e75c95360fa4a5b7d388ee7a01a7a4247a3356432c1d2ec475b6e5dae1",
+          "Created": "2026-11-22T00:36:37.666053711Z",
+          "Path": "docker-entrypoint.sh",
+          "Args": [
+            "postgres",
+            "-c",
+            "shared_buffers=2GB",
+            "-c",
+            "work_mem=32MB",
+            "-c",
+            "max_parallel_workers=4",
+            "-c",
+            "max_parallel_workers_per_gather=4",
+            "-c",
+            "max_worker_processes=8"
+          ],
+          "State": {
+            "Status": "running",
+            "Running": true,
+            "Paused": false,
+            "Restarting": false,
+            "OOMKilled": false,
+            "Dead": false,
+            "Pid": 85031,
+            "ExitCode": 0,
+            "Error": "",
+            "StartedAt": "2026-11-22T01:02:36.910591586Z",
+            "FinishedAt": "2026-11-22T01:02:31.549814708Z",
+            "Health": {
+              "Status": "healthy",
+              "FailingStreak": 0,
+              "Log": [
+                {
+                  "Start": "2026-11-22T01:13:48.200288591Z",
+                  "End": "2026-11-22T01:13:48.2466888Z",
+                  "ExitCode": 0,
+                  "Output": "/var/run/postgresql:5432 - accepting connections\n"
+                },
+                {
+                  "Start": "2026-11-22T01:13:50.247260884Z",
+                  "End": "2026-11-22T01:13:50.293648509Z",
+                  "ExitCode": 0,
+                  "Output": "/var/run/postgresql:5432 - accepting connections\n"
+                },
+                {
+                  "Start": "2026-11-22T01:13:52.295310968Z",
+                  "End": "2026-11-22T01:13:52.32670526Z",
+                  "ExitCode": 0,
+                  "Output": "/var/run/postgresql:5432 - accepting connections\n"
+                },
+                {
+                  "Start": "2026-11-22T01:13:54.327228928Z",
+                  "End": "2026-11-22T01:13:54.350557219Z",
+                  "ExitCode": 0,
+                  "Output": "/var/run/postgresql:5432 - accepting connections\n"
+                },
+                {
+                  "Start": "2026-11-22T01:13:56.351301678Z",
+                  "End": "2026-11-22T01:13:56.375720345Z",
+                  "ExitCode": 0,
+                  "Output": "/var/run/postgresql:5432 - accepting connections\n"
+                }
+              ]
+            }
+          },
+          "Image": "sha256:f3bd19c606e442c3d7bdfa8002e03fe260a1023351e0ea4598032022b68dd6e3",
+          "ResolvConfPath": "/var/lib/docker/containers/094947e75c95360fa4a5b7d388ee7a01a7a4247a3356432c1d2ec475b6e5dae1/resolv.conf",
+          "HostnamePath": "/var/lib/docker/containers/094947e75c95360fa4a5b7d388ee7a01a7a4247a3356432c1d2ec475b6e5dae1/hostname",
+          "HostsPath": "/var/lib/docker/containers/094947e75c95360fa4a5b7d388ee7a01a7a4247a3356432c1d2ec475b6e5dae1/hosts",
+          "LogPath": "/var/lib/docker/containers/094947e75c95360fa4a5b7d388ee7a01a7a4247a3356432c1d2ec475b6e5dae1/094947e75c95360fa4a5b7d388ee7a01a7a4247a3356432c1d2ec475b6e5dae1-json.log",
+          "Name": "/cedardb-backup-recovery-postgres-1",
+          "RestartCount": 0,
+          "Driver": "overlayfs",
+          "Platform": "linux",
+          "MountLabel": "",
+          "ProcessLabel": "",
+          "AppArmorProfile": "",
+          "ExecIDs": [
+            "3dd13ae3c6a77b12be3152d2b2edf717268e64d4ff533b09f3b0b8ae4ce48e6c"
+          ],
+          "HostConfig": {
+            "Binds": [
+              "cedardb-backup-recovery_postgres-data:/var/lib/postgresql/data:rw",
+              "/host_mnt/Users/muzammil/github.com/muzammilar/examples/cedardb/backup-recovery/postgres-initdb:/docker-entrypoint-initdb.d:ro"
+            ],
+            "ContainerIDFile": "",
+            "LogConfig": {
+              "Type": "json-file",
+              "Config": {}
+            },
+            "NetworkMode": "cedardb-backup-recovery_default",
+            "PortBindings": {},
+            "RestartPolicy": {
+              "Name": "no",
+              "MaximumRetryCount": 0
+            },
+            "AutoRemove": false,
+            "VolumeDriver": "",
+            "VolumesFrom": null,
+            "ConsoleSize": [
+              0,
+              0
+            ],
+            "CapAdd": null,
+            "CapDrop": null,
+            "CgroupnsMode": "private",
+            "Dns": null,
+            "DnsOptions": null,
+            "DnsSearch": null,
+            "ExtraHosts": [],
+            "GroupAdd": null,
+            "IpcMode": "private",
+            "Cgroup": "",
+            "Links": null,
+            "OomScoreAdj": 0,
+            "PidMode": "",
+            "Privileged": false,
+            "PublishAllPorts": false,
+            "ReadonlyRootfs": false,
+            "SecurityOpt": null,
+            "UTSMode": "",
+            "UsernsMode": "",
+            "ShmSize": 67108864,
+            "Runtime": "runc",
+            "Isolation": "",
+            "CpuShares": 0,
+            "Memory": 6442450944,
+            "NanoCpus": 4000000000,
+            "CgroupParent": "",
+            "BlkioWeight": 0,
+            "BlkioWeightDevice": null,
+            "BlkioDeviceReadBps": null,
+            "BlkioDeviceWriteBps": null,
+            "BlkioDeviceReadIOps": null,
+            "BlkioDeviceWriteIOps": null,
+            "CpuPeriod": 0,
+            "CpuQuota": 0,
+            "CpuRealtimePeriod": 0,
+            "CpuRealtimeRuntime": 0,
+            "CpusetCpus": "",
+            "CpusetMems": "",
+            "Devices": null,
+            "DeviceCgroupRules": null,
+            "DeviceRequests": null,
+            "MemoryReservation": 0,
+            "MemorySwap": 6442450944,
+            "MemorySwappiness": null,
+            "OomKillDisable": null,
+            "PidsLimit": null,
+            "Ulimits": null,
+            "CpuCount": 0,
+            "CpuPercent": 0,
+            "IOMaximumIOps": 0,
+            "IOMaximumBandwidth": 0,
+            "MaskedPaths": [
+              "/proc/acpi",
+              "/proc/asound",
+              "/proc/interrupts",
+              "/proc/kcore",
+              "/proc/keys",
+              "/proc/latency_stats",
+              "/proc/sched_debug",
+              "/proc/scsi",
+              "/proc/timer_list",
+              "/proc/timer_stats",
+              "/sys/devices/virtual/powercap",
+              "/sys/firmware"
+            ],
+            "ReadonlyPaths": [
+              "/proc/bus",
+              "/proc/fs",
+              "/proc/irq",
+              "/proc/sys",
+              "/proc/sysrq-trigger"
+            ]
+          },
+          "Storage": {
+            "RootFS": {
+              "Snapshot": {
+                "Name": "overlayfs"
+              }
+            }
+          },
+          "Mounts": [
+            {
+              "Type": "volume",
+              "Name": "cedardb-backup-recovery_postgres-data",
+              "Source": "/var/lib/docker/volumes/cedardb-backup-recovery_postgres-data/_data",
+              "Destination": "/var/lib/postgresql/data",
+              "Driver": "local",
+              "Mode": "rw",
+              "RW": true,
+              "Propagation": ""
+            },
+            {
+              "Type": "bind",
+              "Source": "/host_mnt/Users/muzammil/github.com/muzammilar/examples/cedardb/backup-recovery/postgres-initdb",
+              "Destination": "/docker-entrypoint-initdb.d",
+              "Mode": "ro",
+              "RW": false,
+              "Propagation": "rprivate"
+            }
+          ],
+          "Config": {
+            "Hostname": "094947e75c95",
+            "Domainname": "",
+            "User": "",
+            "AttachStdin": false,
+            "AttachStdout": true,
+            "AttachStderr": true,
+            "ExposedPorts": {
+              "5432/tcp": {}
+            },
+            "Tty": false,
+            "OpenStdin": false,
+            "StdinOnce": false,
+            "Env": [
+              "POSTGRES_PASSWORD=Cedar-Lab-1",
+              "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/postgresql/17/bin",
+              "GOSU_VERSION=1.19",
+              "LANG=en_US.utf8",
+              "PG_MAJOR=17",
+              "PG_VERSION=17.6-2.pgdg12+1",
+              "PGDATA=/var/lib/postgresql/data"
+            ],
+            "Cmd": [
+              "postgres",
+              "-c",
+              "shared_buffers=2GB",
+              "-c",
+              "work_mem=32MB",
+              "-c",
+              "max_parallel_workers=4",
+              "-c",
+              "max_parallel_workers_per_gather=4",
+              "-c",
+              "max_worker_processes=8"
+            ],
+            "Healthcheck": {
+              "Test": [
+                "CMD",
+                "pg_isready",
+                "-U",
+                "postgres"
+              ],
+              "Interval": 2000000000,
+              "Timeout": 3000000000,
+              "Retries": 60
+            },
+            "Image": "postgres:17.6-bookworm@sha256:f3bd19c606e442c3d7bdfa8002e03fe260a1023351e0ea4598032022b68dd6e3",
+            "Volumes": {
+              "/var/lib/postgresql/data": {}
+            },
+            "WorkingDir": "",
+            "Entrypoint": [
+              "docker-entrypoint.sh"
+            ],
+            "Labels": {
+              "com.docker.compose.config-hash": "e793a9bbb7e087bd3cf79da2b497cc91d69ec5f0b5a485af3cac3808db217257",
+              "com.docker.compose.container-number": "1",
+              "com.docker.compose.depends_on": "",
+              "com.docker.compose.image": "sha256:f3bd19c606e442c3d7bdfa8002e03fe260a1023351e0ea4598032022b68dd6e3",
+              "com.docker.compose.oneoff": "False",
+              "com.docker.compose.project": "cedardb-backup-recovery",
+              "com.docker.compose.project.config_files": "/Users/muzammil/github.com/muzammilar/examples/cedardb/backup-recovery/docker-compose.yml",
+              "com.docker.compose.project.working_dir": "/Users/muzammil/github.com/muzammilar/examples/cedardb/backup-recovery",
+              "com.docker.compose.service": "postgres",
+              "com.docker.compose.version": "5.1.4"
+            },
+            "StopSignal": "SIGINT",
+            "StopTimeout": 60
+          },
+          "NetworkSettings": {
+            "SandboxID": "953a2177e2fd3b2df46861a216d1935469dff4341a7920fcbd8ebd733453fe42",
+            "SandboxKey": "/var/run/docker/netns/953a2177e2fd",
+            "Ports": {
+              "5432/tcp": null
+            },
+            "Networks": {
+              "cedardb-backup-recovery_default": {
+                "IPAMConfig": null,
+                "Links": null,
+                "Aliases": [
+                  "cedardb-backup-recovery-postgres-1",
+                  "postgres"
+                ],
+                "DriverOpts": null,
+                "GwPriority": 0,
+                "NetworkID": "ad2b1ba148e8b1aa1fc3192ca9a932c0bcbaae8d5851f0f3096ee34476a80c95",
+                "EndpointID": "e2e17c19291201935b427a545fd53ac2ea5cdd48e87377369d0644fc7c1aece7",
+                "Gateway": "172.21.0.1",
+                "IPAddress": "172.21.0.3",
+                "MacAddress": "66:ce:08:79:90:bc",
+                "IPPrefixLen": 16,
+                "IPv6Gateway": "",
+                "GlobalIPv6Address": "",
+                "GlobalIPv6PrefixLen": 0,
+                "DNSNames": [
+                  "cedardb-backup-recovery-postgres-1",
+                  "postgres",
+                  "094947e75c95"
+                ]
+              }
+            }
+          },
+          "ImageManifestDescriptor": {
+            "mediaType": "application/vnd.oci.image.manifest.v1+json",
+            "digest": "sha256:5d11ffb37e58a7c9a2285359e50f7674e216c99b9114e47b0e7f21187c11252c",
+            "size": 3642,
+            "annotations": {
+              "com.docker.official-images.bashbrew.arch": "arm64v8",
+              "org.opencontainers.image.base.digest": "sha256:bb09e47e6f9d59d3871f22d2f80991dbb69bbcd037fa71df0b8da704cd9d7fa0",
+              "org.opencontainers.image.base.name": "debian:bookworm-slim",
+              "org.opencontainers.image.created": "2025-11-04T00:27:52Z",
+              "org.opencontainers.image.revision": "5ec89312491bdaa2c42377a65ec0af2ecb774480",
+              "org.opencontainers.image.source": "https://github.com/docker-library/postgres.git#5ec89312491bdaa2c42377a65ec0af2ecb774480:17/bookworm",
+              "org.opencontainers.image.url": "https://hub.docker.com/_/postgres",
+              "org.opencontainers.image.version": "17.6-bookworm"
+            },
+            "platform": {
+              "architecture": "arm64",
+              "os": "linux",
+              "variant": "v8"
+            }
+          }
+        },
+        "native_counters_disk_and_main_process": "__memory.peak\n97771520\n__cpu.stat\nusage_usec 15800317\nuser_usec 13127652\nsystem_usec 2672665\nnice_usec 0\nnr_periods 1149\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n__io.stat\n254:0 rbytes=0 wbytes=3923968 rios=0 wios=2353 dbytes=0 dios=0\n__memory.events\nlow 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n__DISK\n68119955\t/var/lib/postgresql/data\n68182016\t/var/lib/postgresql/data\n__FILESYSTEM\nFilesystem        1-blocks        Used   Available Capacity Mounted on\n/dev/vda1      83954712576 31814672384 47828353024      40% /var/lib/postgresql/data\n__PROCESS\nName:\tpostgres\nUmask:\t0077\nState:\tS (sleeping)\nTgid:\t1\nNgid:\t0\nPid:\t1\nPPid:\t0\nTracerPid:\t0\nUid:\t999\t999\t999\t999\nGid:\t999\t999\t999\t999\nFDSize:\t1024\nGroups:\t101 \nNStgid:\t1\nNSpid:\t1\nNSpgid:\t1\nNSsid:\t1\nKthread:\t0\nVmPeak:\t 2261692 kB\nVmSize:\t 2261692 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t   81672 kB\nVmRSS:\t   81672 kB\nRssAnon:\t    2384 kB\nRssFile:\t   15432 kB\nRssShmem:\t   63856 kB\nVmData:\t    1640 kB\nVmStk:\t     132 kB\nVmExe:\t    9396 kB\nVmLib:\t   57636 kB\nVmPTE:\t     284 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffff\nThreads:\t1\nSigQ:\t0/99998\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\t0000000000400000\nSigIgn:\t0000000001303000\nSigCgt:\t0000000000014a07\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t00000000a80425fb\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t2\nSeccomp_filters:\t1\nSpeculation_Store_Bypass:\tvulnerable\nSpeculationIndirectBranch:\tunknown\nCpus_allowed:\t7ff\nCpus_allowed_list:\t0-10\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t795\nnonvoluntary_ctxt_switches:\t11\n",
+        "base_table_compression": {
+          "available": true,
+          "scope": "Native payload storage/compression across all rows. NULL means no PostgreSQL column compression; tuple/index/WAL bytes are separate.",
+          "query": "SELECT pg_column_compression(payload),count(*),SUM(pg_column_size(payload)) FROM orders GROUP BY pg_column_compression(payload)",
+          "records": [
+            [
+              null,
+              10000,
+              2600000
+            ],
+            {
+              "children_peak_rss_kib": 0,
+              "children_system_cpu_seconds": 0,
+              "children_user_cpu_seconds": 0,
+              "cpu.max": "100000 100000\n",
+              "cpu.stat": "usage_usec 10856\nuser_usec 6513\nsystem_usec 4342\nnice_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+              "cpu_percent_one_core_100_self_and_reaped_children": 26.516021990620892,
+              "io.stat": "",
+              "kind": "process-resources",
+              "main_cpu_seconds_self_and_reaped_children": 0.0016799999999999992,
+              "main_wall_seconds": 0.006335792,
+              "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n",
+              "memory.max": "536870912\n",
+              "memory.peak": "7065600\n",
+              "memory.swap.max": "0\n",
+              "peak_rss_kib": 14132,
+              "scope": "Linux Docker process lifetime; CPU covers all Go threads. Native cgroup peaks include charged cache/kernel memory.",
+              "system_cpu_seconds": 0.003313,
+              "timing_scope": "Main wall time and CPU deltas bracket the operation and connection close; process-lifetime totals separately include runtime startup. Rusage/timer calls add small measurement overhead; native counters are sampled before final JSON/exit. Cgroup counters include parent/children; do not add them to process CPU again.",
+              "user_cpu_seconds": 0.006626
+            }
+          ]
+        },
+        "native_compression": {
+          "available": true,
+          "query": "SELECT coalesce(pg_column_compression(payload),'none'),count(*),sum(pg_column_size(payload)) FROM \"mutable_c8b6f82d97d1465e8430eb479d2f5ad7\".mutable_orders GROUP BY pg_column_compression(payload)",
+          "scope": "Actual mutable payload storage/compression; tuple, index, receipt, WAL and base fixture bytes are separate",
+          "records": [
+            [
+              "none",
+              10000,
+              2600000
+            ],
+            {
+              "children_peak_rss_kib": 0,
+              "children_system_cpu_seconds": 0,
+              "children_user_cpu_seconds": 0,
+              "cpu.max": "100000 100000\n",
+              "cpu.stat": "usage_usec 10653\nuser_usec 6392\nsystem_usec 4261\nnice_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+              "cpu_percent_one_core_100_self_and_reaped_children": 34.154921534138914,
+              "io.stat": "",
+              "kind": "process-resources",
+              "main_cpu_seconds_self_and_reaped_children": 0.0018689999999999991,
+              "main_wall_seconds": 0.005472125,
+              "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n",
+              "memory.max": "536870912\n",
+              "memory.peak": "7495680\n",
+              "memory.swap.max": "0\n",
+              "peak_rss_kib": 13948,
+              "scope": "Linux Docker process lifetime; CPU covers all Go threads. Native cgroup peaks include charged cache/kernel memory.",
+              "system_cpu_seconds": 0.003239,
+              "timing_scope": "Main wall time and CPU deltas bracket the operation and connection close; process-lifetime totals separately include runtime startup. Rusage/timer calls add small measurement overhead; native counters are sampled before final JSON/exit. Cgroup counters include parent/children; do not add them to process CPU again.",
+              "user_cpu_seconds": 0.006478
+            }
+          ]
+        }
+      },
+      "passed": true
+    }
+  ]
+}

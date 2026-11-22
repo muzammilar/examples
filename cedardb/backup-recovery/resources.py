@@ -7,6 +7,36 @@ import threading
 import time
 
 
+def parse_native_io(text):
+    devices = {}
+    required = {"rbytes", "wbytes", "rios", "wios"}
+    for line in text.splitlines():
+        fields = line.split()
+        if not fields:
+            continue
+        device = fields[0]
+        if (
+            len(device.split(":")) != 2
+            or not all(part.isdigit() for part in device.split(":"))
+            or device in devices
+        ):
+            raise ValueError("invalid/duplicate native I/O device")
+        pairs = [field.split("=", 1) for field in fields[1:]]
+        raw = dict(pairs)
+        if len(raw) != len(pairs):
+            raise ValueError("duplicate native I/O counter")
+        # Linux can list a device without fields when all counters are zero.
+        if not fields[1:]:
+            raw = dict.fromkeys(required, "0")
+        if not required <= raw.keys():
+            raise ValueError("incomplete native I/O counters")
+        values = {key: int(raw[key]) for key in required}
+        if any(value < 0 for value in values.values()):
+            raise ValueError("negative native I/O counter")
+        devices[device] = values
+    return devices
+
+
 class UnixHTTP(http.client.HTTPConnection):
     def __init__(self, path):
         super().__init__("localhost", timeout=3)
@@ -150,6 +180,17 @@ def summarize_records(records):
                         counters[f"network_{interface}_{key}"] = values[key]
             for key, value in counters.items():
                 counter_series.setdefault(key, []).append((record["ended_ns"], value))
+            native = record.get("disk", {})
+            for device, values in native.get("native_io", {}).items():
+                for field, suffix in (
+                    ("rbytes", "read_bytes"),
+                    ("wbytes", "write_bytes"),
+                    ("rios", "read_operations"),
+                    ("wios", "write_operations"),
+                ):
+                    counter_series.setdefault(
+                        "native_block_" + device + "_" + suffix, []
+                    ).append((native["native_io_captured_ns"], values[field]))
             for path, values in record.get("disk", {}).get("paths", {}).items():
                 disk.setdefault(path, []).append(values)
         io = {}

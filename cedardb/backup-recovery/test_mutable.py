@@ -7,9 +7,33 @@ import tempfile
 import unittest
 
 import mutable_oracle as oracle
+import resources
 
 
 class MutableWitness(unittest.TestCase):
+    def test_native_io_records_operation_rates_and_rejects_incomplete_data(self):
+        first = resources.parse_native_io("254:0 rbytes=100 wbytes=200 rios=1 wios=2\n")
+        second = resources.parse_native_io(
+            "254:0 rbytes=500 wbytes=1000 rios=5 wios=10\n"
+        )
+        samples = []
+        for timestamp, values in ((1_000_000_000, first), (3_000_000_000, second)):
+            samples.append(
+                {
+                    "role": "cedar",
+                    "ended_ns": timestamp,
+                    "stats": {},
+                    "disk": {"native_io": values, "native_io_captured_ns": timestamp},
+                }
+            )
+        io = resources.summarize_records(samples)["cedar"]["io_and_network"]
+        self.assertEqual(io["native_block_254:0_write_operations"]["per_second"], 4)
+        self.assertEqual(io["native_block_254:0_read_bytes"]["observed_delta"], 400)
+        self.assertEqual(resources.parse_native_io("254:0\n")["254:0"]["rios"], 0)
+        for text in ("254:0 rios=1", "254:0 rbytes=-1 wbytes=0 rios=0 wios=0"):
+            with self.assertRaises(ValueError):
+                resources.parse_native_io(text)
+
     def test_snapshot_watermark_cannot_forget_prior_acknowledgement(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "reader.jsonl"

@@ -107,6 +107,18 @@ The block windows span **14.073 s** and **15.157 s** respectively, including set
 and verification. Sampled Docker statistics did not expose IOPS in this run;
 native `io.stat` cumulative operation counters remain in the raw snapshots.
 
+A subsequent [collector check](MUTABLE_IO_RESULTS.json) samples native cgroup
+`io.stat` alongside Docker statistics, retaining each device separately. Both
+10,000-row healthy cases pass: **600 CedarDB / 601 PostgreSQL** acknowledged
+transactions, zero acknowledged loss or wrong/partial rows, and **20 controller
+tests**. Across the setup-through-verification sampled intervals, CedarDB records
+**1.016 read / 268.808 write IOPS** and PostgreSQL **0 / 42.832 IOPS**. These short
+functional observations validate collection, not relative capacity. Zero reads
+mean no charged device reads during those intervals, not no logical reads.
+The native block endpoints can share a backing device; do not add them to the
+Docker byte counters as if they were distinct traffic. Physical host I/O
+latency/queue depth remains unavailable.
+
 The four-cell diagnostic uses **2 s warmup / 10 s measurement / one trial** on
 10,000 rows, both alone and under mutations. It proves the orchestration, resource
 gates and full-output oracle execute; it cannot support a sustained ranking.
