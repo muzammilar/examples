@@ -1,0 +1,63 @@
+# Rendered only by cold_readback.py using verified local checkpoint identities.
+name: ${COLD_PROJECT:?}
+services:
+  storage:
+    image: ${COLD_STORAGE_IMAGE:?}
+    pull_policy: never
+    command: [mini, -dir=/data, -ip=storage, -ip.bind=0.0.0.0, -s3.port=8333, -s3.port.iceberg=8181, -volume.max=4, -master.volumeSizeLimitMB=256]
+    environment:
+      S3_TABLE_BUCKET: warehouse
+      AWS_ACCESS_KEY_ID: demo
+      AWS_SECRET_ACCESS_KEY: demo
+    volumes: [restored:/data]
+    cpus: 1
+    mem_limit: 1g
+    memswap_limit: 1g
+    healthcheck:
+      test: [CMD, wget, -q, -O, /dev/null, http://127.0.0.1:8181/v1/config]
+      interval: 3s
+      timeout: 5s
+      retries: 30
+  clickhouse:
+    image: ${COLD_QUERY_IMAGE:?}
+    pull_policy: never
+    environment:
+      CLICKHOUSE_USER: default
+      CLICKHOUSE_PASSWORD: local-reader
+      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: '1'
+    volumes:
+      - ./config/clickhouse.xml:/etc/clickhouse-server/config.d/lab.xml:ro
+      - query:/var/lib/clickhouse
+    cpus: 2
+    mem_limit: 1536m
+    memswap_limit: 1536m
+    healthcheck:
+      test: [CMD, clickhouse-client, --password, local-reader, --query, 'SELECT 1']
+      interval: 3s
+      timeout: 5s
+      retries: 30
+  verifier:
+    profiles: [tools]
+    image: ${COLD_RUNNER_IMAGE:?}
+    pull_policy: never
+    user: ${COLD_UID:?}:${COLD_GID:?}
+    cpus: 1
+    mem_limit: 2g
+    memswap_limit: 2g
+    environment:
+      AWS_EC2_METADATA_DISABLED: 'true'
+      CATALOG_URL: http://storage:8181
+      S3_ENDPOINT: storage:8333
+      CLICKHOUSE_ADDR: clickhouse:9000
+      CLICKHOUSE_PASSWORD: local-reader
+      RESULTS_DIR: /results
+    volumes:
+      - ${COLD_RESULTS:?}:/results
+networks:
+  default:
+    internal: true
+volumes:
+  restored:
+    external: true
+    name: ${COLD_RESTORE_VOLUME:?}
+  query: {}

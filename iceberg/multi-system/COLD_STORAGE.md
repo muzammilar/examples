@@ -55,6 +55,40 @@ Raw evidence is ignored under `results/cold-storage/`. Archives and temporary
 restore volumes are retained for the native recovery/upgrade tests; no complete
 teardown or automatic deletion of failed evidence is claimed.
 
+## Repeatable native readback
+
+After the checkpoint, run this for each witnessed table that must be recovered:
+
+```sh
+make cold-readback COLD_CHECKPOINT=results/cold-storage/<checkpoint-UUID> COLD_CASE=results/<run>/production/<case-UUID> COLD_VERIFICATION=<baseline-verification-UUID>
+```
+
+Use a successful full-body verification, or an explicitly diagnostic verification
+whose integrity check passed. The case must be registered on the checkpoint's
+original volume; its CSVs, configuration and external journals must still match
+the baseline. This requires the existing current-version Linux ARM64 runner.
+Each invocation creates a new internal, portless Compose project and a fresh
+ClickHouse query volume, then opens only the separate restored storage volume.
+The original database services may remain running or be stopped; no application
+workload may be active in the original example during the replay.
+
+The native verifier independently reconciles every body through both engines,
+checks the original snapshot, hashes its saved CSV artifacts and records actual
+core/extension/executable versions. A failed original live-test qualification
+stays failed in a diagnostic replay, even when the separate restore check passes.
+Writers are not started by this read-only audit. Query shutdown completes before
+storage shutdown begins. Temporary resources remain stopped for guarded cleanup;
+the archive and source/restore volumes are retained.
+
+The actual tracked Make runs passed **146 host controls** and both cases:
+**39.427 s** for 2,670,000 acknowledged rows and **42.276 s** for 3,390,000 rows,
+each independently checked through both engines. Those workflow times include
+control tests, input hashing, startup, body verification and shutdown; they are
+not query-only latencies or capacity benchmarks. A native harness negative control
+then lost the CLI response after creating a gated verifier. It preserved the
+original timeout and failed data verdict while finding and fencing that exact
+container; both dependency services still shut down cleanly.
+
 ## Native readback and shutdown diagnostic
 
 A separate internal, portless Compose project reopened the restored SeaweedFS
@@ -74,6 +108,6 @@ for both services. The earlier concurrent-shutdown verdict remains failed.
 Compact counts, resources and provenance are in
 [`COLD_STORAGE_RESULTS.json`](COLD_STORAGE_RESULTS.json).
 
-Next steps are a tracked native-readback Make target, verified cleanup of the
-owned temporary resources, and a separately pinned newer-release upgrade using
-the preserved checkpoint. An in-place downgrade is not assumed safe.
+Next steps are verified cleanup of the owned temporary resources and a separately
+pinned newer-release upgrade using the preserved checkpoint. An in-place
+downgrade is not assumed safe.

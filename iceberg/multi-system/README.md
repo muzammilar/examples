@@ -81,11 +81,12 @@ cost and repeated cold/warm capacity trials remain incomplete.
 
 `make cold-storage` takes a deliberate maintenance outage with workload actors
 stopped. The reviewed run restored **146 files** from a **569,685,468-byte**
-whole-volume archive and restarted the original services. Independent readback
+whole-volume archive and restarted the original services. `make cold-readback`
+reconciles one explicitly selected registered table per run. Independent readback
 reconciled **6.06 million acknowledged rows per engine**. Concurrent shutdown failed; a retained-state
 rerun passed after changing to serial query-before-storage shutdown.
 See [`COLD_STORAGE.md`](COLD_STORAGE.md) for commands, failure boundaries and
-remaining native-readback/cleanup work.
+remaining cleanup/upgrade work.
 
 ## Current and historical DuckDB versions
 

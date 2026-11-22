@@ -210,7 +210,10 @@ million acknowledged rows per engine but failed its simultaneous dependency
 shutdown. The retained-state rerun passed serial query-before-storage shutdown
 with both services exiting zero; keep both outcomes. Keep the archive,
 original volume, native witnesses and that failed verdict. See `COLD_STORAGE.md`.
-Track native replay and cleanup before upgrading the restore to a newer pinned
+Native replay is now a tracked `cold-readback` Make target: both 2.67-million-
+and 3.39-million-ACK-row cases pass with 146 host controls. The lost-CLI-response
+control proves the pre-registered verifier is fenced while its failed data verdict
+is retained. Complete guarded cleanup before upgrading the restore to a newer pinned
 SeaweedFS release; never change the sole historical storage volume first.
 
 ## Archive safety

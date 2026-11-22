@@ -263,6 +263,9 @@ def sources():
     optional = [
         ROOT / "prefault_archive.py",
         ROOT / "cold_storage.py",
+        ROOT / "cold_readback.py",
+        ROOT / "test_cold_readback.py",
+        ROOT / "docker-compose.cold-readback.yml",
         ROOT / "test_cold_storage.py",
         ROOT / "manifest_control.py",
         ROOT / "test_manifest_control.py",
