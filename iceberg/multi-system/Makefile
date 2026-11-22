@@ -80,7 +80,14 @@ unit-test: config prepare
 
 recovery-unit-test:
 	python3 -c 'import sys; assert sys.version_info >= (3, 11), "Recovery controls require Python 3.11+; check the python3 selected by Make"'
-	LAB_PROFILE=historical python3 -m unittest test_recovery_resources.py test_recovery_control.py test_recovery_report.py test_recovery_cleanup.py test_recovery_retirement.py test_compactor_cleanup.py test_compactor_control.py test_prefault_archive.py test_manifest_control.py test_cold_storage.py test_cold_readback.py test_cold_upgrade.py test_cold_cleanup.py test_compound_archive.py test_maintenance_control.py test_lab_profiles.py test_duckdb_maintenance.py
+	LAB_PROFILE=historical python3 -m unittest test_recovery_resources.py test_recovery_control.py test_recovery_report.py test_recovery_cleanup.py test_recovery_retirement.py test_compactor_cleanup.py test_compactor_control.py test_prefault_archive.py test_manifest_control.py test_cold_storage.py test_cold_readback.py test_cold_upgrade.py test_cold_cleanup.py test_compound_archive.py test_maintenance_control.py test_lab_profiles.py test_duckdb_maintenance.py test_failed_preservation.py
+
+.PHONY: preserve-failed-case check-failed-preservation
+preserve-failed-case: recovery-unit-test ## Seal reviewed original failures and independent restore proofs; does not authorize teardown
+	python3 failed_preservation.py "$(FAILED_CASE)"
+
+check-failed-preservation: recovery-unit-test ## Offline replay of the latest preservation receipt; no teardown
+	python3 failed_preservation.py --replay "$(FAILED_CASE)"
 
 .PHONY: duckdb-maintenance duckdb-rejections duckdb-conflicts
 duckdb-maintenance: config recovery-unit-test ## Native DuckDB v2 compaction, rollback, retained snapshot and no-op checks

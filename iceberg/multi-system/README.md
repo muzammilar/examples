@@ -139,6 +139,10 @@ unchanged throughout the separate current runs. The recovery increment passed
 
 ## Native DuckDB compaction
 
+The current failed compactor fixture now has a checked, independently replayed
+[preservation receipt](FAILED_PRESERVATION.md). Its original verdict remains
+failed and teardown is still blocked; this is evidence preservation only.
+
 After `make up`, run `make duckdb-maintenance` for DuckDB **2.0.1** native
 Iceberg v2 rewriting. The fresh **2,000,000-row / 10,000-customer** baseline
 passes rollback, committed **20 → 1 file** replacement, retained-snapshot,

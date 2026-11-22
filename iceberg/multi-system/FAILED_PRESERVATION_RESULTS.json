@@ -1,0 +1,90 @@
+{
+  "date": "2026-11-22",
+  "original_case_id": "6191b730-b1aa-4cbf-8371-13952cf26a54",
+  "receipt_id": "c4316ab0-c3d1-4515-a415-7237dd3c331b",
+  "original_operational_passed": false,
+  "data_preservation_passed": true,
+  "offline_replay_passed": true,
+  "teardown_authorized": false,
+  "host_controls_passed": 224,
+  "original_source_files": 76,
+  "original_artifacts": 229,
+  "case_artifacts": 343,
+  "native_process_fences": 16,
+  "controller_source_files": 83,
+  "body_proof": {
+    "rows_verified": 3800000,
+    "acknowledged_batches": 380,
+    "acknowledged_rows": 3800000,
+    "ambiguous_batches_applied": 0,
+    "ambiguous_batches_absent": 0,
+    "known_failed_batches_absent": 0,
+    "canonical_body_sha256": "f6a5030dc86070c81d9ba72f543bc0b032a8c6eb12869f89ea4110bcc681c2b2",
+    "ambiguous_batches": null
+  },
+  "snapshot": {
+    "table_uuid": "d9c95d1e-f660-44df-aa1e-a93ab324a041",
+    "snapshot_id": 1075081727671484799,
+    "metadata_location": "s3://warehouse/lab/recovery_6191b730b1aa4cbf837113952cf26a54-d9c95d1e-f660-44df-aa1e-a93ab324a041/metadata/v383.metadata.json"
+  },
+  "checkpoint_id": "632744d8-a60b-4236-8253-d7a0d9748e6f",
+  "restore_volume": "iceberg-cold-632744d8a60b42368253d7a0d9748e6f",
+  "controller_workflows": {
+    "publish": {
+      "exit_code": 0,
+      "duration_s": 9.570340750040486,
+      "host_controller_cpu_core_s": 9.290823,
+      "host_controller_peak_rss_bytes": 107659264,
+      "source_unchanged": true,
+      "scope": "Host preservation/replay controller accounting, not a fresh backend performance measurement."
+    },
+    "offline_replay": {
+      "exit_code": 0,
+      "duration_s": 7.921336499974132,
+      "host_controller_cpu_core_s": 7.723421,
+      "host_controller_peak_rss_bytes": 107659264,
+      "source_unchanged": true,
+      "scope": "Host preservation/replay controller accounting, not a fresh backend performance measurement."
+    }
+  },
+  "evidence": [
+    {
+      "path": "results/current/qualification-20261122/live/production/6191b730-b1aa-4cbf-8371-13952cf26a54/preservation-receipts/c4316ab0-c3d1-4515-a415-7237dd3c331b/invocation.json",
+      "sha256": "ab8ac25a649b661ba28d16c0129a7d17839b48b72be802f32cbbade27c75d1fe"
+    },
+    {
+      "path": "results/current/qualification-20261122/live/production/6191b730-b1aa-4cbf-8371-13952cf26a54/preservation-receipts/c4316ab0-c3d1-4515-a415-7237dd3c331b/receipt.json",
+      "sha256": "c2575fb2850483cf7f3de51b2b4b6a642e6e6ab7287b5f92a0409f0bad762dd5"
+    },
+    {
+      "path": "results/current/qualification-20261122/live/production/6191b730-b1aa-4cbf-8371-13952cf26a54/case.json",
+      "sha256": "64935d92d86e8e408e770c291b80c984f0f41b14c9739eab595c58f8cc5220da"
+    },
+    {
+      "path": "results/current/qualification-20261122/live/production/6191b730-b1aa-4cbf-8371-13952cf26a54/failure.json",
+      "sha256": "7f16e429e69052b788b635d46ae4c33b61ed8aafc3ad16206874bc03cf732a2a"
+    },
+    {
+      "path": "results/current/failed-preservation-workflows/a50a00e5-bd26-43af-8add-27342a8e2d47/invocation.json",
+      "sha256": "e69aa06f2f9cf998c57b52cdf7e92e5fd19274b2ba7348ece4786b0da0e0f2d8"
+    },
+    {
+      "path": "results/current/failed-preservation-workflows/a50a00e5-bd26-43af-8add-27342a8e2d47/0-result.json",
+      "sha256": "962d0be2e88306eb7ba2fa5f9c8c503e32d9ca5d73df7cd5372a4d655630a0e3"
+    },
+    {
+      "path": "results/current/failed-preservation-workflows/a50a00e5-bd26-43af-8add-27342a8e2d47/1-result.json",
+      "sha256": "91187866725087a67d619f9279b9fcccccd19543da102feb3d6c5f16deade1cf"
+    },
+    {
+      "path": "failed-preservation-plans.json",
+      "sha256": "8073cfd896eb307da196d0c75aa6c3a395dbc5c95b61cd9035b539c830b0957d"
+    }
+  ],
+  "limits": [
+    "Read-only preservation and offline replay; no new backend fault or throughput run.",
+    "Original failed verdict and diagnostic restore status remain false.",
+    "Existing cleanup gates are unchanged and remain blocked; native maintenance fixture retirement also needs policy before deleting this volume.",
+    "Host-controller CPU/RSS are bookkeeping costs; native database resource/compression/disk/I/O measurements are in CURRENT_COLD_RESULTS.json and the pinned restore artifacts."
+  ]
+}
