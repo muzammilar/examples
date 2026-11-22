@@ -57,6 +57,13 @@ Spark performs explicit maintenance; snapshot expiration and orphan-file cleanup
 are omitted. Warm, compressible, memory-resident query results are local lab
 observations; they do not predict cold S3 scans or production throughput.
 
+The shared compactor Dockerfile retains the historical Spark 4.0.1 / Iceberg
+1.10.1 defaults for this recorded example. Its release artifacts can now be
+selected with checked build arguments, and reports read the actual loaded
+Iceberg version/commit. The separately pinned current maintenance experiment is
+in [`iceberg/multi-system`](../../iceberg/multi-system/README.md#current-maintenance-engine-check);
+its offline result does not establish a current-version rerun of this example.
+
 ## Direct-write baseline
 
 The Go client bootstraps an empty Iceberg v2 table through the REST API.

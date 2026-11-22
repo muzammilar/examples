@@ -89,6 +89,22 @@ ClickHouse output. No committed object was rewritten by the inspection.
 Do not patch committed manifests, weaken validation or report the five-path
 2.0.1 matrix as passed. Historical 1.5.5 normal-path results remain historical.
 
+## Maintenance dependency qualification
+
+The separately selected **Spark 4.1.4 / Iceberg 1.12.0** image now passes an offline
+2-million-row compaction/append/retained-snapshot Make check with full bodies,
+200 recovery controls and explicit resource measurements. It does not replace
+the historical live-fault lane or qualify S3/REST interruption recovery.
+See [`MAINTENANCE_RESULTS.json`](MAINTENANCE_RESULTS.json).
+
+Spark's [release page](https://spark.apache.org/downloads.html) lists 4.3.0 as newer,
+but the [Iceberg 1.12.0 integration modules](https://github.com/apache/iceberg/blob/apache-iceberg-1.12.0/settings.gradle)
+have no 4.3 implementation. Maven Central returned 404 for the 4.2 runtime's
+release checksum, while the 4.1 runtime and AWS bundle were available. Both JARs
+are SHA512-checked, and the Spark image is digest-pinned. The compactor now reports
+the loaded [Iceberg build version and commit](https://github.com/apache/iceberg/blob/apache-iceberg-1.12.0/api/src/main/java/org/apache/iceberg/IcebergBuild.java),
+with matching release references, instead of a hardcoded version string.
+
 ## Remaining qualification
 
 - Complete the current-version normal architecture matrix and live compactor

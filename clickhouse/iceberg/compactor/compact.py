@@ -213,15 +213,42 @@ def snapshot_rows(spark, name, identifier):
     )
 
 
+def native_versions(spark):
+    build = spark.sparkContext._jvm.org.apache.iceberg.IcebergBuild
+    version, commit = build.version(), build.gitCommitId()
+    if not isinstance(version, str) or not re.fullmatch(
+        r"[0-9]+\.[0-9]+\.[0-9]+", version
+    ):
+        raise RuntimeError("native Iceberg release version is unavailable or unstable")
+    if not isinstance(commit, str) or not re.fullmatch(r"[0-9a-f]{40}", commit):
+        raise RuntimeError("native Iceberg commit is unavailable")
+    return {
+        "spark_version": spark.version,
+        "iceberg_version": version,
+        "iceberg_commit": commit,
+    }
+
+
+def source_references(versions):
+    # References follow the loaded release; baseline line anchors do not transfer.
+    spark_line = ".".join(versions["spark_version"].split(".")[:2])
+    return {
+        key: url.split("#")[0]
+        .replace("1.10.1", versions["iceberg_version"])
+        .replace("/spark/v4.0/", "/spark/v" + spark_line + "/")
+        for key, url in SOURCES.items()
+    }
+
+
 def compact(spark, name, target, result):
     config = configuration()
+    versions = native_versions(spark)
     result.update(
+        **versions,
         table=name,
         target_file_bytes=target,
-        spark_version=spark.version,
-        iceberg_version="1.10.1",
         configuration=config,
-        sources=SOURCES,
+        sources=source_references(versions),
         effective_http_client_properties={},
     )
     result["before"] = metrics(

@@ -426,6 +426,36 @@ application `make down` passed. Original volumes and backup copies remain;
 full infrastructure teardown and the fresh live-compactor qualification are
 pending. See [preservation results](COMPOUND_PRESERVATION_RESULTS.json).
 
+## Current maintenance engine check
+
+```sh
+make build-current-compactor
+make test-current-compactor
+```
+
+These optional commands build and test **Spark 4.1.4 / Iceberg 1.12.0** without
+opening the retained database volumes. The ordinary live-fault lane still uses
+its labeled historical maintenance image. The final Make check passed **200
+recovery controls** and a fresh, offline Hadoop-catalog experiment: **2 million
+rows / 10,000 customers**, compaction **40 → 1 files**, then **100,000 additional
+rows**. Every body matched before/after compaction and append; the original
+2-million-row snapshot retained its exact hash.
+
+The final native control took **23.219 s**, including complete-body validation,
+used **35.584 CPU core-s** and reached **1,522.84 MiB** lifetime charged memory
+under a **2 CPU / 2 GiB** cap. Current file bytes fell **7,083,354 → 5,969,919**;
+encoded Parquet chunk compression changed **5.4989× → 5.9735×**. Owned `/data`
+allocation was **15,003,648 bytes**, including retained history. Storage was capped
+tmpfs: block I/O counters were unavailable and these numbers do not measure disk
+performance. This is one final correctness qualification, not a capacity ranking.
+
+The earlier `noexec`-scratch failure remains recorded: Zstandard JNI could not
+map its extracted library. The fresh run allows execution only on its bounded
+scratch mount; successful and failed probe containers were positively fenced
+and removed. Full source, parameters, measurements and limits are in
+[maintenance results](MAINTENANCE_RESULTS.json). S3/REST integration and the live
+compactor interruption remain separate unfinished tests.
+
 ## Limitations by architecture
 
 | Case | Useful for | Limitation |

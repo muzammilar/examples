@@ -221,6 +221,22 @@ failed. Original-volume/image deletion awaits explicit approval after automatic
 review rejection. Next qualify fresh bounded-memory/capacity settings and
 continuous compactor recovery; the cold result does not establish an OOM fix.
 
+## Current maintenance qualification
+
+`make build-current-compactor` and `make test-current-compactor` now qualify the
+explicit Spark 4.1.4 / Iceberg 1.12.0 build on isolated tmpfs with no network or
+retained database mounts. The final native Make run passes 200 controls and
+complete bodies through 2-million-row compaction, a 100,000-row append and the
+original retained snapshot. The noexec-scratch failure remains recorded; final
+success is published only after Spark/sampler shutdown, positive fencing and
+container removal. See `MAINTENANCE_RESULTS.json` for resource and storage numbers.
+
+Before selecting this image for live faults, wire the maintenance override into
+both lifecycle and controller selection, freeze its build pins, and update the
+version-specific evidence/cleanup gates. Then run the actual S3/REST compactor
+interruption against the fresh bounded 4.54 fixture. Offline Hadoop-catalog
+success does not close that operational requirement.
+
 ## Archive safety
 
 ### ClickHouse hot data to Iceberg

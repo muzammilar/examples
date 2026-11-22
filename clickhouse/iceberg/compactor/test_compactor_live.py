@@ -229,6 +229,10 @@ class PinnedMetrics(unittest.TestCase):
         environment.start()
         self.addCleanup(environment.stop)
         self.spark, self.table = Mock(), Mock()
+        self.spark.sparkContext._jvm.org.apache.iceberg.IcebergBuild.version.return_value = "1.10.1"
+        self.spark.sparkContext._jvm.org.apache.iceberg.IcebergBuild.gitCommitId.return_value = (
+            "a" * 40
+        )
         self.loader = self.spark.sparkContext._jvm.org.apache.iceberg.spark.Spark3Util.loadIcebergTable
         self.loader.return_value = self.table
         self.snapshot = self.table.currentSnapshot.return_value
@@ -411,9 +415,46 @@ class PinnedMetrics(unittest.TestCase):
         self.planned.close.assert_called_once()
 
 
+class NativeVersionContract(unittest.TestCase):
+    def test_loaded_release_and_sources_follow_actual_engine(self):
+        spark = Mock(version="4.1.4")
+        build = spark.sparkContext._jvm.org.apache.iceberg.IcebergBuild
+        build.version.return_value = "1.12.0"
+        build.gitCommitId.return_value = "b" * 40
+        versions = compact.native_versions(spark)
+        self.assertEqual(versions["iceberg_version"], "1.12.0")
+        self.assertEqual(versions["iceberg_commit"], "b" * 40)
+        self.assertIn(
+            "/spark/v4.1/", compact.source_references(versions)["table_refresh"]
+        )
+        self.assertTrue(
+            all("1.10.1" not in u for u in compact.source_references(versions).values())
+        )
+
+    def test_unknown_or_unstable_build_fails_before_table_operations(self):
+        for version, commit in [
+            ("unknown", "a" * 40),
+            ("1.12.0-SNAPSHOT", "a" * 40),
+            ("1.12.0", "unknown"),
+        ]:
+            spark = Mock(version="4.1.4")
+            build = spark.sparkContext._jvm.org.apache.iceberg.IcebergBuild
+            build.version.return_value, build.gitCommitId.return_value = version, commit
+            with self.subTest(version=version, commit=commit):
+                with self.assertRaises(RuntimeError):
+                    compact.compact(spark, "lab.probe", 1048576, {})
+                spark.sql.assert_not_called()
+
+
 class LiveRowContract(unittest.TestCase):
     def execute(self, after=10, retained=10, live=False, manifests=True):
         spark, result = Mock(version="4.0.1"), {}
+        spark.sparkContext._jvm.org.apache.iceberg.IcebergBuild.version.return_value = (
+            "1.10.1"
+        )
+        spark.sparkContext._jvm.org.apache.iceberg.IcebergBuild.gitCommitId.return_value = (
+            "a" * 40
+        )
         spark.sql.return_value.collect.return_value = []
         env = {
             "COMPACTION_LIVE_WRITERS": str(live).lower(),
@@ -472,6 +513,12 @@ class LiveRowContract(unittest.TestCase):
 
     def test_rewrite_error_preserves_before_snapshot_and_never_checks_new_head(self):
         spark, result = Mock(version="4.0.1"), {}
+        spark.sparkContext._jvm.org.apache.iceberg.IcebergBuild.version.return_value = (
+            "1.10.1"
+        )
+        spark.sparkContext._jvm.org.apache.iceberg.IcebergBuild.gitCommitId.return_value = (
+            "a" * 40
+        )
         original = RuntimeError("upload interrupted")
         spark.sql.side_effect = original
         with patch.dict(compact.os.environ, {}, clear=True):

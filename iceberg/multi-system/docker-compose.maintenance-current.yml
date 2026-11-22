@@ -1,0 +1,13 @@
+# Build/qualification lane; selected explicitly, never opens retained storage.
+services:
+  compactor:
+    image: iceberg-multi-compactor-current:dev
+    build:
+      args:
+        SPARK_IMAGE: spark:4.1.4-python3@sha256:7b4366980e41e887276406f66ec21c2f57c445905f35a147927c3da87e3e5991
+        SPARK_LINE: '4.1'
+        ICEBERG_VERSION: 1.12.0
+        ICEBERG_RUNTIME_SHA512: ac1e2cb00970309f0c6bf241fabf334aef373c1f3e3b443181d429d5f2c0903ace47df9cfc1d55c95807a096cf405ae0a8868831b9e9eb5696dfdb6380587f38
+        ICEBERG_AWS_SHA512: b01456f80142c8837004e31329a0f40db8a9d44917a4a694cb7d8d6d3a68cb20c61e6f7788fa1bdcb95c0edf724322b49667d6f9ef60fc9cc46da5c24ce5c7de
+  recovery-compactor:
+    image: iceberg-multi-compactor-current:dev

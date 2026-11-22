@@ -1,0 +1,301 @@
+{
+  "date": "2026-11-22",
+  "passed": true,
+  "scope": "Offline Hadoop-catalog current-maintenance compatibility; not the S3/REST live compactor failure qualification or a capacity benchmark",
+  "versions": {
+    "spark_version": "4.1.4",
+    "iceberg_version": "1.12.0",
+    "iceberg_commit": "212aa894e919ff9fdf89160da4aadcbe6858ac01"
+  },
+  "image_id": "sha256:e06caa927b0f311226ac188df130f4a9218c091a87fdfd799926adb541e92386",
+  "spark_base_index_digest": "sha256:7b4366980e41e887276406f66ec21c2f57c445905f35a147927c3da87e3e5991",
+  "spark_base_arm64_digest": "sha256:433ae2aac69a3f450799958fbc416c581c2620030050616cd997a0319a5e14f9",
+  "selection": "Spark 4.3 is newer but Iceberg 1.12.0 has no 4.3 integration module. The 4.2 runtime checksum returned HTTP 404 from Maven Central; the published 4.1 runtime was selected with Spark 4.1.4. This is a tested compatible pair, not the newest Spark.",
+  "dataset": {
+    "rows": 2000000,
+    "columns": [
+      "id BIGINT",
+      "customer BIGINT",
+      "value BIGINT"
+    ],
+    "customers": 10000,
+    "nulls": 0,
+    "generation": "id=0..N-1, customer=id%10000, value=id*7+3; 20 inserts of 100000 rows",
+    "logical_fixed_width_value_bytes": 48000000,
+    "unit": "bytes (48MB), excludes encoding/metadata/request text",
+    "append_rows": 100000
+  },
+  "host_controls": 200,
+  "before": {
+    "count": 40,
+    "file_bytes": 7083354,
+    "compressed_chunk_bytes": 7040794,
+    "uncompressed_chunk_bytes": 38716510,
+    "chunk_compression_ratio": 5.4988840747222545
+  },
+  "after": {
+    "count": 1,
+    "file_bytes": 5969919,
+    "compressed_chunk_bytes": 5958816,
+    "uncompressed_chunk_bytes": 35595213,
+    "chunk_compression_ratio": 5.9735378638977945
+  },
+  "full_body_checks": {
+    "before_body": {
+      "rows": 2000000,
+      "canonical_sha256": "72dbe46a5e7db14d22b55cbb5f60aad1e64a890a4545e95e3d08d62bf19414ec",
+      "encoding": "little-endian signed int64 id/customer/value, ordered by id"
+    },
+    "after_body": {
+      "rows": 2000000,
+      "canonical_sha256": "72dbe46a5e7db14d22b55cbb5f60aad1e64a890a4545e95e3d08d62bf19414ec",
+      "encoding": "little-endian signed int64 id/customer/value, ordered by id"
+    },
+    "current_body": {
+      "rows": 2100000,
+      "canonical_sha256": "727a54d8dacbf96ae63c935636688ec1bb495f6fc6e877a06d81ccbcc1349e0b",
+      "encoding": "little-endian signed int64 id/customer/value, ordered by id"
+    },
+    "retained_body": {
+      "rows": 2000000,
+      "canonical_sha256": "72dbe46a5e7db14d22b55cbb5f60aad1e64a890a4545e95e3d08d62bf19414ec",
+      "encoding": "little-endian signed int64 id/customer/value, ordered by id"
+    }
+  },
+  "timings": {
+    "seed": {
+      "seconds": 3.886309376999634
+    },
+    "verify_before": {
+      "seconds": 4.57104666899977
+    },
+    "rewrite": {
+      "seconds": 0.671788416999334
+    },
+    "verify_after": {
+      "seconds": 3.3014572100000805
+    },
+    "verify_append": {
+      "seconds": 3.399631168000269
+    },
+    "verify_retained": {
+      "seconds": 3.3933800009999686
+    }
+  },
+  "native_probe_wall_seconds": 23.218757510001524,
+  "resources": {
+    "samples": 26,
+    "clock_ticks_per_second": 100,
+    "container": {
+      "observed_seconds": 23.216299469000003,
+      "cpu_core_seconds": 35.58404,
+      "cpu_percent_one_core_100": 153.27179961437977,
+      "cpu_counter_resolution_seconds": 1e-06,
+      "cpu_utilization_min_interval_seconds": 0.0,
+      "cpu_short_intervals_suppressed": 0,
+      "cpu_interval_percent_min_mean_max": {
+        "min": 58.42441596137581,
+        "mean": 151.10262353114712,
+        "max": 206.50329498306797
+      },
+      "sampled_memory_bytes_min_mean_max": {
+        "min": 192454656,
+        "mean": 989753974.1538461,
+        "max": 1526112256
+      },
+      "lifetime_peak_memory_bytes": 1596813312,
+      "generations": [],
+      "io": null,
+      "identity_or_counter_gaps": 0
+    },
+    "python": {
+      "observed_seconds": 23.216299469000003,
+      "cpu_core_seconds": 7.86,
+      "cpu_percent_one_core_100": 33.85552469503252,
+      "cpu_counter_resolution_seconds": 0.01,
+      "cpu_utilization_min_interval_seconds": 0.1,
+      "cpu_short_intervals_suppressed": 1,
+      "cpu_interval_percent_min_mean_max": {
+        "min": 0.0,
+        "mean": 32.42200212704203,
+        "max": 95.50821732664843
+      },
+      "sampled_memory_bytes_min_mean_max": {
+        "min": 44318720,
+        "mean": 55578466.461538464,
+        "max": 67477504
+      },
+      "lifetime_peak_memory_bytes": 68362240,
+      "generations": [
+        {
+          "pid": 60,
+          "start_ticks": 1270943
+        }
+      ],
+      "io": {
+        "process": {
+          "observed_seconds": 23.216299469000003,
+          "counters": {
+            "rchar": 540870,
+            "wchar": 116082,
+            "syscr": 750,
+            "syscw": 31,
+            "read_bytes": 0,
+            "write_bytes": 116082,
+            "cancelled_write_bytes": 0
+          },
+          "per_second": {
+            "rchar": 23296.994455219134,
+            "wchar": 5000.021650952627,
+            "syscr": 32.30488997617607,
+            "syscw": 1.3352687856819443,
+            "read_bytes": 0.0,
+            "write_bytes": 5000.021650952627,
+            "cancelled_write_bytes": 0.0
+          }
+        }
+      },
+      "identity_or_counter_gaps": 0
+    },
+    "jvm": {
+      "observed_seconds": 23.215210802,
+      "cpu_core_seconds": 27.490000000000002,
+      "cpu_percent_one_core_100": 118.41374275882829,
+      "cpu_counter_resolution_seconds": 0.01,
+      "cpu_utilization_min_interval_seconds": 0.1,
+      "cpu_short_intervals_suppressed": 0,
+      "cpu_interval_percent_min_mean_max": {
+        "min": 9.533906717949451,
+        "mean": 121.09533277129741,
+        "max": 203.7854563018891
+      },
+      "sampled_memory_bytes_min_mean_max": {
+        "min": 174116864,
+        "mean": 954567720.96,
+        "max": 1417322496
+      },
+      "lifetime_peak_memory_bytes": 1499664384,
+      "generations": [
+        {
+          "pid": 1,
+          "start_ticks": 1270852
+        }
+      ],
+      "io": {
+        "process": {
+          "observed_seconds": 23.215210802,
+          "counters": {
+            "rchar": 216340378,
+            "wchar": 446129413,
+            "syscr": 67085,
+            "syscw": 19082,
+            "read_bytes": 0,
+            "write_bytes": 0,
+            "cancelled_write_bytes": 0
+          },
+          "per_second": {
+            "rchar": 9318906.463746699,
+            "wchar": 19217116.60535797,
+            "syscr": 2889.7002302568194,
+            "syscw": 821.9610910600078,
+            "read_bytes": 0.0,
+            "write_bytes": 0.0,
+            "cancelled_write_bytes": 0.0
+          }
+        }
+      },
+      "identity_or_counter_gaps": 0
+    },
+    "scope": "Container cgroup v2 totals include the JVM and Python, including any JVM startup before Python entry; deltas cover observed intervals only. Process CPU/IO deltas never bridge a changed PID/start-tick generation. Process CPU counters have 1/SC_CLK_TCK-second resolution: interval utilization requires at least 10 ticks of elapsed time, and whole-run utilization requires the same minimum total observed duration. Short intervals are counted and excluded only from utilization peaks/interval summaries, never CPU core-seconds or raw counters. Cgroup CPU has microsecond counter resolution and uses its observed intervals without the process tick threshold. Cgroup charged memory includes page cache; Python/JVM RSS and lifetime peaks are separate and must not be summed. Memory means are sample means. /tmp and /results statvfs values are shared-filesystem capacity/free space, not per-job disk allocation. Block IO counters are container/VM accounting, not physical-drive latency; devices are separate and stacked devices must not be summed; Python/JVM rchar/wchar are syscall bytes, not disk bytes. Missing counters/devices remain unavailable, not zero."
+  },
+  "allocated_data_bytes": 15003648,
+  "limits": {
+    "cpu": 2,
+    "memory_bytes": 2147483648,
+    "data_tmpfs_bytes": 536870912,
+    "scratch_tmpfs_bytes": 536870912,
+    "network": "none",
+    "root_read_only": true,
+    "persistent_database_volumes": 0
+  },
+  "final_container_removed": true,
+  "evidence": [
+    {
+      "path": "results/maintenance-current/50979221-2153-49ff-9861-cea3b52fc4ad/result.json",
+      "sha256": "b982859a471a68b69725609f4fff8bcad02a9b75a7d3c4f14d93bf005d94d32a"
+    },
+    {
+      "path": "results/maintenance-current/50979221-2153-49ff-9861-cea3b52fc4ad/qualification.json",
+      "sha256": "3f76bc873a9813415a9a4fc2d546f908e8b0a96bbd687711f638e955fbf33cdf"
+    },
+    {
+      "path": "results/maintenance-current/50979221-2153-49ff-9861-cea3b52fc4ad/cleanup.json",
+      "sha256": "2f979174e42c0689560e408c29f0b36fad2da24615080c6edc6e102eea9c39f3"
+    },
+    {
+      "path": "results/maintenance-current/50979221-2153-49ff-9861-cea3b52fc4ad/invocation.json",
+      "sha256": "0a863de7fd012997eb6ad8a7db28314c27f8d05c283c713d8d91c434d5414097"
+    },
+    {
+      "path": "results/maintenance-current/50979221-2153-49ff-9861-cea3b52fc4ad/created.json",
+      "sha256": "517b63750310797a2ead803f1dcf99b79b07d88955a4723db9339c2f2f220ccc"
+    },
+    {
+      "path": "results/maintenance-current/50979221-2153-49ff-9861-cea3b52fc4ad/final.json",
+      "sha256": "ce5bb58570c9e6b1a10de0db9fa2c76be4ec9d1fed54ac2470436ea5faba465b"
+    },
+    {
+      "path": "results/maintenance-current/50979221-2153-49ff-9861-cea3b52fc4ad/resources.jsonl",
+      "sha256": "4238a261db063cf5dcbbca2ce958bb4ff377e1c9bdc380371661e980c6626096"
+    },
+    {
+      "path": "results/maintenance-current-20261122/build-start.json",
+      "sha256": "9ee094012dc9c1ff4725a84753084aa5cbeac3590810932e2e10b9b438015a45"
+    },
+    {
+      "path": "results/maintenance-current-20261122/build-result.json",
+      "sha256": "38a78a41056fe32b452f728c2b0d750bea7624edcdc658200d609c69432b56a0"
+    },
+    {
+      "path": "results/maintenance-current-20261122/builder-stopped.json",
+      "sha256": "638ccfd30cb0df57c654f21531e9484f0d3979795e5d60f13e04639c6782e74d"
+    },
+    {
+      "path": "results/maintenance-current-20261122/make-current-smoke-final/invocation.json",
+      "sha256": "dccfcc0c7b0fa965bb54e29d7c492474f3254320db558164a75ebacc20d2aa21"
+    },
+    {
+      "path": "results/maintenance-current-20261122/make-current-smoke-final/result.json",
+      "sha256": "3be338a5b986ab9479415ff9a98f5c7e44a99b4adebc38f1137489c57cfb3340"
+    }
+  ],
+  "negative_control": {
+    "status": "Failed noexec tmpfs run preserved; fixed in new fixture, not reset",
+    "run": "results/maintenance-current-20261122/b72a929f-9487-4126-b4e4-8a61b89cd727",
+    "error": "Zstandard JNI failed to map its shared library from noexec tmpfs",
+    "container_removed_after_positive_fence": true,
+    "evidence": [
+      {
+        "path": "results/maintenance-current-20261122/b72a929f-9487-4126-b4e4-8a61b89cd727/result.json",
+        "sha256": "650a5d8c1d559a96c0478004da70f0a420f875d5275171d5d37dea890fe571cb"
+      },
+      {
+        "path": "results/maintenance-current-20261122/b72a929f-9487-4126-b4e4-8a61b89cd727/final.json",
+        "sha256": "1f316f167f7fae92a451a89a6448fc085f142f3a4ae801504aa573965541ad11"
+      },
+      {
+        "path": "results/maintenance-current-20261122/b72a929f-9487-4126-b4e4-8a61b89cd727/cleanup.json",
+        "sha256": "e4fd58e9ebd2b7a819b58eed701af0a57b966f293532fb3cad91c4460663aa63"
+      }
+    ],
+    "seed_phase_completed": false
+  },
+  "limitations": [
+    "One final Make qualification; preliminary manual/Make smoke runs are retained separately and are not pooled as a performance comparison",
+    "All engine CPU and memory include verification; startup before Python entry is outside observed CPU deltas",
+    "Tmpfs is memory-backed: native block I/O devices were unavailable, not measured zero; no SSD throughput or durability claim",
+    "High synthetic numeric compression; not string-heavy or skewed production data",
+    "No S3/REST, concurrent writers, network fault, process crash, storage replacement or restart persistence in this offline control",
+    "Current maintenance lane is explicitly selected for build/smoke only; live checker version gate and lifecycle selection still require integration"
+  ]
+}

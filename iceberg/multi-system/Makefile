@@ -64,7 +64,7 @@ unit-test: config prepare
 
 recovery-unit-test:
 	python3 -c 'import sys; assert sys.version_info >= (3, 11), "Recovery controls require Python 3.11+; check the python3 selected by Make"'
-	python3 -m unittest test_recovery_resources.py test_recovery_control.py test_recovery_report.py test_recovery_cleanup.py test_recovery_retirement.py test_compactor_cleanup.py test_compactor_control.py test_prefault_archive.py test_manifest_control.py test_cold_storage.py test_cold_readback.py test_cold_upgrade.py test_cold_cleanup.py test_compound_archive.py
+	python3 -m unittest test_recovery_resources.py test_recovery_control.py test_recovery_report.py test_recovery_cleanup.py test_recovery_retirement.py test_compactor_cleanup.py test_compactor_control.py test_prefault_archive.py test_manifest_control.py test_cold_storage.py test_cold_readback.py test_cold_upgrade.py test_cold_cleanup.py test_compound_archive.py test_maintenance_control.py
 
 storage-crash: config recovery-unit-test
 	python3 recovery_control.py storage-crash
@@ -209,3 +209,11 @@ cold-upgrade: config recovery-unit-test ## Reconcile a restored table with pinne
 archive-compound-case: config recovery-unit-test ## Preserve the known failed compound case without passing its live test
 	@test -n "$(FAILED_CASE)" || (echo 'Set FAILED_CASE to the registered compound-failure case'; exit 1)
 	python3 recovery_cleanup.py archive-compound-case --case "$(FAILED_CASE)"
+
+.PHONY: build-current-compactor
+build-current-compactor: config prepare ## Build the compatible Spark 4.1.4 / Iceberg 1.12.0 lane without starting services
+	$(COMPOSE) -f docker-compose.maintenance-current.yml build compactor
+
+.PHONY: test-current-compactor
+test-current-compactor: config recovery-unit-test ## Offline 2M-row compaction, append and retained-snapshot correctness on the current maintenance image
+	python3 maintenance_control.py
