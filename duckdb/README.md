@@ -32,4 +32,9 @@ and 10,000 customers, at equal 1/4-CPU and 4-GiB container limits. It includes
 exact output checks, repeated warm-query measurements, first-query observations,
 CPU time and peak RSS/cgroup memory. DuckDB wins the scans and join in this
 workload; Rayforce wins the two group aggregations and bulk CSV loading. Full
-numbers and the unrun persistence/cold-cache scenarios are in that README.
+numbers and the unrun cold-cache scenarios are in that README. Its separate
+[native live WAL profile](../rayforce/duckdb-comparison/DUCKDB_RECOVERY.md)
+tests the same two-million-trade fixture with C++ Quack sessions, pinned TLS,
+independent readers/writers, two retained-volume SIGKILLs and checkpointing under
+load. It is a single-owner recovery test; the existing ZFS lab covers different
+storage/replication failure boundaries.

@@ -31,6 +31,8 @@ make test-ingestion METHODS=native,columnar MUTATION_ROWS=10001 BATCH_SIZES=1,10
 make ingestion-benchmark METHODS=native,columnar MUTATION_ROWS=100000
 make test-rayforce-snapshot
 make test-duckdb-snapshot
+make test-duckdb-connectivity
+make test-duckdb-recovery
 make test-journal-capability
 make test-journal-recovery
 make test-journal-writer-lock
@@ -43,17 +45,21 @@ make test-production
 **4 GiB** container ceiling; current runs disable swap. Historical artifacts retain
 their original inspected limits. The [persisted snapshot profiles](PERSISTENCE.md)
 verify full two-million-row reopens and native file footprints, separately from
-the in-memory measurements below. [Native synchronous journal tests](JOURNAL.md)
+the in-memory measurements below. [DuckDB native live recovery](DUCKDB_RECOVERY.md)
+adds independent C++ Quack sessions, pinned TLS/authentication, two retained-volume
+SIGKILL cycles and a checkpoint under live read/write traffic.
+[Native synchronous journal tests](JOURNAL.md)
 add independent writers/readers through two retained-state process crashes.
 [Writer-exclusion tests](FENCING.md) use a labeled Linux volume and retain the
 host-share lock failure separately. Do not assume a host bind mount enforces locks.
 [Controlled torn-tail recovery](TAIL_RECOVERY.md) verifies native refusal, framing
 validation and repair of only a known synthetic trailer in a separate copy.
-`make test-production-recovery` runs the six recovery cases and creates its own
+`make test-production-recovery` runs two DuckDB gates plus the six Rayforce recovery cases and creates its own
 restore/repair source. The default `make test-production` adds the [interior
 payload-corruption probe](CORRUPTION.md) and currently returns nonzero: a valid
 one-bit edit replays one wrong ACK body. That finding remains failed; snapshot
-and ingestion targets remain separate.
+and ingestion targets remain separate. DuckDB's live profile does not imply that
+its unrun disk-loss or WAL-corruption cases passed.
 The [middle-header diagnostic](HEADER_CORRUPTION.md) also runs before that probe:
 startup rejects both edits, but blindly following its truncation hint on a
 disposable copy loses acknowledged rows. The guard rejects that unsafe repair.
@@ -388,11 +394,14 @@ single winner for all workloads; use the per-query measurements below.
 analytics-workload/
   native/{bridge.c,bridge.h}     # bounded numeric result adapter, engine ownership
   cpp/main.cpp                  # C++ workload, RAII, per-query CPU/latency
+  cpp/{ipc.cpp,aof.cpp,duckdb_quack.cpp} # native live sessions and event-log probes
   python/main.py                # Python workload, ctypes, per-query CPU/latency
   rust/{Cargo.toml,Cargo.lock,build.rs,src/main.rs}
   CMakeLists.txt
 docker/Dockerfile
 {docker-compose.yml,Makefile}
+docker-compose.duckdb-live.yml   # native TLS database + example-owned SQL apps
+{duckdb_live.py,duckdb_recovery.py,publish_duckdb_recovery.py,quack-sources.json}
 {prepare.py,experiment.py,test_controller.py,write_results.py,sources.json}
 BENCHMARK_RESULTS.json          # committed compact measured results
 .build/                         # ignored, verified source archives/build context
@@ -403,7 +412,10 @@ results/{data,plans,runs}/       # ignored inputs, oracle, raw evidence
 there are no source symlinks or dependencies on another example's generated files.
 Cleanup removes only the named Compose project and `rayforce-duckdb-analytics:dev`;
 all inputs and evidence remain local. Re-running `up` verifies hashes rather than
-silently overwriting inputs. No Docker volumes are created.
+silently overwriting inputs. Embedded runs create no persistent volumes; native
+Rayforce journal and DuckDB recovery cases own separately labeled Linux volumes.
+Teardown refuses while either native project still has containers, networks or
+volumes, so retained failed state cannot be hidden by image cleanup.
 
 ## Inspected upstream references
 

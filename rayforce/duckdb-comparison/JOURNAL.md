@@ -11,10 +11,14 @@ tests before teardown:
 ```sh
 make test-journal-capability  # native IPC/status/scalar replay gate
 make test-journal-recovery    # independent writer/reader through two SIGKILLs
-make test-production-recovery # six recovery cases with fresh restore/tail source
+make test-production-recovery # two DuckDB gates + six Rayforce recovery cases
 ```
 
-`test-production-recovery` runs six recovery cases including [controlled torn-tail recovery](TAIL_RECOVERY.md). The default `test-production` additionally runs [interior payload corruption](CORRUPTION.md), which currently fails integrity and exits nonzero. Individual targets remain available for independent reruns.
+`test-production-recovery` runs the two [DuckDB native recovery gates](DUCKDB_RECOVERY.md)
+and six Rayforce cases including [controlled torn-tail recovery](TAIL_RECOVERY.md).
+The default `test-production` additionally runs the header, payload and AOF
+corruption diagnostics; the documented integrity failures still exit nonzero.
+Individual targets remain available for independent reruns.
 
 `JOURNAL_BASELINE_S=10`, `JOURNAL_OUTAGE_S=5` and `JOURNAL_RECOVERY_S=15`
 are overridable; the second snapshot gets another baseline interval. These are

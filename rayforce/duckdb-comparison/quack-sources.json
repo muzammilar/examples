@@ -1,0 +1,39 @@
+{
+  "duckdb_version": "2.0.0",
+  "quack_source_commit": "f96420ed46",
+  "httpfs_source_commit": "77392a7207",
+  "quack_source_archive": {
+    "url": "https://codeload.github.com/duckdb/duckdb-quack/tar.gz/f96420ed46",
+    "sha256": "623563468a1d9c3d40e370134cd30fdef43e4acfa1998755934ebaec800990da"
+  },
+  "artifacts": {
+    "quack-linux_arm64.duckdb_extension.gz": {
+      "url": "https://extensions.duckdb.org/v2.0.0/linux_arm64/quack.duckdb_extension.gz",
+      "sha256": "9f7938a11eb9ff8026ccc9c6403ac4a9b1ba347f8c12ecd815f86eea09ed6005",
+      "uncompressed_sha256": "f3e30e7533f53e2b935ec29b59f87cb26ec3afaacb9880e9072426a6d16ced9e",
+      "uncompressed_bytes": 57207750,
+      "platform": "linux_arm64"
+    },
+    "quack-linux_amd64.duckdb_extension.gz": {
+      "url": "https://extensions.duckdb.org/v2.0.0/linux_amd64/quack.duckdb_extension.gz",
+      "sha256": "f9a5c0d2e0eef0f7546aba4579ab80d75d167cdf48830459faf67378ab2000fe",
+      "uncompressed_sha256": "9c893bd543ec2c5253d0c47d5614f90a1bfa1791c735dc6bbcea4e8bd3811a97",
+      "uncompressed_bytes": 59756486,
+      "platform": "linux_amd64"
+    },
+    "httpfs-linux_arm64.duckdb_extension.gz": {
+      "url": "https://extensions.duckdb.org/v2.0.0/linux_arm64/httpfs.duckdb_extension.gz",
+      "sha256": "f524888fc7d74cc0c6c4a8f7ed5beedac5b12e71cb426503f882c72ce6afbd43",
+      "uncompressed_sha256": "53f7aea1a0448ea62ef9b63f95da37c5766070084f14f14110e275e76382e7b2",
+      "uncompressed_bytes": 26476950,
+      "platform": "linux_arm64"
+    },
+    "httpfs-linux_amd64.duckdb_extension.gz": {
+      "url": "https://extensions.duckdb.org/v2.0.0/linux_amd64/httpfs.duckdb_extension.gz",
+      "sha256": "ee6c7d7e60a5da1b6f6bf6156b4298b55ddce0496a5bfe628bd6ab6d47eb8e3e",
+      "uncompressed_sha256": "77e6c429aa04f25da7962572f12b19113e0ce46080fa1365ad66017aadcdb68d",
+      "uncompressed_bytes": 26929718,
+      "platform": "linux_amd64"
+    }
+  }
+}

@@ -1,0 +1,68 @@
+name: duckdb-live-recovery
+services:
+  database:
+    image: rayforce-duckdb-analytics:dev
+    entrypoint: [/opt/bench/duckdb_quack]
+    command: [server, "${DUCKDB_LAB_TOKEN:-duckdb_recovery_example_token_2026}"]
+    user: "${LAB_UID:-10001}:${LAB_GID:-10001}"
+    environment: {HOME: /tmp}
+    cpus: 1
+    mem_limit: 4g
+    memswap_limit: 4g
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    tmpfs: [/tmp:size=512m]
+    stop_signal: SIGTERM
+    stop_grace_period: 15s
+    volumes:
+      - database-state:/state
+      - ./results/data:/data:ro
+    networks: [database]
+    depends_on:
+      init-volume: {condition: service_completed_successfully}
+    healthcheck:
+      test: [CMD, python, -c, "import socket; socket.create_connection(('127.0.0.1',9494),1).close()"]
+      interval: 5s
+      timeout: 2s
+      retries: 12
+      start_period: 30s
+  observer:
+    image: rayforce-duckdb-analytics:dev
+    entrypoint: [/opt/bench/duckdb_quack]
+    command: [client, "quack:database:9494", "${DUCKDB_LAB_TOKEN:-duckdb_recovery_example_token_2026}", "${DUCKDB_FINGERPRINT:-not-discovered}", "${DUCKDB_RPC_TIMEOUT_S:-3}"]
+    user: "${LAB_UID:-10001}:${LAB_GID:-10001}"
+    environment: {HOME: /tmp}
+    cpus: 1
+    mem_limit: 512m
+    memswap_limit: 512m
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    tmpfs: [/tmp:size=256m]
+    profiles: [tools]
+    networks: [database]
+  init-volume:
+    image: rayforce-duckdb-analytics:dev
+    user: "0:0"
+    entrypoint: [python, -c]
+    command:
+      - "import os,json,pathlib,resource; os.chmod('/state',0o700); os.chown('/state',int(os.environ['LAB_UID']),int(os.environ['LAB_GID'])); print(json.dumps({'peak_rss_bytes':resource.getrusage(resource.RUSAGE_SELF).ru_maxrss*1024,'cgroup':{p:pathlib.Path('/sys/fs/cgroup',p).read_text() for p in ('cpu.stat','memory.peak','io.stat')}}))"
+    environment:
+      LAB_UID: "${LAB_UID:?Set the example owner UID}"
+      LAB_GID: "${LAB_GID:?Set the example owner GID}"
+    cpus: 1
+    mem_limit: 512m
+    memswap_limit: 512m
+    network_mode: none
+    read_only: true
+    cap_drop: [ALL]
+    cap_add: [CHOWN]
+    security_opt: [no-new-privileges:true]
+    volumes: [database-state:/state]
+volumes:
+  database-state:
+    name: "${DUCKDB_VOLUME:?Set a unique example-owned volume}"
+networks:
+  database:
+    internal: true

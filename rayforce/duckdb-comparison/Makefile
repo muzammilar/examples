@@ -20,7 +20,7 @@ up:
 test: check-controls
 	python3 experiment.py test
 check-controls:
-	python3 -m unittest test_controller.py test_ingestion.py test_persistence.py test_live_journal.py test_journal_tail.py test_journal_corruption.py test_journal_header.py test_aof.py
+	python3 -m unittest test_controller.py test_ingestion.py test_persistence.py test_live_journal.py test_journal_tail.py test_journal_corruption.py test_journal_header.py test_aof.py test_duckdb_recovery.py
 benchmark:
 	python3 experiment.py benchmark
 down:
@@ -136,3 +136,16 @@ AOF_RESULT ?=
 report-aof:
 	@test -n "$(AOF_RESULT)" || { echo 'Set AOF_RESULT to an explicit AOF result directory'; exit 1; }
 	python3 publish_aof.py "$(AOF_RESULT)"
+
+.PHONY: test-duckdb-connectivity test-duckdb-recovery
+test-duckdb-connectivity: check-controls
+	python3 duckdb_live.py
+
+test-duckdb-recovery: check-controls
+	python3 duckdb_recovery.py
+
+DUCKDB_RECOVERY_RESULT ?=
+.PHONY: report-duckdb-recovery
+report-duckdb-recovery:
+	@test -n "$(DUCKDB_RECOVERY_RESULT)" || { echo 'Set DUCKDB_RECOVERY_RESULT to an explicit duckdb-live result directory'; exit 1; }
+	python3 publish_duckdb_recovery.py "$(DUCKDB_RECOVERY_RESULT)"

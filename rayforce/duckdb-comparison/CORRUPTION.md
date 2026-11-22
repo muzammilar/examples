@@ -21,7 +21,8 @@ make test-production
 
 The default production matrix includes this adversarial probe, the
 [middle-header diagnostic](HEADER_CORRUPTION.md) and [native AOF probes](AOF.md), and returns
-**nonzero on the measured build**. The six recovery cases run first; backup
+**nonzero on the measured build**. The six Rayforce recovery cases and two
+[DuckDB gates](DUCKDB_RECOVERY.md) run first; backup
 recovery inside this probe also finishes before its integrity failure is reported.
 The runner records both independent payload/AOF outcomes, then returns nonzero
 if either failed. The standalone Python probe exits **1**. Do not read the final error

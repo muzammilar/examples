@@ -17,7 +17,10 @@ import ingestion
 class NativeIPC:
     """One bounded native connection, no automatic replay of failed requests."""
 
-    def __init__(self, compose, env, name, log):
+    def __init__(self, compose, env, name, log, timeout=12):
+        if not 1 <= timeout <= 240:
+            raise ValueError("native IPC deadline outside 1..240 seconds")
+        self.timeout = timeout
         self.stderr = log.open("w")
         self.process = subprocess.Popen(
             compose + ["run", "--rm", "-T", "--no-deps", "--name", name, "observer"],
@@ -36,9 +39,9 @@ class NativeIPC:
         self.process.stdin.flush()
         with selectors.DefaultSelector() as selector:
             selector.register(self.process.stdout, selectors.EVENT_READ)
-            if not selector.select(12):
+            if not selector.select(self.timeout):
                 raise TimeoutError(
-                    "native IPC process did not answer within 12 seconds"
+                    f"native IPC process did not answer within {self.timeout} seconds"
                 )
         line = self.process.stdout.readline()
         fields = line.rstrip("\n").split("\t")

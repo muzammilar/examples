@@ -18,7 +18,13 @@ RUN case "$TARGETARCH" in arm64) march=armv8-a+simd ;; amd64) march=x86-64-v3 ;;
     make -C /opt/rayforce -j4 release CC=gcc RAY_MARCH=$march GIT_HASH=38fd4be RAY_VERSION=3.0.2
 COPY analytics-workload /workload
 RUN cmake -S /workload -B /build -DCMAKE_BUILD_TYPE=Release && cmake --build /build -j4 && \
-    mkdir -p /opt/bench && cp /build/libbench*.so /build/cpp_* /build/rayforce_ipc /build/rayforce_aof /opt/bench/
+    mkdir -p /opt/bench && cp /build/libbench*.so /build/cpp_* /build/rayforce_ipc /build/rayforce_aof /build/duckdb_quack /opt/bench/
+COPY quack-*.duckdb_extension.gz httpfs-*.duckdb_extension.gz /tmp/extensions/
+RUN extension_platform=$(LD_LIBRARY_PATH=/opt/duckdb/lib /build/duckdb_quack platform) && \
+    mkdir -p /opt/duckdb/extensions/v2.0.0/$extension_platform && \
+    for extension in httpfs quack; do \
+      gzip -dc /tmp/extensions/$extension-$extension_platform.duckdb_extension.gz > /opt/duckdb/extensions/v2.0.0/$extension_platform/$extension.duckdb_extension || exit 1; \
+    done && rm -rf /tmp/extensions
 WORKDIR /workload/rust
 RUN cargo fmt --check && \
     ENGINE=rayforce cargo build --locked --release && cp target/release/analytics-workload /opt/bench/rust_rayforce && \

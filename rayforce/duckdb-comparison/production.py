@@ -20,6 +20,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
     failed_diagnostics = []
     try:
+        command("duckdb_live.py")
+        command("duckdb_recovery.py")
         command("journal.py")
         command("filesystem_lock_check.py", "volume")
         subprocess.run(
@@ -41,6 +43,9 @@ if __name__ == "__main__":
                 except subprocess.CalledProcessError:
                     failed_diagnostics.append(arguments[0])
     finally:
+        from duckdb_live import require_empty
+
+        require_empty()
         for resource, flags in (
             ("ps", ["-aq"]),
             ("network", ["ls", "-q"]),

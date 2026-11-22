@@ -223,7 +223,7 @@ def publish(root):
         "sampled_native_file_bytes_max": disk_max,
         "scope": "One synchronous Rayforce declared-scenario correctness experiment, not a DuckDB comparison or capacity benchmark. Native checkpoint counters are observed lower bounds on full lifetime CPU/I/O costs and observed memory peaks. Checkpoint exec overhead is included. Phase sample intervals crossing phase/generation boundaries are excluded. Memory means are sample means. Network values are cumulative generation counters, not per-phase traffic. Missing I/O/device latency and physical host I/O remain unavailable.",
         "unrun": [
-            "equivalent DuckDB live adapter/recovery",
+            "repeated matched DuckDB/Rayforce recovery-performance trials",
             "asynchronous journal and explicit sync watermark",
             "interrupted snapshot publication",
             "torn tails and interior corruption",

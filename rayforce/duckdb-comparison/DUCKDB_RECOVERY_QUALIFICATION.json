@@ -1,0 +1,61 @@
+{
+  "utc": "2026-11-22",
+  "native_recovery_report": "DUCKDB_RECOVERY_RESULTS.json",
+  "final_connectivity_run": "results/duckdb-connectivity/cd04e6408e8e47cf8cea6b63e5899024",
+  "final_recovery_run": "results/duckdb-live/c1e70f9006f24798bf9871cc60df57c4",
+  "controller_tests_passed": 33,
+  "functional_engine_language_cases_passed": 6,
+  "negative_controls": {
+    "passed": 18,
+    "languages": 3,
+    "engines": 2,
+    "cases": [
+      "wrong expected result",
+      "engine query error",
+      "null result"
+    ]
+  },
+  "final_five_command_lifecycle": [
+    "make docker-up",
+    "make up",
+    "make test",
+    "make down",
+    "make docker-down"
+  ],
+  "final_lifecycle_regression_directory": "results/runs/dee0c65c533a4f3293b33bb5d7836f35",
+  "logs_sha256": {
+    "production-duckdb-and-rayforce.log": "c75e1e60d44f625a51ee6a0de7c0fc350b21d8186453f2c9c6b8ec7baf1eb717",
+    "duckdb-connectivity-final.log": "e8ce0b217010bce1460b0999f5879e81dcaedeb12580bc95ef21788c7a06a659",
+    "duckdb-live-final.log": "909dc8f10c2e28e970e69ddddd39ee9bf381fd11347af0f608fca3235883fa02",
+    "duckdb-final-lifecycle.log": "9fe81931835c722880ed0da0d452c053eadeb5449fbc7914f23cbc7650ac3acc",
+    "duckdb-quack-reviewed-build.log": "a67de64c24aca779fd984f6630aae47929e9ba1e5b1b7ab98f85927da090ebcd"
+  },
+  "cleanup": {
+    "owned_projects_empty": [
+      "duckdb-live-recovery",
+      "rayforce-duckdb-journal",
+      "rayforce-duckdb-comparison"
+    ],
+    "owned_image_absent": true,
+    "unrelated_containers_untouched": 9
+  },
+  "production": {
+    "workflow_cases": 11,
+    "make_exit_code": 2,
+    "strict_integrity_passed": false,
+    "failed_cases": [
+      "journal_corruption.py",
+      "aof.py"
+    ],
+    "rayforce_live_source": "results/journal-live/d80f1f3704134c86be1c36bfa2d3ec3e",
+    "rayforce_live_acknowledged": 2254,
+    "rayforce_writer_lock_source": "results/journal-live/2bb5066f5b0947fb8cd7e52dfb3b6bad",
+    "rayforce_lock_acknowledged": 1152,
+    "restore": "results/journal-restore/ee05c19b1d4f48a8a4ea92cac8fc0da8",
+    "tail": "results/journal-tail/e960b180d658486f82bf1e6c53765137",
+    "header_diagnostic": "results/journal-header/29f4ef4783ae4df3b2db5fdba83b1f5c",
+    "payload_failure": "results/journal-corruption/30c6a6b8ceb24a72a76f70b9f20eaab8",
+    "aof_failure": "results/aof/517a34946ebd4114a5dbd1b93770dcee",
+    "scope": "Suite completed before the final DuckDB-only tightening of phase gates and report metadata; both final DuckDB gates were rerun afterward. Prior corruption failures remain failed."
+  }
+}

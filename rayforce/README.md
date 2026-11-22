@@ -96,3 +96,11 @@ and commit-marker edits yield successful opens/scans missing **5,000 / 5,000 /
 compression, disk and native API timing are reported separately from buffered
 admission versus commit barriers. This is an application event-log API, not
 automatic database persistence; live AOF process-crash and rotation tests remain open.
+
+The matching [DuckDB live WAL profile](duckdb-comparison/DUCKDB_RECOVERY.md),
+qualified on 2026-11-22, uses native C++ Quack sessions with TLS and the same
+two-million-trade / 10,000-customer input. Both retained-volume crashes recovered
+all **2,364 ACK bodies**, with **zero loss/corruption**. Checkpointing keeps readers
+and writers active. CPU/memory, native codecs/archive compression, disk/block I/O
+and recovery observations are published. This is one functional observation,
+not a latency/capacity winner; native protocols and logged operations differ.

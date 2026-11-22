@@ -784,20 +784,29 @@ def main():
     )
     args = parser.parse_args()
     if args.action in {"down", "docker-down"}:
-        journal_containers = capture(
-            [
-                "docker",
-                "ps",
-                "-aq",
-                "--filter",
-                "label=com.docker.compose.project=rayforce-duckdb-journal",
-            ],
-            text=True,
-        ).strip()
-        if journal_containers:
-            raise RuntimeError(
-                "journal workloads remain; preserve their state and inspect before teardown"
-            )
+        for project in ("rayforce-duckdb-journal", "duckdb-live-recovery"):
+            for kind, flags in (
+                ("ps", ["-aq"]),
+                ("network", ["ls", "-q"]),
+                ("volume", ["ls", "-q"]),
+            ):
+                remaining = capture(
+                    [
+                        "docker",
+                        kind,
+                        *flags,
+                        "--filter",
+                        "label=com.docker.compose.project=" + project,
+                    ],
+                    text=True,
+                ).strip()
+                if remaining:
+                    raise RuntimeError(
+                        project
+                        + " "
+                        + kind
+                        + " resources remain; preserve state and inspect before teardown"
+                    )
     if args.action == "prepare":
         prepare()
     elif args.action in {"test", "benchmark"}:

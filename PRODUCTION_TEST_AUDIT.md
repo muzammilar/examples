@@ -15,6 +15,17 @@ execution evidence.
 
 ## Fresh qualification in this follow-up
 
+- [DuckDB native WAL recovery](rayforce/duckdb-comparison/DUCKDB_RECOVERY.md):
+  2026-11-22, two retained-volume SIGKILLs with independent C++ Quack writer/reader
+  sessions and checkpoint under load. Final strict-phase run verifies **2,000,000
+  seed trades, 10,000 customers and 2,364 live ACK bodies**, zero loss/corruption.
+  TLS wrong-token/wrong-pin controls, 33 host controls, six language/engine
+  correctness cases and 18 negative controls pass; five-command cleanup passes.
+  Full eleven-case production workflow completes with the two known Rayforce
+  payload/AOF integrity failures still nonzero. The final DuckDB rerun strengthens
+  healthy/outage assertions and temperature-separated reporting; it is a separate
+  recorded run. Resource/storage costs and gaps are explicit; no HA, device-loss,
+  capacity or comparative recovery-speed claim.
 - [Kafka enrichment](kafka/connect-postgres-enrichment/VERIFIED_RESULTS.json): on
   2026-11-21, fresh broker, active Connect worker, Go processor and PostgreSQL
   SIGKILL cases passed with **8,020,480 ACKs**, live independent source/output/SQL

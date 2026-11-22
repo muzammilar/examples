@@ -25,7 +25,8 @@ make test-aof-integrity
 The measured strict-integrity target returns **nonzero** after completing fault
 observations and intact-backup verification. The full `make test-production`
 also runs this profile. It records both independent payload/AOF failures before
-returning nonzero; the six-case `make test-production-recovery` stays separate.
+returning nonzero; `make test-production-recovery` runs the six Rayforce recovery
+cases plus the two [DuckDB gates](DUCKDB_RECOVERY.md), separately from corruption.
 
 The [C++20 application](analytics-workload/cpp/aof.cpp) calls the public native
 `ray_aof_open`, `append`, `commit`, `scan` and `close` APIs directly. CMake builds
