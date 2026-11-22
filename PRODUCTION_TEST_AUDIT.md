@@ -395,6 +395,17 @@ never reset a failed fixture to make a report pass. Run destructive cases serial
 
 ## Current testing pass and next work
 
+**Current goal priority (2026-11-22):** finish the in-flight DuckDB/ZFS recovery,
+ZFS repair-reader and Rust embedded qualification runs and preserve/publish their
+results. Then prioritize **Tigris, DuckDB and Iceberg-related projects** before
+unrelated systems. Focus on reproducible failure mechanisms, symptoms, data/service
+impact and demonstrated recovery: Tigris S3 application/network/commit failures
+and appropriate object-store comparisons; DuckDB recovery/archival boundaries;
+and Iceberg catalog/storage/compaction interruptions and safe archive handoffs.
+Keep unobservable provider-internal faults and unrun cases explicit. Independent
+functional cases may run in parallel within the verified combined resource budget;
+comparative benchmarks need isolated, matched conditions.
+
 The 2026-11-22 source inventory covers all **36 Makefiles in this recent cohort**;
 it is not a completed upstream/code review or a rerun of all systems. The detailed
 findings above remain the execution/gap record. The separate
@@ -413,7 +424,8 @@ candidates, outside this deployment count.
 This queue implements the [progressive passes](AGENTS.md#progressive-testing-across-systems):
 survey breadth first, establish missing correctness/recovery evidence, then deepen
 tests and compare stable configurations. No new live coverage is established by
-this inventory refresh. Do not start another lab while the active comparison runs.
+this inventory refresh. Isolate comparative measurements from other heavy jobs; parallel functional labs
+follow the resource and ownership rules in AGENTS.md.
 
 ## Declared-target inventory
 
