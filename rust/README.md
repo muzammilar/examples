@@ -18,5 +18,9 @@ engines are in-process libraries; do not invent native replication or cluster HA
 | [Fjall](https://github.com/fjall-rs/fjall) | LSM ingestion, atomic batches, prefix/range scans during compaction, durable kill/reopen | redb / RocksDB |
 | [redb](https://github.com/cberner/redb) | Transactional catalog updates, snapshot readers, writer contention and crash recovery | Fjall / SQLite |
 
-Documentation backlog only; these examples are deferred until the current
-StarRocks, Neon and GreptimeDB batch is finished.
+Documentation backlog only; implementation remains deferred until active
+experiments finish. Research does not start another lab or qualify runtime behavior.
+
+The [embedded database research pass](EMBEDDED_DATABASE_SURVEY.md) reviews pinned
+Fjall/redb/Turso releases, durability defaults, concurrency/experimental boundaries
+and the first correctness/recovery tests. It contains no executed results.

@@ -422,5 +422,9 @@ Plan and source links: [`observability/README.md`](observability/README.md), inc
 
 ## Rust embedded database backlog
 
+- [x] [Initial candidate research](rust/EMBEDDED_DATABASE_SURVEY.md): Fjall 3.1.13,
+  redb 5.0.0 and Turso 0.8.4 documentation and selected source paths reviewed;
+  sync/transaction, migration and experimental-feature boundaries recorded.
+  Research only: examples, runtime settings and all tests remain unverified.
 - [ ] Future `rust/embedded-databases` Cargo project: Fjall LSM ingestion/compaction and redb transactional catalogs, snapshot readers, kill/reopen recovery, matched durable commits and external ACK reconciliation; compare SQLite / RocksDB. In-process engines, not invented cluster deployments.
 - [ ] Qdrant extensions: existing single/cluster examples remain covered; add matched-corpus comparisons with Milvus / Weaviate / pgvector plus skew, shard relocation and permanent disk replacement after the current batch.
