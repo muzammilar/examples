@@ -10,6 +10,75 @@ import uuid
 from resources import Sampler
 
 
+RESULTS_ROOT = Path("/results")
+
+
+SOURCES = {
+    "table_refresh": "https://github.com/apache/iceberg/blob/apache-iceberg-1.10.1/spark/v4.0/spark/src/main/java/org/apache/iceberg/spark/Spark3Util.java#L665-L679",
+    "snapshot_scan": "https://iceberg.apache.org/javadoc/1.10.1/org/apache/iceberg/TableScan.html#useSnapshot(long)",
+    "time_travel": "https://iceberg.apache.org/docs/1.10.1/spark-queries/#time-travel-queries-with-sql",
+    "rewrite_options": "https://iceberg.apache.org/docs/1.10.1/spark-procedures/#general-options",
+    "s3_http_properties": "https://github.com/apache/iceberg/blob/apache-iceberg-1.10.1/aws/src/main/java/org/apache/iceberg/aws/HttpClientProperties.java#L85-L95",
+    "s3_http_timeout": "https://github.com/apache/iceberg/blob/apache-iceberg-1.10.1/aws/src/main/java/org/apache/iceberg/aws/ApacheHttpClientConfigurations.java#L49-L87",
+    "table_io_overrides": "https://github.com/apache/iceberg/blob/apache-iceberg-1.10.1/core/src/main/java/org/apache/iceberg/rest/RESTSessionCatalog.java#L914-L922",
+}
+
+
+def results_directory():
+    value = os.environ.get("COMPACTION_RESULTS_DIR", str(RESULTS_ROOT))
+    path = Path(value)
+    if not path.is_absolute() or os.path.normpath(value) != value:
+        raise ValueError(
+            "COMPACTION_RESULTS_DIR must be an absolute normalized path inside /results"
+        )
+    try:
+        path.relative_to(RESULTS_ROOT)
+        resolved = path.resolve(strict=True)
+        resolved.relative_to(RESULTS_ROOT.resolve(strict=True))
+    except (ValueError, OSError) as error:
+        raise ValueError(
+            "COMPACTION_RESULTS_DIR must be an existing directory inside /results"
+        ) from error
+    if not resolved.is_dir():
+        raise ValueError(
+            "COMPACTION_RESULTS_DIR must be an existing directory inside /results"
+        )
+    return resolved
+
+
+def boolean(name, default):
+    value = os.environ.get(name, "true" if default else "false")
+    if value not in ("true", "false"):
+        raise ValueError(name + " must be true or false")
+    return value == "true"
+
+
+def configuration():
+    endpoint = os.environ.get("COMPACTOR_S3_ENDPOINT", "http://storage:8333")
+    if endpoint not in ("http://storage:8333", "http://compaction-upload-gate:8333"):
+        raise ValueError("COMPACTOR_S3_ENDPOINT must be an allowed local lab service")
+    catalog = os.environ.get("CATALOG_URL", "http://storage:8181")
+    if catalog != "http://storage:8181":
+        raise ValueError("CATALOG_URL must be http://storage:8181")
+    return {
+        "live_writers": boolean("COMPACTION_LIVE_WRITERS", False),
+        "rewrite_manifests": boolean("REWRITE_MANIFESTS", True),
+        "s3_endpoint": endpoint,
+        "catalog_url": catalog,
+        "http_client_properties": {
+            "http-client.type": "apache",
+            "http-client.apache.socket-timeout-ms": "180000",
+        }
+        if endpoint == "http://compaction-upload-gate:8333"
+        else {},
+        "http_timeout_scope": "socket inactivity only, not a total operation/job deadline; unconfigured properties retain SDK defaults",
+        "rewrite_options": {
+            "partial-progress.enabled": "false",
+            "max-concurrent-file-group-rewrites": "1",
+        },
+    }
+
+
 def save_json(path, value, *, replace=False):
     """Unique fsynced reports; retain the established successful-result filename."""
     temporary = (
@@ -31,9 +100,10 @@ def save_json(path, value, *, replace=False):
 
 
 def build_spark():
+    config = configuration()
     from pyspark.sql import SparkSession
 
-    return (
+    builder = (
         SparkSession.builder.appName("iceberg-compaction")
         .config(
             "spark.sql.extensions",
@@ -43,7 +113,7 @@ def build_spark():
         .config("spark.sql.catalog.lake.type", "rest")
         .config(
             "spark.sql.catalog.lake.uri",
-            os.environ.get("CATALOG_URL", "http://storage:8181"),
+            config["catalog_url"],
         )
         .config("spark.sql.catalog.lake.warehouse", "warehouse")
         .config("spark.sql.catalog.lake.credential", "demo:demo")
@@ -53,65 +123,153 @@ def build_spark():
             "http://storage:8181/v1/oauth/tokens",
         )
         .config("spark.sql.catalog.lake.io-impl", "org.apache.iceberg.aws.s3.S3FileIO")
-        .config("spark.sql.catalog.lake.s3.endpoint", "http://storage:8333")
+        .config("spark.sql.catalog.lake.s3.endpoint", config["s3_endpoint"])
         .config("spark.sql.catalog.lake.s3.path-style-access", "true")
         .config("spark.sql.catalog.lake.s3.access-key-id", "demo")
         .config("spark.sql.catalog.lake.s3.secret-access-key", "demo")
         .config("spark.sql.shuffle.partitions", "2")
-        .getOrCreate()
     )
+    for name, value in config["http_client_properties"].items():
+        builder = builder.config("spark.sql.catalog.lake." + name, value)
+    return builder.getOrCreate()
 
 
-def metrics(spark, name):
-    files = (
-        spark.sql(
-            f"SELECT count(*) files, coalesce(sum(file_size_in_bytes),0) bytes, "
-            f"coalesce(min(file_size_in_bytes),0) min_bytes, coalesce(max(file_size_in_bytes),0) max_bytes "
-            f"FROM lake.{name}.files"
+def metrics(spark, name, *, effective_http=None):
+    # The catalog can cache TableOperations. Refresh once, then pin *both* scans;
+    # separate current refs/files/count queries can observe three different heads.
+    table = (
+        spark.sparkContext._jvm.org.apache.iceberg.spark.Spark3Util.loadIcebergTable(
+            spark._jsparkSession, "lake." + name
         )
-        .first()
-        .asDict()
     )
-    files["snapshot"] = spark.sql(
-        f"SELECT snapshot_id FROM lake.{name}.refs WHERE name='main'"
-    ).first()[0]
-    files["rows"] = spark.sql(f"SELECT count(*) FROM lake.{name}").first()[0]
-    return files
+    configured = configuration()["http_client_properties"]
+    observed = None
+    if configured:
+        # REST table config can override catalog properties. Inspect only these
+        # two nonsecret settings; never dump FileIO properties/credentials.
+        properties = table.io().properties()
+        observed = {key: properties.get(key) for key in configured}
+        if effective_http is not None:
+            effective_http.update(observed)
+        if observed != configured:
+            raise RuntimeError(
+                "effective gated S3 HTTP settings differ: " + repr(observed)
+            )
+    table.refresh()
+    snapshot = table.currentSnapshot()
+    if snapshot is None:
+        raise RuntimeError("compaction requires a table with a committed snapshot")
+    identifier = int(snapshot.snapshotId())
+    planned = table.newScan().useSnapshot(identifier).planFiles()
+    iterator, primary, membership = None, None, []
+    try:
+        iterator = planned.iterator()
+        while iterator.hasNext():
+            data = iterator.next().file()
+            location = str(data.location())
+            if not location.startswith("s3://warehouse/"):
+                raise ValueError("data file is outside the lab warehouse: " + location)
+            membership.append(
+                {
+                    "location": location,
+                    "bytes": int(data.fileSizeInBytes()),
+                    "records": int(data.recordCount()),
+                }
+            )
+    except BaseException as error:
+        primary = error
+    finally:
+        for resource in (iterator, planned):
+            if resource is not None:
+                try:
+                    resource.close()
+                except BaseException as error:
+                    if primary is None:
+                        primary = error
+                    elif hasattr(primary, "add_note"):
+                        primary.add_note("closing snapshot file scan: " + repr(error))
+    if primary is not None:
+        raise primary
+    sizes = [item["bytes"] for item in membership]
+    return {
+        "snapshot": identifier,
+        "snapshot_manifest_list": str(snapshot.manifestListLocation()),
+        "files": len(membership),
+        "bytes": sum(sizes),
+        "min_bytes": min(sizes, default=0),
+        "max_bytes": max(sizes, default=0),
+        "file_membership": sorted(membership, key=lambda item: item["location"]),
+        "file_scope": "data files in TableScan.useSnapshot(snapshot); excludes delete files",
+        "http_client_properties": observed,
+        "rows": snapshot_rows(spark, name, identifier),
+    }
+
+
+def snapshot_rows(spark, name, identifier):
+    return int(
+        spark.sql(
+            f"SELECT count(*) FROM lake.{name} VERSION AS OF {identifier}"
+        ).first()[0]
+    )
 
 
 def compact(spark, name, target, result):
+    config = configuration()
     result.update(
         table=name,
         target_file_bytes=target,
         spark_version=spark.version,
         iceberg_version="1.10.1",
-        before=metrics(spark, name),
+        configuration=config,
+        sources=SOURCES,
+        effective_http_client_properties={},
+    )
+    result["before"] = metrics(
+        spark, name, effective_http=result["effective_http_client_properties"]
     )
     start = time.monotonic()
     result["rewrite"] = [
         r.asDict()
         for r in spark.sql(
             f"CALL lake.system.rewrite_data_files(table => '{name}', strategy => 'binpack', "
-            f"options => map('target-file-size-bytes','{target}','min-input-files','2'))"
+            f"options => map('target-file-size-bytes','{target}','min-input-files','2',"
+            "'partial-progress.enabled','false','max-concurrent-file-group-rewrites','1'))"
         ).collect()
     ]
-    result["manifests"] = [
-        r.asDict()
-        for r in spark.sql(f"CALL lake.system.rewrite_manifests('{name}')").collect()
-    ]
+    result["data_rewrite_seconds"] = time.monotonic() - start
+    result["manifests"] = []
+    result["manifest_rewrite_seconds"] = None
+    if config["rewrite_manifests"]:
+        manifests_started = time.monotonic()
+        result["manifests"] = [
+            r.asDict()
+            for r in spark.sql(
+                f"CALL lake.system.rewrite_manifests('{name}')"
+            ).collect()
+        ]
+        result["manifest_rewrite_seconds"] = time.monotonic() - manifests_started
     result["seconds"] = time.monotonic() - start
     result["after"] = metrics(spark, name)
-    if result["before"]["rows"] != result["after"]["rows"]:
-        raise RuntimeError("compaction changed the row count")
     old = result["before"]["snapshot"]
-    result["retained_snapshot_rows"] = spark.sql(
-        f"SELECT count(*) FROM lake.{name} VERSION AS OF {old}"
-    ).first()[0]
+    result["retained_snapshot_rows"] = snapshot_rows(spark, name, old)
     if result["retained_snapshot_rows"] != result["before"]["rows"]:
         raise RuntimeError("retained snapshot changed")
+    result["row_count_check"] = {
+        "mode": "nondecreasing-with-live-appends"
+        if config["live_writers"]
+        else "exact",
+        "scope": "snapshot row counts only; independent acknowledged-body reconciliation is required",
+    }
+    before, after = result["before"]["rows"], result["after"]["rows"]
+    if after < before or (not config["live_writers"] and after != before):
+        raise RuntimeError(
+            "compaction changed the row count outside the declared writer mode"
+        )
 
 
-def run(output=Path("/results")):
+def run(output=None):
+    if output is None:
+        output = results_directory()
     identifier = str(uuid.uuid4())
     report_path = output / ("compaction-" + identifier + "-resources.json")
     samples_path = output / ("compaction-" + identifier + "-resources.jsonl")
@@ -151,7 +309,9 @@ def run(output=Path("/results")):
             raise ValueError("TABLE must be a simple namespace.table")
         if target < 1048576:
             raise ValueError("TARGET_FILE_BYTES must be at least 1 MiB")
-        report.update(table=name, target_file_bytes=target)
+        report.update(
+            table=name, target_file_bytes=target, configuration=configuration()
+        )
         report["phases"]["spark_startup_started_ns"] = time.time_ns()
         spark = build_spark()
         report["phases"]["spark_startup_completed_ns"] = time.time_ns()

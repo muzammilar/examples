@@ -81,6 +81,27 @@ actual Spark image and a fresh 2.1-million-row compaction. Historical results
 below do not include these new reports; this is not a rerun of this directory's
 complete failure-test matrix.
 
+The shared Spark worker now pins each file-membership and row-count observation
+to one native Iceberg snapshot, avoiding mixed-head metrics during concurrent
+appends. Quiescent jobs keep exact before/after row equality. An explicit
+`COMPACTION_LIVE_WRITERS=true` permits growth while still checking the original
+snapshot's row count; `REWRITE_MANIFESTS=false` isolates data-file maintenance.
+Separate invocations can use an existing directory below `/results` through
+`COMPACTION_RESULTS_DIR`. See the pinned
+[TableScan API](https://iceberg.apache.org/javadoc/1.10.1/org/apache/iceberg/TableScan.html#useSnapshot(long))
+and [time-travel semantics](https://iceberg.apache.org/docs/1.10.1/spark-queries/#time-travel-queries-with-sql).
+
+Qualification on 2026-11-22: **43 worker controls passed**, plus native 20,000-row
+quiescent checks and the multi-system live baseline. That baseline observed
+**2,410,000 → 2,630,000 rows**, **241 → 24 files** and
+**188,388,828 → 117,520,223 file bytes** while appenders ran. The worker retained
+the starting snapshot and completed in **11.162 s**; its sampled cgroup interval
+used **26.813 core-s**, with **887,955,456 bytes** lifetime peak charged memory.
+These are functional observations with concurrent appends, not a compression
+ratio or capacity benchmark. The subsequent multi-system crash case failed when
+its separately capped 1 GiB SeaweedFS process was OOM-killed; that failure does
+not qualify compactor recovery or rerun this directory's full archive matrix.
+
 ## Verified archive before TTL cleanup
 
 ```text
