@@ -271,6 +271,14 @@ idempotency-key reuse. Treat variations as explicit benchmark axes. Do not weake
 the declared contract after observing failures or compare weaker durability as if
 it provided the same guarantees.
 
+Settings readback does not prove effective protocol behavior. Inspect and exercise
+timeout, retry and cancellation overrides; separately time connection setup,
+execution/commit, fetching and error-path close. When claiming a deadline, test an
+isolated stalled response and measure the actual bound, using an external worker
+supervisor when native cancellation is insufficient. A deadline-terminated
+mutation remains ambiguous until its effects are reconciled; do not classify it
+as a known failed write merely because the caller stopped waiting.
+
 Verify each system's actual model. Snapshot isolation can permit write skew;
 serializable transactions must prevent it. Quorum overlap alone is not proof of
 linearizability. Eventual convergence and permitted stale reads must be measured
