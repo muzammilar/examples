@@ -5,12 +5,75 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
+from unittest import mock
 
+import control
 import mutable_oracle as oracle
+import mutable_benchmark as benchmark
+import mutable_benchmark_report as publisher
 import resources
 
 
 class MutableWitness(unittest.TestCase):
+    def test_teardown_preserves_unarchived_mutable_state(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "lab.json").write_text(json.dumps({"generation": "active"}))
+            case = root / "mutable" / "failed"
+            case.mkdir(parents=True)
+            (case / "config.json").write_text(json.dumps({"generation": "active"}))
+            with mock.patch.object(control, "RESULTS", root):
+                with self.assertRaisesRegex(RuntimeError, "verified archive"):
+                    control.verify_mutable_archives()
+
+    def test_publisher_rejects_short_and_duplicate_matrix(self):
+        config = {
+            "rows": 1000000,
+            "trials": 3,
+            "warmup_s": 60,
+            "duration_s": 300,
+            "diagnostic_only": False,
+            "workload_image": "pinned",
+        }
+        cells = [
+            {
+                "backend": b,
+                "concurrent": c,
+                "trial": t,
+                "passed": True,
+                "workload_image": "pinned",
+            }
+            for b in control.BACKENDS
+            for c in (False, True)
+            for t in range(1, 4)
+        ]
+        raw = {"config": config, "cells": cells, "complete": True, "finalized": True}
+        publisher.cohort_gate(raw)
+        config["duration_s"] = 10
+        with self.assertRaisesRegex(RuntimeError, "sustained"):
+            publisher.cohort_gate(raw)
+        config["duration_s"] = 300
+        cells[-1] = cells[0]
+        with self.assertRaisesRegex(RuntimeError, "duplicate"):
+            publisher.cohort_gate(raw)
+
+    def test_benchmark_rejects_wrong_fixture_and_out_of_window_disk_samples(self):
+        with self.assertRaisesRegex(RuntimeError, "retained fixture"):
+            benchmark.verify_fixture({"rows": 10000, "phase": "ready"}, 1000000)
+        with self.assertRaisesRegex(RuntimeError, "retained fixture"):
+            benchmark.verify_fixture({"rows": 1000000, "phase": "destroyed"}, 1000000)
+        sample = {
+            "started_ns": 10,
+            "ended_ns": 20,
+            "disk": {"native_io_captured_ns": 31},
+        }
+        self.assertEqual(benchmark.measured_samples([sample], 0, 30), [])
+        event = {"kind": "ok", "started_ns": 0, "ended_ns": 100, "elapsed_ns": 100}
+        result = benchmark.live_summary([event], 0, 1_001_000_000, 1)
+        self.assertEqual(result["ok"]["rate"], 1)
+        with self.assertRaisesRegex(RuntimeError, "clocks"):
+            benchmark.live_summary([event], 0, 1_100_000_000, 1)
+
     def test_native_io_records_operation_rates_and_rejects_incomplete_data(self):
         first = resources.parse_native_io("254:0 rbytes=100 wbytes=200 rios=1 wios=2\n")
         second = resources.parse_native_io(

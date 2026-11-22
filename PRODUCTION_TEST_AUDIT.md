@@ -16,6 +16,12 @@ execution evidence.
 ## Fresh qualification in this follow-up
 
 - [CedarDB/PostgreSQL mutable workload](cedardb/backup-recovery/MUTABLE.md):
+  newer million-row healthy/SIGKILL qualification verifies **2,972 ACKed
+  transactions**, zero acknowledged loss or wrong/partial rows, full seed/body/
+  receipt/history reconciliation, native controls and 23 host controls. Native
+  per-device IOPS now accompany byte counters. The failed prototype is externally
+  archived before verified fixture replacement; its failed verdict remains intact.
+  The sustained comparison is still pending. Earlier evidence follows:
   2026-11-22 checkpoint, four 10,000-row healthy/container-SIGKILL cases verify
   **3,036 ACKed paired UPDATE/DELETE-reinsert transactions**, zero acknowledged
   loss or wrong/partial rows. Native read-only/rollback controls, snapshot readers,

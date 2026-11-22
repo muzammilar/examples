@@ -16,6 +16,54 @@ from mutable_lab import MutableCase, sample_disk
 from resources import Recorder, summarize_records
 
 
+def verify_fixture(lab, requested_rows):
+    if lab["phase"] != "ready" or lab["rows"] != requested_rows:
+        raise RuntimeError(
+            "ROWS differs from the ready retained fixture; recreate it explicitly"
+        )
+
+
+def measured_samples(samples, start, end):
+    return [
+        sample
+        for sample in samples
+        if start <= sample["started_ns"]
+        and sample["ended_ns"] <= end
+        and start
+        <= sample.get("disk", {}).get("native_io_captured_ns", sample["ended_ns"])
+        <= end
+    ]
+
+
+def live_summary(events, start, end, seconds):
+    if seconds <= 0 or abs((end - start) / 1e9 - seconds) > 0.01:
+        raise RuntimeError(
+            "live-window UTC and monotonic clocks differ by more than 10ms"
+        )
+    summary = control.phase_summary(events, start, end)
+    for metrics in summary.values():
+        metrics["rate"] = metrics["count"] / seconds
+    return summary
+
+
+def verify_cohort(config):
+    lab = json.loads((control.RESULTS / "lab.json").read_text())
+    verify_fixture(lab, config["rows"])
+    if lab["generation"] != config["base_generation"]:
+        raise RuntimeError("base fixture generation changed during cohort")
+    for name, digest in config["source_sha256"].items():
+        if hashlib.sha256((control.ROOT / name).read_bytes()).hexdigest() != digest:
+            raise RuntimeError("runtime source changed during cohort: " + name)
+    current_image = json.loads(
+        control.run(["docker", "image", "inspect", "cedardb-recovery-orders:dev"])
+    )[0]["Id"]
+    if current_image != config["workload_image"]:
+        raise RuntimeError("workload image changed during cohort")
+    for backend, image in config["database_images"].items():
+        if control.container(backend)["Image"] != image:
+            raise RuntimeError("database image changed during cohort")
+
+
 def stop_database(backend, root, label):
     info = control.container(backend)
     if info["State"]["Running"]:
@@ -194,7 +242,7 @@ def cell(backend, concurrent, trial, warmup, duration, pairs):
         live = {}
         for role in case.actors:
             events = [e for e in case.events(role) if e.get("ended_ns", 0) <= end]
-            live[role] = control.phase_summary(events, start, end)
+            live[role] = live_summary(events, start, end, queries["measured_seconds"])
             total = sum(value["count"] for value in live[role].values())
             if (
                 live[role]["ok"]["count"] < 5
@@ -209,9 +257,7 @@ def cell(backend, concurrent, trial, warmup, duration, pairs):
             .read_text()
             .splitlines()
         ]
-        measured = summarize_records(
-            [s for s in samples if start <= s["started_ns"] and s["ended_ns"] <= end]
-        )
+        measured = summarize_records(measured_samples(samples, start, end))
         expected_roles = {backend, "analytics"} | (
             {"writer", "reader"} if concurrent else set()
         )
@@ -221,6 +267,22 @@ def cell(backend, concurrent, trial, warmup, duration, pairs):
             for v in measured.values()
         ):
             raise RuntimeError("required measured CPU/memory evidence is missing")
+        native_io = measured[backend]["io_and_network"]
+        if not all(
+            any(
+                k.startswith("native_block_")
+                and k.endswith(suffix)
+                and v["observed_seconds"] > 0
+                for k, v in native_io.items()
+            )
+            for suffix in (
+                "read_bytes",
+                "write_bytes",
+                "read_operations",
+                "write_operations",
+            )
+        ):
+            raise RuntimeError("measurement lacks native disk-byte/IOPS intervals")
         result = {
             "passed": False,
             "scenario_passed": True,
@@ -242,6 +304,7 @@ def cell(backend, concurrent, trial, warmup, duration, pairs):
             "workload_image": info["Image"],
             "warmup_s": warmup,
             "duration_s": duration,
+            "live_rate_clock": "Counts selected by UTC phase markers; rates use the analytical application's direct monotonic measurement interval, within a 10ms UTC guard",
             "scope": "Fixed aggregate invariants over actually updated/replaced rows; fresh database process/schema and warm queries, retained immutable base volumes, no OS-cold or saturation claim",
         }
         control.save(case.root / "benchmark-result.json", result)
@@ -307,6 +370,7 @@ def main():
     warmup = bounded_setting("ANALYTICS_WARMUP_S", 60, 0, 3600)
     duration = bounded_setting("ANALYTICS_DURATION_S", 300, 1, 3600)
     lab = json.loads((control.RESULTS / "lab.json").read_text())
+    verify_fixture(lab, int(control.ENV.get("ROWS", "1000000")))
     pairs = (
         bounded_setting(
             "MUTABLE_PAIRS",
@@ -320,6 +384,19 @@ def main():
     with (control.RESULTS / "controller.lock").open("a") as lock:
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
         control.owned_inventory()
+        input_proofs = {
+            backend: control.reconcile(backend) for backend in control.BACKENDS
+        }
+        if (
+            len(
+                {
+                    (p["seed_rows"], p["csv_sha256"], p["csv_bytes"])
+                    for p in input_proofs.values()
+                }
+            )
+            != 1
+        ):
+            raise RuntimeError("immutable base fixtures differ between backends")
         batch = control.RESULTS / "mutable-benchmark" / uuid.uuid4().hex
         config = {
             "created_ns": time.time_ns(),
@@ -327,10 +404,34 @@ def main():
             "warmup_s": warmup,
             "duration_s": duration,
             "rows": lab["rows"],
+            "input_fixture": input_proofs,
+            "host_hardware": control.run(
+                [
+                    "/usr/sbin/sysctl",
+                    "machdep.cpu.brand_string",
+                    "hw.memsize",
+                    "hw.physicalcpu",
+                    "hw.logicalcpu",
+                ]
+            )
+            if os.uname().sysname == "Darwin"
+            else {
+                "uname": list(os.uname()),
+                "cpuinfo": Path("/proc/cpuinfo").read_text(),
+            },
             "pairs": pairs,
             "rate": int(control.ENV.get("RATE", "50")),
             "diagnostic_only": trials < 3 or warmup < 60 or duration < 300,
             "base_generation": lab["generation"],
+            "workload_image": json.loads(
+                control.run(
+                    ["docker", "image", "inspect", "cedardb-recovery-orders:dev"]
+                )
+            )[0]["Id"],
+            "database_images": {
+                backend: control.container(backend)["Image"]
+                for backend in control.BACKENDS
+            },
             "source_sha256": {
                 str(p.relative_to(control.ROOT)): hashlib.sha256(
                     p.read_bytes()
@@ -369,10 +470,16 @@ def main():
             )
             for concurrent in (False, True) if trial % 2 == 0 else (True, False):
                 for backend in backends:
+                    verify_cohort(config)
                     print("Mutable cell:", trial + 1, backend, concurrent, flush=True)
                     results.append(
                         cell(backend, concurrent, trial + 1, warmup, duration, pairs)
                     )
+                    verify_cohort(config)
+                    if results[-1]["workload_image"] != config["workload_image"]:
+                        raise RuntimeError(
+                            "executed analytical image differs from cohort"
+                        )
                     control.save(
                         batch / "results.json",
                         {

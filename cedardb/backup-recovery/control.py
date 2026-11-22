@@ -804,6 +804,50 @@ def exercise(backend, action):
         raise
 
 
+def verify_mutable_archives():
+    """Destroy owned storage only after independent mutable witnesses are exported."""
+    import mutable_oracle
+
+    if not (RESULTS / "lab.json").exists():
+        return
+    generation = json.loads((RESULTS / "lab.json").read_text())["generation"]
+    checked = []
+    for path in sorted((RESULTS / "mutable").glob("*/config.json")):
+        config = json.loads(path.read_text())
+        if config["generation"] != generation:
+            continue
+        root = path.parent
+        archive = root / "pre-teardown-archive.json"
+        if not (root / "cleanup.json").exists() and not archive.exists():
+            raise RuntimeError(
+                "mutable state needs a verified archive before storage deletion: "
+                + root.name
+            )
+        prefix = "pre-teardown-" if archive.exists() else ""
+        proof = mutable_oracle.reconcile(
+            root / (prefix + "rows.csv"),
+            root / (prefix + "receipts.csv"),
+            root / "writer.jsonl",
+            config["rows"],
+            config["pairs"],
+        )
+        if archive.exists() and proof != json.loads(archive.read_text())["proof"]:
+            raise RuntimeError("mutable archive proof changed: " + root.name)
+        checked.append(
+            {
+                "identity": root.name,
+                "proof": proof,
+                "scope": "Final data/receipt/writer-witness preservation only; historical reader formats and failed verdicts are not requalified",
+                "failed_verdict_preserved": (root / "failure.json").exists()
+                or (root / "invalidated.json").exists(),
+            }
+        )
+    save(
+        RESULTS / "generations" / generation / "mutable-teardown-audit.json",
+        {"cases": checked},
+    )
+
+
 def setup():
     state = RESULTS / "lab.json"
     rows = int(ENV.get("ROWS", "1000000"))
@@ -982,6 +1026,7 @@ def main():
                 raise RuntimeError(
                     "failed histories require successful retained-data reconciliation before deleting database storage"
                 )
+            verify_mutable_archives()
             compose("--profile", "restore", "--profile", "tools", "down", "--volumes")
             # UUID restore volumes from failed cases remain explicit evidence.
             remaining = run(

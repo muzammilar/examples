@@ -12,8 +12,10 @@ Enterprise Edition feature), so there is no multi-node example.
 
 The [mutable workload extension](backup-recovery/MUTABLE.md) adds Go UPDATE and
 DELETE/reinsert transactions, independent snapshot readers and complete versioned
-body/receipt checks. Four **10,000-row** healthy/crash cases pass with zero ACK
-loss; the sustained million-row mutation comparison is still pending.
+body/receipt checks. Four **million-row** healthy/crash cases verify **2,972 ACKed
+transactions** with zero ACK loss or wrong/partial rows; the sustained mutation
+comparison is still pending. CPU, memory, compression, storage and native IOPS
+are recorded separately from the earlier 10,000-row checkpoint.
 
 ## Benchmark
 

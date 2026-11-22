@@ -5,6 +5,7 @@ TRIALS ?= 3
 ANALYTICS_WARMUP_S ?= 60
 ANALYTICS_DURATION_S ?= 300
 HTAP_RESULTS_DIR ?=
+MUTABLE_RESULTS_DIR ?=
 export ROWS RATE
 export TRIALS ANALYTICS_WARMUP_S ANALYTICS_DURATION_S
 .NOTPARALLEL:
@@ -31,7 +32,7 @@ report:
 benchmark-htap:
 	python3 htap.py
 
-.PHONY: test-mutable test-mutable-recovery test-mutable-benchmark benchmark-mutable
+.PHONY: test-mutable test-mutable-recovery test-mutable-benchmark benchmark-mutable report-mutable-benchmark
 test-mutable: check-controls
 	python3 mutable_lab.py
 test-mutable-recovery: check-controls
@@ -40,6 +41,9 @@ test-mutable-benchmark: check-controls
 	TRIALS=1 ANALYTICS_WARMUP_S=2 ANALYTICS_DURATION_S=10 python3 mutable_benchmark.py
 benchmark-mutable: check-controls
 	python3 mutable_benchmark.py
+report-mutable-benchmark:
+	@test -n "$(MUTABLE_RESULTS_DIR)" || { echo 'Set MUTABLE_RESULTS_DIR=results/mutable-benchmark/<run-id>'; exit 1; }
+	python3 mutable_benchmark_report.py "$(MUTABLE_RESULTS_DIR)"
 report-htap:
 	@test -n "$(HTAP_RESULTS_DIR)" || { echo 'Set HTAP_RESULTS_DIR=results/htap/<run-id> from the completed benchmark'; exit 1; }
 	python3 htap_report.py "$(HTAP_RESULTS_DIR)"

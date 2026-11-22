@@ -8,11 +8,12 @@ make test-mutable
 make test-mutable-recovery
 make test-mutable-benchmark  # four short harness checks, not performance qualification
 make benchmark-mutable     # full 3-trial, 60s-warmup / 300s-measurement matrix; pending
+make report-mutable-benchmark MUTABLE_RESULTS_DIR=results/mutable-benchmark/<run-id>
 ```
 
-**Current checkpoint: 10,000-row correctness and recovery are tested. The sustained
-million-row comparison has not run yet. No new performance winner is established.**
-The [result document](MUTABLE_RESULTS.json) records exact case IDs, source/image
+**Current checkpoint: million-row correctness and recovery are tested. The sustained
+comparison is pending. No new performance winner is established.**
+The earlier [10,000-row result document](MUTABLE_RESULTS.json) records case IDs, source/image
 hashes, full-body proofs, resources and preserved prototype failures. Existing
 [append-only HTAP results](HTAP.md) remain a separate million-row experiment.
 
@@ -20,8 +21,11 @@ hashes, full-body proofs, resources and preserved prototype failures. Existing
 
 The [backend contract](mutable-contract.json) defines one Go writer, an independent
 Go snapshot reader, and a Go analytical application, built/tested through the
-pinned Docker Go toolchain. No host application toolchain is required. Each
-database has **4 CPUs / 6 GiB**, each application **1 CPU / 512 MiB**, swap disabled.
+pinned Docker Go toolchain. No host application toolchain is required. This
+extension retains the existing Go/pgx workload and Python lifecycle/oracle tools
+to keep the protocol, witness and earlier recovery paths consistent; this is a
+continuation of that harness rather than a new language choice.
+Each database has **4 CPUs / 6 GiB**, each application **1 CPU / 512 MiB**, swap disabled.
 Performance cells activate one backend at a time. CedarDB CE `v2026-11-18` and
 PostgreSQL `17.6` retain the example's pinned image digests.
 
@@ -57,7 +61,44 @@ Defaults are **50 mutation transactions/s**, **20 snapshot reads/s**, and a
 deliberately cycle **8 pairs**. Arrival is ticker-paced closed loop; backpressure
 can drop ticks. Actual completions and failures are reported, not a capacity rate.
 
-## Executed checkpoint
+## Million-row functional qualification
+
+**2026-11-22, Apple M4 Pro / 48 GiB host RAM**, native ARM64 Docker VM, the same
+4-CPU / 6-GiB per-database limits and independently running applications described
+above. Fresh fixtures on both engines have identical verified original CSVs:
+**274,666,817 bytes**, SHA-256
+`8e3eb0cc5a03c0fb2c5c2d5a218895b779628c245af6394a3bdac8a13de70941`.
+That is an export size, not native storage or process memory. Each mutable case
+copies all **1,000,000 rows / 10,000 customers**, adds revisions and cycles eight
+two-row pairs. This small mutation window deliberately revisits bodies; the
+sustained benchmark instead defaults to 10,000 pairs.
+
+| Backend / case | Intents | ACKed transactions | Successful snapshots | ACK loss / wrong or partial rows |
+|---|---:|---:|---:|---:|---:|
+| CedarDB healthy | 600 | 600 | 239 | 0 / 0 |
+| PostgreSQL healthy | 605 | 605 | 242 | 0 / 0 |
+| CedarDB SIGKILL | 1,092 | 891 | 357 | 0 / 0 |
+| PostgreSQL SIGKILL | 1,100 | 876 | 350 | 0 / 0 |
+
+All **2,972 ACKed transactions**, complete million-row bodies/revisions, native
+receipts and all 100 analytical invariants pass. Both actors observe errors during
+the five-second outages and resume after retained-volume database recovery.
+Native read-only/rollback controls and **23 controller tests** pass. Fresh
+million-row driver controls also reject duplicate PKs and verify missing keys,
+followed by complete body readback. These remain single-process functional tests,
+not independent-host durability or recovery-performance comparisons.
+
+The [million-row evidence](MUTABLE_MILLION_RESULTS.json) retains case/source hashes,
+per-phase success/error latency, CPU/utilization, charged memory, native compression,
+export gzip costs, whole-store allocation, network and block-byte/IOPS counters.
+For the healthy cases, observed DB CPU is **31.068 / 28.427 core-s** and sampled
+charged-memory maxima **1,595.08 / 2,724.12 MiB**, CedarDB/PostgreSQL respectively.
+These intervals include setup and complete export/verification; crash-reset gaps
+are excluded. They are not sustained efficiency measurements. The full serial
+pipeline checks correctness and recovery before its short diagnostic and repeated
+performance matrix; only the sustained publisher can qualify that comparison.
+
+## Earlier 10,000-row checkpoint
 
 **2026-11-22, Apple M4 Pro, native ARM64 Docker VM.** Each independent case starts
 with **10,000 rows**, 10,000 customers, a 256-byte ASCII payload per row and no
@@ -127,6 +168,20 @@ schemas, alternating backend/condition order, 60 s warmup and at least 300 s per
 measurement. Base volumes and OS caches are retained; no OS-cold claim. A larger
 fixture requires verified teardown/recreation first; `up` refuses to overwrite a
 retained fixture with a different `ROWS` value.
+The benchmark also checks `ROWS` against the ready fixture; use `ROWS=10000`
+explicitly for an existing small fixture. It checks source hashes, base generation
+and application/database image IDs before and after each cell. Live operation
+rates use the analytical application's direct monotonic measurement duration;
+UTC markers select operations and samples, with a 10 ms clock discrepancy guard.
+Native I/O captures must themselves fall inside the phase. A short diagnostic,
+unfinished cohort, missing trial, changed input or failed witness cannot be
+published as sustained results.
+
+Mutation latency covers connection work (when needed) and the database transaction
+through commit/rollback handling, excluding the external intent/ACK fsyncs.
+Completion rates include that witness overhead and ticker backpressure. Statement
+and commit durations are retained separately; a four-body read is one composite
+read-only transaction, not four independently timed point reads.
 
 ## Preserved failure and limits
 
@@ -138,6 +193,13 @@ incorrectly marked its run passed despite failed UPDATEs; it is explicitly
 **INVALIDATED**, with raw state/history retained. Neither is used as passing
 qualification. Successful schemas are dropped only after verified external
 exports and stopped actors; failed schemas are retained.
+Before replacing the small fixture, the failed PostgreSQL schema was exported
+again and independently reconciled: all **10,000 seed bodies / 301 ACKed
+transactions** survived. The external archive retains its **FAILED** verdict.
+Teardown now requires verified body/receipt/writer-witness archives for every
+mutable case in the current generation; a failed schema needs an explicit fresh
+archive before its owned database volume can be deleted. Historical reader
+formats are preserved without being retroactively requalified.
 
 Still pending: the repeated million-row benchmark, multi-writer conflicts,
 arbitrary changing aggregate totals, permanent deletes, verified cold access,
@@ -152,3 +214,7 @@ Inspected references: [CedarDB transactions](https://cedardb.com/docs/references
 [simple-protocol encoding](https://github.com/jackc/pgx/blob/v5.7.6/values.go).
 CedarDB engine source is closed; the example inspects its public APIs/configuration
 and the available pinned driver/PostgreSQL source rather than claiming an engine-source audit.
+Native I/O interpretation follows the [kernel cgroup-v2 interface](https://www.kernel.org/doc/html/latest/admin-guide/cgroup-v2.html#io-interface-files)
+and [Linux 6.12's counter printer](https://github.com/torvalds/linux/blob/v6.12/block/blk-cgroup.c#L1071):
+an explicitly listed device without counters represents all-zero counters;
+an absent device or unavailable collection is not proof of zero traffic.
