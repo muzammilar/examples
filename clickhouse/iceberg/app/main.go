@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -402,12 +401,8 @@ func main() {
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Minute)
 	defer cancel()
-	if e := run(ctx, os.Args[1]); e != nil {
+	if e := measuredRun(ctx, os.Args[1], run); e != nil {
 		log.Print(e)
-		var injected injectedFailure
-		if errors.As(e, &injected) {
-			os.Exit(42)
-		}
-		os.Exit(1)
+		os.Exit(commandExitCode(e))
 	}
 }

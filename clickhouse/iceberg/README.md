@@ -67,6 +67,20 @@ Queriers use the catalog's committed metadata location, never the latest-looking
 JSON filename in an S3 listing. This is the baseline for the archival experiment,
 not a second nearly identical deployment.
 
+One-shot Go commands write unique `command-metrics-*.json` files before exit:
+application elapsed time, workload exit status, native process CPU/peak RSS and
+raw cgroup/process counters. Spark writes a unique resource report and sample
+JSONL covering Python, its JVM and container counters around startup, work and
+stop. Missing/empty device counters remain unavailable; syscall character bytes
+are not physical disk I/O. These reports survive Compose's `--rm`; server costs
+and full container lifetime require separate observations. The
+[multi-system qualification](../../iceberg/multi-system/RESOURCE_REPORT_RESULTS.json)
+ran both shared worker paths and five Spark jobs; all 22 workload tools retained
+reports. The corrected process-tick aggregation also passed 15 controls in the
+actual Spark image and a fresh 2.1-million-row compaction. Historical results
+below do not include these new reports; this is not a rerun of this directory's
+complete failure-test matrix.
+
 ## Verified archive before TTL cleanup
 
 ```text

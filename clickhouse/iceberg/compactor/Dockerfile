@@ -7,7 +7,7 @@ RUN echo '69ab79b02537e9a865556ded766137ecca33613ef72b6f94659174135614dc095556f3
  && chmod 644 /opt/spark/jars/iceberg-*.jar
 ARG LOCAL_UID=10001
 RUN if ! getent passwd "${LOCAL_UID}" >/dev/null; then useradd --no-create-home --uid "${LOCAL_UID}" lab; fi
-COPY compact.py /opt/lab/compact.py
+COPY compact.py resources.py /opt/lab/
 USER spark
 ENV SPARK_USER=lab HADOOP_USER_NAME=lab
 ENTRYPOINT ["/opt/spark/bin/spark-submit", "--master", "local[2]", "--driver-memory", "1g", "--conf", "spark.jars.ivy=/tmp/ivy", "--conf", "spark.driver.extraJavaOptions=-Duser.home=/tmp", "/opt/lab/compact.py"]
