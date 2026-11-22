@@ -1,0 +1,2567 @@
+{
+  "passed": true,
+  "published_at_utc": "2026-11-22T04:32:18.756067+00:00",
+  "publisher_sha256": "5632159aa7e6dcb7848cdeef1831eb0148cde8c2135ed4a7c7a78a6d646cd37e",
+  "hardware": {
+    "machdep.cpu.brand_string": "Apple M4 Pro",
+    "hw.memsize": "51539607552",
+    "hw.logicalcpu": "14",
+    "hw.model": "Mac16,7",
+    "captured_ns": 1795317931834500000,
+    "host_kernel": "25.5.0",
+    "host_architecture": "arm64",
+    "disk_class": "QEMU virtio on sparse QCOW2 files on shared Docker host; physical SSD model/IOPS cap unavailable",
+    "topology": "two local software-emulated Linux guests, no independent-host/AZ failure domains",
+    "co_tenancy": "Concurrent independent DuckDB/ZFS and Rust correctness lanes; no comparative capacity claim"
+  },
+  "native_versions": {
+    "source": "6.8.0-147-generic\nzfs-2.2.2-0ubuntu9.5\nzfs-kmod-2.2.2-0ubuntu9.5\nfio-3.36",
+    "target": "6.8.0-147-generic\nzfs-2.2.2-0ubuntu9.5\nzfs-kmod-2.2.2-0ubuntu9.5\nfio-3.36"
+  },
+  "effective_arc_observation": {
+    "source": {
+      "captured_ns": 1795319085893848623,
+      "module_arc_max": 268435456,
+      "arc": {
+        "c": 250305280,
+        "c_min": 47536896,
+        "c_max": 268435456,
+        "size": 199662504
+      }
+    },
+    "target": {
+      "captured_ns": 1795319089997417139,
+      "module_arc_max": 268435456,
+      "arc": {
+        "c": 47536896,
+        "c_min": 47536896,
+        "c_max": 268435456,
+        "size": 960
+      }
+    },
+    "scope": "Read-only in-flight effective ARC observation. Member-fault/rebuild tests do not reboot a guest; reboot persistence of ARC cap remains unqualified."
+  },
+  "effective_limits_observation": {
+    "captured_ns": 1795321237297239000,
+    "roles": [
+      {
+        "role": "runner",
+        "id": "03df7ef75b72909c23c092ebad29de3f1a1b57e7aa5390b1142f87658941941f",
+        "image_id": "sha256:14e731d82e0ed531694e75feccdf368a6424da21ec0b161f7e7a14e685af061f",
+        "started_at": "2026-11-22T04:17:20.2332038Z",
+        "restart_count": 0,
+        "oom_killed": false,
+        "cpus": 1.0,
+        "memory_limit_bytes": 268435456,
+        "memory_plus_swap_limit_bytes": 536870912,
+        "native_cgroup": {
+          "cpu.max": "100000 100000\n",
+          "memory.max": "268435456\n",
+          "memory.swap.max": "268435456\n",
+          "memory.swap.current": "0\n",
+          "memory.swap.peak": "0\n",
+          "memory.events": "low 0\nhigh 0\nmax 10680\noom 0\noom_kill 0\noom_group_kill 0\n"
+        }
+      },
+      {
+        "role": "target",
+        "id": "7483af3b950c65f9c8954ca0b5569ada658c44cb1e4b263b7887c12d6a61167e",
+        "image_id": "sha256:c987448b0f1995eab59b18561403b162809d963837f4b58d2d77728802ee3684",
+        "started_at": "2026-11-22T03:31:28.020714595Z",
+        "restart_count": 0,
+        "oom_killed": false,
+        "cpus": 2.0,
+        "memory_limit_bytes": 3221225472,
+        "memory_plus_swap_limit_bytes": 3221225472,
+        "native_cgroup": {
+          "cpu.max": "200000 100000\n",
+          "memory.max": "3221225472\n",
+          "memory.swap.max": "0\n",
+          "memory.swap.current": "0\n",
+          "memory.swap.peak": "0\n",
+          "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n"
+        }
+      },
+      {
+        "role": "source",
+        "id": "b745212644d3955dc2b7b1f60fba826aa4060d7068297cebb4793040789d7e7e",
+        "image_id": "sha256:c987448b0f1995eab59b18561403b162809d963837f4b58d2d77728802ee3684",
+        "started_at": "2026-11-22T03:23:55.745354094Z",
+        "restart_count": 0,
+        "oom_killed": false,
+        "cpus": 2.0,
+        "memory_limit_bytes": 3221225472,
+        "memory_plus_swap_limit_bytes": 3221225472,
+        "native_cgroup": {
+          "cpu.max": "200000 100000\n",
+          "memory.max": "3221225472\n",
+          "memory.swap.max": "0\n",
+          "memory.swap.current": "0\n",
+          "memory.swap.peak": "0\n",
+          "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n"
+        }
+      }
+    ],
+    "scope": "Selected healthy native Docker/cgroup observations during guarded final archival, not a replacement for phase samples. Startup and one-shot process generations recorded separately in run artifacts."
+  },
+  "network_lifetime_observation": {
+    "roles": {
+      "source": {
+        "rx_bytes": 2504952536,
+        "tx_bytes": 3179704295,
+        "rx_packets": 819818,
+        "tx_packets": 2218625
+      },
+      "target": {
+        "rx_bytes": 631553079,
+        "tx_bytes": 1874018,
+        "rx_packets": 20374,
+        "tx_packets": 23254
+      }
+    },
+    "scope": "Docker eth0 lifetime counters since guest container creation, including bootstrap, both qualification attempts, native archive/control SSH and health checks. Not a per-phase/client-only rate; removed one-shot runner network counters unavailable."
+  },
+  "post_promotion_fencing": {
+    "captured_ns": 1795320984544480000,
+    "scope": "Independent healthy native listings after promotion and before teardown. Source pool is absent; target owns the imported pool. Administrative export, not quorum-enforced or power fencing.",
+    "source": {
+      "exit_code": 0,
+      "pools": [],
+      "stderr": ""
+    },
+    "target": {
+      "exit_code": 0,
+      "pools": [
+        "zfslab"
+      ],
+      "stderr": ""
+    }
+  },
+  "post_cleanup": {
+    "captured_ns": 1795321532776623000,
+    "healthy_runtime_lists": {
+      "containers": [],
+      "volumes": [],
+      "networks": [],
+      "image_tag": []
+    }
+  },
+  "controller_exclusion": {
+    "captured_ns": 1795321434510688000,
+    "native_independent_host_process_exclusion_passed": true,
+    "child": {
+      "exclusive": false,
+      "errno": 35,
+      "device": 16777232,
+      "inode": 136794405
+    },
+    "scope": "Controlled independent host-process test against the actual state/controller.lock file. Does not claim cross-container/NFS locking. Earlier after-teardown status attempt remains explicitly inconclusive."
+  },
+  "auxiliary_inconclusive_attempt": {
+    "qualification_operation": false,
+    "result": "inconclusive",
+    "reason": "The teardown handle completed before this auxiliary status/exclusion probe ran. The probe acquired the now-free host lock then failed at a read-only Docker listing because the filesystem sandbox blocked socket access. No Docker mutation occurred; original controller-exclusion.json and empty run directory retained here for provenance.",
+    "preserved_empty_run": "f2437d092d5548d39d5013f8bc9462c2"
+  },
+  "earlier_failed_attempt": {
+    "results_directory": "results/continuous-20261122",
+    "original_target_passed": false,
+    "mirror_case_passed": true,
+    "mirror_case": "233bb1b1bfd54b0d9c65bf5ec36d9c8f",
+    "failure": "Native archive checker incorrectly required balanced BEGIN/END counts for recursive compound package; source stayed fenced and intact. Retained stream rechecked against pinned source semantics and actual native output.",
+    "archive_revalidation": "results/continuous-20261122/pool-archives/2b48b602218a41de89d5fa916a29662f/revalidated.json",
+    "reuse": "Same already-provisioned owned guests and native versions; new independent full serial qualification, no reboot or hidden failed-case reset. Native archive guard must pass before any pool recycling.",
+    "created_ns": 1795319744489113000
+  },
+  "cases": [
+    {
+      "id": "943411366b4c4f96a0d76b5dab3c6a8c",
+      "config": {
+        "layout": "raidz2",
+        "data_mib": 512,
+        "write_mib_s": 4,
+        "seed": 20261114,
+        "created_ns": 1795320279887205170,
+        "scope": "Independent immutable reads with native fio writes under member faults and resilver. TCG/shared-host diagnostic, not capacity."
+      },
+      "immutable_ack": {
+        "bytes": 67108864,
+        "sha256": "bce36161850980e7c63aace6c8c76bb9117cee24827e28c8d0783bfd8c81df50"
+      },
+      "controller_tagged_read_summary": {
+        "after-scrub": {
+          "ok": 4,
+          "fail": 0,
+          "mismatch": 0,
+          "mean_ms": 723.574654,
+          "p50_ms": 722.07755,
+          "p99_ms": 812.21821,
+          "scope": "Complete 64 MiB SHA256 read, including hashing; shared guest monotonic clock bounds native-action overlap. Small-sample p99 is effectively maximum."
+        },
+        "baseline": {
+          "ok": 25,
+          "fail": 0,
+          "mismatch": 0,
+          "mean_ms": 1277.37547608,
+          "p50_ms": 1167.736615,
+          "p99_ms": 2266.082273,
+          "scope": "Complete 64 MiB SHA256 read, including hashing; shared guest monotonic clock bounds native-action overlap. Small-sample p99 is effectively maximum."
+        },
+        "degraded": {
+          "ok": 7,
+          "fail": 0,
+          "mismatch": 0,
+          "mean_ms": 924.8617802857143,
+          "p50_ms": 936.556009,
+          "p99_ms": 1186.978366,
+          "scope": "Complete 64 MiB SHA256 read, including hashing; shared guest monotonic clock bounds native-action overlap. Small-sample p99 is effectively maximum."
+        },
+        "repaired": {
+          "ok": 79,
+          "fail": 0,
+          "mismatch": 0,
+          "mean_ms": 754.823343164557,
+          "p50_ms": 683.03528,
+          "p99_ms": 1449.866108,
+          "scope": "Complete 64 MiB SHA256 read, including hashing; shared guest monotonic clock bounds native-action overlap. Small-sample p99 is effectively maximum."
+        },
+        "replacement": {
+          "ok": 35,
+          "fail": 0,
+          "mismatch": 0,
+          "mean_ms": 1335.2803301714287,
+          "p50_ms": 1283.888354,
+          "p99_ms": 2419.312599,
+          "scope": "Complete 64 MiB SHA256 read, including hashing; shared guest monotonic clock bounds native-action overlap. Small-sample p99 is effectively maximum."
+        }
+      },
+      "native_read_phase_summary": {
+        "after-scrub": {
+          "ok": 11,
+          "fail": 0,
+          "mismatch": 0,
+          "mean_ms": 751.0883355454546,
+          "p50_ms": 746.71763,
+          "p99_ms": 1058.194172,
+          "scope": "Complete 64 MiB SHA256 read, including hashing; shared guest monotonic clock bounds native-action overlap. Small-sample p99 is effectively maximum.",
+          "native_started_monotonic_ns": 2621167512734,
+          "native_ended_monotonic_ns": null
+        },
+        "baseline": {
+          "ok": 11,
+          "fail": 0,
+          "mismatch": 0,
+          "mean_ms": 1229.0216865454545,
+          "p50_ms": 1099.158787,
+          "p99_ms": 2153.781618,
+          "scope": "Complete 64 MiB SHA256 read, including hashing; shared guest monotonic clock bounds native-action overlap. Small-sample p99 is effectively maximum.",
+          "native_started_monotonic_ns": null,
+          "native_ended_monotonic_ns": 2467062656078
+        },
+        "degraded": {
+          "ok": 19,
+          "fail": 0,
+          "mismatch": 0,
+          "mean_ms": 1152.3138431052632,
+          "p50_ms": 1035.727499,
+          "p99_ms": 2266.082273,
+          "scope": "Complete 64 MiB SHA256 read, including hashing; shared guest monotonic clock bounds native-action overlap. Small-sample p99 is effectively maximum.",
+          "native_started_monotonic_ns": 2476816948595,
+          "native_ended_monotonic_ns": 2503521307972
+        },
+        "fault-injection": {
+          "ok": 6,
+          "fail": 0,
+          "mismatch": 0,
+          "mean_ms": 1265.2990493333334,
+          "p50_ms": 1417.7420075,
+          "p99_ms": 1545.84268,
+          "scope": "Complete 64 MiB SHA256 read, including hashing; shared guest monotonic clock bounds native-action overlap. Small-sample p99 is effectively maximum.",
+          "native_started_monotonic_ns": 2467062656078,
+          "native_ended_monotonic_ns": 2476816948595
+        },
+        "post-replacement-verification": {
+          "ok": 61,
+          "fail": 0,
+          "mismatch": 0,
+          "mean_ms": 752.7504496885246,
+          "p50_ms": 672.114243,
+          "p99_ms": 1449.866108,
+          "scope": "Complete 64 MiB SHA256 read, including hashing; shared guest monotonic clock bounds native-action overlap. Small-sample p99 is effectively maximum.",
+          "native_started_monotonic_ns": 2547985648740,
+          "native_ended_monotonic_ns": 2607649576810
+        },
+        "replacement-workflow": {
+          "ok": 26,
+          "fail": 0,
+          "mismatch": 0,
+          "mean_ms": 1424.0891568846155,
+          "p50_ms": 1380.1740340000001,
+          "p99_ms": 2419.312599,
+          "scope": "Complete 64 MiB SHA256 read, including hashing; shared guest monotonic clock bounds native-action overlap. Small-sample p99 is effectively maximum.",
+          "native_started_monotonic_ns": 2503521307972,
+          "native_ended_monotonic_ns": 2547985648740
+        },
+        "scrub": {
+          "ok": 12,
+          "fail": 0,
+          "mismatch": 0,
+          "mean_ms": 829.6820405833333,
+          "p50_ms": 825.804549,
+          "p99_ms": 1100.064561,
+          "scope": "Complete 64 MiB SHA256 read, including hashing; shared guest monotonic clock bounds native-action overlap. Small-sample p99 is effectively maximum.",
+          "native_started_monotonic_ns": 2607649576810,
+          "native_ended_monotonic_ns": 2621167512734
+        },
+        "spans-transition": {
+          "ok": 6,
+          "fail": 0,
+          "mismatch": 0,
+          "mean_ms": 937.4031273333334,
+          "p50_ms": 995.9598995,
+          "p99_ms": 1139.841234,
+          "scope": "Complete 64 MiB SHA256 read, including hashing; shared guest monotonic clock bounds native-action overlap. Small-sample p99 is effectively maximum."
+        }
+      },
+      "read_phase_scope": "Canonical phases derived from same-guest native-command monotonic intervals. Reads spanning transitions remain separately counted; controller tags can lag native changes. Resource phase brackets additionally include SSH/controller overhead.",
+      "successful_immutable_reads": 152,
+      "native_replacement_intervals": [
+        {
+          "started_ns": 1795320349082702084,
+          "ended_ns": 1795320366198936198,
+          "started_monotonic_ns": 2503521307972,
+          "ended_monotonic_ns": 2520637534870,
+          "command": [
+            "zpool",
+            "replace",
+            "-w",
+            "zfslab",
+            "/dev/disk/by-id/virtio-zfslab-d0",
+            "/dev/disk/by-id/virtio-zfslab-d4"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "controller_started_ns": 1795320343421977797,
+          "controller_ended_ns": 1795320366557066627
+        },
+        {
+          "started_ns": 1795320373024733671,
+          "ended_ns": 1795320393547047108,
+          "started_monotonic_ns": 2527463336375,
+          "ended_monotonic_ns": 2547985648740,
+          "command": [
+            "zpool",
+            "replace",
+            "-w",
+            "zfslab",
+            "/dev/disk/by-id/virtio-zfslab-d1",
+            "/dev/disk/by-id/virtio-zfslab-d5"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "controller_started_ns": 1795320366558220460,
+          "controller_ended_ns": 1795320393875373376
+        }
+      ],
+      "replacement_seconds_including_controller": 50.45512027299992,
+      "scrub_seconds_including_controller": 18.678801050000402,
+      "payload_file": {
+        "bytes": 536870912,
+        "sha256": "006377eced6b66dda53673db88d923c3e1568acc4581121c45a30fed17466f08"
+      },
+      "verified_payload_bytes": 536870912,
+      "fio_write": {
+        "bytes": 536870912,
+        "operations": 4096,
+        "iops": 31.999,
+        "runtime_ms": 128004,
+        "completion_latency_ns": {
+          "min": 458500,
+          "max": 56797683,
+          "mean": 2328823.359619,
+          "stddev": 3081454.090886,
+          "N": 4096,
+          "percentile": {
+            "1.000000": 643072,
+            "5.000000": 733184,
+            "10.000000": 774144,
+            "20.000000": 847872,
+            "30.000000": 905216,
+            "40.000000": 978944,
+            "50.000000": 1056768,
+            "60.000000": 1155072,
+            "70.000000": 1613824,
+            "80.000000": 3457024,
+            "90.000000": 5472256,
+            "95.000000": 7897088,
+            "99.000000": 13959168,
+            "99.500000": 17432576,
+            "99.900000": 30015488,
+            "99.950000": 36962304,
+            "99.990000": 56885248
+          }
+        },
+        "fsync": {
+          "total_ios": 511,
+          "lat_ns": {
+            "min": 21545435,
+            "max": 235723578,
+            "mean": 41823394.199609,
+            "stddev": 17822637.849461,
+            "N": 511,
+            "percentile": {
+              "1.000000": 23461888,
+              "5.000000": 24772608,
+              "10.000000": 26869760,
+              "20.000000": 29229056,
+              "30.000000": 31588352,
+              "40.000000": 34865152,
+              "50.000000": 38010880,
+              "60.000000": 41156608,
+              "70.000000": 44826624,
+              "80.000000": 50593792,
+              "90.000000": 59506688,
+              "95.000000": 69730304,
+              "99.000000": 108527616,
+              "99.500000": 114819072,
+              "99.900000": 235929600,
+              "99.950000": 235929600,
+              "99.990000": 235929600
+            }
+          }
+        },
+        "job_user_cpu_percent": 14.309709,
+        "job_system_cpu_percent": 6.424799,
+        "scope": "Native fio job over entire fault/verification workload. Buffered write completion is not individual durable commit; fsync statistics separate. No per-phase write latency history or per-flush external ACK journal. Diagnostic, not capacity."
+      },
+      "fio_verification_read": {
+        "bytes": 536870912,
+        "operations": 4096,
+        "iops": 442.04619,
+        "runtime_ms": 9266,
+        "completion_latency_ns": {
+          "min": 286515,
+          "max": 58232718,
+          "mean": 1995319.416504,
+          "stddev": 1641640.345855,
+          "N": 4096,
+          "percentile": {
+            "1.000000": 305152,
+            "5.000000": 346112,
+            "10.000000": 378880,
+            "20.000000": 485376,
+            "30.000000": 1499136,
+            "40.000000": 1777664,
+            "50.000000": 1957888,
+            "60.000000": 2244608,
+            "70.000000": 2473984,
+            "80.000000": 2768896,
+            "90.000000": 3260416,
+            "95.000000": 3751936,
+            "99.000000": 6651904,
+            "99.500000": 8978432,
+            "99.900000": 15532032,
+            "99.950000": 17956864,
+            "99.990000": 58458112
+          }
+        },
+        "fsync": {
+          "total_ios": 0,
+          "lat_ns": {
+            "min": 3816503906,
+            "max": 4659113798,
+            "mean": 4270179352.399219,
+            "stddev": 263604618.735787,
+            "N": 511,
+            "percentile": {
+              "1.000000": 3808428032,
+              "5.000000": 3841982464,
+              "10.000000": 3909091328,
+              "20.000000": 3976200192,
+              "30.000000": 4043309056,
+              "40.000000": 4244635648,
+              "50.000000": 4328521728,
+              "60.000000": 4395630592,
+              "70.000000": 4462739456,
+              "80.000000": 4529848320,
+              "90.000000": 4596957184,
+              "95.000000": 4596957184,
+              "99.000000": 4664066048,
+              "99.500000": 4664066048,
+              "99.900000": 4664066048,
+              "99.950000": 4664066048,
+              "99.990000": 4664066048
+            }
+          }
+        },
+        "job_user_cpu_percent": 8.205873,
+        "job_system_cpu_percent": 63.650964,
+        "scope": "Native fio job over entire fault/verification workload. Buffered write completion is not individual durable commit; fsync statistics separate. No per-phase write latency history or per-flush external ACK journal. Diagnostic, not capacity."
+      },
+      "bytes_progressed_while_degraded": 10616832,
+      "faulted_members": 2,
+      "before": {
+        "size_bytes": 68182605824,
+        "allocated_bytes": 2064384,
+        "free_bytes": 68180541440,
+        "health": "ONLINE",
+        "status": "pool: zfslab\n state: ONLINE\nconfig:\n\n\tNAME                                        STATE     READ WRITE CKSUM\n\tzfslab                                      ONLINE       0     0     0\n\t  raidz2-0                                  ONLINE       0     0     0\n\t    /dev/disk/by-id/virtio-zfslab-d0-part1  ONLINE       0     0     0\n\t    /dev/disk/by-id/virtio-zfslab-d1-part1  ONLINE       0     0     0\n\t    /dev/disk/by-id/virtio-zfslab-d2-part1  ONLINE       0     0     0\n\t    /dev/disk/by-id/virtio-zfslab-d3-part1  ONLINE       0     0     0\n\nerrors: No known data errors"
+      },
+      "degraded": {
+        "size_bytes": 68182605824,
+        "allocated_bytes": 309755904,
+        "free_bytes": 67872849920,
+        "health": "DEGRADED",
+        "status": "pool: zfslab\n state: DEGRADED\nstatus: One or more devices are faulted in response to persistent errors.\n\tSufficient replicas exist for the pool to continue functioning in a\n\tdegraded state.\naction: Replace the faulted device, or use 'zpool clear' to mark the device\n\trepaired.\nconfig:\n\n\tNAME                                        STATE     READ WRITE CKSUM\n\tzfslab                                      DEGRADED     0     0     0\n\t  raidz2-0                                  DEGRADED     0     0     0\n\t    /dev/disk/by-id/virtio-zfslab-d0-part1  FAULTED      0     0     0  external device fault\n\t    /dev/disk/by-id/virtio-zfslab-d1-part1  FAULTED      0     0     0  external device fault\n\t    /dev/disk/by-id/virtio-zfslab-d2-part1  ONLINE       0     0     0\n\t    /dev/disk/by-id/virtio-zfslab-d3-part1  ONLINE       0     0     0\n\nerrors: No known data errors"
+      },
+      "after": {
+        "size_bytes": 68182605824,
+        "allocated_bytes": 1250131968,
+        "free_bytes": 66932473856,
+        "health": "ONLINE",
+        "status": "pool: zfslab\n state: ONLINE\n  scan: scrub repaired 0B in 00:00:13 with 0 errors on Sun Nov 22 04:07:46 2026\nconfig:\n\n\tNAME                                        STATE     READ WRITE CKSUM\n\tzfslab                                      ONLINE       0     0     0\n\t  raidz2-0                                  ONLINE       0     0     0\n\t    /dev/disk/by-id/virtio-zfslab-d4-part1  ONLINE       0     0     0\n\t    /dev/disk/by-id/virtio-zfslab-d5-part1  ONLINE       0     0     0\n\t    /dev/disk/by-id/virtio-zfslab-d2-part1  ONLINE       0     0     0\n\t    /dev/disk/by-id/virtio-zfslab-d3-part1  ONLINE       0     0     0\n\nerrors: No known data errors"
+      },
+      "compression": "zfslab\tused\t605026752\nzfslab\tlogicalused\t604319744\nzfslab\tcompressratio\t1.00\nzfslab/data\tused\t603973248\nzfslab/data\tlogicalused\t604199936\nzfslab/data\tcompressratio\t1.00",
+      "raw_result_sha256": "cc0b31053e98c3cfd87b4b0046891b6fc40c9140b9f5a2ba7438d165fc8fcce8",
+      "read_history_sha256": "cc93b42c46b947d51ce9cc8cebee86a6b61060149719441d6583ac1eb50b921f"
+    },
+    {
+      "id": "e984baeea3674d75a7b8971e2c9771ab",
+      "config": {
+        "layout": "mirror",
+        "data_mib": 512,
+        "write_mib_s": 4,
+        "seed": 20261114,
+        "created_ns": 1795319911056240222,
+        "scope": "Independent immutable reads with native fio writes under member faults and resilver. TCG/shared-host diagnostic, not capacity."
+      },
+      "immutable_ack": {
+        "bytes": 67108864,
+        "sha256": "370ad6bef16429df729244725892b970cffc7d82a457ff5931a5036b0a530f20"
+      },
+      "controller_tagged_read_summary": {
+        "after-scrub": {
+          "ok": 3,
+          "fail": 0,
+          "mismatch": 0,
+          "mean_ms": 741.7116903333333,
+          "p50_ms": 662.939863,
+          "p99_ms": 984.451374,
+          "scope": "Complete 64 MiB SHA256 read, including hashing; shared guest monotonic clock bounds native-action overlap. Small-sample p99 is effectively maximum."
+        },
+        "baseline": {
+          "ok": 19,
+          "fail": 0,
+          "mismatch": 0,
+          "mean_ms": 1090.9695488947368,
+          "p50_ms": 1139.896333,
+          "p99_ms": 2087.283374,
+          "scope": "Complete 64 MiB SHA256 read, including hashing; shared guest monotonic clock bounds native-action overlap. Small-sample p99 is effectively maximum."
+        },
+        "degraded": {
+          "ok": 8,
+          "fail": 0,
+          "mismatch": 0,
+          "mean_ms": 905.915204375,
+          "p50_ms": 830.3659075,
+          "p99_ms": 1448.670459,
+          "scope": "Complete 64 MiB SHA256 read, including hashing; shared guest monotonic clock bounds native-action overlap. Small-sample p99 is effectively maximum."
+        },
+        "repaired": {
+          "ok": 118,
+          "fail": 0,
+          "mismatch": 0,
+          "mean_ms": 762.8644145847458,
+          "p50_ms": 687.7489734999999,
+          "p99_ms": 1542.687939,
+          "scope": "Complete 64 MiB SHA256 read, including hashing; shared guest monotonic clock bounds native-action overlap. Small-sample p99 is effectively maximum."
+        },
+        "replacement": {
+          "ok": 14,
+          "fail": 0,
+          "mismatch": 0,
+          "mean_ms": 1351.4606004285715,
+          "p50_ms": 1212.3712715000001,
+          "p99_ms": 2154.751498,
+          "scope": "Complete 64 MiB SHA256 read, including hashing; shared guest monotonic clock bounds native-action overlap. Small-sample p99 is effectively maximum."
+        }
+      },
+      "native_read_phase_summary": {
+        "after-scrub": {
+          "ok": 11,
+          "fail": 0,
+          "mismatch": 0,
+          "mean_ms": 798.1485711818182,
+          "p50_ms": 766.762805,
+          "p99_ms": 1181.114948,
+          "scope": "Complete 64 MiB SHA256 read, including hashing; shared guest monotonic clock bounds native-action overlap. Small-sample p99 is effectively maximum.",
+          "native_started_monotonic_ns": 2244248742671,
+          "native_ended_monotonic_ns": null
+        },
+        "baseline": {
+          "ok": 11,
+          "fail": 0,
+          "mismatch": 0,
+          "mean_ms": 1079.4278612727273,
+          "p50_ms": 960.977049,
+          "p99_ms": 2087.283374,
+          "scope": "Complete 64 MiB SHA256 read, including hashing; shared guest monotonic clock bounds native-action overlap. Small-sample p99 is effectively maximum.",
+          "native_started_monotonic_ns": null,
+          "native_ended_monotonic_ns": 2094115853962
+        },
+        "degraded": {
+          "ok": 19,
+          "fail": 0,
+          "mismatch": 0,
+          "mean_ms": 1018.8870679473685,
+          "p50_ms": 993.539194,
+          "p99_ms": 1449.415054,
+          "scope": "Complete 64 MiB SHA256 read, including hashing; shared guest monotonic clock bounds native-action overlap. Small-sample p99 is effectively maximum.",
+          "native_started_monotonic_ns": 2094863311037,
+          "native_ended_monotonic_ns": 2119855073484
+        },
+        "post-replacement-verification": {
+          "ok": 106,
+          "fail": 0,
+          "mismatch": 0,
+          "mean_ms": 751.4196266320755,
+          "p50_ms": 675.6578985,
+          "p99_ms": 1415.988295,
+          "scope": "Complete 64 MiB SHA256 read, including hashing; shared guest monotonic clock bounds native-action overlap. Small-sample p99 is effectively maximum.",
+          "native_started_monotonic_ns": 2133482513778,
+          "native_ended_monotonic_ns": 2235852367030
+        },
+        "replacement-workflow": {
+          "ok": 6,
+          "fail": 0,
+          "mismatch": 0,
+          "mean_ms": 1863.7300656666666,
+          "p50_ms": 1901.214116,
+          "p99_ms": 2154.751498,
+          "scope": "Complete 64 MiB SHA256 read, including hashing; shared guest monotonic clock bounds native-action overlap. Small-sample p99 is effectively maximum.",
+          "native_started_monotonic_ns": 2119855073484,
+          "native_ended_monotonic_ns": 2133482513778
+        },
+        "scrub": {
+          "ok": 7,
+          "fail": 0,
+          "mismatch": 0,
+          "mean_ms": 794.0308565714286,
+          "p50_ms": 742.552851,
+          "p99_ms": 1081.190484,
+          "scope": "Complete 64 MiB SHA256 read, including hashing; shared guest monotonic clock bounds native-action overlap. Small-sample p99 is effectively maximum.",
+          "native_started_monotonic_ns": 2235852367030,
+          "native_ended_monotonic_ns": 2244248742671
+        },
+        "spans-transition": {
+          "ok": 5,
+          "fail": 0,
+          "mismatch": 0,
+          "mean_ms": 1053.8470782,
+          "p50_ms": 950.21023,
+          "p99_ms": 1626.641595,
+          "scope": "Complete 64 MiB SHA256 read, including hashing; shared guest monotonic clock bounds native-action overlap. Small-sample p99 is effectively maximum."
+        },
+        "fault-injection": {
+          "ok": 0,
+          "fail": 0,
+          "mismatch": 0,
+          "mean_ms": null,
+          "p50_ms": null,
+          "p99_ms": null,
+          "scope": "No complete read wholly inside this native interval; transition-spanning reads are separate, not zero latency.",
+          "native_started_monotonic_ns": 2094115853962,
+          "native_ended_monotonic_ns": 2094863311037
+        }
+      },
+      "read_phase_scope": "Canonical phases derived from same-guest native-command monotonic intervals. Reads spanning transitions remain separately counted; controller tags can lag native changes. Resource phase brackets additionally include SSH/controller overhead.",
+      "successful_immutable_reads": 165,
+      "native_replacement_intervals": [
+        {
+          "started_ns": 1795319965416469979,
+          "ended_ns": 1795319979043913185,
+          "started_monotonic_ns": 2119855073484,
+          "ended_monotonic_ns": 2133482513778,
+          "command": [
+            "zpool",
+            "replace",
+            "-w",
+            "zfslab",
+            "/dev/disk/by-id/virtio-zfslab-d0",
+            "/dev/disk/by-id/virtio-zfslab-d2"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "controller_started_ns": 1795319961122025592,
+          "controller_ended_ns": 1795319979368548837
+        }
+      ],
+      "replacement_seconds_including_controller": 18.247465424999973,
+      "scrub_seconds_including_controller": 13.90461163100008,
+      "payload_file": {
+        "bytes": 536870912,
+        "sha256": "773dacfe0e4430f1120661d310b0ff8e1505dc063a0914869eb98c1e14ea15ab"
+      },
+      "verified_payload_bytes": 536870912,
+      "fio_write": {
+        "bytes": 536870912,
+        "operations": 4096,
+        "iops": 32.0015,
+        "runtime_ms": 127994,
+        "completion_latency_ns": {
+          "min": 478256,
+          "max": 37395376,
+          "mean": 1902600.785156,
+          "stddev": 2516655.204013,
+          "N": 4096,
+          "percentile": {
+            "1.000000": 700416,
+            "5.000000": 765952,
+            "10.000000": 798720,
+            "20.000000": 872448,
+            "30.000000": 929792,
+            "40.000000": 978944,
+            "50.000000": 1028096,
+            "60.000000": 1073152,
+            "70.000000": 1187840,
+            "80.000000": 2146304,
+            "90.000000": 3981312,
+            "95.000000": 6455296,
+            "99.000000": 13434880,
+            "99.500000": 17170432,
+            "99.900000": 22413312,
+            "99.950000": 31326208,
+            "99.990000": 37486592
+          }
+        },
+        "fsync": {
+          "total_ios": 511,
+          "lat_ns": {
+            "min": 14343632,
+            "max": 155563456,
+            "mean": 26671219.506849,
+            "stddev": 12266584.692721,
+            "N": 511,
+            "percentile": {
+              "1.000000": 15400960,
+              "5.000000": 16449536,
+              "10.000000": 17170432,
+              "20.000000": 19005440,
+              "30.000000": 20316160,
+              "40.000000": 21889024,
+              "50.000000": 23986176,
+              "60.000000": 25821184,
+              "70.000000": 28442624,
+              "80.000000": 31850496,
+              "90.000000": 38010880,
+              "95.000000": 43253760,
+              "99.000000": 69730304,
+              "99.500000": 88604672,
+              "99.900000": 156237824,
+              "99.950000": 156237824,
+              "99.990000": 156237824
+            }
+          }
+        },
+        "job_user_cpu_percent": 6.764432,
+        "job_system_cpu_percent": 6.410507,
+        "scope": "Native fio job over entire fault/verification workload. Buffered write completion is not individual durable commit; fsync statistics separate. No per-phase write latency history or per-flush external ACK journal. Diagnostic, not capacity."
+      },
+      "fio_verification_read": {
+        "bytes": 536870912,
+        "operations": 4096,
+        "iops": 455.009998,
+        "runtime_ms": 9002,
+        "completion_latency_ns": {
+          "min": 286517,
+          "max": 41325957,
+          "mean": 1877249.92041,
+          "stddev": 2038265.522234,
+          "N": 4096,
+          "percentile": {
+            "1.000000": 305152,
+            "5.000000": 337920,
+            "10.000000": 370688,
+            "20.000000": 505856,
+            "30.000000": 1171456,
+            "40.000000": 1417216,
+            "50.000000": 1597440,
+            "60.000000": 1761280,
+            "70.000000": 1957888,
+            "80.000000": 2342912,
+            "90.000000": 3194880,
+            "95.000000": 4620288,
+            "99.000000": 10158080,
+            "99.500000": 12910592,
+            "99.900000": 20316160,
+            "99.950000": 30015488,
+            "99.990000": 41156608
+          }
+        },
+        "fsync": {
+          "total_ios": 0,
+          "lat_ns": {
+            "min": 2033946136,
+            "max": 2739841006,
+            "mean": 2379836668.213307,
+            "stddev": 206426206.443723,
+            "N": 511,
+            "percentile": {
+              "1.000000": 2038431744,
+              "5.000000": 2071986176,
+              "10.000000": 2105540608,
+              "20.000000": 2164260864,
+              "30.000000": 2231369728,
+              "40.000000": 2298478592,
+              "50.000000": 2365587456,
+              "60.000000": 2466250752,
+              "70.000000": 2533359616,
+              "80.000000": 2600468480,
+              "90.000000": 2667577344,
+              "95.000000": 2701131776,
+              "99.000000": 2734686208,
+              "99.500000": 2734686208,
+              "99.900000": 2734686208,
+              "99.950000": 2734686208,
+              "99.990000": 2734686208
+            }
+          }
+        },
+        "job_user_cpu_percent": 9.382316,
+        "job_system_cpu_percent": 65.126958,
+        "scope": "Native fio job over entire fault/verification workload. Buffered write completion is not individual durable commit; fsync statistics separate. No per-phase write latency history or per-flush external ACK journal. Diagnostic, not capacity."
+      },
+      "bytes_progressed_while_degraded": 11272192,
+      "faulted_members": 1,
+      "before": {
+        "size_bytes": 16642998272,
+        "allocated_bytes": 688128,
+        "free_bytes": 16642310144,
+        "health": "ONLINE",
+        "status": "pool: zfslab\n state: ONLINE\nconfig:\n\n\tNAME                                        STATE     READ WRITE CKSUM\n\tzfslab                                      ONLINE       0     0     0\n\t  mirror-0                                  ONLINE       0     0     0\n\t    /dev/disk/by-id/virtio-zfslab-d0-part1  ONLINE       0     0     0\n\t    /dev/disk/by-id/virtio-zfslab-d1-part1  ONLINE       0     0     0\n\nerrors: No known data errors"
+      },
+      "degraded": {
+        "size_bytes": 16642998272,
+        "allocated_bytes": 108421120,
+        "free_bytes": 16534577152,
+        "health": "DEGRADED",
+        "status": "pool: zfslab\n state: DEGRADED\nstatus: One or more devices are faulted in response to persistent errors.\n\tSufficient replicas exist for the pool to continue functioning in a\n\tdegraded state.\naction: Replace the faulted device, or use 'zpool clear' to mark the device\n\trepaired.\nconfig:\n\n\tNAME                                        STATE     READ WRITE CKSUM\n\tzfslab                                      DEGRADED     0     0     0\n\t  mirror-0                                  DEGRADED     0     0     0\n\t    /dev/disk/by-id/virtio-zfslab-d0-part1  FAULTED      0     0     0  external device fault\n\t    /dev/disk/by-id/virtio-zfslab-d1-part1  ONLINE       0     0     0\n\nerrors: No known data errors"
+      },
+      "after": {
+        "size_bytes": 16642998272,
+        "allocated_bytes": 605519872,
+        "free_bytes": 16037478400,
+        "health": "ONLINE",
+        "status": "pool: zfslab\n state: ONLINE\n  scan: scrub repaired 0B in 00:00:08 with 0 errors on Sun Nov 22 04:01:29 2026\nconfig:\n\n\tNAME                                        STATE     READ WRITE CKSUM\n\tzfslab                                      ONLINE       0     0     0\n\t  mirror-0                                  ONLINE       0     0     0\n\t    /dev/disk/by-id/virtio-zfslab-d2-part1  ONLINE       0     0     0\n\t    /dev/disk/by-id/virtio-zfslab-d1-part1  ONLINE       0     0     0\n\nerrors: No known data errors"
+      },
+      "compression": "zfslab\tused\t605134848\nzfslab\tlogicalused\t604308992\nzfslab\tcompressratio\t1.00\nzfslab/data\tused\t604495872\nzfslab/data\tlogicalused\t604196864\nzfslab/data\tcompressratio\t1.00",
+      "raw_result_sha256": "53b65778ae2c17369190b676721a65be4c7478b37d692fab4b843991169124ff",
+      "read_history_sha256": "7e8ec7ad162c0ddb8b8e316f842e474849066f5acc21a569f790a563c8290ecd"
+    }
+  ],
+  "replication": {
+    "baseline": {
+      "bytes": 536870912,
+      "sha256": "c3616b8f70567546932b036a042d2cbedebe90b662cea6084f9332763559a69d"
+    },
+    "delta": {
+      "bytes": 67108864,
+      "sha256": "7e1556a90f760abb59b22c32ea65a1d9f77970f865263f8d5bbc7303e07e2da6"
+    },
+    "clone": {
+      "payload": {
+        "bytes": 536870912,
+        "sha256": "c3616b8f70567546932b036a042d2cbedebe90b662cea6084f9332763559a69d"
+      },
+      "delta": {
+        "bytes": 67108864,
+        "sha256": "7e1556a90f760abb59b22c32ea65a1d9f77970f865263f8d5bbc7303e07e2da6"
+      }
+    },
+    "full_stream": {
+      "bytes": 538194928,
+      "seconds": 62.114681985998686,
+      "interrupted": false
+    },
+    "interrupted": {
+      "bytes": 65536,
+      "seconds": 3.6054738350012485,
+      "interrupted": true
+    },
+    "resumed": {
+      "bytes": 67277856,
+      "seconds": 14.736385591000726,
+      "interrupted": false
+    },
+    "source_pool_exported": true,
+    "replicated_bytes_missing": 0,
+    "unreplicated_tail_absent_bytes": 67108864,
+    "new_promoted_bytes_verified": 67108864,
+    "promotion_verification_and_write_seconds": 28.759564722000505
+  },
+  "replication_raw_sha256": "fabbf536f8441cf34e6eec7d2add49e543bdf4e4c6cd89930c6c00f0ff9392cd",
+  "runs": [
+    {
+      "environment": {
+        "host_system": "Darwin",
+        "host_architecture": "arm64",
+        "host_kernel": "25.5.0",
+        "members_at_start": [
+          {
+            "id": "7483af3b950c65f9c8954ca0b5569ada658c44cb1e4b263b7887c12d6a61167e",
+            "image_id": "sha256:c987448b0f1995eab59b18561403b162809d963837f4b58d2d77728802ee3684",
+            "image": "zfs-storage-lab:dev",
+            "role": "target",
+            "cpu_limit": 2.0,
+            "memory_limit_bytes": 3221225472
+          },
+          {
+            "id": "b745212644d3955dc2b7b1f60fba826aa4060d7068297cebb4793040789d7e7e",
+            "image_id": "sha256:c987448b0f1995eab59b18561403b162809d963837f4b58d2d77728802ee3684",
+            "image": "zfs-storage-lab:dev",
+            "role": "source",
+            "cpu_limit": 2.0,
+            "memory_limit_bytes": 3221225472
+          }
+        ],
+        "docker": {
+          "ServerVersion": "29.5.3",
+          "KernelVersion": "6.12.76-linuxkit",
+          "Architecture": "aarch64",
+          "NCPU": 11,
+          "MemTotal": 26216296448,
+          "CgroupVersion": "2"
+        },
+        "scope": "One-host QEMU TCG guests; all roles share Docker VM and host. Other independent functional labs may run concurrently. Diagnostic, not a performance comparison. Images and exact resources recorded; guest versions in versions.json."
+      },
+      "id": "67b648f6875f470b8a434ea53452a5b4",
+      "completion": {
+        "ended_ns": 1795320847602672000,
+        "duration_s": 1095.909235249972,
+        "exit_code": 0,
+        "sampling_errors": [],
+        "sampler_stopped": true
+      },
+      "sources": {
+        "run.py": "3b3871a29914f994344568b5f0d6eedfd5a6092851060bbaefd126c65918aaa4",
+        "resources.py": "8ca113e654628da913336fef5b98bb676c2fafe8bd5902e27fb4ad86ccaee549",
+        "Makefile": "52ae1c69195133dfe1bd23b5086498f1b64b7970e9da6bf067ab86b427916de7",
+        "docker-compose.yml": "4234dafdb3847501bcc82a025adca4e48822109570c5212eecf338eae644571c",
+        "vm/Dockerfile": "0ef1a888bdaa673d8ac0044600c7404e5b4646e42062593e1e4a4be1fce36045",
+        "vm/boot.py": "1b90235a013f4598a70e691e4a20e2a3adf75528611454b1292ffa26465057d8",
+        "app/evidence.py": "64eab9d533b24c817fb5cf74e9d967adb77253b81eba6c75af8e4aea19f1b640",
+        "app/lab.py": "9a8ee35fad02df47200f16f54173b1a946eb5f157f45482d1d4d019ee1b3c7c8",
+        "app/observe.py": "e1a41ce24341f1fc23b1f5ca801438ce5a41b11d11eb0b0ea7d12222362e87d7",
+        "app/test_evidence.py": "a629dbff47ccbc6c591d4f2965db7a7b1736b2782b9a7cf41fecf83777b9ef09",
+        "app/test_lab.py": "cb673e79ddeabd4d71f538bdea907f201537f11f7b68c5e4e9e751f55b435fde"
+      },
+      "resources": {
+        "runner": {
+          "samples": 868,
+          "observed_cpu_core_seconds": 35.78825099999997,
+          "average_cpu_percent_one_core_100": 3.2709578120865572,
+          "sampled_memory_bytes_min_mean_max": [
+            15753216,
+            152404760.77419356,
+            268435456
+          ],
+          "native_peak_memory_bytes": 268619776,
+          "state_disk_bytes_baseline_peak_settled": {
+            "state_logical_bytes": [
+              0,
+              0,
+              0
+            ],
+            "state_allocated_bytes": [
+              0,
+              0,
+              0
+            ]
+          },
+          "native_block_io": null,
+          "counter_reset_or_identity_gaps": 0,
+          "scope": "Whole container cgroup, including QEMU/all guest threads and probe costs. About 1 s plus sequential probe intervals; native timestamps retained. CPU excludes initial/final edges and reset gaps; memory peak is lifetime since start. Per-device VM block accounting, not host physical SSD I/O; do not sum stacked/duplicate counters. Absent device rows are unavailable, not zero. Physical I/O latency/queue depth and engine heap unavailable."
+        },
+        "source": {
+          "samples": 869,
+          "observed_cpu_core_seconds": 1737.802144000001,
+          "average_cpu_percent_one_core_100": 158.64904942654323,
+          "sampled_memory_bytes_min_mean_max": [
+            2460782592,
+            2576561876.6950517,
+            2721259520
+          ],
+          "native_peak_memory_bytes": 2737737728,
+          "state_disk_bytes_baseline_peak_settled": {
+            "state_logical_bytes": [
+              1621146918,
+              3770333734,
+              3770333734
+            ],
+            "state_allocated_bytes": [
+              1620946944,
+              3770068992,
+              3770068992
+            ]
+          },
+          "native_block_io": {
+            "254:0": {
+              "observed_seconds": 1095.3750749100002,
+              "rbytes": 7767016448,
+              "wbytes": 4819404800,
+              "rios": 99587,
+              "wios": 114178,
+              "rbytes_per_second": 7090736.886301858,
+              "wbytes_per_second": 4399775.848830574,
+              "rios_per_second": 90.91589016500345,
+              "wios_per_second": 104.23644157630778
+            }
+          },
+          "counter_reset_or_identity_gaps": 0,
+          "scope": "Whole container cgroup, including QEMU/all guest threads and probe costs. About 1 s plus sequential probe intervals; native timestamps retained. CPU excludes initial/final edges and reset gaps; memory peak is lifetime since start. Per-device VM block accounting, not host physical SSD I/O; do not sum stacked/duplicate counters. Absent device rows are unavailable, not zero. Physical I/O latency/queue depth and engine heap unavailable."
+        },
+        "target": {
+          "samples": 869,
+          "observed_cpu_core_seconds": 861.0790110000002,
+          "average_cpu_percent_one_core_100": 78.61108202398228,
+          "sampled_memory_bytes_min_mean_max": [
+            1985064960,
+            2130386976.9942462,
+            2591223808
+          ],
+          "native_peak_memory_bytes": 2591223808,
+          "state_disk_bytes_baseline_peak_settled": {
+            "state_logical_bytes": [
+              218873894,
+              1592835622,
+              1592835622
+            ],
+            "state_allocated_bytes": [
+              218853376,
+              1592770560,
+              1592770560
+            ]
+          },
+          "native_block_io": {
+            "254:0": {
+              "observed_seconds": 1095.3659316600001,
+              "rbytes": 1211997184,
+              "wbytes": 1503019008,
+              "rios": 12588,
+              "wios": 27761,
+              "rbytes_per_second": 1106476.9762952623,
+              "wbytes_per_second": 1372161.5439711655,
+              "rios_per_second": 11.492049949849358,
+              "wios_per_second": 25.34404183808135
+            }
+          },
+          "counter_reset_or_identity_gaps": 0,
+          "scope": "Whole container cgroup, including QEMU/all guest threads and probe costs. About 1 s plus sequential probe intervals; native timestamps retained. CPU excludes initial/final edges and reset gaps; memory peak is lifetime since start. Per-device VM block accounting, not host physical SSD I/O; do not sum stacked/duplicate counters. Absent device rows are unavailable, not zero. Physical I/O latency/queue depth and engine heap unavailable."
+        }
+      },
+      "phases": {
+        "943411366b4c4f96a0d76b5dab3c6a8c": {
+          "baseline": {
+            "started_ns": 1795320296197617511,
+            "ended_ns": 1795320307450140919,
+            "roles": {
+              "runner": {
+                "samples": 9,
+                "observed_cpu_core_seconds": 0.220291,
+                "average_cpu_percent_one_core_100": 2.178773171697404,
+                "sampled_memory_bytes_min_mean_max": [
+                  267354112,
+                  268084565.33333334,
+                  268410880
+                ],
+                "native_peak_memory_bytes": 268541952,
+                "state_disk_bytes_baseline_peak_settled": {
+                  "state_logical_bytes": [
+                    0,
+                    0,
+                    0
+                  ],
+                  "state_allocated_bytes": [
+                    0,
+                    0,
+                    0
+                  ]
+                },
+                "native_block_io": null,
+                "counter_reset_or_identity_gaps": 0,
+                "scope": "Whole container cgroup, including QEMU/all guest threads and probe costs. About 1 s plus sequential probe intervals; native timestamps retained. CPU excludes initial/final edges and reset gaps; memory peak is lifetime since start. Per-device VM block accounting, not host physical SSD I/O; do not sum stacked/duplicate counters. Absent device rows are unavailable, not zero. Physical I/O latency/queue depth and engine heap unavailable."
+              },
+              "source": {
+                "samples": 8,
+                "observed_cpu_core_seconds": 17.431723,
+                "average_cpu_percent_one_core_100": 196.9276683242667,
+                "sampled_memory_bytes_min_mean_max": [
+                  2496106496,
+                  2511355904,
+                  2518687744
+                ],
+                "native_peak_memory_bytes": 2649980928,
+                "state_disk_bytes_baseline_peak_settled": {
+                  "state_logical_bytes": [
+                    1816443942,
+                    1842527270,
+                    1842527270
+                  ],
+                  "state_allocated_bytes": [
+                    1816182784,
+                    1842266112,
+                    1842266112
+                  ]
+                },
+                "native_block_io": {
+                  "254:0": {
+                    "observed_seconds": 8.851840449,
+                    "rbytes": 0,
+                    "wbytes": 33386496,
+                    "rios": 0,
+                    "wios": 786,
+                    "rbytes_per_second": 0.0,
+                    "wbytes_per_second": 3771701.059497937,
+                    "rios_per_second": 0.0,
+                    "wios_per_second": 88.79509346429703
+                  }
+                },
+                "counter_reset_or_identity_gaps": 0,
+                "scope": "Whole container cgroup, including QEMU/all guest threads and probe costs. About 1 s plus sequential probe intervals; native timestamps retained. CPU excludes initial/final edges and reset gaps; memory peak is lifetime since start. Per-device VM block accounting, not host physical SSD I/O; do not sum stacked/duplicate counters. Absent device rows are unavailable, not zero. Physical I/O latency/queue depth and engine heap unavailable."
+              },
+              "target": {
+                "samples": 9,
+                "observed_cpu_core_seconds": 4.123273,
+                "average_cpu_percent_one_core_100": 40.82460560535363,
+                "sampled_memory_bytes_min_mean_max": [
+                  2140004352,
+                  2141582677.3333333,
+                  2147049472
+                ],
+                "native_peak_memory_bytes": 2156359680,
+                "state_disk_bytes_baseline_peak_settled": {
+                  "state_logical_bytes": [
+                    221626406,
+                    221691942,
+                    221691942
+                  ],
+                  "state_allocated_bytes": [
+                    221605888,
+                    221671424,
+                    221671424
+                  ]
+                },
+                "native_block_io": {
+                  "254:0": {
+                    "observed_seconds": 10.099970199,
+                    "rbytes": 9728,
+                    "wbytes": 217088,
+                    "rios": 1,
+                    "wios": 7,
+                    "rbytes_per_second": 963.1711587587824,
+                    "wbytes_per_second": 21493.92480598546,
+                    "rios_per_second": 0.09901019312898668,
+                    "wios_per_second": 0.6930713519029068
+                  }
+                },
+                "counter_reset_or_identity_gaps": 0,
+                "scope": "Whole container cgroup, including QEMU/all guest threads and probe costs. About 1 s plus sequential probe intervals; native timestamps retained. CPU excludes initial/final edges and reset gaps; memory peak is lifetime since start. Per-device VM block accounting, not host physical SSD I/O; do not sum stacked/duplicate counters. Absent device rows are unavailable, not zero. Physical I/O latency/queue depth and engine heap unavailable."
+              }
+            }
+          },
+          "fault-injection": {
+            "started_ns": 1795320307450140919,
+            "ended_ns": 1795320329979254680,
+            "roles": {
+              "runner": {
+                "samples": 18,
+                "observed_cpu_core_seconds": 0.40551699999999996,
+                "average_cpu_percent_one_core_100": 1.9032313108100225,
+                "sampled_memory_bytes_min_mean_max": [
+                  267284480,
+                  267929372.44444445,
+                  268394496
+                ],
+                "native_peak_memory_bytes": 268541952,
+                "state_disk_bytes_baseline_peak_settled": {
+                  "state_logical_bytes": [
+                    0,
+                    0,
+                    0
+                  ],
+                  "state_allocated_bytes": [
+                    0,
+                    0,
+                    0
+                  ]
+                },
+                "native_block_io": null,
+                "counter_reset_or_identity_gaps": 0,
+                "scope": "Whole container cgroup, including QEMU/all guest threads and probe costs. About 1 s plus sequential probe intervals; native timestamps retained. CPU excludes initial/final edges and reset gaps; memory peak is lifetime since start. Per-device VM block accounting, not host physical SSD I/O; do not sum stacked/duplicate counters. Absent device rows are unavailable, not zero. Physical I/O latency/queue depth and engine heap unavailable."
+              },
+              "source": {
+                "samples": 18,
+                "observed_cpu_core_seconds": 41.56253400000001,
+                "average_cpu_percent_one_core_100": 195.02809325710103,
+                "sampled_memory_bytes_min_mean_max": [
+                  2520444928,
+                  2546320725.3333335,
+                  2558889984
+                ],
+                "native_peak_memory_bytes": 2649980928,
+                "state_disk_bytes_baseline_peak_settled": {
+                  "state_logical_bytes": [
+                    1853602854,
+                    1998109734,
+                    1998109734
+                  ],
+                  "state_allocated_bytes": [
+                    1853341696,
+                    1997856768,
+                    1997856768
+                  ]
+                },
+                "native_block_io": {
+                  "254:0": {
+                    "observed_seconds": 21.311049759999996,
+                    "rbytes": 15360,
+                    "wbytes": 187772928,
+                    "rios": 3,
+                    "wios": 5344,
+                    "rbytes_per_second": 720.7528569911237,
+                    "wbytes_per_second": 8811059.52614509,
+                    "rios_per_second": 0.14077204238107888,
+                    "wios_per_second": 250.76193149482847
+                  }
+                },
+                "counter_reset_or_identity_gaps": 0,
+                "scope": "Whole container cgroup, including QEMU/all guest threads and probe costs. About 1 s plus sequential probe intervals; native timestamps retained. CPU excludes initial/final edges and reset gaps; memory peak is lifetime since start. Per-device VM block accounting, not host physical SSD I/O; do not sum stacked/duplicate counters. Absent device rows are unavailable, not zero. Physical I/O latency/queue depth and engine heap unavailable."
+              },
+              "target": {
+                "samples": 17,
+                "observed_cpu_core_seconds": 14.253128,
+                "average_cpu_percent_one_core_100": 71.06557792967233,
+                "sampled_memory_bytes_min_mean_max": [
+                  1985064960,
+                  2036293150.1176472,
+                  2153140224
+                ],
+                "native_peak_memory_bytes": 2156359680,
+                "state_disk_bytes_baseline_peak_settled": {
+                  "state_logical_bytes": [
+                    221691942,
+                    221757478,
+                    221757478
+                  ],
+                  "state_allocated_bytes": [
+                    221671424,
+                    221736960,
+                    221736960
+                  ]
+                },
+                "native_block_io": {
+                  "254:0": {
+                    "observed_seconds": 20.056303509,
+                    "rbytes": 0,
+                    "wbytes": 1900544,
+                    "rios": 0,
+                    "wios": 269,
+                    "rbytes_per_second": 0.0,
+                    "wbytes_per_second": 94760.43275607373,
+                    "rios_per_second": 0.0,
+                    "wios_per_second": 13.412242185071134
+                  }
+                },
+                "counter_reset_or_identity_gaps": 0,
+                "scope": "Whole container cgroup, including QEMU/all guest threads and probe costs. About 1 s plus sequential probe intervals; native timestamps retained. CPU excludes initial/final edges and reset gaps; memory peak is lifetime since start. Per-device VM block accounting, not host physical SSD I/O; do not sum stacked/duplicate counters. Absent device rows are unavailable, not zero. Physical I/O latency/queue depth and engine heap unavailable."
+              }
+            }
+          },
+          "degraded": {
+            "started_ns": 1795320329979254680,
+            "ended_ns": 1795320339849845545,
+            "roles": {
+              "runner": {
+                "samples": 7,
+                "observed_cpu_core_seconds": 0.21363600000000002,
+                "average_cpu_percent_one_core_100": 2.841005350530023,
+                "sampled_memory_bytes_min_mean_max": [
+                  267423744,
+                  267863186.2857143,
+                  268267520
+                ],
+                "native_peak_memory_bytes": 268541952,
+                "state_disk_bytes_baseline_peak_settled": {
+                  "state_logical_bytes": [
+                    0,
+                    0,
+                    0
+                  ],
+                  "state_allocated_bytes": [
+                    0,
+                    0,
+                    0
+                  ]
+                },
+                "native_block_io": null,
+                "counter_reset_or_identity_gaps": 0,
+                "scope": "Whole container cgroup, including QEMU/all guest threads and probe costs. About 1 s plus sequential probe intervals; native timestamps retained. CPU excludes initial/final edges and reset gaps; memory peak is lifetime since start. Per-device VM block accounting, not host physical SSD I/O; do not sum stacked/duplicate counters. Absent device rows are unavailable, not zero. Physical I/O latency/queue depth and engine heap unavailable."
+              },
+              "source": {
+                "samples": 8,
+                "observed_cpu_core_seconds": 16.717297,
+                "average_cpu_percent_one_core_100": 190.16884362330114,
+                "sampled_memory_bytes_min_mean_max": [
+                  2562220032,
+                  2566747648,
+                  2572374016
+                ],
+                "native_peak_memory_bytes": 2649980928,
+                "state_disk_bytes_baseline_peak_settled": {
+                  "state_logical_bytes": [
+                    2003483686,
+                    2043198502,
+                    2043198502
+                  ],
+                  "state_allocated_bytes": [
+                    2003230720,
+                    2042945536,
+                    2042945536
+                  ]
+                },
+                "native_block_io": {
+                  "254:0": {
+                    "observed_seconds": 8.790765449,
+                    "rbytes": 0,
+                    "wbytes": 51048448,
+                    "rios": 0,
+                    "wios": 1336,
+                    "rbytes_per_second": 0.0,
+                    "wbytes_per_second": 5807053.810747169,
+                    "rios_per_second": 0.0,
+                    "wios_per_second": 151.9776642603947
+                  }
+                },
+                "counter_reset_or_identity_gaps": 0,
+                "scope": "Whole container cgroup, including QEMU/all guest threads and probe costs. About 1 s plus sequential probe intervals; native timestamps retained. CPU excludes initial/final edges and reset gaps; memory peak is lifetime since start. Per-device VM block accounting, not host physical SSD I/O; do not sum stacked/duplicate counters. Absent device rows are unavailable, not zero. Physical I/O latency/queue depth and engine heap unavailable."
+              },
+              "target": {
+                "samples": 8,
+                "observed_cpu_core_seconds": 4.379747,
+                "average_cpu_percent_one_core_100": 49.90536453398921,
+                "sampled_memory_bytes_min_mean_max": [
+                  1999912960,
+                  2002716160,
+                  2003992576
+                ],
+                "native_peak_memory_bytes": 2156359680,
+                "state_disk_bytes_baseline_peak_settled": {
+                  "state_logical_bytes": [
+                    221757478,
+                    221823014,
+                    221823014
+                  ],
+                  "state_allocated_bytes": [
+                    221736960,
+                    221802496,
+                    221802496
+                  ]
+                },
+                "native_block_io": {
+                  "254:0": {
+                    "observed_seconds": 8.776104615000001,
+                    "rbytes": 11776,
+                    "wbytes": 229376,
+                    "rios": 1,
+                    "wios": 7,
+                    "rbytes_per_second": 1341.8253902617132,
+                    "wbytes_per_second": 26136.424992923807,
+                    "rios_per_second": 0.11394577023282212,
+                    "wios_per_second": 0.7976203916297548
+                  }
+                },
+                "counter_reset_or_identity_gaps": 0,
+                "scope": "Whole container cgroup, including QEMU/all guest threads and probe costs. About 1 s plus sequential probe intervals; native timestamps retained. CPU excludes initial/final edges and reset gaps; memory peak is lifetime since start. Per-device VM block accounting, not host physical SSD I/O; do not sum stacked/duplicate counters. Absent device rows are unavailable, not zero. Physical I/O latency/queue depth and engine heap unavailable."
+              }
+            }
+          },
+          "replacement": {
+            "started_ns": 1795320339849845545,
+            "ended_ns": 1795320393876359126,
+            "roles": {
+              "runner": {
+                "samples": 43,
+                "observed_cpu_core_seconds": 0.8346069999999999,
+                "average_cpu_percent_one_core_100": 1.578550328993494,
+                "sampled_memory_bytes_min_mean_max": [
+                  19865600,
+                  204519947.90697673,
+                  268341248
+                ],
+                "native_peak_memory_bytes": 268541952,
+                "state_disk_bytes_baseline_peak_settled": {
+                  "state_logical_bytes": [
+                    0,
+                    0,
+                    0
+                  ],
+                  "state_allocated_bytes": [
+                    0,
+                    0,
+                    0
+                  ]
+                },
+                "native_block_io": null,
+                "counter_reset_or_identity_gaps": 0,
+                "scope": "Whole container cgroup, including QEMU/all guest threads and probe costs. About 1 s plus sequential probe intervals; native timestamps retained. CPU excludes initial/final edges and reset gaps; memory peak is lifetime since start. Per-device VM block accounting, not host physical SSD I/O; do not sum stacked/duplicate counters. Absent device rows are unavailable, not zero. Physical I/O latency/queue depth and engine heap unavailable."
+              },
+              "source": {
+                "samples": 43,
+                "observed_cpu_core_seconds": 104.27946399999999,
+                "average_cpu_percent_one_core_100": 197.1474641802459,
+                "sampled_memory_bytes_min_mean_max": [
+                  2574602240,
+                  2635221611.162791,
+                  2670493696
+                ],
+                "native_peak_memory_bytes": 2670493696,
+                "state_disk_bytes_baseline_peak_settled": {
+                  "state_logical_bytes": [
+                    2048310310,
+                    2776611366,
+                    2776611366
+                  ],
+                  "state_allocated_bytes": [
+                    2048057344,
+                    2776334336,
+                    2776334336
+                  ]
+                },
+                "native_block_io": {
+                  "254:0": {
+                    "observed_seconds": 52.894144205,
+                    "rbytes": 875369472,
+                    "wbytes": 850886144,
+                    "rios": 10656,
+                    "wios": 23930,
+                    "rbytes_per_second": 16549459.021538582,
+                    "wbytes_per_second": 16086584.947896123,
+                    "rios_per_second": 201.45897358128926,
+                    "wios_per_second": 452.4130290728465
+                  }
+                },
+                "counter_reset_or_identity_gaps": 0,
+                "scope": "Whole container cgroup, including QEMU/all guest threads and probe costs. About 1 s plus sequential probe intervals; native timestamps retained. CPU excludes initial/final edges and reset gaps; memory peak is lifetime since start. Per-device VM block accounting, not host physical SSD I/O; do not sum stacked/duplicate counters. Absent device rows are unavailable, not zero. Physical I/O latency/queue depth and engine heap unavailable."
+              },
+              "target": {
+                "samples": 43,
+                "observed_cpu_core_seconds": 37.803763999999994,
+                "average_cpu_percent_one_core_100": 71.49103951466117,
+                "sampled_memory_bytes_min_mean_max": [
+                  2003599360,
+                  2033253447.4418604,
+                  2060947456
+                ],
+                "native_peak_memory_bytes": 2156359680,
+                "state_disk_bytes_baseline_peak_settled": {
+                  "state_logical_bytes": [
+                    221823014,
+                    222019622,
+                    222019622
+                  ],
+                  "state_allocated_bytes": [
+                    221802496,
+                    221999104,
+                    221999104
+                  ]
+                },
+                "native_block_io": {
+                  "254:0": {
+                    "observed_seconds": 52.87902408,
+                    "rbytes": 36352,
+                    "wbytes": 2195456,
+                    "rios": 1,
+                    "wios": 272,
+                    "rbytes_per_second": 687.4559550305528,
+                    "wbytes_per_second": 41518.466692549446,
+                    "rios_per_second": 0.018911090312240118,
+                    "wios_per_second": 5.143816564929312
+                  }
+                },
+                "counter_reset_or_identity_gaps": 0,
+                "scope": "Whole container cgroup, including QEMU/all guest threads and probe costs. About 1 s plus sequential probe intervals; native timestamps retained. CPU excludes initial/final edges and reset gaps; memory peak is lifetime since start. Per-device VM block accounting, not host physical SSD I/O; do not sum stacked/duplicate counters. Absent device rows are unavailable, not zero. Physical I/O latency/queue depth and engine heap unavailable."
+              }
+            }
+          },
+          "recovered": {
+            "started_ns": 1795320393876359126,
+            "ended_ns": 1795320478315351096,
+            "roles": {
+              "runner": {
+                "samples": 67,
+                "observed_cpu_core_seconds": 1.4185119999999996,
+                "average_cpu_percent_one_core_100": 1.7042754183915099,
+                "sampled_memory_bytes_min_mean_max": [
+                  17514496,
+                  18998348.41791045,
+                  20058112
+                ],
+                "native_peak_memory_bytes": 268541952,
+                "state_disk_bytes_baseline_peak_settled": {
+                  "state_logical_bytes": [
+                    0,
+                    0,
+                    0
+                  ],
+                  "state_allocated_bytes": [
+                    0,
+                    0,
+                    0
+                  ]
+                },
+                "native_block_io": null,
+                "counter_reset_or_identity_gaps": 0,
+                "scope": "Whole container cgroup, including QEMU/all guest threads and probe costs. About 1 s plus sequential probe intervals; native timestamps retained. CPU excludes initial/final edges and reset gaps; memory peak is lifetime since start. Per-device VM block accounting, not host physical SSD I/O; do not sum stacked/duplicate counters. Absent device rows are unavailable, not zero. Physical I/O latency/queue depth and engine heap unavailable."
+              },
+              "source": {
+                "samples": 67,
+                "observed_cpu_core_seconds": 145.03030900000002,
+                "average_cpu_percent_one_core_100": 174.26551598858362,
+                "sampled_memory_bytes_min_mean_max": [
+                  2511331328,
+                  2550130168.358209,
+                  2671058944
+                ],
+                "native_peak_memory_bytes": 2671058944,
+                "state_disk_bytes_baseline_peak_settled": {
+                  "state_logical_bytes": [
+                    2789587494,
+                    3127163430,
+                    3127163430
+                  ],
+                  "state_allocated_bytes": [
+                    2789310464,
+                    3126890496,
+                    3126890496
+                  ]
+                },
+                "native_block_io": {
+                  "254:0": {
+                    "observed_seconds": 83.22375667799996,
+                    "rbytes": 1749131264,
+                    "wbytes": 442131968,
+                    "rios": 32182,
+                    "wios": 13092,
+                    "rbytes_per_second": 21017211.116382822,
+                    "wbytes_per_second": 5312569.218794671,
+                    "rios_per_second": 386.692469609549,
+                    "wios_per_second": 157.31085116301708
+                  }
+                },
+                "counter_reset_or_identity_gaps": 0,
+                "scope": "Whole container cgroup, including QEMU/all guest threads and probe costs. About 1 s plus sequential probe intervals; native timestamps retained. CPU excludes initial/final edges and reset gaps; memory peak is lifetime since start. Per-device VM block accounting, not host physical SSD I/O; do not sum stacked/duplicate counters. Absent device rows are unavailable, not zero. Physical I/O latency/queue depth and engine heap unavailable."
+              },
+              "target": {
+                "samples": 67,
+                "observed_cpu_core_seconds": 54.53787899999998,
+                "average_cpu_percent_one_core_100": 65.52239134707673,
+                "sampled_memory_bytes_min_mean_max": [
+                  2060578816,
+                  2118854319.761194,
+                  2166120448
+                ],
+                "native_peak_memory_bytes": 2179264512,
+                "state_disk_bytes_baseline_peak_settled": {
+                  "state_logical_bytes": [
+                    222019622,
+                    222478374,
+                    222478374
+                  ],
+                  "state_allocated_bytes": [
+                    221999104,
+                    222457856,
+                    222457856
+                  ]
+                },
+                "native_block_io": {
+                  "254:0": {
+                    "observed_seconds": 83.23548313600001,
+                    "rbytes": 53760,
+                    "wbytes": 5410816,
+                    "rios": 3,
+                    "wios": 702,
+                    "rbytes_per_second": 645.8783919372527,
+                    "wbytes_per_second": 65006.12234278939,
+                    "rios_per_second": 0.03604232097864133,
+                    "wios_per_second": 8.433903109002072
+                  }
+                },
+                "counter_reset_or_identity_gaps": 0,
+                "scope": "Whole container cgroup, including QEMU/all guest threads and probe costs. About 1 s plus sequential probe intervals; native timestamps retained. CPU excludes initial/final edges and reset gaps; memory peak is lifetime since start. Per-device VM block accounting, not host physical SSD I/O; do not sum stacked/duplicate counters. Absent device rows are unavailable, not zero. Physical I/O latency/queue depth and engine heap unavailable."
+              }
+            }
+          }
+        },
+        "e984baeea3674d75a7b8971e2c9771ab": {
+          "baseline": {
+            "started_ns": 1795319925292780881,
+            "ended_ns": 1795319934942313261,
+            "roles": {
+              "runner": {
+                "samples": 8,
+                "observed_cpu_core_seconds": 0.26041099999999995,
+                "average_cpu_percent_one_core_100": 2.978502685376758,
+                "sampled_memory_bytes_min_mean_max": [
+                  18870272,
+                  19203584,
+                  19562496
+                ],
+                "native_peak_memory_bytes": 268541952,
+                "state_disk_bytes_baseline_peak_settled": {
+                  "state_logical_bytes": [
+                    0,
+                    0,
+                    0
+                  ],
+                  "state_allocated_bytes": [
+                    0,
+                    0,
+                    0
+                  ]
+                },
+                "native_block_io": null,
+                "counter_reset_or_identity_gaps": 0,
+                "scope": "Whole container cgroup, including QEMU/all guest threads and probe costs. About 1 s plus sequential probe intervals; native timestamps retained. CPU excludes initial/final edges and reset gaps; memory peak is lifetime since start. Per-device VM block accounting, not host physical SSD I/O; do not sum stacked/duplicate counters. Absent device rows are unavailable, not zero. Physical I/O latency/queue depth and engine heap unavailable."
+              },
+              "source": {
+                "samples": 8,
+                "observed_cpu_core_seconds": 17.230669,
+                "average_cpu_percent_one_core_100": 196.95503103832246,
+                "sampled_memory_bytes_min_mean_max": [
+                  2501017600,
+                  2527625216,
+                  2536566784
+                ],
+                "native_peak_memory_bytes": 2628186112,
+                "state_disk_bytes_baseline_peak_settled": {
+                  "state_logical_bytes": [
+                    1625537830,
+                    1625537830,
+                    1625537830
+                  ],
+                  "state_allocated_bytes": [
+                    1625337856,
+                    1625337856,
+                    1625337856
+                  ]
+                },
+                "native_block_io": {
+                  "254:0": {
+                    "observed_seconds": 8.748529504,
+                    "rbytes": 0,
+                    "wbytes": 29888512,
+                    "rios": 0,
+                    "wios": 480,
+                    "rbytes_per_second": 0.0,
+                    "wbytes_per_second": 3416404.092405973,
+                    "rios_per_second": 0.0,
+                    "wios_per_second": 54.86636351635261
+                  }
+                },
+                "counter_reset_or_identity_gaps": 0,
+                "scope": "Whole container cgroup, including QEMU/all guest threads and probe costs. About 1 s plus sequential probe intervals; native timestamps retained. CPU excludes initial/final edges and reset gaps; memory peak is lifetime since start. Per-device VM block accounting, not host physical SSD I/O; do not sum stacked/duplicate counters. Absent device rows are unavailable, not zero. Physical I/O latency/queue depth and engine heap unavailable."
+              },
+              "target": {
+                "samples": 8,
+                "observed_cpu_core_seconds": 5.590853999999999,
+                "average_cpu_percent_one_core_100": 63.94822758310094,
+                "sampled_memory_bytes_min_mean_max": [
+                  2128908288,
+                  2130960384,
+                  2132606976
+                ],
+                "native_peak_memory_bytes": 2156359680,
+                "state_disk_bytes_baseline_peak_settled": {
+                  "state_logical_bytes": [
+                    219791398,
+                    219856934,
+                    219856934
+                  ],
+                  "state_allocated_bytes": [
+                    219770880,
+                    219836416,
+                    219836416
+                  ]
+                },
+                "native_block_io": {
+                  "254:0": {
+                    "observed_seconds": 8.742781796,
+                    "rbytes": 36352,
+                    "wbytes": 90112,
+                    "rios": 1,
+                    "wios": 5,
+                    "rbytes_per_second": 4157.944330331083,
+                    "wbytes_per_second": 10307.016931524939,
+                    "rios_per_second": 0.11438007070673094,
+                    "wios_per_second": 0.5719003535336546
+                  }
+                },
+                "counter_reset_or_identity_gaps": 0,
+                "scope": "Whole container cgroup, including QEMU/all guest threads and probe costs. About 1 s plus sequential probe intervals; native timestamps retained. CPU excludes initial/final edges and reset gaps; memory peak is lifetime since start. Per-device VM block accounting, not host physical SSD I/O; do not sum stacked/duplicate counters. Absent device rows are unavailable, not zero. Physical I/O latency/queue depth and engine heap unavailable."
+              }
+            }
+          },
+          "fault-injection": {
+            "started_ns": 1795319934942313261,
+            "ended_ns": 1795319948084579878,
+            "roles": {
+              "runner": {
+                "samples": 10,
+                "observed_cpu_core_seconds": 0.270137,
+                "average_cpu_percent_one_core_100": 2.3693810731997957,
+                "sampled_memory_bytes_min_mean_max": [
+                  19075072,
+                  19437977.6,
+                  19902464
+                ],
+                "native_peak_memory_bytes": 268541952,
+                "state_disk_bytes_baseline_peak_settled": {
+                  "state_logical_bytes": [
+                    0,
+                    0,
+                    0
+                  ],
+                  "state_allocated_bytes": [
+                    0,
+                    0,
+                    0
+                  ]
+                },
+                "native_block_io": null,
+                "counter_reset_or_identity_gaps": 0,
+                "scope": "Whole container cgroup, including QEMU/all guest threads and probe costs. About 1 s plus sequential probe intervals; native timestamps retained. CPU excludes initial/final edges and reset gaps; memory peak is lifetime since start. Per-device VM block accounting, not host physical SSD I/O; do not sum stacked/duplicate counters. Absent device rows are unavailable, not zero. Physical I/O latency/queue depth and engine heap unavailable."
+              },
+              "source": {
+                "samples": 10,
+                "observed_cpu_core_seconds": 21.919480999999998,
+                "average_cpu_percent_one_core_100": 192.44494727902116,
+                "sampled_memory_bytes_min_mean_max": [
+                  2538844160,
+                  2545593139.2,
+                  2554064896
+                ],
+                "native_peak_memory_bytes": 2628186112,
+                "state_disk_bytes_baseline_peak_settled": {
+                  "state_logical_bytes": [
+                    1625603366,
+                    1625865510,
+                    1625865510
+                  ],
+                  "state_allocated_bytes": [
+                    1625403392,
+                    1625665536,
+                    1625665536
+                  ]
+                },
+                "native_block_io": {
+                  "254:0": {
+                    "observed_seconds": 11.390000782000001,
+                    "rbytes": 5120,
+                    "wbytes": 72032256,
+                    "rios": 1,
+                    "wios": 1377,
+                    "rbytes_per_second": 449.51708941858084,
+                    "wbytes_per_second": 6324166.02761213,
+                    "rios_per_second": 0.08779630652706656,
+                    "wios_per_second": 120.89551408777066
+                  }
+                },
+                "counter_reset_or_identity_gaps": 0,
+                "scope": "Whole container cgroup, including QEMU/all guest threads and probe costs. About 1 s plus sequential probe intervals; native timestamps retained. CPU excludes initial/final edges and reset gaps; memory peak is lifetime since start. Per-device VM block accounting, not host physical SSD I/O; do not sum stacked/duplicate counters. Absent device rows are unavailable, not zero. Physical I/O latency/queue depth and engine heap unavailable."
+              },
+              "target": {
+                "samples": 10,
+                "observed_cpu_core_seconds": 11.676134,
+                "average_cpu_percent_one_core_100": 102.448560729288,
+                "sampled_memory_bytes_min_mean_max": [
+                  2131746816,
+                  2136851660.8,
+                  2145972224
+                ],
+                "native_peak_memory_bytes": 2156359680,
+                "state_disk_bytes_baseline_peak_settled": {
+                  "state_logical_bytes": [
+                    219922470,
+                    219922470,
+                    219922470
+                  ],
+                  "state_allocated_bytes": [
+                    219901952,
+                    219901952,
+                    219901952
+                  ]
+                },
+                "native_block_io": {
+                  "254:0": {
+                    "observed_seconds": 11.397069823999999,
+                    "rbytes": 27648,
+                    "wbytes": 36864,
+                    "rios": 4,
+                    "wios": 7,
+                    "rbytes_per_second": 2425.8866907859706,
+                    "wbytes_per_second": 3234.515587714627,
+                    "rios_per_second": 0.35096740318084063,
+                    "wios_per_second": 0.6141929555664711
+                  }
+                },
+                "counter_reset_or_identity_gaps": 0,
+                "scope": "Whole container cgroup, including QEMU/all guest threads and probe costs. About 1 s plus sequential probe intervals; native timestamps retained. CPU excludes initial/final edges and reset gaps; memory peak is lifetime since start. Per-device VM block accounting, not host physical SSD I/O; do not sum stacked/duplicate counters. Absent device rows are unavailable, not zero. Physical I/O latency/queue depth and engine heap unavailable."
+              }
+            }
+          },
+          "degraded": {
+            "started_ns": 1795319948084579878,
+            "ended_ns": 1795319956169182465,
+            "roles": {
+              "runner": {
+                "samples": 7,
+                "observed_cpu_core_seconds": 0.210003,
+                "average_cpu_percent_one_core_100": 2.784500982372896,
+                "sampled_memory_bytes_min_mean_max": [
+                  18059264,
+                  18996662.85714286,
+                  19656704
+                ],
+                "native_peak_memory_bytes": 268541952,
+                "state_disk_bytes_baseline_peak_settled": {
+                  "state_logical_bytes": [
+                    0,
+                    0,
+                    0
+                  ],
+                  "state_allocated_bytes": [
+                    0,
+                    0,
+                    0
+                  ]
+                },
+                "native_block_io": null,
+                "counter_reset_or_identity_gaps": 0,
+                "scope": "Whole container cgroup, including QEMU/all guest threads and probe costs. About 1 s plus sequential probe intervals; native timestamps retained. CPU excludes initial/final edges and reset gaps; memory peak is lifetime since start. Per-device VM block accounting, not host physical SSD I/O; do not sum stacked/duplicate counters. Absent device rows are unavailable, not zero. Physical I/O latency/queue depth and engine heap unavailable."
+              },
+              "source": {
+                "samples": 7,
+                "observed_cpu_core_seconds": 13.72369,
+                "average_cpu_percent_one_core_100": 182.1182818238942,
+                "sampled_memory_bytes_min_mean_max": [
+                  2555101184,
+                  2574904758.857143,
+                  2598035456
+                ],
+                "native_peak_memory_bytes": 2628186112,
+                "state_disk_bytes_baseline_peak_settled": {
+                  "state_logical_bytes": [
+                    1625865510,
+                    1625865510,
+                    1625865510
+                  ],
+                  "state_allocated_bytes": [
+                    1625665536,
+                    1625665536,
+                    1625665536
+                  ]
+                },
+                "native_block_io": {
+                  "254:0": {
+                    "observed_seconds": 7.535591628999999,
+                    "rbytes": 0,
+                    "wbytes": 32854016,
+                    "rios": 0,
+                    "wios": 566,
+                    "rbytes_per_second": 0.0,
+                    "wbytes_per_second": 4359845.599058803,
+                    "rios_per_second": 0.0,
+                    "wios_per_second": 75.11022728750368
+                  }
+                },
+                "counter_reset_or_identity_gaps": 0,
+                "scope": "Whole container cgroup, including QEMU/all guest threads and probe costs. About 1 s plus sequential probe intervals; native timestamps retained. CPU excludes initial/final edges and reset gaps; memory peak is lifetime since start. Per-device VM block accounting, not host physical SSD I/O; do not sum stacked/duplicate counters. Absent device rows are unavailable, not zero. Physical I/O latency/queue depth and engine heap unavailable."
+              },
+              "target": {
+                "samples": 7,
+                "observed_cpu_core_seconds": 9.198730000000001,
+                "average_cpu_percent_one_core_100": 122.02859485051319,
+                "sampled_memory_bytes_min_mean_max": [
+                  1987620864,
+                  2011259465.142857,
+                  2148032512
+                ],
+                "native_peak_memory_bytes": 2156359680,
+                "state_disk_bytes_baseline_peak_settled": {
+                  "state_logical_bytes": [
+                    219922470,
+                    220053542,
+                    220053542
+                  ],
+                  "state_allocated_bytes": [
+                    219901952,
+                    220033024,
+                    220033024
+                  ]
+                },
+                "native_block_io": {
+                  "254:0": {
+                    "observed_seconds": 7.538175794999999,
+                    "rbytes": 24064,
+                    "wbytes": 1839104,
+                    "rios": 1,
+                    "wios": 250,
+                    "rbytes_per_second": 3192.284268026944,
+                    "wbytes_per_second": 243972.02320750602,
+                    "rios_per_second": 0.13265808959553457,
+                    "wios_per_second": 33.16452239888365
+                  }
+                },
+                "counter_reset_or_identity_gaps": 0,
+                "scope": "Whole container cgroup, including QEMU/all guest threads and probe costs. About 1 s plus sequential probe intervals; native timestamps retained. CPU excludes initial/final edges and reset gaps; memory peak is lifetime since start. Per-device VM block accounting, not host physical SSD I/O; do not sum stacked/duplicate counters. Absent device rows are unavailable, not zero. Physical I/O latency/queue depth and engine heap unavailable."
+              }
+            }
+          },
+          "replacement": {
+            "started_ns": 1795319956169182465,
+            "ended_ns": 1795319979369585878,
+            "roles": {
+              "runner": {
+                "samples": 18,
+                "observed_cpu_core_seconds": 0.36944600000000005,
+                "average_cpu_percent_one_core_100": 1.7325435983059467,
+                "sampled_memory_bytes_min_mean_max": [
+                  17715200,
+                  19516074.666666668,
+                  20209664
+                ],
+                "native_peak_memory_bytes": 268541952,
+                "state_disk_bytes_baseline_peak_settled": {
+                  "state_logical_bytes": [
+                    0,
+                    0,
+                    0
+                  ],
+                  "state_allocated_bytes": [
+                    0,
+                    0,
+                    0
+                  ]
+                },
+                "native_block_io": null,
+                "counter_reset_or_identity_gaps": 0,
+                "scope": "Whole container cgroup, including QEMU/all guest threads and probe costs. About 1 s plus sequential probe intervals; native timestamps retained. CPU excludes initial/final edges and reset gaps; memory peak is lifetime since start. Per-device VM block accounting, not host physical SSD I/O; do not sum stacked/duplicate counters. Absent device rows are unavailable, not zero. Physical I/O latency/queue depth and engine heap unavailable."
+              },
+              "source": {
+                "samples": 18,
+                "observed_cpu_core_seconds": 41.753907,
+                "average_cpu_percent_one_core_100": 195.822232085153,
+                "sampled_memory_bytes_min_mean_max": [
+                  2600800256,
+                  2613100088.888889,
+                  2631200768
+                ],
+                "native_peak_memory_bytes": 2631200768,
+                "state_disk_bytes_baseline_peak_settled": {
+                  "state_logical_bytes": [
+                    1625865510,
+                    1630911782,
+                    1630911782
+                  ],
+                  "state_allocated_bytes": [
+                    1625665536,
+                    1630711808,
+                    1630711808
+                  ]
+                },
+                "native_block_io": {
+                  "254:0": {
+                    "observed_seconds": 21.322352705,
+                    "rbytes": 235956736,
+                    "wbytes": 384812544,
+                    "rios": 2138,
+                    "wios": 6618,
+                    "rbytes_per_second": 11066167.944247032,
+                    "wbytes_per_second": 18047377.291051146,
+                    "rios_per_second": 100.27036085462784,
+                    "wios_per_second": 310.37850707947945
+                  }
+                },
+                "counter_reset_or_identity_gaps": 0,
+                "scope": "Whole container cgroup, including QEMU/all guest threads and probe costs. About 1 s plus sequential probe intervals; native timestamps retained. CPU excludes initial/final edges and reset gaps; memory peak is lifetime since start. Per-device VM block accounting, not host physical SSD I/O; do not sum stacked/duplicate counters. Absent device rows are unavailable, not zero. Physical I/O latency/queue depth and engine heap unavailable."
+              },
+              "target": {
+                "samples": 18,
+                "observed_cpu_core_seconds": 22.1976,
+                "average_cpu_percent_one_core_100": 104.09535636380515,
+                "sampled_memory_bytes_min_mean_max": [
+                  1988460544,
+                  2009865557.3333333,
+                  2019479552
+                ],
+                "native_peak_memory_bytes": 2156359680,
+                "state_disk_bytes_baseline_peak_settled": {
+                  "state_logical_bytes": [
+                    220053542,
+                    220184614,
+                    220184614
+                  ],
+                  "state_allocated_bytes": [
+                    220033024,
+                    220164096,
+                    220164096
+                  ]
+                },
+                "native_block_io": {
+                  "254:0": {
+                    "observed_seconds": 21.324294162000005,
+                    "rbytes": 719360,
+                    "wbytes": 491520,
+                    "rios": 22,
+                    "wios": 42,
+                    "rbytes_per_second": 33734.29359654506,
+                    "wbytes_per_second": 23049.766443190932,
+                    "rios_per_second": 1.0316871373498546,
+                    "wios_per_second": 1.9695845349406313
+                  }
+                },
+                "counter_reset_or_identity_gaps": 0,
+                "scope": "Whole container cgroup, including QEMU/all guest threads and probe costs. About 1 s plus sequential probe intervals; native timestamps retained. CPU excludes initial/final edges and reset gaps; memory peak is lifetime since start. Per-device VM block accounting, not host physical SSD I/O; do not sum stacked/duplicate counters. Absent device rows are unavailable, not zero. Physical I/O latency/queue depth and engine heap unavailable."
+              }
+            }
+          },
+          "recovered": {
+            "started_ns": 1795319979369585878,
+            "ended_ns": 1795320101897225671,
+            "roles": {
+              "runner": {
+                "samples": 97,
+                "observed_cpu_core_seconds": 1.9785149999999996,
+                "average_cpu_percent_one_core_100": 1.6303769301266486,
+                "sampled_memory_bytes_min_mean_max": [
+                  16842752,
+                  18341676.86597938,
+                  19439616
+                ],
+                "native_peak_memory_bytes": 268541952,
+                "state_disk_bytes_baseline_peak_settled": {
+                  "state_logical_bytes": [
+                    0,
+                    0,
+                    0
+                  ],
+                  "state_allocated_bytes": [
+                    0,
+                    0,
+                    0
+                  ]
+                },
+                "native_block_io": null,
+                "counter_reset_or_identity_gaps": 0,
+                "scope": "Whole container cgroup, including QEMU/all guest threads and probe costs. About 1 s plus sequential probe intervals; native timestamps retained. CPU excludes initial/final edges and reset gaps; memory peak is lifetime since start. Per-device VM block accounting, not host physical SSD I/O; do not sum stacked/duplicate counters. Absent device rows are unavailable, not zero. Physical I/O latency/queue depth and engine heap unavailable."
+              },
+              "source": {
+                "samples": 97,
+                "observed_cpu_core_seconds": 188.14638999999994,
+                "average_cpu_percent_one_core_100": 155.0254840109201,
+                "sampled_memory_bytes_min_mean_max": [
+                  2462130176,
+                  2526977330.14433,
+                  2639200256
+                ],
+                "native_peak_memory_bytes": 2639200256,
+                "state_disk_bytes_baseline_peak_settled": {
+                  "state_logical_bytes": [
+                    1630977318,
+                    1665645862,
+                    1665645862
+                  ],
+                  "state_allocated_bytes": [
+                    1630777344,
+                    1665445888,
+                    1665445888
+                  ]
+                },
+                "native_block_io": {
+                  "254:0": {
+                    "observed_seconds": 121.364813792,
+                    "rbytes": 1745587712,
+                    "wbytes": 721252352,
+                    "rios": 15357,
+                    "wios": 12999,
+                    "rbytes_per_second": 14382980.185605193,
+                    "wbytes_per_second": 5942845.619456986,
+                    "rios_per_second": 126.53585104426935,
+                    "wios_per_second": 107.1068260548582
+                  }
+                },
+                "counter_reset_or_identity_gaps": 0,
+                "scope": "Whole container cgroup, including QEMU/all guest threads and probe costs. About 1 s plus sequential probe intervals; native timestamps retained. CPU excludes initial/final edges and reset gaps; memory peak is lifetime since start. Per-device VM block accounting, not host physical SSD I/O; do not sum stacked/duplicate counters. Absent device rows are unavailable, not zero. Physical I/O latency/queue depth and engine heap unavailable."
+              },
+              "target": {
+                "samples": 97,
+                "observed_cpu_core_seconds": 86.88853399999998,
+                "average_cpu_percent_one_core_100": 71.5987674980584,
+                "sampled_memory_bytes_min_mean_max": [
+                  2021605376,
+                  2079964803.958763,
+                  2136641536
+                ],
+                "native_peak_memory_bytes": 2156359680,
+                "state_disk_bytes_baseline_peak_settled": {
+                  "state_logical_bytes": [
+                    220184614,
+                    220708902,
+                    220708902
+                  ],
+                  "state_allocated_bytes": [
+                    220164096,
+                    220688384,
+                    220688384
+                  ]
+                },
+                "native_block_io": {
+                  "254:0": {
+                    "observed_seconds": 121.35479008400003,
+                    "rbytes": 45568,
+                    "wbytes": 8716288,
+                    "rios": 3,
+                    "wios": 1194,
+                    "rbytes_per_second": 375.4940366874558,
+                    "wbytes_per_second": 71824.83686030614,
+                    "rios_per_second": 0.024720903047365857,
+                    "wios_per_second": 9.83891941285161
+                  }
+                },
+                "counter_reset_or_identity_gaps": 0,
+                "scope": "Whole container cgroup, including QEMU/all guest threads and probe costs. About 1 s plus sequential probe intervals; native timestamps retained. CPU excludes initial/final edges and reset gaps; memory peak is lifetime since start. Per-device VM block accounting, not host physical SSD I/O; do not sum stacked/duplicate counters. Absent device rows are unavailable, not zero. Physical I/O latency/queue depth and engine heap unavailable."
+              }
+            }
+          }
+        }
+      },
+      "host_controller": {
+        "wall_seconds": 1096.6925748339854,
+        "self_cpu_core_seconds": 8.342959,
+        "self_cpu_percent_one_core_100": 0.760738167782611,
+        "children_cpu_core_seconds": 96.220991,
+        "process_peak_rss_bytes": 26116096,
+        "scope": "Host Python controller across all threads, plus separately reaped Docker CLI child CPU. Includes sampling/metadata/command costs after main starts; peak RSS is process lifetime. Native Docker/QEMU cgroup CPU is a separate layer; do not sum counters as physical-device usage."
+      },
+      "teardown": null
+    },
+    {
+      "environment": {
+        "host_system": "Darwin",
+        "host_architecture": "arm64",
+        "host_kernel": "25.5.0",
+        "members_at_start": [
+          {
+            "id": "7483af3b950c65f9c8954ca0b5569ada658c44cb1e4b263b7887c12d6a61167e",
+            "image_id": "sha256:c987448b0f1995eab59b18561403b162809d963837f4b58d2d77728802ee3684",
+            "image": "zfs-storage-lab:dev",
+            "role": "target",
+            "cpu_limit": 2.0,
+            "memory_limit_bytes": 3221225472
+          },
+          {
+            "id": "b745212644d3955dc2b7b1f60fba826aa4060d7068297cebb4793040789d7e7e",
+            "image_id": "sha256:c987448b0f1995eab59b18561403b162809d963837f4b58d2d77728802ee3684",
+            "image": "zfs-storage-lab:dev",
+            "role": "source",
+            "cpu_limit": 2.0,
+            "memory_limit_bytes": 3221225472
+          }
+        ],
+        "docker": {
+          "ServerVersion": "29.5.3",
+          "KernelVersion": "6.12.76-linuxkit",
+          "Architecture": "aarch64",
+          "NCPU": 11,
+          "MemTotal": 26216296448,
+          "CgroupVersion": "2"
+        },
+        "scope": "One-host QEMU TCG guests; all roles share Docker VM and host. Other independent functional labs may run concurrently. Diagnostic, not a performance comparison. Images and exact resources recorded; guest versions in versions.json."
+      },
+      "id": "e783159945604f77b36d2127c38bb5cd",
+      "completion": {
+        "ended_ns": 1795321307081366000,
+        "duration_s": 267.03556412481703,
+        "exit_code": 0,
+        "sampling_errors": [],
+        "sampler_stopped": true
+      },
+      "sources": {
+        "run.py": "3b3871a29914f994344568b5f0d6eedfd5a6092851060bbaefd126c65918aaa4",
+        "resources.py": "8ca113e654628da913336fef5b98bb676c2fafe8bd5902e27fb4ad86ccaee549",
+        "Makefile": "52ae1c69195133dfe1bd23b5086498f1b64b7970e9da6bf067ab86b427916de7",
+        "docker-compose.yml": "4234dafdb3847501bcc82a025adca4e48822109570c5212eecf338eae644571c",
+        "vm/Dockerfile": "0ef1a888bdaa673d8ac0044600c7404e5b4646e42062593e1e4a4be1fce36045",
+        "vm/boot.py": "1b90235a013f4598a70e691e4a20e2a3adf75528611454b1292ffa26465057d8",
+        "app/evidence.py": "64eab9d533b24c817fb5cf74e9d967adb77253b81eba6c75af8e4aea19f1b640",
+        "app/lab.py": "9a8ee35fad02df47200f16f54173b1a946eb5f157f45482d1d4d019ee1b3c7c8",
+        "app/observe.py": "e1a41ce24341f1fc23b1f5ca801438ce5a41b11d11eb0b0ea7d12222362e87d7",
+        "app/test_evidence.py": "a629dbff47ccbc6c591d4f2965db7a7b1736b2782b9a7cf41fecf83777b9ef09",
+        "app/test_lab.py": "cb673e79ddeabd4d71f538bdea907f201537f11f7b68c5e4e9e751f55b435fde"
+      },
+      "resources": {
+        "runner": {
+          "samples": 211,
+          "observed_cpu_core_seconds": 12.621489000000002,
+          "average_cpu_percent_one_core_100": 4.767587293025278,
+          "sampled_memory_bytes_min_mean_max": [
+            16261120,
+            212746628.2464455,
+            268439552
+          ],
+          "native_peak_memory_bytes": 268820480,
+          "state_disk_bytes_baseline_peak_settled": {
+            "state_logical_bytes": [
+              0,
+              0,
+              0
+            ],
+            "state_allocated_bytes": [
+              0,
+              0,
+              0
+            ]
+          },
+          "native_block_io": null,
+          "counter_reset_or_identity_gaps": 0,
+          "scope": "Whole container cgroup, including QEMU/all guest threads and probe costs. About 1 s plus sequential probe intervals; native timestamps retained. CPU excludes initial/final edges and reset gaps; memory peak is lifetime since start. Per-device VM block accounting, not host physical SSD I/O; do not sum stacked/duplicate counters. Absent device rows are unavailable, not zero. Physical I/O latency/queue depth and engine heap unavailable."
+        },
+        "source": {
+          "samples": 212,
+          "observed_cpu_core_seconds": 308.7169210000002,
+          "average_cpu_percent_one_core_100": 116.0612324183157,
+          "sampled_memory_bytes_min_mean_max": [
+            2593603584,
+            2674995586.4150944,
+            2763677696
+          ],
+          "native_peak_memory_bytes": 2763677696,
+          "state_disk_bytes_baseline_peak_settled": {
+            "state_logical_bytes": [
+              3771120166,
+              3778787878,
+              3778787878
+            ],
+            "state_allocated_bytes": [
+              3770855424,
+              3778531328,
+              3778531328
+            ]
+          },
+          "native_block_io": {
+            "254:0": {
+              "observed_seconds": 265.9948671640001,
+              "rbytes": 692923392,
+              "wbytes": 38483968,
+              "rios": 7745,
+              "wios": 5075,
+              "rbytes_per_second": 2605025.4254446784,
+              "wbytes_per_second": 144679.36321595474,
+              "rios_per_second": 29.117103207953228,
+              "wios_per_second": 19.07931553006619
+            }
+          },
+          "counter_reset_or_identity_gaps": 0,
+          "scope": "Whole container cgroup, including QEMU/all guest threads and probe costs. About 1 s plus sequential probe intervals; native timestamps retained. CPU excludes initial/final edges and reset gaps; memory peak is lifetime since start. Per-device VM block accounting, not host physical SSD I/O; do not sum stacked/duplicate counters. Absent device rows are unavailable, not zero. Physical I/O latency/queue depth and engine heap unavailable."
+        },
+        "target": {
+          "samples": 212,
+          "observed_cpu_core_seconds": 301.8313039999999,
+          "average_cpu_percent_one_core_100": 113.4691713920138,
+          "sampled_memory_bytes_min_mean_max": [
+            2430414848,
+            2507973380.8301888,
+            2593259520
+          ],
+          "native_peak_memory_bytes": 2593259520,
+          "state_disk_bytes_baseline_peak_settled": {
+            "state_logical_bytes": [
+              1594801702,
+              1601355302,
+              1601355302
+            ],
+            "state_allocated_bytes": [
+              1594736640,
+              1601290240,
+              1601290240
+            ]
+          },
+          "native_block_io": {
+            "254:0": {
+              "observed_seconds": 266.002915415,
+              "rbytes": 680865280,
+              "wbytes": 34623488,
+              "rios": 7573,
+              "wios": 4399,
+              "rbytes_per_second": 2559615.855855412,
+              "wbytes_per_second": 130162.06211869048,
+              "rios_per_second": 28.46961277918744,
+              "wios_per_second": 16.53741273149948
+            }
+          },
+          "counter_reset_or_identity_gaps": 0,
+          "scope": "Whole container cgroup, including QEMU/all guest threads and probe costs. About 1 s plus sequential probe intervals; native timestamps retained. CPU excludes initial/final edges and reset gaps; memory peak is lifetime since start. Per-device VM block accounting, not host physical SSD I/O; do not sum stacked/duplicate counters. Absent device rows are unavailable, not zero. Physical I/O latency/queue depth and engine heap unavailable."
+        }
+      },
+      "phases": {},
+      "host_controller": {
+        "wall_seconds": 267.20121433306485,
+        "self_cpu_core_seconds": 2.104054,
+        "self_cpu_percent_one_core_100": 0.7874417806265313,
+        "children_cpu_core_seconds": 23.402147,
+        "process_peak_rss_bytes": 26230784,
+        "scope": "Host Python controller across all threads, plus separately reaped Docker CLI child CPU. Includes sampling/metadata/command costs after main starts; peak RSS is process lifetime. Native Docker/QEMU cgroup CPU is a separate layer; do not sum counters as physical-device usage."
+      },
+      "teardown": {
+        "containers": [],
+        "volumes": [],
+        "networks": []
+      }
+    },
+    {
+      "environment": {
+        "host_system": "Darwin",
+        "host_architecture": "arm64",
+        "host_kernel": "25.5.0",
+        "members_at_start": [
+          {
+            "id": "7483af3b950c65f9c8954ca0b5569ada658c44cb1e4b263b7887c12d6a61167e",
+            "image_id": "sha256:c987448b0f1995eab59b18561403b162809d963837f4b58d2d77728802ee3684",
+            "image": "zfs-storage-lab:dev",
+            "role": "target",
+            "cpu_limit": 2.0,
+            "memory_limit_bytes": 3221225472
+          },
+          {
+            "id": "b745212644d3955dc2b7b1f60fba826aa4060d7068297cebb4793040789d7e7e",
+            "image_id": "sha256:c987448b0f1995eab59b18561403b162809d963837f4b58d2d77728802ee3684",
+            "image": "zfs-storage-lab:dev",
+            "role": "source",
+            "cpu_limit": 2.0,
+            "memory_limit_bytes": 3221225472
+          }
+        ],
+        "docker": {
+          "ServerVersion": "29.5.3",
+          "KernelVersion": "6.12.76-linuxkit",
+          "Architecture": "aarch64",
+          "NCPU": 11,
+          "MemTotal": 26216296448,
+          "CgroupVersion": "2"
+        },
+        "scope": "One-host QEMU TCG guests; all roles share Docker VM and host. Other independent functional labs may run concurrently. Diagnostic, not a performance comparison. Images and exact resources recorded; guest versions in versions.json."
+      },
+      "id": "ff9d865ea9024e07a7f7aee2bb204304",
+      "completion": {
+        "ended_ns": 1795321039792101000,
+        "duration_s": 5.189913166919723,
+        "exit_code": 0,
+        "sampling_errors": [],
+        "sampler_stopped": true
+      },
+      "sources": {
+        "run.py": "3b3871a29914f994344568b5f0d6eedfd5a6092851060bbaefd126c65918aaa4",
+        "resources.py": "8ca113e654628da913336fef5b98bb676c2fafe8bd5902e27fb4ad86ccaee549",
+        "Makefile": "52ae1c69195133dfe1bd23b5086498f1b64b7970e9da6bf067ab86b427916de7",
+        "docker-compose.yml": "4234dafdb3847501bcc82a025adca4e48822109570c5212eecf338eae644571c",
+        "vm/Dockerfile": "0ef1a888bdaa673d8ac0044600c7404e5b4646e42062593e1e4a4be1fce36045",
+        "vm/boot.py": "1b90235a013f4598a70e691e4a20e2a3adf75528611454b1292ffa26465057d8",
+        "app/evidence.py": "64eab9d533b24c817fb5cf74e9d967adb77253b81eba6c75af8e4aea19f1b640",
+        "app/lab.py": "9a8ee35fad02df47200f16f54173b1a946eb5f157f45482d1d4d019ee1b3c7c8",
+        "app/observe.py": "e1a41ce24341f1fc23b1f5ca801438ce5a41b11d11eb0b0ea7d12222362e87d7",
+        "app/test_evidence.py": "a629dbff47ccbc6c591d4f2965db7a7b1736b2782b9a7cf41fecf83777b9ef09",
+        "app/test_lab.py": "cb673e79ddeabd4d71f538bdea907f201537f11f7b68c5e4e9e751f55b435fde"
+      },
+      "resources": {
+        "runner": {
+          "samples": 4,
+          "observed_cpu_core_seconds": 0.086667,
+          "average_cpu_percent_one_core_100": 2.3057684638834806,
+          "sampled_memory_bytes_min_mean_max": [
+            16347136,
+            16670720,
+            17006592
+          ],
+          "native_peak_memory_bytes": 17006592,
+          "state_disk_bytes_baseline_peak_settled": {
+            "state_logical_bytes": [
+              0,
+              0,
+              0
+            ],
+            "state_allocated_bytes": [
+              0,
+              0,
+              0
+            ]
+          },
+          "native_block_io": null,
+          "counter_reset_or_identity_gaps": 0,
+          "scope": "Whole container cgroup, including QEMU/all guest threads and probe costs. About 1 s plus sequential probe intervals; native timestamps retained. CPU excludes initial/final edges and reset gaps; memory peak is lifetime since start. Per-device VM block accounting, not host physical SSD I/O; do not sum stacked/duplicate counters. Absent device rows are unavailable, not zero. Physical I/O latency/queue depth and engine heap unavailable."
+        },
+        "source": {
+          "samples": 5,
+          "observed_cpu_core_seconds": 2.917437,
+          "average_cpu_percent_one_core_100": 58.09289258056847,
+          "sampled_memory_bytes_min_mean_max": [
+            2731614208,
+            2732187648,
+            2732875776
+          ],
+          "native_peak_memory_bytes": 2755710976,
+          "state_disk_bytes_baseline_peak_settled": {
+            "state_logical_bytes": [
+              3771120166,
+              3771120166,
+              3771120166
+            ],
+            "state_allocated_bytes": [
+              3770855424,
+              3770855424,
+              3770855424
+            ]
+          },
+          "native_block_io": {
+            "254:0": {
+              "observed_seconds": 5.022020544,
+              "rbytes": 0,
+              "wbytes": 16384,
+              "rios": 0,
+              "wios": 4,
+              "rbytes_per_second": 0.0,
+              "wbytes_per_second": 3262.4318949819094,
+              "rios_per_second": 0.0,
+              "wios_per_second": 0.7964921618608177
+            }
+          },
+          "counter_reset_or_identity_gaps": 0,
+          "scope": "Whole container cgroup, including QEMU/all guest threads and probe costs. About 1 s plus sequential probe intervals; native timestamps retained. CPU excludes initial/final edges and reset gaps; memory peak is lifetime since start. Per-device VM block accounting, not host physical SSD I/O; do not sum stacked/duplicate counters. Absent device rows are unavailable, not zero. Physical I/O latency/queue depth and engine heap unavailable."
+        },
+        "target": {
+          "samples": 5,
+          "observed_cpu_core_seconds": 4.749725,
+          "average_cpu_percent_one_core_100": 94.63541611524853,
+          "sampled_memory_bytes_min_mean_max": [
+            2456059904,
+            2459203993.6,
+            2465136640
+          ],
+          "native_peak_memory_bytes": 2591571968,
+          "state_disk_bytes_baseline_peak_settled": {
+            "state_logical_bytes": [
+              1593753126,
+              1594801702,
+              1594801702
+            ],
+            "state_allocated_bytes": [
+              1593688064,
+              1594736640,
+              1594736640
+            ]
+          },
+          "native_block_io": {
+            "254:0": {
+              "observed_seconds": 5.018971960999999,
+              "rbytes": 9728,
+              "wbytes": 3993600,
+              "rios": 2,
+              "wios": 370,
+              "rbytes_per_second": 1938.2455362555474,
+              "wbytes_per_second": 795700.7990943827,
+              "rios_per_second": 0.39848798031569643,
+              "wios_per_second": 73.72027635840384
+            }
+          },
+          "counter_reset_or_identity_gaps": 0,
+          "scope": "Whole container cgroup, including QEMU/all guest threads and probe costs. About 1 s plus sequential probe intervals; native timestamps retained. CPU excludes initial/final edges and reset gaps; memory peak is lifetime since start. Per-device VM block accounting, not host physical SSD I/O; do not sum stacked/duplicate counters. Absent device rows are unavailable, not zero. Physical I/O latency/queue depth and engine heap unavailable."
+        }
+      },
+      "phases": {},
+      "host_controller": {
+        "wall_seconds": 5.832025666953996,
+        "self_cpu_core_seconds": 0.055623,
+        "self_cpu_percent_one_core_100": 0.9537509465223477,
+        "children_cpu_core_seconds": 1.156698,
+        "process_peak_rss_bytes": 25772032,
+        "scope": "Host Python controller across all threads, plus separately reaped Docker CLI child CPU. Includes sampling/metadata/command costs after main starts; peak RSS is process lifetime. Native Docker/QEMU cgroup CPU is a separate layer; do not sum counters as physical-device usage."
+      },
+      "teardown": null
+    }
+  ],
+  "native_archives": [
+    {
+      "node": "source",
+      "snapshot": "zfslab@evidence_21b97072795945828181c969fb7bfc02",
+      "dataset_snapshots": [
+        "zfslab@evidence_21b97072795945828181c969fb7bfc02",
+        "zfslab/data@evidence_21b97072795945828181c969fb7bfc02"
+      ],
+      "bytes": 672797904,
+      "sha256": "b2b1145380b277c8997442f6ca1e402ea6c6c7fced1f428b40def063ff0a37b8",
+      "native_stream_check_exit_code": 0,
+      "scope": "Native recursive send stream preserved outside both guests before reset; no restore qualification claimed."
+    },
+    {
+      "node": "source",
+      "snapshot": "zfslab@evidence_230cdea6df2e4375bc873da9a8971d28",
+      "dataset_snapshots": [
+        "zfslab@evidence_230cdea6df2e4375bc873da9a8971d28",
+        "zfslab/data@evidence_230cdea6df2e4375bc873da9a8971d28"
+      ],
+      "bytes": 605513376,
+      "sha256": "50f909f08174779e60ee0ed13ee4ba39cde6330593600ffc82e959f28a559c09",
+      "native_stream_check_exit_code": 0,
+      "scope": "Native recursive send stream preserved outside both guests before reset; no restore qualification claimed."
+    },
+    {
+      "node": "source",
+      "snapshot": "zfslab@evidence_2e5863e947a64ba290762472e02e346c",
+      "dataset_snapshots": [
+        "zfslab@evidence_2e5863e947a64ba290762472e02e346c",
+        "zfslab/data@evidence_2e5863e947a64ba290762472e02e346c"
+      ],
+      "bytes": 605513376,
+      "sha256": "afcaa90bac726b0a9206d00acae82744258a567325aa0a10a24c773f64d2251c",
+      "native_stream_check_exit_code": 0,
+      "scope": "Native recursive send stream preserved outside both guests before reset; no restore qualification claimed."
+    },
+    {
+      "node": "source",
+      "snapshot": "zfslab@evidence_32ff07500604479ca60b5084e7e9d06c",
+      "dataset_snapshots": [
+        "zfslab@evidence_32ff07500604479ca60b5084e7e9d06c",
+        "zfslab/data@evidence_32ff07500604479ca60b5084e7e9d06c"
+      ],
+      "bytes": 605514928,
+      "sha256": "6818acbf59c1cb230f432f938d4b841d7160b66909fdf773e76b286a7edec922",
+      "native_stream_check_exit_code": 0,
+      "scope": "Native recursive send stream preserved outside both guests before reset; no restore qualification claimed."
+    },
+    {
+      "node": "target",
+      "snapshot": "zfslab@evidence_caaa7fe2336c45be9b56a07f0b08480c",
+      "dataset_snapshots": [
+        "zfslab@evidence_caaa7fe2336c45be9b56a07f0b08480c",
+        "zfslab/data@evidence_caaa7fe2336c45be9b56a07f0b08480c"
+      ],
+      "bytes": 672800752,
+      "sha256": "6c54995a00f468369d47f7a221c332d5d49e7520715f0a1c3f0679a89351e134",
+      "native_stream_check_exit_code": 0,
+      "scope": "Native recursive send stream preserved outside both guests before reset; no restore qualification claimed."
+    }
+  ],
+  "scope": "Functional mirror/RAIDZ2 immutable-reader and active-fio recovery observations. Software emulation/shared host and concurrent independent functional lanes; no comparative throughput winner, independent-host durability, per-flush external ACK, native-stream restore or continuous replication qualification. Native send archives are re-hashed here; prior zstream checksum results are preserved, not replaced by a restore claim."
+}

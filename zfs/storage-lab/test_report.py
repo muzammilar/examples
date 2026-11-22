@@ -142,6 +142,16 @@ class ReplayTests(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, "fencing/target ownership"):
             report.check_final_observations(cleanup, fencing)
 
+    def test_fresh_cohort_does_not_require_an_unrelated_prior_probe(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "auxiliary-attempts/status-probe.json"
+            self.assertIsNone(report.optional_observation(path))
+            path.parent.mkdir()
+            path.write_text(json.dumps({"result": "inconclusive"}))
+            self.assertEqual(
+                report.optional_observation(path), {"result": "inconclusive"}
+            )
+
 
 if __name__ == "__main__":
     unittest.main()

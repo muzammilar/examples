@@ -32,7 +32,7 @@ services:
     user: '${LOCAL_UID:-1000}:${LOCAL_GID:-1000}'
     environment:
       DATA_MIB: ${DATA_MIB:-512}
-      WRITE_MIB_S: ${WRITE_MIB_S:-8}
+      WRITE_MIB_S: ${WRITE_MIB_S:-4}
       BENCH_MIB: ${BENCH_MIB:-256}
       BENCH_SECONDS: ${BENCH_SECONDS:-10}
     volumes: ['./state/ssh:/keys:ro', './${RESULTS_DIR:-results/manual}:/results']

@@ -325,7 +325,7 @@ def native_action(case, *arguments):
 
 def fault_test(layout):
     mib = setting("DATA_MIB", 512, 256, 2048)
-    rate = setting("WRITE_MIB_S", 8, 1, 64)
+    rate = setting("WRITE_MIB_S", 4, 1, 64)
     if mib / rate < 60:
         raise ValueError(
             "DATA_MIB / WRITE_MIB_S must allow at least 60 seconds of active writes"

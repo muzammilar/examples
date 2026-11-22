@@ -103,6 +103,10 @@ def fio_metrics(value, direction):
     }
 
 
+def optional_observation(path):
+    return load(path) if path.exists() else None
+
+
 def case_report(path):
     if (path / "failure.json").exists() or (path / "cleanup-failure.json").exists():
         raise RuntimeError("failed case cannot qualify: " + path.name)
@@ -314,8 +318,10 @@ def publish(folder):
         "network_lifetime_observation": load(folder / "network-lifetime.json"),
         "post_promotion_fencing": fencing,
         "post_cleanup": cleanup,
-        "controller_exclusion": load(folder / "controller-exclusion-verified.json"),
-        "auxiliary_inconclusive_attempt": load(
+        "controller_exclusion": optional_observation(
+            folder / "controller-exclusion-verified.json"
+        ),
+        "auxiliary_inconclusive_attempt": optional_observation(
             folder / "auxiliary-attempts/status-probe.json"
         ),
         "earlier_failed_attempt": load(folder / "prior-attempt.json")

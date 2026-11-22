@@ -4,17 +4,18 @@ A storage-only lab with three selectable setups. Two actual Linux kernels run
 ZFS inside unprivileged QEMU containers; upstream fio generates and verifies data.
 There is no database, shared writable database file or host ZFS requirement.
 
-The **2026-11-22 full serial follow-up passed**, followed by verified scoped
-teardown. Independent readers verified **317 complete 64 MiB bodies**, with zero
-read failures/mismatches, while fio remained active through all three native
-member replacements. The earlier archive-checker failure remains failed and its
-source bytes are preserved. Historical November 14–15 results remain separate
-below; this is a one-host functional recovery qualification, not production
-readiness or a capacity comparison.
+The **2026-11-22 default five-command lifecycle passed**, followed by verified
+scoped teardown. Independent readers checked **297 complete 64 MiB bodies**, with
+zero read failures/mismatches, while fio remained active through all three native
+member replacements. The earlier archive-checker failure and explicit-rate
+checkpoint remain separate. This is a one-host functional recovery qualification,
+not production readiness or a capacity comparison.
 
 ## Quick start
 
-Prerequisites: ARM64 Docker with Compose v2, Make, host Python 3.11+ and `ssh-keygen`. Allow 8 GiB
+Prerequisites: ARM64 Docker with Compose v2, Make, host Python 3.11+ and `ssh-keygen`.
+Ensure the `python3` selected by Make meets that version; macOS Python 3.9 is
+insufficient. Allow 8 GiB
 Docker RAM and 12 GiB free Docker disk. QEMU uses TCG software emulation;
 initial boot and offline package installation take several minutes. Virtual
 16 GiB devices are sparse, with capacity allocated from the Docker host as used.
@@ -22,7 +23,7 @@ No privileged containers, host devices, host kernel modules or Docker socket.
 
 1. `make docker-up` — build the pinned runtime and boot both guest kernels; wait until healthy.
 2. `make up` — install the offline ZFS/fio packages and cap each guest's ARC.
-3. `make test WRITE_MIB_S=4` — run mirror, RAIDZ2 and snapshot replication tests serially with the tested live-write window.
+3. `make test` — run mirror, RAIDZ2 and snapshot replication tests serially with the default live-write window.
 4. `make down` — export imported example pools, retaining the guests and disks.
 5. `make docker-down` — archive and verify retained pools, then delete only owned containers, disks, network, image tag and SSH keys.
 
@@ -82,16 +83,17 @@ this lab. Database consistency under active WAL writes is covered separately in
 |---|---:|---|
 | `DISK_GIB` | 16 | Each owned device; 8–64, requires clean lifecycle when changed |
 | `DATA_MIB` | 512 | Checksummed payload per test; 256–2048 |
-| `WRITE_MIB_S` | 8 | Deliberate fault-test rate cap; allow at least 60 s of work |
+| `WRITE_MIB_S` | 4 | Deliberate fault-test rate cap; allow at least 60 s of work |
 | `BENCH_MIB` | 256 | Benchmark file per layout; 64–1024 |
 | `BENCH_SECONDS` | 10 | Random mixed I/O duration per layout; 5–60 |
 | `RESULTS_DIR` | `results/manual` | Raw reports |
 
-The richer observer profile was tested at `WRITE_MIB_S=4`. Use the Quick-start
-override: the historical default **8 MiB/s** has not been requalified with these
-additional readers/probes and can exhaust the finite writer before both RAIDZ2
-replacements finish. That is a coverage failure, not a pass or evidence of data
-loss. The earlier **8 MiB/s** measurements below retain their original method.
+The **4 MiB/s** default passed the complete lifecycle below without a
+`WRITE_MIB_S` override. It gives finite writers enough work to remain active
+through both RAIDZ2 replacements; it does not improve a capacity number. The
+[earlier override checkpoint](OBSERVER_RESULTS_4M_OVERRIDE.json) preserves the
+previously measured 4 MiB/s run and its tested runtime at commit `0cd5c58`, byte
+for byte. Historical **8 MiB/s** measurements retain their separate method below.
 
 ## Correctness protocol
 
@@ -157,7 +159,7 @@ kernels use **268,435,456 bytes** for `zfs_arc_max` and native `c_max`. This mem
 fault matrix does not reboot guests. ARC-cap persistence across reboot remains
 unqualified; repeat provisioning after a retained boot before relying on its cap.
 
-`make test-production WRITE_MIB_S=4` runs all three applicable cases serially. Resource/lifecycle
+`make test-production` runs all three applicable cases serially. Resource/lifecycle
 and archive/reader negative controls run in `make unit-test`. Supported scaling,
 pressure and additional loss combinations remain unrun; there is no Kubernetes
 operator in this filesystem-only example.
@@ -187,115 +189,135 @@ exit status and diagnostics on both output streams. Its selected actual native
 output is a regression fixture. The separate fresh full target subsequently passed;
 revalidation does not relabel the failed attempt as a pass.
 
-## Measured observer follow-up: 2026-11-22
+## Measured default profile: 2026-11-22
+
+The five commands ran separately in `results/continuous-default-20261122/`.
+Only `RESULTS_DIR` changed; `DATA_MIB=512`, `WRITE_MIB_S=4`, `DISK_GIB=16` and
+`SETUP=all` came from defaults. Boot took **324.352 s**, provisioning **395.210 s**,
+`make test` **1,008.198 s**, `make down` **6.022 s** and guarded `make docker-down`
+**287.763 s**. The instrumented native full target itself took **1,006.455 s**.
+These timings include setup/archival/control work and cannot establish a speedup
+against earlier retained-state runs.
 
 Apple M4 Pro, 14 host cores / 48 GiB RAM; Docker VM 11 CPUs / 24.42 GiB,
-ARM64 Linux. Each QEMU guest/container retains the limits above; the runner has
-1 CPU / 256 MiB. Linux **6.8.0-147-generic**, ZFS userspace/module
-**2.2.2-0ubuntu9.5**, fio **3.36**. Independent DuckDB/ZFS and Rust functional
-lanes shared the host under explicit budgets; no comparative benchmarks ran.
-The fresh full target took **1,095.909 s**, including prior-fixture archival,
-all three setups and observations. Runtime source hashes match the tested files.
+ARM64 Linux. Two guest containers each had **2 CPUs / 3 GiB**, each guest
+**2 vCPUs / 1,536 MiB** and live ARC **256 MiB**; runner **1 CPU / 256 MiB**.
+Linux **6.8.0-147-generic**, ZFS userspace/module **2.2.2-0ubuntu9.5**, fio **3.36**.
+A separate local DuckDB functional lane and temporary **1 CPU / 2 GiB** Go SDK
+build/control containers shared the host under explicit budgets. The SDK jobs
+ran serially while DuckDB's standby was stopped; their exact intervals are in
+the JSON co-tenancy addendum. No comparative benchmark ran. Runtime source hashes
+match the tested files.
 
-Each layout wrote/CRC-verified **512 MiB** in **4,096 × 128 KiB** operations, plus
-an independently fsynced **64 MiB** immutable body. The deliberate **4 MiB/s**
-write cap supplies a long fault window; it is not capacity throughput. Reader
-timing covers the complete file read and SHA-256, excluding SSH reporting and
-external journal fsync. The repeated 64 MiB working set fits the 256 MiB ARC;
+Each layout wrote and CRC-verified **512 MiB** in **4,096 × 128 KiB** operations,
+plus a separately fsynced **64 MiB** immutable body. The deliberate 4 MiB/s cap
+provides a long fault window. Full-body read latency includes SHA-256, excluding
+SSH reporting and external journal fsync. This repeated working set fits ARC;
 these observations do not establish uncached device-read performance.
 
 | Layout | Faulted leaves | Complete immutable reads / errors | Further degraded write growth | Replace/wait incl. SSH | Scrub incl. SSH |
 |---|---:|---:|---:|---:|---:|
-| Mirror | 1 | 165 / 0 | 11,272,192 B | 18.247 s | 13.905 s |
-| RAIDZ2 | 2 | 152 / 0 | 10,616,832 B | 50.455 s | 18.679 s |
+| Mirror | 1 | 157 / 0 | 10,878,976 B | 23.376 s | 14.388 s |
+| RAIDZ2 | 2 | 140 / 0 | 12,189,696 B | 62.611 s | 20.568 s |
 
-Native replacement-command intervals were **13.627 s** for mirror and
-**17.116 / 20.522 s** for the two RAIDZ2 replacements. Each contains complete
-successful independent reads; the writer stayed active until every native
-replacement finished. Both final scrubs reported **0 errors**, ONLINE membership
-and correct complete payloads. Reads continued through verification and scrub.
+Actual native replacements took **16.541 s** for mirror and **18.505 / 28.210 s**
+for RAIDZ2. Each contains complete successful independent reads; the writer
+remained active until every replacement completed. Both full payload verifications
+and final ONLINE scrubs passed with **0 errors**. Readers continued through scrub.
 
 | Layout / actual phase | Samples | Complete 64 MiB read+hash p50 / p99 |
 |---|---:|---:|
-| Mirror baseline | 11 | 960.977 / 2,087.283 ms |
-| Mirror degraded | 19 | 993.539 / 1,449.415 ms |
-| RAIDZ2 baseline | 11 | 1,099.159 / 2,153.782 ms |
-| RAIDZ2 degraded | 19 | 1,035.727 / 2,266.082 ms |
+| Mirror baseline | 13 | 992.350 / 2,571.741 ms |
+| Mirror degraded | 20 | 1,011.759 / 1,956.775 ms |
+| RAIDZ2 baseline | 13 | 992.859 / 2,257.217 ms |
+| RAIDZ2 degraded | 20 | 1,044.850 / 1,960.418 ms |
 
-These small-sample p99s are effectively maxima, not production tails. Canonical
-phases use actual same-guest monotonic command boundaries; reads spanning changes
-are separate. Controller labels can lag a native fault. No complete mirror read
-fits wholly inside its brief offline command; that interval has no latency sample,
-not zero latency. All phase counts/means/percentiles and errors remain in JSON.
+Canonical phases use the same guest's actual monotonic command boundaries;
+transition-spanning reads are separate. No complete mirror read fits wholly
+inside its brief offline command, so that interval has no latency sample, not
+zero latency. These small-sample p99s are effectively maxima. All phase counts,
+means, percentiles and error counts remain in JSON.
 
-Snapshot replication also passed: a **512 MiB** baseline plus **64 MiB** delta
-matched the received clone's complete SHA-256 bodies. Interruption after
-**65,536 B** produced a resume token; full/resumed streams were
-**538,194,928 B / 62.115 s** and **67,277,856 B / 14.736 s**. The intentionally
-unreplicated **64 MiB** tail was absent after promotion, with **0 missing
-replicated bytes**; another **64 MiB** was written and CRC-verified on the promoted
-owner. Promotion plus verification/new write took **28.760 s**. Independent
-successful native listings afterward proved source pool absent and target pool
-imported. This is administrative export/fencing and asynchronous RPO, not
-power fencing, quorum ownership or permanent destruction of the old source tail.
+| Layout | Buffered 128 KiB write p50 / p99 | Fsync p50 / p99 |
+|---|---:|---:|
+| Mirror | 1.122 / 16.056 ms | 28.180 / 74.973 ms |
+| RAIDZ2 | 1.090 / 18.743 ms | 43.254 / 145.752 ms |
 
-Whole-target observed resources, including setup/archival/control overhead:
+These are native fio completion timings across each whole fault workload, not
+per-phase application commits. Each job issued **511** measured fsyncs plus final
+flush; buffered write completion alone is not per-write durable acknowledgement.
+The configured write rate is about **32 operations/s**, deliberately capped.
+
+Snapshot replication passed: the **512 MiB** baseline and **64 MiB** delta matched
+the received clone's complete SHA-256 bodies. Interruption after **65,536 B**
+produced a real resume token. Full/resumed streams were **538,194,928 B / 69.477 s**
+and **67,274,248 B / 14.367 s**. The intentional **64 MiB** unreplicated tail was
+absent after promotion, with **0 missing replicated bytes**; another **64 MiB** was
+written and CRC-verified on the promoted owner. Promotion plus verification/new
+write took **30.074 s**. Positive native global listings afterward proved source
+pool absent and target imported. This is administrative export/fencing and
+asynchronous RPO, not power fencing, quorum ownership or destruction of the old tail.
+
+Whole native-target resources, including setup/archival/control overhead:
 
 | Role | CPU core-s / mean utilization¹ | Sampled mean / max charged memory | Native lifetime memory peak² |
 |---|---:|---:|---:|
-| Source QEMU/guest | 1,737.802 / 158.65% | 2,457.20 / 2,595.20 MiB | 2,610.91 MiB |
-| Target QEMU/guest | 861.079 / 78.61% | 2,031.70 / 2,471.18 MiB | 2,471.18 MiB |
-| Runner | 35.788 / 3.27% | 145.34 / 256.00 MiB | 256.18 MiB |
+| Source QEMU/guest | 1,585.116 / 157.55% | 2,412.99 / 2,574.67 MiB | 2,580.86 MiB |
+| Target QEMU/guest | 802.902 / 79.80% | 2,002.28 / 2,341.96 MiB | 2,341.96 MiB |
+| Runner | 30.784 / 3.06% | 93.96 / 256.00 MiB | 256.12 MiB |
 
-¹ One core = 100%; each guest container allows 200%. Unsampled initial/final and
-reset intervals are excluded. ² Lifetime since container creation, including
-earlier boot/provisioning, not a phase peak. Sum of role peaks is not a measured
-simultaneous whole-stack peak. Host-controller CPU/RSS and CLI-child CPU are
-separately retained. These are whole-QEMU/cgroup costs, not native ZFS-only CPU
-or engine heap. VM swap limits are zero. The final archive runner allowed
-256 MiB swap and reported native swap peak **0**; its `memory.events.max` was
-**10,680**, with **0 OOM/oom_kill events** at that observation. This indicates
-limit pressure/reclaim, not an observed OOM. Earlier removed one-shot swap
-counters were not collected.
+¹ One core = 100%; each guest container permits 200%. Unsampled edges and reset
+intervals are excluded. ² Lifetime since container creation, including boot/up,
+not a phase peak; summing role peaks is not simultaneous whole-stack memory.
+Host-controller CPU/RSS and CLI-child CPU are separate in JSON. These are whole
+QEMU/cgroup costs, not ZFS-only CPU or engine heap. Native limits show no VM swap;
+the runner allows 256 MiB swap and had zero swap/events at the initial main-run
+observation. Later removed one-shot swap/OOM-event counters were not collected.
 
 | Role / VM device | Read / write MiB | Read / write IOPS |
 |---|---:|---:|
-| Source / 254:0 | 7,407.204 / 4,596.143 | 90.916 / 104.236 |
-| Target / 254:0 | 1,155.851 / 1,433.391 | 11.492 / 25.344 |
+| Source / 254:0 | 7,105.127 / 4,756.679 | 99.596 / 113.289 |
+| Target / 254:0 | 1,155.021 / 1,421.766 | 10.372 / 22.765 |
 | Runner | unavailable | unavailable |
 
-About 1 s plus sequential probes; native intervals/raw counters are retained.
-These are per-device Docker VM block counters, not physical SSD traffic; do not
-sum stacked counters or infer physical latency. Native fio buffered-I/O/fsync
-latency is separate in JSON. Per-vdev queue/timing counters were not collected.
+Sampling was about 1 s plus sequential probes, with native intervals/counters
+retained. These are Docker VM block counters, not physical SSD traffic; do not
+sum stacked devices or infer physical latency. Native fio buffered-I/O/fsync
+latencies are separate. Per-vdev queue/timing counters were not collected.
 Owned QCOW2 allocated bytes (baseline / sampled peak / last sample) were
-**1,620,946,944 / 3,770,068,992 / 3,770,068,992** for source and
-**218,853,376 / 1,592,770,560 / 1,592,770,560** for target, including OS/data disks
-and recycled-space effects, excluding immutable image layers. Native ZFS
-used/logical-used/compression are another layer; both immutable-reader setups
-reported **1.00×** native dataset compression. Lifetime network byte/packet
-observations are separately scoped; no per-phase network rate is claimed.
+**215,969,792 / 3,731,501,056 / 3,731,501,056** for source and
+**215,445,504 / 1,589,334,016 / 1,589,334,016** for target, including OS/data disks
+and recycled space, excluding immutable image layers. Native ZFS used/logical-used/
+compression are separate; both fault setups reported **1.00×** dataset compression.
+Native network byte/packet observations cover container lifetime through post-test
+inspection, not per-phase rates or later teardown traffic.
 
-`make down`, then `make docker-down`, both passed. Five corrected native archives
-(**3,162,140,336 B**) remain externally preserved and re-hashed; their streams
-passed native checksum/framing/dataset checks before pool/device deletion.
-Fresh healthy Docker listings prove **0 owned containers, volumes, networks and
-image tags**; ignored journals/native archives remain. Final controls passed:
-**19 in the built image plus 14 host controls**, with one additional publisher
-fencing/cleanup rejection control added and passed afterward. A late auxiliary
-status/lock probe missed the already-completed teardown and was inconclusive;
-its metadata is retained. A separate controlled independent-process test verified
-the actual host lock, without claiming cross-container/NFS locking.
+Four native archives (**2,556,621,936 B**) were preserved and independently
+re-hashed after their native checksum/framing/dataset checks. Fresh healthy Docker
+listings prove **0 owned containers, volumes, networks and image tags** after
+cleanup. Generated SSH keys were removed. All **35 controls** passed: **16 host**
+and **19 in the built image**.
 
-[OBSERVER_RESULTS.json](OBSERVER_RESULTS.json) contains compact per-case, phase,
-resource, source/image and recovery evidence, the original failure reference,
-post-promotion fencing and cleanup proofs. Raw cohorts are ignored under
-`results/continuous-20261122/` and `results/continuous-fixed-20261122/`.
-Remaining: reboot-persistent ARC qualification, independent restore of the new
-recursive archive format, uncached degraded reads, rebuilt-copy isolation,
-real EIO/disk-full/host loss, beyond-tolerance failures and repeated isolated
-performance comparisons. Native replication restore does not qualify every one
-of these different boundaries.
+The first `make test` attempt failed before native tests because the nested Make
+selected Python **3.9.6**, below the documented prerequisite; its child lacked
+`hashlib.file_digest`. Its failed log/command and diagnostic remain preserved.
+Putting the existing Python **3.14.7** first in the test executor's PATH satisfied
+the prerequisite; the same exact `make test` then passed without workload/source
+changes. This does not relabel the failed prerequisite attempt as a pass.
+
+[OBSERVER_RESULTS.json](OBSERVER_RESULTS.json) contains independently replayed
+cases, phases, resource/storage measurements, runtime/image hashes, archive and
+cleanup proofs plus prior-failure references. The earlier explicit 4 MiB/s run
+(**317** correct bodies) remains byte-identical in
+[OBSERVER_RESULTS_4M_OVERRIDE.json](OBSERVER_RESULTS_4M_OVERRIDE.json). The original
+checker-failed run remains failed under `results/continuous-20261122/`; the earlier
+passed raw cohort is `results/continuous-fixed-20261122/`.
+
+Remaining: fail-fast host-version/child-error diagnostics, reboot-persistent ARC
+qualification, independent restore of the recursive archives, uncached degraded
+reads, rebuilt-copy isolation, real EIO/disk-full/host loss, beyond-tolerance
+failures and repeated isolated performance comparisons. Native replication restore
+does not qualify every one of these different boundaries.
 
 ## Benchmark method
 
