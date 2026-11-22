@@ -125,6 +125,16 @@ observation; unexpected corruption or loss must remain a failed result. Document
 the diagnosis, exact recovery procedure, required fencing/backups, operator/manual
 steps and any unrecoverable state. Never conceal a broken run by resetting data.
 
+Understanding **how and why a system fails, and how to recover it**, is a primary
+outcome of these experiments. Investigate failures during ordinary workloads and
+operations as well as injected chaos: overload, stalls/deadlocks, exhausted
+resources, configuration drift, dependency loss, interrupted maintenance and
+incorrect or corrupt results. For each observed failure, preserve a reproducible
+trigger, symptoms and detection signals, evidence of the mechanism, its effect on
+data and service, and the verified automatic/manual recovery steps and limits.
+Record uncertainty and unrecoverable states honestly; discovering a reproducible
+failure is useful evidence even when a safe recovery has not yet been found.
+
 Implement operational tests alongside functional correctness tests. Use the common
 requirements below, the deployment-specific matrix, and the applicable workload
 tests. These are requirements for new or materially changed examples, not claims

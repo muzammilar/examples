@@ -3,6 +3,12 @@
 How to add and test a database, pub/sub or other system under `<system>/`. Follows what the
 existing examples do (`ydb/`, `scylladb/`, `tigerbeetle/`, `oceanbase/`, `rondb/`, …).
 
+Each experiment should teach **how the system fails and how to recover it**.
+Investigate ordinary workload/operational failures as well as injected faults;
+preserve triggers, symptoms, diagnosis, data/service impact and demonstrated
+recovery limits. Follow the [production-test guidance](AGENTS.md#non-functional--production-tests)
+and keep unresolved failures explicit alongside performance results.
+
 ## Layout
 
 ```
