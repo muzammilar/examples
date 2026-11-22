@@ -218,6 +218,11 @@ comparisons for stable evaluated configurations that pass their relevant gates.
   including quantified asynchronous/snapshot RPO where applicable.
 - Report first successful operation, longest outage, errors/retries, election,
   catch-up and restored redundancy separately. Pod readiness alone is insufficient.
+- Verify effective native cache, durability and other declared tunables before
+  and after recovery, including settled post-boot values. Persist them through
+  supported startup configuration. A surviving container memory limit does not
+  establish that an engine or filesystem cache cap survived. Record unexpected
+  configuration drift separately from data correctness and rerun after fixing it.
 
 ## Benchmarks
 

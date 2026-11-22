@@ -369,6 +369,14 @@ observations during the operation.
   as applicable. A Ready pod, successful survivor read or desired replica count is
   not enough. Verify the repaired member serves data; where supported, fail a
   different member afterward to prove the recovered copy is usable.
+- Recheck effective native settings after each restart, failover and recovery,
+  including durability, cache/ARC limits, worker counts and filesystem/module
+  tunables. Container resource limits alone do not prove these settings survived.
+  Persist required settings through the supported startup mechanism and verify
+  actual values after boot and settling. Unexpected drift fails configuration
+  qualification even when all acknowledged data survived; preserve those distinct
+  outcomes, fix persistence and rerun. Do not repair settings mid-measurement to
+  conceal a mismatched benchmark or recovery profile.
 - Assert both availability and expected rejection: minority/quorum loss, stale
   primaries and read-only replicas must obey the documented consistency contract.
   Never lower replication, disable fsync or weaken consistency to obtain a pass.
