@@ -198,9 +198,10 @@ snapshot, no-op and wrong-body controls, plus independent ClickHouse/REST
 verification. It passes 215 controls; resource and timing evidence is in
 `DUCKDB_MAINTENANCE_RESULTS.json`. Native live-fault recovery remains unfinished.
 
-Next native cases must verify v3 and pending-write rejection, then concurrent
-append behavior and process/S3/catalog interruption with independent writers and
-readers kept live. Pin/dump native client timeout/retry settings first. Do not
+Separate native controls now verify v3 and pending data/schema rejection, with
+unchanged committed metadata/bodies and pinned/dumped HTTP policy; 217 controls
+pass. See `DUCKDB_REJECTIONS.md`. Next, test concurrent append behavior and
+process/S3/catalog interruption with independent writers and readers kept live. Do not
 pause writers or reduce offered load to make maintenance complete. Distinguish
 safe conflict rejection, progress/starvation, ambiguous commits and acknowledged
 loss through the durable witness; source snapshot checks do not prove which

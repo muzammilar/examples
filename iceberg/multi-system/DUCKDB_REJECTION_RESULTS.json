@@ -1,0 +1,459 @@
+{
+  "date": "2026-11-22",
+  "case_id": "b71ed187-c81b-4889-ae1f-91095d93ea3e",
+  "passed": true,
+  "production_qualified": false,
+  "native_engine": "DuckDB 2.0.1",
+  "iceberg_extension": "f979b5b28a",
+  "image_id": "sha256:f0dd3bdc601806f2b55d5ffc47c513a3710d82b744767c5cf633f873ec0a37e1",
+  "command": "make duckdb-rejections",
+  "host_controls_passed": 217,
+  "dataset": {
+    "rows": 10,
+    "customers": 10,
+    "columns": {
+      "event_id": "BIGINT",
+      "customer_id": "INTEGER",
+      "amount_cents": "BIGINT",
+      "payload_sha256": "VARCHAR (SHA256 decimal ID)"
+    },
+    "ids": "0..9",
+    "amount_cents": "event_id + 1",
+    "nulls": 0,
+    "skew": "one row per customer; deterministic, no RNG"
+  },
+  "checks": {
+    "expected_rejections": [
+      "pending-write",
+      "pending-schema",
+      "v3"
+    ],
+    "rows_verified": 10,
+    "metadata_unchanged": true,
+    "pending_data_and_schema_rolled_back": true,
+    "production_qualified": false,
+    "clickhouse_readback": {
+      "rows": {
+        "rows": 10,
+        "unique_ids": 10,
+        "first_id": 0,
+        "last_id": 9,
+        "amount_total_cents": 55,
+        "invalid_bodies": 0
+      },
+      "duration_ns": 97636041,
+      "scope": "Docker exec, client connection, SQL, result transfer and JSON decode; not query-only latency"
+    }
+  },
+  "client_settings": [
+    {
+      "name": "http_keep_alive",
+      "value": "true"
+    },
+    {
+      "name": "http_retries",
+      "value": "3"
+    },
+    {
+      "name": "http_retry_backoff",
+      "value": "4.0"
+    },
+    {
+      "name": "http_retry_wait_ms",
+      "value": "100"
+    },
+    {
+      "name": "http_timeout",
+      "value": "30"
+    },
+    {
+      "name": "max_temp_directory_size",
+      "value": "953.6 MiB"
+    },
+    {
+      "name": "memory_limit",
+      "value": "953.6 MiB"
+    },
+    {
+      "name": "threads",
+      "value": "2"
+    }
+  ],
+  "storage": {
+    "data_files": [
+      {
+        "file_name": "s3://warehouse/lab/duck_compact_b71ed187c81b4889ae1f91095d93ea3e-5b768682-bf51-4f8a-af09-dbbe8a0e32fb/data/01a20565-ebd7-713b-a6ae-69d4283f35da.parquet",
+        "file_size_bytes": 1702,
+        "num_rows": 10,
+        "footer_size": 761
+      }
+    ],
+    "parquet_encoded_chunks": {
+      "column_chunks": 4,
+      "compressed_bytes": 929,
+      "uncompressed_bytes": 976
+    },
+    "encoded_compression_ratio": 1.0505920344456405
+  },
+  "resources": {
+    "clickhouse": {
+      "samples": 5,
+      "unavailable_samples": 0,
+      "observed_seconds": 5.64,
+      "cpu_core_seconds": {
+        "total": 1.2060300000000002,
+        "user": 0.13901,
+        "system": 1.06702
+      },
+      "cpu_percent_one_core_100": 21.383510638297874,
+      "charged_memory_bytes_min_mean_max": [
+        1516535808,
+        1518221721.6,
+        1519157248
+      ],
+      "lifetime_peak_memory_bytes": 1614176256,
+      "allocated_disk_bytes_first_peak_last": [
+        966635520,
+        969277440,
+        969277440
+      ],
+      "native_block_io": {
+        "254:0": {
+          "observed_seconds": 5.64,
+          "rbytes": 0,
+          "wbytes": 2682880,
+          "rios": 0,
+          "wios": 237,
+          "rbytes_per_second": 0.0,
+          "wbytes_per_second": 475687.9432624114,
+          "rios_per_second": 0.0,
+          "wios_per_second": 42.02127659574468
+        }
+      },
+      "identity_or_counter_gaps": 0,
+      "scope": "Native cgroup CPU across all threads including probes; sampled charged memory and per-generation lifetime peak. Intervals use native /proc/uptime with centisecond resolution; full probe brackets retain uncertainty. Approximate du allocated bytes, not open-deleted or unique physical storage. Workload /results binds share one witness directory: do not sum them. Device I/O is Docker-VM accounting, not physical SSD latency/queue depth; do not sum stacked devices. Missing devices/counters are unavailable, not zero. CPU and byte/IOPS deltas exclude restart bridges and unobserved initial/final edges. Raw samples retain network counters and timing uncertainty.",
+      "memory_stat_bytes_min_mean_max": {
+        "anon": [
+          601354240,
+          601958809.6,
+          602198016
+        ],
+        "file": [
+          431730688,
+          433591910.4,
+          434339840
+        ],
+        "kernel": [
+          351576064,
+          351775948.8,
+          351866880
+        ]
+      },
+      "memory_stat_samples": 5,
+      "memory_stat_scope": "Sampled native cgroup byte gauges, not Go heap or process RSS. File includes charged file cache; kernel includes its subcategories. Counters are read nonatomically; do not infer an exact partition of memory.current."
+    },
+    "duckdb-cli": {
+      "samples": 4,
+      "unavailable_samples": 0,
+      "observed_seconds": 4.25,
+      "cpu_core_seconds": {
+        "total": 1.3218530000000002,
+        "user": 1.182166,
+        "system": 0.139687
+      },
+      "cpu_percent_one_core_100": 31.102423529411773,
+      "charged_memory_bytes_min_mean_max": [
+        2531328,
+        2844672,
+        3289088
+      ],
+      "lifetime_peak_memory_bytes": 50528256,
+      "allocated_disk_bytes_first_peak_last": [
+        1110016,
+        1224704,
+        1224704
+      ],
+      "native_block_io": null,
+      "identity_or_counter_gaps": 0,
+      "scope": "Native cgroup CPU across all threads including probes; sampled charged memory and per-generation lifetime peak. Intervals use native /proc/uptime with centisecond resolution; full probe brackets retain uncertainty. Approximate du allocated bytes, not open-deleted or unique physical storage. Workload /results binds share one witness directory: do not sum them. Device I/O is Docker-VM accounting, not physical SSD latency/queue depth; do not sum stacked devices. Missing devices/counters are unavailable, not zero. CPU and byte/IOPS deltas exclude restart bridges and unobserved initial/final edges. Raw samples retain network counters and timing uncertainty.",
+      "memory_stat_bytes_min_mean_max": {
+        "anon": [
+          495616,
+          499712,
+          507904
+        ],
+        "file": [
+          0,
+          12288,
+          24576
+        ],
+        "kernel": [
+          1388544,
+          1589248,
+          1683456
+        ]
+      },
+      "memory_stat_samples": 4,
+      "memory_stat_scope": "Sampled native cgroup byte gauges, not Go heap or process RSS. File includes charged file cache; kernel includes its subcategories. Counters are read nonatomically; do not infer an exact partition of memory.current."
+    },
+    "storage": {
+      "samples": 5,
+      "unavailable_samples": 0,
+      "observed_seconds": 5.619999999999999,
+      "cpu_core_seconds": {
+        "total": 0.179945,
+        "user": 0.129718,
+        "system": 0.050228
+      },
+      "cpu_percent_one_core_100": 3.2018683274021353,
+      "charged_memory_bytes_min_mean_max": [
+        682876928,
+        689843404.8,
+        699592704
+      ],
+      "lifetime_peak_memory_bytes": 1079885824,
+      "allocated_disk_bytes_first_peak_last": [
+        3168522240,
+        3168555008,
+        3168555008
+      ],
+      "native_block_io": {
+        "254:0": {
+          "observed_seconds": 5.619999999999999,
+          "rbytes": 0,
+          "wbytes": 12288,
+          "rios": 0,
+          "wios": 3,
+          "rbytes_per_second": 0.0,
+          "wbytes_per_second": 2186.4768683274024,
+          "rios_per_second": 0.0,
+          "wios_per_second": 0.5338078291814947
+        }
+      },
+      "identity_or_counter_gaps": 0,
+      "scope": "Native cgroup CPU across all threads including probes; sampled charged memory and per-generation lifetime peak. Intervals use native /proc/uptime with centisecond resolution; full probe brackets retain uncertainty. Approximate du allocated bytes, not open-deleted or unique physical storage. Workload /results binds share one witness directory: do not sum them. Device I/O is Docker-VM accounting, not physical SSD latency/queue depth; do not sum stacked devices. Missing devices/counters are unavailable, not zero. CPU and byte/IOPS deltas exclude restart bridges and unobserved initial/final edges. Raw samples retain network counters and timing uncertainty.",
+      "memory_stat_bytes_min_mean_max": {
+        "anon": [
+          411320320,
+          417731379.2,
+          427347968
+        ],
+        "file": [
+          253739008,
+          253752115.2,
+          253771776
+        ],
+        "kernel": [
+          15745024,
+          15774515.2,
+          15826944
+        ]
+      },
+      "memory_stat_samples": 5,
+      "memory_stat_scope": "Sampled native cgroup byte gauges, not Go heap or process RSS. File includes charged file cache; kernel includes its subcategories. Counters are read nonatomically; do not infer an exact partition of memory.current."
+    }
+  },
+  "source_sha256": {
+    "Makefile": "d7d1ae7023617c674fadccaa8ad0042a91c0386fd0705868cf2725e805b6bcbe",
+    "docker-compose.yml": "969ab4517b5c4e157a78a4bc06e31d85c80bedffe5fd069e7342e49b1f34a1e0",
+    "docker-compose.recovery.yml": "cf0865a118a870b5f189b0b16ccf45665e64fe437cc95d2250667bbedaa4e13e",
+    "config/generated/cluster.yml": "950b0639504c547ee6f6b28dcd935da0b94211a39c20d380033205b9378ffa94",
+    "config/clickhouse.xml": "bc00e22e156df00e0622b487cfdb6067fe2163e00a61bb4cf221010069fc745c",
+    "config/generated/remote.xml": "147b6caefe4cecf3ce1f901696385fb4eb9d5a9bbe7fd232e13fc2bafdc9ccbf",
+    "scripts/cluster-config.py": "d9cd3c84a3ca6ef6ee4989514e001593a1aafb9b656c8bc5be4ac23321b18dce",
+    "recovery_control.py": "5b7a37ea3f939b0e63b748570a1f78445e8593217875b83f5c8077d9d8cd415f",
+    "recovery_resources.py": "20b29e3cfa5834da35e789028728c638a0c4c582aaa2160863b07017776a523d",
+    "recovery_report.py": "fd09b59ccb78958a7bb46f5a4b6b78675184a57dd9bc1733af28ba7be5d47597",
+    "recovery_cleanup.py": "38f1f1a8cceb096043dc62dd0cec96b90a9421bf29c89eef4e0fcd4431aac885",
+    "recovery_retirement.py": "0d9cb0f8675aa4731b31bec147269557cc0494aee604806f8856c84f7129234f",
+    "recovery-contract.json": "8af0ef31694246d7191edddd19c86087e973b5a8b9c1d3335278ad1ea5387b9d",
+    "app/Dockerfile": "9853053b1fcaa494cc1056fcd8c4c3d998b336207571792a2c88e3cac9d8ba30",
+    "app/go.mod": "5db3b967ed8eb850220a66d9fd8c564632afc55b53a026e3d93bf3aa54280180",
+    "app/go.sum": "57e57bee2784485ff50cf3143261ca959720821f802d658ad725c5cca57742f9",
+    "app/archive.go": "ec768eec27bf9f8e1caaeaf1bdbc525ec042adf4c70404cbc7319a7b0552ce2b",
+    "app/benchmark.go": "00028ed50f05efe965a91103152d791ea893e59d50e0818500dc8e118ed0b640",
+    "app/command_metrics.go": "ccb87387effd96672a792aa6cf82f136ba16996e131a7115638046925b630430",
+    "app/command_metrics_test.go": "d4b893570ffeaba0d428def625f99e39cafe3dd0cc88a0cecf8d3369cea49eb0",
+    "app/extensions.go": "449bccc23f9ad66384f71a8617156c6c04fde081ee1317424e4588457682d30f",
+    "app/extensions_test.go": "d1958391bbad9296adfc3f97889254f466071ac4ddd52652c8650e646e686cd2",
+    "app/isolation.go": "ed0e74d73250f281a56b59f2787243038268955771fb72f83532825da28b74c3",
+    "app/isolation_test.go": "a5930919aaf1972d466822865a63036cbc231efe4f00d206a09b1ecbb3823c54",
+    "app/main.go": "3de5053d196522b90eec8f001b99a4a5269b5ae33c29e7c3ad731c3858914dc7",
+    "app/native.go": "16fc4df4c18ae2833c310c48d67fb68b8b2b61e7cb76eb27f1f7e5d89eadf211",
+    "app/recovery_catalog_test.go": "e9912d50441e9daa2e76b73a51083b900fed727ff8c950d0a64f6dd0fe327dfa",
+    "app/recovery_history.go": "11b486553cc3ce47e97ae334ef25b5babe8fe00cd8acc4a8f57be45288283967",
+    "app/recovery_history_test.go": "67b787b7399577472862781d7251152d39f3fb05749ef22ff5b6c57225566291",
+    "app/recovery_inspect.go": "26d507dc4732d3466f908d4bacaa89bb9d803d2af7a6f7aa6a1d880a3831e684",
+    "app/recovery_inspect_test.go": "024977e02e131d4d9864a650ec45270d30596291ce06eb9427e26af0376ed87b",
+    "app/recovery_manifest_probe.go": "9817f4bbc36e1f2d4110e30d29d349b21678e89c08229c5bb18510b11b3fc069",
+    "app/recovery_manifest_probe_test.go": "c146eb83400834eec55cea1a48f94d3a63f505b20af112d41b3fc838dc61ca3a",
+    "app/recovery_native.go": "1493af0a2983b487bfdd489288bf3cd789dfe8d6b23566d7324acaabb656c0cc",
+    "app/recovery_storage.go": "b9dfd7df5ab1cee47e51ac8ab37f1d7bb9945b2f8825c8c0f7ad3ac1a6d404f0",
+    "app/recovery_storage_test.go": "e13a5b38b775c62b6fbf051e34a8dcec3f35fda9a76673c8d284042535e9416d",
+    "app/workload.go": "e0afdb820f62afc94e25bea501eebb636c5640707bb3d60bdca67be41cda0aa6",
+    "lab_profiles.py": "c0c4703d835cb4fb5f5f656d8cc4d22ac9de7e7dd2ca4a7e6a3330937c9119a1",
+    "docker-compose.storage-current.yml": "c5b7592d409ffc649a121a5d3efbbd4c1c92020e5b1f02b6b88240acdbc4bd4d",
+    "docker-compose.maintenance-current.yml": "995c5ce94709eb08c6955bdaa188fc92d27c82a86e99035d92202622f11c141b",
+    "docker-compose.current.yml": "516d56849e066851ce402d5db8c1a657b43ee6314fc49763e3b3b498a0a51d82",
+    "maintenance_control.py": "1ed579acecb5d60ee88cb32c48d84eb3a7ca20cec3c5e9c0f9692f36f4b394f1",
+    "duckdb_maintenance.py": "eff84d64784476ce3b951b401dbffdafc90f69f56104e326c8da29933c953439",
+    "duckdb_rejections.py": "217aaf67745fff631d7e92de27aaabbe42c914b0a45175028a09a0b55ecbd47d",
+    "test_duckdb_maintenance.py": "5676e8ef9747d32ac3f5fd16761dbe76e943a843dc8246af7e458bd94deda133",
+    "maintenance_smoke.py": "1dc8f4c4537cfadf3a09e3f946a1e681edee7a436fcc7b3fbaa5f312eba8ef91",
+    "test_maintenance_control.py": "baa0b964c3e7e76123007d88f341acb3d9db30fc9a49b510d61d667db9dfc93c",
+    "prefault_archive.py": "b09a07769f705e9b5e16d5680bb84acfacd4085148da2f5eaee8d7a0c256c325",
+    "compound_archive.py": "9d06319dfef82cfd00d45d5d84695e24ad43f5f84367bf498fcbff9a200ad0d7",
+    "test_compound_archive.py": "491d9ba3b484c3a25abb8d6269752cb9793023c71f83e2bf731618b68bdadf26",
+    "cold_storage.py": "3ce46d310b5e0bd742cb9d346aec2ba602dac7e7b17dd55a1784a33c579b5d5b",
+    "cold_readback.py": "ebadae5dd28b535d2ea3e44cd833c16309b6ec2d1f8cc0c5581ae8ca85b700dc",
+    "cold_upgrade.py": "064df20c033d313659ad6b0fbe6cc3440d32d7b9bddbbe23ffd5d4ce9cea9415",
+    "test_cold_upgrade.py": "db91681c8da0e3d4f53a034cd2bf65ba968302a4add43632f50483c93dd112dd",
+    "cold_cleanup.py": "bcb2d9f91cfae544177950b0a0011ea25333c40b4d0b0c49f5a3eb604f0bccf3",
+    "test_cold_cleanup.py": "c2c0bda754675b55477f8e833e4b265e3ee96c2edffca3afaf866d5430a2a24b",
+    "test_cold_readback.py": "d16862a2e654bcb21ea38244a5e484d3c12b340baafb1a6beb03fdbe9affabd3",
+    "docker-compose.cold-readback.yml": "ebe8f66197cdc955a8a1ac7eadd2d23f4c88a376bad9590f09b989777229a57b",
+    "test_cold_storage.py": "d0a2edfd85f2cfcc773ac7c2c169e8acd2f08f731381e5abc8b60a5e9d6e9e85",
+    "manifest_control.py": "57a47402be48292bde565de31159c68be463671652b1ca8b182f4ae047450170",
+    "test_manifest_control.py": "6443971848d8c07555d4d77089408b0b0b6b88d2a45cec0699321d803638d471",
+    "docker-compose.duckdb2.yml": "49156d58e6764febe7a3eaa1c1cdd5ffa5c10bca8e2cece4aa22f27f936a7c7c",
+    "app/Dockerfile.duckdb2": "ce46d02efb8c3e30ffe7a8403ec87aebb3463c86840fc9449a6c43930b6426e1",
+    "app/go.duckdb2.mod": "129fbc3b6a90e5de2c2750bfa7ce902014bf0971369fd5431769e6f80acb5eb1",
+    "app/go.duckdb2.sum": "0d71791783c85b8dc0cef83b6607ad55e654c47605163cf8b685d0f2e40f98e3",
+    "compactor_control.py": "ee565b73e47efcabce1fd86c3ed2da8da6695b5571cd0e09c1001c1abb19e191",
+    "compactor_evidence.py": "2612d695ea49d30cdcb0250ba632e44bf2a88cbd905b71b1e50bfc62e505ad5a",
+    "compactor-contract.json": "08ec451ba2fc5fdd6886452dc8eed1979e9e1e4e6aca705e609dc553dfef1a94",
+    "compaction-upload-gate/Dockerfile": "a59b77fbefa3f7958cf688e127857c70a1b6434edea0ada79ddcd0d8b66617b0",
+    "compaction-upload-gate/go.mod": "f975c4b314c1f91a771d30ab99c63714711d69bcef3bce5313f474f0f3f5f548",
+    "compaction-upload-gate/framing_test.go": "514013bb6485cc7ea74d7545dce7e00ded357de8de6dc8db1bf5c9fc891dc5d9",
+    "compaction-upload-gate/gate.go": "01a6006a4bb9a42d22d5c93d246d6912b3c435288249977bfa51c2c90f4b512b",
+    "compaction-upload-gate/gate_test.go": "267b386d4c8ebc52392afd8cf833105fb7fa3f9ec5988d1359434d8671521ea6",
+    "compaction-upload-gate/main.go": "b1317d2a388157c7625ebb4c2065a685e4bcdaec664689be8007280fa19c53db",
+    "iceberg-compaction/Dockerfile": "ca1b988ffeb7d689d423c69eca06d2e38a93d3be860906db8a37c1d712c4fe40",
+    "iceberg-compaction/compact.py": "3036bdf341d16c9c7c6463ca94e664a6d0f7d27b82488a35c226f8f504e7f04c",
+    "iceberg-compaction/resources.py": "a217a3b11ce0d9293dbb6c92e5d465810d44481bc381202860608407ced64945",
+    "iceberg-compaction/test_compactor.py": "d32f502dc4812f9b979142cfdb3e2d9b7c2d52e0b0312c9594a86a011c556986",
+    "iceberg-compaction/test_compactor_live.py": "d41c9fd1cac9005c731ab7e19b7a60c9f922447602e3f71558397ec5c10f9291"
+  },
+  "evidence": [
+    {
+      "path": "results/current/duckdb-rejections/b71ed187-c81b-4889-ae1f-91095d93ea3e/invocation.json",
+      "sha256": "8b5e442acf71a63b5dc6accffc22535d86edf052cb427e82b5a0d1dcccf57300"
+    },
+    {
+      "path": "results/current/duckdb-rejections/b71ed187-c81b-4889-ae1f-91095d93ea3e/result.json",
+      "sha256": "59cbbc51acfc698294b601fab68e664dd107244c7ef7e3fe304c4a47ff4a2294"
+    },
+    {
+      "path": "results/current/duckdb-rejections/b71ed187-c81b-4889-ae1f-91095d93ea3e/resource-summary.json",
+      "sha256": "d0c03e8375abdbf5123dab28826a57249da695b3f2d6f07f29b2bdb3f2af793a"
+    },
+    {
+      "path": "results/current/duckdb-rejections/b71ed187-c81b-4889-ae1f-91095d93ea3e/native-sha256.txt",
+      "sha256": "3b224109f985229349b94235d4e92b7f12363182f1a490d80324bd63682e8296"
+    },
+    {
+      "path": "results/current/duckdb-rejections/b71ed187-c81b-4889-ae1f-91095d93ea3e/before-catalog.json",
+      "sha256": "54ca9f3a0d61aca0ada77ba20168942771fa39a2119584d1c080bcc9b68c4d07"
+    },
+    {
+      "path": "results/current/duckdb-rejections/b71ed187-c81b-4889-ae1f-91095d93ea3e/after-catalog.json",
+      "sha256": "54ca9f3a0d61aca0ada77ba20168942771fa39a2119584d1c080bcc9b68c4d07"
+    },
+    {
+      "path": "results/current/duckdb-rejections/b71ed187-c81b-4889-ae1f-91095d93ea3e/v3-before-catalog.json",
+      "sha256": "2ed8dd105e1c254ea83209ac0c2692179e3b493a6863434906a4d0ef9a7df3c2"
+    },
+    {
+      "path": "results/current/duckdb-rejections/b71ed187-c81b-4889-ae1f-91095d93ea3e/v3-after-catalog.json",
+      "sha256": "2ed8dd105e1c254ea83209ac0c2692179e3b493a6863434906a4d0ef9a7df3c2"
+    },
+    {
+      "path": "results/current/duckdb-rejections/b71ed187-c81b-4889-ae1f-91095d93ea3e/compression.json",
+      "sha256": "713dd79ff86000719f868a72586792d6bd0996cfcc9684581915e8facb7aef43"
+    },
+    {
+      "path": "results/current/duckdb-rejections/b71ed187-c81b-4889-ae1f-91095d93ea3e/data-files.json",
+      "sha256": "9f2839fe94a912429b062842f3cebc57c76be05cc013b97928a173fef4bfd0d3"
+    },
+    {
+      "path": "results/current/duckdb-rejections/b71ed187-c81b-4889-ae1f-91095d93ea3e/client-settings.json",
+      "sha256": "e9e68cae7d7b442827a5a671b2698af3781e66225e6dbd6a05e16e658a4493a8"
+    },
+    {
+      "path": "results/current/duckdb-rejections/b71ed187-c81b-4889-ae1f-91095d93ea3e/after-schema.json",
+      "sha256": "8750ea143a24f2b05485bfcb09da7980be1c8af0f02bf1de188ab918c36ec484"
+    },
+    {
+      "path": "results/current/duckdb-rejections/b71ed187-c81b-4889-ae1f-91095d93ea3e/before-rows.json",
+      "sha256": "413736b274fa81c8f35e033c8cb324f3b7130291c0697a3d9d186f6c7092c40e"
+    },
+    {
+      "path": "results/current/duckdb-rejections/b71ed187-c81b-4889-ae1f-91095d93ea3e/after-rows.json",
+      "sha256": "413736b274fa81c8f35e033c8cb324f3b7130291c0697a3d9d186f6c7092c40e"
+    },
+    {
+      "path": "results/current/duckdb-rejections/b71ed187-c81b-4889-ae1f-91095d93ea3e/seed.sql",
+      "sha256": "1afa1170576ba8a026abddb3df5d2cb4409a7491e09e32f9c72f72c4a6bcceb5"
+    },
+    {
+      "path": "results/current/duckdb-rejections/b71ed187-c81b-4889-ae1f-91095d93ea3e/pending-write.sql",
+      "sha256": "8513f55fd759b3e953ff60ef9c262a50964aa43c12ad2b04ad1d2c6f882e3869"
+    },
+    {
+      "path": "results/current/duckdb-rejections/b71ed187-c81b-4889-ae1f-91095d93ea3e/pending-schema.sql",
+      "sha256": "bfc70560d5f18d1e81f2733c530ee6907a3cc74e192f85f51f6418031d3cc194"
+    },
+    {
+      "path": "results/current/duckdb-rejections/b71ed187-c81b-4889-ae1f-91095d93ea3e/v3.sql",
+      "sha256": "e4f23040af7ae439b7467bff6860b598f2995b28fc997dc1391b8d0f58f969c8"
+    },
+    {
+      "path": "results/current/duckdb-rejections/b71ed187-c81b-4889-ae1f-91095d93ea3e/verify.sql",
+      "sha256": "2be67c2d1fe4ae3bbf97b3568ac72aa6a3cc6367b18498ba5c872d1cbe0acb3b"
+    },
+    {
+      "path": "results/current/duckdb-rejections/b71ed187-c81b-4889-ae1f-91095d93ea3e/run.sh",
+      "sha256": "a5490925ec19833c7884fc76bacb6b782c2e5e8227917ef6319c98a7324f9339"
+    },
+    {
+      "path": "results/current/duckdb-rejections/b71ed187-c81b-4889-ae1f-91095d93ea3e/pending-write-stderr.log",
+      "sha256": "5f01c1182fb744884d7dcc4001ca78bbae57ad7c4b7bbd11a1812d6946087117"
+    },
+    {
+      "path": "results/current/duckdb-rejections/b71ed187-c81b-4889-ae1f-91095d93ea3e/pending-schema-stderr.log",
+      "sha256": "5f01c1182fb744884d7dcc4001ca78bbae57ad7c4b7bbd11a1812d6946087117"
+    },
+    {
+      "path": "results/current/duckdb-rejections/b71ed187-c81b-4889-ae1f-91095d93ea3e/v3-stderr.log",
+      "sha256": "ab7a860860662c8c400f792a1f1159abda5a6c1287c971a8393aef7df5d7ae9e"
+    },
+    {
+      "path": "results/current/duckdb-rejections/b71ed187-c81b-4889-ae1f-91095d93ea3e/final.json",
+      "sha256": "3399f606bf242df8b1c293a5fae7df026467a901be6afa2c2f59e60ca092b913"
+    }
+  ],
+  "preserved_harness_failures": [
+    {
+      "case_id": "47f0a9a5-e4f1-4184-9f52-1b665be69a13",
+      "error": "Binder Error: Table function cannot contain subqueries\nhint: -agent renders errors as JSON and results compactly for AI coding agents (duckdb -help lists all options)",
+      "result_path": "results/current/duckdb-rejections/47f0a9a5-e4f1-4184-9f52-1b665be69a13/result.json",
+      "result_sha256": "c0d2fd6b451698613d7318e87099bdcd586f63a97fe93ce0dd79cb4594c94fa1",
+      "scope": "Seed telemetry SQL used an unsupported subquery inside a table function; not an engine fault-injection result."
+    },
+    {
+      "case_id": "a17da03f-819d-4ee6-bca9-34371909bd21",
+      "error": "Binder Error: Table function cannot contain subqueries\nhint: -agent renders errors as JSON and results compactly for AI coding agents (duckdb -help lists all options)",
+      "result_path": "results/current/duckdb-rejections/a17da03f-819d-4ee6-bca9-34371909bd21/result.json",
+      "result_sha256": "d0fcb413719138eff27cf40d8ccfe711c3e6e688f9d3c2b9125a408d69d2d16c",
+      "scope": "Seed telemetry SQL used an unsupported subquery inside a table function; not an engine fault-injection result."
+    }
+  ],
+  "limitations": [
+    "Ten-row functional rejection controls, not capacity or production-fault qualification.",
+    "CLI children are sequential; final cgroup sample captures cumulative child CPU/peak memory. Sampling is about one second; fast requests have no reliable sampled instantaneous peak utilization.",
+    "Role observation windows differ; cgroup CPU includes probes. Charged/lifetime memory is distinct from process RSS; server lifetime peaks may predate this trial.",
+    "Whole-role disk and I/O counters include existing fixtures/background work. CLI native block I/O counters unavailable, not zero. Do not sum stacked devices.",
+    "HTTP timeout/retry values are pinned and dumped; they are not a hard end-to-end query deadline.",
+    "Concurrent append conflicts and live native compactor failures remain unrun."
+  ]
+}

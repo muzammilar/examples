@@ -100,11 +100,13 @@ errors remain recorded.
 The pinned [planner](https://github.com/duckdb/duckdb-iceberg/blob/f979b5b28a044c49c38a26636ac01bc1f7047fa5/src/maintenance/rewrite_data_files_planner.cpp#L562-L564)
 rejects v3 rewrites. Its [executor](https://github.com/duckdb/duckdb-iceberg/blob/f979b5b28a044c49c38a26636ac01bc1f7047fa5/src/maintenance/rewrite_data_files_executor.cpp)
 checks the planned snapshot and rejects pending same-table data/schema changes.
-Those are source observations; their exact rejection paths and concurrent-append behavior
-still need native tests. API details: [DuckDB 2.0 Iceberg functions](https://duckdb.org/docs/2.0/core_extensions/iceberg/iceberg_functions).
+The v3 and pending data/schema rejection paths now pass separate native tests,
+with unchanged committed metadata and complete bodies; see
+[`DUCKDB_REJECTIONS.md`](DUCKDB_REJECTIONS.md). Concurrent-append behavior remains
+unrun. API details: [DuckDB 2.0 Iceberg functions](https://duckdb.org/docs/2.0/core_extensions/iceberg/iceberg_functions).
 
-Next, pin/dump timeout and retry behavior, test those rejection/conflict paths,
-and keep independent writers/readers live through process and S3/catalog
+Timeout/retry settings are now pinned/dumped for the rejection lane. Next, test
+concurrent commit conflicts and keep independent writers/readers live through process and S3/catalog
 interruptions. Do not pause writers to force a successful recovery. Committed
 deletes, partition evolution, manifest rewrites, expiration/orphan cleanup and
 repeated comparative benchmarks remain unrun here. Local DuckDB WAL/file-format

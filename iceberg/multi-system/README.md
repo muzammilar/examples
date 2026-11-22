@@ -146,6 +146,10 @@ no-op and wrong-body controls, with independent ClickHouse/REST verification.
 The committed CALL profile is **2,149.995 ms**; all **215 controls** pass.
 CPU/memory/disk/I/O, compression, source provenance and the two preserved harness
 failures are in [`DUCKDB_MAINTENANCE.md`](DUCKDB_MAINTENANCE.md).
+`make duckdb-rejections` also passes three native expected-error cases: pending
+data/schema changes and v3 compaction, with unchanged committed state and an
+independent ten-row readback. All **217 controls** pass; pinned HTTP policy,
+resource evidence and scope are in [`DUCKDB_REJECTIONS.md`](DUCKDB_REJECTIONS.md).
 Native compaction under live writers/readers and injected faults remains unrun;
 the earlier live compactor-crash pass uses Spark.
 

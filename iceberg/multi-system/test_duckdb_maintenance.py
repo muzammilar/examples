@@ -1,13 +1,58 @@
 """Guard the native maintenance scope and the complete-body oracle."""
 
 import unittest
+import tempfile
 from pathlib import Path
 from unittest.mock import Mock, patch
 
 import duckdb_maintenance as maintenance
+import duckdb_rejections as rejections
 
 
 class NativeMaintenance(unittest.TestCase):
+    def test_rejection_requires_the_specific_native_error_not_just_exit_one(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "seed-exit.txt").write_text("0\n")
+            (root / "seed-stderr.log").write_text("")
+            (root / "pending-write-exit.txt").write_text("1\n")
+            (root / "pending-write-stderr.log").write_text("Connection refused")
+            with self.assertRaisesRegex(RuntimeError, "wrong native rejection"):
+                rejections.verify(root, 10)
+
+    def test_changed_catalog_cannot_pass_as_an_expected_rejection(self):
+        row = {
+            "rows": 10,
+            "unique_ids": 10,
+            "first_id": 0,
+            "last_id": 9,
+            "amount_total_cents": 55,
+            "invalid_bodies": 0,
+        }
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            for name in ("seed", *rejections.ERRORS, "verify"):
+                (root / (name + "-exit.txt")).write_text(
+                    "1" if name in rejections.ERRORS else "0"
+                )
+                (root / (name + "-stderr.log")).write_text(
+                    "Not implemented Error: " + rejections.ERRORS[name]
+                    if name in rejections.ERRORS
+                    else ""
+                )
+            with patch.object(
+                maintenance,
+                "single",
+                side_effect=[
+                    row,
+                    row,
+                    {"metadata_location": "before"},
+                    {"metadata_location": "after"},
+                ],
+            ):
+                with self.assertRaisesRegex(RuntimeError, "changed committed metadata"):
+                    rejections.verify(root, 10)
+
     def test_fencing_failure_does_not_skip_resource_shutdown(self):
         planned = Mock(side_effect=OSError("runtime unavailable"))
         sampler = Mock()
