@@ -1,0 +1,333 @@
+{
+  "date": "2026-11-22",
+  "case_id": "2a30dee2-c5b9-4adf-955b-b297c3855172",
+  "command": "make duckdb-clickhouse-partial ROWS=2000000",
+  "passed": true,
+  "production_qualified": false,
+  "host_controls_passed": 231,
+  "engines": {
+    "duckdb": "2.0.1",
+    "connector": "ce337c48c1",
+    "clickhouse": "26.10.10.3"
+  },
+  "dataset": {
+    "attempt_rows": 2000000,
+    "columns": [
+      "event_id Int64",
+      "value Int8"
+    ],
+    "id_range": "0..1999999",
+    "value": 1,
+    "invalid_last_value": 128,
+    "logical_valid_input_bytes": 18000000,
+    "bytes_scope": "fixed-width field widths only; excludes wire framing, engine overhead and failed INT32 intermediate",
+    "seed": "deterministic range; no RNG; no nulls; no customer-sharding claims"
+  },
+  "checks": {
+    "corrected_replay_final": {
+      "rows": 2000000,
+      "unique_ids": 2000000,
+      "wrong_values": 0
+    },
+    "failed_statement_acknowledged_rows": 0,
+    "first_failed_statement_effects": {
+      "rows": 1906688,
+      "unique_ids": 1906688,
+      "wrong_values": 0
+    },
+    "blind_retry_effects": {
+      "rows": 3813376,
+      "unique_ids": 1906688,
+      "wrong_values": 0
+    },
+    "independent_final_effects": {
+      "rows": 3813377,
+      "unique_ids": 1906689,
+      "wrong_values": 0,
+      "recovery_markers": 1
+    },
+    "production_qualified": false,
+    "scope": "Late client conversion failure and blind retry only; corrected immutable-key replay checked with FINAL, not a transactional or exactly-once guarantee; no injected outage."
+  },
+  "parts": [
+    {
+      "table": "duck_compact_2a30dee2c5b94adf955bb297c3855172",
+      "physical_rows": 3813377,
+      "uncompressed_bytes": 34320393,
+      "compressed_bytes": 15294599,
+      "allocated_bytes": 15313481,
+      "uncompressed_over_compressed": 2.2439550719832537
+    },
+    {
+      "table": "duck_compact_2a30dee2c5b94adf955bb297c3855172_replay",
+      "physical_rows": 4000000,
+      "uncompressed_bytes": 36000000,
+      "compressed_bytes": 16040418,
+      "allocated_bytes": 16054686,
+      "uncompressed_over_compressed": 2.244330540513346
+    }
+  ],
+  "resources": {
+    "clickhouse": {
+      "samples": 6,
+      "unavailable_samples": 0,
+      "observed_seconds": 6.409999999999999,
+      "cpu_core_seconds": {
+        "total": 1.9977960000000001,
+        "user": 1.0805349999999998,
+        "system": 0.9172610000000001
+      },
+      "cpu_percent_one_core_100": 31.166864274570987,
+      "charged_memory_bytes_min_mean_max": [
+        1554706432,
+        1560752128,
+        1574748160
+      ],
+      "lifetime_peak_memory_bytes": 1614176256,
+      "allocated_disk_bytes_first_peak_last": [
+        1029644288,
+        1098194944,
+        1098194944
+      ],
+      "native_block_io": {
+        "254:0": {
+          "observed_seconds": 6.409999999999999,
+          "rbytes": 0,
+          "wbytes": 16384,
+          "rios": 0,
+          "wios": 4,
+          "rbytes_per_second": 0.0,
+          "wbytes_per_second": 2556.00624024961,
+          "rios_per_second": 0.0,
+          "wios_per_second": 0.62402496099844
+        }
+      },
+      "identity_or_counter_gaps": 0,
+      "scope": "Native cgroup CPU across all threads including probes; sampled charged memory and per-generation lifetime peak. Intervals use native /proc/uptime with centisecond resolution; full probe brackets retain uncertainty. Approximate du allocated bytes, not open-deleted or unique physical storage. Workload /results binds share one witness directory: do not sum them. Device I/O is Docker-VM accounting, not physical SSD latency/queue depth; do not sum stacked devices. Missing devices/counters are unavailable, not zero. CPU and byte/IOPS deltas exclude restart bridges and unobserved initial/final edges. Raw samples retain network counters and timing uncertainty.",
+      "memory_stat_bytes_min_mean_max": {
+        "anon": [
+          598466560,
+          601009493.3333334,
+          603115520
+        ],
+        "file": [
+          614227968,
+          619518634.6666666,
+          631578624
+        ],
+        "kernel": [
+          169005056,
+          170049536,
+          173527040
+        ]
+      },
+      "memory_stat_samples": 6,
+      "memory_stat_scope": "Sampled native cgroup byte gauges, not Go heap or process RSS. File includes charged file cache; kernel includes its subcategories. Counters are read nonatomically; do not infer an exact partition of memory.current."
+    },
+    "duckdb-cli": {
+      "samples": 5,
+      "unavailable_samples": 0,
+      "observed_seconds": 5.16,
+      "cpu_core_seconds": {
+        "total": 0.415507,
+        "user": 0.318848,
+        "system": 0.096659
+      },
+      "cpu_percent_one_core_100": 8.052461240310077,
+      "charged_memory_bytes_min_mean_max": [
+        2297856,
+        12359270.4,
+        19050496
+      ],
+      "lifetime_peak_memory_bytes": 74170368,
+      "allocated_disk_bytes_first_peak_last": [
+        59699200,
+        59793408,
+        59793408
+      ],
+      "native_block_io": null,
+      "identity_or_counter_gaps": 0,
+      "scope": "Native cgroup CPU across all threads including probes; sampled charged memory and per-generation lifetime peak. Intervals use native /proc/uptime with centisecond resolution; full probe brackets retain uncertainty. Approximate du allocated bytes, not open-deleted or unique physical storage. Workload /results binds share one witness directory: do not sum them. Device I/O is Docker-VM accounting, not physical SSD latency/queue depth; do not sum stacked devices. Missing devices/counters are unavailable, not zero. CPU and byte/IOPS deltas exclude restart bridges and unobserved initial/final edges. Raw samples retain network counters and timing uncertainty.",
+      "memory_stat_bytes_min_mean_max": {
+        "anon": [
+          483328,
+          492339.2,
+          499712
+        ],
+        "file": [
+          0,
+          9525657.6,
+          15876096
+        ],
+        "kernel": [
+          1376256,
+          1628569.6,
+          1761280
+        ]
+      },
+      "memory_stat_samples": 5,
+      "memory_stat_scope": "Sampled native cgroup byte gauges, not Go heap or process RSS. File includes charged file cache; kernel includes its subcategories. Counters are read nonatomically; do not infer an exact partition of memory.current."
+    },
+    "storage": {
+      "samples": 7,
+      "unavailable_samples": 0,
+      "observed_seconds": 7.67,
+      "cpu_core_seconds": {
+        "total": 0.10042899999999999,
+        "user": 0.054354,
+        "system": 0.046075
+      },
+      "cpu_percent_one_core_100": 1.309374185136897,
+      "charged_memory_bytes_min_mean_max": [
+        806998016,
+        807594861.7142857,
+        807985152
+      ],
+      "lifetime_peak_memory_bytes": 1079885824,
+      "allocated_disk_bytes_first_peak_last": [
+        3296616448,
+        3296616448,
+        3296616448
+      ],
+      "native_block_io": {
+        "254:0": {
+          "observed_seconds": 7.67,
+          "rbytes": 0,
+          "wbytes": 0,
+          "rios": 0,
+          "wios": 0,
+          "rbytes_per_second": 0.0,
+          "wbytes_per_second": 0.0,
+          "rios_per_second": 0.0,
+          "wios_per_second": 0.0
+        }
+      },
+      "identity_or_counter_gaps": 0,
+      "scope": "Native cgroup CPU across all threads including probes; sampled charged memory and per-generation lifetime peak. Intervals use native /proc/uptime with centisecond resolution; full probe brackets retain uncertainty. Approximate du allocated bytes, not open-deleted or unique physical storage. Workload /results binds share one witness directory: do not sum them. Device I/O is Docker-VM accounting, not physical SSD latency/queue depth; do not sum stacked devices. Missing devices/counters are unavailable, not zero. CPU and byte/IOPS deltas exclude restart bridges and unobserved initial/final edges. Raw samples retain network counters and timing uncertainty.",
+      "memory_stat_bytes_min_mean_max": {
+        "anon": [
+          276807680,
+          276811776,
+          276815872
+        ],
+        "file": [
+          381833216,
+          381833216,
+          381833216
+        ],
+        "kernel": [
+          22020096,
+          22087972.57142857,
+          22151168
+        ]
+      },
+      "memory_stat_samples": 7,
+      "memory_stat_scope": "Sampled native cgroup byte gauges, not Go heap or process RSS. File includes charged file cache; kernel includes its subcategories. Counters are read nonatomically; do not infer an exact partition of memory.current."
+    }
+  },
+  "successful_corrected_insert_seconds": [
+    0.096513083,
+    0.093502083
+  ],
+  "limits": [
+    "Shared-host correctness diagnostic, not capacity benchmark or performance ranking.",
+    "Two-column values differ from the four-column round-trip fixture.",
+    "FINAL reads are mandatory for the tested replacement semantics; physical duplicates may remain.",
+    "Corrected input differs from the invalid request; no acknowledgement is inferred for failed writes.",
+    "No network ACK-loss injection, live crash or continuous reader/writer recovery yet.",
+    "Earlier ordinary connector read wrong answers remain unresolved.",
+    "Predeclared intent fsynced before release; local ACK files fsynced at final reconciliation, not a power-loss-qualified live witness.",
+    "Native I/O sampling does not cover all delayed writeback; zero read bytes do not establish cold storage cost.",
+    "No S3 data is written; existing storage role sampled as background only."
+  ],
+  "raw_evidence": [
+    {
+      "path": "results/current/duckdb-connector-partial/2a30dee2-c5b9-4adf-955b-b297c3855172/result.json",
+      "sha256": "4db2bc9e6bf1af2326325be441a171e6339440abd72174751279d7dcf71774fe"
+    },
+    {
+      "path": "results/current/duckdb-connector-partial/2a30dee2-c5b9-4adf-955b-b297c3855172/intents.json",
+      "sha256": "7b8128522c510768616b032d4213ae2782683c738097b124d4aa75946b0f7b79"
+    },
+    {
+      "path": "results/current/duckdb-connector-partial/2a30dee2-c5b9-4adf-955b-b297c3855172/invocation.json",
+      "sha256": "53aa4b9ab01ccf7e8d23477f8e9dfc7aa8abc400171da739e1765d4db778c573"
+    },
+    {
+      "path": "results/current/duckdb-connector-partial/2a30dee2-c5b9-4adf-955b-b297c3855172/run.sql",
+      "sha256": "ebbdba72f9c4d386ebd42361058f6cca0e3e9bcaeefc5c2bda6c94684a85b12d"
+    },
+    {
+      "path": "results/current/duckdb-connector-partial/2a30dee2-c5b9-4adf-955b-b297c3855172/run.sh",
+      "sha256": "6e8d0ee4591875e03d0b410874319f34e446a65b49d009569825e541220267f5"
+    },
+    {
+      "path": "results/current/duckdb-connector-partial/2a30dee2-c5b9-4adf-955b-b297c3855172/native-exit.txt",
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    {
+      "path": "results/current/duckdb-connector-partial/2a30dee2-c5b9-4adf-955b-b297c3855172/native-stderr.log",
+      "sha256": "57fcbf9755a90d4ebd407f1b19c86848d6c33b9ae2f09d7636af7e8baec1865a"
+    },
+    {
+      "path": "results/current/duckdb-connector-partial/2a30dee2-c5b9-4adf-955b-b297c3855172/attempt-1-effects.json",
+      "sha256": "267e2103ca7d984a468d02ce2df0ec751d9b0deffff4c4c201cb6ea15dfb6c0b"
+    },
+    {
+      "path": "results/current/duckdb-connector-partial/2a30dee2-c5b9-4adf-955b-b297c3855172/attempt-2-effects.json",
+      "sha256": "1734110e354e3dd724177669950237768ad2931ca8ca34ef145b6317045c02c6"
+    },
+    {
+      "path": "results/current/duckdb-connector-partial/2a30dee2-c5b9-4adf-955b-b297c3855172/independent-effects.json",
+      "sha256": "eddd2228b8997f225530a668ed7108a906ba58923d963075b014d2ca22686942"
+    },
+    {
+      "path": "results/current/duckdb-connector-partial/2a30dee2-c5b9-4adf-955b-b297c3855172/independent-replay.json",
+      "sha256": "5bbee5594a629fcebcd1aa2dfcab24a4239f758d2ec89bea0190088b61583ce1"
+    },
+    {
+      "path": "results/current/duckdb-connector-partial/2a30dee2-c5b9-4adf-955b-b297c3855172/native-parts.jsonl",
+      "sha256": "e1b7e32284dacabba84bdb1bb574ac6cebe805481e514a14b1be9cc194b86bdc"
+    },
+    {
+      "path": "results/current/duckdb-connector-partial/2a30dee2-c5b9-4adf-955b-b297c3855172/resource-summary.json",
+      "sha256": "be5092dc7ef409b79d9a7272bd34b36d951d98d64fe2c0d7ebfa4a911fa4252c"
+    },
+    {
+      "path": "results/current/duckdb-connector-partial/2a30dee2-c5b9-4adf-955b-b297c3855172/resources.jsonl",
+      "sha256": "9ed8252b83f7aae0328553a5d23b0faacb9ab1195160f775494e03f6d57a74bc"
+    },
+    {
+      "path": "results/current/duckdb-connector-partial/2a30dee2-c5b9-4adf-955b-b297c3855172/replay-1-ack.json",
+      "sha256": "95de1cdda20c2fa43ecd3d13b3c935545561c2c32377ee7ff1e09b522be08bda"
+    },
+    {
+      "path": "results/current/duckdb-connector-partial/2a30dee2-c5b9-4adf-955b-b297c3855172/replay-2-ack.json",
+      "sha256": "48043212d495962ab2ca7fce05008600bfa82c5ea7850807d0953bb1772831c1"
+    },
+    {
+      "path": "results/current/duckdb-connector-partial/2a30dee2-c5b9-4adf-955b-b297c3855172/replay-1-profile.json",
+      "sha256": "de621658354d2f6b856d7f4680badd4f54a2c965c66a3eb8a3020582fb39f42e"
+    },
+    {
+      "path": "results/current/duckdb-connector-partial/2a30dee2-c5b9-4adf-955b-b297c3855172/replay-2-profile.json",
+      "sha256": "f71649aacf014a1ea6abd2188cb785ce51f18de61d70bb2b32611cfe1f240e30"
+    },
+    {
+      "path": "results/current/duckdb-connector-partial/2a30dee2-c5b9-4adf-955b-b297c3855172/started.json",
+      "sha256": "40a51b65545bd522c6651292d47d4fda2ab7024fbed9d56097c36ebba4c90d1b"
+    },
+    {
+      "path": "results/current/duckdb-connector-partial/2a30dee2-c5b9-4adf-955b-b297c3855172/ended.json",
+      "sha256": "12e02790f9cdc1a962680b9b5e1d3538f3521c5aae8d3b86c709a30e6cfb7ded"
+    },
+    {
+      "path": "results/current/duckdb-connector-partial/2a30dee2-c5b9-4adf-955b-b297c3855172/final.json",
+      "sha256": "12e02790f9cdc1a962680b9b5e1d3538f3521c5aae8d3b86c709a30e6cfb7ded"
+    },
+    {
+      "path": "results/current/duckdb-connector-partial/2a30dee2-c5b9-4adf-955b-b297c3855172/connector-artifacts.json",
+      "sha256": "2f2a7a12de1c09f6c89a491d0304506dba24d829216ace0e2a38257a7968a0cf"
+    }
+  ]
+}

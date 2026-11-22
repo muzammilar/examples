@@ -6,6 +6,7 @@ import tempfile
 import unittest
 
 import duckdb_clickhouse as connector
+import duckdb_partial as partial
 
 
 class ConnectorRoundTrip(unittest.TestCase):
@@ -77,6 +78,37 @@ class ConnectorRoundTrip(unittest.TestCase):
             )
             with self.assertRaisesRegex(RuntimeError, "bypassed ClickHouse"):
                 connector.verify(root, 10000)
+
+
+class PartialInsertControls(unittest.TestCase):
+    def test_no_partial_effects_is_not_a_reproduction(self):
+        with self.assertRaisesRegex(RuntimeError, "partial insert"):
+            partial.check_effects(
+                {"rows": 0, "unique_ids": 0, "wrong_values": 0}, {}, {}, {}, 100
+            )
+
+    def test_wrong_values_fail_even_if_replay_count_matches(self):
+        first = {"rows": 90, "unique_ids": 90, "wrong_values": 0}
+        second = first | {"rows": 180}
+        final = {
+            "rows": 181,
+            "unique_ids": 91,
+            "wrong_values": 0,
+            "recovery_markers": 1,
+        }
+        with self.assertRaisesRegex(RuntimeError, "replay did not reconcile"):
+            partial.check_effects(
+                first,
+                second,
+                final,
+                {"rows": 100, "unique_ids": 100, "wrong_values": 1},
+                100,
+            )
+
+    def test_native_final_disagreement_is_not_ignored(self):
+        first = {"rows": 90, "unique_ids": 90, "wrong_values": 0}
+        with self.assertRaisesRegex(RuntimeError, "native final"):
+            partial.check_effects(first, first | {"rows": 180}, {"rows": 0}, {}, 100)
 
 
 if __name__ == "__main__":

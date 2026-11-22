@@ -257,3 +257,7 @@ build-current-compactor: config prepare ## Build the compatible Spark 4.1.4 / Ic
 .PHONY: test-current-compactor
 test-current-compactor: config recovery-unit-test ## Offline 2M-row compaction, append and retained-snapshot correctness on the current maintenance image
 	python3 maintenance_control.py
+
+.PHONY: duckdb-clickhouse-partial
+duckdb-clickhouse-partial: config recovery-unit-test ## Observe partial remote inserts and blind retry after conversion errors
+	python3 duckdb_maintenance.py --connector-partial

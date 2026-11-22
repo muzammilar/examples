@@ -406,6 +406,7 @@ def run(mode="baseline"):
     import duckdb_clickhouse
     import duckdb_conflicts
     import duckdb_rejections
+    import duckdb_partial
 
     if mode not in {
         "baseline",
@@ -413,6 +414,7 @@ def run(mode="baseline"):
         "conflicts",
         "connector",
         "connector-read",
+        "connector-partial",
     }:
         raise ValueError("unknown native maintenance scenario")
     scenario = {
@@ -420,6 +422,7 @@ def run(mode="baseline"):
         "conflicts": duckdb_conflicts,
         "connector": duckdb_clickhouse,
         "connector-read": duckdb_clickhouse,
+        "connector-partial": duckdb_partial,
     }.get(mode)
     if control.lab.PROFILE != "current":
         raise RuntimeError("DuckDB-native maintenance requires the current profile")
@@ -447,6 +450,8 @@ def run(mode="baseline"):
     table = ("duck_frontend_" if mode == "connector" else "duck_compact_") + run_id.hex
     if mode == "connector":
         artifacts = scenario.artifacts(table, rows, customers, batch)
+    elif mode == "connector-partial":
+        artifacts = scenario.artifacts(table, rows)
     elif mode == "connector-read":
         artifacts = scenario.read_artifacts(rows)
     else:
@@ -468,7 +473,7 @@ def run(mode="baseline"):
     required_slots = 1 if scenario else max(3, (rows * 384 + 255999999) // 256000000)
     if mode == "connector":
         required_slots = (rows * 128 + 255999999) // 256000000 + 1
-    elif mode == "connector-read":
+    elif mode in {"connector-read", "connector-partial"}:
         required_slots = 0
     free_slots = settings["topology"]["Topology"].get("Free")
     if type(free_slots) is not int or free_slots < required_slots:
@@ -483,8 +488,23 @@ def run(mode="baseline"):
     )
     if image["Config"].get("Labels", {}).get("org.examples.owner") != control.OWNER:
         raise RuntimeError("native CLI image lacks repository ownership")
-    if mode in {"connector", "connector-read"}:
-        scenario.prepare(root, image)
+    if mode in {"connector", "connector-read", "connector-partial"}:
+        duckdb_clickhouse.prepare(root, image)
+    if mode == "connector-partial":
+        control.save(
+            root / "intents.json",
+            {
+                "table": table,
+                "rows_per_attempt": rows,
+                "attempts": [1, 2],
+                "corrected_replays": [1, 2],
+                "corrected_value": 1,
+                "replay_semantics": "immutable event_id, ReplacingMergeTree with FINAL reads",
+                "invalid_last_value": 128,
+                "recovery_marker": rows,
+                "failed_response_does_not_imply_rollback": True,
+            },
+        )
     frozen = control.sources()
     for relative, expected_sha in frozen.items():
         data = (control.ROOT / relative).read_bytes()
@@ -635,7 +655,9 @@ def run(mode="baseline"):
         if logs.returncode:
             raise RuntimeError("native CLI logs could not be retained")
         cold_storage.stopped(value)
-        if mode == "connector-read":
+        if mode == "connector-partial":
+            result = scenario.verify(root, table, rows, query)
+        elif mode == "connector-read":
             result = scenario.verify_read(root, rows)
         else:
             result = scenario.verify(root, rows) if scenario else verify(root, rows)
@@ -694,6 +716,12 @@ if __name__ == "__main__":
     )
     group.add_argument(
         "--connector-read", dest="mode", action="store_const", const="connector-read"
+    )
+    group.add_argument(
+        "--connector-partial",
+        dest="mode",
+        action="store_const",
+        const="connector-partial",
     )
     parser.set_defaults(mode="baseline")
     args = parser.parse_args()

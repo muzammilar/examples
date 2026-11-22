@@ -278,6 +278,7 @@ def sources():
         ROOT / "duckdb_rejections.py",
         ROOT / "duckdb_conflicts.py",
         ROOT / "duckdb_clickhouse.py",
+        ROOT / "duckdb_partial.py",
         ROOT / "test_duckdb_clickhouse.py",
         ROOT / "failed_preservation.py",
         ROOT / "failed-preservation-plans.json",

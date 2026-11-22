@@ -80,8 +80,11 @@ exercised and failed; the five-group scope remains:
 1. **Full round trip:** two million rows through DuckDB → ClickHouse → Iceberg →
    ClickHouse, complete body/type oracle and ordinary versus pass-through queries.
    Resolve or clearly mark the discovery failure.
-2. **Insert failure/retry:** partial block commits, ambiguous acknowledgements,
-   duplicate prevention and recovery from the durable witness.
+2. **Insert failure/retry:** [late conversion failure and blind-retry duplicate
+   effects](DUCKDB_PARTIAL.md) reproduced at two million input rows; corrected
+   immutable-key replay passes in a separate replacement table with FINAL reads.
+   Transport-level ambiguous acknowledgements and live durable-witness faults
+   remain unrun.
 3. **ClickHouse restart:** live independent readers/writers, persisted state,
    reconnect behavior and acknowledged-row reconciliation.
 4. **S3/catalog outage:** expected failures/backpressure, visibility and recovery,
