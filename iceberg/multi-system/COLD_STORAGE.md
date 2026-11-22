@@ -200,3 +200,27 @@ approval. Compact receipts are in
 Next: finish authorized fixture retirement, then qualify fresh 4.54 bounded-memory/
 capacity settings and continuous compactor recovery. The original operational
 failure remains failed.
+
+
+## Fresh 4.54 settings probe
+
+A separate **1 CPU / 1 GiB**, network-isolated, tmpfs-only container verified the
+proposed settings before selecting them for a new live fixture. Native metrics
+reported `go_gc_gomemlimit_bytes=629145600` (**600 MiB**), and the master's
+`/dir/status` reported **16 volume slots**. The pinned binary was 4.54 /
+`5ef99c1d8`. Its explicit process arguments included a **256 MiB reader budget**
+and disabled S3 data-cache capacity. There is no independently verified runtime
+getter for that reader budget; process arguments establish configuration only.
+
+The startup scrape observed **0.15 process CPU seconds** and **153,411,584 bytes
+RSS**. These are single observations, not run totals, peak memory or benchmark
+results. The probe used capped tmpfs, mounted no source database volume, exited
+zero without OOM and was removed. No workload, sustained pressure, volume
+expansion or compactor fault ran. The candidate Compose override remains
+unselected by the lifecycle. See
+[`STORAGE_SETTINGS_RESULTS.json`](STORAGE_SETTINGS_RESULTS.json).
+
+Pinned upstream source documents [mini configuration precedence](https://github.com/seaweedfs/seaweedfs/blob/4.54/weed/command/mini.go)
+and [native metric registration](https://github.com/seaweedfs/seaweedfs/blob/4.54/weed/stats/metrics.go).
+Explicit flags take precedence over saved mini options; later live tests must
+also check effective settings and behavior on their actual fixture.

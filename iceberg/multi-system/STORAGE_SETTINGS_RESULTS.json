@@ -1,0 +1,32 @@
+{
+  "date": "2026-11-22",
+  "passed": true,
+  "scope": "Fresh tmpfs-only settings probe; profile not yet selected by the lifecycle and no live compactor qualification",
+  "image": "sha256:4b42c212543a0acd4c0e675215ecdcaf62a186ef98def76c7e12701871222d15",
+  "native_version": "version 30GB 4.54 5ef99c1d8 linux arm64",
+  "settings": {
+    "gomemlimit_bytes": 629145600,
+    "native_volume_slots": 16,
+    "reader_budget_MiB": 256,
+    "reader_budget_evidence": "Explicit pinned native argv only; no independent reader-budget getter",
+    "production_qualified": false
+  },
+  "clean_exit_code": 0,
+  "container_removed": true,
+  "evidence": {
+    "results/storage-settings-20261122/a2da5184-1df9-43ef-900b-b48def5f8e0b/invocation.json": "0c510896bf3610e342ba025d1b9d748ee7d3a4f7d8bb11cf9de2452bf66e8917",
+    "results/storage-settings-20261122/a2da5184-1df9-43ef-900b-b48def5f8e0b/running.json": "76a58e2e3ca173ebc95116a9a75c76b86d59aaa531128aaee59ea37446c95149",
+    "results/storage-settings-20261122/a2da5184-1df9-43ef-900b-b48def5f8e0b/final.json": "80693fa7c4b8f7d1a304431c58138fdf201faa917fedc27a631db7c721077735",
+    "results/storage-settings-20261122/a2da5184-1df9-43ef-900b-b48def5f8e0b/settings.json": "44fafc0c5bed2d3dacf0edc00fee6b4702b32f512d36f8a4f546599b9b010ad3",
+    "results/storage-settings-20261122/a2da5184-1df9-43ef-900b-b48def5f8e0b/metrics.txt": "385864bb8e0603fdc60344bef7e66e2d2983cbc6c1b18b4fa5c8f2a65af975e9",
+    "results/storage-settings-20261122/a2da5184-1df9-43ef-900b-b48def5f8e0b/topology.json": "a76a03318331e8d2a3d340e5f45628dcd6e9bd2072c2ead31b969c524d859f89",
+    "results/storage-settings-20261122/a2da5184-1df9-43ef-900b-b48def5f8e0b/result.json": "ce7dba9e4c972ab1c375ad6b13f325c9ee5e0e91e4e1d7dbbb75f9b71b05b078"
+  },
+  "limits": [
+    "No application workload or compactor ran",
+    "No sustained memory-pressure or capacity result",
+    "Volume slots verified at bootstrap, not by expansion",
+    "Reader budget verified from explicit native argv; no independent getter",
+    "Tmpfs limits apply to this probe only; source database volumes were not mounted"
+  ]
+}
