@@ -3,8 +3,10 @@
 Status: all five normal data paths and native replica recovery passed the historical
 2026-11-14 run; see README.md for its measured numbers and limits. All five paths
 also passed the isolated 2026-11-22 functional rerun, including compaction and
-2,100,000-row native replica readback. Short-lived tool resource sampling remains
-incomplete, so this is not a fresh performance qualification. The first continuous
+2,100,000-row native replica readback. A subsequent five-path run accounts for
+all 22 short-lived tools and 14 serving/storage roles; full engine startup/exit
+CPU and repeated capacity measurements remain incomplete. This is not a fresh
+performance qualification. The first continuous
 recovery run failed its snapshot-ID metrics recorder, despite complete body checks;
 its preserved 2,480,000 acknowledged rows passed a separate corrected verification.
 The fresh two-million-row crash case, all-history checks and guarded teardown now
@@ -19,7 +21,7 @@ a claim that every listed test has run.
 - Iceberg v2 tables contain Parquet data. The REST catalog's committed metadata location is authoritative; readers must not choose the newest-looking JSON file from an object listing.
 - Go clients use DuckDB's Go driver and the ClickHouse Go client. DuckDB processes use independent local databases and attach the shared catalog; no shared writable `.duckdb` file.
 - A Spark/Iceberg maintenance job performs data-file and manifest rewrites through the same catalog. It owns compaction, independently of the current writer/reader engine.
-- Reuse the already-tested DuckDB 1.5.5 / duckdb-go v2.10505.0 and ClickHouse 26.10.2.103 as compatibility starting points. Pin the Spark/Iceberg runtime and extension artifacts before execution. Verify actual versions in every result.
+- Default to actual DuckDB 2.0.1 through the official shared C ABI and Go binding v2.20000.0; keep native 1.5.5 / binding v2.10505.0 as a labeled historical regression lane. Existing normal-matrix results are historical. Pin and verify core, driver and extension versions separately; see `DUCKDB_VERSIONS.md`. ClickHouse 26.10.2.103 and SeaweedFS 4.53 remain fixed comparison components; separately qualify newer releases.
 - Run architectures serially to keep resource use bounded. The nine-node ClickHouse topology is enabled only for its scenarios. All containers still share one host and physical Docker disk.
 - Use only example-owned local Docker/Compose services and an internal network.
   Never read, mount or use host AWS configuration/credentials, metadata discovery
@@ -56,7 +58,31 @@ current volume against their original witnesses, including earlier cases after
 later faults. Failed or incomplete qualification must retain its native state
 and diagnostic exports; a successful subset cannot replace the failed verdict.
 
-### Next fault: interrupted compactor output (not implemented)
+### Next fault: interrupted compactor output (qualification in progress)
+
+The controller, upload gate and snapshot/body inspectors are implemented. The
+first native attempt failed in its healthy baseline, before fault injection:
+wrapping Go's `http.NoBody` changed an empty signed multipart-init request's
+framing and caused a local S3 `403 SignatureDoesNotMatch`. This was a harness
+bug, not an Iceberg recovery failure. Its failed verdict and original sources
+remain preserved. A separate read-only audit verified **2,670,000 acknowledged
+rows** through both engines, with zero missing or wrong bodies; its one ambiguous
+batch was absent and remains unacknowledged. The minimal framing fix passes
+signed-request regression controls and a real bundled-SDK multipart round trip
+against local SeaweedFS (**48,128 bytes**, exact-body verification). Neither that
+transport check nor the data audit qualifies the pending compactor-crash test.
+
+The next fresh case passed the forwarding baseline and independently validated a
+held output, then killed Spark with positive exit-137/non-OOM fencing. During
+the hold SeaweedFS exceeded its 1 GiB container limit and was OOM-killed; the
+DuckDB reader subsequently aborted on a native manifest HTTP I/O exception.
+This remains a failed combined-fault observation, not an isolated compactor pass.
+The same storage container/volume restarted. Preserve its original source and
+151-artifact seal, diagnostic full-body reconciliation with a bounded writable spill directory now
+verifies 3,390,000 acknowledged rows per engine and 36 absent ambiguous batches,
+while retaining failed qualification. Investigate backend memory growth and the native
+reader's exception boundary, then qualify the intended isolated fault separately.
+Do not archive or reset this newer failure through the unrelated pre-fault receipt.
 
 Use a fresh UUID table with the two-million-row witness; never compact the
 archived precision-failure table, whose exact native snapshot is sealed.

@@ -1,5 +1,16 @@
 SHELL := /bin/sh
-COMPOSE := docker compose -f docker-compose.yml -f config/generated/cluster.yml
+DUCKDB_VERSION ?= 2.0.1
+export DUCKDB_VERSION
+ifneq ($(words $(DUCKDB_VERSION)),1)
+$(error Select exactly one DUCKDB_VERSION)
+endif
+ifeq ($(filter 1.5.5 2.0.1,$(DUCKDB_VERSION)),)
+$(error DUCKDB_VERSION must be 2.0.1 or the historical 1.5.5 lane)
+endif
+COMPOSE := docker compose -f docker-compose.yml -f config/generated/cluster.yml -f docker-compose.recovery.yml
+ifeq ($(DUCKDB_VERSION),2.0.1)
+COMPOSE += -f docker-compose.duckdb2.yml
+endif
 QUERY_RUNS ?= 20
 export QUERY_RUNS
 ROWS ?= 2000000
@@ -29,7 +40,7 @@ RUN := $(COMPOSE) run --rm --user $(LOCAL_USER)
 
 .PHONY: prepare unit-test config test-case cluster-up cluster-down cluster-test cluster-failure-test
 .PHONY: docker-up up test probe load verify compact status cli down docker-down
-.PHONY: recovery-unit-test storage-crash verify-history retire-failed-case test-production
+.PHONY: recovery-unit-test storage-crash compactor-crash manifest-io verify-history retire-failed-case test-production
 
 docker-up: config
 	@docker info >/dev/null
@@ -39,7 +50,7 @@ prepare:
 	python3 prepare.py
 
 up: config prepare
-	$(COMPOSE) build runner compactor ch-workload
+	$(COMPOSE) build runner compactor ch-workload compaction-upload-gate
 	$(COMPOSE) up -d --wait storage clickhouse
 	@mkdir -p "$(RESULTS_DIR)"
 
@@ -53,10 +64,19 @@ unit-test: config prepare
 
 recovery-unit-test:
 	python3 -c 'import sys; assert sys.version_info >= (3, 11), "Recovery controls require Python 3.11+; check the python3 selected by Make"'
-	python3 -m unittest test_recovery_resources.py test_recovery_control.py test_recovery_report.py test_recovery_cleanup.py test_recovery_retirement.py
+	python3 -m unittest test_recovery_resources.py test_recovery_control.py test_recovery_report.py test_recovery_cleanup.py test_recovery_retirement.py test_compactor_cleanup.py test_compactor_control.py test_prefault_archive.py test_manifest_control.py
 
 storage-crash: config recovery-unit-test
 	python3 recovery_control.py storage-crash
+
+compactor-crash: config recovery-unit-test
+	python3 compactor_control.py
+
+MANIFEST_CASE ?=
+MANIFEST_INSPECTION ?=
+MANIFEST_VERIFICATION ?=
+manifest-io: config recovery-unit-test
+	python3 manifest_control.py --case "$(MANIFEST_CASE)" $(if $(MANIFEST_INSPECTION),--inspection-id "$(MANIFEST_INSPECTION)") $(if $(MANIFEST_VERIFICATION),--verification-id "$(MANIFEST_VERIFICATION)")
 
 verify-history: config recovery-unit-test
 	python3 recovery_cleanup.py verify-history
@@ -66,6 +86,8 @@ retire-failed-case: config recovery-unit-test
 
 test-production:
 	$(MAKE) storage-crash
+	$(MAKE) verify-history
+	$(MAKE) compactor-crash
 	$(MAKE) verify-history
 
 test: config unit-test

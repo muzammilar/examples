@@ -3,8 +3,8 @@ WORKDIR /src
 COPY go.mod go.sum ./
 RUN go mod download
 COPY . .
-RUN CGO_ENABLED=1 go test ./... && CGO_ENABLED=1 go build -trimpath -o /out/lab . \
- && sha256sum *.go go.mod go.sum Dockerfile > /out/sources.sha256
+RUN --mount=type=cache,target=/root/.cache/go-build CGO_ENABLED=1 go test ./... && CGO_ENABLED=1 go build -trimpath -o /out/lab . \
+ && sha256sum *.go go.mod go.sum go.duckdb2.mod go.duckdb2.sum Dockerfile Dockerfile.duckdb2 > /out/sources.sha256
 FROM debian:bookworm-slim@sha256:734a72b3d6142a71993b4bc580ca01d8ca687f77a2c422d96a961d3376b179bc
 RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates libstdc++6 \
  && rm -rf /var/lib/apt/lists/* && useradd --uid 10001 --create-home app \

@@ -9,6 +9,7 @@ import json
 import math
 import os
 from pathlib import Path
+import re
 import signal
 import sys
 import time
@@ -29,6 +30,8 @@ SERVICES = {
     "recovery-tools",
     "recovery-writer",
     "recovery-reader",
+    "recovery-compactor",
+    "compaction-upload-gate",
     *[f"ch{s}{r}" for s in range(1, 4) for r in range(1, 4)],
     "keeper1",
     "keeper2",
@@ -36,9 +39,13 @@ SERVICES = {
 }
 IMAGES = (
     "iceberg-multi-runner:dev",
+    "iceberg-multi-runner-duckdb2:dev",
     "iceberg-multi-compactor:dev",
     "iceberg-multi-ch-workload:dev",
+    "iceberg-multi-upload-gate:dev",
 )
+CASE_KINDS = {"iceberg-storage-crash", "iceberg-compactor-crash"}
+PREFAULT_ARCHIVE_ID = "f1b2af24-f6c2-4bd2-8e44-a35392666f23"
 
 
 def regular(path, root):
@@ -127,7 +134,7 @@ def register_fixture(case, metadata=None):
     if (
         metadata.get("run_id") != valid_uuid(case.name)
         or metadata.get("project") != control.PROJECT
-        or metadata.get("kind") != "iceberg-storage-crash"
+        or metadata.get("kind") not in CASE_KINDS
     ):
         raise RuntimeError("fixture registration identity differs")
     records = index_records()
@@ -163,7 +170,7 @@ def cases_by_volume():
         case = regular(control.ROOT / record["case"], results)
         metadata = load(case / "case.json", case)
         if (
-            metadata["kind"] != "iceberg-storage-crash"
+            metadata["kind"] not in CASE_KINDS
             or metadata["project"] != control.PROJECT
             or metadata["run_id"] != case.name
             or digest(case / "case.json") != record["case_sha256"]
@@ -239,6 +246,11 @@ def fixture_stamp(cases):
         ):
             if (case / name).exists():
                 paths.append(case / name)
+        if metadata["kind"] == "iceberg-compactor-crash":
+            if case.name != PREFAULT_ARCHIVE_ID:
+                paths.append(case / "compactor-evidence.json")
+            for directory in (case / "maintenance", workload / "observations"):
+                paths += sorted(path for path in directory.rglob("*") if path.is_file())
         for path in paths:
             regular(path, case)
             hashes[str(path.relative_to(control.ROOT))] = digest(path)
@@ -348,8 +360,66 @@ def check_clients(
     expected_tools = ["recovery-seed", "recovery-verify"] + (
         ["recovery-verify"] if allow_failed_verifiers else []
     )
-    if sorted(tools) != expected_tools:
+    if metadata["kind"] == "iceberg-compactor-crash":
+        expected_tools += ["recovery-inspect"] * 4
+    if sorted(tools) != sorted(expected_tools):
         raise RuntimeError("missing original seed/verification client proof")
+
+
+def check_native_versions(directory, proof, storage, metadata, manifest, case):
+    reference = proof.get("native_versions")
+    if "native_versions" not in proof and "native_versions" not in storage:
+        if "duckdb_version" not in metadata:
+            return  # Historical proofs predate explicit native-version evidence.
+        raise RuntimeError("native version evidence is required")
+    if (
+        not isinstance(reference, dict)
+        or set(reference) != {"file", "sha256"}
+        or reference != storage.get("native_versions")
+        or reference["file"] != "native-versions.json"
+    ):
+        raise RuntimeError("native version references differ")
+    path = regular(directory / "native-versions.json", case)
+    if digest(path) != reference["sha256"]:
+        raise RuntimeError("native version evidence changed")
+    versions = load(path, case)
+    bindings = {"v2.0.1": "v2.20000.0", "v1.5.5": "v2.10505.0"}
+    engine, platform = versions.get("engine"), versions.get("platform")
+
+    def matches(value, pattern):
+        return isinstance(value, str) and re.fullmatch(pattern, value)
+
+    if (
+        not isinstance(engine, str)
+        or engine not in bindings
+        or versions.get("duckdb_go_version") != bindings[engine]
+        or not matches(platform, r"[a-z0-9_]+")
+        or not matches(versions.get("lab_binary_sha256"), r"[0-9a-f]{64}")
+    ):
+        raise RuntimeError("invalid native engine/binding identity")
+    extensions = versions.get("extensions")
+    if (
+        not isinstance(extensions, list)
+        or len(extensions) != 3
+        or any(not isinstance(item, dict) for item in extensions)
+        or any(
+            item.get("name") not in ("avro", "httpfs", "iceberg") for item in extensions
+        )
+        or sorted(item.get("name", "") for item in extensions)
+        != ["avro", "httpfs", "iceberg"]
+    ):
+        raise RuntimeError("invalid native extension set")
+    prefix = f"/opt/duckdb/extensions/{engine}/{platform}/"
+    for item in extensions:
+        if (
+            not matches(item.get("version"), r"[0-9a-f]+")
+            or not matches(item.get("sha256"), r"[0-9a-f]{64}")
+            or item.get("installed") is not True
+            or type(item.get("loaded")) is not bool
+            or item.get("install_path") != prefix + item["name"] + ".duckdb_extension"
+        ):
+            raise RuntimeError("invalid native extension identity/path")
+    add_artifact(manifest, path, case)
 
 
 def check_verification(case, reference, metadata, manifest, newest_ns):
@@ -472,6 +542,7 @@ def check_verification(case, reference, metadata, manifest, newest_ns):
         or storage["snapshot"] != proof["snapshot"]
     ):
         raise RuntimeError("native storage measurement identity differs")
+    check_native_versions(directory, proof, storage, metadata, manifest, case)
     totals = storage["totals"]
     ratio = storage["encoded_parquet_chunk_compression_ratio"]
     if (
@@ -504,6 +575,10 @@ def check_verification(case, reference, metadata, manifest, newest_ns):
 
 
 def base_record(case):
+    if case.name == PREFAULT_ARCHIVE_ID:
+        from prefault_archive import archived_base
+
+        return archived_base(case)
     from recovery_retirement import RUN_ID, archived_base
 
     if case.name == RUN_ID or any(
@@ -518,6 +593,10 @@ def base_record(case):
 
 
 def base_artifacts(case):
+    if case.name == PREFAULT_ARCHIVE_ID:
+        # This sealed failed baseline never reached its compactor-fault workflow.
+        # Its dedicated archive validates its actual actors and data audit instead.
+        return base_record(case)
     result, result_path, manifest = base_record(case)
     metadata = load(case / "case.json", case)
     for name in (
@@ -537,6 +616,10 @@ def base_artifacts(case):
         allow_failed_verifiers=result.get("status") == "failed-but-archived",
     )
     check_verification(case, result, metadata, {}, 0)
+    if metadata["kind"] == "iceberg-compactor-crash":
+        from compactor_evidence import check_compactor_case
+
+        check_compactor_case(case, metadata, result, manifest)
     return result, result_path, manifest
 
 
@@ -930,7 +1013,7 @@ def teardown(action):
     checked = check_histories(groups, active_key=key, require_closure=True)
     for value in before["containers"]:
         role = value["Config"]["Labels"]["com.docker.compose.service"]
-        if role.startswith("recovery-") and (
+        if (role.startswith("recovery-") or role == "compaction-upload-gate") and (
             value["State"]["Running"] or value["State"]["Pid"]
         ):
             raise RuntimeError("live/unfenced recovery client remains; preserve state")
@@ -972,7 +1055,7 @@ def teardown(action):
         control.call(control.COMPOSE + PROFILES + ["config", "--format", "json"])
     )
     if set(rendered["services"]) != SERVICES:
-        raise RuntimeError("teardown topology differs from the twenty owned services")
+        raise RuntimeError("teardown topology differs from the declared owned services")
     directory = results_root() / "lifecycle" / str(uuid.uuid4())
     directory.mkdir(parents=True)
     fixtures = [
@@ -1058,7 +1141,13 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "action",
-        choices=["down", "docker-down", "verify-history", "retire-failed-case"],
+        choices=[
+            "down",
+            "docker-down",
+            "verify-history",
+            "retire-failed-case",
+            "archive-prefault-case",
+        ],
     )
     parser.add_argument("--case")
     parser.add_argument("--source-manifest")
@@ -1067,7 +1156,17 @@ def main():
     args = parser.parse_args()
     action = args.action
     retirement_args = (args.case, args.source_manifest, args.original_manifest)
-    if action == "retire-failed-case":
+    if action == "archive-prefault-case":
+        if (
+            not args.case
+            or not args.completed_verification
+            or args.source_manifest
+            or args.original_manifest
+        ):
+            parser.error(
+                "prefault archive requires case and completed-verification only"
+            )
+    elif action == "retire-failed-case":
         if not all(retirement_args):
             parser.error(
                 "retirement requires case, source-manifest and original-manifest"
@@ -1083,9 +1182,7 @@ def main():
     with os.fdopen(descriptor, "a") as lock:
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
         control.local_docker()
-        if action == "retire-failed-case":
-            import recovery_retirement
-
+        if action in {"retire-failed-case", "archive-prefault-case"}:
             case = Path(args.case).resolve()
             registered = {
                 (control.ROOT / record["case"]).resolve() for record in index_records()
@@ -1094,6 +1191,13 @@ def main():
                 raise RuntimeError(
                     "retirement case must be registered in this example's fixture index"
                 )
+            if action == "archive-prefault-case":
+                from prefault_archive import archive_case
+
+                print(archive_case(case, Path(args.completed_verification).resolve()))
+                return
+            import recovery_retirement
+
             print(
                 recovery_retirement.retire_case(
                     case,

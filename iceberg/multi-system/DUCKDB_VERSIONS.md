@@ -1,0 +1,103 @@
+# DuckDB version evaluation
+
+The current lane uses **DuckDB 2.0.1**, linked through its official shared C
+library and Go binding `v2.20000.0`. The binding normally bundles 2.0.0;
+`duckdb_use_lib`, the checked release archive and `SELECT version()` establish
+that this runner actually uses **2.0.1**. The historical lane retains native
+1.5.5 and binding `v2.10505.0`. Both currently target Linux ARM64 here.
+
+`DUCKDB_VERSION` defaults to `2.0.1`. To run the historical regression, export
+`DUCKDB_VERSION=1.5.5` before the lifecycle commands; do not mix versions silently
+between commands. Each lane has its own image and Go dependency lockfiles.
+Original native database files and failure witnesses remain unchanged.
+
+The comparison holds **SeaweedFS 4.53**, ClickHouse 26.10.2.103 and the existing
+Spark 4.0.1 / Iceberg 1.10.1 maintenance image fixed as the common storage and
+reader baseline. It does not qualify the latest release of every component.
+SeaweedFS **4.54** is the next backup/restore-and-upgrade evaluation; the 4.53 OOM
+must not be presented as a reproduced 4.54 failure.
+
+## Manifest I/O failure
+
+Both engines read the same preserved Iceberg snapshot, containing **2,790,000
+rows**, with **SUM(amount_cents) = 13,951,395,000**. An example-owned, read-only
+HTTP proxy forwards signed requests to local storage, then closes data-manifest
+GET connections after fsyncing the exact request witness. It does not stop the
+object store or modify its data. Both healthy controls returned the expected
+count and sum.
+
+| Engine | Manifest connection failure | Process outcome | Contract result |
+|---|---|---|---|
+| 1.5.5 / Iceberg `45163a28` | Uncaught native I/O exception | `SIGABRT`, exit 2; no final application report | Failed |
+| 2.0.1 / Iceberg `f979b5b28a` | SQL I/O error returned to Go | Exit 1; failed-query report written, no OOM or abort | Expected rejection |
+
+The newer extension contains a [destructor exception guard](https://github.com/duckdb/duckdb-iceberg/blob/f979b5b28a044c49c38a26636ac01bc1f7047fa5/src/planning/scan_plan/iceberg_manifest_store.cpp#L467-L480).
+The controlled native results support that specific improvement. They do not
+establish hard timeouts, arbitrary-fault recovery or a performance winner. The
+probe checks aggregates; complete-body verification is separate below.
+
+Run `make manifest-io MANIFEST_CASE=<owned recovery case>` after a successful
+`make storage-crash`. The default selector uses that case's successful final
+verification. `MANIFEST_VERIFICATION=<UUID>` selects another successful verification;
+`MANIFEST_INSPECTION=<UUID>` selects a passed `before` full-body snapshot inspection.
+Diagnostic verifications are not accepted as this controller's input. The source
+must use complete, aligned 10,000-row amount cycles. Source files and the original
+case's process registry are retained; each probe copies only configuration into
+its own ignored result directory. A native abort returns nonzero, including in
+the historical lane.
+
+The final tracked Make runs took **42.703 s (2.0.1)** and **42.627 s (1.5.5)**,
+including 124 host controls, two process starts, resource sampling and fencing.
+These are test-workflow durations, not query latencies. Compact results and raw
+evidence hashes are in [`DUCKDB_VERSION_RESULTS.json`](DUCKDB_VERSION_RESULTS.json).
+
+## Full-body readback on the current engine
+
+After the retained storage container and Docker Desktop restarted, the current
+engine and ClickHouse independently checked **3,390,000 acknowledged rows / 339
+batches**, with no missing, duplicate or wrong bodies. All **36 ambiguous
+batches were absent** and remain unacknowledged. Both exports have canonical body
+hash `404308f8e350e15a3ca87416cd1f712b66f2506aed41b9d38eb1c41ba432b1c0`.
+
+The 100-file snapshot occupied **176,839,475 file bytes**. Its encoded Parquet
+column chunks contained **278,150,885 uncompressed / 176,666,496 compressed
+bytes (1.5744×)**. This is not logical CSV-to-disk compression.
+
+Verification `0a1b3af7-e6c1-4aba-84db-cef69b0eb4e9` records actual native **2.0.1**,
+binding `v2.20000.0`, platform and all three extension revisions/binary hashes in
+its own `native-versions.json`, hash-bound to the verification and storage reports.
+It retains **`qualified=false`, `integrity_passed=true`**: the original 1.5.5
+reader crashed during the earlier combined fault. A newer readback cannot turn
+that old availability failure into a pass.
+
+## Current-version interoperability failure
+
+The actual `make probe DUCKDB_VERSION=2.0.1` on 2026-11-22 failed when DuckDB
+read the fresh ClickHouse-written `lab.reverse` table:
+`Invalid Configuration Error: Manifest ... has invalid Avro key-value metadata, content is missing`.
+The DuckDB-written 10,000-row table was already readable by ClickHouse with the
+correct sum; the reverse 20,000-row read did not pass. This is a separate
+compatibility failure, not the manifest-connection failure above. The
+[Iceberg manifest specification](https://iceberg.apache.org/spec/#manifest-file-format)
+requires the `content` header for v2/v3 manifests. Independent native inspection using Spark's bundled Avro `DataFileStream` confirms
+both tables declare format version **2**. The DuckDB-written manifest contains
+`content=data`; the ClickHouse-written manifest has seven header keys and omits
+`content`. The reader is rejecting a missing required header in this tested
+ClickHouse output. No committed object was rewritten by the inspection.
+Do not patch committed manifests, weaken validation or report the five-path
+2.0.1 matrix as passed. Historical 1.5.5 normal-path results remain historical.
+
+## Remaining qualification
+
+- Complete the current-version normal architecture matrix and live compactor
+  recovery, with bounded backend resources and sufficient volume slots.
+- Test the newest SeaweedFS release using a verified cold backup and separate
+  restore; do not assume in-place downgrade compatibility.
+- Rerun Quack deadlines, native WAL recovery and owned-copy file-format migration
+  on 2.0.1. Historical 1.5.5 timeout and beta-protocol findings do not establish
+  current Quack behavior.
+- Run repeated, equivalent cold/warm and sustained resource/performance trials.
+  These functional diagnostics provide no current-version capacity ranking.
+
+See the official [2.0.1 changes](https://duckdb.org/2026/11/20/announcing-duckdb-201)
+and [Go native-library linking instructions](https://github.com/duckdb/duckdb-go/blob/v2.20000.0/README.md#linking-a-dynamic-library).

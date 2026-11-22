@@ -33,3 +33,37 @@ services:
     <<: *recovery
   recovery-reader:
     <<: *recovery
+  recovery-compactor:
+    image: iceberg-multi-compactor:dev
+    pull_policy: never
+    profiles: [production]
+    environment:
+      AWS_EC2_METADATA_DISABLED: 'true'
+      AWS_REGION: us-east-1
+      CATALOG_URL: http://storage:8181
+      COMPACTION_LIVE_WRITERS: 'true'
+      REWRITE_MANIFESTS: 'false'
+      COMPACTOR_S3_ENDPOINT: http://compaction-upload-gate:8333
+      TARGET_FILE_BYTES: ${TARGET_FILE_BYTES:-134217728}
+      SPARK_USER: lab
+      HADOOP_USER_NAME: lab
+    volumes:
+      - ./${RESULTS_DIR:-results/manual}:/results
+    cpus: 2
+    mem_limit: 2g
+    memswap_limit: 2g
+  compaction-upload-gate:
+    image: iceberg-multi-upload-gate:dev
+    pull_policy: never
+    profiles: [production]
+    build: ./compaction-upload-gate
+    environment:
+      AWS_EC2_METADATA_DISABLED: 'true'
+    volumes:
+      - ./${RESULTS_DIR:-results/manual}:/results
+    cpus: 1
+    mem_limit: 256m
+    memswap_limit: 256m
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]

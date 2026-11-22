@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "case_kind": "iceberg-compactor-crash",
+  "status": "Declared; native qualification pending",
+  "scope": "One local Spark compactor interrupted inside data-output close after S3 backend completion but before its acknowledgement. Not a physical disk fault or S3/catalog outage.",
+  "data": {"seed_rows": 2000000, "customers": 10000, "batch_rows": 10000},
+  "live_actors": {"writers": 2, "readers": ["duckdb", "clickhouse"], "application_mutation_retries": 0},
+  "budget": {"maximum_cpus": 11, "maximum_memory_bytes": 11542724608, "scope": "Storage/query, four actors, gate, Spark and one overlapping inspector; no native serving tier or other lab."},
+  "baseline": "Run a healthy compaction through a forwarding-only instance of the same gate; require a successful backend upload journal and clean Spark result before injecting a fault.",
+  "fault": "Fresh gate instance holds every successful final-upload response for the exact owned table data prefix. Require fsynced backend completion plus independent nonempty Parquet footer and deterministic body validation, then SIGKILL the exact live compactor and prove Exit137/Pid0/notOOM.",
+  "correctness": "All seeded and acknowledged bodies survive. Selected committed snapshots contain whole batches, no duplicates or wrong values. An output file can split a batch. The pinned starting snapshot remains byte-for-byte equivalent through full-body hashing.",
+  "concurrent_appends": "Current snapshots may advance. Candidate/interrupted histories must add no replacement snapshot beyond the known baseline; append commits remain allowed. After authoritative reconciliation, a fresh compactor must add a replacement commit while writers/readers remain active.",
+  "retries": "The gate holds all matching final acknowledgements, including retries; transport request lengths are not object size. Never replay a data append or treat an unknown compaction commit as absent.",
+  "retention": "Retain candidate output, old snapshots, journals and diagnostics. No snapshot expiration, orphan deletion, table reset or source-data deletion in this test.",
+  "recovery": "Fence the failed compactor, re-read authoritative metadata and pin, stop the gate without releasing held responses, then start a new direct-storage compactor. Verify its clean report, a new replacement snapshot, continuous actor progress, the original pin and complete dual-engine acknowledgement reconciliation.",
+  "limits": ["One local Docker VM/storage volume, not replicated HA or host-loss durability.", "Configured deadlines are not qualified as strict native I/O deadlines.", "Functional fault observations are not capacity comparisons or cold-cache benchmarks."]
+}

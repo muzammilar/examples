@@ -76,8 +76,18 @@ func recoveryDuck(ctx context.Context, c recoveryConfig) (*sql.DB, error) {
 		return nil, err
 	}
 	db.SetMaxOpenConns(1)
+	var engine string
+	if err = db.QueryRowContext(ctx, "SELECT version()").Scan(&engine); err == nil {
+		_, err = qualifiedExtensionPins(engine, expectedNativeVersion)
+	}
+	if err != nil {
+		_ = db.Close()
+		return nil, err
+	}
 	for _, q := range []string{
-		"SET threads=2", "SET memory_limit='512MB'", "SET extension_directory='/opt/duckdb/extensions'", "SET autoinstall_known_extensions=false", "SET allow_persistent_secrets=false", "LOAD httpfs", "LOAD iceberg",
+		// Full sorted verification can exceed memory. Keep bounded spill inside
+		// this disposable container; its default working directory is not writable.
+		"SET threads=2", "SET memory_limit='512MB'", "SET temp_directory='/tmp/duckdb-recovery-spill'", "SET max_temp_directory_size='1GiB'", "SET extension_directory='/opt/duckdb/extensions'", "SET autoinstall_known_extensions=false", "SET allow_persistent_secrets=false", "LOAD httpfs", "LOAD iceberg",
 		fmt.Sprintf("SET http_timeout=%d", c.TimeoutSeconds), "SET http_retries=0", "SET enable_global_s3_configuration=false",
 		"CREATE SECRET recovery_s3 (TYPE S3,KEY_ID 'demo',SECRET 'demo',ENDPOINT 'storage:8333',URL_STYLE 'path',USE_SSL false)",
 		"CREATE SECRET recovery_catalog (TYPE ICEBERG,ENDPOINT 'http://storage:8181',CLIENT_ID 'demo',CLIENT_SECRET 'demo')",
@@ -521,6 +531,10 @@ func recoveryReader() (returned error) {
 }
 
 func recoveryCatalogRecord(ctx context.Context, root string, c recoveryConfig, digest, name string) error {
+	return localCatalogRecord(ctx, root, c.Table, c.RunID, digest, name)
+}
+
+func localCatalogRecord(ctx context.Context, root, table, runID, digest, name string) error {
 	client := &http.Client{Timeout: 10 * time.Second, CheckRedirect: func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse }}
 	request := func(method, path string, body io.Reader) ([]byte, error) {
 		req, err := http.NewRequestWithContext(ctx, method, "http://storage:8181"+path, body)
@@ -557,7 +571,7 @@ func recoveryCatalogRecord(ctx context.Context, root string, c recoveryConfig, d
 	}
 	var body []byte
 	if err == nil && token.Token != "" {
-		req, e := http.NewRequestWithContext(ctx, "GET", "http://storage:8181/v1/namespaces/lab/tables/"+c.Table, nil)
+		req, e := http.NewRequestWithContext(ctx, "GET", "http://storage:8181/v1/namespaces/lab/tables/"+url.PathEscape(table), nil)
 		err = e
 		if err == nil {
 			req.Header.Set("Authorization", "Bearer "+token.Token)
@@ -577,7 +591,7 @@ func recoveryCatalogRecord(ctx context.Context, root string, c recoveryConfig, d
 	} else if err == nil {
 		err = errors.New("empty local catalog token")
 	}
-	value := map[string]any{"run_id": c.RunID, "config_sha256": digest, "table": c.Table, "utc_ns": time.Now().UnixNano(), "available": err == nil}
+	value := map[string]any{"run_id": runID, "config_sha256": digest, "table": table, "utc_ns": time.Now().UnixNano(), "available": err == nil}
 	if err == nil {
 		if !json.Valid(body) {
 			err = errors.New("invalid catalog metadata JSON")
@@ -694,12 +708,24 @@ func recoveryVerify() (returned error) {
 	if err != nil {
 		return err
 	}
+	versions, versionErr := qualifiedNativeVersions(ctx, db)
+	if versionErr == nil {
+		versionErr = recoverySave(filepath.Join(output, "native-versions.json"), versions)
+	}
+	var versionsSHA string
+	if versionErr == nil {
+		versionsSHA, versionErr = recoveryFileHash(filepath.Join(output, "native-versions.json"))
+	}
+	if versionErr != nil {
+		return errors.Join(versionErr, db.Close())
+	}
+	versionsRef := map[string]any{"file": "native-versions.json", "sha256": versionsSHA}
 	storage, measureErr := recoveryMeasureStorage(ctx, db, before.Metadata, before.Snapshot, exports["duckdb"].Proof.Rows)
 	closeErr := db.Close()
 	measureErr = errors.Join(measureErr, closeErr)
 	storageReport := map[string]any{
 		"run_id": c.RunID, "verification_id": verificationID, "config_sha256": digest, "snapshot": before,
-		"passed": measureErr == nil, "raw_manifest_entries": storage.Entries, "excluded_deleted_entries": storage.ExcludedDeleted, "files": storage.Files,
+		"native_versions": versionsRef, "passed": measureErr == nil, "raw_manifest_entries": storage.Entries, "excluded_deleted_entries": storage.ExcludedDeleted, "files": storage.Files,
 		"started_ns": storageStarted.UnixNano(), "ended_ns": time.Now().UnixNano(), "duration_ns": time.Since(storageStarted).Nanoseconds(), "native_counters": recoveryNativeCounters(),
 		"scope": "Committed live Parquet files at the verified snapshot. Compression ratio sums encoded column-chunk uncompressed/compressed page bytes, including page headers once per leaf column/row group; not CSV/raw logical/RAM/allocated-disk compression. File/footer bytes are separate. Native counters are cumulative within this verifier container and include earlier full-body exports; duration covers only storage measurement/setup/save preparation.",
 	}
@@ -738,7 +764,7 @@ func recoveryVerify() (returned error) {
 	}
 	resultPath := filepath.Join(output, "verified.json")
 	qualified := !diagnostic && len(issues) == 0
-	if err = recoverySave(resultPath, map[string]any{"passed": qualified, "qualified": qualified, "integrity_passed": true, "actor_lifecycle_passed": actorsClean, "strict_mutation_history_passed": historyValid, "reader_contract_passed": readersValid, "diagnostic": diagnostic, "qualification_issues": issues, "run_id": c.RunID, "verification_id": verificationID, "config_sha256": digest, "history_sha256": witnesses, "exports": exports, "storage_metrics": map[string]any{"file": "storage-metrics.json", "sha256": storageSHA, "snapshot": before}, "snapshot": before, "utc_ns": time.Now().UnixNano(), "scope": "Both engines independently stream every body from one quiescent catalog snapshot; Go reconciles each against durable intents/outcomes. Diagnostic prefix replay never qualifies a malformed/incomplete journal or failed actor. Whole-batch unacknowledged application remains ambiguous. Same-host/process-fault evidence, not physical power-loss durability or a performance ranking."}); err != nil {
+	if err = recoverySave(resultPath, map[string]any{"passed": qualified, "qualified": qualified, "integrity_passed": true, "actor_lifecycle_passed": actorsClean, "strict_mutation_history_passed": historyValid, "reader_contract_passed": readersValid, "diagnostic": diagnostic, "qualification_issues": issues, "run_id": c.RunID, "verification_id": verificationID, "config_sha256": digest, "history_sha256": witnesses, "exports": exports, "native_versions": versionsRef, "storage_metrics": map[string]any{"file": "storage-metrics.json", "sha256": storageSHA, "snapshot": before}, "snapshot": before, "utc_ns": time.Now().UnixNano(), "scope": "Both engines independently stream every body from one quiescent catalog snapshot; Go reconciles each against durable intents/outcomes. Diagnostic prefix replay never qualifies a malformed/incomplete journal or failed actor. Whole-batch unacknowledged application remains ambiguous. Same-host/process-fault evidence, not physical power-loss durability or a performance ranking."}); err != nil {
 		return err
 	}
 	fmt.Println(resultPath)

@@ -1,0 +1,39 @@
+# Latest-stable Go runner linked to the official DuckDB 2.0.1 shared library.
+# These release assets are Linux arm64; reject another architecture explicitly.
+FROM debian:bookworm-slim@sha256:734a72b3d6142a71993b4bc580ca01d8ca687f77a2c422d96a961d3376b179bc AS native
+RUN test "$(uname -m)" = aarch64 \
+ && apt-get update && apt-get install -y --no-install-recommends ca-certificates libstdc++6 \
+ && rm -rf /var/lib/apt/lists/* \
+ && useradd --uid 10001 --create-home app \
+ && install -d -o app -g app /opt/duckdb/extensions /opt/duckdb/native /results
+ADD --checksum=sha256:84e37891fcc45c887e30220f51a4914995cd8174139e87f8efd311ac83c956a7 https://github.com/duckdb/duckdb/releases/download/v2.0.1/duckdb-cli-linux-arm64.tar.gz /tmp/duckdb-cli.tar.gz
+ADD --checksum=sha256:811e8b4d0226f5e531f583aadc798070ffb33b350e3823be563a2ebeb2c68593 https://github.com/duckdb/duckdb/releases/download/v2.0.1/duckdb-shared-libs-linux-arm64.tar.gz /tmp/duckdb-shared.tar.gz
+RUN tar -xzf /tmp/duckdb-cli.tar.gz -C /usr/local/bin \
+ && tar -xzf /tmp/duckdb-shared.tar.gz -C /opt/duckdb/native \
+ && rm /tmp/duckdb-*.tar.gz \
+ && test "$(duckdb -csv -noheader -c 'SELECT version()')" = v2.0.1
+USER app
+RUN duckdb -json -c "SET extension_directory='/opt/duckdb/extensions'; FORCE INSTALL httpfs FROM 'https://extensions.duckdb.org'; FORCE INSTALL avro FROM 'https://extensions.duckdb.org'; FORCE INSTALL iceberg FROM 'https://extensions.duckdb.org'; LOAD iceberg; SELECT version() AS native_version; SELECT extension_name,extension_version,install_path,installed_from FROM duckdb_extensions() WHERE installed AND extension_name IN ('httpfs','avro','iceberg') ORDER BY extension_name" > /opt/duckdb/extensions/installed-versions.json \
+ && cd /opt/duckdb/extensions && find . -type f -name '*.duckdb_extension' -exec sha256sum {} \; > artifact-sha256.txt
+ENV AWS_EC2_METADATA_DISABLED=true
+ENTRYPOINT ["duckdb"]
+
+FROM golang:1.27.4-bookworm@sha256:4fa7c968ba93f1635670522dbb01a2c78150443e1385746924566079f36570ea AS build
+WORKDIR /src
+COPY --from=native /opt/duckdb/native /opt/duckdb/native
+ENV CGO_ENABLED=1 CGO_CFLAGS=-I/opt/duckdb/native CGO_LDFLAGS="-L/opt/duckdb/native -lduckdb -Wl,-rpath,/opt/duckdb/native" GOMAXPROCS=2
+COPY go.mod go.sum go.duckdb2.mod go.duckdb2.sum ./
+RUN go mod download -modfile=go.duckdb2.mod
+COPY . .
+RUN --mount=type=cache,target=/root/.cache/go-build go test -mod=readonly -modfile=go.duckdb2.mod -tags=duckdb_use_lib -ldflags='-X main.expectedNativeVersion=v2.0.1' ./... \
+ && go build -mod=readonly -modfile=go.duckdb2.mod -tags=duckdb_use_lib -ldflags='-X main.expectedNativeVersion=v2.0.1' -trimpath -o /out/lab . \
+ && sha256sum *.go go.mod go.sum go.duckdb2.mod go.duckdb2.sum Dockerfile Dockerfile.duckdb2 > /out/sources.sha256
+
+FROM native AS runner
+USER root
+COPY --from=build /out/lab /usr/local/bin/lab
+COPY --from=build /out/sources.sha256 /usr/local/share/iceberg-lab/sources.sha256
+LABEL org.examples.owner="iceberg-multi-system" org.examples.duckdb.version="2.0.1"
+USER app
+RUN lab extensions
+ENTRYPOINT ["lab"]

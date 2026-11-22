@@ -81,6 +81,23 @@ func recoveryAddStorage(total *int64, value int64) error {
 }
 
 func recoveryLiveFiles(entries []recoveryManifestEntry) ([]recoveryManifestEntry, int64, error) {
+	return recoveryLiveFilesForVersion(entries, expectedNativeVersion)
+}
+
+func recoveryLiveFilesForVersion(entries []recoveryManifestEntry, engine string) ([]recoveryManifestEntry, int64, error) {
+	dataContent := ""
+	knownContent := map[string]bool{"POSITION_DELETES": true, "EQUALITY_DELETES": true}
+	switch engine {
+	case "v1.5.5":
+		// Iceberg 45163a28 incorrectly formats the content enum as entry status.
+		dataContent = "EXISTING"
+		knownContent["EXISTING"], knownContent["ADDED"], knownContent["DELETED"] = true, true, true
+	case "v2.0.1":
+		// Iceberg f979b5b28a correctly reports the file-content enum.
+		dataContent, knownContent["DATA"] = "DATA", true
+	default:
+		return nil, 0, fmt.Errorf("unqualified manifest content semantics for DuckDB %s", engine)
+	}
 	var live []recoveryManifestEntry
 	var deleted int64
 	seen := map[string]bool{}
@@ -92,16 +109,14 @@ func recoveryLiveFiles(entries []recoveryManifestEntry) ([]recoveryManifestEntry
 		if err != nil {
 			return nil, 0, err
 		}
-		if entry.Sequence < 0 || entry.Records < 0 || (entry.Status != "EXISTING" && entry.Status != "ADDED" && entry.Status != "DELETED") || (entry.ManifestContent != "DATA" && entry.ManifestContent != "DELETE") || (entry.Content != "EXISTING" && entry.Content != "ADDED" && entry.Content != "DELETED" && entry.Content != "POSITION_DELETES" && entry.Content != "EQUALITY_DELETES") || !strings.EqualFold(entry.Format, "PARQUET") {
+		if entry.Sequence < 0 || entry.Records < 0 || (entry.Status != "EXISTING" && entry.Status != "ADDED" && entry.Status != "DELETED") || (entry.ManifestContent != "DATA" && entry.ManifestContent != "DELETE") || !knownContent[entry.Content] || !strings.EqualFold(entry.Format, "PARQUET") {
 			return nil, 0, fmt.Errorf("unknown/unsupported native manifest entry: %+v", entry)
 		}
 		if entry.Status == "DELETED" {
 			deleted++
 			continue
 		}
-		// Pinned Iceberg 45163a28 prints data content enum 0 as EXISTING.
-		// ADDED/DELETED can denote delete-file enum values in that same bug.
-		if entry.ManifestContent != "DATA" || entry.Content != "EXISTING" {
+		if entry.ManifestContent != "DATA" || entry.Content != dataContent {
 			return nil, 0, errors.New("active delete file or unsupported content in append-only snapshot")
 		}
 		if seen[identity] {

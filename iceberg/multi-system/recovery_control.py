@@ -43,7 +43,17 @@ CAPS = {
     "recovery-tools": (1, 2 * GIB),
     "recovery-writer": (1, GIB),
     "recovery-reader": (1, GIB),
+    "recovery-compactor": (2, 2 * GIB),
+    "compaction-upload-gate": (1, GIB // 4),
 }
+DUCKDB_VERSION = os.environ.get("DUCKDB_VERSION", "2.0.1")
+if DUCKDB_VERSION not in {"1.5.5", "2.0.1"}:
+    raise RuntimeError("DUCKDB_VERSION must be stable 2.0.1 or historical 1.5.5")
+if DUCKDB_VERSION == "2.0.1":
+    COMPOSE += ["-f", "docker-compose.duckdb2.yml"]
+GO_ROLES = ("recovery-tools", "recovery-writer", "recovery-reader")
+BASE_ROLES = ("storage", "clickhouse", *GO_ROLES)
+AUXILIARY_ROLES = ("recovery-compactor", "compaction-upload-gate")
 GATE = 'trap "exit 143" TERM INT; while ! test -f "$1"; do sleep 0.1; done; shift; exec /usr/local/bin/lab "$@"'
 DOCKER_ENV = None
 DESKTOP_BIND_TRANSLATION = False
@@ -62,6 +72,7 @@ def local_environment():
         "DOCKER_CONTEXT",
         "DOCKER_HOST",
         "DOCKER_CONFIG",
+        "DUCKDB_VERSION",
         "LOCAL_UID",
         "RECOVERY_ROWS",
         "RECOVERY_CUSTOMERS",
@@ -249,6 +260,32 @@ def sources():
         ROOT / "app/go.sum",
         *sorted((ROOT / "app").glob("*.go")),
     ]
+    optional = [
+        ROOT / "prefault_archive.py",
+        ROOT / "manifest_control.py",
+        ROOT / "test_manifest_control.py",
+        ROOT / "docker-compose.duckdb2.yml",
+        ROOT / "app/Dockerfile.duckdb2",
+        ROOT / "app/go.duckdb2.mod",
+        ROOT / "app/go.duckdb2.sum",
+        ROOT / "compactor_control.py",
+        ROOT / "compactor_evidence.py",
+        ROOT / "compactor-contract.json",
+    ]
+    gate = ROOT / "compaction-upload-gate"
+    optional += [
+        gate / "Dockerfile",
+        gate / "go.mod",
+        gate / "go.sum",
+        *sorted(gate.glob("*.go")),
+    ]
+    compactor = ROOT / "iceberg-compaction"
+    optional += [compactor / "Dockerfile", *sorted(compactor.glob("*.py"))]
+    for path in optional:
+        if path.exists():
+            if not path.is_file() or not path.resolve().is_relative_to(ROOT.parents[1]):
+                raise RuntimeError("auxiliary source escaped this repository")
+            paths.append(path)
     return {
         str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest()
         for path in paths
@@ -323,7 +360,7 @@ def check_mounts(value, case=None):
         raise RuntimeError("workload must bind only its owned witness directory")
 
 
-def profile(case, storage, query):
+def profile(case, storage, query, *, auxiliary=False):
     """Check rendered limits before creating anything; exact clients are checked again behind their gate."""
     config = json.loads(
         call(
@@ -332,7 +369,9 @@ def profile(case, storage, query):
         )
     )
     services, images = config["services"], {}
-    for name, (cpus, memory) in CAPS.items():
+    roles = (*BASE_ROLES, *AUXILIARY_ROLES) if auxiliary else BASE_ROLES
+    for name in roles:
+        cpus, memory = CAPS[name]
         item = services[name]
         if (
             float(item.get("cpus", 0)) != cpus
@@ -351,15 +390,26 @@ def profile(case, storage, query):
             raise RuntimeError("profile networks must be internal and example-owned")
         (image,) = json.loads(call(["docker", "image", "inspect", item["image"]]))
         images[name] = image["Id"]
-        if name.startswith("recovery-"):
+        if (
+            name in GO_ROLES
+            and DUCKDB_VERSION == "2.0.1"
+            and image["Config"].get("Labels", {}).get("org.examples.duckdb.version")
+            != DUCKDB_VERSION
+        ):
+            raise RuntimeError(
+                "workload image does not identify the selected DuckDB engine"
+            )
+        if name in (*GO_ROLES, *AUXILIARY_ROLES):
             if image["Config"].get("Labels", {}).get("org.examples.owner") != PROJECT:
                 raise RuntimeError("workload image lacks this example's owner label")
             env = item.get("environment", {})
             if (
-                str(env.get("WRITERS")) != "2"
-                or str(env.get("RECOVERY_READERS")) != "2"
-                or str(env.get("AWS_EC2_METADATA_DISABLED")).lower() != "true"
-            ):
+                name in GO_ROLES
+                and (
+                    str(env.get("WRITERS")) != "2"
+                    or str(env.get("RECOVERY_READERS")) != "2"
+                )
+            ) or str(env.get("AWS_EC2_METADATA_DISABLED")).lower() != "true":
                 raise RuntimeError(
                     "initial profile requires exactly two writers/two readers and local-only SDK configuration"
                 )
@@ -373,7 +423,7 @@ def profile(case, storage, query):
                 raise RuntimeError(
                     "rendered client witness mount differs from owned case"
                 )
-    if len({images[name] for name in images if name.startswith("recovery-")}) != 1:
+    if len({images[name] for name in GO_ROLES}) != 1:
         raise RuntimeError("all recovery roles must use the same built workload image")
     network_ids = set()
     for value, role in ((storage, "storage"), (query, "clickhouse")):
@@ -410,11 +460,24 @@ def profile(case, storage, query):
             raise RuntimeError(
                 "stop other owned topology/workloads before this separate recovery profile"
             )
+    if auxiliary:
+        info = json.loads(call(["docker", "info", "--format", "{{json .}}"]))
+        if (
+            info["OSType"] != "linux"
+            or info["NCPU"] < 11
+            or info["MemTotal"] < 43 * GIB // 4
+        ):
+            raise RuntimeError(
+                "compactor inspection overlap requires 11 CPUs / 10.75 GiB"
+            )
     return {
         "images": images,
         "network_ids": network_ids,
         "rendered": config,
-        "live_budget": {"cpus": 7, "memory_bytes": 13 * GIB // 2},
+        "live_budget": {
+            "cpus": 11 if auxiliary else 7,
+            "memory_bytes": 43 * GIB // 4 if auxiliary else 13 * GIB // 2,
+        },
         "tool_budget": {"cpus": 4, "memory_bytes": 9 * GIB // 2},
     }
 
@@ -453,6 +516,9 @@ def built_source_proof(value):
             ROOT / "app/go.mod",
             ROOT / "app/go.sum",
             ROOT / "app/Dockerfile",
+            ROOT / "app/Dockerfile.duckdb2",
+            ROOT / "app/go.duckdb2.mod",
+            ROOT / "app/go.duckdb2.sum",
         ]
     }
     text = call(
@@ -667,11 +733,70 @@ def tool(
     verification=None,
     diagnostic=False,
     timeout=1800,
+    inspection=None,
 ):
-    if any(inspect_client(client)["State"]["Running"] for client in clients.values()):
-        raise RuntimeError("one-shot tool cannot overlap another live client")
+    if inspection is not None:
+        allowed = {
+            "RECOVERY_OBSERVATION_ID",
+            "RECOVERY_INSPECTION_PHASE",
+            "RECOVERY_PIN_OBSERVATION",
+            "RECOVERY_CANDIDATE_URI",
+        }
+        if (
+            command != "recovery-inspect"
+            or not isinstance(inspection, dict)
+            or not set(inspection) <= allowed
+            or verification is not None
+            or diagnostic
+        ):
+            raise RuntimeError("inspection arguments require the read-only inspector")
+        identifier = inspection.get("RECOVERY_OBSERVATION_ID")
+        try:
+            parsed = uuid.UUID(identifier)
+        except (ValueError, AttributeError, TypeError) as error:
+            raise RuntimeError("canonical inspection UUID required") from error
+        if parsed.version != 4 or str(parsed) != identifier:
+            raise RuntimeError("canonical inspection UUID required")
+        stage = inspection.get("RECOVERY_INSPECTION_PHASE")
+        pin, candidate = (
+            inspection.get("RECOVERY_PIN_OBSERVATION"),
+            inspection.get("RECOVERY_CANDIDATE_URI"),
+        )
+        if (
+            stage not in {"before", "candidate", "interrupted", "recovered"}
+            or (stage == "before") != (pin is None)
+            or (stage == "candidate") != (candidate is not None)
+        ):
+            raise RuntimeError("inspection arguments differ from phase")
+        if pin is not None:
+            try:
+                parsed_pin = uuid.UUID(pin)
+            except (ValueError, AttributeError, TypeError) as error:
+                raise RuntimeError(
+                    "canonical pinned observation UUID required"
+                ) from error
+            if parsed_pin.version != 4 or str(parsed_pin) != pin:
+                raise RuntimeError("canonical pinned observation UUID required")
+        if candidate is not None and (
+            not isinstance(candidate, str)
+            or not candidate.startswith("s3://warehouse/")
+            or not candidate.endswith(".parquet")
+            or any(ord(char) < 32 for char in candidate)
+        ):
+            raise RuntimeError("owned Parquet candidate URI required")
+    elif command == "recovery-inspect":
+        raise RuntimeError("inspection arguments required")
+    for client in clients.values():
+        value = inspect_client(client)
+        if value["State"]["Running"] and not (
+            command == "recovery-inspect"
+            and client.service in {"recovery-writer", "recovery-reader"}
+            and client.initial is not None
+            and live_identity(value) == live_identity(client.initial)
+        ):
+            raise RuntimeError("one-shot tool cannot overlap another live client")
     role = "tool-" + uuid.uuid4().hex
-    extra = {}
+    extra = dict(inspection or {})
     if verification:
         extra["RECOVERY_VERIFICATION_ID"] = verification
     if diagnostic:
@@ -942,6 +1067,7 @@ def storage_crash():
         case / "case.json",
         {
             "kind": "iceberg-storage-crash",
+            "duckdb_version": DUCKDB_VERSION,
             "run_id": case.name,
             "project": PROJECT,
             "context": context,

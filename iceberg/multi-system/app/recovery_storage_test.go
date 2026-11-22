@@ -13,7 +13,11 @@ import (
 )
 
 func storageEntry(path string) recoveryManifestEntry {
-	return recoveryManifestEntry{Manifest: "s3://warehouse/lab/metadata/manifest.avro", Sequence: 1, ManifestContent: "DATA", Status: "ADDED", Content: "EXISTING", Path: path, Format: "PARQUET", Records: 10}
+	content := "EXISTING"
+	if expectedNativeVersion == "v2.0.1" {
+		content = "DATA"
+	}
+	return recoveryManifestEntry{Manifest: "s3://warehouse/lab/metadata/manifest.avro", Sequence: 1, ManifestContent: "DATA", Status: "ADDED", Content: content, Path: path, Format: "PARQUET", Records: 10}
 }
 
 func TestRecoveryStorageOnlyWarehouseObjectURIs(t *testing.T) {
@@ -47,7 +51,13 @@ func TestRecoveryStorageManifestLabelsAndOldManifestRemainLive(t *testing.T) {
 		t.Fatalf("discarded live old manifest: %+v %d %v", live, count, err)
 	}
 	for _, mutation := range []func(*recoveryManifestEntry){
-		func(e *recoveryManifestEntry) { e.Status = "UNKNOWN" }, func(e *recoveryManifestEntry) { e.ManifestContent = "UNKNOWN" }, func(e *recoveryManifestEntry) { e.Content = "DATA" }, func(e *recoveryManifestEntry) { e.Content = "POSITION_DELETES" }, func(e *recoveryManifestEntry) { e.Content = "EQUALITY_DELETES" }, func(e *recoveryManifestEntry) { e.Content = "ADDED" }, func(e *recoveryManifestEntry) { e.Content = "DELETED" }, func(e *recoveryManifestEntry) { e.ManifestContent = "DELETE" }, func(e *recoveryManifestEntry) { e.Format = "AVRO" }, func(e *recoveryManifestEntry) { e.Records = -1 }, func(e *recoveryManifestEntry) { e.Manifest = "https://not-the-lab.invalid/m" },
+		func(e *recoveryManifestEntry) { e.Status = "UNKNOWN" }, func(e *recoveryManifestEntry) { e.ManifestContent = "UNKNOWN" }, func(e *recoveryManifestEntry) {
+			if expectedNativeVersion == "v2.0.1" {
+				e.Content = "EXISTING"
+			} else {
+				e.Content = "DATA"
+			}
+		}, func(e *recoveryManifestEntry) { e.Content = "POSITION_DELETES" }, func(e *recoveryManifestEntry) { e.Content = "EQUALITY_DELETES" }, func(e *recoveryManifestEntry) { e.Content = "ADDED" }, func(e *recoveryManifestEntry) { e.Content = "DELETED" }, func(e *recoveryManifestEntry) { e.ManifestContent = "DELETE" }, func(e *recoveryManifestEntry) { e.Format = "AVRO" }, func(e *recoveryManifestEntry) { e.Records = -1 }, func(e *recoveryManifestEntry) { e.Manifest = "https://not-the-lab.invalid/m" },
 	} {
 		bad := old
 		mutation(&bad)
@@ -172,5 +182,26 @@ func TestRecoveryStorageNativeLocalParquetSQL(t *testing.T) {
 	}
 	if _, err := recoveryParquetMetadata(ctx, db, path, 4095); err == nil {
 		t.Fatal("native manifest rowcount mismatch accepted")
+	}
+}
+
+func TestRecoveryStorageContentEnumsStayVersionQualified(t *testing.T) {
+	for _, lane := range []struct{ engine, good, bad string }{{"v1.5.5", "EXISTING", "DATA"}, {"v2.0.1", "DATA", "EXISTING"}} {
+		entry := storageEntry("s3://warehouse/data.parquet")
+		entry.Content = lane.good
+		if _, _, err := recoveryLiveFilesForVersion([]recoveryManifestEntry{entry}, lane.engine); err != nil {
+			t.Fatal(lane.engine, err)
+		}
+		entry.Content = lane.bad
+		if _, _, err := recoveryLiveFilesForVersion([]recoveryManifestEntry{entry}, lane.engine); err == nil {
+			t.Fatal("accepted wrong engine content enum", lane.engine)
+		}
+		entry.Status = "DELETED"
+		if _, _, err := recoveryLiveFilesForVersion([]recoveryManifestEntry{entry}, lane.engine); err == nil {
+			t.Fatal("discarded unrecognized deleted-file content", lane.engine)
+		}
+	}
+	if _, _, err := recoveryLiveFilesForVersion(nil, "v2.1.0"); err == nil {
+		t.Fatal("accepted unqualified engine semantics")
 	}
 }

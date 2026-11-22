@@ -77,6 +77,26 @@ changed after the full five-path run. Cleanup passed and nine unrelated
 containers stayed unchanged. Normal-path encoded compression, full startup/exit
 cost and repeated cold/warm capacity trials remain incomplete.
 
+## Current and historical DuckDB versions
+
+New commands default to **DuckDB 2.0.1**, using the official shared C library
+through the Go binding. This lane currently requires Linux ARM64. Export
+`DUCKDB_VERSION=1.5.5` before the lifecycle commands to reproduce the historical
+lane. Keep that choice consistent across commands. Existing architecture and
+performance numbers below remain historical 1.5.5 results unless labeled otherwise.
+
+The same **2,790,000-row snapshot** passes healthy manifest reads on both engines.
+Closing manifest GET connections reproduces a native **SIGABRT on 1.5.5**;
+**2.0.1 returns a SQL I/O error** and writes its failure report instead. Current
+2.0.1 and ClickHouse also independently reconcile **3,390,000 acknowledged rows**
+with zero missing/wrong bodies after the earlier storage failure. This does not
+turn that original failed live-recovery case into a pass. Version provenance,
+commands and remaining qualification are in
+[`DUCKDB_VERSIONS.md`](DUCKDB_VERSIONS.md). The current normal interoperability
+probe **fails**: ClickHouse's v2 output omits the required Avro `content` header,
+which 2.0.1 rejects. Native header inspection confirms the omission; the full
+2.0.1 architecture matrix is not qualified.
+
 ## Architectures
 
 | Case | Data path | Purpose |
@@ -337,6 +357,54 @@ read/write histories. Failure evidence and native data stay retained until
 verification and cleanup guards pass. Separate catalog/network, compactor and
 archive/TTL interruption cases remain unrun work in `PLAN.md`.
 
+## Compactor interruption qualification in progress
+
+`make compactor-crash` uses a fresh two-million-row table, 10,000 customers and
+10,000-row batches. Two Go append writers and independent DuckDB/ClickHouse
+readers remain live. A compactor-only S3 proxy forwards output, journals backend
+completion, then withholds final acknowledgements. The controller independently
+validates a candidate Parquet body before killing Spark; recovery must retain the
+original snapshot, reconcile the catalog and finish a new direct-storage rewrite.
+The maximum overlapping profile is **11 CPUs / 10.75 GiB**. This is an output-close
+interruption, not disk loss or a storage outage. Native qualification is pending.
+
+The first attempt failed **before injection**: the proxy wrapped Go's `http.NoBody`,
+changing signed empty-body multipart-init framing and producing a local S3
+`403 SignatureDoesNotMatch`. The failed verdict, original source and journals
+remain preserved. A separate read-only audit verified **2,670,000 acknowledged
+rows / 267 batches** through both engines, with zero missing/wrong bodies. Its
+one ambiguous batch was absent and remains unacknowledged. The native 267-file
+snapshot contained **208,747,238 file bytes**; encoded column chunks were
+208,415,090 compressed versus 235,034,493 uncompressed bytes (**1.1277×**).
+This data-preservation result does not pass the operational case.
+
+The minimal proxy correction passed signed-request regression tests and a real
+bundled-SDK multipart round trip against local SeaweedFS: **48,128 exact bytes**,
+body verification and deletion of only that transport-control object. Those
+bytes were explicitly not an Iceberg/Parquet fixture. The fresh crash rerun is
+separate; no real cloud endpoint, account or host credentials were used.
+
+That rerun passed healthy compaction (**2,410,000 → 2,630,000 rows; 241 → 24
+files**) and validated a held candidate against its **2,790,000-row** pinned
+snapshot. Spark was positively fenced with exit 137 and no OOM. During the
+following hold, however, SeaweedFS was **OOM-killed at its 1 GiB cap**; DuckDB's
+reader then aborted on an uncaught native manifest-fetch I/O exception. Its
+combined-failure verdict remains **failed**; the fresh recovery compactor did not
+run. Storage sampled charged memory reached **1,073,741,824 bytes**, with
+**48.460 core-s** over **231.43 observed seconds**, and allocated storage grew
+**338,583,552 → 1,026,179,072 bytes**. Docker-VM block counters observed
+25,968,238,592 read and 770,883,584 written bytes; these are not physical SSD costs.
+The exact storage container restarted on its original volume. After fixing the verifier's unwritable default spill path, the diagnostic audit
+with bounded container-local spill checked **3,390,000 acknowledged rows / 339
+batches through each engine**, with zero missing, wrong or duplicate bodies.
+All **36 ambiguous batches were absent** and remain unacknowledged. The committed
+100-file snapshot occupied **176,839,475 file bytes**, with encoded chunk
+compression **1.5744×** (278,150,885 uncompressed / 176,666,496 compressed bytes).
+The audit explicitly retains `passed=false`, `qualified=false`, and
+`integrity_passed=true`: clean reader completion failed. This establishes data
+preservation after the retained-volume restart, not continuous availability,
+HA or completed compactor recovery.
+
 ## Limitations by architecture
 
 | Case | Useful for | Limitation |
@@ -351,8 +419,9 @@ All cases share one SeaweedFS mini instance and host/disk. Nine serving copies d
 not make the source objects highly available. Data is synthetic, compressible and
 fits memory; warm-query measurements do not establish cold-object-store latency,
 WAN behavior or production capacity. Old snapshots/files remain until a separate,
-reader-aware retention policy expires them. Catalog contention, compactor crashes
-and storage failure remain untested experiments in `PLAN.md`.
+reader-aware retention policy expires them. Catalog contention and compactor interruption remain unqualified in `PLAN.md`.
+The live retained-volume storage crash is qualified separately above; it does
+not establish independent catalog recovery, disk replacement or HA.
 
 ## Verified baseline numbers
 
@@ -455,7 +524,8 @@ Archive reader queries cover 1 million cold rows; the correctness suite separate
 ## Compatibility and failure limits
 
 This ClickHouse release requires explicit beta settings for Iceberg catalog and
-writes. A direct append to a DuckDB-created snapshot failed with:
+writes. In the historical **DuckDB 1.5.5** lane, a direct append to a
+DuckDB-created snapshot failed with:
 `Cannot derive Iceberg snapshot total 'total-files-size': the parent snapshot's summary omits it`.
 The tested reverse path uses an empty catalog table before ClickHouse's data
 appends. This is not proof that the pinned engines can alternate writes to the

@@ -1,0 +1,294 @@
+{
+  "date": "2026-11-22",
+  "scope": "Local isolated Docker correctness/error-handling diagnostics; no managed Tigris or cloud resources; no capacity ranking",
+  "environment": {
+    "host": "Apple M4 Pro ARM64, 48 GiB RAM",
+    "docker_vm": "11 CPUs / 24.42 GiB",
+    "storage_version": "SeaweedFS 4.53",
+    "query_version": "ClickHouse 26.10.2.103",
+    "storage_cpu_limit": 1,
+    "storage_memory_limit_bytes": 1073741824,
+    "probe_cpu_limit": 1,
+    "probe_memory_limit_bytes": 2147483648,
+    "network": "example-owned internal Compose network; same retained storage volume"
+  },
+  "pinned_snapshot": {
+    "id": 2974449031838976026,
+    "rows": 2790000,
+    "amount_sum": 13951395000
+  },
+  "manifest_trials": [
+    {
+      "trial_id": "f86409e1-f98b-45f0-a5f9-d910b4e5af16",
+      "engine": "2.0.1",
+      "passed": true,
+      "native_abort_reproduced": false,
+      "make_exit_code": 0,
+      "workflow_seconds": 42.70329,
+      "sources_unchanged": true,
+      "evidence": [
+        {
+          "path": "results/manifest-io/f86409e1-f98b-45f0-a5f9-d910b4e5af16/2b463a19-1a8c-43bf-b84d-5a0fa03f5836/result.json",
+          "sha256": "175d8942a1046c1f9839297df7a865223d101fe5f91fbda43ed366a697c07851"
+        },
+        {
+          "path": "results/manifest-io/f86409e1-f98b-45f0-a5f9-d910b4e5af16/2b463a19-1a8c-43bf-b84d-5a0fa03f5836/invocation.json",
+          "sha256": "491ebbe7974d6cae7420b36c76768136568e2232ac31fc0614364f95ae0e5b73"
+        },
+        {
+          "path": "results/manifest-io/f86409e1-f98b-45f0-a5f9-d910b4e5af16/2b463a19-1a8c-43bf-b84d-5a0fa03f5836/resource-summary.json",
+          "sha256": "08d2351448a2697e4aee0384fdb3ce36cd25ad9ccc9de820491b479d55b20ccd"
+        },
+        {
+          "path": "results/qualification-20261122/18-manifest-stable-final.result.json",
+          "sha256": "62b6419848823a0ab6650b95b59174ebe04b700ac0efce26cc22f2b69f090f34"
+        }
+      ],
+      "phases": [
+        {
+          "mode": "healthy",
+          "passed": true,
+          "backend_contract_passed": true,
+          "native_exit_code": 0,
+          "oom_killed": false,
+          "image_id": "sha256:2dd7668c862c3c7dda166ff8aa379e5bda3b08cf17379ba062b1aab7e65d5512",
+          "survivors_unchanged": true,
+          "evidence": [
+            {
+              "path": "results/manifest-io/f86409e1-f98b-45f0-a5f9-d910b4e5af16/2b463a19-1a8c-43bf-b84d-5a0fa03f5836/recovery-2b463a19-1a8c-43bf-b84d-5a0fa03f5836/manifest-probe-1380906692/native-version.json",
+              "sha256": "6e8b77f1bc35be7b8a9dbf180052957cedb0d2e9e596fd83d9bd8714f7310fd0"
+            },
+            {
+              "path": "results/manifest-io/f86409e1-f98b-45f0-a5f9-d910b4e5af16/2b463a19-1a8c-43bf-b84d-5a0fa03f5836/recovery-2b463a19-1a8c-43bf-b84d-5a0fa03f5836/manifest-probe-1380906692/requests.jsonl",
+              "sha256": "80686df4c61ca4411ec5a5e21ca41fe2b84420097c80dd8e7537fb2cd2c5c937"
+            },
+            {
+              "path": "results/manifest-io/f86409e1-f98b-45f0-a5f9-d910b4e5af16/2b463a19-1a8c-43bf-b84d-5a0fa03f5836/recovery-2b463a19-1a8c-43bf-b84d-5a0fa03f5836/manifest-probe-1380906692/result.json",
+              "sha256": "643181e085b6b66e68bd78a22658ffc209ba2e40f6bbccc231769bf7b6475b45"
+            }
+          ],
+          "operation_ms": 306.393334,
+          "operation_scope": "Connection/setup/query/close including error handling; not SQL-only latency",
+          "dropped_requests": 0,
+          "rows": 2790000,
+          "amount_sum": 13951395000,
+          "cpu_core_seconds": 0.333046,
+          "process_lifetime_peak_rss_bytes": 178188288,
+          "container_lifetime_peak_charged_memory_bytes": 104976384,
+          "process_accounted_io_bytes": {
+            "read_bytes": 0,
+            "write_bytes": 18449
+          },
+          "device_io_available": false
+        },
+        {
+          "mode": "drop-data-manifest",
+          "passed": true,
+          "backend_contract_passed": true,
+          "native_exit_code": 1,
+          "oom_killed": false,
+          "image_id": "sha256:2dd7668c862c3c7dda166ff8aa379e5bda3b08cf17379ba062b1aab7e65d5512",
+          "survivors_unchanged": true,
+          "evidence": [
+            {
+              "path": "results/manifest-io/f86409e1-f98b-45f0-a5f9-d910b4e5af16/2b463a19-1a8c-43bf-b84d-5a0fa03f5836/recovery-2b463a19-1a8c-43bf-b84d-5a0fa03f5836/manifest-probe-1372597750/native-version.json",
+              "sha256": "6e8b77f1bc35be7b8a9dbf180052957cedb0d2e9e596fd83d9bd8714f7310fd0"
+            },
+            {
+              "path": "results/manifest-io/f86409e1-f98b-45f0-a5f9-d910b4e5af16/2b463a19-1a8c-43bf-b84d-5a0fa03f5836/recovery-2b463a19-1a8c-43bf-b84d-5a0fa03f5836/manifest-probe-1372597750/requests.jsonl",
+              "sha256": "9535abf8607d4679ea9e5ba338948844228499916946c5c64a7bcdc7034f2bb0"
+            },
+            {
+              "path": "results/manifest-io/f86409e1-f98b-45f0-a5f9-d910b4e5af16/2b463a19-1a8c-43bf-b84d-5a0fa03f5836/recovery-2b463a19-1a8c-43bf-b84d-5a0fa03f5836/manifest-probe-1372597750/result.json",
+              "sha256": "0f0acb663b2f49c1e56f6984f85b98f69338c0c975dba8ebbf09bab38f284242"
+            }
+          ],
+          "operation_ms": 179.251792,
+          "operation_scope": "Connection/setup/query/close including error handling; not SQL-only latency",
+          "dropped_requests": 3,
+          "rows": 0,
+          "amount_sum": 0,
+          "cpu_core_seconds": 0.229323,
+          "process_lifetime_peak_rss_bytes": 111935488,
+          "container_lifetime_peak_charged_memory_bytes": 35938304,
+          "process_accounted_io_bytes": {
+            "read_bytes": 0,
+            "write_bytes": 4822
+          },
+          "device_io_available": false
+        }
+      ]
+    },
+    {
+      "trial_id": "ccab0316-718c-4e60-a0c1-f0c7623fa56a",
+      "engine": "1.5.5",
+      "passed": false,
+      "native_abort_reproduced": true,
+      "make_exit_code": 2,
+      "workflow_seconds": 42.627027,
+      "sources_unchanged": true,
+      "evidence": [
+        {
+          "path": "results/manifest-io/ccab0316-718c-4e60-a0c1-f0c7623fa56a/2b463a19-1a8c-43bf-b84d-5a0fa03f5836/result.json",
+          "sha256": "7ac1f3a92fff71e6c97f77771491eb9721d13af5fc0282a41e39ff9d151f6348"
+        },
+        {
+          "path": "results/manifest-io/ccab0316-718c-4e60-a0c1-f0c7623fa56a/2b463a19-1a8c-43bf-b84d-5a0fa03f5836/invocation.json",
+          "sha256": "9d448e17420eb01799269fceb97f5f87a4c45e6e6b4d27aa477f7540c182e5ea"
+        },
+        {
+          "path": "results/manifest-io/ccab0316-718c-4e60-a0c1-f0c7623fa56a/2b463a19-1a8c-43bf-b84d-5a0fa03f5836/resource-summary.json",
+          "sha256": "9ecdbe64c1f8054bd6717a38071d350cb293ac608c829083babda55c23385356"
+        },
+        {
+          "path": "results/qualification-20261122/19-manifest-historical-final.result.json",
+          "sha256": "5afd275e0b69536fa4cfe8fbdd4fe8ca1727ab0953700d8335d82d1e6119f8d9"
+        }
+      ],
+      "phases": [
+        {
+          "mode": "healthy",
+          "passed": true,
+          "backend_contract_passed": true,
+          "native_exit_code": 0,
+          "oom_killed": false,
+          "image_id": "sha256:531e7919ec01011b27f46a34d740d5589f4577782053ef1bb11b740c5a2d6137",
+          "survivors_unchanged": true,
+          "evidence": [
+            {
+              "path": "results/manifest-io/ccab0316-718c-4e60-a0c1-f0c7623fa56a/2b463a19-1a8c-43bf-b84d-5a0fa03f5836/recovery-2b463a19-1a8c-43bf-b84d-5a0fa03f5836/manifest-probe-1253845885/native-version.json",
+              "sha256": "03131021d6fda66e583f16e5a9e8b1177342e1ca0d6699520afe3755972aa043"
+            },
+            {
+              "path": "results/manifest-io/ccab0316-718c-4e60-a0c1-f0c7623fa56a/2b463a19-1a8c-43bf-b84d-5a0fa03f5836/recovery-2b463a19-1a8c-43bf-b84d-5a0fa03f5836/manifest-probe-1253845885/requests.jsonl",
+              "sha256": "f93b548bf9ae9c3ebebbc4129d3b62b5ca1229953eeae5f9fc25d5e2f993db61"
+            },
+            {
+              "path": "results/manifest-io/ccab0316-718c-4e60-a0c1-f0c7623fa56a/2b463a19-1a8c-43bf-b84d-5a0fa03f5836/recovery-2b463a19-1a8c-43bf-b84d-5a0fa03f5836/manifest-probe-1253845885/result.json",
+              "sha256": "2412a89dae8fb844ae7ebd61c0890e1a193bd4449d04dc0cca5a10aa0b5ae56b"
+            }
+          ],
+          "operation_ms": 289.773958,
+          "operation_scope": "Connection/setup/query/close including error handling; not SQL-only latency",
+          "dropped_requests": 0,
+          "rows": 2790000,
+          "amount_sum": 13951395000,
+          "cpu_core_seconds": 0.326911,
+          "process_lifetime_peak_rss_bytes": 128536576,
+          "container_lifetime_peak_charged_memory_bytes": 70066176,
+          "process_accounted_io_bytes": {
+            "read_bytes": 0,
+            "write_bytes": 28296
+          },
+          "device_io_available": false
+        },
+        {
+          "mode": "drop-data-manifest",
+          "passed": false,
+          "backend_contract_passed": false,
+          "native_exit_code": 2,
+          "oom_killed": false,
+          "image_id": "sha256:531e7919ec01011b27f46a34d740d5589f4577782053ef1bb11b740c5a2d6137",
+          "survivors_unchanged": true,
+          "evidence": [
+            {
+              "path": "results/manifest-io/ccab0316-718c-4e60-a0c1-f0c7623fa56a/2b463a19-1a8c-43bf-b84d-5a0fa03f5836/recovery-2b463a19-1a8c-43bf-b84d-5a0fa03f5836/manifest-probe-1453813893/native-version.json",
+              "sha256": "03131021d6fda66e583f16e5a9e8b1177342e1ca0d6699520afe3755972aa043"
+            },
+            {
+              "path": "results/manifest-io/ccab0316-718c-4e60-a0c1-f0c7623fa56a/2b463a19-1a8c-43bf-b84d-5a0fa03f5836/recovery-2b463a19-1a8c-43bf-b84d-5a0fa03f5836/manifest-probe-1453813893/requests.jsonl",
+              "sha256": "e55215eaf5d99ba4eac18942ec7766099d8de67656c336e898513bf3d24e4dac"
+            }
+          ],
+          "operation_and_exit_counters": "Unavailable: native SIGABRT prevented final report; periodic samples remain in raw evidence. Do not infer zero CPU/memory/I/O."
+        }
+      ]
+    }
+  ],
+  "current_interoperability": {
+    "passed": false,
+    "make_exit_code": 2,
+    "error": "Invalid Avro key-value metadata, content is missing",
+    "required_header_reference": "https://iceberg.apache.org/spec/#manifest-file-format",
+    "native_header_inspection_passed": true,
+    "tables": [
+      {
+        "table": "lab.probe",
+        "format_version": 2,
+        "metadata_location": "s3://warehouse/lab/probe-6b6780d9-7c9e-45cf-91b1-c07be3bc4bb5/metadata/v2.metadata.json",
+        "snapshot_id": 8281726930308645846,
+        "manifests": [
+          {
+            "path": "s3://warehouse/lab/probe-6b6780d9-7c9e-45cf-91b1-c07be3bc4bb5/metadata/5554a8be-2b3e-45f9-9a18-26b446fc8520-m0.avro",
+            "bytes": 3286,
+            "header_keys": [
+              "avro.codec",
+              "avro.schema",
+              "schema",
+              "schema-id",
+              "partition-spec",
+              "partition-spec-id",
+              "format-version",
+              "content"
+            ],
+            "content": "data",
+            "format_version_header": "2"
+          }
+        ]
+      },
+      {
+        "table": "lab.reverse",
+        "format_version": 2,
+        "metadata_location": "s3://warehouse/lab/reverse-c7e5fc5a-12e2-41d7-a519-931baa54c038/metadata/v2.metadata.json",
+        "snapshot_id": 7987908104173577713,
+        "manifests": [
+          {
+            "path": "s3://warehouse/lab/reverse-c7e5fc5a-12e2-41d7-a519-931baa54c038/metadata/0961345e-6e10-4273-afe6-b3afd61c6ffe.avro",
+            "bytes": 9705,
+            "header_keys": [
+              "avro.codec",
+              "avro.schema",
+              "format-version",
+              "partition-spec",
+              "partition-spec-id",
+              "schema",
+              "schema-id"
+            ],
+            "content": null,
+            "format_version_header": "2"
+          }
+        ]
+      }
+    ],
+    "evidence": [
+      {
+        "path": "results/current-interop/895d01b1-bc32-48c5-8950-671aa1032fe9/headers.json",
+        "sha256": "d5f12fa11af3ef3d09cecc2a0119362888366c8b7b05a2b2d7e35947360433fe"
+      },
+      {
+        "path": "results/current-interop/895d01b1-bc32-48c5-8950-671aa1032fe9/avro_headers.py",
+        "sha256": "96f542299c302a72f18e2d9d6be1acb5e55de5ea9a6611907e3572bccdf0f768"
+      },
+      {
+        "path": "results/qualification-20261122/20-probe-current-stable.result.json",
+        "sha256": "83c9fb18c72c6f9c98c8b7bb4596ae5a1157b7187f2ac5bd691aca532bc15de7"
+      },
+      {
+        "path": "results/qualification-20261122/20-probe-current-stable.log",
+        "sha256": "bd9e294f20e0988e5128b83f2f773a59658d13d1572472bb91d9e8414003f35d"
+      },
+      {
+        "path": "results/current-interop/895d01b1-bc32-48c5-8950-671aa1032fe9/invocation.json",
+        "sha256": "d50744b15362a042bf671cf19cb31b61a3186bd55bdf0940019054ceacdf4667"
+      }
+    ]
+  },
+  "limits": [
+    "One trial per lane, warm/unspecified caches; no statistical performance conclusion",
+    "Manifest probe validates count/sum, not complete bodies; complete 3.39-million-row reconciliation is reported separately",
+    "S3 data unchanged by read-only manifest probes/inspection; no new compression/disk-space experiment",
+    "Container peak includes setup and file cache; process I/O is Linux accounting, not physical SSD I/O; fast native operations may fall between periodic samples",
+    "Historical combined-fault case remains failed despite later intact-data readback",
+    "Current-version five-path matrix, live compactor recovery, Quack deadlines and file-format migration remain incomplete"
+  ]
+}

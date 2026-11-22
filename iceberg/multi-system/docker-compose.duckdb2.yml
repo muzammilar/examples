@@ -1,0 +1,13 @@
+# Apply after the base and recovery files. Historical lane omits this override.
+services:
+  runner:
+    image: iceberg-multi-runner-duckdb2:dev
+    build:
+      context: ./app
+      dockerfile: Dockerfile.duckdb2
+  recovery-tools:
+    image: iceberg-multi-runner-duckdb2:dev
+  recovery-writer:
+    image: iceberg-multi-runner-duckdb2:dev
+  recovery-reader:
+    image: iceberg-multi-runner-duckdb2:dev

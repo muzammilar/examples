@@ -6,6 +6,17 @@ Website: https://duckdb.org/
 
 - [`zfs-recovery/`](zfs-recovery/README.md) — multi-client Quack server on mirrored ZFS, live disk replacement, retained-disk VM crash, snapshot replication, read-only clones and measured failover loss.
 
+## Current-version Iceberg evaluation
+
+[`Iceberg multi-system`](../iceberg/multi-system/DUCKDB_VERSIONS.md) adds actual
+DuckDB **2.0.1** alongside the historical **1.5.5** lane. On the same 2.79-million-row
+snapshot, a manifest connection failure aborts the older native process; 2.0.1
+returns an ordinary SQL error. Complete dual-engine readback checks 3.39 million
+acknowledged rows without missing or wrong bodies. The original combined-fault
+recovery case remains failed. These are correctness/error-handling diagnostics;
+the older benchmark and ZFS/Quack findings below do not establish 2.0.1 performance
+or recovery behavior.
+
 ## Benchmark
 
 TPC-H SF1 on 4 CPUs / 6 GB (Apple M4 Pro, Docker VM aarch64, 2026-09-28): all 22 queries in 0.43 s

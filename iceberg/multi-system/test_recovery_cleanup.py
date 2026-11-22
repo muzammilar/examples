@@ -297,6 +297,136 @@ def reverify_receipt(case, stamp, identifier=OTHER):
     return directory
 
 
+class NativeVersionEvidence(unittest.TestCase):
+    def setUp(self):
+        temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(temporary.cleanup)
+        self.root = Path(temporary.name).resolve()
+        root_patch = patch.object(control, "ROOT", self.root)
+        root_patch.start()
+        self.addCleanup(root_patch.stop)
+        self.case, self.metadata = fixture(self.root)
+        self.directory = self.case / ("recovery-" + RUN) / "verifications" / VERIFY
+        self.proof = json.loads((self.directory / "verified.json").read_text())
+        self.storage = json.loads((self.directory / "storage-metrics.json").read_text())
+        self.versions = {
+            "engine": "v2.0.1",
+            "platform": "linux_arm64",
+            "duckdb_go_version": "v2.20000.0",
+            "lab_binary_sha256": "a" * 64,
+            "extensions": [
+                {
+                    "name": name,
+                    "version": "abc123",
+                    "install_path": (
+                        "/opt/duckdb/extensions/v2.0.1/linux_arm64/"
+                        + name
+                        + ".duckdb_extension"
+                    ),
+                    "sha256": "b" * 64,
+                    "installed": True,
+                    "loaded": name != "avro",
+                }
+                for name in ("avro", "httpfs", "iceberg")
+            ],
+        }
+
+    def bind(self):
+        path = self.directory / "native-versions.json"
+        write(path, self.versions)
+        reference = {"file": path.name, "sha256": sha(path)}
+        self.proof["native_versions"] = reference
+        self.storage["native_versions"] = copy.deepcopy(reference)
+
+    def check(self):
+        storage_path = self.directory / "storage-metrics.json"
+        write(storage_path, self.storage)
+        self.proof["storage_metrics"]["sha256"] = sha(storage_path)
+        write(self.directory / "verified.json", self.proof)
+        manifest = {}
+        cleanup.check_verification(
+            self.case,
+            {
+                "verification_id": VERIFY,
+                "verification_sha256": sha(self.directory / "verified.json"),
+            },
+            self.metadata,
+            manifest,
+            0,
+        )
+        return manifest
+
+    def test_old_seed_can_be_reverified_by_new_native_engine(self):
+        self.metadata["duckdb_version"] = "v1.5.5"
+        self.bind()
+        self.assertTrue(
+            any(name.endswith("native-versions.json") for name in self.check())
+        )
+
+    def test_legacy_without_refs_is_allowed_but_new_metadata_requires_them(self):
+        self.check()
+        self.metadata["duckdb_version"] = "v2.0.1"
+        with self.assertRaisesRegex(RuntimeError, "version evidence is required"):
+            self.check()
+
+    def test_changed_document_is_rejected_even_when_outer_proof_is_rehashed(self):
+        self.bind()
+        self.versions["engine"] = "v1.5.5"
+        write(self.directory / "native-versions.json", self.versions)
+        with self.assertRaisesRegex(RuntimeError, "version evidence changed"):
+            self.check()
+
+    def test_both_refs_must_match_and_use_exact_filename(self):
+        self.bind()
+        self.storage["native_versions"]["sha256"] = "c" * 64
+        with self.assertRaisesRegex(RuntimeError, "version references differ"):
+            self.check()
+        for reference in (self.proof, self.storage):
+            reference["native_versions"] = {
+                "file": "../native-versions.json",
+                "sha256": "a" * 64,
+            }
+        with self.assertRaisesRegex(RuntimeError, "version references differ"):
+            self.check()
+
+    def test_native_engine_and_go_binding_are_checked_together(self):
+        for engine, binding in (("v9.0.0", "v2.20000.0"), ("v2.0.1", "v2.10505.0")):
+            with self.subTest(engine=engine, binding=binding):
+                self.versions.update(engine=engine, duckdb_go_version=binding)
+                self.bind()
+                with self.assertRaisesRegex(RuntimeError, "engine/binding identity"):
+                    self.check()
+
+    def test_legacy_native_engine_binding_remains_supported(self):
+        self.versions.update(engine="v1.5.5", duckdb_go_version="v2.10505.0")
+        for extension in self.versions["extensions"]:
+            extension["install_path"] = extension["install_path"].replace(
+                "v2.0.1", "v1.5.5"
+            )
+        self.bind()
+        self.check()
+
+    def test_extension_set_path_flags_and_hashes_are_not_trusted(self):
+        original = copy.deepcopy(self.versions)
+        for key, value in (
+            ("name", "httpfs"),
+            ("version", "not-a-revision"),
+            ("sha256", "missing"),
+            ("installed", 1),
+            ("loaded", "true"),
+            (
+                "install_path",
+                "/opt/duckdb/extensions/v2.0.1/linux_arm64/../avro.duckdb_extension",
+            ),
+        ):
+            with self.subTest(key=key):
+                self.versions = copy.deepcopy(original)
+                self.versions["extensions"][0][key] = value
+                self.bind()
+                with self.assertRaisesRegex(RuntimeError, "native extension"):
+                    self.check()
+
+
 class EvidenceGates(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()

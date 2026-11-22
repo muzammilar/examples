@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -131,6 +132,38 @@ func probe() error {
 	if count != 20000 || total != 100010000 {
 		return fmt.Errorf("DuckDB reverse read: %d rows / %d cents", count, total)
 	}
+	// Qualify the exact bound-snapshot API on a small, owned normal fixture
+	// before the destructive production controller creates a witnessed UUID.
+	for _, fixture := range []struct {
+		table       string
+		rows, total int64
+	}{
+		{"probe", 10000, 50005000}, {"reverse", 20000, 100010000},
+	} {
+		directory, err := os.MkdirTemp("/results", "pinned-"+fixture.table+"-probe-")
+		if err != nil {
+			return err
+		}
+		if err = localCatalogRecord(ctx, directory, fixture.table, "normal-probe", "", "catalog"); err != nil {
+			return err
+		}
+		pinned, err := recoveryCatalogState(directory, "catalog")
+		if err != nil {
+			return err
+		}
+		if _, err = recoveryWarehouseURI(pinned.Metadata); err != nil {
+			return err
+		}
+		if err = db.QueryRowContext(ctx, "SELECT count(*),sum(amount_cents) FROM iceberg_scan(?,snapshot_from_id=CAST(? AS UBIGINT))", pinned.Metadata, pinned.Snapshot).Scan(&count, &total); err != nil {
+			return err
+		}
+		if count != fixture.rows || total != fixture.total {
+			return fmt.Errorf("pinned %s probe body: %d rows / %d cents", fixture.table, count, total)
+		}
+		if err = recoverySave(filepath.Join(directory, "pinned.json"), map[string]any{"passed": true, "table": fixture.table, "snapshot": pinned, "rows": count, "amount_cents": total, "scope": "Bound explicit-metadata/snapshot API on normal probe fixture; not production recovery or a capacity benchmark."}); err != nil {
+			return err
+		}
+	}
 	fmt.Printf("PROBE PASS: %d rows, %d cents visible in both directions\n", count, total)
 	return nil
 }
@@ -165,24 +198,12 @@ func runCommand(mode string) error {
 		err = recoveryReader()
 	case "recovery-verify":
 		err = recoveryVerify()
+	case "recovery-inspect":
+		err = recoveryInspect()
+	case "recovery-manifest-probe":
+		err = recoveryManifestProbe()
 	case "extensions":
-		var db *sql.DB
-		db, err = sql.Open("duckdb", "")
-		if err == nil {
-			defer db.Close()
-			for _, q := range []string{"SET extension_directory='/opt/duckdb/extensions'", "FORCE INSTALL httpfs FROM 'https://extensions.duckdb.org'", "FORCE INSTALL avro FROM 'https://extensions.duckdb.org'", "FORCE INSTALL iceberg FROM 'https://extensions.duckdb.org'", "LOAD iceberg"} {
-				if _, err = db.Exec(q); err != nil {
-					break
-				}
-			}
-			if err == nil {
-				var installed int
-				err = db.QueryRow("SELECT count(*) FROM duckdb_extensions() WHERE installed AND ((extension_name='httpfs' AND extension_version='827222f') OR (extension_name='avro' AND extension_version='f9d5902') OR (extension_name='iceberg' AND extension_version='45163a28'))").Scan(&installed)
-				if err == nil && installed != 3 {
-					err = fmt.Errorf("extension revisions differ from the qualified HTTPFS/Avro/Iceberg pins: matched %d/3", installed)
-				}
-			}
-		}
+		err = installQualifiedExtensions()
 	case "benchmark":
 		err = benchmark()
 	case "duck-archive":

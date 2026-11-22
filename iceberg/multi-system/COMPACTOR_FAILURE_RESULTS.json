@@ -1,0 +1,267 @@
+{
+  "status": "FAILED; diagnostic body integrity passed",
+  "run_id": "2b463a19-1a8c-43bf-b84d-5a0fa03f5836",
+  "seed_rows": 2000000,
+  "customers": 10000,
+  "batch_rows": 10000,
+  "writers": 2,
+  "readers": [
+    "duckdb",
+    "clickhouse"
+  ],
+  "fault": "Spark SIGKILL at held backend-complete output, followed by unexpected SeaweedFS storage OOM and native DuckDB reader abort",
+  "passed": false,
+  "qualified": false,
+  "integrity_passed": true,
+  "verification_id": "3a38daa8-02cd-4931-8ee1-4ebfbbd3ef97",
+  "verification_sha256": "b8f780f388953740ae9314767e985fbda91f7dea892d570defeacc344594612c",
+  "exports": {
+    "clickhouse": {
+      "rows_verified": 3390000,
+      "acknowledged_batches": 339,
+      "acknowledged_rows": 3390000,
+      "ambiguous_batches_applied": 0,
+      "ambiguous_batches_absent": 36,
+      "canonical_body_sha256": "404308f8e350e15a3ca87416cd1f712b66f2506aed41b9d38eb1c41ba432b1c0"
+    },
+    "duckdb": {
+      "rows_verified": 3390000,
+      "acknowledged_batches": 339,
+      "acknowledged_rows": 3390000,
+      "ambiguous_batches_applied": 0,
+      "ambiguous_batches_absent": 36,
+      "canonical_body_sha256": "404308f8e350e15a3ca87416cd1f712b66f2506aed41b9d38eb1c41ba432b1c0"
+    }
+  },
+  "storage": {
+    "totals": {
+      "files": 100,
+      "rows": 3390000,
+      "file_bytes": 176839475,
+      "footer_bytes": 110344,
+      "column_chunks": 700,
+      "compressed_chunk_bytes": 176666496,
+      "uncompressed_chunk_bytes": 278150885
+    },
+    "encoded_parquet_chunk_compression_ratio": 1.574440492667042
+  },
+  "resources": {
+    "storage": {
+      "samples": 52,
+      "unavailable_samples": 1,
+      "observed_seconds": 231.43,
+      "cpu_core_seconds": {
+        "total": 48.45959499999999,
+        "user": 32.346858000000005,
+        "system": 16.112738
+      },
+      "cpu_percent_one_core_100": 20.939201918506672,
+      "charged_memory_bytes_min_mean_max": [
+        802041856,
+        1008334769.2307693,
+        1073741824
+      ],
+      "lifetime_peak_memory_bytes": 1076207616,
+      "allocated_disk_bytes_first_peak_last": [
+        338583552,
+        1026179072,
+        1026179072
+      ],
+      "native_block_io": {
+        "254:0": {
+          "observed_seconds": 231.43,
+          "rbytes": 25968238592,
+          "wbytes": 770883584,
+          "rios": 445158,
+          "wios": 1978,
+          "rbytes_per_second": 112207745.72008814,
+          "wbytes_per_second": 3330957.887914272,
+          "rios_per_second": 1923.5103487015513,
+          "wios_per_second": 8.546860821846778
+        }
+      },
+      "identity_or_counter_gaps": 0,
+      "scope": "Native cgroup CPU across all threads including probes; sampled charged memory and per-generation lifetime peak. Intervals use native /proc/uptime with centisecond resolution; full probe brackets retain uncertainty. Approximate du allocated bytes, not open-deleted or unique physical storage. Workload /results binds share one witness directory: do not sum them. Device I/O is Docker-VM accounting, not physical SSD latency/queue depth; do not sum stacked devices. Missing devices/counters are unavailable, not zero. CPU and byte/IOPS deltas exclude restart bridges and unobserved initial/final edges. Raw samples retain network counters and timing uncertainty."
+    },
+    "reader-000": {
+      "samples": 24,
+      "unavailable_samples": 0,
+      "observed_seconds": 108.14,
+      "cpu_core_seconds": {
+        "total": 32.31068799999999,
+        "user": 29.556515,
+        "system": 2.7541729999999998
+      },
+      "cpu_percent_one_core_100": 29.878572221194737,
+      "charged_memory_bytes_min_mean_max": [
+        81510400,
+        286561109.3333333,
+        611184640
+      ],
+      "lifetime_peak_memory_bytes": 741969920,
+      "allocated_disk_bytes_first_peak_last": [
+        753664,
+        2809856,
+        2809856
+      ],
+      "native_block_io": null,
+      "identity_or_counter_gaps": 0,
+      "scope": "Native cgroup CPU across all threads including probes; sampled charged memory and per-generation lifetime peak. Intervals use native /proc/uptime with centisecond resolution; full probe brackets retain uncertainty. Approximate du allocated bytes, not open-deleted or unique physical storage. Workload /results binds share one witness directory: do not sum them. Device I/O is Docker-VM accounting, not physical SSD latency/queue depth; do not sum stacked devices. Missing devices/counters are unavailable, not zero. CPU and byte/IOPS deltas exclude restart bridges and unobserved initial/final edges. Raw samples retain network counters and timing uncertainty."
+    },
+    "reader-001": {
+      "samples": 24,
+      "unavailable_samples": 0,
+      "observed_seconds": 108.14999999999998,
+      "cpu_core_seconds": {
+        "total": 1.4583979999999999,
+        "user": 1.2037259999999999,
+        "system": 0.25467199999999995
+      },
+      "cpu_percent_one_core_100": 1.3484956079519188,
+      "charged_memory_bytes_min_mean_max": [
+        20508672,
+        22310229.333333332,
+        23474176
+      ],
+      "lifetime_peak_memory_bytes": 24170496,
+      "allocated_disk_bytes_first_peak_last": [
+        753664,
+        2809856,
+        2809856
+      ],
+      "native_block_io": null,
+      "identity_or_counter_gaps": 0,
+      "scope": "Native cgroup CPU across all threads including probes; sampled charged memory and per-generation lifetime peak. Intervals use native /proc/uptime with centisecond resolution; full probe brackets retain uncertainty. Approximate du allocated bytes, not open-deleted or unique physical storage. Workload /results binds share one witness directory: do not sum them. Device I/O is Docker-VM accounting, not physical SSD latency/queue depth; do not sum stacked devices. Missing devices/counters are unavailable, not zero. CPU and byte/IOPS deltas exclude restart bridges and unobserved initial/final edges. Raw samples retain network counters and timing uncertainty."
+    },
+    "writer-000": {
+      "samples": 24,
+      "unavailable_samples": 0,
+      "observed_seconds": 108.09,
+      "cpu_core_seconds": {
+        "total": 18.590434000000002,
+        "user": 17.135499999999997,
+        "system": 1.4549340000000002
+      },
+      "cpu_percent_one_core_100": 17.199032287908224,
+      "charged_memory_bytes_min_mean_max": [
+        54202368,
+        71401472,
+        87597056
+      ],
+      "lifetime_peak_memory_bytes": 90542080,
+      "allocated_disk_bytes_first_peak_last": [
+        753664,
+        2809856,
+        2809856
+      ],
+      "native_block_io": null,
+      "identity_or_counter_gaps": 0,
+      "scope": "Native cgroup CPU across all threads including probes; sampled charged memory and per-generation lifetime peak. Intervals use native /proc/uptime with centisecond resolution; full probe brackets retain uncertainty. Approximate du allocated bytes, not open-deleted or unique physical storage. Workload /results binds share one witness directory: do not sum them. Device I/O is Docker-VM accounting, not physical SSD latency/queue depth; do not sum stacked devices. Missing devices/counters are unavailable, not zero. CPU and byte/IOPS deltas exclude restart bridges and unobserved initial/final edges. Raw samples retain network counters and timing uncertainty."
+    },
+    "writer-001": {
+      "samples": 24,
+      "unavailable_samples": 0,
+      "observed_seconds": 108.13000000000001,
+      "cpu_core_seconds": {
+        "total": 18.643138,
+        "user": 17.288947000000004,
+        "system": 1.354191
+      },
+      "cpu_percent_one_core_100": 17.241411264218996,
+      "charged_memory_bytes_min_mean_max": [
+        59695104,
+        77615616,
+        87719936
+      ],
+      "lifetime_peak_memory_bytes": 92954624,
+      "allocated_disk_bytes_first_peak_last": [
+        753664,
+        2809856,
+        2809856
+      ],
+      "native_block_io": null,
+      "identity_or_counter_gaps": 0,
+      "scope": "Native cgroup CPU across all threads including probes; sampled charged memory and per-generation lifetime peak. Intervals use native /proc/uptime with centisecond resolution; full probe brackets retain uncertainty. Approximate du allocated bytes, not open-deleted or unique physical storage. Workload /results binds share one witness directory: do not sum them. Device I/O is Docker-VM accounting, not physical SSD latency/queue depth; do not sum stacked devices. Missing devices/counters are unavailable, not zero. CPU and byte/IOPS deltas exclude restart bridges and unobserved initial/final edges. Raw samples retain network counters and timing uncertainty."
+    },
+    "baseline-compactor": {
+      "samples": 5,
+      "unavailable_samples": 1,
+      "observed_seconds": 18.78,
+      "cpu_core_seconds": {
+        "total": 23.911748,
+        "user": 23.316969999999998,
+        "system": 0.594778
+      },
+      "cpu_percent_one_core_100": 127.32560170394036,
+      "charged_memory_bytes_min_mean_max": [
+        2576384,
+        426895769.6,
+        887054336
+      ],
+      "lifetime_peak_memory_bytes": 887791616,
+      "allocated_disk_bytes_first_peak_last": [
+        790528,
+        1048576,
+        1048576
+      ],
+      "native_block_io": {
+        "254:0": {
+          "observed_seconds": 9.39,
+          "rbytes": 122880,
+          "wbytes": 100651008,
+          "rios": 7,
+          "wios": 101,
+          "rbytes_per_second": 13086.26198083067,
+          "wbytes_per_second": 10718957.188498402,
+          "rios_per_second": 0.7454739084132055,
+          "wios_per_second": 10.75612353567625
+        }
+      },
+      "identity_or_counter_gaps": 0,
+      "scope": "Native cgroup CPU across all threads including probes; sampled charged memory and per-generation lifetime peak. Intervals use native /proc/uptime with centisecond resolution; full probe brackets retain uncertainty. Approximate du allocated bytes, not open-deleted or unique physical storage. Workload /results binds share one witness directory: do not sum them. Device I/O is Docker-VM accounting, not physical SSD latency/queue depth; do not sum stacked devices. Missing devices/counters are unavailable, not zero. CPU and byte/IOPS deltas exclude restart bridges and unobserved initial/final edges. Raw samples retain network counters and timing uncertainty."
+    },
+    "fault-compactor": {
+      "samples": 8,
+      "unavailable_samples": 0,
+      "observed_seconds": 33.37,
+      "cpu_core_seconds": {
+        "total": 21.936934,
+        "user": 21.401512999999998,
+        "system": 0.5354209999999999
+      },
+      "cpu_percent_one_core_100": 65.7384896613725,
+      "charged_memory_bytes_min_mean_max": [
+        2695168,
+        673985024,
+        1028575232
+      ],
+      "lifetime_peak_memory_bytes": 1151803392,
+      "allocated_disk_bytes_first_peak_last": [
+        1896448,
+        2691072,
+        2691072
+      ],
+      "native_block_io": {
+        "254:0": {
+          "observed_seconds": 23.98,
+          "rbytes": 45056,
+          "wbytes": 130637824,
+          "rios": 3,
+          "wios": 135,
+          "rbytes_per_second": 1878.8990825688072,
+          "wbytes_per_second": 5447782.4854045035,
+          "rios_per_second": 0.12510425354462051,
+          "wios_per_second": 5.629691409507923
+        }
+      },
+      "identity_or_counter_gaps": 0,
+      "scope": "Native cgroup CPU across all threads including probes; sampled charged memory and per-generation lifetime peak. Intervals use native /proc/uptime with centisecond resolution; full probe brackets retain uncertainty. Approximate du allocated bytes, not open-deleted or unique physical storage. Workload /results binds share one witness directory: do not sum them. Device I/O is Docker-VM accounting, not physical SSD latency/queue depth; do not sum stacked devices. Missing devices/counters are unavailable, not zero. CPU and byte/IOPS deltas exclude restart bridges and unobserved initial/final edges. Raw samples retain network counters and timing uncertainty."
+    }
+  },
+  "recovery": "Same storage container and retained volume restarted; full bodies verified diagnostically; fresh recovery compaction and continuous reader qualification incomplete",
+  "limits": [
+    "One local Docker VM and storage volume",
+    "Failure verdict and all original evidence retained",
+    "Not a capacity comparison or HA qualification"
+  ]
+}
