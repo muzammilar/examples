@@ -246,6 +246,10 @@ comparisons for stable evaluated configurations that pass their relevant gates.
   matches an earlier experiment. Retain a configuration hash and phase timestamps.
 - Images run under emulation (amd64 on arm64) must be marked as such.
 - Raw output goes to `results/` (gitignored); the README gets the table.
+- Commit compact curated result summaries, with per-trial metrics and provenance;
+  keep raw logs, datasets, native database files and full inspection dumps ignored.
+  Check actual large files and the Git index before staging; see
+  [result artifact hygiene](AGENTS.md#result-artifacts-and-git-hygiene).
 - Keep raw operation histories, phase-aligned resource samples and every failed or
   interrupted trial. Missing measurements are unavailable/incomplete, never zero;
   unsupported measurements need a reason. Historical operation-only results need

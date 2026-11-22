@@ -609,6 +609,22 @@ and current gaps/next steps in `TODO.md` or `PRODUCTION_TEST_AUDIT.md`. Distingu
 unfinished implementation, compiled/unit-tested code and actually executed live
 experiments; preserve failed outcomes and identify the tested revision/run.
 
+### Result artifacts and Git hygiene
+
+Commit reproducible source/configuration, concise README results and compact
+machine-readable summaries. Keep the per-trial/phase metrics, units, correctness
+and recovery verdicts, limitations and provenance needed to assess the result.
+Avoid redundant copies and unfiltered Docker/Kubernetes inspections, environment
+dumps or per-request output in committed summaries; retain selected relevant fields.
+
+Raw datasets, operation/witness logs, resource samples, database files, snapshots,
+core dumps, downloaded binaries and materialized build outputs belong in ignored
+directories such as `results/` and `.build/`. Before committing, check actual large
+files with `git check-ignore`, inspect `git ls-files` and review staged paths: an
+ignore rule does not remove a file that is already tracked. Preserve failed raw
+evidence in verified local archives when reclaiming space; commit its compact
+verdict/provenance rather than the archive, and never relabel the failure.
+
 ## Technology research
 
 Before adding or materially changing an example for a technology, and before describing what it is good or bad at, read the relevant official manpages and inspect the corresponding source code. Use the documentation and source for the version actually used by the example when possible. Follow the execution path relevant to the example (configuration, query or API behavior, storage, replication, scheduling, or failure handling) rather than relying only on a project overview or benchmark headline. Use this research to choose representative workloads and explain tradeoffs; distinguish behavior confirmed in source from behavior measured by this repository's example, and cite useful upstream references in the README.
