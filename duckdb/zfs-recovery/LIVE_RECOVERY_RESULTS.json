@@ -1,0 +1,853 @@
+{
+  "passed": true,
+  "case": "075a266a1b8947f886a4869a7cc94054",
+  "raw_directory": "results/qualification-20261122-native-copy/live/075a266a1b8947f886a4869a7cc94054",
+  "date_utc": "2026-11-22T06:50:27Z",
+  "config": {
+    "table": "live_075a266a1b8947f886a4869a7cc94054",
+    "rows": 2000000,
+    "customers": 10000,
+    "clients": 4,
+    "batch_rows": 1000,
+    "delay_seconds": 0.5,
+    "reader_delay_seconds": 0.2,
+    "baseline_seconds": 10,
+    "recovered_seconds": 10,
+    "source_sha256": {
+      ".dockerignore": "8f982650f8a329f8170d8956b06ee2c9f0b75639603c75e738df65c7eafa5506",
+      "Makefile": "cca9669ada35c26ad66eb8d5c69899e2b77f57735c9439b924c2f27ddada8a09",
+      "app/archive_guest.py": "50bcb0202824cb492e78632ca326b2e0c711c5312bb23f92f56de4ac5219f9a6",
+      "app/archive_verify.py": "742a88b3fca6f290a39c6ccd7e3fd9ea6205547e62203cc9c1803451279a183f",
+      "app/export_control.py": "4f290d98e93a50c9f8505c3976abe3ba64aeb2a65acc8d518c555405b8913619",
+      "app/export_csv.py": "d394b8292e39cae46fe7e9ffa681c07f9c7c468fd9e089504a2d161aef24e192",
+      "app/fencing_control.py": "24235edf70642af06c5e6a434747ffdbfe20c77ab6387c2eb1403b7728132a8e",
+      "app/history.py": "ea9513bd1d323aef4a27406792d33ccf17b3fff65e38b7ebfd2a873e5b7ebdb5",
+      "app/lab.py": "eb37736e1e4f04f221e185ba6bb30f7df3f075ec6cf2fa2860bb9115d6206f90",
+      "app/live.py": "e596517403baf544bdc1b92e6c13a448ad29bb6e79f54ebd6e98bdfa792e3718",
+      "app/server.py": "8aa6f2abbbd5a5a8560d9234e23058f81e05ef6307aca85303277403b931cf2f",
+      "app/test_history.py": "d9925d600f6924473513800bcd93956de565847c9314eedae17c64d5565171ee",
+      "docker-compose.yml": "6660706d766c67c6ee113fc9f9b89fdcf87398c71c7660e108b69683a544b31f",
+      "live-contract.json": "bf1f781b54dc813a2a2e03f8346f80f581ff6b6f4ea04c267c993b753150318f",
+      "production.py": "f2db98aaad1ae586d34dce5e5795238cc6da037eb8bec1642b05d05c8fbfe011",
+      "vm/Dockerfile": "db5327ca78bbb519e1a1426937ddc3539be0702150a88c8273402b372954a2eb",
+      "vm/boot.py": "7663d6f122cfb36c9037c0177f7712317c33e1837f3bc78654f92b6cde3eb6ca"
+    },
+    "scope": "Retained-disk guest crash with beta Quack; functional correctness/recovery, not physical host power loss, independent-host HA or capacity comparison."
+  },
+  "proof": {
+    "rows_verified": 2323000,
+    "seed_rows_verified": 2000000,
+    "mutation_intents": 1517,
+    "acknowledged_batches": 323,
+    "acknowledged_rows": 323000,
+    "applied_unacknowledged_batches": 0,
+    "acknowledged_missing": 0,
+    "wrong_duplicate_partial_or_unexpected_rows": 0,
+    "successful_reads_verified": 180,
+    "csv_bytes": 218674842,
+    "csv_sha256": "6c8b3dec0563908090ae0e22e821cfd02dc3620e4e22b3a1ffc09f3e82d00b1d",
+    "gzip1": {
+      "compressed_bytes": 108600676,
+      "ratio": 2.0135679634259365,
+      "wall_ns": 1422331667,
+      "cpu_ns": 1388037479,
+      "scope": "Off-path exported CSV gzip1, including file reads. Not engine or ZFS compression."
+    }
+  },
+  "prior_case_native_rechecks": [],
+  "availability": {
+    "writer": {
+      "first_success_after_vm_restart_seconds_since_fault": 298.976483011,
+      "longest_observed_success_completion_gap_seconds": 299.088132928,
+      "outage_attempts": 691,
+      "outage_failed_or_ambiguous": 691
+    },
+    "reader": {
+      "first_success_after_vm_restart_seconds_since_fault": 298.728549386,
+      "longest_observed_success_completion_gap_seconds": 298.723623178,
+      "outage_attempts": 373,
+      "outage_failed_or_ambiguous": 373
+    },
+    "scope": "Operation completion gaps include pacing, request duration and client reconnection; not exact server downtime or election time. First success is after guest restart, while native service recovery is observed. Actor monotonic clocks share the Docker VM kernel, not the host or guest kernel."
+  },
+  "phases": {
+    "configuration": {
+      "seconds": 25.215294846,
+      "operations": {
+        "writer": {
+          "ok": {
+            "count": 0,
+            "rate_per_second": 0.0,
+            "p50_ms": null,
+            "p99_ms": null
+          },
+          "fail": {
+            "count": 0,
+            "rate_per_second": 0.0,
+            "p50_ms": null,
+            "p99_ms": null
+          },
+          "ambiguous": {
+            "count": 0,
+            "rate_per_second": 0.0,
+            "p50_ms": null,
+            "p99_ms": null
+          },
+          "mismatch": {
+            "count": 0,
+            "rate_per_second": 0.0,
+            "p50_ms": null,
+            "p99_ms": null
+          }
+        },
+        "reader": {
+          "ok": {
+            "count": 0,
+            "rate_per_second": 0.0,
+            "p50_ms": null,
+            "p99_ms": null
+          },
+          "fail": {
+            "count": 0,
+            "rate_per_second": 0.0,
+            "p50_ms": null,
+            "p99_ms": null
+          },
+          "ambiguous": {
+            "count": 0,
+            "rate_per_second": 0.0,
+            "p50_ms": null,
+            "p99_ms": null
+          },
+          "mismatch": {
+            "count": 0,
+            "rate_per_second": 0.0,
+            "p50_ms": null,
+            "p99_ms": null
+          }
+        }
+      }
+    },
+    "seed": {
+      "seconds": 60.862687861,
+      "operations": {
+        "writer": {
+          "ok": {
+            "count": 0,
+            "rate_per_second": 0.0,
+            "p50_ms": null,
+            "p99_ms": null
+          },
+          "fail": {
+            "count": 0,
+            "rate_per_second": 0.0,
+            "p50_ms": null,
+            "p99_ms": null
+          },
+          "ambiguous": {
+            "count": 0,
+            "rate_per_second": 0.0,
+            "p50_ms": null,
+            "p99_ms": null
+          },
+          "mismatch": {
+            "count": 0,
+            "rate_per_second": 0.0,
+            "p50_ms": null,
+            "p99_ms": null
+          }
+        },
+        "reader": {
+          "ok": {
+            "count": 0,
+            "rate_per_second": 0.0,
+            "p50_ms": null,
+            "p99_ms": null
+          },
+          "fail": {
+            "count": 0,
+            "rate_per_second": 0.0,
+            "p50_ms": null,
+            "p99_ms": null
+          },
+          "ambiguous": {
+            "count": 0,
+            "rate_per_second": 0.0,
+            "p50_ms": null,
+            "p99_ms": null
+          },
+          "mismatch": {
+            "count": 0,
+            "rate_per_second": 0.0,
+            "p50_ms": null,
+            "p99_ms": null
+          }
+        }
+      }
+    },
+    "baseline": {
+      "seconds": 14.912676132,
+      "operations": {
+        "writer": {
+          "ok": {
+            "count": 97,
+            "rate_per_second": 6.504533401074468,
+            "p50_ms": 87.929667,
+            "p99_ms": 524.580834
+          },
+          "fail": {
+            "count": 0,
+            "rate_per_second": 0.0,
+            "p50_ms": null,
+            "p99_ms": null
+          },
+          "ambiguous": {
+            "count": 1,
+            "rate_per_second": 0.06705704537190173,
+            "p50_ms": 53.779167,
+            "p99_ms": 53.779167
+          },
+          "mismatch": {
+            "count": 0,
+            "rate_per_second": 0.0,
+            "p50_ms": null,
+            "p99_ms": null
+          }
+        },
+        "reader": {
+          "ok": {
+            "count": 55,
+            "rate_per_second": 3.6881374954545953,
+            "p50_ms": 52.693541,
+            "p99_ms": 552.621
+          },
+          "fail": {
+            "count": 0,
+            "rate_per_second": 0.0,
+            "p50_ms": null,
+            "p99_ms": null
+          },
+          "ambiguous": {
+            "count": 0,
+            "rate_per_second": 0.0,
+            "p50_ms": null,
+            "p99_ms": null
+          },
+          "mismatch": {
+            "count": 0,
+            "rate_per_second": 0.0,
+            "p50_ms": null,
+            "p99_ms": null
+          }
+        }
+      }
+    },
+    "fault": {
+      "seconds": 226.990071728,
+      "operations": {
+        "writer": {
+          "ok": {
+            "count": 0,
+            "rate_per_second": 0.0,
+            "p50_ms": null,
+            "p99_ms": null
+          },
+          "fail": {
+            "count": 0,
+            "rate_per_second": 0.0,
+            "p50_ms": null,
+            "p99_ms": null
+          },
+          "ambiguous": {
+            "count": 691,
+            "rate_per_second": 3.044186006637412,
+            "p50_ms": 41.55,
+            "p99_ms": 53987.413317
+          },
+          "mismatch": {
+            "count": 0,
+            "rate_per_second": 0.0,
+            "p50_ms": null,
+            "p99_ms": null
+          }
+        },
+        "reader": {
+          "ok": {
+            "count": 0,
+            "rate_per_second": 0.0,
+            "p50_ms": null,
+            "p99_ms": null
+          },
+          "fail": {
+            "count": 373,
+            "rate_per_second": 1.643243676520629,
+            "p50_ms": 32.241166,
+            "p99_ms": 204.769042
+          },
+          "ambiguous": {
+            "count": 0,
+            "rate_per_second": 0.0,
+            "p50_ms": null,
+            "p99_ms": null
+          },
+          "mismatch": {
+            "count": 0,
+            "rate_per_second": 0.0,
+            "p50_ms": null,
+            "p99_ms": null
+          }
+        }
+      }
+    },
+    "native-recovery": {
+      "seconds": 97.639806461,
+      "operations": {
+        "writer": {
+          "ok": {
+            "count": 143,
+            "rate_per_second": 1.4645666064190541,
+            "p50_ms": 225.472459,
+            "p99_ms": 1959.492043
+          },
+          "fail": {
+            "count": 0,
+            "rate_per_second": 0.0,
+            "p50_ms": null,
+            "p99_ms": null
+          },
+          "ambiguous": {
+            "count": 502,
+            "rate_per_second": 5.141345709247308,
+            "p50_ms": 30.774521,
+            "p99_ms": 191.418416
+          },
+          "mismatch": {
+            "count": 0,
+            "rate_per_second": 0.0,
+            "p50_ms": null,
+            "p99_ms": null
+          }
+        },
+        "reader": {
+          "ok": {
+            "count": 77,
+            "rate_per_second": 0.7886127880717984,
+            "p50_ms": 123.621917,
+            "p99_ms": 1514.195334
+          },
+          "fail": {
+            "count": 264,
+            "rate_per_second": 2.703815273389023,
+            "p50_ms": 54.118354,
+            "p99_ms": 165.538625
+          },
+          "ambiguous": {
+            "count": 0,
+            "rate_per_second": 0.0,
+            "p50_ms": null,
+            "p99_ms": null
+          },
+          "mismatch": {
+            "count": 0,
+            "rate_per_second": 0.0,
+            "p50_ms": null,
+            "p99_ms": null
+          }
+        }
+      }
+    },
+    "recovered": {
+      "seconds": 12.444961714,
+      "operations": {
+        "writer": {
+          "ok": {
+            "count": 83,
+            "rate_per_second": 6.669365636266191,
+            "p50_ms": 68.9045,
+            "p99_ms": 201.768792
+          },
+          "fail": {
+            "count": 0,
+            "rate_per_second": 0.0,
+            "p50_ms": null,
+            "p99_ms": null
+          },
+          "ambiguous": {
+            "count": 0,
+            "rate_per_second": 0.0,
+            "p50_ms": null,
+            "p99_ms": null
+          },
+          "mismatch": {
+            "count": 0,
+            "rate_per_second": 0.0,
+            "p50_ms": null,
+            "p99_ms": null
+          }
+        },
+        "reader": {
+          "ok": {
+            "count": 48,
+            "rate_per_second": 3.8569825366358694,
+            "p50_ms": 42.524354,
+            "p99_ms": 142.993459
+          },
+          "fail": {
+            "count": 0,
+            "rate_per_second": 0.0,
+            "p50_ms": null,
+            "p99_ms": null
+          },
+          "ambiguous": {
+            "count": 0,
+            "rate_per_second": 0.0,
+            "p50_ms": null,
+            "p99_ms": null
+          },
+          "mismatch": {
+            "count": 0,
+            "rate_per_second": 0.0,
+            "p50_ms": null,
+            "p99_ms": null
+          }
+        }
+      }
+    },
+    "verify": {
+      "seconds": 51.877358482,
+      "operations": {
+        "writer": {
+          "ok": {
+            "count": 0,
+            "rate_per_second": 0.0,
+            "p50_ms": null,
+            "p99_ms": null
+          },
+          "fail": {
+            "count": 0,
+            "rate_per_second": 0.0,
+            "p50_ms": null,
+            "p99_ms": null
+          },
+          "ambiguous": {
+            "count": 0,
+            "rate_per_second": 0.0,
+            "p50_ms": null,
+            "p99_ms": null
+          },
+          "mismatch": {
+            "count": 0,
+            "rate_per_second": 0.0,
+            "p50_ms": null,
+            "p99_ms": null
+          }
+        },
+        "reader": {
+          "ok": {
+            "count": 0,
+            "rate_per_second": 0.0,
+            "p50_ms": null,
+            "p99_ms": null
+          },
+          "fail": {
+            "count": 0,
+            "rate_per_second": 0.0,
+            "p50_ms": null,
+            "p99_ms": null
+          },
+          "ambiguous": {
+            "count": 0,
+            "rate_per_second": 0.0,
+            "p50_ms": null,
+            "p99_ms": null
+          },
+          "mismatch": {
+            "count": 0,
+            "rate_per_second": 0.0,
+            "p50_ms": null,
+            "p99_ms": null
+          }
+        }
+      }
+    },
+    "complete": {
+      "seconds": 0.075563584,
+      "operations": {
+        "writer": {
+          "ok": {
+            "count": 0,
+            "rate_per_second": 0.0,
+            "p50_ms": null,
+            "p99_ms": null
+          },
+          "fail": {
+            "count": 0,
+            "rate_per_second": 0.0,
+            "p50_ms": null,
+            "p99_ms": null
+          },
+          "ambiguous": {
+            "count": 0,
+            "rate_per_second": 0.0,
+            "p50_ms": null,
+            "p99_ms": null
+          },
+          "mismatch": {
+            "count": 0,
+            "rate_per_second": 0.0,
+            "p50_ms": null,
+            "p99_ms": null
+          }
+        },
+        "reader": {
+          "ok": {
+            "count": 0,
+            "rate_per_second": 0.0,
+            "p50_ms": null,
+            "p99_ms": null
+          },
+          "fail": {
+            "count": 0,
+            "rate_per_second": 0.0,
+            "p50_ms": null,
+            "p99_ms": null
+          },
+          "ambiguous": {
+            "count": 0,
+            "rate_per_second": 0.0,
+            "p50_ms": null,
+            "p99_ms": null
+          },
+          "mismatch": {
+            "count": 0,
+            "rate_per_second": 0.0,
+            "p50_ms": null,
+            "p99_ms": null
+          }
+        }
+      }
+    }
+  },
+  "resources": {
+    "primary": {
+      "samples": 430,
+      "unavailable_samples": 5,
+      "observed_cpu_core_seconds": 756.609803,
+      "observed_user_cpu_core_seconds": 746.837361,
+      "observed_system_cpu_core_seconds": 9.772442,
+      "observed_cpu_percent_one_core_100": 156.45604250108258,
+      "peak_sampled_cpu_percent_one_core_100": 200.19789259198126,
+      "counter_resets_excluded": 1,
+      "memory_mean_bytes": 2053539170.1835294,
+      "memory_sampled_max_bytes": 2950680576,
+      "native_memory_peak_bytes": 2950680576,
+      "block_io_by_device_counter": {
+        "254:0:rbytes": {
+          "observed_delta": 405504512,
+          "observed_seconds": 483.59257392999973,
+          "per_second": 838525.1012119491
+        },
+        "254:0:wbytes": {
+          "observed_delta": 458809344,
+          "observed_seconds": 483.59257392999973,
+          "per_second": 948751.8393250036
+        },
+        "254:0:rios": {
+          "observed_delta": 12079,
+          "observed_seconds": 483.59257392999973,
+          "per_second": 24.977637480736917
+        },
+        "254:0:wios": {
+          "observed_delta": 15145,
+          "observed_seconds": 483.59257392999973,
+          "per_second": 31.317685209517396
+        },
+        "254:0:dbytes": {
+          "observed_delta": 0,
+          "observed_seconds": 483.59257392999973,
+          "per_second": 0.0
+        },
+        "254:0:dios": {
+          "observed_delta": 0,
+          "observed_seconds": 483.59257392999973,
+          "per_second": 0.0
+        }
+      },
+      "storage_peak_logical_bytes": 728807982,
+      "storage_peak_allocated_bytes": 728649728
+    },
+    "standby": {
+      "samples": 0,
+      "unavailable_samples": 0,
+      "observed_cpu_core_seconds": null,
+      "observed_user_cpu_core_seconds": null,
+      "observed_system_cpu_core_seconds": null,
+      "observed_cpu_percent_one_core_100": null,
+      "peak_sampled_cpu_percent_one_core_100": null,
+      "counter_resets_excluded": 0,
+      "memory_mean_bytes": null,
+      "memory_sampled_max_bytes": null,
+      "native_memory_peak_bytes": null,
+      "block_io_by_device_counter": null,
+      "storage_peak_logical_bytes": null,
+      "storage_peak_allocated_bytes": null
+    },
+    "controller": {
+      "samples": 430,
+      "unavailable_samples": 2,
+      "observed_cpu_core_seconds": 267.934685,
+      "observed_user_cpu_core_seconds": 247.942386,
+      "observed_system_cpu_core_seconds": 19.992299,
+      "observed_cpu_percent_one_core_100": 54.9050719077554,
+      "peak_sampled_cpu_percent_one_core_100": 171.39923246233192,
+      "counter_resets_excluded": 0,
+      "memory_mean_bytes": 221210289.04672897,
+      "memory_sampled_max_bytes": 574992384,
+      "native_memory_peak_bytes": 584679424,
+      "block_io_by_device_counter": null,
+      "storage_peak_logical_bytes": 0,
+      "storage_peak_allocated_bytes": 0
+    },
+    "scope": "Native Docker cgroup counters including QEMU/guest work and charged file cache. Approximately1s plus sequential docker-exec overhead; actual sample timestamps retained. Reset/initial/final partial CPU/IO intervals excluded. Disk logical sparse capacity is different from allocated bytes. Per-device bytes/operation counters cannot be summed across stacked layers. Physical disk latency/queue depth unavailable. Network and per-phase raw samples retained. Functional co-tenancy is allowed; no capacity ranking."
+  },
+  "actors": [
+    {
+      "pid": 1060,
+      "exit_code": 0
+    },
+    {
+      "pid": 1061,
+      "exit_code": 0
+    },
+    {
+      "pid": 1062,
+      "exit_code": 0
+    },
+    {
+      "pid": 1063,
+      "exit_code": 0
+    },
+    {
+      "pid": 1064,
+      "exit_code": 0
+    }
+  ],
+  "controller_process_resources": {
+    "pid": 1,
+    "user_cpu_seconds": 12.763144,
+    "system_cpu_seconds": 1.392138,
+    "peak_rss_bytes": 413134848
+  },
+  "actor_resources": {
+    "host-controller-resources": {
+      "wall_seconds": 491.3432912910357,
+      "user_cpu_seconds": 1.16194,
+      "system_cpu_seconds": 2.3389049999999996,
+      "reaped_children_user_cpu_seconds": 17.115694,
+      "reaped_children_system_cpu_seconds": 11.991084,
+      "process_lifetime_peak_rss_bytes": 35536896,
+      "scope": "Host orchestration and resource collection, including its own reaped Docker CLI children. Separate from Docker cgroups; do not add Docker CPU to the same process counters twice. RSS is process-lifetime peak, not heap or whole-host memory."
+    },
+    "writer-0-resources": {
+      "pid": 1060,
+      "user_cpu_seconds": 36.279538,
+      "system_cpu_seconds": 2.422269,
+      "peak_rss_bytes": 98385920
+    },
+    "writer-1-resources": {
+      "pid": 1061,
+      "user_cpu_seconds": 36.433294,
+      "system_cpu_seconds": 2.544987,
+      "peak_rss_bytes": 97452032
+    },
+    "writer-3-resources": {
+      "pid": 1063,
+      "user_cpu_seconds": 36.600749,
+      "system_cpu_seconds": 2.545165,
+      "peak_rss_bytes": 98402304
+    },
+    "writer-2-resources": {
+      "pid": 1062,
+      "user_cpu_seconds": 36.259809,
+      "system_cpu_seconds": 2.6104950000000002,
+      "peak_rss_bytes": 98304000
+    },
+    "reader-resources": {
+      "pid": 1064,
+      "user_cpu_seconds": 77.660454,
+      "system_cpu_seconds": 5.318404,
+      "peak_rss_bytes": 98070528
+    }
+  },
+  "native_artifacts": {
+    "guest": {
+      "sha256": {
+        "engine": "60ba180312ca4d6fcf14ebded76efcc1775485e69dcf89ec8f45653a5892a5ef",
+        "server_source": "8aa6f2abbbd5a5a8560d9234e23058f81e05ef6307aca85303277403b931cf2f",
+        "quack/v1.5.5/linux_arm64/quack.duckdb_extension": "41b2b9292bfb860c5ca8c5f818f9dd7a2c6bc24f9c750cffbc3169286fe59f08",
+        "quack/v1.5.5/linux_arm64/httpfs.duckdb_extension": "eba6e263e395a83966090f1f11ade63630b1b21422f0f2813858d179d42ea1e9"
+      },
+      "versions": [
+        [
+          "v1.5.5",
+          "c154811"
+        ]
+      ]
+    },
+    "controller": {
+      "sha256": {
+        "engine": "60ba180312ca4d6fcf14ebded76efcc1775485e69dcf89ec8f45653a5892a5ef",
+        "server_source": "8aa6f2abbbd5a5a8560d9234e23058f81e05ef6307aca85303277403b931cf2f",
+        "quack/v1.5.5/linux_arm64/quack.duckdb_extension": "41b2b9292bfb860c5ca8c5f818f9dd7a2c6bc24f9c750cffbc3169286fe59f08",
+        "quack/v1.5.5/linux_arm64/httpfs.duckdb_extension": "eba6e263e395a83966090f1f11ade63630b1b21422f0f2813858d179d42ea1e9"
+      },
+      "versions": [
+        [
+          "v1.5.5",
+          "c154811"
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "administrative_client": [
+      [
+        "http_retries",
+        "0"
+      ],
+      [
+        "http_timeout",
+        "300"
+      ],
+      [
+        "memory_limit",
+        "244.1 MiB"
+      ],
+      [
+        "threads",
+        "2"
+      ]
+    ],
+    "versions": [
+      [
+        "v1.5.5",
+        "c154811"
+      ]
+    ],
+    "native_engine": [
+      [
+        "checkpoint_threshold",
+        "244.1 MiB"
+      ],
+      [
+        "memory_limit",
+        "488.2 MiB"
+      ],
+      [
+        "threads",
+        "2"
+      ],
+      [
+        "wal_autocheckpoint",
+        "244.1 MiB"
+      ]
+    ]
+  },
+  "workload_settings": [
+    [
+      "http_retries",
+      "0"
+    ],
+    [
+      "http_timeout",
+      "3"
+    ],
+    [
+      "memory_limit",
+      "244.1 MiB"
+    ],
+    [
+      "threads",
+      "2"
+    ]
+  ],
+  "environment": {
+    "cpu_model": "Apple M4 Pro",
+    "host_architecture": "arm64",
+    "host_kernel": "25.5.0",
+    "docker": {
+      "ServerVersion": "29.5.3",
+      "KernelVersion": "6.12.76-linuxkit",
+      "Architecture": "aarch64",
+      "NCPU": 11,
+      "MemTotal": 26216296448,
+      "Driver": "overlayfs",
+      "CgroupVersion": "2"
+    },
+    "vms": {
+      "primary": {
+        "id": "ff84848b917ce58e4df930e82417de343aedddfe65899a166367c4417b89c2b8",
+        "image": "sha256:1378c1d1ff38ae8f1261b945765896c6858a969da4d358415fb6202da3a54eed",
+        "state": {
+          "Running": true,
+          "ExitCode": 0,
+          "StartedAt": "2026-11-22T06:00:59.873828388Z",
+          "FinishedAt": "0001-01-01T00:00:00Z"
+        },
+        "cpus": 2.0,
+        "memory_limit_bytes": 3221225472,
+        "swap_limit_bytes": 3221225472
+      },
+      "standby": {
+        "id": "499195461a7f127fa54549c9e8c56a6ce891fa9dffb3e717eebd0b233d710284",
+        "image": "sha256:1378c1d1ff38ae8f1261b945765896c6858a969da4d358415fb6202da3a54eed",
+        "state": {
+          "Running": false,
+          "ExitCode": 0,
+          "StartedAt": "2026-11-22T06:00:59.874699013Z",
+          "FinishedAt": "2026-11-22T06:22:35.225063042Z"
+        },
+        "cpus": 2.0,
+        "memory_limit_bytes": 3221225472,
+        "swap_limit_bytes": 3221225472
+      }
+    },
+    "co_tenancy": "duckdb-zfs-recovery-primary-1 duckdb-zfs-lab:dev"
+  },
+  "native_storage": {
+    "after_seed": {
+      "used": "93986816",
+      "logicalused": "142652928",
+      "referenced": "93986816",
+      "logicalreferenced": "142652928",
+      "compressratio": "1.52",
+      "compression": "lz4",
+      "sync": "standard",
+      "atime": "off",
+      "recordsize": "262144"
+    },
+    "after_reopen_actors_live": {
+      "used": "107970560",
+      "logicalused": "161032192",
+      "referenced": "107970560",
+      "logicalreferenced": "161032192",
+      "compressratio": "1.49",
+      "compression": "lz4",
+      "sync": "standard",
+      "atime": "off",
+      "recordsize": "262144"
+    },
+    "after_actors_stopped": {
+      "used": "118796288",
+      "logicalused": "175450112",
+      "referenced": "118796288",
+      "logicalreferenced": "175450112",
+      "compressratio": "1.48",
+      "compression": "lz4",
+      "sync": "standard",
+      "atime": "off",
+      "recordsize": "262144"
+    }
+  },
+  "scope": "One functional2m-row retained-disk QEMU/TCG crash observation; not native capacity, independent-host durability or HA. Standby inactive. Failed setup and all raw histories remain preserved. Successful/error latencies separate; p99 from small phase counts is near a maximum, not an established production tail. Cold-cache, physical disk loss, partitions, pressure, repeated recovery-performance comparisons and remaining deployment matrices are unrun."
+}

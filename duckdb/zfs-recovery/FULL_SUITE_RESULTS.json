@@ -1,0 +1,837 @@
+{
+  "passed": true,
+  "verdict_scope": "All five advertised lifecycle commands and implemented data/recovery/resource/cleanup gates passed. Full production, performance and hard client-deadline qualification remain false.",
+  "production_testing_complete": false,
+  "performance_comparison_qualified": false,
+  "client_deadline_contract_qualified": false,
+  "date_utc": "2026-11-22T07:09:37Z",
+  "raw_directory": "results/qualification-20261122-native-copy",
+  "lifecycle": [
+    {
+      "command": "make docker-up",
+      "exit_code": 0,
+      "log": "results/qualification-20261122-native-copy/01-docker-up.log"
+    },
+    {
+      "command": "make up",
+      "exit_code": 0,
+      "log": "results/qualification-20261122-native-copy/02-up.log"
+    },
+    {
+      "command": "make test",
+      "exit_code": 0,
+      "log": "results/qualification-20261122-native-copy/03-test.log"
+    },
+    {
+      "command": "make down",
+      "exit_code": 0,
+      "log": "results/qualification-20261122-native-copy/04-down.log"
+    },
+    {
+      "command": "make docker-down",
+      "exit_code": 0,
+      "log": "results/qualification-20261122-native-copy/05-docker-down.log"
+    }
+  ],
+  "controls": {
+    "host_unit_and_negative_cases": 19,
+    "native_copy_shapes": [
+      "legacy five-column",
+      "payload six-column"
+    ],
+    "native_copy_existing_file_rejection": true,
+    "actual_ssh_timeout_pidfd_fencing": true,
+    "unrelated_live_owner_unchanged_during_control": true
+  },
+  "source_sha256": {
+    ".dockerignore": "8f982650f8a329f8170d8956b06ee2c9f0b75639603c75e738df65c7eafa5506",
+    "Makefile": "cca9669ada35c26ad66eb8d5c69899e2b77f57735c9439b924c2f27ddada8a09",
+    "app/archive_guest.py": "50bcb0202824cb492e78632ca326b2e0c711c5312bb23f92f56de4ac5219f9a6",
+    "app/archive_verify.py": "742a88b3fca6f290a39c6ccd7e3fd9ea6205547e62203cc9c1803451279a183f",
+    "app/export_control.py": "4f290d98e93a50c9f8505c3976abe3ba64aeb2a65acc8d518c555405b8913619",
+    "app/export_csv.py": "d394b8292e39cae46fe7e9ffa681c07f9c7c468fd9e089504a2d161aef24e192",
+    "app/fencing_control.py": "24235edf70642af06c5e6a434747ffdbfe20c77ab6387c2eb1403b7728132a8e",
+    "app/history.py": "ea9513bd1d323aef4a27406792d33ccf17b3fff65e38b7ebfd2a873e5b7ebdb5",
+    "app/lab.py": "eb37736e1e4f04f221e185ba6bb30f7df3f075ec6cf2fa2860bb9115d6206f90",
+    "app/live.py": "e596517403baf544bdc1b92e6c13a448ad29bb6e79f54ebd6e98bdfa792e3718",
+    "app/server.py": "8aa6f2abbbd5a5a8560d9234e23058f81e05ef6307aca85303277403b931cf2f",
+    "app/test_history.py": "d9925d600f6924473513800bcd93956de565847c9314eedae17c64d5565171ee",
+    "docker-compose.yml": "6660706d766c67c6ee113fc9f9b89fdcf87398c71c7660e108b69683a544b31f",
+    "live-contract.json": "bf1f781b54dc813a2a2e03f8346f80f581ff6b6f4ea04c267c993b753150318f",
+    "production.py": "f2db98aaad1ae586d34dce5e5795238cc6da037eb8bec1642b05d05c8fbfe011",
+    "vm/Dockerfile": "db5327ca78bbb519e1a1426937ddc3539be0702150a88c8273402b372954a2eb",
+    "vm/boot.py": "7663d6f122cfb36c9037c0177f7712317c33e1837f3bc78654f92b6cde3eb6ca"
+  },
+  "steps": [
+    {
+      "target": "disk-test",
+      "wall_ns": 129397986167,
+      "exit_code": 0
+    },
+    {
+      "target": "crash-test",
+      "wall_ns": 491578356833,
+      "exit_code": 0
+    },
+    {
+      "target": "replica-test",
+      "wall_ns": 442695138417,
+      "exit_code": 0
+    },
+    {
+      "target": "verify-archives",
+      "wall_ns": 470159926542,
+      "exit_code": 0
+    }
+  ],
+  "implemented_matrix_seconds": 1533.831407959,
+  "disk": {
+    "dataset_guid": "13040330369350388094",
+    "before": {
+      "size_bytes": 16642998272,
+      "allocated_bytes": 1019904,
+      "free_bytes": 16641978368,
+      "health": "ONLINE",
+      "status": "pool: ducklab\n state: ONLINE\nconfig:\n\n\tNAME                                        STATE     READ WRITE CKSUM\n\tducklab                                     ONLINE       0     0     0\n\t  mirror-0                                  ONLINE       0     0     0\n\t    /dev/disk/by-id/virtio-ducklab-a-part1  ONLINE       0     0     0\n\t    /dev/disk/by-id/virtio-ducklab-b-part1  ONLINE       0     0     0\n\nerrors: No known data errors"
+    },
+    "degraded": {
+      "size_bytes": 16642998272,
+      "allocated_bytes": 1941504,
+      "free_bytes": 16641056768,
+      "health": "DEGRADED",
+      "status": "pool: ducklab\n state: DEGRADED\nstatus: One or more devices are faulted in response to persistent errors.\n\tSufficient replicas exist for the pool to continue functioning in a\n\tdegraded state.\naction: Replace the faulted device, or use 'zpool clear' to mark the device\n\trepaired.\nconfig:\n\n\tNAME                                        STATE     READ WRITE CKSUM\n\tducklab                                     DEGRADED     0     0     0\n\t  mirror-0                                  DEGRADED     0     0     0\n\t    /dev/disk/by-id/virtio-ducklab-a-part1  FAULTED      0     0     0  external device fault\n\t    /dev/disk/by-id/virtio-ducklab-b-part1  ONLINE       0     0     0\n\nerrors: No known data errors"
+    },
+    "after": {
+      "size_bytes": 16642998272,
+      "allocated_bytes": 26476544,
+      "free_bytes": 16616521728,
+      "health": "ONLINE",
+      "status": "pool: ducklab\n state: ONLINE\n  scan: scrub repaired 0B in 00:00:01 with 0 errors on Sun Nov 22 06:22:28 2026\nconfig:\n\n\tNAME                                                  STATE     READ WRITE CKSUM\n\tducklab                                               ONLINE       0     0     0\n\t  mirror-0                                            ONLINE       0     0     0\n\t    /dev/disk/by-id/virtio-ducklab-replacement-part1  ONLINE       0     0     0\n\t    /dev/disk/by-id/virtio-ducklab-b-part1            ONLINE       0     0     0\n\nerrors: No known data errors"
+    },
+    "replacement_seconds": 11.531884755000647,
+    "scrub_seconds": 8.519229379002354,
+    "acknowledged_at_fault": 230000,
+    "additional_acknowledged_while_degraded": 20000,
+    "oracle": {
+      "rows": 2000000,
+      "unique_ids": 2000000,
+      "amount_cents": 10001000000,
+      "invalid_rows": 0,
+      "acknowledged_missing": 0,
+      "missing_by_phase": {
+        "disk": 0
+      },
+      "duplicate_ids": 0
+    }
+  },
+  "continuous_case": {
+    "case": "075a266a1b8947f886a4869a7cc94054",
+    "proof": {
+      "rows_verified": 2323000,
+      "seed_rows_verified": 2000000,
+      "mutation_intents": 1517,
+      "acknowledged_batches": 323,
+      "acknowledged_rows": 323000,
+      "applied_unacknowledged_batches": 0,
+      "acknowledged_missing": 0,
+      "wrong_duplicate_partial_or_unexpected_rows": 0,
+      "successful_reads_verified": 180,
+      "csv_bytes": 218674842,
+      "csv_sha256": "6c8b3dec0563908090ae0e22e821cfd02dc3620e4e22b3a1ffc09f3e82d00b1d",
+      "gzip1": {
+        "compressed_bytes": 108600676,
+        "ratio": 2.0135679634259365,
+        "wall_ns": 1422331667,
+        "cpu_ns": 1388037479,
+        "scope": "Off-path exported CSV gzip1, including file reads. Not engine or ZFS compression."
+      }
+    },
+    "availability": {
+      "writer": {
+        "first_success_after_vm_restart_seconds_since_fault": 298.976483011,
+        "longest_observed_success_completion_gap_seconds": 299.088132928,
+        "outage_attempts": 691,
+        "outage_failed_or_ambiguous": 691
+      },
+      "reader": {
+        "first_success_after_vm_restart_seconds_since_fault": 298.728549386,
+        "longest_observed_success_completion_gap_seconds": 298.723623178,
+        "outage_attempts": 373,
+        "outage_failed_or_ambiguous": 373
+      },
+      "scope": "Operation completion gaps include pacing, request duration and client reconnection; not exact server downtime or election time. First success is after guest restart, while native service recovery is observed. Actor monotonic clocks share the Docker VM kernel, not the host or guest kernel."
+    },
+    "phase_seconds": {
+      "configuration": 25.215294846,
+      "seed": 60.862687861,
+      "baseline": 14.912676132,
+      "fault": 226.990071728,
+      "native-recovery": 97.639806461,
+      "recovered": 12.444961714,
+      "verify": 51.877358482,
+      "complete": 0.075563584
+    },
+    "report": "LIVE_RECOVERY_RESULTS.json"
+  },
+  "replica": {
+    "configured_rows": 2000000,
+    "quack_revision": "c154811",
+    "clients": 4,
+    "batch_rows": 10000,
+    "baseline": {
+      "rows": 1000000,
+      "unique_ids": 1000000,
+      "amount_cents": 5000500000,
+      "invalid_rows": 0,
+      "acknowledged_missing": 0,
+      "missing_by_phase": {
+        "seed": 0
+      },
+      "duplicate_ids": 0
+    },
+    "full_replication": {
+      "bytes": 10294016,
+      "seconds": 6.51854379499855,
+      "interrupted": false
+    },
+    "baseline_clone": [
+      1000000,
+      1000000,
+      5000500000,
+      0
+    ],
+    "live_replication": {
+      "bytes": 3160632,
+      "seconds": 5.957433169998694,
+      "interrupted": false
+    },
+    "live_clone": [
+      1080000,
+      1080000,
+      5400540000,
+      0
+    ],
+    "interrupted_replication": {
+      "bytes": 65536,
+      "seconds": 3.5400775850030186,
+      "interrupted": true
+    },
+    "resumed_replication": {
+      "bytes": 6052936,
+      "seconds": 6.703464629001246,
+      "interrupted": false
+    },
+    "last_complete_clone": [
+      1500000,
+      1500000,
+      7500750000,
+      0
+    ],
+    "promoted": {
+      "rows": 1500000,
+      "unique_ids": 1500000,
+      "amount_cents": 7500750000,
+      "invalid_rows": 0,
+      "acknowledged_missing": 30000,
+      "missing_by_phase": {
+        "seed": 0,
+        "live": 0,
+        "fault": 30000
+      },
+      "duplicate_ids": 0
+    },
+    "after_promoted_writes": {
+      "rows": 1600000,
+      "unique_ids": 1600000,
+      "amount_cents": 8000800000,
+      "invalid_rows": 0,
+      "acknowledged_missing": 0,
+      "missing_by_phase": {
+        "promoted": 0
+      },
+      "duplicate_ids": 0
+    },
+    "recovery_and_ten_batches_seconds": 29.326776305002568,
+    "first_recovered_write_seconds": 28.534291220999876,
+    "fault_client_errors": [
+      [
+        {
+          "first_id": 1520000,
+          "end_id": 1530000,
+          "error": "IO Error: Failed to send message: IO Error: Server returned nothing (no headers, no data) error for HTTP POST to 'http://primary:9494/quack'",
+          "outcome": "ambiguous"
+        }
+      ],
+      [
+        {
+          "first_id": 1550000,
+          "end_id": 1560000,
+          "error": "IO Error: Failed to send message: IO Error: Could not resolve hostname error for HTTP POST to 'http://primary:9494/quack'",
+          "outcome": "ambiguous"
+        }
+      ],
+      [
+        {
+          "first_id": 1570000,
+          "end_id": 1580000,
+          "error": "IO Error: Failed to send message: IO Error: Could not resolve hostname error for HTTP POST to 'http://primary:9494/quack'",
+          "outcome": "ambiguous"
+        }
+      ],
+      [
+        {
+          "first_id": 1540000,
+          "end_id": 1550000,
+          "error": "IO Error: Failed to send message: IO Error: Could not resolve hostname error for HTTP POST to 'http://primary:9494/quack'",
+          "outcome": "ambiguous"
+        }
+      ]
+    ],
+    "batch_p50_seconds": 0.40531662500143284,
+    "batch_p99_seconds": 1.5097900010005105,
+    "total_seconds": 175.42663941299907
+  },
+  "archive": {
+    "historical_cases": [
+      {
+        "case": "075a266a1b8947f886a4869a7cc94054",
+        "proof": {
+          "rows_verified": 2323000,
+          "seed_rows_verified": 2000000,
+          "mutation_intents": 1517,
+          "acknowledged_batches": 323,
+          "acknowledged_rows": 323000,
+          "applied_unacknowledged_batches": 0,
+          "acknowledged_missing": 0,
+          "wrong_duplicate_partial_or_unexpected_rows": 0,
+          "successful_reads_verified": 180,
+          "csv_bytes": 218674842,
+          "csv_sha256": "6c8b3dec0563908090ae0e22e821cfd02dc3620e4e22b3a1ffc09f3e82d00b1d"
+        },
+        "configuration_failed": false
+      },
+      {
+        "case": "legacy-disk",
+        "proof": {
+          "rows_verified": 2000000,
+          "acknowledged_rows": 2000000,
+          "missing_acknowledged_by_label": {},
+          "applied_unacknowledged_batches": 0,
+          "wrong_duplicate_or_partial_rows": 0,
+          "csv_sha256": "1a30e7203979046b4b19f6ced3159593480349be9c0151568213770ee6b05b4a",
+          "csv_bytes": 66225747
+        }
+      }
+    ],
+    "fenced_primary_source": {
+      "rows_verified": 1530000,
+      "acknowledged_rows": 1530000,
+      "missing_acknowledged_by_label": {},
+      "applied_unacknowledged_batches": 0,
+      "wrong_duplicate_or_partial_rows": 0,
+      "csv_sha256": "6d1daa467dece424eac029a938f5f3f1425d777f547f8c72451ad4b16a61a594",
+      "csv_bytes": 49879899
+    },
+    "promoted_standby": {
+      "rows_verified": 1600000,
+      "acknowledged_rows": 1630000,
+      "missing_acknowledged_by_label": {
+        "fault": 30000
+      },
+      "applied_unacknowledged_batches": 0,
+      "wrong_duplicate_or_partial_rows": 0,
+      "csv_sha256": "f47cbe8a7d08df2c2d202e0cd7a2174e968717f1077fc19749d64323d8d74937",
+      "csv_bytes": 52314387
+    },
+    "dataset_guid_by_name": {
+      "ducklab/data": "12043034722308657268",
+      "ducklab/retained-data-5f24391f28154c4cb41074470b9b2281": "13040330369350388094",
+      "ducklab/retained-data-b41e776b35474dbeb5d6d645dd417417": "12219981453865244650"
+    },
+    "native_table_inventories": [
+      {
+        "dataset": "ducklab/retained-data-5f24391f28154c4cb41074470b9b2281",
+        "tables": [
+          "events",
+          "live_075a266a1b8947f886a4869a7cc94054"
+        ]
+      },
+      {
+        "dataset": "ducklab/retained-data-b41e776b35474dbeb5d6d645dd417417",
+        "tables": []
+      },
+      {
+        "dataset": "ducklab/data",
+        "tables": [
+          "events"
+        ]
+      }
+    ],
+    "body_rows_verified_across_exported_copies": 7453000,
+    "scope": "Four full body exports plus explicit empty-generation inventory; rows include replicated copies, not unique logical IDs."
+  },
+  "resource_summary": {
+    "primary": {
+      "samples": 1291,
+      "unavailable_samples": 31,
+      "observed_cpu_core_seconds": 1943.513992,
+      "observed_user_cpu_core_seconds": 1920.322658,
+      "observed_system_cpu_core_seconds": 23.191331,
+      "observed_cpu_percent_one_core_100": 129.98493254870675,
+      "peak_sampled_cpu_percent_one_core_100": 200.50603818267828,
+      "counter_resets_excluded": 2,
+      "memory_mean_bytes": 2297120823.263492,
+      "memory_sampled_max_bytes": 2989862912,
+      "native_memory_peak_bytes": 2989862912,
+      "block_io_by_device_counter": {
+        "254:0:rbytes": {
+          "observed_delta": 847982592,
+          "observed_seconds": 1495.1840600999994,
+          "per_second": 567142.6111533627
+        },
+        "254:0:wbytes": {
+          "observed_delta": 1330825216,
+          "observed_seconds": 1495.1840600999994,
+          "per_second": 890074.5075566102
+        },
+        "254:0:rios": {
+          "observed_delta": 25491,
+          "observed_seconds": 1495.1840600999994,
+          "per_second": 17.048737128922532
+        },
+        "254:0:wios": {
+          "observed_delta": 45100,
+          "observed_seconds": 1495.1840600999994,
+          "per_second": 30.16351043562066
+        },
+        "254:0:dbytes": {
+          "observed_delta": 0,
+          "observed_seconds": 1495.1840600999994,
+          "per_second": 0.0
+        },
+        "254:0:dios": {
+          "observed_delta": 0,
+          "observed_seconds": 1495.1840600999994,
+          "per_second": 0.0
+        }
+      },
+      "storage_peak_logical_bytes": 1237236270,
+      "storage_peak_allocated_bytes": 1237098496
+    },
+    "standby": {
+      "samples": 1291,
+      "unavailable_samples": 417,
+      "observed_cpu_core_seconds": 1008.887173,
+      "observed_user_cpu_core_seconds": 999.03267,
+      "observed_system_cpu_core_seconds": 9.854504,
+      "observed_cpu_percent_one_core_100": 96.87743579181942,
+      "peak_sampled_cpu_percent_one_core_100": 200.14439356706575,
+      "counter_resets_excluded": 1,
+      "memory_mean_bytes": 1969893675.9359267,
+      "memory_sampled_max_bytes": 2308935680,
+      "native_memory_peak_bytes": 2308935680,
+      "block_io_by_device_counter": {
+        "254:0:rbytes": {
+          "observed_delta": 306067968,
+          "observed_seconds": 1041.405735767,
+          "per_second": 293898.8690844684
+        },
+        "254:0:wbytes": {
+          "observed_delta": 154062848,
+          "observed_seconds": 1041.405735767,
+          "per_second": 147937.39145918188
+        },
+        "254:0:rios": {
+          "observed_delta": 10965,
+          "observed_seconds": 1041.405735767,
+          "per_second": 10.529037457167671
+        },
+        "254:0:wios": {
+          "observed_delta": 17642,
+          "observed_seconds": 1041.405735767,
+          "per_second": 16.940563503816875
+        },
+        "254:0:dbytes": {
+          "observed_delta": 0,
+          "observed_seconds": 1041.405735767,
+          "per_second": 0.0
+        },
+        "254:0:dios": {
+          "observed_delta": 0,
+          "observed_seconds": 1041.405735767,
+          "per_second": 0.0
+        }
+      },
+      "storage_peak_logical_bytes": 378059566,
+      "storage_peak_allocated_bytes": 377905152
+    },
+    "controller": {
+      "samples": 1291,
+      "unavailable_samples": 380,
+      "observed_cpu_core_seconds": 297.965382,
+      "observed_user_cpu_core_seconds": 273.450559,
+      "observed_system_cpu_core_seconds": 24.514824,
+      "observed_cpu_percent_one_core_100": 27.354596459520327,
+      "peak_sampled_cpu_percent_one_core_100": 175.11156301667503,
+      "counter_resets_excluded": 3,
+      "memory_mean_bytes": 163331457.54555434,
+      "memory_sampled_max_bytes": 580444160,
+      "native_memory_peak_bytes": 584679424,
+      "block_io_by_device_counter": null,
+      "storage_peak_logical_bytes": 0,
+      "storage_peak_allocated_bytes": 0
+    },
+    "scope": "Native Docker cgroup counters including QEMU/guest work and charged file cache. Approximately1s plus sequential docker-exec overhead; actual sample timestamps retained. Reset/initial/final partial CPU/IO intervals excluded. Disk logical sparse capacity is different from allocated bytes. Per-device bytes/operation counters cannot be summed across stacked layers. Physical disk latency/queue depth unavailable. Network and per-phase raw samples retained. Functional co-tenancy is allowed; no capacity ranking."
+  },
+  "native_effective_settings_after_suite": {
+    "primary": {
+      "arc_max_bytes": 268435456,
+      "effective_c_max_bytes": 268435456,
+      "versions": "6.8.0-147-generic\nzfs-2.2.2-0ubuntu9.5\nzfs-kmod-2.2.2-0ubuntu9.5\n1.5.5",
+      "original_datasets": {
+        "ducklab/data": {
+          "logicalreferenced": "16828416",
+          "referenced": "6766592",
+          "used": "8019968",
+          "compressratio": "2.65",
+          "compression": "lz4",
+          "recordsize": "262144",
+          "sync": "standard",
+          "readonly": "off",
+          "guid": "12043034722308657268"
+        },
+        "ducklab/retained-data-5f24391f28154c4cb41074470b9b2281": {
+          "logicalreferenced": "175450112",
+          "referenced": "118796288",
+          "used": "118796288",
+          "compressratio": "1.48",
+          "compression": "lz4",
+          "recordsize": "262144",
+          "sync": "standard",
+          "readonly": "off",
+          "guid": "13040330369350388094"
+        },
+        "ducklab/retained-data-b41e776b35474dbeb5d6d645dd417417": {
+          "logicalreferenced": "55296",
+          "referenced": "102400",
+          "used": "102400",
+          "compressratio": "1.17",
+          "compression": "lz4",
+          "recordsize": "262144",
+          "sync": "standard",
+          "readonly": "off",
+          "guid": "12219981453865244650"
+        }
+      },
+      "pool": {
+        "size_bytes": 16642998272,
+        "allocated_bytes": 159158272,
+        "free_bytes": 16483840000,
+        "health": "ONLINE",
+        "status": "pool: ducklab\n state: ONLINE\n  scan: scrub repaired 0B in 00:00:01 with 0 errors on Sun Nov 22 06:22:28 2026\nconfig:\n\n\tNAME                                                  STATE     READ WRITE CKSUM\n\tducklab                                               ONLINE       0     0     0\n\t  mirror-0                                            ONLINE       0     0     0\n\t    /dev/disk/by-id/virtio-ducklab-replacement-part1  ONLINE       0     0     0\n\t    /dev/disk/by-id/virtio-ducklab-b-part1            ONLINE       0     0     0\n\nerrors: No known data errors"
+      },
+      "fs_tunables": "65536\n9223372036854775807"
+    },
+    "standby": {
+      "arc_max_bytes": 268435456,
+      "effective_c_max_bytes": 268435456,
+      "versions": "6.8.0-147-generic\nzfs-2.2.2-0ubuntu9.5\nzfs-kmod-2.2.2-0ubuntu9.5\n1.5.5",
+      "original_datasets": {
+        "ducklab/data": {
+          "logicalreferenced": "18536448",
+          "referenced": "7704576",
+          "used": "8986624",
+          "compressratio": "2.51",
+          "compression": "lz4",
+          "recordsize": "262144",
+          "sync": "standard",
+          "readonly": "off",
+          "guid": "10400812394598317378"
+        },
+        "ducklab/retained-data-b41e776b35474dbeb5d6d645dd417417": {
+          "logicalreferenced": "43008",
+          "referenced": "98304",
+          "used": "98304",
+          "compressratio": "1.00",
+          "compression": "lz4",
+          "recordsize": "262144",
+          "sync": "standard",
+          "readonly": "off",
+          "guid": "11050404015116483115"
+        }
+      },
+      "pool": {
+        "size_bytes": 16642998272,
+        "allocated_bytes": 10084352,
+        "free_bytes": 16632913920,
+        "health": "ONLINE",
+        "status": "pool: ducklab\n state: ONLINE\nconfig:\n\n\tNAME                                        STATE     READ WRITE CKSUM\n\tducklab                                     ONLINE       0     0     0\n\t  mirror-0                                  ONLINE       0     0     0\n\t    /dev/disk/by-id/virtio-ducklab-a-part1  ONLINE       0     0     0\n\t    /dev/disk/by-id/virtio-ducklab-b-part1  ONLINE       0     0     0\n\nerrors: No known data errors"
+      },
+      "fs_tunables": "65536\n9223372036854775807"
+    }
+  },
+  "client_timeout_limitation": {
+    "configured_duckdb_http_timeout_s": 3,
+    "configured_timeout_is_effective_quack_rpc_deadline": false,
+    "pinned_source_quack_timeout_s": 86400,
+    "hard_end_to_end_3s_deadline_verified": false,
+    "maximum_measured_ambiguous_writer_attempt_ms": 75058.195868,
+    "fault_ambiguous_writer_p99_ms": 53987.413317,
+    "measurement_scope": "Client creation, execution/fetch and error cleanup are included; individual spans were not isolated. The overall hard-deadline contract is unqualified.",
+    "source_urls": [
+      "https://github.com/duckdb/duckdb-quack/blob/c1548111c1bfd16207e22fd3cb7e4bde1335b9d0/src/quack_client.cpp#L47-L95",
+      "https://github.com/duckdb/duckdb-quack/blob/c1548111c1bfd16207e22fd3cb7e4bde1335b9d0/src/include/quack_client.hpp#L79-L94"
+    ]
+  },
+  "co_tenancy_addenda": [
+    {
+      "raw_file": "results/qualification-20261122-native-copy/co-tenancy-addendum-1795329181481119000.json",
+      "report": {
+        "recorded_utc_ns": 1795329181481121000,
+        "source": "Parent agent report; original run headers remain unchanged. Exact compiler start/end timestamps were not supplied.",
+        "completed_sdk": {
+          "session": 41909,
+          "container": "iceberg-storage-sdk-1cca31451cba484988e87639bab8eb95",
+          "cpu_limit": 1,
+          "memory_limit_bytes": 2147483648,
+          "swap_limit_bytes": 0,
+          "network": "none",
+          "exit_code": 0,
+          "work": "Offline Parquet SQL and full Rust package build/tests; no system-under-test workload."
+        },
+        "announced_followup": "Another cached SDK control at the same1CPU2GiB cap, followed by a proposed2CPU4GiB capped image build afterSDKcompletion. Follow-up completion/boundaries will be recorded separately.",
+        "scope": "Functional recovery timings/resources are diagnostic under co-tenancy; no capacity ranking or normalized performance winner is claimed."
+      }
+    },
+    {
+      "raw_file": "results/qualification-20261122-native-copy/co-tenancy-addendum-1795329326922554000.json",
+      "report": {
+        "recorded_utc_ns": 1795329326922557000,
+        "source": "Rust sibling agent report; original environment headers unchanged.",
+        "completed_offline_sdk": {
+          "cpu_limit": 1,
+          "memory_limit_bytes": 2147483648,
+          "swap_limit_bytes": 0,
+          "network": "none",
+          "started_utc": "2026-11-22T06:32:15.407816464Z",
+          "finished_utc": "2026-11-22T06:32:21.041269258Z",
+          "started_utc_ns": 1795329135407816464,
+          "finished_utc_ns": 1795329141041269258,
+          "exit_code": 0,
+          "scope": "No system-under-test workload; package tests only."
+        },
+        "earlier_sdk": "Pre-fix SDK container e45af037 ran during the prior few minutes; exact evidence remains with the reporting agent. No exact interval is inferred here.",
+        "next_builder_budget": {
+          "cpu_limit": 2,
+          "memory_limit_bytes": 4294967296,
+          "status": "Announced; actual interval will be recorded separately."
+        },
+        "scope": "Diagnostic functional recovery only, without normalized capacity comparisons."
+      }
+    },
+    {
+      "raw_file": "results/qualification-20261122-native-copy/co-tenancy-addendum-1795329360793034000.json",
+      "report": {
+        "recorded_utc_ns": 1795329360793037000,
+        "source": "Rust sibling agent supplied the earlier SDK interval after the prior addendum.",
+        "completed_earlier_sdk": {
+          "container_prefix": "e45af037",
+          "cpu_limit": 1,
+          "memory_limit_bytes": 2147483648,
+          "swap_limit_bytes": 0,
+          "network": "none",
+          "started_utc": "2026-11-22T06:29:53.946637051Z",
+          "finished_utc": "2026-11-22T06:30:00.140465929Z",
+          "started_utc_ns": 1795328993946637051,
+          "finished_utc_ns": 1795329000140465929,
+          "exit_code": 0
+        },
+        "cleanup": "Both SDK containers were reported verified stopped/removed; raw evidence retained by that agent.",
+        "scope": "Co-tenancy timeline correction/addition only; original headers and workload settings remain unchanged."
+      }
+    },
+    {
+      "raw_file": "results/qualification-20261122-native-copy/co-tenancy-addendum-1795329452794244000.json",
+      "report": {
+        "recorded_utc_ns": 1795329452794248000,
+        "source": "Rust sibling agent report; original headers unchanged.",
+        "builder": {
+          "container_id_prefix": "d214ee48433",
+          "started_utc": "2026-11-22T06:36:31.231880138Z",
+          "started_utc_ns": 1795329391231880138,
+          "cpu_limit": 2,
+          "memory_limit_bytes": 4294967296,
+          "swap_limit_bytes": 0,
+          "max_parallelism": 1,
+          "status": "Running; stop timestamp not yet supplied.",
+          "work": "Offline canonical image compilation/preflight, no system-under-test workload."
+        },
+        "scope": "Functional diagnostics under declared co-tenancy, not a normalized capacity benchmark."
+      }
+    },
+    {
+      "raw_file": "results/qualification-20261122-native-copy/co-tenancy-addendum-1795329673317687000.json",
+      "report": {
+        "recorded_utc_ns": 1795329673317690000,
+        "source": "Rust sibling agent report; original environment headers unchanged.",
+        "completed_builder": {
+          "container_id_prefix": "d214ee48433",
+          "started_utc": "2026-11-22T06:36:31.231880138Z",
+          "finished_utc": "2026-11-22T06:40:40.580126420Z",
+          "started_utc_ns": 1795329391231880138,
+          "finished_utc_ns": 1795329640580126420,
+          "cpu_limit": 2,
+          "memory_limit_bytes": 4294967296,
+          "swap_limit_bytes": 0,
+          "max_parallelism": 1,
+          "exit_code": 0,
+          "stopped": true,
+          "pid": 0,
+          "oom_killed": false,
+          "scope": "Canonical image build/tests only; no system-under-test workload."
+        },
+        "announced_followup": "Small runtime/CLI guards at1CPU2GiB/networknone; no exact interval or completion supplied yet.",
+        "scope": "Declared co-tenancy for functional diagnostics, without normalized capacity claims."
+      }
+    },
+    {
+      "raw_file": "results/qualification-20261122-native-copy/co-tenancy-addendum-1795329862566885000.json",
+      "report": {
+        "recorded_utc_ns": 1795329862566888000,
+        "source": "Rust sibling agent report; original headers unchanged.",
+        "completed_final_offline_probe": {
+          "cpu_limit": 1,
+          "memory_limit_bytes": 2147483648,
+          "network": "none",
+          "started_utc": "2026-11-22T06:41:32.780074889Z",
+          "finished_utc": "2026-11-22T06:41:33.148027833Z",
+          "started_utc_ns": 1795329692780074889,
+          "finished_utc_ns": 1795329693148027833,
+          "exit_code": 0
+        },
+        "cleanup": "All sibling build/probe child containers and dedicated builder were reported stopped/removed; runner image retained. No other system-under-test case ran.",
+        "scope": "Functional recovery diagnostics with declared transient compilation co-tenancy; no normalized capacity comparison."
+      }
+    }
+  ],
+  "post_promotion_up_rejection": {
+    "passed": true,
+    "return_code": 2,
+    "utc_ns": 1795330192110948000,
+    "reason": "Exact expected promoted-standby guard rejected stale-primary startup before provisioning/mutations."
+  },
+  "post_down_native_fences": {
+    "passed": true,
+    "nodes": {
+      "primary": {
+        "main_pid": "0",
+        "service": "inactive",
+        "processes": {
+          "helpers": [],
+          "servers": [],
+          "termination": [],
+          "healthy_proc_listing": true,
+          "expected": null,
+          "fenced": false
+        },
+        "boot_id": "c83f22ca-72a9-4bb4-ac0e-c63ad755cd33"
+      },
+      "standby": {
+        "main_pid": "0",
+        "service": "inactive",
+        "processes": {
+          "helpers": [],
+          "servers": [],
+          "termination": [],
+          "healthy_proc_listing": true,
+          "expected": null,
+          "fenced": false
+        },
+        "boot_id": "182d60b9-fc21-41c0-b26f-bffaf5c614ed"
+      }
+    }
+  },
+  "cleanup": {
+    "passed": true,
+    "utc_ns": 1795331110053275000,
+    "healthy_teardown_listing": {
+      "containers": [],
+      "volumes": [],
+      "networks": [],
+      "built_image_tag": [],
+      "passed": true
+    },
+    "generated_keys_absent": true,
+    "unrelated_inbox_containers_unchanged": 9,
+    "host_free_bytes": 14875262976,
+    "source_sha256_unchanged": true
+  },
+  "previous_failed_attempt": {
+    "status": "failed-but-archived",
+    "passed": false,
+    "report": "VERIFIER_FAILURE_RESULTS.json"
+  },
+  "limits": "One physical host, QEMU TCG, beta Quack, manual asynchronous recovery. Physical power loss, independent-host durability, repeated performance comparisons, pressure, network partitions, upgrades and independent backup/restore are unrun. Legacy disk/replica paths still lack continuous independent readers and pre-request intent journals.",
+  "external_results_storage": {
+    "recorded_utc_ns": 1795331567567336000,
+    "files": 140,
+    "logical_bytes": 618034565,
+    "allocated_file_blocks_bytes": 637538304,
+    "scope": "Ignored host results after lifecycle. Separate from guest ZFS referenced bytes and /state qcow allocation. File allocation metadata is not physical-device IO."
+  },
+  "measurement_boundaries": [
+    "CPU utilization uses one core = 100%, with unavailable/reset intervals excluded. Memory is charged cgroup memory, not application RSS.",
+    "Block counters describe the Docker virtual storage path, not host physical disk IO. Controller counters are unavailable, not zero.",
+    "storage_peak_* is limited to /state VM disk files; controller zeros mean no such files, not no host bind writes. Host result-file footprint is recorded separately.",
+    "Native ZFS compression includes DB/WAL and legacy plus live tables. CSV gzip is off-path and covers only the live export; these layers are not directly comparable."
+  ],
+  "post_qualification_addenda": [
+    {
+      "raw_file": "results/qualification-20261122-native-copy/post-qualification-co-tenancy-1795330986953309000.json",
+      "report": {
+        "recorded_utc_ns": 1795330986953312000,
+        "source": "Rust sibling agent report.",
+        "builder": {
+          "started_utc": "2026-11-22T06:55:06.788871210Z",
+          "started_utc_ns": 1795330506788871210,
+          "cpu_limit": 2,
+          "memory_limit_bytes": 4294967296,
+          "swap_limit_bytes": 0,
+          "max_parallelism": 1
+        },
+        "iceberg_make_up_started_utc": "2026-11-22T06:58:41.761606Z",
+        "iceberg_make_up_started_utc_ns": 1795330721761606000,
+        "scope": "Reported post-qualification preparation during this example cleanup/publication. No change to frozen source, original run headers, workload knobs or data verdicts."
+      }
+    },
+    {
+      "raw_file": "results/qualification-20261122-native-copy/post-qualification-co-tenancy-1795331752383749000.json",
+      "report": {
+        "recorded_utc_ns": 1795331752383752000,
+        "source": "Rust sibling agent final report.",
+        "completed_builder": {
+          "started_utc": "2026-11-22T06:55:06.788871210Z",
+          "finished_utc": "2026-11-22T07:01:22.309579675Z",
+          "started_utc_ns": 1795330506788871210,
+          "finished_utc_ns": 1795330882309579675,
+          "cpu_limit": 2,
+          "memory_limit_bytes": 4294967296,
+          "swap_limit_bytes": 0,
+          "max_parallelism": 1,
+          "stopped": true
+        },
+        "make_up_started_utc": "2026-11-22T06:58:41.761606Z",
+        "make_up_finished_utc": "2026-11-22T07:01:21.973001Z",
+        "completed_offline_probe": {
+          "started_utc_ns": 1795330934110044380,
+          "finished_utc_ns": 1795330934460297380,
+          "cpu_limit": 1,
+          "memory_limit_bytes": 2147483648,
+          "network": "none",
+          "exit_code": 0
+        },
+        "scope": "Post-qualification preparation during cleanup/publication; not part of the completed recovery matrix."
+      }
+    }
+  ]
+}

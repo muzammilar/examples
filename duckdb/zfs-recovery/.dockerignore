@@ -1,3 +1,5 @@
-state/
 results/
+state/
+__pycache__/
 **/__pycache__/
+*.pyc

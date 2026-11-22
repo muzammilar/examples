@@ -1,6 +1,7 @@
 """Orchestrate owned VM storage, independent DuckDB clients and recovery checks."""
 
 import concurrent.futures
+import hashlib
 import json
 import multiprocessing as mp
 import os
@@ -12,6 +13,7 @@ import subprocess
 import sys
 import tempfile
 import time
+import uuid
 
 import duckdb
 
@@ -38,6 +40,7 @@ SSH = [
     "2222",
 ]
 NODES = ("primary", "standby")
+ARC_MAX = 256 * 1024**2
 
 
 def ssh_args(node, command):
@@ -66,7 +69,7 @@ def integer(name, default, minimum=1):
 
 def save(name, value):
     RESULTS.mkdir(exist_ok=True)
-    with (RESULTS / (name + ".json")).open("w") as f:
+    with (RESULTS / (name + ".json")).open("x") as f:
         json.dump(value, f, indent=2)
         f.write("\n")
         f.flush()
@@ -101,7 +104,31 @@ def ready(node, timeout=90):
     raise RuntimeError(f"{node} Quack not ready: {last}")
 
 
+def configure_arc(node):
+    ssh(
+        node,
+        f"""
+expected='options zfs zfs_arc_max={ARC_MAX}'
+previous=$(if test -f /etc/modprobe.d/ducklab-zfs.conf; then cat /etc/modprobe.d/ducklab-zfs.conf; fi)
+if test "$previous" != "$expected"; then
+  printf '%s\\n' "$expected" > /etc/modprobe.d/ducklab-zfs.conf
+  update-initramfs -u
+fi
+mkdir -p /etc/systemd/system/ducklab.service.d
+cat > /etc/systemd/system/ducklab.service.d/arc.conf <<'UNIT'
+[Service]
+ExecStartPre=/bin/sh -ec 'echo {ARC_MAX} > /sys/module/zfs/parameters/zfs_arc_max'
+UNIT
+printf '%s' {ARC_MAX} > /sys/module/zfs/parameters/zfs_arc_max
+test "$(cat /sys/module/zfs/parameters/zfs_arc_max)" = {ARC_MAX}
+systemctl daemon-reload
+""",
+        timeout=600,
+    )
+
+
 def start_server(node):
+    configure_arc(node)
     ssh(node, "systemctl start ducklab.service")
     ready(node)
 
@@ -118,6 +145,23 @@ def provision():
             "standby was promoted; use the complete clean lifecycle rather than restarting the stale primary"
         )
     for node in NODES:
+        expected_server = hashlib.sha256(
+            Path("/opt/lab/app/server.py").read_bytes()
+        ).hexdigest()
+        retained = ssh(
+            node,
+            "if test -x /opt/venv/bin/python && test -f /opt/ducklab/server.py && test -f /etc/systemd/system/ducklab.service; then /opt/venv/bin/python -c 'import duckdb; print(duckdb.__version__)'; zfs version; sha256sum /opt/ducklab/server.py; fi",
+        )
+        if (
+            retained.startswith("1.5.5\nzfs-2.2.2-0ubuntu9.5\n")
+            and expected_server in retained
+        ):
+            configure_arc(node)
+            healthy_pool(node)
+            print(
+                f"{node}: verified retained pinned runtime and healthy pool", flush=True
+            )
+            continue
         print(f"{node}: installing offline runtime and ZFS packages", flush=True)
         # The artifacts are pinned and installed once in the image, then copied offline.
         files = [
@@ -175,9 +219,10 @@ systemctl daemon-reload
             timeout=600,
         )
         print(f"{node}: pool and service definition ready", flush=True)
+        configure_arc(node)
     start_server("primary")
     save(
-        "versions",
+        "versions-" + uuid.uuid4().hex,
         {
             node: ssh(
                 node,
@@ -199,11 +244,26 @@ def reset():
         raise RuntimeError(
             "previous failover retained; run docker-down then docker-up/up for a fresh test"
         )
+    # Independent fixtures may change between cases, but their acknowledged data
+    # must not disappear to make the next test pass. Retain complete native
+    # datasets (including failed state and snapshots) until guarded teardown.
+    generation = uuid.uuid4().hex
     for node in NODES:
-        ssh(
-            node,
-            "systemctl stop ducklab.service; if zfs list ducklab/readcopy >/dev/null 2>&1; then zfs destroy -r ducklab/readcopy; fi; if zfs list ducklab/data >/dev/null 2>&1; then zfs destroy -r ducklab/data; fi",
-        )
+        ssh(node, "systemctl stop ducklab.service")
+        for dataset in ("readcopy", "data"):
+            target = f"ducklab/retained-{dataset}-{generation}"
+            ssh(
+                node,
+                f"if zfs list ducklab/{dataset} >/dev/null 2>&1; then zfs rename ducklab/{dataset} {target}; fi",
+            )
+    save(
+        "retained-" + generation,
+        {
+            "nodes": NODES,
+            "generation": generation,
+            "scope": "Native previous datasets renamed, not destroyed; same-pool retention is not an independent backup.",
+        },
+    )
     ssh("primary", "zfs create ducklab/data")
     start_server("primary")
     with connect("primary") as c:
@@ -219,7 +279,7 @@ def reset():
 def writer(node, lo, hi, worker, clients, batch, customers, delay, label):
     path = RESULTS / f"{label}-{worker}.jsonl"
     failures = []
-    with path.open("w") as journal:
+    with path.open("x") as journal:
         try:
             with connect(node) as c:
                 for first in range(lo + worker * batch, hi, clients * batch):
@@ -265,7 +325,7 @@ def writer(node, lo, hi, worker, clients, batch, customers, delay, label):
 def spawn(node, lo, hi, label, delay):
     for p in RESULTS.glob(label + "-*"):
         if re.fullmatch(re.escape(label) + r"-\d+(?:-errors)?\.(?:jsonl|json)", p.name):
-            p.unlink()
+            raise RuntimeError("refuse to overwrite earlier witness: " + str(p))
     clients = integer("CLIENTS", 4)
     if clients > 8:
         raise ValueError("CLIENTS must be 1..8 for this resource-limited lab")
@@ -545,6 +605,7 @@ def disk_test():
     save(
         "disk-test",
         {
+            "dataset_guid": ssh("primary", "zfs get -Hp -o value guid ducklab/data"),
             "before": before,
             "degraded": degraded,
             "after": healthy_pool("primary"),

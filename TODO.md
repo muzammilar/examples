@@ -5,10 +5,10 @@ Candidate databases and systems to add as examples. Branch names follow the exis
 
 ## Break and recover: all existing and future examples
 
-**Current goal priority (2026-11-22):** finish and publish the active DuckDB/ZFS
-full lifecycle; the ZFS repair-reader and Rust embedded follow-ups now pass and
-are documented below. Then focus on **Tigris, DuckDB and Iceberg-related
-projects** before other systems. Investigate production operations, failure mechanisms and verified
+**Current goal priority (2026-11-22):** the fresh DuckDB/ZFS full lifecycle,
+ZFS repair-reader and Rust embedded follow-ups now pass and are documented below.
+Continue with **Tigris, DuckDB and Iceberg-related projects** before other systems.
+Investigate production operations, failure mechanisms and verified
 recovery, with matched comparisons after correctness/recovery gates pass.
 
 **Local-only scope:** all current tests use isolated Docker/Compose services and
@@ -288,7 +288,8 @@ Planned as a `mysql/` folder, mirroring the Postgres section with the same `orde
 - [x] Rayforce [AOF segment recovery boundaries](rayforce/duckdb-comparison/AOF_SEGMENTS.md): 159 native segments, complete 10,000/10,003-body rotation/reopen/backup checks, exact known three-byte tail handling and full-scan rejection of sealed CRC damage. Native open alone misses sealed corruption; deleting the tail loses 46/49 ACK bodies and the external witness rejects. CPU/memory/compression/disk/I/O and per-operation timings recorded. Expected-loss diagnostic, not a pass for existing strict integrity failures, physical disk loss or live availability.
 - [ ] Rayforce/DuckDB: repeated alternating recovery-performance trials, asynchronous journal/watermark recovery, interrupted snapshot replacement, compressed journal frames, AOF live concurrent scan/process-crash and interrupted rotation, missing first/interior segments, online backup/restore, pressure, prepared SQL and genuinely cold persisted-query matrices.
 
-- [x] `duckdb-zfs-recovery`: four Quack clients, real ZFS snapshot replication, interrupted receive/resume, read-only clones and fenced-primary promotion with measured asynchronous loss.
+- [x] [`duckdb-zfs-recovery`](duckdb/zfs-recovery/FULL_SUITE_RESULTS.json): fresh five-command lifecycle passes; continuous guest-crash recovery verifies 2,000,000 seed + 323,000 acknowledged rows and 180 independent reads with zero missing/wrong/partial bodies. The full disk/crash/replica/archive sequence verifies 7,453,000 exported bodies across copies and preserves all 30,000 source acknowledgements absent from the asynchronous standby. Effective 256 MiB ARC persists across reboot; all owned resources are removed. CPU/memory/compression/disk/I/O evidence and earlier failures remain explicit. Quack overrides the requested HTTP timeout, so no three-second RPC deadline, capacity comparison or complete production qualification is claimed.
+- [ ] DuckDB/ZFS deeper pass: isolate Quack connection/query/fetch/close timings and qualify a supervised deadline with ambiguous-write reconciliation; add further dependency/pressure/restore and retention cases. Keep physical host-loss durability and repeated fair recovery-performance comparisons unqualified.
 - [x] [ZFS storage recovery follow-up](zfs/storage-lab/): default 4 MiB/s five-command lifecycle, full mirror/RAIDZ2/replication suite, 157/140 complete immutable-body reads during recovery, verified 512 MiB payloads, clean scrubs, guarded native pool archives and scoped teardown. Thirty-five controls pass; CPU/memory/compression/disk-byte/IOPS observations published. Earlier explicit-rate checkpoint and archive-checker/Python-prerequisite failures remain separate; stream validation is not restore qualification.
 - [ ] ZFS deeper pass: restore the preserved native streams, add continuous replication observation and per-flush external acknowledgements, and exercise guest restart/configuration persistence, bounded pressure and further loss combinations. Current Tigris/DuckDB/Iceberg priorities come first.
 

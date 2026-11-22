@@ -1,0 +1,38 @@
+{
+  "backend": "DuckDB1.5.5 with Quack c154811 on mirrored OpenZFS2.2.2",
+  "operations": [
+    "atomic append batch",
+    "exact acknowledged recent and historical point reads",
+    "ordered full-body export"
+  ],
+  "consistency": "Each remote SQL statement executes inside the single DuckDB owner. Readers require exact bodies of already acknowledged immutable keys. This is not a general linearizability or SQL isolation-anomaly qualification.",
+  "atomicity": "One INSERT SELECT statement per uniquely identified batch; zero or all expected rows may be present after an ambiguous response.",
+  "idempotency": "No mutation retries. Each new attempt gets a disjoint ID range; failed or ambiguous ranges are retained and reconciled.",
+  "durability": "Native default DuckDB WAL synchronization and ZFS sync=standard. Retained virtual-disk guest power-cut recovery must lose zero acknowledged rows. No claim about physical host power-loss durability.",
+  "retry_policy": "http_retries=0; http_timeout=3 seconds. Persistent native client instances are discarded after errors; fresh connection establishment is attempted for new requests. No server-side dedup assumption. Administrative seed/export uses300 seconds, separately recorded; this does not change live-operation deadlines.",
+  "reference_load": {
+    "seed_rows": 2000000,
+    "customers": 10000,
+    "writer_processes": 4,
+    "rows_per_batch": 1000,
+    "writer_delay_seconds": 0.5,
+    "reader_processes": 1,
+    "reader_delay_seconds": 0.2
+  },
+  "data": "Deterministic IDs, customer=id%customers, amount=id%10000+1,64-character lowercase SHA256 of decimal ID, batch start/end. No nulls. SQL generates payloads; this is not application-byte upload throughput.",
+  "topology": "One active primary QEMU guest(2CPU/3GiB container;2vCPU/1536MiB guest;512MB DuckDB;256MiB ZFS ARC). Provisioned standby is stopped and does not replicate this profile's table. Workload controller has2CPU/1GiB, swap disabled.",
+  "expected_phases": {
+    "baseline": "Independent readers and all writer processes remain alive; require observed successful reads and writes before injection.",
+    "fault": "QMP quit stops the exact owned QEMU process. Host verifies stopped Docker runtime state and PID0, then holds at least5 seconds before restarting it. Readers and writers continue submitting; errors/ambiguous outcomes are expected.",
+    "native-recovery": "Same owned disks reopen on a changed guest boot ID. Pool is healthy and native DuckDB WAL recovery finishes. Actors retain process identity and reconnect. Effective zfs_arc_max and c_max must remain268435456 bytes after boot and after owner startup; drift fails qualification.",
+    "recovered": "Require new successful reads/writes for at least10 seconds. Reconcile all2m seed rows and every attempted/acknowledged batch, with zero wrong, partial, duplicate or missing acknowledged rows. Re-export and independently reconcile earlier same-dataset case tables before cleanup.",
+    "configuration": "Persist256MiB ZFS ARC option in the owned guest module configuration/initramfs and service pre-start hook; verify effective maximum before any workload. Record stable dataset GUID and retain prior same-dataset case tables."
+  },
+  "limits": [
+    "One host and shared Docker storage",
+    "QEMU TCG software emulation",
+    "Quack beta release",
+    "Functional co-tenancy permitted and recorded; no capacity ranking",
+    "No replicated HA, disk-loss, partition, pressure, SQL mutation/isolation or restore qualification in this profile"
+  ]
+}

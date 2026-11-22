@@ -1,0 +1,403 @@
+{
+  "passed": false,
+  "status": "failed-but-archived",
+  "date_utc": "2026-11-22T06:07:45Z",
+  "raw_directory": "results/production-20261122",
+  "failure": {
+    "stage": "verify-archives",
+    "mechanism": "Guest Python CSV rendering exceeded the 600-second SSH deadline. The remote exporter survived the SSH timeout and required explicit fencing; disk, crash and replica checks passed individually.",
+    "steps": [
+      {
+        "target": "disk-test",
+        "wall_ns": 135428947750,
+        "exit_code": 0
+      },
+      {
+        "target": "crash-test",
+        "wall_ns": 538252212959,
+        "exit_code": 0
+      },
+      {
+        "target": "replica-test",
+        "wall_ns": 488573396042,
+        "exit_code": 0
+      },
+      {
+        "target": "verify-archives",
+        "wall_ns": 903099225750,
+        "exit_code": 2
+      }
+    ]
+  },
+  "original_source_sha256": {
+    ".dockerignore": "8f982650f8a329f8170d8956b06ee2c9f0b75639603c75e738df65c7eafa5506",
+    "Makefile": "043655eb5386083e697ac022073d62b228d73d9166f9a98fd351afb78bc9937a",
+    "app/archive_guest.py": "b949a84b70f9178a403216bd1e6671cdd0d18c482516eb1ec2ba10354cce36be",
+    "app/archive_verify.py": "602eff84148d5cc56b69fe29cf1d551b4ed70179553ae51c0a01162267bde02c",
+    "app/history.py": "ea9513bd1d323aef4a27406792d33ccf17b3fff65e38b7ebfd2a873e5b7ebdb5",
+    "app/lab.py": "eb37736e1e4f04f221e185ba6bb30f7df3f075ec6cf2fa2860bb9115d6206f90",
+    "app/live.py": "e596517403baf544bdc1b92e6c13a448ad29bb6e79f54ebd6e98bdfa792e3718",
+    "app/server.py": "8aa6f2abbbd5a5a8560d9234e23058f81e05ef6307aca85303277403b931cf2f",
+    "app/test_history.py": "d9925d600f6924473513800bcd93956de565847c9314eedae17c64d5565171ee",
+    "docker-compose.yml": "6660706d766c67c6ee113fc9f9b89fdcf87398c71c7660e108b69683a544b31f",
+    "live-contract.json": "bf1f781b54dc813a2a2e03f8346f80f581ff6b6f4ea04c267c993b753150318f",
+    "production.py": "9d0e530fac8294f22df7a5f010a148685041e8aca7f2a3888a703e6ff0bd9c05",
+    "vm/Dockerfile": "d8c9acd87d1a323a3884a6ce29e0fb7a7b9435ebeae7b65f0ea4bd5a2ce63ef5",
+    "vm/boot.py": "7663d6f122cfb36c9037c0177f7712317c33e1837f3bc78654f92b6cde3eb6ca"
+  },
+  "preservation": {
+    "source_files_verified_against_original_freeze": 14,
+    "sealed_failure_files": 43,
+    "partial_csv_files": [
+      {
+        "path": "/tmp/ducklab-export-e3ffc42b4dda47928af7ba52c51e0856/live_3ada336c8d5f4fbda0287c7aa97edcab.csv",
+        "bytes": 224159329,
+        "external_path": "results/production-20261122/failed-native-export-partials/live_3ada336c8d5f4fbda0287c7aa97edcab.csv",
+        "sha256": "f0e78392fb6e415f585524bb3f00a696e3423ec264217233278e44b157585c2a"
+      },
+      {
+        "path": "/tmp/ducklab-export-e3ffc42b4dda47928af7ba52c51e0856/live_a18f147a9e4347ea8f787de667cb3320.csv",
+        "bytes": 42443328,
+        "external_path": "results/production-20261122/failed-native-export-partials/live_a18f147a9e4347ea8f787de667cb3320.csv",
+        "sha256": "389c3d0c64a024cc817f48a4e85befe9acc3626f85d4be099010ff926551e2f5"
+      }
+    ],
+    "old_export_fenced": {
+      "passed": true,
+      "before": {
+        "pid": 1223,
+        "start_ticks": "29428",
+        "state": "R",
+        "argv": [
+          "/opt/venv/bin/python",
+          "/tmp/ducklab-archive-e3ffc42b4dda47928af7ba52c51e0856.py",
+          "export",
+          "/srv/ducklab/verify-e3ffc42b4dda47928af7ba52c51e0856/events.duckdb",
+          "/tmp/ducklab-export-e3ffc42b4dda47928af7ba52c51e0856",
+          "live_3ada336c8d5f4fbda0287c7aa97edcab",
+          "live_a18f147a9e4347ea8f787de667cb3320"
+        ]
+      },
+      "after": {
+        "pid": 1223,
+        "start_ticks": "29428",
+        "state": "Z",
+        "argv": []
+      },
+      "sigterm_sent": true,
+      "expected": {
+        "pid": 1223,
+        "start_ticks": "29428",
+        "state": "R",
+        "argv": [
+          "/opt/venv/bin/python",
+          "/tmp/ducklab-archive-e3ffc42b4dda47928af7ba52c51e0856.py",
+          "export",
+          "/srv/ducklab/verify-e3ffc42b4dda47928af7ba52c51e0856/events.duckdb",
+          "/tmp/ducklab-export-e3ffc42b4dda47928af7ba52c51e0856",
+          "live_3ada336c8d5f4fbda0287c7aa97edcab",
+          "live_a18f147a9e4347ea8f787de667cb3320"
+        ],
+        "open_files": {
+          "0": "pipe:[10765]",
+          "1": "pipe:[10766]",
+          "2": "pipe:[10767]",
+          "3": "/srv/ducklab/verify-e3ffc42b4dda47928af7ba52c51e0856/events.duckdb",
+          "4": "/tmp/ducklab-export-e3ffc42b4dda47928af7ba52c51e0856/live_3ada336c8d5f4fbda0287c7aa97edcab.csv"
+        }
+      },
+      "partial_files": [
+        {
+          "path": "/tmp/ducklab-export-e3ffc42b4dda47928af7ba52c51e0856/live_3ada336c8d5f4fbda0287c7aa97edcab.csv",
+          "bytes": 224159329
+        },
+        {
+          "path": "/tmp/ducklab-export-e3ffc42b4dda47928af7ba52c51e0856/live_a18f147a9e4347ea8f787de667cb3320.csv",
+          "bytes": 42443328
+        }
+      ],
+      "proc_listing_succeeded": true,
+      "utc_ns": 1795325431499730000
+    },
+    "retirement_native_fences": {
+      "passed": true,
+      "nodes": {
+        "primary": {
+          "main_pid": "0",
+          "service": "inactive",
+          "processes": {
+            "helpers": [],
+            "servers": [],
+            "termination": [],
+            "healthy_proc_listing": true,
+            "expected": null,
+            "fenced": false
+          },
+          "boot_id": "9f074581-48bc-4191-8678-36df2b4bdf4f"
+        },
+        "standby": {
+          "main_pid": "0",
+          "service": "inactive",
+          "processes": {
+            "helpers": [],
+            "servers": [],
+            "termination": [],
+            "healthy_proc_listing": true,
+            "expected": null,
+            "fenced": false
+          },
+          "boot_id": "b2ece539-3f64-4bee-b150-0a03664d6879"
+        }
+      }
+    }
+  },
+  "continuous_case": {
+    "case": "9f3a42fd0afd4ef8b15404e1de188bfd",
+    "proof": {
+      "rows_verified": 2332000,
+      "seed_rows_verified": 2000000,
+      "mutation_intents": 1670,
+      "acknowledged_batches": 332,
+      "acknowledged_rows": 332000,
+      "applied_unacknowledged_batches": 0,
+      "acknowledged_missing": 0,
+      "wrong_duplicate_partial_or_unexpected_rows": 0,
+      "successful_reads_verified": 182,
+      "csv_bytes": 219572627,
+      "csv_sha256": "b082c8849d18adeaaf46749a1cc5558fd8ffde5f0162d93b66b11c7f9e85f65a",
+      "gzip1": {
+        "compressed_bytes": 109025077,
+        "ratio": 2.0139644294862546,
+        "wall_ns": 1644056751,
+        "cpu_ns": 1465330776,
+        "scope": "Off-path exported CSV gzip1, including file reads. Not engine or ZFS compression."
+      }
+    }
+  },
+  "replacement_archive": {
+    "passed": true,
+    "historical_cases": [
+      {
+        "case": "3ada336c8d5f4fbda0287c7aa97edcab",
+        "proof": {
+          "rows_verified": 2378000,
+          "seed_rows_verified": 2000000,
+          "mutation_intents": 1775,
+          "acknowledged_batches": 377,
+          "acknowledged_rows": 377000,
+          "applied_unacknowledged_batches": 1,
+          "acknowledged_missing": 0,
+          "wrong_duplicate_partial_or_unexpected_rows": 0,
+          "successful_reads_verified": 210,
+          "csv_bytes": 224159329,
+          "csv_sha256": "f0e78392fb6e415f585524bb3f00a696e3423ec264217233278e44b157585c2a"
+        },
+        "configuration_failed": false
+      },
+      {
+        "case": "a18f147a9e4347ea8f787de667cb3320",
+        "proof": {
+          "rows_verified": 2374000,
+          "seed_rows_verified": 2000000,
+          "mutation_intents": 1396,
+          "acknowledged_batches": 374,
+          "acknowledged_rows": 374000,
+          "applied_unacknowledged_batches": 0,
+          "acknowledged_missing": 0,
+          "wrong_duplicate_partial_or_unexpected_rows": 0,
+          "successful_reads_verified": 208,
+          "csv_bytes": 223763763,
+          "csv_sha256": "97e6dc126a981fce9ca3cf08ba8d5ae9e32a8d915792fcd4acb88588d9d19e4e"
+        },
+        "configuration_failed": true
+      },
+      {
+        "case": "9f3a42fd0afd4ef8b15404e1de188bfd",
+        "proof": {
+          "rows_verified": 2332000,
+          "seed_rows_verified": 2000000,
+          "mutation_intents": 1670,
+          "acknowledged_batches": 332,
+          "acknowledged_rows": 332000,
+          "applied_unacknowledged_batches": 0,
+          "acknowledged_missing": 0,
+          "wrong_duplicate_partial_or_unexpected_rows": 0,
+          "successful_reads_verified": 182,
+          "csv_bytes": 219572627,
+          "csv_sha256": "b082c8849d18adeaaf46749a1cc5558fd8ffde5f0162d93b66b11c7f9e85f65a"
+        },
+        "configuration_failed": false
+      },
+      {
+        "case": "legacy-disk",
+        "proof": {
+          "rows_verified": 2000000,
+          "acknowledged_rows": 2000000,
+          "missing_acknowledged_by_label": {},
+          "applied_unacknowledged_batches": 0,
+          "wrong_duplicate_or_partial_rows": 0,
+          "csv_sha256": "1a30e7203979046b4b19f6ced3159593480349be9c0151568213770ee6b05b4a",
+          "csv_bytes": 66225747
+        }
+      }
+    ],
+    "fenced_primary_source": {
+      "rows_verified": 1520000,
+      "acknowledged_rows": 1520000,
+      "missing_acknowledged_by_label": {},
+      "applied_unacknowledged_batches": 0,
+      "wrong_duplicate_or_partial_rows": 0,
+      "csv_sha256": "33d5e466d766f142994f3ff6784c8eaa1808011c9ab89b1d8af21353b098adc9",
+      "csv_bytes": 49532115
+    },
+    "promoted_standby": {
+      "rows_verified": 1600000,
+      "acknowledged_rows": 1620000,
+      "missing_acknowledged_by_label": {
+        "fault": 20000
+      },
+      "applied_unacknowledged_batches": 0,
+      "wrong_duplicate_or_partial_rows": 0,
+      "csv_sha256": "f47cbe8a7d08df2c2d202e0cd7a2174e968717f1077fc19749d64323d8d74937",
+      "csv_bytes": 52314387
+    },
+    "dataset_guid_by_name": {
+      "ducklab/data": "11930229928737479124",
+      "ducklab/retained-data-5ef60289460c45f085a6a303a4a091bf": "7692909777724719768",
+      "ducklab/retained-data-cae060dcb33c43cd81c2407412fada1a": "18295468110543166464"
+    },
+    "source_sha256": {
+      "archive_verify.py": "742a88b3fca6f290a39c6ccd7e3fd9ea6205547e62203cc9c1803451279a183f",
+      "archive_guest.py": "50bcb0202824cb492e78632ca326b2e0c711c5312bb23f92f56de4ac5219f9a6",
+      "export_csv.py": "d394b8292e39cae46fe7e9ffa681c07f9c7c468fd9e089504a2d161aef24e192",
+      "history.py": "ea9513bd1d323aef4a27406792d33ccf17b3fff65e38b7ebfd2a873e5b7ebdb5",
+      "lab.py": "eb37736e1e4f04f221e185ba6bb30f7df3f075ec6cf2fa2860bb9115d6206f90"
+    }
+  },
+  "failed_pipeline_resources": {
+    "primary": {
+      "samples": 1738,
+      "unavailable_samples": 35,
+      "observed_cpu_core_seconds": 2607.869994,
+      "observed_user_cpu_core_seconds": 2580.716649,
+      "observed_system_cpu_core_seconds": 27.153347,
+      "observed_cpu_percent_one_core_100": 129.0197198575158,
+      "peak_sampled_cpu_percent_one_core_100": 200.93577988140044,
+      "counter_resets_excluded": 2,
+      "memory_mean_bytes": 2410499391.285966,
+      "memory_sampled_max_bytes": 3084234752,
+      "native_memory_peak_bytes": 3085393920,
+      "block_io_by_device_counter": {
+        "254:0:rbytes": {
+          "observed_delta": 1585837056,
+          "observed_seconds": 2021.2956568809996,
+          "per_second": 784564.6185412862
+        },
+        "254:0:wbytes": {
+          "observed_delta": 1410436096,
+          "observed_seconds": 2021.2956568809996,
+          "per_second": 697788.1198124185
+        },
+        "254:0:rios": {
+          "observed_delta": 30635,
+          "observed_seconds": 2021.2956568809996,
+          "per_second": 15.156120231946645
+        },
+        "254:0:wios": {
+          "observed_delta": 48504,
+          "observed_seconds": 2021.2956568809996,
+          "per_second": 23.996489496665255
+        },
+        "254:0:dbytes": {
+          "observed_delta": 0,
+          "observed_seconds": 2021.2956568809996,
+          "per_second": 0.0
+        },
+        "254:0:dios": {
+          "observed_delta": 0,
+          "observed_seconds": 2021.2956568809996,
+          "per_second": 0.0
+        }
+      },
+      "storage_peak_logical_bytes": 2102114862,
+      "storage_peak_allocated_bytes": 2102149120
+    },
+    "standby": {
+      "samples": 1738,
+      "unavailable_samples": 458,
+      "observed_cpu_core_seconds": 1454.086827,
+      "observed_user_cpu_core_seconds": 1440.867105,
+      "observed_system_cpu_core_seconds": 13.219723,
+      "observed_cpu_percent_one_core_100": 95.30293792557585,
+      "peak_sampled_cpu_percent_one_core_100": 200.6982501614719,
+      "counter_resets_excluded": 1,
+      "memory_mean_bytes": 2106711075.2,
+      "memory_sampled_max_bytes": 2549329920,
+      "native_memory_peak_bytes": 2549329920,
+      "block_io_by_device_counter": {
+        "254:0:rbytes": {
+          "observed_delta": 327455744,
+          "observed_seconds": 1525.7523625720005,
+          "per_second": 214619.19511499186
+        },
+        "254:0:wbytes": {
+          "observed_delta": 207028224,
+          "observed_seconds": 1525.7523625720005,
+          "per_second": 135689.26981768335
+        },
+        "254:0:rios": {
+          "observed_delta": 11719,
+          "observed_seconds": 1525.7523625720005,
+          "per_second": 7.680800821599238
+        },
+        "254:0:wios": {
+          "observed_delta": 23974,
+          "observed_seconds": 1525.7523625720005,
+          "per_second": 15.71290373726599
+        },
+        "254:0:dbytes": {
+          "observed_delta": 0,
+          "observed_seconds": 1525.7523625720005,
+          "per_second": 0.0
+        },
+        "254:0:dios": {
+          "observed_delta": 0,
+          "observed_seconds": 1525.7523625720005,
+          "per_second": 0.0
+        }
+      },
+      "storage_peak_logical_bytes": 433109806,
+      "storage_peak_allocated_bytes": 432955392
+    },
+    "controller": {
+      "samples": 1738,
+      "unavailable_samples": 392,
+      "observed_cpu_core_seconds": 329.437933,
+      "observed_user_cpu_core_seconds": 302.709466,
+      "observed_system_cpu_core_seconds": 26.728468,
+      "observed_cpu_percent_one_core_100": 20.45925226606202,
+      "peak_sampled_cpu_percent_one_core_100": 163.1723566826233,
+      "counter_resets_excluded": 3,
+      "memory_mean_bytes": 106741723.48291233,
+      "memory_sampled_max_bytes": 535064576,
+      "native_memory_peak_bytes": 594382848,
+      "block_io_by_device_counter": null,
+      "storage_peak_logical_bytes": 0,
+      "storage_peak_allocated_bytes": 0
+    },
+    "scope": "Native Docker cgroup counters including QEMU/guest work and charged file cache. Approximately1s plus sequential docker-exec overhead; actual sample timestamps retained. Reset/initial/final partial CPU/IO intervals excluded. Disk logical sparse capacity is different from allocated bytes. Per-device bytes/operation counters cannot be summed across stacked layers. Physical disk latency/queue depth unavailable. Network and per-phase raw samples retained. Functional co-tenancy is allowed; no capacity ranking."
+  },
+  "cleanup": {
+    "containers": [],
+    "volumes": [],
+    "networks": [],
+    "built_image_tag": [],
+    "passed": true
+  },
+  "scope": "The original full make test failed. The native COPY repair re-exported and reconciled 12,204,000 bodies across six exported tables/copies, including all 20,000 acknowledged tail rows absent from the asynchronous standby. These include replicated copies, not 12 million unique logical IDs. Failure reports, configuration, exact source bytes and partial CSVs were preserved before native volume deletion. A subsequent independent fresh lifecycle is linked separately; this original attempt remains failed. These are functional diagnostics, not a capacity comparison or production qualification.",
+  "subsequent_fresh_workflow": {
+    "passed": true,
+    "report": "FULL_SUITE_RESULTS.json",
+    "scope": "New independent fixture; original failed attempt remains failed."
+  }
+}

@@ -1,4 +1,4 @@
-FROM ubuntu:24.04
+FROM ubuntu:24.04@sha256:9c7f200c07e3d4a03e7249d2c16bf66a51120fb876aa2242cf31451412543289
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends \
     qemu-system-arm qemu-efi-aarch64 qemu-utils cloud-image-utils openssh-client \
@@ -18,6 +18,9 @@ RUN apt-get update && mkdir -p /opt/zfs-debs && cd /opt/zfs-debs \
  && rm -rf /var/lib/apt/lists/*
 ARG LOCAL_UID=1000
 RUN if ! getent passwd "${LOCAL_UID}" >/dev/null; then useradd --no-create-home --uid "${LOCAL_UID}" labctl; fi
+RUN printf '%s  %s\n' \
+    '41b2b9292bfb860c5ca8c5f818f9dd7a2c6bc24f9c750cffbc3169286fe59f08' '/opt/duckdb_extensions/v1.5.5/linux_arm64/quack.duckdb_extension' \
+    'eba6e263e395a83966090f1f11ade63630b1b21422f0f2813858d179d42ea1e9' '/opt/duckdb_extensions/v1.5.5/linux_arm64/httpfs.duckdb_extension' | sha256sum --check -
 COPY vm/boot.py /opt/lab/boot.py
 COPY app /opt/lab/app
 ENTRYPOINT ["python3", "/opt/lab/boot.py"]

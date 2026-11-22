@@ -15,6 +15,19 @@ execution evidence.
 
 ## Fresh qualification in this follow-up
 
+- [DuckDB/ZFS](duckdb/zfs-recovery/FULL_SUITE_RESULTS.json): fresh five-command
+  lifecycle passed on 2026-11-22. Continuous guest-crash recovery verifies
+  **2,000,000 seed + 323,000 acknowledged rows** and 180 independent read results,
+  zero missing/wrong/partial/duplicate bodies. The complete disk/crash/replica/
+  archive sequence verifies **7,453,000 bodies across exported copies**, including
+  all **30,000 source acknowledgements** absent on the asynchronous standby.
+  Native ARC remains 256 MiB across reboot. Nineteen host controls, native CSV/
+  timeout-fencing controls, all-history replay and scoped teardown pass; CPU,
+  memory, compression, disk bytes and virtual-device IOPS are recorded. Earlier
+  ARC drift and verifier failures keep their failed verdicts. Pinned Quack source
+  overrides the requested HTTP timeout with 86,400 seconds; the observed 75.058 s
+  ambiguous operation is not a qualified three-second deadline. Full production,
+  physical host-loss and comparative performance qualification remain false.
 - [CedarDB/PostgreSQL mutable workload](cedardb/backup-recovery/MUTABLE.md):
   newer million-row healthy/SIGKILL qualification verifies **2,972 ACKed
   transactions**, zero acknowledged loss or wrong/partial rows, full seed/body/
@@ -385,7 +398,7 @@ Closing one fault case does not close the entire deployment matrix.
 | Iceberg multi-system | Make cluster fault path and native verifier | Stopping a member then appending/verifying is not continuous read/write observation. Add catalog/object-store/compaction commit interruption and native repair proof. |
 | ClickHouse Iceberg | Make archive failure/resume/restart paths and archive oracle | Existing export/verification hooks preserve source data and resume. Add actual dependency outages with concurrent readers; archive atomicity does not establish database HA. |
 | Trino Iceberg | `scripts/failover.sh`, heavy-query fixture | Existing worker/storage/catalog cases keep a query active, not a durable writer. Add commit ambiguity and independent reader checks for mutation scenarios. |
-| DuckDB ZFS recovery | `app/lab.py`, writers/journals and snapshot replica checks | `spawn` removes same-label journals. Preserve failed evidence and add independent reads. Keep supported single-writer service recovery distinct from unsupported shared-file multi-process writing. |
+| DuckDB ZFS recovery | `app/lab.py`, continuous `app/live.py`, durable histories, native export/fencing and guarded teardown | Fresh full lifecycle now preserves old datasets/journals and verifies continuous crash recovery plus all historical bodies before cleanup. Independent readers, persistent ARC and quantified asynchronous tail checks pass. Quack's ignored requested timeout remains an explicit deadline gap; deeper production coverage is incomplete. This is a single writable server with remote clients, not shared-file multi-writer DuckDB. |
 | ZFS storage lab | `app/lab.py`, independent immutable-body reader, native fio/send-receive checks and guarded external pool archives | Default 4 MiB/s five-command lifecycle passed 2026-11-22: 157 mirror/140 RAIDZ2 complete 64 MiB SHA reads, including each native replacement interval; both 512 MiB payloads verified with clean scrubs. Snapshot promotion preserves required bytes and quantifies the missing 64 MiB asynchronous tail. Thirty-five controls and scoped teardown pass; CPU/memory/compression/disk-byte/IOPS evidence is published. Earlier explicit-rate checkpoint and archive-checker/Python-prerequisite failures remain separate. Native archive restore, per-flush external ACKs, continuous replication observers, guest-reboot ARC persistence, pressure and wider failure combinations remain unqualified. |
 | Single-node Neon/Greptime/StarRocks | Lifecycle, verify and benchmark paths | Comparison fixtures, not HA deployments. Qualify cold reopen/full-shutdown persistence separately; cluster results cannot substitute. |
 
@@ -395,8 +408,8 @@ never reset a failed fixture to make a report pass. Run destructive cases serial
 
 ## Current testing pass and next work
 
-**Current goal priority (2026-11-22):** finish the in-flight DuckDB/ZFS full
-lifecycle and preserve/publish its results. ZFS repair-reader and Rust embedded
+**Current goal priority (2026-11-22):** the fresh DuckDB/ZFS full lifecycle has
+passed with its data, failed-attempt and resource evidence preserved. ZFS repair-reader and Rust embedded
 follow-ups now pass with the limitations recorded below. Then prioritize
 **Tigris, DuckDB and Iceberg-related projects** before unrelated systems. Focus on
 production deployment/operations, reproducible failure mechanisms, symptoms, data/service
@@ -425,7 +438,7 @@ qualification is recorded separately below.
 | Fjall/redb embedded Rust | 100k and million-pair native-process crash/reopen and fresh-copy restore pass; million-pair proofs verify 1,000,789/1,000,778 ACKed pairs with zero loss or wrong/partial data | Keep one applied redb ambiguous intent unacknowledged. These are shared-host functional observations, not a comparative performance winner. Scoped teardown and clean fixture recreation pass. Defer deeper KV tests while Tigris/DuckDB/Iceberg take priority. |
 | CedarDB/PostgreSQL | Million-row mutation correctness/recovery and twelve sustained cells pass | Explicitly prepared statistics/plans, ingestion/cache variants and bounded storage pressure remain. Keep warm-query, automatic-statistics and single-node limits visible. |
 | Rayforce/DuckDB | Native DuckDB WAL recovery passes; Rayforce strict integrity cases remain failed | Keep failed cases visible. Diagnose/retest integrity before new qualified performance rankings; timing failed cases is diagnostic only. |
-| DuckDB/ZFS | Historical individual storage/recovery tests exist; continuous crash/recovery follow-up is in progress | Preserve prior native datasets and witnesses, use fsynced intents/outcomes and independent readers/writers, and validate all historical state after the full disk/crash/replica lifecycle. The earlier ARC-cap drift remains a configuration failure separate from its passing data proof. Do not substitute a filename-only fix or partial test target for complete recovery observation. |
+| DuckDB/ZFS | Fresh five-command lifecycle and full disk/crash/replica/archive sequence pass, including 2.323 million crash-case bodies and 7.453 million checks across exported copies | Preserve the earlier ARC drift/verifier failures separately. All 30,000 asynchronous tail ACKs remain on the fenced source; they are absent on the promoted snapshot as declared RPO. Quack source overrides the requested timeout, so qualify phase-specific transport/deadline behavior next; retain the wider production/pressure/restore and fair-performance gaps. |
 | ZFS storage | Default 4 MiB/s five-command lifecycle and full mirror/RAIDZ2/replication suite pass; independent readers cover every native replacement interval | Preserve the earlier explicit-rate checkpoint and failed archive-checker/Python-prerequisite attempts separately. Native stream checks do not establish restore, fio growth is not a per-flush ACK witness, and exported-source promotion is administrative fencing. Defer deeper storage tests while the local DuckDB/Iceberg work takes priority. |
 | Iceberg/archive examples | Native data/shard checks and archive gates exist; continuous mutation/reader and commit-ambiguity gaps remain | Add external histories and continuous observation through catalog/object-store/compaction interruptions, then verify the committed snapshot and retained source before cleanup. Do not infer HA from queries on surviving copies. |
 | Recent relational, search and S3 clusters | Core per-example proofs above pass on their recorded configurations; extended matrices and new holistic measurement requirements are incomplete | Revisit applicable quorum/partition, scaling, maintenance/upgrade, pressure and independent-restore cases across the cohort. Preserve version-specific qualification and every earlier failed attempt. |
