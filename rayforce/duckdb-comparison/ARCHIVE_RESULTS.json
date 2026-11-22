@@ -1,0 +1,26 @@
+{
+  "archive": "results-archives/193d82cf7ae249e2b1dd1089859fb19a.tar.gz",
+  "archive_sha256": "8a2ff04fcb82352dde8cd8268cdfdf273d59e54030db23cd008110fa09d2d4b8",
+  "file_count": 16793,
+  "source_logical_bytes": 28535127422,
+  "source_allocated_bytes_counted": 28565184512,
+  "archive_bytes": 8034681495,
+  "archive_allocated_bytes": 8036294656,
+  "purged": true,
+  "wall_seconds": 190.88906037504785,
+  "cpu_core_seconds": 181.465782,
+  "children_cpu_core_seconds": 0.22369299999999998,
+  "cpu_percent_one_core_100": 95.06347902388399,
+  "peak_rss_bytes": 120684544,
+  "filesystem_available_bytes_before": 32416305152,
+  "filesystem_available_bytes_after": 53969129472,
+  "scope": "Off-path evidence housekeeping, not benchmark capacity. Every raw file, including failed-state bytes, preserved and independently streamed/SHA256/CRC verified before removal. Sparse allocation/inode relationships are not restored. Physical device IO/latency unavailable; source bytes, archive bytes and observed filesystem free space are distinct.",
+  "date_utc": "2026-11-22",
+  "verification": {
+    "archive_sha256": "8a2ff04fcb82352dde8cd8268cdfdf273d59e54030db23cd008110fa09d2d4b8",
+    "every_member_sha256_verified": true,
+    "entries": 18808
+  },
+  "compression": "gzip level 1 of a tar stream; independently re-read every archived body and validate gzip CRC before removal",
+  "reproducibility": "Archive is local and ignored. Committed source, pins and Make lifecycle recreate experiments; published results preserve failed verdicts. Original allocated block/sparse/inode relationships are not reproduced by tar extraction."
+}

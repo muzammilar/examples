@@ -1,4 +1,5 @@
 results/
+results-archives/
 .build/
 __pycache__/
 analytics-workload/rust/target/

@@ -77,6 +77,26 @@ directory first. Failed runs remain evidence; no automatic data reset or retry.
 An example-local lock prevents concurrent controllers. Other examples must be
 stopped independently before performance measurements.
 
+## Local evidence housekeeping
+
+On 2026-11-22, **16,793** raw files (26.575 GiB logical) were archived into
+**7.483 GiB** of gzip-compressed tar, including all failed-state database bytes,
+witnesses and logs. Every member's SHA-256, size/type/ownership metadata and the
+gzip CRC were independently checked before removing the originals. All three
+owned Compose projects had no containers, volumes or networks; the controller
+lock was held throughout. Known integrity failures retain their failed verdicts.
+
+The local archive, manifest, verification record and one-off archiver are under
+ignored `results-archives/193d82cf7ae249e2b1dd1089859fb19a.*`; only the compact
+[housekeeping summary](ARCHIVE_RESULTS.json) is tracked. Raw `results/` now contains
+only its lock. Source/configuration and published results remain in Git. Re-running
+the lifecycle regenerates inputs; it does not restore old raw observations.
+The archive preserves file bodies, not original sparse allocation or inode links.
+This off-path cleanup took **190.889 s**, **181.466 CPU core-s** and **115.09 MiB**
+peak RSS; these are housekeeping costs, not database performance. Available host
+space rose from **30.19 to 50.26 GiB** during cleanup; shared-filesystem free-space
+changes are observations, not exact physical-block attribution.
+
 ## Setup and language boundary
 
 | Component | Pin / method |
