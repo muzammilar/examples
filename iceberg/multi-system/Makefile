@@ -64,7 +64,7 @@ unit-test: config prepare
 
 recovery-unit-test:
 	python3 -c 'import sys; assert sys.version_info >= (3, 11), "Recovery controls require Python 3.11+; check the python3 selected by Make"'
-	python3 -m unittest test_recovery_resources.py test_recovery_control.py test_recovery_report.py test_recovery_cleanup.py test_recovery_retirement.py test_compactor_cleanup.py test_compactor_control.py test_prefault_archive.py test_manifest_control.py test_cold_storage.py test_cold_readback.py
+	python3 -m unittest test_recovery_resources.py test_recovery_control.py test_recovery_report.py test_recovery_cleanup.py test_recovery_retirement.py test_compactor_cleanup.py test_compactor_control.py test_prefault_archive.py test_manifest_control.py test_cold_storage.py test_cold_readback.py test_cold_upgrade.py test_cold_cleanup.py
 
 storage-crash: config recovery-unit-test
 	python3 recovery_control.py storage-crash
@@ -190,3 +190,17 @@ COLD_VERIFICATION ?=
 cold-readback: config recovery-unit-test ## Reconcile one witnessed table on its separate restored volume
 	@test -n "$(COLD_CHECKPOINT)" -a -n "$(COLD_CASE)" -a -n "$(COLD_VERIFICATION)" || (echo 'Set COLD_CHECKPOINT, COLD_CASE and COLD_VERIFICATION'; exit 1)
 	python3 cold_readback.py --checkpoint "$(COLD_CHECKPOINT)" --case "$(COLD_CASE)" --verification "$(COLD_VERIFICATION)"
+
+COLD_READBACK ?=
+.PHONY: cold-readback-cleanup cold-checkpoint-cleanup cold-upgrade
+cold-readback-cleanup: config recovery-unit-test ## Remove verified stopped readback containers, network and query cache volume
+	@test -n "$(COLD_READBACK)" || (echo 'Set COLD_READBACK'; exit 1)
+	python3 cold_cleanup.py --readback "$(COLD_READBACK)"
+
+cold-checkpoint-cleanup: config recovery-unit-test ## Remove recorded stopped checkpoint utilities, retaining all volumes and archives
+	@test -n "$(COLD_CHECKPOINT)" || (echo 'Set COLD_CHECKPOINT'; exit 1)
+	python3 cold_cleanup.py --checkpoint "$(COLD_CHECKPOINT)"
+
+cold-upgrade: config recovery-unit-test ## Reconcile a restored table with pinned SeaweedFS 4.54; refuse implicit downgrade
+	@test -n "$(COLD_CHECKPOINT)" -a -n "$(COLD_CASE)" -a -n "$(COLD_VERIFICATION)" || (echo 'Set COLD_CHECKPOINT, COLD_CASE and COLD_VERIFICATION'; exit 1)
+	python3 cold_upgrade.py --checkpoint "$(COLD_CHECKPOINT)" --case "$(COLD_CASE)" --verification "$(COLD_VERIFICATION)"

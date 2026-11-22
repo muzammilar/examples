@@ -108,6 +108,64 @@ for both services. The earlier concurrent-shutdown verdict remains failed.
 Compact counts, resources and provenance are in
 [`COLD_STORAGE_RESULTS.json`](COLD_STORAGE_RESULTS.json).
 
-Next steps are verified cleanup of the owned temporary resources and a separately
-pinned newer-release upgrade using the preserved checkpoint. An in-place
-downgrade is not assumed safe.
+## Guarded temporary-resource cleanup
+
+```sh
+make cold-readback-cleanup COLD_READBACK=results/cold-storage/<checkpoint-UUID>/native-readback/<readback-UUID>
+make cold-checkpoint-cleanup COLD_CHECKPOINT=results/cold-storage/<checkpoint-UUID>
+```
+
+The first target requires passed native readback and removes only its recorded,
+positively fenced containers, private network and query-cache volume. The second
+removes only the checkpoint's recorded stopped file helpers. Both retain source/
+restore volumes, archives and every result. Runtime errors mean unknown state;
+healthy listings must prove exact IDs absent. Unknown project resources, changed
+mounts/identities or missing final evidence block cleanup. Repeated cleanup is
+supported and independently recorded.
+
+Native cleanup removed **17 containers, 4 networks and 4 query-cache volumes**
+across the completed baseline/upgrade readbacks and three checkpoint utility
+sets. Repeated cleanup passed with no additional removals. The failed helper's
+original verdict stayed failed. Older failed diagnostic projects remain preserved;
+this does not claim that the whole main lab has been torn down. The final suite
+has **171 host controls**; exact removal receipts are in
+`COLD_STORAGE_RESULTS.json`.
+
+## Pinned SeaweedFS 4.54 cold upgrade
+
+```sh
+make cold-upgrade COLD_CHECKPOINT=results/cold-storage/<checkpoint-UUID> COLD_CASE=results/<run>/production/<case-UUID> COLD_VERIFICATION=<baseline-verification-UUID>
+```
+
+This target supports the pinned Linux ARM64 **4.53 → 4.54** transition. It fetches
+the public image by digest if necessary, verifies the actual native binary and
+reserves only the checkpoint's restored copy for that image **before** opening
+its data. Original 4.53 storage and the pre-upgrade archive remain available.
+An unknown/newer source image is rejected. After reservation, ordinary
+`cold-readback` refuses to use the older source image; use `cold-upgrade` for
+further checks on that copy. Rollback means restoring the archive to new storage,
+not reopening the upgraded files with 4.53. The native rejection control proved
+that refusal created no container or case.
+
+Actual binary: **4.54 / commit 5ef99c1d8**, image digest
+`sha256:4b42c212543a0acd4c0e675215ecdcaf62a186ef98def76c7e12701871222d15`.
+[Official release](https://github.com/seaweedfs/seaweedfs/releases/tag/4.54).
+Both complete-body checks and serial shutdown passed:
+
+| ACK rows per engine | Make workflow (s) | Observed storage CPU (core-s) | Storage lifetime charged-memory peak (MiB) | Encoded Parquet chunk compression |
+|---:|---:|---:|---:|---:|
+| 2,670,000 | 40.879 | 1.563 | 437.0 | 1.1277× |
+| 3,390,000 | 43.460 | 1.071 | 421.2 | 1.5744× |
+
+The storage allocation remained **1,004,400,640 bytes** in both observed windows.
+Both engines retained the exact snapshot/body hashes; all **37 ambiguous batches**
+remained absent. CPU windows exclude startup/final edges and include observation
+probes; memory includes file cache. The query/verifier budgets and CPU/memory/disk/
+I/O results are in [`SEAWEED_UPGRADE_RESULTS.json`](SEAWEED_UPGRADE_RESULTS.json).
+These are cold compatibility checks, with the same **1 CPU / 1 GiB** storage cap,
+default reader budget and four volume slots. They do not qualify a rolling/live
+upgrade, prove a fix for the historical OOM or establish capacity/performance.
+
+Next: preserve/retire the original failed compound-fault case through an explicit
+archive receipt, then use a fresh 4.54 fixture for bounded-memory/capacity settings
+and continuous compactor recovery. The original failure must remain visible.

@@ -233,10 +233,9 @@
     }
   ],
   "remaining": [
-    "Add guarded cleanup for checkpoint helpers and temporary restore volumes, preserving archives and failed evidence",
-    "Test newer pinned SeaweedFS using the retained checkpoint; do not assume downgrade compatibility",
     "Native data readback does not clear the older reader-abort/combined-fault qualification failures",
-    "Final helper shell now propagates pipeline errors; tiny native helper controls separately verify normal completion and failure propagation after the full checkpoint run"
+    "Final helper shell now propagates pipeline errors; tiny native helper controls separately verify normal completion and failure propagation after the full checkpoint run",
+    "Close the preserved failed original case with explicit failed-but-preserved archive evidence before moving the main live lab to a new fixture. Cold compatibility does not qualify live compactor recovery or the historical OOM on 4.54."
   ],
   "final_helper_controls": {
     "passed": true,
@@ -563,5 +562,289 @@
       "path": "results/cold-readback-observation-control/ad198fdc-012a-498a-99b9-b2eba1748da7/result.json",
       "sha256": "b1a20ef54a9c6e0723f75887fefd13175eae118b58f6b23bfd984d3b30114d56"
     }
+  },
+  "temporary_cleanup": {
+    "passed": true,
+    "removed_counts": {
+      "container": 17,
+      "network": 4,
+      "query_volume": 4
+    },
+    "source_restore_archives_and_results_retained": true,
+    "scope": "Registered passed readback projects and three checkpoint utility sets; older failed diagnostic projects remain preserved, not a claim of complete lab teardown",
+    "runs": [
+      {
+        "command": "26-cold-readback-cleanup-normal",
+        "passed": true,
+        "workflow_seconds": 5.795402,
+        "removed": [
+          {
+            "container": "81216530179ecb55ce6fc157f904831861fd318c3ac028a54584f8173b685641"
+          },
+          {
+            "container": "47a3fb37d0a7279c13464fc2465b017f07905e6b95fbab20d65991a650d2acd4"
+          },
+          {
+            "container": "59ab565b8e98087d3ac374368a11c439cf98ee49b97eebb15248d8a0f3f7d9cf"
+          },
+          {
+            "network": "3262153c0b28514ef6c899a6cd372d5c778ab3711d4a67b6367fb997feb7f62e"
+          },
+          {
+            "query_volume": "iceberg-cold-readback-9a373b351d134aa3b647b84ecaabbe6d_query"
+          }
+        ],
+        "observed_retained_volume_names": [
+          "iceberg-cold-c5f56820970c4eb382b1a783ab526c06",
+          "iceberg-multi-system_storage"
+        ],
+        "already_absent_intended_volume_names": [],
+        "evidence": [
+          {
+            "path": "results/cold-storage/c5f56820-970c-4eb3-82b1-a783ab526c06/native-readback/9a373b35-1d13-4aa3-b647-b84ecaabbe6d/cleanup/58276655-e5e6-4a15-b249-ef36a7e390eb/result.json",
+            "sha256": "070771a87eab944eb2166d3059e0aacbcbad45b92b172b6c08a8c70f484a6a33"
+          },
+          {
+            "path": "results/qualification-20261122/26-cold-readback-cleanup-normal.result.json",
+            "sha256": "e078c0852ddc7877653f0ed21ed75a03854614c9d865e0fb9678c70cb7dd8b47"
+          }
+        ]
+      },
+      {
+        "command": "27-cold-readback-cleanup-diagnostic",
+        "passed": true,
+        "workflow_seconds": 5.96549,
+        "removed": [
+          {
+            "container": "17e4778be0a8a1ded1db2eedc8201ae7deb3835211678a2cd56f9553c0041407"
+          },
+          {
+            "container": "084911fb9c8cf7fd11935e21571e10b04fcae06f623c3fd8d9283c47ba392148"
+          },
+          {
+            "container": "d88e4814f8dbf8f331abf0b315bbe6eaa56f6b5c4ed0e552754e048273fb5ad3"
+          },
+          {
+            "network": "7c26132348abd6ce8d4ed8c61694fbdea9dd9ccff0d9af19c43e7ce928af03ac"
+          },
+          {
+            "query_volume": "iceberg-cold-readback-0aaeb59cfca34687833712c38b57313d_query"
+          }
+        ],
+        "observed_retained_volume_names": [
+          "iceberg-cold-c5f56820970c4eb382b1a783ab526c06",
+          "iceberg-multi-system_storage"
+        ],
+        "already_absent_intended_volume_names": [],
+        "evidence": [
+          {
+            "path": "results/cold-storage/c5f56820-970c-4eb3-82b1-a783ab526c06/native-readback/0aaeb59c-fca3-4687-8337-12c38b57313d/cleanup/1486e228-bfe1-4be0-857a-26a68d5f5280/result.json",
+            "sha256": "4243155c84111a49e967a7f535661ab20c60df510252fb52da74379830ea022f"
+          },
+          {
+            "path": "results/qualification-20261122/27-cold-readback-cleanup-diagnostic.result.json",
+            "sha256": "c98a10a3fd4fec4f0b14162ed7d4223fbffa121143423825609f728761ca9ebe"
+          }
+        ]
+      },
+      {
+        "command": "28-cold-checkpoint-cleanup-reviewed",
+        "passed": true,
+        "workflow_seconds": 4.349462,
+        "removed": [
+          {
+            "container": "f697d06d8049af6bd5fe4e9e3d898993a8678654c4926253fc3a06711ed9ab4e"
+          },
+          {
+            "container": "23becf568a50e3c2e0841d8f1c819febc0161c1c1fa11d2b33c0c7fed0d8cec5"
+          }
+        ],
+        "observed_retained_volume_names": [
+          "iceberg-cold-c5f56820970c4eb382b1a783ab526c06",
+          "iceberg-multi-system_storage"
+        ],
+        "already_absent_intended_volume_names": [],
+        "evidence": [
+          {
+            "path": "results/cold-storage/c5f56820-970c-4eb3-82b1-a783ab526c06/cleanup/59ebd0fa-a68f-43e6-8801-0fb845c42170/result.json",
+            "sha256": "7ff2b4fff88d68a9b20c990e211e610c504b44f46be28cf715e48190400e7525"
+          },
+          {
+            "path": "results/qualification-20261122/28-cold-checkpoint-cleanup-reviewed.result.json",
+            "sha256": "51ffb8b24e1038b252526ea79a126be3352b14bf28c523cc5d93a3c55758aac2"
+          }
+        ]
+      },
+      {
+        "command": "29-cold-checkpoint-cleanup-prior",
+        "passed": true,
+        "workflow_seconds": 4.539928,
+        "removed": [
+          {
+            "container": "e28b80ea88214e24f3ff638d8091118d52499dfa2b9a1419106a67d6f5463fcd"
+          },
+          {
+            "container": "8c93f3d8421c82f23d8a294a5b08e19c04cc0bed451d2bdf9ec82f01dd8b2cde"
+          }
+        ],
+        "observed_retained_volume_names": [
+          "iceberg-cold-2210c5d81fc349b09b401d1b4e2e85ae",
+          "iceberg-multi-system_storage"
+        ],
+        "already_absent_intended_volume_names": [],
+        "evidence": [
+          {
+            "path": "results/cold-storage/2210c5d8-1fc3-49b0-9b40-1d1b4e2e85ae/cleanup/d0c63cde-19a0-42be-8cde-e31ffa4ce39b/result.json",
+            "sha256": "9a07a0dc21a3eff8ef517a3ad09d6dbbec481decf58d980891ed045a3ffefca4"
+          },
+          {
+            "path": "results/qualification-20261122/29-cold-checkpoint-cleanup-prior.result.json",
+            "sha256": "7f1d6524d34701354ce0f84d421c5f15206c280e64765fe41300af7189c2b0e8"
+          }
+        ]
+      },
+      {
+        "command": "30-cold-checkpoint-cleanup-failed",
+        "passed": true,
+        "workflow_seconds": 4.388525,
+        "removed": [
+          {
+            "container": "fdedaf9e9a7f08032e9f492bf3cf63fc2e49b2b5a05b74a079df3119dcdd3720"
+          }
+        ],
+        "observed_retained_volume_names": [
+          "iceberg-multi-system_storage"
+        ],
+        "already_absent_intended_volume_names": [
+          "iceberg-cold-710e92e715324081b1fad1024e8d0a90"
+        ],
+        "evidence": [
+          {
+            "path": "results/cold-storage/710e92e7-1532-4081-b1fa-d1024e8d0a90/cleanup/ea43837e-f5bf-405d-b754-bab4eb02721e/result.json",
+            "sha256": "ccc2ec499fcb269e18eed416a57c0d552e65db161b7a095ef6936695491448d2"
+          },
+          {
+            "path": "results/qualification-20261122/30-cold-checkpoint-cleanup-failed.result.json",
+            "sha256": "866bd3854a3b9f397ede0f55835732c5f978455e82d64fcff7575676dff9ddec"
+          }
+        ]
+      },
+      {
+        "command": "31-cold-readback-cleanup-repeat",
+        "passed": true,
+        "workflow_seconds": 5.31081,
+        "removed": [],
+        "observed_retained_volume_names": [
+          "iceberg-cold-c5f56820970c4eb382b1a783ab526c06",
+          "iceberg-multi-system_storage"
+        ],
+        "already_absent_intended_volume_names": [],
+        "evidence": [
+          {
+            "path": "results/cold-storage/c5f56820-970c-4eb3-82b1-a783ab526c06/native-readback/9a373b35-1d13-4aa3-b647-b84ecaabbe6d/cleanup/a8d9c74d-0711-4b8a-9913-ca4c75bdf5c8/result.json",
+            "sha256": "05ad06307f5f6f41491816739440e46f8173c886b81e48b0bee39f64dc85ae66"
+          },
+          {
+            "path": "results/qualification-20261122/31-cold-readback-cleanup-repeat.result.json",
+            "sha256": "8abe0ddd0b22e434efb8090b55fcd8714d8b7da89fcfdff474606e7edea842c2"
+          }
+        ]
+      },
+      {
+        "command": "35-cold-upgrade-cleanup-normal",
+        "passed": true,
+        "workflow_seconds": 5.680322,
+        "removed": [
+          {
+            "container": "08d1e6a1b6008be8582cc72d8db57df10185dd71215dd0db0f6c0d59c23ff22c"
+          },
+          {
+            "container": "e29ab4c3ca21438e3e5c7bdd33d8d0f1a27db185c4da58042842a23aab7f3260"
+          },
+          {
+            "container": "cd6262b26e3569cfa5e06e460ff486b6f3c5feb071d7e7a2134b0ac53259834f"
+          },
+          {
+            "network": "dd02ba8cda4415b41d1762ea186f517d13f4d9284a94e63e7bd8d013714f7fcf"
+          },
+          {
+            "query_volume": "iceberg-cold-readback-78cdba99db794a17acd974cd8e024961_query"
+          }
+        ],
+        "observed_retained_volume_names": [
+          "iceberg-cold-c5f56820970c4eb382b1a783ab526c06",
+          "iceberg-multi-system_storage"
+        ],
+        "already_absent_intended_volume_names": [],
+        "evidence": [
+          {
+            "path": "results/cold-storage/c5f56820-970c-4eb3-82b1-a783ab526c06/native-readback/78cdba99-db79-4a17-acd9-74cd8e024961/cleanup/a4048a43-9fd3-4c79-b640-dbe046d0baa8/result.json",
+            "sha256": "1aa1eb7c78eb1237c6f23753b74fea244e4a4cbf76dd8f299849356717a193d5"
+          },
+          {
+            "path": "results/qualification-20261122/35-cold-upgrade-cleanup-normal.result.json",
+            "sha256": "c081bc6f17b826cdb836a13f0b5f9af659a94b200e4efc6885926696cae96c7d"
+          }
+        ]
+      },
+      {
+        "command": "36-cold-upgrade-cleanup-diagnostic",
+        "passed": true,
+        "workflow_seconds": 5.908736,
+        "removed": [
+          {
+            "container": "e36aea49cec7df7d37967c6a57d634c2dc80d7fb6d863a46446aac85cdef710d"
+          },
+          {
+            "container": "8482ab9038a7e25405654897dc835594440cf8aecdaa5361ab4d885cb579c606"
+          },
+          {
+            "container": "2b93635ae9530cd8af9c75b35cb769b8a1cc6d1a9a15f75b734770d711c4e126"
+          },
+          {
+            "network": "fb9376532ff308b6a1c022f4c4d69392b97c3df33293e54edcf910314dfc2b05"
+          },
+          {
+            "query_volume": "iceberg-cold-readback-7f6f30a6b1c4468f8a72c2e1eab33d00_query"
+          }
+        ],
+        "observed_retained_volume_names": [
+          "iceberg-cold-c5f56820970c4eb382b1a783ab526c06",
+          "iceberg-multi-system_storage"
+        ],
+        "already_absent_intended_volume_names": [],
+        "evidence": [
+          {
+            "path": "results/cold-storage/c5f56820-970c-4eb3-82b1-a783ab526c06/native-readback/7f6f30a6-b1c4-468f-8a72-c2e1eab33d00/cleanup/0ca627c4-977d-4d18-9723-266ec27f773a/result.json",
+            "sha256": "2cf7e72cd471d2972630b302b666f35ed1324fc4d1d7bb3b42522959d8471254"
+          },
+          {
+            "path": "results/qualification-20261122/36-cold-upgrade-cleanup-diagnostic.result.json",
+            "sha256": "b1e1b6562547317ba6200d5a7422628655f6c2b04a18fe94d66d59bac13f2ad2"
+          }
+        ]
+      },
+      {
+        "command": "37-cold-upgrade-cleanup-repeat-final",
+        "passed": true,
+        "workflow_seconds": 5.536426,
+        "removed": [],
+        "observed_retained_volume_names": [
+          "iceberg-cold-c5f56820970c4eb382b1a783ab526c06",
+          "iceberg-multi-system_storage"
+        ],
+        "already_absent_intended_volume_names": [],
+        "evidence": [
+          {
+            "path": "results/cold-storage/c5f56820-970c-4eb3-82b1-a783ab526c06/native-readback/7f6f30a6-b1c4-468f-8a72-c2e1eab33d00/cleanup/a10205e8-ce42-4df9-ae5a-4c1deb57f577/result.json",
+            "sha256": "d3128e81ffada9334fe2a39f0323141c655feb8ade3f67dc1f19372438083ddf"
+          },
+          {
+            "path": "results/qualification-20261122/37-cold-upgrade-cleanup-repeat-final.result.json",
+            "sha256": "0fa81209caf87d470a09dc1dde9a57bb7b348ade40a1f5dd81cf442decc49fbc"
+          }
+        ]
+      }
+    ]
   }
 }

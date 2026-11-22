@@ -213,8 +213,11 @@ original volume, native witnesses and that failed verdict. See `COLD_STORAGE.md`
 Native replay is now a tracked `cold-readback` Make target: both 2.67-million-
 and 3.39-million-ACK-row cases pass with 146 host controls. The lost-CLI-response
 control proves the pre-registered verifier is fenced while its failed data verdict
-is retained. Complete guarded cleanup before upgrading the restore to a newer pinned
-SeaweedFS release; never change the sole historical storage volume first.
+is retained. Guarded cleanup now removes registered temporary resources and preserves database
+volumes/archives. Cold upgrade to pinned SeaweedFS 4.54 passes both tables and
+serial shutdown; a persisted intent blocks older-image reuse. Next qualify the
+original failed-case archive closure, fresh bounded-memory/capacity settings and
+continuous compactor recovery; the cold result does not establish an OOM fix.
 
 ## Archive safety
 

@@ -85,8 +85,11 @@ whole-volume archive and restarted the original services. `make cold-readback`
 reconciles one explicitly selected registered table per run. Independent readback
 reconciled **6.06 million acknowledged rows per engine**. Concurrent shutdown failed; a retained-state
 rerun passed after changing to serial query-before-storage shutdown.
-See [`COLD_STORAGE.md`](COLD_STORAGE.md) for commands, failure boundaries and
-remaining cleanup/upgrade work.
+The repeatable 4.53→4.54 cold-upgrade target also passes both tables and blocks
+implicit downgrade. Verified temporary cleanup removes its registered resources
+while retaining database volumes and archives. See
+[`COLD_STORAGE.md`](COLD_STORAGE.md) for commands, measured resources and remaining
+live-compactor work.
 
 ## Current and historical DuckDB versions
 

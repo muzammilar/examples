@@ -17,6 +17,12 @@ import recovery_control as control
 from recovery_resources import ResourceSampler
 
 TEMPLATE = "docker-compose.cold-readback.yml"
+BASELINE_453_IMAGE = (
+    "sha256:ccad23e18639c8b98cee17e7100b95830a06077b56d8e5b006d6dcf8ec5e94a0"
+)
+UPGRADE_454_IMAGE = (
+    "sha256:4b42c212543a0acd4c0e675215ecdcaf62a186ef98def76c7e12701871222d15"
+)
 DDL = """CREATE DATABASE lake ENGINE=DataLakeCatalog('http://storage:8181', 'demo', 'demo')
 SETTINGS catalog_type='rest', catalog_credential='demo:demo', vended_credentials=false,
 warehouse='warehouse', storage_endpoint='http://storage:8333/warehouse'"""
@@ -249,9 +255,42 @@ def validate_proof(proof, baseline, run_id, verification, binary_sha):
         raise RuntimeError("missing built workload identity")
 
 
-def run(checkpoint_path, case_path, verification):
+def storage_selection(parent, invocation, restored, image=None, transition=None):
+    baseline = invocation["services"]["storage"]["image_id"]
+    marker = cleanup.regular(parent / "storage-image-transition.json", parent)
+    if not marker.exists():
+        if image is not None or transition is not None:
+            raise RuntimeError("storage upgrade has no registered transition")
+        return baseline, None
+    intent = cleanup.load(marker, parent)
+    if (
+        intent["checkpoint_id"] != parent.name
+        or baseline != BASELINE_453_IMAGE
+        or cleanup.volume_key(intent["restore_volume"]) != cleanup.volume_key(restored)
+        or intent["source_image"] != baseline
+        or intent["target_image"] != UPGRADE_454_IMAGE
+        or intent["target_version"] != "4.54"
+        or image != intent["target_image"]
+        or transition != cleanup.valid_uuid(intent["transition_id"])
+    ):
+        raise RuntimeError(
+            "restore is reserved for 4.54; refuse implicit downgrade or unknown transition"
+        )
+    return image, {
+        "file": marker.name,
+        "sha256": cleanup.digest(marker),
+        "transition_id": transition,
+    }
+
+
+def run(
+    checkpoint_path, case_path, verification, *, storage_image=None, transition=None
+):
     control.local_docker()
     parent, invocation, restored = checkpoint(checkpoint_path)
+    storage_image, image_intent = storage_selection(
+        parent, invocation, restored, storage_image, transition
+    )
     case, workload, baseline_path, baseline, files = fixture(
         case_path, verification, invocation["source_volume"]
     )
@@ -284,7 +323,7 @@ def run(checkpoint_path, case_path, verification):
         "COLD_PROJECT": project,
         "COLD_RESULTS": str(root),
         "COLD_RESTORE_VOLUME": name,
-        "COLD_STORAGE_IMAGE": invocation["services"]["storage"]["image_id"],
+        "COLD_STORAGE_IMAGE": storage_image,
         "COLD_QUERY_IMAGE": invocation["services"]["clickhouse"]["image_id"],
         "COLD_RUNNER_IMAGE": image["Id"],
         "COLD_UID": str(os.getuid()),
@@ -313,6 +352,8 @@ def run(checkpoint_path, case_path, verification):
             "source_witnesses": files,
             "source_sha256": frozen,
             "restore_volume": actual,
+            "storage_image": storage_image,
+            "storage_image_intent": image_intent,
             "started_ns": time.time_ns(),
         },
     )
@@ -320,6 +361,11 @@ def run(checkpoint_path, case_path, verification):
         root / "compose.json",
         json.loads(control.call(compose + ["config", "--format", "json"], env=env)),
     )
+    if image_intent is not None:
+        control.save_text(
+            root / "storage-image-transition.json",
+            cleanup.regular(parent / image_intent["file"], parent).read_text(),
+        )
     sampler = ResourceSampler(root, env=control.DOCKER_ENV)
     sampler.start()
     failure, errors, client, result = None, [], None, None

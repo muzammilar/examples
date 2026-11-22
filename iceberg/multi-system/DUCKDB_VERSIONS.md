@@ -14,8 +14,10 @@ Original native database files and failure witnesses remain unchanged.
 The comparison holds **SeaweedFS 4.53**, ClickHouse 26.10.2.103 and the existing
 Spark 4.0.1 / Iceberg 1.10.1 maintenance image fixed as the common storage and
 reader baseline. It does not qualify the latest release of every component.
-SeaweedFS **4.54** is the next backup/restore-and-upgrade evaluation; the 4.53 OOM
-must not be presented as a reproduced 4.54 failure.
+SeaweedFS **4.54** now passes separate cold-upgrade readbacks of both retained
+tables on a verified restored copy; see `COLD_STORAGE.md`. The original 4.53
+baseline remains intact. The 4.53 OOM has not been reproduced on 4.54, and cold
+compatibility does not qualify continuous compactor recovery.
 
 ## Manifest I/O failure
 
@@ -91,8 +93,9 @@ Do not patch committed manifests, weaken validation or report the five-path
 
 - Complete the current-version normal architecture matrix and live compactor
   recovery, with bounded backend resources and sufficient volume slots.
-- Test the newest SeaweedFS release using a verified cold backup and separate
-  restore; do not assume in-place downgrade compatibility.
+- Extend the successful cold 4.53→4.54 upgrade to bounded-memory/capacity settings
+  and live compactor recovery on a fresh fixture; do not assume in-place downgrade
+  compatibility.
 - Rerun Quack deadlines, native WAL recovery and owned-copy file-format migration
   on 2.0.1. Historical 1.5.5 timeout and beta-protocol findings do not establish
   current Quack behavior.

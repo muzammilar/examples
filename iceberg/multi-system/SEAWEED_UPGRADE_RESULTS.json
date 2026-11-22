@@ -1,0 +1,324 @@
+{
+  "date": "2026-11-22",
+  "scope": "Offline 4.53-to-4.54 compatibility on a separate verified restored volume; original 4.53 service/volume and archive retained; no cloud resources",
+  "source_image": "sha256:ccad23e18639c8b98cee17e7100b95830a06077b56d8e5b006d6dcf8ec5e94a0",
+  "target": {
+    "image_id": "sha256:4b42c212543a0acd4c0e675215ecdcaf62a186ef98def76c7e12701871222d15",
+    "repo_digests": [
+      "chrislusf/seaweedfs@sha256:4b42c212543a0acd4c0e675215ecdcaf62a186ef98def76c7e12701871222d15"
+    ],
+    "architecture": "arm64",
+    "actual_version": "version 30GB 4.54 5ef99c1d8 linux arm64"
+  },
+  "preflight_evidence": {
+    "path": "results/seaweed-454-preflight/1dc61e73-b059-419f-8cb6-90aad5e755fa/result.json",
+    "sha256": "613b3e6f286ff803917cd5c55aa2362108fbc97277c33de5a668c466596f8f89"
+  },
+  "transition_evidence": {
+    "path": "results/cold-storage/c5f56820-970c-4eb3-82b1-a783ab526c06/storage-image-transition.json",
+    "sha256": "d5541a67d36d123d74a21391401b32eb028017fd1875088da47d4db05518fbed"
+  },
+  "trials": [
+    {
+      "trial_id": "78cdba99-db79-4a17-acd9-74cd8e024961",
+      "passed": true,
+      "storage_image": "sha256:4b42c212543a0acd4c0e675215ecdcaf62a186ef98def76c7e12701871222d15",
+      "original_live_qualification_retained": true,
+      "diagnostic": false,
+      "rows_per_engine": 2670000,
+      "ambiguous_batches_absent": 1,
+      "canonical_body_sha256": "362e1e11b5ae1ec4e2da8ff038a86636be708a64e73ba73ea5ef3439be2eb1cf",
+      "snapshot": {
+        "table_uuid": "1fc2ed32-ff57-4799-93c8-e8f64ae113a1",
+        "snapshot_id": 3246169348701310691,
+        "metadata_location": "s3://warehouse/lab/recovery_f1b2af24f6c24bd28e44a35392666f23-1fc2ed32-ff57-4799-93c8-e8f64ae113a1/metadata/v268.metadata.json"
+      },
+      "workflow_seconds": 40.878775,
+      "make_exit_code": 0,
+      "host_controls_passed_at_native_run": 170,
+      "engine_export_validate_seconds": {
+        "duckdb": 6.75583992,
+        "clickhouse": 5.71775071
+      },
+      "encoded_parquet_chunk_compression_ratio": 1.1277230118030321,
+      "parquet_totals": {
+        "files": 267,
+        "rows": 2670000,
+        "file_bytes": 208747238,
+        "footer_bytes": 291297,
+        "column_chunks": 1869,
+        "compressed_chunk_bytes": 208415090,
+        "uncompressed_chunk_bytes": 235034493
+      },
+      "resources": {
+        "clickhouse": {
+          "observed_seconds": 19.859999999999996,
+          "cpu_core_seconds": {
+            "total": 2.308232,
+            "user": 1.512065,
+            "system": 0.7961670000000001
+          },
+          "charged_memory_bytes_min_mean_max": [
+            276455424,
+            558384696.8888888,
+            1107709952
+          ],
+          "lifetime_peak_memory_bytes": 1181675520,
+          "allocated_disk_bytes_first_peak_last": [
+            229376,
+            5091328,
+            5091328
+          ],
+          "native_block_io": {
+            "254:0": {
+              "observed_seconds": 19.859999999999996,
+              "rbytes": 409600,
+              "wbytes": 4120576,
+              "rios": 6,
+              "wios": 306,
+              "rbytes_per_second": 20624.370594159118,
+              "wbytes_per_second": 207481.16817724073,
+              "rios_per_second": 0.3021148036253777,
+              "wios_per_second": 15.407854984894263
+            }
+          }
+        },
+        "storage": {
+          "observed_seconds": 20.979999999999997,
+          "cpu_core_seconds": {
+            "total": 1.562739,
+            "user": 0.946911,
+            "system": 0.6158279999999999
+          },
+          "charged_memory_bytes_min_mean_max": [
+            197791744,
+            407407562.1052632,
+            455892992
+          ],
+          "lifetime_peak_memory_bytes": 458223616,
+          "allocated_disk_bytes_first_peak_last": [
+            1004400640,
+            1004400640,
+            1004400640
+          ],
+          "native_block_io": {
+            "254:0": {
+              "observed_seconds": 20.979999999999997,
+              "rbytes": 0,
+              "wbytes": 733184,
+              "rios": 0,
+              "wios": 39,
+              "rbytes_per_second": 0.0,
+              "wbytes_per_second": 34946.80648236416,
+              "rios_per_second": 0.0,
+              "wios_per_second": 1.8589132507149668
+            }
+          }
+        },
+        "verifier": {
+          "observed_seconds": 14.11,
+          "cpu_core_seconds": {
+            "total": 8.87421,
+            "user": 7.504747,
+            "system": 1.369464
+          },
+          "charged_memory_bytes_min_mean_max": [
+            1998848,
+            648617353.8461539,
+            1082044416
+          ],
+          "lifetime_peak_memory_bytes": 1128062976,
+          "allocated_disk_bytes_first_peak_last": [
+            610304,
+            539815936,
+            539815936
+          ],
+          "native_block_io": null
+        }
+      },
+      "evidence": [
+        {
+          "path": "results/cold-storage/c5f56820-970c-4eb3-82b1-a783ab526c06/native-readback/78cdba99-db79-4a17-acd9-74cd8e024961/result.json",
+          "sha256": "d91c615a21e5a5355750158f7d5e26bf7b462cdf1171481750b76f199ed91006"
+        },
+        {
+          "path": "results/cold-storage/c5f56820-970c-4eb3-82b1-a783ab526c06/native-readback/78cdba99-db79-4a17-acd9-74cd8e024961/invocation.json",
+          "sha256": "82bcee360f21d8f32617c4baf1acbea758f394da687f04f803f1589c4abffaf6"
+        },
+        {
+          "path": "results/cold-storage/c5f56820-970c-4eb3-82b1-a783ab526c06/native-readback/78cdba99-db79-4a17-acd9-74cd8e024961/resource-summary.json",
+          "sha256": "255051c4f2e9bb27dadefc1aee40aec67fa5d95950d189b3c5b72cb5ac5a35c2"
+        },
+        {
+          "path": "results/cold-storage/c5f56820-970c-4eb3-82b1-a783ab526c06/native-readback/78cdba99-db79-4a17-acd9-74cd8e024961/recovery-f1b2af24-f6c2-4bd2-8e44-a35392666f23/verifications/e91f4d6f-6d54-4b14-b093-d13f707e067b/native-versions.json",
+          "sha256": "e6eb8cf853ac40886a07fb33c740261fe2aeb69a3f15d7e5aaac563d28dcbd40"
+        },
+        {
+          "path": "results/qualification-20261122/32-cold-upgrade-454-normal.result.json",
+          "sha256": "ad992e619c06253dc0021d3d870edbe92581cc4dafc457265a303d59e3b181c2"
+        }
+      ]
+    },
+    {
+      "trial_id": "7f6f30a6-b1c4-468f-8a72-c2e1eab33d00",
+      "passed": true,
+      "storage_image": "sha256:4b42c212543a0acd4c0e675215ecdcaf62a186ef98def76c7e12701871222d15",
+      "original_live_qualification_retained": false,
+      "diagnostic": true,
+      "rows_per_engine": 3390000,
+      "ambiguous_batches_absent": 36,
+      "canonical_body_sha256": "404308f8e350e15a3ca87416cd1f712b66f2506aed41b9d38eb1c41ba432b1c0",
+      "snapshot": {
+        "table_uuid": "f4bf9a2a-70e7-4668-ac30-112a8acd9b94",
+        "snapshot_id": 2119811354969392301,
+        "metadata_location": "s3://warehouse/lab/recovery_2b463a191a8c43bfb84d5a0fa03f5836-f4bf9a2a-70e7-4668-ac30-112a8acd9b94/metadata/v341.metadata.json"
+      },
+      "workflow_seconds": 43.459685,
+      "make_exit_code": 0,
+      "host_controls_passed_at_native_run": 170,
+      "engine_export_validate_seconds": {
+        "duckdb": 8.776960713,
+        "clickhouse": 7.211807462
+      },
+      "encoded_parquet_chunk_compression_ratio": 1.574440492667042,
+      "parquet_totals": {
+        "files": 100,
+        "rows": 3390000,
+        "file_bytes": 176839475,
+        "footer_bytes": 110344,
+        "column_chunks": 700,
+        "compressed_chunk_bytes": 176666496,
+        "uncompressed_chunk_bytes": 278150885
+      },
+      "resources": {
+        "clickhouse": {
+          "observed_seconds": 22.12,
+          "cpu_core_seconds": {
+            "total": 2.417501,
+            "user": 1.7015519999999995,
+            "system": 0.7159499999999999
+          },
+          "charged_memory_bytes_min_mean_max": [
+            301453312,
+            604374016,
+            1142009856
+          ],
+          "lifetime_peak_memory_bytes": 1178238976,
+          "allocated_disk_bytes_first_peak_last": [
+            229376,
+            5943296,
+            5943296
+          ],
+          "native_block_io": {
+            "254:0": {
+              "observed_seconds": 22.12,
+              "rbytes": 131072,
+              "wbytes": 4292608,
+              "rios": 1,
+              "wios": 319,
+              "rbytes_per_second": 5925.497287522604,
+              "wbytes_per_second": 194060.03616636526,
+              "rios_per_second": 0.045207956600361664,
+              "wios_per_second": 14.42133815551537
+            }
+          }
+        },
+        "storage": {
+          "observed_seconds": 23.24,
+          "cpu_core_seconds": {
+            "total": 1.071,
+            "user": 0.660242,
+            "system": 0.41075800000000007
+          },
+          "charged_memory_bytes_min_mean_max": [
+            187400192,
+            355525973.3333333,
+            440590336
+          ],
+          "lifetime_peak_memory_bytes": 441618432,
+          "allocated_disk_bytes_first_peak_last": [
+            1004400640,
+            1004400640,
+            1004400640
+          ],
+          "native_block_io": {
+            "254:0": {
+              "observed_seconds": 23.24,
+              "rbytes": 0,
+              "wbytes": 733184,
+              "rios": 0,
+              "wios": 31,
+              "rbytes_per_second": 0.0,
+              "wbytes_per_second": 31548.364888123928,
+              "rios_per_second": 0.0,
+              "wios_per_second": 1.333907056798623
+            }
+          }
+        },
+        "verifier": {
+          "observed_seconds": 17.5,
+          "cpu_core_seconds": {
+            "total": 11.224468,
+            "user": 9.835296000000001,
+            "system": 1.3891719999999999
+          },
+          "charged_memory_bytes_min_mean_max": [
+            2101248,
+            629092096,
+            945262592
+          ],
+          "lifetime_peak_memory_bytes": 1235668992,
+          "allocated_disk_bytes_first_peak_last": [
+            770048,
+            707530752,
+            707530752
+          ],
+          "native_block_io": null
+        }
+      },
+      "evidence": [
+        {
+          "path": "results/cold-storage/c5f56820-970c-4eb3-82b1-a783ab526c06/native-readback/7f6f30a6-b1c4-468f-8a72-c2e1eab33d00/result.json",
+          "sha256": "3f88ad1a94a220cd070ae041f281d6f204f8454204cd130dacb3df11ca16505d"
+        },
+        {
+          "path": "results/cold-storage/c5f56820-970c-4eb3-82b1-a783ab526c06/native-readback/7f6f30a6-b1c4-468f-8a72-c2e1eab33d00/invocation.json",
+          "sha256": "ed542efdb607c74048400ece52d49fb958ea5a708fd937bc5e78857b19b29232"
+        },
+        {
+          "path": "results/cold-storage/c5f56820-970c-4eb3-82b1-a783ab526c06/native-readback/7f6f30a6-b1c4-468f-8a72-c2e1eab33d00/resource-summary.json",
+          "sha256": "4418c5d26b613fa11999a63c7dbf35a247967160e1a697c409c915cc5e6c93a6"
+        },
+        {
+          "path": "results/cold-storage/c5f56820-970c-4eb3-82b1-a783ab526c06/native-readback/7f6f30a6-b1c4-468f-8a72-c2e1eab33d00/recovery-2b463a19-1a8c-43bf-b84d-5a0fa03f5836/verifications/d08e01f9-a278-4827-9c75-ea70eb7ee7d4/native-versions.json",
+          "sha256": "e6eb8cf853ac40886a07fb33c740261fe2aeb69a3f15d7e5aaac563d28dcbd40"
+        },
+        {
+          "path": "results/qualification-20261122/33-cold-upgrade-454-diagnostic.result.json",
+          "sha256": "a74fad79e759fa0b99eb6fa8335ee575411f9fe602d96252c209461577085c4a"
+        }
+      ]
+    }
+  ],
+  "downgrade_guard": {
+    "passed": true,
+    "scope": "Expected controller rejection, not a backend recovery failure",
+    "make_exit_code": 2,
+    "older_engine_reopen_refused": true,
+    "new_case_created": false,
+    "cold_container_inventory_unchanged": true,
+    "driver_sha256": "d143466cd6dab1b9bb167d0a45fba6d2a976185efa47a68cb78ae842c52d3dbf",
+    "evidence": {
+      "path": "results/cold-upgrade-downgrade-control/e29b0df4-dd5c-4f23-8871-ce968ffc8939/result.json",
+      "sha256": "3a774f18e5728c256cf9b732772c193c82eb955116e085e7a5d4f8dafd3476af"
+    }
+  },
+  "limits": [
+    "One cold compatibility trial per table, no live writes/compaction or rolling upgrade",
+    "Same 1 CPU/1 GiB mini storage, query2 CPU/1.5GiB, verifier1 CPU/2GiB on one Docker VM; unrelated original services remain running, no capacity comparison",
+    "Reader cache and volume slots retain baseline defaults; 4.53 OOM has not been reproduced or fixed by this cold readback",
+    "Resource samples exclude startup/final edges; device counters are Docker-VM accounting, not physical SSD I/O; charged memory includes file cache",
+    "Original failed live-test verdicts remain failed; original volumes, archive and raw evidence retained",
+    "Only pinned source4.53/target4.54 supported; unknown/newer source refuses before reserving or starting storage; final guard controls bring the full suite to171"
+  ]
+}
