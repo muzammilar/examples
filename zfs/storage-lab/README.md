@@ -4,12 +4,17 @@ A storage-only lab with three selectable setups. Two actual Linux kernels run
 ZFS inside unprivileged QEMU containers; upstream fio generates and verifies data.
 There is no database, shared writable database file or host ZFS requirement.
 
-All three live correctness setups and ten negative tests passed. Performance
-was measured afterward; results and limitations are below.
+The **2026-11-22 full serial follow-up passed**, followed by verified scoped
+teardown. Independent readers verified **317 complete 64 MiB bodies**, with zero
+read failures/mismatches, while fio remained active through all three native
+member replacements. The earlier archive-checker failure remains failed and its
+source bytes are preserved. Historical November 14–15 results remain separate
+below; this is a one-host functional recovery qualification, not production
+readiness or a capacity comparison.
 
 ## Quick start
 
-Prerequisites: ARM64 Docker with Compose v2, Make and `ssh-keygen`. Allow 8 GiB
+Prerequisites: ARM64 Docker with Compose v2, Make, host Python 3.11+ and `ssh-keygen`. Allow 8 GiB
 Docker RAM and 12 GiB free Docker disk. QEMU uses TCG software emulation;
 initial boot and offline package installation take several minutes. Virtual
 16 GiB devices are sparse, with capacity allocated from the Docker host as used.
@@ -17,9 +22,9 @@ No privileged containers, host devices, host kernel modules or Docker socket.
 
 1. `make docker-up` — build the pinned runtime and boot both guest kernels; wait until healthy.
 2. `make up` — install the offline ZFS/fio packages and cap each guest's ARC.
-3. `make test` — run mirror, RAIDZ2 and snapshot replication tests serially.
+3. `make test WRITE_MIB_S=4` — run mirror, RAIDZ2 and snapshot replication tests serially with the tested live-write window.
 4. `make down` — export imported example pools, retaining the guests and disks.
-5. `make docker-down` — delete the example's containers, disks, network, image tag and SSH keys.
+5. `make docker-down` — archive and verify retained pools, then delete only owned containers, disks, network, image tag and SSH keys.
 
 `make unit-test` runs standard-library negative tests: incomplete/error fio results,
 missing receive tokens, corrupt received copies and failed/incomplete source fencing
@@ -31,8 +36,9 @@ Tests reset only this project's pools and dedicated virtual disks. `make test
 SETUP=mirror`, `SETUP=raidz2` or `SETUP=replication` selects one setup. Separate
 aliases: `make mirror-test`, `make raidz2-test`, `make replication-test`.
 `make benchmark` runs after correctness and recreates source pools for each layout;
-it intentionally discards prior source state. A tracked exported source is first
-imported with `-N` (no filesystem mounts), then destroyed before recreation. `make status` shows pools/datasets;
+it preserves prior source state in a verified native send stream before recycling
+the pool. A tracked exported pool is first imported with `-N` (no filesystem mounts),
+fenced read-only, archived and checked before recreation. `make status` shows pools/datasets;
 `make cli` opens an SSH shell in the source guest.
 
 ## Directory structure
@@ -44,7 +50,11 @@ zfs/
     ├── README.md
     ├── Makefile
     ├── docker-compose.yml
+    ├── run.py                # host ownership/lock and cgroup resource collection
+    ├── resources.py          # native CPU/memory/disk/byte/IOPS summaries
     ├── app/lab.py            # standard-library orchestration; invokes ZFS and fio
+    ├── app/observe.py        # independent guest reader and timed native actions
+    ├── app/evidence.py       # fsynced histories and native archive gates
     ├── vm/Dockerfile         # pinned Linux image and offline packages; no DuckDB
     ├── vm/boot.py            # guest kernel and six owned sparse disks per guest
     ├── state/               # ignored SSH keys; VM disks live in named volumes
@@ -77,6 +87,12 @@ this lab. Database consistency under active WAL writes is covered separately in
 | `BENCH_SECONDS` | 10 | Random mixed I/O duration per layout; 5–60 |
 | `RESULTS_DIR` | `results/manual` | Raw reports |
 
+The richer observer profile was tested at `WRITE_MIB_S=4`. Use the Quick-start
+override: the historical default **8 MiB/s** has not been requalified with these
+additional readers/probes and can exhaust the finite writer before both RAIDZ2
+replacements finish. That is a coverage failure, not a pass or evidence of data
+loss. The earlier **8 MiB/s** measurements below retain their original method.
+
 ## Correctness protocol
 
 Fault tests use one fio sync worker, 128 KiB I/O, CRC32C verification headers,
@@ -96,6 +112,190 @@ SHA-256 hashes. A later 64 MiB source file is deliberately not replicated. The
 source pool is exported before target promotion; the target must lack that tail
 and retain all replicated bytes. It must then write and verify another 64 MiB.
 This is filesystem recovery of completed files, not a database transaction test.
+
+## Follow-up recovery observations
+
+The existing Python controller is retained to preserve its native fio/ZFS paths;
+rewriting it only to change languages would obscure those recovery boundaries.
+The new reader also uses Python's standard library and runs as an independent
+guest process, rather than blocking behind the fio writer or fault controller.
+
+Mirror/RAIDZ2 cases first write and fsync a separate **64 MiB** immutable file,
+record its byte count/SHA-256 outside both guests, then repeatedly read and hash
+the complete body. A separate fio writer remains active through member fault and
+replacement. UUID case directories preserve prior read histories, failures,
+immutable acknowledgements and native-action timing. At least one complete
+successful immutable read must occur inside **each actual native replacement
+interval**, compared on the same guest monotonic clock. Reads continue through
+full payload verification and scrub, with zero wrong bodies required. The existing
+fio file-growth signal is still not a count of independently journaled per-flush
+application acknowledgements. This extension does not add continuous replication
+observers or power-loss guarantees.
+
+Before an independent case recycles a pool, or teardown deletes its devices,
+active fio/readers are rejected, datasets are fenced read-only and a recursive
+native `zfs send` snapshot stream is fsynced outside the guests. Re-reading that
+stream through `zstream dump` checks native checksums, header-aware substream/
+compound-package conclusion counts and complete byte count; a SHA-256 manifest is retained. OpenZFS 2.2's dump path can
+print a checksum error yet exit zero, so checksum diagnostics on either output
+stream also reject the archive. A failed export preserves the original pool. These are **archive
+preservation checks, not a demonstrated restore**. Raw archives and histories
+remain ignored under `results/`; source, configuration and concise measured
+summaries belong in Git.
+
+Each lifecycle operation records native container cgroup CPU core-seconds and
+utilization, sampled/lifetime-peak charged memory, owned QCOW2 apparent/allocated
+bytes and per-device block read/write bytes and IOPS. Native ZFS used/logicalused/
+compression ratios and per-read latency/reader CPU/RSS are separate layers.
+Absent I/O devices are unavailable, not zero. Physical SSD latency/queue depth
+and engine heap are unavailable. Samples are about 1 s plus sequential probe costs;
+all timestamps and gaps are retained. Observers are charged to their containers.
+TCG emulation, warm cache and concurrent independent functional labs prevent
+these diagnostics from being capacity or comparative benchmark claims.
+Provisioning sets the live ARC cap; read-only observations confirm both current
+kernels use **268,435,456 bytes** for `zfs_arc_max` and native `c_max`. This member-
+fault matrix does not reboot guests. ARC-cap persistence across reboot remains
+unqualified; repeat provisioning after a retained boot before relying on its cap.
+
+`make test-production WRITE_MIB_S=4` runs all three applicable cases serially. Resource/lifecycle
+and archive/reader negative controls run in `make unit-test`. Supported scaling,
+pressure and additional loss combinations remain unrun; there is no Kubernetes
+operator in this filesystem-only example.
+
+### Failure symptoms and recovery mechanism
+
+| Case | Detection | Native recovery in the owned source guest |
+|---|---|---|
+| Mirror member fault | `zpool status -P zfslab` reports DEGRADED and d0 FAULTED, while independent reads and the fio writer continue | `zpool replace -w zfslab /dev/disk/by-id/virtio-zfslab-d0 /dev/disk/by-id/virtio-zfslab-d2`; require complete payload verification, a completed `zpool scrub -w zfslab` and ONLINE/no known data errors. |
+| Two RAIDZ2 member faults | DEGRADED with d0/d1 FAULTED; two failed leaves are this layout's declared boundary | Replace d0→d4 and d1→d5 serially with `zpool replace -w`; require successful complete immutable reads inside each replacement interval and continued writer activity until native rebuild finishes, then verify and scrub. |
+
+These are native persistent fault-state injections, not destroyed physical drives.
+The replacement devices are separate owned virtual disks; restored membership and
+scrub evidence remain in each case. Do not substitute `zpool clear` for rebuilding
+lost storage or infer independent-host durability from these one-host copies.
+
+The first follow-up target stopped **before RAIDZ2 reset** because its archive
+checker incorrectly assumed every native stream has equal BEGIN/END counts.
+The retained valid recursive stream contains **3 BEGIN / 4 END** records and
+**605,513,376 bytes**: a compound package has an additional conclusion END in
+[OpenZFS 2.2.2's sender](https://github.com/openzfs/zfs/blob/zfs-2.2.2/lib/libzfs/libzfs_sendrecv.c#L2356).
+The source pool remained fenced read-only and intact. The exact old stream was
+rechecked, with clean native checksums and both expected dataset snapshots; its
+original failed verdict remains under `results/continuous-20261122/`. The corrected
+gate checks header types and compound conclusions, byte count, dataset coverage,
+exit status and diagnostics on both output streams. Its selected actual native
+output is a regression fixture. The separate fresh full target subsequently passed;
+revalidation does not relabel the failed attempt as a pass.
+
+## Measured observer follow-up: 2026-11-22
+
+Apple M4 Pro, 14 host cores / 48 GiB RAM; Docker VM 11 CPUs / 24.42 GiB,
+ARM64 Linux. Each QEMU guest/container retains the limits above; the runner has
+1 CPU / 256 MiB. Linux **6.8.0-147-generic**, ZFS userspace/module
+**2.2.2-0ubuntu9.5**, fio **3.36**. Independent DuckDB/ZFS and Rust functional
+lanes shared the host under explicit budgets; no comparative benchmarks ran.
+The fresh full target took **1,095.909 s**, including prior-fixture archival,
+all three setups and observations. Runtime source hashes match the tested files.
+
+Each layout wrote/CRC-verified **512 MiB** in **4,096 × 128 KiB** operations, plus
+an independently fsynced **64 MiB** immutable body. The deliberate **4 MiB/s**
+write cap supplies a long fault window; it is not capacity throughput. Reader
+timing covers the complete file read and SHA-256, excluding SSH reporting and
+external journal fsync. The repeated 64 MiB working set fits the 256 MiB ARC;
+these observations do not establish uncached device-read performance.
+
+| Layout | Faulted leaves | Complete immutable reads / errors | Further degraded write growth | Replace/wait incl. SSH | Scrub incl. SSH |
+|---|---:|---:|---:|---:|---:|
+| Mirror | 1 | 165 / 0 | 11,272,192 B | 18.247 s | 13.905 s |
+| RAIDZ2 | 2 | 152 / 0 | 10,616,832 B | 50.455 s | 18.679 s |
+
+Native replacement-command intervals were **13.627 s** for mirror and
+**17.116 / 20.522 s** for the two RAIDZ2 replacements. Each contains complete
+successful independent reads; the writer stayed active until every native
+replacement finished. Both final scrubs reported **0 errors**, ONLINE membership
+and correct complete payloads. Reads continued through verification and scrub.
+
+| Layout / actual phase | Samples | Complete 64 MiB read+hash p50 / p99 |
+|---|---:|---:|
+| Mirror baseline | 11 | 960.977 / 2,087.283 ms |
+| Mirror degraded | 19 | 993.539 / 1,449.415 ms |
+| RAIDZ2 baseline | 11 | 1,099.159 / 2,153.782 ms |
+| RAIDZ2 degraded | 19 | 1,035.727 / 2,266.082 ms |
+
+These small-sample p99s are effectively maxima, not production tails. Canonical
+phases use actual same-guest monotonic command boundaries; reads spanning changes
+are separate. Controller labels can lag a native fault. No complete mirror read
+fits wholly inside its brief offline command; that interval has no latency sample,
+not zero latency. All phase counts/means/percentiles and errors remain in JSON.
+
+Snapshot replication also passed: a **512 MiB** baseline plus **64 MiB** delta
+matched the received clone's complete SHA-256 bodies. Interruption after
+**65,536 B** produced a resume token; full/resumed streams were
+**538,194,928 B / 62.115 s** and **67,277,856 B / 14.736 s**. The intentionally
+unreplicated **64 MiB** tail was absent after promotion, with **0 missing
+replicated bytes**; another **64 MiB** was written and CRC-verified on the promoted
+owner. Promotion plus verification/new write took **28.760 s**. Independent
+successful native listings afterward proved source pool absent and target pool
+imported. This is administrative export/fencing and asynchronous RPO, not
+power fencing, quorum ownership or permanent destruction of the old source tail.
+
+Whole-target observed resources, including setup/archival/control overhead:
+
+| Role | CPU core-s / mean utilization¹ | Sampled mean / max charged memory | Native lifetime memory peak² |
+|---|---:|---:|---:|
+| Source QEMU/guest | 1,737.802 / 158.65% | 2,457.20 / 2,595.20 MiB | 2,610.91 MiB |
+| Target QEMU/guest | 861.079 / 78.61% | 2,031.70 / 2,471.18 MiB | 2,471.18 MiB |
+| Runner | 35.788 / 3.27% | 145.34 / 256.00 MiB | 256.18 MiB |
+
+¹ One core = 100%; each guest container allows 200%. Unsampled initial/final and
+reset intervals are excluded. ² Lifetime since container creation, including
+earlier boot/provisioning, not a phase peak. Sum of role peaks is not a measured
+simultaneous whole-stack peak. Host-controller CPU/RSS and CLI-child CPU are
+separately retained. These are whole-QEMU/cgroup costs, not native ZFS-only CPU
+or engine heap. VM swap limits are zero. The final archive runner allowed
+256 MiB swap and reported native swap peak **0**; its `memory.events.max` was
+**10,680**, with **0 OOM/oom_kill events** at that observation. This indicates
+limit pressure/reclaim, not an observed OOM. Earlier removed one-shot swap
+counters were not collected.
+
+| Role / VM device | Read / write MiB | Read / write IOPS |
+|---|---:|---:|
+| Source / 254:0 | 7,407.204 / 4,596.143 | 90.916 / 104.236 |
+| Target / 254:0 | 1,155.851 / 1,433.391 | 11.492 / 25.344 |
+| Runner | unavailable | unavailable |
+
+About 1 s plus sequential probes; native intervals/raw counters are retained.
+These are per-device Docker VM block counters, not physical SSD traffic; do not
+sum stacked counters or infer physical latency. Native fio buffered-I/O/fsync
+latency is separate in JSON. Per-vdev queue/timing counters were not collected.
+Owned QCOW2 allocated bytes (baseline / sampled peak / last sample) were
+**1,620,946,944 / 3,770,068,992 / 3,770,068,992** for source and
+**218,853,376 / 1,592,770,560 / 1,592,770,560** for target, including OS/data disks
+and recycled-space effects, excluding immutable image layers. Native ZFS
+used/logical-used/compression are another layer; both immutable-reader setups
+reported **1.00×** native dataset compression. Lifetime network byte/packet
+observations are separately scoped; no per-phase network rate is claimed.
+
+`make down`, then `make docker-down`, both passed. Five corrected native archives
+(**3,162,140,336 B**) remain externally preserved and re-hashed; their streams
+passed native checksum/framing/dataset checks before pool/device deletion.
+Fresh healthy Docker listings prove **0 owned containers, volumes, networks and
+image tags**; ignored journals/native archives remain. Final controls passed:
+**19 in the built image plus 14 host controls**, with one additional publisher
+fencing/cleanup rejection control added and passed afterward. A late auxiliary
+status/lock probe missed the already-completed teardown and was inconclusive;
+its metadata is retained. A separate controlled independent-process test verified
+the actual host lock, without claiming cross-container/NFS locking.
+
+[OBSERVER_RESULTS.json](OBSERVER_RESULTS.json) contains compact per-case, phase,
+resource, source/image and recovery evidence, the original failure reference,
+post-promotion fencing and cleanup proofs. Raw cohorts are ignored under
+`results/continuous-20261122/` and `results/continuous-fixed-20261122/`.
+Remaining: reboot-persistent ARC qualification, independent restore of the new
+recursive archive format, uncached degraded reads, rebuilt-copy isolation,
+real EIO/disk-full/host loss, beyond-tolerance failures and repeated isolated
+performance comparisons. Native replication restore does not qualify every one
+of these different boundaries.
 
 ## Benchmark method
 
@@ -187,10 +387,12 @@ are 2.2.2-0ubuntu9.5. fio package: 3.36-1build2. Actual versions are written to
 - [ZFS 2.2 vdev layouts and fault limits](https://openzfs.github.io/openzfs-docs/man/v2.2/7/zpoolconcepts.7.html).
 - [Faulting a member](https://openzfs.github.io/openzfs-docs/man/v2.2/8/zpool-offline.8.html), [replacement completion](https://openzfs.github.io/openzfs-docs/man/v2.2/8/zpool-replace.8.html), [scrub](https://openzfs.github.io/openzfs-docs/man/v2.2/8/zpool-scrub.8.html).
 - [Unmounted pool import](https://openzfs.github.io/openzfs-docs/man/v2.2/8/zpool-import.8.html).
+- [Native stream inspection](https://openzfs.github.io/openzfs-docs/man/v2.2/8/zstream.8.html).
 - [Snapshot send](https://openzfs.github.io/openzfs-docs/man/v2.2/8/zfs-send.8.html) and [resumable receive](https://openzfs.github.io/openzfs-docs/man/v2.2/8/zfs-receive.8.html).
 - [fio 3.36 manual/source](https://github.com/axboe/fio/blob/fio-3.36/HOWTO.rst).
 
 Inspected source: OpenZFS zfs-2.2.2 `zpool_main.c` (fault/replace/scrub waits),
 `zfs_main.c` (resumable streams), `libzfs_pool_os.c` (label/partition waits), `module/zfs/vdev_raidz.c` (parity and failure
-limits); fio fio-3.36 `verify.c` (CRC32C/header/offset checks), `filesetup.c` (allocation), and `engines/sync.c`
+limits), and `cmd/zstream/zstream_dump.c` (checksum diagnostics, record counts and
+zero-exit boundary), `lib/libzfs/libzfs_sendrecv.c` (compound package conclusion); fio fio-3.36 `verify.c` (CRC32C/header/offset checks), `filesetup.c` (allocation), and `engines/sync.c`
 (sync read/write). Orchestration and administrative fencing are lab code.

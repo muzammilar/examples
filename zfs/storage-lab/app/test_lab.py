@@ -69,6 +69,11 @@ class PromotionGateTests(unittest.TestCase):
 
 
 class PoolCreationTests(unittest.TestCase):
+    def setUp(self):
+        self.archive = patch.object(lab.evidence, "archive_pool", return_value=None)
+        self.archive.start()
+        self.addCleanup(self.archive.stop)
+
     def test_unrelated_failure_is_not_retried(self):
         with patch.object(
             lab, "ssh", side_effect=["", RuntimeError("read-only device")]

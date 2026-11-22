@@ -10,9 +10,9 @@ BENCH_SECONDS ?= 10
 RESULTS_DIR ?= results/manual
 SETUP ?= all
 export LOCAL_UID LOCAL_GID DISK_GIB DATA_MIB WRITE_MIB_S BENCH_MIB BENCH_SECONDS RESULTS_DIR
-RUN := $(COMPOSE) run --rm runner
+RUN := python3 run.py
 .NOTPARALLEL:
-.PHONY: unit-test build keys docker-up up test mirror-test raidz2-test replication-test benchmark status cli down docker-down
+.PHONY: report test-production unit-test build keys docker-up up test mirror-test raidz2-test replication-test benchmark status cli down docker-down
 keys:
 	@mkdir -p state/ssh "$(RESULTS_DIR)"
 	@test -f state/ssh/id_ed25519 || ssh-keygen -q -t ed25519 -N '' -f state/ssh/id_ed25519
@@ -20,16 +20,19 @@ build: keys
 	$(COMPOSE) build source
 
 docker-up: build
-	$(COMPOSE) up -d --wait source target
+	$(RUN) docker-up
 up:
 	@mkdir -p "$(RESULTS_DIR)"
 	$(RUN) up
 unit-test:
+	python3 -m unittest test_resources.py test_lifecycle.py test_report.py test_observe_process.py
 	$(COMPOSE) run --rm --entrypoint python3 runner -m unittest discover -s /opt/lab/app -p 'test_*.py'
 
 test: unit-test
 	@mkdir -p "$(RESULTS_DIR)"
 	$(RUN) test "$(SETUP)"
+test-production:
+	$(MAKE) test SETUP=all
 mirror-test:
 	$(MAKE) test SETUP=mirror
 raidz2-test:
@@ -47,7 +50,7 @@ cli:
 down:
 	$(RUN) down
 docker-down:
-	$(COMPOSE) --profile tools down --volumes --remove-orphans
-	@if docker image inspect zfs-storage-lab:dev >/dev/null 2>&1; then docker image rm zfs-storage-lab:dev; fi
-	@rm -f state/ssh/id_ed25519 state/ssh/id_ed25519.pub
-	@rmdir state/ssh state 2>/dev/null || true
+	$(RUN) docker-down
+
+report:
+	python3 report.py "$(RESULTS_DIR)"

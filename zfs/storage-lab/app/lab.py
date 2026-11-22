@@ -1,6 +1,9 @@
 """Storage-only ZFS experiments, using upstream fio and ZFS CLI tools."""
 
 import json
+import uuid
+
+import evidence
 import os
 from pathlib import Path
 import shlex
@@ -53,6 +56,9 @@ def ssh(node, command, timeout=120):
 
 def save(name, value):
     RESULTS.mkdir(exist_ok=True)
+    records = RESULTS / "records"
+    records.mkdir(exist_ok=True)
+    evidence.save(records / (name + "-" + uuid.uuid4().hex + ".json"), value)
     with (RESULTS / (name + ".json")).open("w") as f:
         json.dump(value, f, indent=2)
         f.write("\n")
@@ -139,13 +145,18 @@ def provision():
             "2222",
         ]
         subprocess.run(
-            scp + ["/opt/packages.tar.gz", "lab@" + node + ":/tmp/"],
+            scp
+            + [
+                "/opt/packages.tar.gz",
+                "/opt/lab/app/observe.py",
+                "lab@" + node + ":/tmp/",
+            ],
             check=True,
             timeout=180,
         )
         ssh(
             node,
-            "mkdir -p /tmp/zfslab-packages; tar xzf /tmp/packages.tar.gz -C /tmp/zfslab-packages; dpkg --install /tmp/zfslab-packages/*.deb; printf 268435456 > /sys/module/zfs/parameters/zfs_arc_max",
+            "mkdir -p /opt/zfslab; cp /tmp/observe.py /opt/zfslab/observe.py; mkdir -p /tmp/zfslab-packages; tar xzf /tmp/packages.tar.gz -C /tmp/zfslab-packages; dpkg --install /tmp/zfslab-packages/*.deb; printf 268435456 > /sys/module/zfs/parameters/zfs_arc_max",
             timeout=600,
         )
         print(node + ": storage runtime ready", flush=True)
@@ -164,7 +175,10 @@ def device(index):
 def reset(node, layout):
     count = 2 if layout == "mirror" else 4
     disks = [device(i) for i in range(count)]
-    # A tracked exported pool is imported without mounts before destructive test reset.
+    archive = evidence.archive_pool(node, RESULTS, ssh_args, ssh)
+    if archive:
+        print("Preserved prior pool: " + archive["sha256"], flush=True)
+    # Only explicitly independent cases recycle pools, after native archival.
     ssh(
         node,
         "if test -f /var/lib/zfslab-exported; then if ! zpool list zfslab >/dev/null 2>&1; then zpool import -N -d /dev/disk/by-id zfslab; fi; rm /var/lib/zfslab-exported; fi; if zpool list zfslab >/dev/null 2>&1; then zpool destroy -f zfslab; fi; udevadm settle; printf 268435456 > /sys/module/zfs/parameters/zfs_arc_max",
@@ -297,6 +311,18 @@ def file_info(node, filename):
     return {"bytes": int(value[0]), "sha256": value[1].split()[0]}
 
 
+def native_action(case, *arguments):
+    command = shlex.join(["python3", "/opt/zfslab/observe.py", "action", *arguments])
+    started = time.time_ns()
+    result = json.loads(ssh("source", command, timeout=600))
+    result["controller_started_ns"] = started
+    result["controller_ended_ns"] = time.time_ns()
+    evidence.save(case / ("action-" + uuid.uuid4().hex + ".json"), result)
+    if result["exit_code"]:
+        raise RuntimeError("native operation failed: " + result["stderr"])
+    return result
+
+
 def fault_test(layout):
     mib = setting("DATA_MIB", 512, 256, 2048)
     rate = setting("WRITE_MIB_S", 8, 1, 64)
@@ -307,84 +333,168 @@ def fault_test(layout):
     reset("source", layout)
     ssh("source", "zfs create zfslab/data")
     before = healthy("source")
-    filename = "/srv/zfslab/data/payload.bin"
-    process = subprocess.Popen(
-        ssh_args("source", fio_command(filename, mib, rate=rate)),
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        text=True,
+    case = RESULTS / "cases" / uuid.uuid4().hex
+    case.mkdir(parents=True)
+    evidence.save(
+        case / "config.json",
+        {
+            "layout": layout,
+            "data_mib": mib,
+            "write_mib_s": rate,
+            "seed": 20261114,
+            "created_ns": time.time_ns(),
+            "scope": "Independent immutable reads with native fio writes under member faults and resilver. TCG/shared-host diagnostic, not capacity.",
+        },
     )
-
-    def growth(minimum):
-        deadline = time.monotonic() + 90
-        while time.monotonic() < deadline:
-            size = int(
-                ssh("source", f"test ! -f {filename} || stat -c %s {filename}") or "0"
-            )
-            if process.poll() is not None:
-                raise RuntimeError(
-                    "fio completed before live fault/replacement; increase DATA_MIB or lower WRITE_MIB_S"
-                )
-            if size >= minimum:
-                return size
-            time.sleep(0.2)
-        raise RuntimeError("no write progress while degraded")
-
+    immutable = "/srv/zfslab/data/immutable.bin"
+    fio_file("source", immutable, 64)
+    expected = file_info("source", immutable)
+    evidence.save(case / "immutable-ack.json", expected)
+    reader, process = None, None
     try:
+        reader = evidence.Reader("source", immutable, expected, case, ssh_args, ssh)
+        reader.progress("baseline")
+        phases = {"baseline": time.time_ns()}
+        filename = "/srv/zfslab/data/payload.bin"
+        process = subprocess.Popen(
+            ssh_args("source", fio_command(filename, mib, rate=rate)),
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+        )
+
+        def growth(minimum):
+            deadline = time.monotonic() + 90
+            while time.monotonic() < deadline:
+                size = int(
+                    ssh("source", f"test ! -f {filename} || stat -c %s {filename}")
+                    or "0"
+                )
+                if process.poll() is not None:
+                    raise RuntimeError(
+                        "fio completed before live fault/replacement; increase DATA_MIB or lower WRITE_MIB_S"
+                    )
+                if size >= minimum:
+                    return size
+                time.sleep(0.2)
+            raise RuntimeError("no write progress while degraded")
+
         growth(16 * 1024**2)
         faults = 1 if layout == "mirror" else 2
+        phases["fault-injection"] = time.time_ns()
         for index in range(faults):
-            ssh("source", "zpool offline -f zfslab " + device(index))
+            native_action(case, "zpool", "offline", "-f", "zfslab", device(index))
         degraded = state("source")
         if (
             degraded["health"] != "DEGRADED"
             or degraded["status"].count("FAULTED") != faults
         ):
             raise RuntimeError("expected degraded layout was not observed")
+        phases["degraded"] = time.time_ns()
+        reader.phase("degraded")
+        reader.progress("degraded")
         first = int(ssh("source", "stat -c %s " + filename))
         last = growth(first + 8 * 1024**2)
         print(
             f"{layout}: {faults} faulted members; writes progressed by {last - first} bytes",
             flush=True,
         )
+        phases["replacement"] = time.time_ns()
+        reader.phase("replacement")
+        reader.progress("replacement")
+        replacements = []
         start = time.monotonic()
         for index in range(faults):
             replacement = 2 if layout == "mirror" else index + 4
-            ssh(
-                "source",
-                f"zpool replace -w zfslab {device(index)} {device(replacement)}",
-                timeout=600,
+            action = native_action(
+                case,
+                "zpool",
+                "replace",
+                "-w",
+                "zfslab",
+                device(index),
+                device(replacement),
             )
+            replacements.append(action)
+            reader.wait_overlap(
+                action["started_monotonic_ns"], action["ended_monotonic_ns"]
+            )
+            if process.poll() is not None:
+                raise RuntimeError(
+                    "writer exhausted input before native repair completed"
+                )
         replaced = time.monotonic() - start
+        phases["recovered"] = time.time_ns()
+        reader.phase("repaired")
+        reader.progress("repaired")
         stdout, stderr = process.communicate(timeout=600)
         if process.returncode:
             raise RuntimeError(f"fio write failed: {stderr}\n{stdout[-1000:]}")
         written = checked_fio(json.loads(stdout), mib)
-    finally:
-        if process.poll() is None:
-            ssh("source", "pkill -x fio || true")
-            process.terminate()
-            process.communicate(timeout=30)
-    verified = fio_file("source", filename, mib, True)
-    start = time.monotonic()
-    ssh("source", "zpool scrub -w zfslab", timeout=600)
-    scrub_seconds = time.monotonic() - start
-    save(
-        layout,
-        {
+        evidence.save(case / "write-completion.json", written)
+        verified = fio_file("source", filename, mib, True)
+        start = time.monotonic()
+        native_action(case, "zpool", "scrub", "-w", "zfslab")
+        scrub_seconds = time.monotonic() - start
+        after = healthy("source")
+        reader.phase("after-scrub")
+        reader.progress("after-scrub")
+        reader.stop()
+        result = {
             "data_mib": mib,
+            "phase_boundaries_ns": {**phases, "finished": time.time_ns()},
+            "phase_clock": "Docker VM UTC shared by controller and native container resource probes; separate guest monotonic clock used only for exact read/action overlap.",
             "faulted_members": faults,
             "before": before,
             "degraded": degraded,
-            "after": healthy("source"),
+            "after": after,
             "bytes_progressed_while_degraded": last - first,
             "replacement_seconds": replaced,
             "scrub_seconds": scrub_seconds,
             "file": file_info("source", filename),
             "write_fio": written,
             "verification_fio": verified,
-        },
-    )
+            "immutable": expected,
+            "read_summary": evidence.summarize_reads(reader.records),
+            "replacement_native_intervals": replacements,
+            "compression": ssh(
+                "source",
+                "zfs get -Hp -o name,property,value used,logicalused,compressratio zfslab zfslab/data",
+            ),
+            "read_history": str(case / "reader.jsonl"),
+            "case": str(case),
+        }
+        evidence.save(case / "result.json", result)
+        save(layout, result)
+    except BaseException as exception:
+        evidence.save(
+            case / "failure.json", {"error": str(exception), "ended_ns": time.time_ns()}
+        )
+        raise
+    finally:
+        original_failure = sys.exc_info()[0] is not None
+        cleanup_errors = []
+        try:
+            if process is not None and process.poll() is None:
+                ssh("source", "pkill -x fio || true")
+                process.terminate()
+                process.communicate(timeout=30)
+        except BaseException as exception:
+            cleanup_errors.append({"actor": "fio", "error": str(exception)})
+        try:
+            if reader is not None and not reader.stopped:
+                reader.stop()
+        except BaseException as exception:
+            cleanup_errors.append({"actor": "reader", "error": str(exception)})
+        if cleanup_errors:
+            evidence.save(
+                case / "cleanup-failure.json",
+                {"errors": cleanup_errors, "ended_ns": time.time_ns()},
+            )
+            if not original_failure:
+                raise RuntimeError(
+                    "background actor cleanup failed; preserve native storage"
+                )
 
 
 def replication_test():
@@ -524,6 +634,9 @@ def main():
                 replication_test()
             else:
                 fault_test(layout)
+    elif action == "archive-pools":
+        for node in NODES:
+            evidence.archive_pool(node, RESULTS, ssh_args, ssh)
     elif action == "benchmark":
         benchmark()
     elif action == "status":

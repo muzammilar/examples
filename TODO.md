@@ -5,9 +5,10 @@ Candidate databases and systems to add as examples. Branch names follow the exis
 
 ## Break and recover: all existing and future examples
 
-**Current goal priority (2026-11-22):** finish and publish the active DuckDB/ZFS,
-ZFS repair and Rust embedded runs, then focus on **Tigris, DuckDB and Iceberg-related
-projects** before other systems. Investigate failure mechanisms and verified
+**Current goal priority (2026-11-22):** finish and publish the active DuckDB/ZFS
+full lifecycle; the ZFS repair-reader and Rust embedded follow-ups now pass and
+are documented below. Then focus on **Tigris, DuckDB and Iceberg-related
+projects** before other systems. Investigate production operations, failure mechanisms and verified
 recovery, with matched comparisons after correctness/recovery gates pass.
 
 Apply the [production-test requirements](AGENTS.md#non-functional--production-tests) to every
@@ -282,6 +283,8 @@ Planned as a `mysql/` folder, mirroring the Postgres section with the same `orde
 - [ ] Rayforce/DuckDB: repeated alternating recovery-performance trials, asynchronous journal/watermark recovery, interrupted snapshot replacement, compressed journal frames, AOF live concurrent scan/process-crash and interrupted rotation, missing first/interior segments, online backup/restore, pressure, prepared SQL and genuinely cold persisted-query matrices.
 
 - [x] `duckdb-zfs-recovery`: four Quack clients, real ZFS snapshot replication, interrupted receive/resume, read-only clones and fenced-primary promotion with measured asynchronous loss.
+- [x] [ZFS storage recovery follow-up](zfs/storage-lab/): full mirror/RAIDZ2/replication suite at `WRITE_MIB_S=4`, 165/152 complete immutable-body reads during recovery, verified 512 MiB payloads, clean scrubs, guarded native pool archives and scoped teardown. Thirty-four controls pass; CPU/memory/compression/disk-byte/IOPS observations published. Preserve the earlier failed archive-checker attempt; stream validation is not restore qualification. Requalify the default separately.
+- [ ] ZFS deeper pass: restore the preserved native streams, add continuous replication observation and per-flush external acknowledgements, and exercise guest restart/configuration persistence, bounded pressure and further loss combinations. Current Tigris/DuckDB/Iceberg priorities come first.
 
 - [ ] `hyper-api-embedded`: Salesforce/Tableau Hyper (Umbra lineage, compiled queries) via `pip install tableauhyperapi`; free, closed source. macOS arm64 wheels stop after 0.0.26479 (newer releases: Linux x86_64 and Windows only), so pin that on a Mac. Compare with DuckDB on the same data.
 - [ ] `polars-datafusion`: Polars and DataFusion on the same Parquet files as the DuckDB example.

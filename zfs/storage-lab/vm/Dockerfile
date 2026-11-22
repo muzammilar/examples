@@ -1,4 +1,4 @@
-FROM ubuntu:24.04
+FROM ubuntu:24.04@sha256:9c7f200c07e3d4a03e7249d2c16bf66a51120fb876aa2242cf31451412543289
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends \
  qemu-system-arm qemu-efi-aarch64 qemu-utils cloud-image-utils openssh-client python3 ca-certificates \
@@ -16,6 +16,7 @@ RUN apt-get update && mkdir -p /opt/debs && cd /opt/debs \
  && rm -rf /var/lib/apt/lists/*
 ARG LOCAL_UID=1000
 RUN if ! getent passwd "${LOCAL_UID}" >/dev/null; then useradd --no-create-home --uid "${LOCAL_UID}" labctl; fi
+LABEL org.examples.owner="zfs-storage-lab"
 COPY vm/boot.py /opt/lab/boot.py
 COPY app /opt/lab/app
 ENTRYPOINT ["python3", "/opt/lab/boot.py"]

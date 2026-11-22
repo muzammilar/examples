@@ -1,3 +1,4 @@
-results
-state
-**/__pycache__
+results/
+state/
+**/__pycache__/
+.git/
