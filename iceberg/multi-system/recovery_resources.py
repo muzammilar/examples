@@ -14,7 +14,7 @@ PROBE = r"""
 set -eu
 printf '!started_uptime\n'; cat /proc/uptime
 printf '!pid_stat\n'; cat /proc/1/stat
-for metric in cpu.stat memory.current memory.peak memory.events io.stat; do
+for metric in cpu.stat memory.current memory.peak memory.events memory.stat io.stat; do
   printf '!%s\n' "$metric"
   cat "/sys/fs/cgroup/$metric"
 done
@@ -80,7 +80,7 @@ def parse_probe(output):
         "network",
         "allocated_kib",
     }
-    if set(sections) != required:
+    if not required <= set(sections) <= required | {"memory.stat"}:
         raise ValueError("incomplete resource probe")
     values = {key: "\n".join(lines) for key, lines in sections.items()}
     start, end = [
@@ -99,7 +99,7 @@ def parse_probe(output):
                     "rx_bytes": counters[0],
                     "tx_bytes": counters[8],
                 }
-    return {
+    result = {
         "native_uptime_start_ns": start,
         "native_uptime_end_ns": end,
         "pid1_start_ticks": int(values["pid_stat"].rsplit(")", 1)[1].split()[19]),
@@ -111,6 +111,9 @@ def parse_probe(output):
         "network": network,
         "allocated_disk_bytes": allocated_bytes(values["allocated_kib"]),
     }
+    if "memory.stat" in values:
+        result["memory_stat"] = numeric_fields(values["memory.stat"])
+    return result
 
 
 def min_mean_max(values):
@@ -200,6 +203,23 @@ def summarize(records):
             "identity_or_counter_gaps": gaps,
             "scope": "Native cgroup CPU across all threads including probes; sampled charged memory and per-generation lifetime peak. Intervals use native /proc/uptime with centisecond resolution; full probe brackets retain uncertainty. Approximate du allocated bytes, not open-deleted or unique physical storage. Workload /results binds share one witness directory: do not sum them. Device I/O is Docker-VM accounting, not physical SSD latency/queue depth; do not sum stacked devices. Missing devices/counters are unavailable, not zero. CPU and byte/IOPS deltas exclude restart bridges and unobserved initial/final edges. Raw samples retain network counters and timing uncertainty.",
         }
+        memory = [
+            row["counters"]["memory_stat"]
+            for row in rows
+            if "memory_stat" in row["counters"]
+        ]
+        if memory:
+            # Preserve exact legacy summaries: old samples lack these counters.
+            result[role]["memory_stat_bytes_min_mean_max"] = {
+                key: min_mean_max([sample[key] for sample in memory if key in sample])
+                for key in ("anon", "file", "kernel")
+            }
+            result[role]["memory_stat_samples"] = len(memory)
+            result[role]["memory_stat_scope"] = (
+                "Sampled native cgroup byte gauges, not Go heap or process RSS. "
+                "File includes charged file cache; kernel includes its subcategories. "
+                "Counters are read nonatomically; do not infer an exact partition of memory.current."
+            )
     return result
 
 

@@ -91,6 +91,31 @@ class NativeCounterTests(unittest.TestCase):
         self.assertEqual(parsed["native_uptime_end_ns"], 1250000000)
         self.assertEqual(parsed["pid1_start_ticks"], 42)
         self.assertIsNone(parsed["allocated_disk_bytes"])
+        self.assertNotIn("memory_stat", parsed)  # Historical probes remain replayable.
+        fields["memory.stat"] = "anon 700\nfile 300\nkernel 24\npgfault 40"
+        parsed = resources.parse_probe(
+            "\n".join("!" + key + "\n" + value for key, value in fields.items())
+        )
+        self.assertEqual(parsed["memory_stat"]["file"], 300)
+        record = {
+            "role": "storage",
+            "container_id": "owned",
+            "available": True,
+            "counters": parsed,
+        }
+        report = resources.summarize([record])["storage"]
+        self.assertEqual(report["memory_stat_samples"], 1)
+        self.assertEqual(
+            report["memory_stat_bytes_min_mean_max"]["anon"], [700, 700, 700]
+        )
+        self.assertEqual(
+            report["memory_stat_bytes_min_mean_max"]["kernel"], [24, 24, 24]
+        )
+        fields["memory.stat"] = "anon -1"
+        with self.assertRaisesRegex(ValueError, "negative"):
+            resources.parse_probe(
+                "\n".join("!" + key + "\n" + value for key, value in fields.items())
+            )
 
 
 if __name__ == "__main__":
