@@ -177,6 +177,14 @@ while ! test -f /backup/ROLE.finish; do sleep 0.1; done
             name,
             "--label",
             LABEL + "=" + str(run_id),
+            # Compose-built images carry project labels. These standalone tools
+            # have their own UUID ownership and must not enter that project.
+            "--label",
+            "com.docker.compose.project=",
+            "--label",
+            "com.docker.compose.service=",
+            "--label",
+            "com.docker.compose.project.working_dir=",
             "--network",
             "none",
             "--cpus",

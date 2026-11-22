@@ -166,6 +166,37 @@ These are cold compatibility checks, with the same **1 CPU / 1 GiB** storage cap
 default reader budget and four volume slots. They do not qualify a rolling/live
 upgrade, prove a fix for the historical OOM or establish capacity/performance.
 
-Next: preserve/retire the original failed compound-fault case through an explicit
-archive receipt, then use a fresh 4.54 fixture for bounded-memory/capacity settings
-and continuous compactor recovery. The original failure must remain visible.
+## Failed-case preservation
+
+```sh
+make archive-compound-case FAILED_CASE=results/compactor-20261122/witnessed/production/2b463a19-1a8c-43bf-b84d-5a0fa03f5836
+make verify-history
+make down
+```
+
+This deliberately narrow migration handles the identified aborted-reader/storage-
+OOM case. It rehashes **333 case artifacts**, **54 external backup/readback
+artifacts** and the original source seals, verifies native catalog heads and
+positively fences all **17 registered processes**. The receipt retains
+`passed=false`, `status=failed-but-preserved`; it does not invent the missing
+completed compactor proof or relax qualification for other failed experiments.
+The independent restored-copy proof covers **3,390,000 acknowledged rows per
+engine**, with all **36 ambiguous batches absent**.
+
+The first publication attempt failed safely on standalone helpers that inherited
+Compose image ownership labels. After exact helper ownership checks and removal,
+a native control verified the corrected helper clears those labels without
+changing main-project resources. The failed attempt remains recorded.
+
+Actual Make runs passed **193 host controls**: archive publication **59.432 s**,
+history verification **74.882 s**, and application `down` **37.921 s**. These are
+workflow durations, not query or capacity benchmarks. Application resources were
+removed; the original storage and query volumes, archive, restored copy and all
+raw evidence remain. Full `docker-down` has **not run**: automatic approval review
+rejected deletion of the original volumes and image tags, pending explicit
+approval. Compact receipts are in
+[`COMPOUND_PRESERVATION_RESULTS.json`](COMPOUND_PRESERVATION_RESULTS.json).
+
+Next: finish authorized fixture retirement, then qualify fresh 4.54 bounded-memory/
+capacity settings and continuous compactor recovery. The original operational
+failure remains failed.

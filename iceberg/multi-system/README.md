@@ -419,6 +419,13 @@ The audit explicitly retains `passed=false`, `qualified=false`, and
 preservation after the retained-volume restart, not continuous availability,
 HA or completed compactor recovery.
 
+The separate failed-case preservation workflow now passes: **333 case artifacts**,
+**54 external artifacts**, **17 process fences** and restored-copy body proofs
+remain bound to a `failed-but-preserved` receipt. `make verify-history` and
+application `make down` passed. Original volumes and backup copies remain;
+full infrastructure teardown and the fresh live-compactor qualification are
+pending. See [preservation results](COMPOUND_PRESERVATION_RESULTS.json).
+
 ## Limitations by architecture
 
 | Case | Useful for | Limitation |

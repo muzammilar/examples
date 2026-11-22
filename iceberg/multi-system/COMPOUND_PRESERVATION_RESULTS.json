@@ -1,0 +1,93 @@
+{
+  "date": "2026-11-22",
+  "scope": "Failure preservation and guarded application teardown; not live compactor qualification or a benchmark",
+  "run_id": "2b463a19-1a8c-43bf-b84d-5a0fa03f5836",
+  "original_operational_passed": false,
+  "status": "failed-but-preserved",
+  "data_preservation_passed": true,
+  "acknowledged_rows_per_engine": 3390000,
+  "ambiguous_batches_absent": 36,
+  "case_artifacts": 333,
+  "external_artifacts": 54,
+  "fenced_processes": 17,
+  "preservation_receipt": {
+    "path": "results/compactor-20261122/witnessed/production/2b463a19-1a8c-43bf-b84d-5a0fa03f5836/compound-archives/bcb40d1a-5ddb-4dd9-ac58-59e679c48655/receipt.json",
+    "sha256": "d3ee4faa9e2496d4c6b558986492c2fa27407698a9334cb668a0265f280e8873"
+  },
+  "archive_sha256": "db3d7b51ca0fd33f4d05b80d35f472df3a0f35d94470d27d526bc07234a0cb0c",
+  "canonical_body_sha256": "404308f8e350e15a3ca87416cd1f712b66f2506aed41b9d38eb1c41ba432b1c0",
+  "host_controls": 193,
+  "runs": [
+    {
+      "command": [
+        "make",
+        "archive-compound-case",
+        "FAILED_CASE=results/compactor-20261122/witnessed/production/2b463a19-1a8c-43bf-b84d-5a0fa03f5836"
+      ],
+      "exit_code": 2,
+      "duration_s": 6.50736,
+      "sources_unchanged": true,
+      "evidence": {
+        "path": "results/qualification-20261122/38-archive-compound-failure.result.json",
+        "sha256": "cba6e8f1a08a1f81dabc505a83e0561bcc762b8ade4394ce58d6b71a88ab1604"
+      }
+    },
+    {
+      "command": [
+        "make",
+        "archive-compound-case",
+        "FAILED_CASE=results/compactor-20261122/witnessed/production/2b463a19-1a8c-43bf-b84d-5a0fa03f5836"
+      ],
+      "exit_code": 0,
+      "duration_s": 59.431541,
+      "sources_unchanged": true,
+      "evidence": {
+        "path": "results/qualification-20261122/39-archive-compound-failure-owned.result.json",
+        "sha256": "f695ad8548962acf6f9b1d3db487dc7a0b80390e3817015016a82512f5fcf2d1"
+      }
+    },
+    {
+      "command": [
+        "make",
+        "verify-history",
+        "DUCKDB_VERSION=2.0.1"
+      ],
+      "exit_code": 0,
+      "duration_s": 74.881632,
+      "sources_unchanged": true,
+      "evidence": {
+        "path": "results/qualification-20261122/40-verify-preserved-history.result.json",
+        "sha256": "61c75173bf6bcc123014a09a0d3c1127feed8265abf27c8cc7fe7eb5e3c6b4c5"
+      }
+    },
+    {
+      "command": [
+        "make",
+        "down",
+        "DUCKDB_VERSION=2.0.1"
+      ],
+      "exit_code": 0,
+      "duration_s": 37.9205,
+      "sources_unchanged": true,
+      "evidence": {
+        "path": "results/qualification-20261122/41-retire-preserved-applications.result.json",
+        "sha256": "ad927f1ac16db659dab4899c4438ac62cf089d663141bb6f6ee332468ae999a7"
+      }
+    }
+  ],
+  "helper_label_fix": {
+    "cause": "Standalone file helpers inherited Compose project labels from their image; strict ownership validation rejected them.",
+    "change": "Clear the three inherited Compose ownership labels; retain the helper-specific UUID label.",
+    "native_control": "results/cold-helper-scope-control/b7dd050c-60ee-4e86-8b4a-e1f5b35cb93c/result.json"
+  },
+  "retained": [
+    "Original storage and query volumes",
+    "Verified whole-volume archive and restored copy",
+    "Failed operational verdict, sources, journals and raw diagnostics"
+  ],
+  "remaining": [
+    "Full docker-down was not executed: automatic approval review rejected deletion of the original volumes and built-image tags; explicit approval pending.",
+    "Fresh bounded-resource SeaweedFS 4.54 live compactor recovery remains unrun."
+  ],
+  "resources": "This preservation workflow rehashes evidence and reads the catalog; measured engine CPU/memory/compression/disk/I/O remain in COMPACTOR_FAILURE_RESULTS.json and SEAWEED_UPGRADE_RESULTS.json. Workflow durations are not query latency or capacity measurements."
+}

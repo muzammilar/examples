@@ -64,7 +64,7 @@ unit-test: config prepare
 
 recovery-unit-test:
 	python3 -c 'import sys; assert sys.version_info >= (3, 11), "Recovery controls require Python 3.11+; check the python3 selected by Make"'
-	python3 -m unittest test_recovery_resources.py test_recovery_control.py test_recovery_report.py test_recovery_cleanup.py test_recovery_retirement.py test_compactor_cleanup.py test_compactor_control.py test_prefault_archive.py test_manifest_control.py test_cold_storage.py test_cold_readback.py test_cold_upgrade.py test_cold_cleanup.py
+	python3 -m unittest test_recovery_resources.py test_recovery_control.py test_recovery_report.py test_recovery_cleanup.py test_recovery_retirement.py test_compactor_cleanup.py test_compactor_control.py test_prefault_archive.py test_manifest_control.py test_cold_storage.py test_cold_readback.py test_cold_upgrade.py test_cold_cleanup.py test_compound_archive.py
 
 storage-crash: config recovery-unit-test
 	python3 recovery_control.py storage-crash
@@ -204,3 +204,8 @@ cold-checkpoint-cleanup: config recovery-unit-test ## Remove recorded stopped ch
 cold-upgrade: config recovery-unit-test ## Reconcile a restored table with pinned SeaweedFS 4.54; refuse implicit downgrade
 	@test -n "$(COLD_CHECKPOINT)" -a -n "$(COLD_CASE)" -a -n "$(COLD_VERIFICATION)" || (echo 'Set COLD_CHECKPOINT, COLD_CASE and COLD_VERIFICATION'; exit 1)
 	python3 cold_upgrade.py --checkpoint "$(COLD_CHECKPOINT)" --case "$(COLD_CASE)" --verification "$(COLD_VERIFICATION)"
+
+.PHONY: archive-compound-case
+archive-compound-case: config recovery-unit-test ## Preserve the known failed compound case without passing its live test
+	@test -n "$(FAILED_CASE)" || (echo 'Set FAILED_CASE to the registered compound-failure case'; exit 1)
+	python3 recovery_cleanup.py archive-compound-case --case "$(FAILED_CASE)"

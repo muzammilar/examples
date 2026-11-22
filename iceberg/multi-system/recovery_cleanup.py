@@ -46,6 +46,7 @@ IMAGES = (
 )
 CASE_KINDS = {"iceberg-storage-crash", "iceberg-compactor-crash"}
 PREFAULT_ARCHIVE_ID = "f1b2af24-f6c2-4bd2-8e44-a35392666f23"
+COMPOUND_ARCHIVE_ID = "2b463a19-1a8c-43bf-b84d-5a0fa03f5836"
 
 
 def regular(path, root):
@@ -235,6 +236,13 @@ def fixture_stamp(cases):
         ).encode()
         hashes["@registration:" + case.name] = hashlib.sha256(registered).hexdigest()
         latest = max(latest, metadata["created_ns"])
+        if case.name == COMPOUND_ARCHIVE_ID:
+            from compound_archive import fingerprint
+
+            failed = fingerprint(case)
+            hashes.update(failed["files"])
+            latest = max(latest, failed["latest_operation_ns"])
+            continue
         paths = [case / "case.json"]
         workload = case / ("recovery-" + case.name)
         paths += sorted(workload.glob("*.json")) + sorted(workload.glob("*.jsonl"))
@@ -624,6 +632,10 @@ def base_artifacts(case):
 
 
 def check_case(case, stamp, *, require_fresh=True, ignore_receipts=False):
+    if case.name == COMPOUND_ARCHIVE_ID:
+        from compound_archive import preserved_case
+
+        return preserved_case(case, stamp, require_fresh=require_fresh)
     metadata = load(case / "case.json", case)
     result, result_path, manifest = base_artifacts(case)
     selected, receipt = result, None
@@ -742,7 +754,7 @@ def current_volume(inventory):
     return volume_key(candidates[0]) if candidates else None
 
 
-def catalog_recoveries(storage):
+def catalog_recoveries(storage, *, snapshots=False):
     """Explicit lab OAuth over container-local HTTP; curl never follows redirects."""
 
     def request(path, *, token=None, form=None):
@@ -847,6 +859,23 @@ def catalog_recoveries(storage):
             if body["metadata"]["format-version"] != 2:
                 raise RuntimeError("recovery table is not Iceberg v2")
             result[run_id] = body["metadata"]["table-uuid"]
+            if snapshots:
+                identifier = body["metadata"].get("current-snapshot-id")
+                location = body.get("metadata-location")
+                if (
+                    type(identifier) is not int
+                    or identifier <= 0
+                    or not isinstance(location, str)
+                    or not location
+                ):
+                    raise RuntimeError(
+                        "native recovery snapshot identity is incomplete"
+                    )
+                result[run_id] = {
+                    "table_uuid": result[run_id],
+                    "snapshot_id": identifier,
+                    "metadata_location": location,
+                }
     return result
 
 
@@ -896,6 +925,12 @@ def verify_history():
         return check_histories(groups, active_key=key, require_closure=True)
     stamp, errors = fixture_stamp(cases), []
     for case, metadata in cases:
+        if case.name == COMPOUND_ARCHIVE_ID:
+            try:
+                check_case(case, stamp)
+            except BaseException as error:
+                errors.append({"run_id": case.name, "preservation": repr(error)})
+            continue
         identifier = str(uuid.uuid4())
         directory = case / "reverifications" / identifier
         directory.mkdir(parents=True)
@@ -1147,6 +1182,7 @@ def main():
             "verify-history",
             "retire-failed-case",
             "archive-prefault-case",
+            "archive-compound-case",
         ],
     )
     parser.add_argument("--case")
@@ -1156,7 +1192,12 @@ def main():
     args = parser.parse_args()
     action = args.action
     retirement_args = (args.case, args.source_manifest, args.original_manifest)
-    if action == "archive-prefault-case":
+    if action == "archive-compound-case":
+        if not args.case or any(
+            (args.source_manifest, args.original_manifest, args.completed_verification)
+        ):
+            parser.error("compound preservation requires only the registered case")
+    elif action == "archive-prefault-case":
         if (
             not args.case
             or not args.completed_verification
@@ -1182,7 +1223,11 @@ def main():
     with os.fdopen(descriptor, "a") as lock:
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
         control.local_docker()
-        if action in {"retire-failed-case", "archive-prefault-case"}:
+        if action in {
+            "retire-failed-case",
+            "archive-prefault-case",
+            "archive-compound-case",
+        }:
             case = Path(args.case).resolve()
             registered = {
                 (control.ROOT / record["case"]).resolve() for record in index_records()
@@ -1191,6 +1236,11 @@ def main():
                 raise RuntimeError(
                     "retirement case must be registered in this example's fixture index"
                 )
+            if action == "archive-compound-case":
+                from compound_archive import archive_case
+
+                print(archive_case(case))
+                return
             if action == "archive-prefault-case":
                 from prefault_archive import archive_case
 

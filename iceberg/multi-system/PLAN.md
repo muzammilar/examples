@@ -215,8 +215,10 @@ and 3.39-million-ACK-row cases pass with 146 host controls. The lost-CLI-respons
 control proves the pre-registered verifier is fenced while its failed data verdict
 is retained. Guarded cleanup now removes registered temporary resources and preserves database
 volumes/archives. Cold upgrade to pinned SeaweedFS 4.54 passes both tables and
-serial shutdown; a persisted intent blocks older-image reuse. Next qualify the
-original failed-case archive closure, fresh bounded-memory/capacity settings and
+serial shutdown; a persisted intent blocks older-image reuse. The original failed-case archive receipt, history verification and application
+teardown now pass with 193 host controls, while its operational verdict stays
+failed. Original-volume/image deletion awaits explicit approval after automatic
+review rejection. Next qualify fresh bounded-memory/capacity settings and
 continuous compactor recovery; the cold result does not establish an OOM fix.
 
 ## Archive safety

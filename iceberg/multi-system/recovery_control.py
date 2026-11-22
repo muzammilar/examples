@@ -262,6 +262,8 @@ def sources():
     ]
     optional = [
         ROOT / "prefault_archive.py",
+        ROOT / "compound_archive.py",
+        ROOT / "test_compound_archive.py",
         ROOT / "cold_storage.py",
         ROOT / "cold_readback.py",
         ROOT / "cold_upgrade.py",

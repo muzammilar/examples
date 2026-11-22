@@ -941,5 +941,167 @@ class LifecycleControls(unittest.TestCase):
                 os.fstat(held[0])
 
 
+class CompoundDispatchTests(unittest.TestCase):
+    def test_catalog_snapshot_preserves_native_int64(self):
+        identifier = 2**60 + 17
+        replies = [
+            {"access_token": "local.token"},
+            {"namespaces": [["lab"]]},
+            {
+                "identifiers": [
+                    {"namespace": ["lab"], "name": "recovery_" + uuid.UUID(RUN).hex}
+                ]
+            },
+            {
+                "metadata-location": "s3://warehouse/metadata/v1.json",
+                "metadata": {
+                    "format-version": 2,
+                    "table-uuid": "native-table",
+                    "current-snapshot-id": identifier,
+                },
+            },
+        ]
+        with patch.object(
+            control, "call", side_effect=[json.dumps(r) + "\n200" for r in replies]
+        ):
+            self.assertEqual(
+                cleanup.catalog_recoveries({"Id": "owned"}, snapshots=True),
+                {
+                    RUN: {
+                        "table_uuid": "native-table",
+                        "snapshot_id": identifier,
+                        "metadata_location": "s3://warehouse/metadata/v1.json",
+                    }
+                },
+            )
+
+    def test_catalog_snapshot_requires_complete_exact_identity(self):
+        for identifier, location in (
+            (None, "s3://warehouse/x"),
+            (2.0, "s3://warehouse/x"),
+            (-1, "s3://warehouse/x"),
+            (17, ""),
+        ):
+            with self.subTest(identifier=identifier, location=location):
+                replies = [
+                    {"access_token": "local.token"},
+                    {"namespaces": [["lab"]]},
+                    {
+                        "identifiers": [
+                            {
+                                "namespace": ["lab"],
+                                "name": "recovery_" + uuid.UUID(RUN).hex,
+                            }
+                        ]
+                    },
+                    {
+                        "metadata-location": location,
+                        "metadata": {
+                            "format-version": 2,
+                            "table-uuid": "native-table",
+                            "current-snapshot-id": identifier,
+                        },
+                    },
+                ]
+                with (
+                    patch.object(
+                        control,
+                        "call",
+                        side_effect=[json.dumps(r) + "\n200" for r in replies],
+                    ),
+                    self.assertRaises(RuntimeError),
+                ):
+                    cleanup.catalog_recoveries({"Id": "owned"}, snapshots=True)
+
+    def test_identified_failure_uses_preservation_not_healthy_case_qualification(self):
+        case = control.ROOT / "results/production" / cleanup.COMPOUND_ARCHIVE_ID
+        expected = {"original_status": "failed", "data_preservation_passed": True}
+        with (
+            patch(
+                "compound_archive.preserved_case", return_value=expected
+            ) as preserved,
+            patch.object(
+                cleanup,
+                "base_artifacts",
+                side_effect=AssertionError("must not qualify failed live run"),
+            ),
+        ):
+            self.assertEqual(cleanup.check_case(case, {"fingerprint": "p"}), expected)
+        preserved.assert_called_once_with(
+            case, {"fingerprint": "p"}, require_fresh=True
+        )
+
+    def test_failed_fingerprint_never_reads_uncompleted_compactor_evidence(self):
+        case = control.ROOT / "results/production" / cleanup.COMPOUND_ARCHIVE_ID
+        with (
+            patch.object(
+                cleanup, "index_records", return_value=[{"run_id": case.name}]
+            ),
+            patch(
+                "compound_archive.fingerprint",
+                return_value={
+                    "files": {"actual-failed-observation": "a" * 64},
+                    "latest_operation_ns": 42,
+                },
+            ),
+            patch.object(
+                cleanup,
+                "digest",
+                side_effect=AssertionError("no invented final artifact"),
+            ),
+        ):
+            stamp = cleanup.fixture_stamp([(case, {"created_ns": 1})])
+        self.assertEqual(stamp["latest_operation_ns"], 42)
+        self.assertEqual(stamp["last_case"], case.name)
+
+    def verify(self, failure=None):
+        case = control.ROOT / "results/production" / cleanup.COMPOUND_ARCHIVE_ID
+        with (
+            patch.object(cleanup, "project_inventory", return_value={}),
+            patch.object(
+                cleanup, "cases_by_volume", return_value={"volume": [(case, {})]}
+            ),
+            patch.object(cleanup, "current_volume", return_value="volume"),
+            patch.object(control, "service", return_value={}),
+            patch.object(
+                cleanup, "catalog_recoveries", return_value={case.name: "native"}
+            ),
+            patch.object(cleanup, "fixture_stamp", return_value={"fingerprint": "p"}),
+            patch.object(cleanup, "check_case", side_effect=failure),
+            patch.object(cleanup, "check_histories", return_value="closed"),
+            patch.object(
+                cleanup,
+                "ResourceSampler",
+                side_effect=AssertionError("no new normal verifier"),
+            ),
+            patch.object(control, "tool") as tool,
+        ):
+            result = cleanup.verify_history()
+        tool.assert_not_called()
+        return result
+
+    def test_history_replays_terminal_preservation_without_new_normal_actor(self):
+        self.assertEqual(self.verify(), "closed")
+
+    def test_missing_or_invalid_preservation_still_blocks_history(self):
+        with self.assertRaisesRegex(RuntimeError, "history re-verification failed"):
+            self.verify(RuntimeError("preservation incomplete"))
+
+    def test_other_failed_cases_do_not_get_the_exception(self):
+        case = control.ROOT / "results/production" / str(uuid.uuid4())
+        with (
+            patch.object(cleanup, "load", return_value={}),
+            patch.object(
+                cleanup, "base_artifacts", side_effect=RuntimeError("unqualified case")
+            ),
+            patch(
+                "compound_archive.preserved_case",
+                side_effect=AssertionError("wrong case"),
+            ),
+            self.assertRaisesRegex(RuntimeError, "unqualified case"),
+        ):
+            cleanup.check_case(case, {})
+
+
 if __name__ == "__main__":
     unittest.main()
