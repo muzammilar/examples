@@ -212,6 +212,12 @@ cases and performance checks. Implement applicable cases as independent Make
 targets and a documented serial `test-production` aggregate. Existing examples do
 not become qualified merely because these requirements were added.
 
+Also follow the [production deployment and ongoing operations guidance](AGENTS.md#production-deployment-and-ongoing-operations):
+explain the deployment architecture and exercise applicable compaction/background
+maintenance, node replacement, long-term storage/tiering, retention/TTL and routine
+capacity operations under live load. Document configuration, measured effects,
+safe procedures and local-lab limits in the example README.
+
 Work across systems in [two or three testing passes](AGENTS.md#progressive-testing-across-systems):
 survey the agreed scope first, establish runnable correctness/recovery coverage,
 then return for deeper production tests. Prioritize sustained performance

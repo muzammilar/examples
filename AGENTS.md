@@ -151,6 +151,32 @@ and isolation rules below. Do not hide faults inside a benchmark. List unsupport
 blocked and unrun cases explicitly, with version-specific upstream reasons for
 unsupported cases.
 
+### Production deployment and ongoing operations
+
+Understanding **how to deploy and operate a system in production** is a primary
+goal alongside failure modes and recovery. For each system, explain the intended
+deployment architecture and exercise its supported ongoing operations in the
+isolated lab. Cover role placement, failure domains, replication/durability,
+persistent storage, resource sizing, observability and safe maintenance. Identify
+which guarantees require independent hosts, disks or availability zones and what
+the local example cannot establish. Base configuration choices on version-specific
+upstream guidance and verify the effective configuration.
+
+Include these cases where applicable, extending the existing example and test
+matrices rather than creating duplicate infrastructure:
+
+| Operation | What to demonstrate and measure |
+|---|---|
+| Compaction and background maintenance | Exercise native compaction, merges, checkpoints, vacuum or garbage collection under live reads/writes. Observe backlog, temporary space, CPU/memory, disk read/write bytes and I/O, amplification and foreground latency. Verify complete data after interruption, restart and completion. |
+| Node failure and replacement | Demonstrate role discovery, fencing, failover, replacement/bootstrap, repair and restored redundancy using the supported deployment procedure. Keep clients live and reconcile acknowledged data; distinguish retained storage, permanent disk loss and whole-node loss. |
+| Long-term storage and tiering | Exercise supported durable local/object storage, hot/cold tiers and archival with older data. Verify reads after eviction/restart, dependency loss and recovery, migration/retry safety, storage growth and retrieval costs. Distinguish caches, replicas, archives and independent backups. |
+| Retention and TTL-based deletion | Verify expiry boundaries, mixed TTLs, concurrent updates/readers, restarts and documented clock semantics. Measure logical expiry separately from physical reclamation, tombstones and compaction lag. Test snapshot/backup/object-version retention and safe garbage collection; source data must survive until an archive is verified. |
+| Routine operations and capacity | Exercise scaling, rolling maintenance, configuration changes and independent backup/restore as supported. Track capacity headroom and bounded sustained growth, maintenance interference and recovery time. Document actionable health/lag/space signals and the exact operator or manual runbook. |
+
+Publish the commands, measured outcomes, deployment tradeoffs and remaining gaps
+in the example README. Mark unsupported and unrun cases explicitly; a local lab
+demonstration alone does not qualify a production deployment.
+
 ### Progressive testing across systems
 
 Evaluate the repository's systems in **two or three passes**, returning to each
