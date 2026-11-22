@@ -15,14 +15,17 @@ LOCAL_USER := $(shell id -u):$(shell id -g)
 RUN := $(COMPOSE) run --rm --user $(LOCAL_USER)
 .NOTPARALLEL:
 
-.PHONY: unit-test config test-case cluster-up cluster-test cluster-failure-test
+.PHONY: prepare unit-test config test-case cluster-up cluster-test cluster-failure-test
 .PHONY: docker-up up test probe load verify compact status cli down docker-down
 
 docker-up: config
 	@docker info >/dev/null
 	$(COMPOSE) up -d --wait storage
 
-up: config
+prepare:
+	python3 prepare.py
+
+up: config prepare
 	$(COMPOSE) build runner compactor ch-workload
 	$(COMPOSE) up -d --wait storage clickhouse
 	@mkdir -p "$(RESULTS_DIR)"
@@ -30,8 +33,8 @@ up: config
 ARCH ?= all
 export ARCH
 
-unit-test:
-	$(MAKE) -C ../../clickhouse/iceberg unit-test
+unit-test: prepare
+	docker run --rm --network none --cpus=2 --memory=1g --memory-swap=1g --user $(LOCAL_USER) -e GOMAXPROCS=2 -e GOCACHE=/tmp/go-cache -e GOMODCACHE=/tmp/go-mod-cache -v "$(CURDIR)/.build/clickhouse-archive-workload:/src:ro" -w /src golang:1.27.4-bookworm go test ./...
 
 test: config unit-test
 	sh scripts/test.sh "$(ARCH)"

@@ -1,3 +1,4 @@
 results/
+.build/
 config/generated/
 __pycache__/

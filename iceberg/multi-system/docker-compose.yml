@@ -41,7 +41,7 @@ services:
   ch-workload:
     profiles: [tools]
     image: iceberg-multi-ch-workload:dev
-    build: ../../clickhouse/iceberg/app
+    build: ./.build/clickhouse-archive-workload
     environment:
       ROWS: ${ROWS:-2000000}
       CUSTOMERS: ${CUSTOMERS:-10000}
@@ -58,7 +58,7 @@ services:
     profiles: [tools]
     image: iceberg-multi-compactor:dev
     build:
-      context: ../../clickhouse/iceberg/compactor
+      context: ./.build/iceberg-compaction
       args:
         LOCAL_UID: ${LOCAL_UID:-10001}
     environment:

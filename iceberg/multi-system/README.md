@@ -86,8 +86,22 @@ multi-system/
 └── results/                 # ignored JSON metrics and acknowledgement journals
 ```
 
-The ClickHouse-only worker and Spark compactor are reused from
-`../../clickhouse/iceberg/app/` and `../../clickhouse/iceberg/compactor/`.
+`clickhouse-archive-workload/` and `iceberg-compaction/` are source symlinks to
+the repository-tracked ClickHouse archive worker and Spark compactor. `make up`
+and `make unit-test` first run the local `prepare.py`, which materializes only
+tracked regular files into ignored `.build/` contexts, using hard links where
+supported and copies otherwise. Docker builds from those local contexts; it does
+not follow directory symlinks automatically. No sibling Makefile, generated
+files, running services or previous state are required. Commit the source links
+and preparation script, never `.build/`.
+
+Build-isolation verification (2026-11-22): all seven materialized files match
+tracked source bytes and are regular hard links on this host; generated files
+are ignored and a symlinked build destination is rejected. The archive-worker
+Go unit suite passes from this local context with networking disabled and
+2-CPU/1-GiB limits; all three workload build contexts resolve inside this example.
+This validates preparation and existing controls, not a rerun of the five live
+data paths or the still-unrun production fault/concurrency matrix below.
 
 ## Limitations by architecture
 
