@@ -5,6 +5,12 @@ SeaweedFS. This example belongs under Iceberg because it tests interoperability.
 The single-server, ClickHouse-only examples are separately indexed under
 [`clickhouse/`](../../clickhouse/README.md#iceberg-examples).
 
+Current priority: **DuckDB as the application SQL client → ClickHouse ↔ Iceberg**.
+The [connector findings](DUCKDB_CLICKHOUSE_FINDINGS.md) record an Iceberg
+catalog-discovery failure, non-rollbackable remote writes and nanosecond precision
+loss. This connector architecture is not yet qualified; its next pass has five
+explicit test groups. Existing direct DuckDB–Iceberg results cover another path.
+
 ## Quick start
 
 Prerequisites: local Linux Docker with Compose v2, Make and Python 3.11+ (including

@@ -1,0 +1,343 @@
+{
+  "date": "2026-11-22",
+  "architecture": "Application DuckDB SQL/C++ extension -> ClickHouse <-> Iceberg REST/S3",
+  "architecture_qualified": false,
+  "native_engine": "DuckDB 2.0.1",
+  "connector_source": "ce337c48c12d24630caeed151b79dc177d48eb86",
+  "connector_binary_sha256": "e32c23138bc7eb620e428bbc6f9b62d7984cdc9d7e94cc19299ae18d852cd5ab",
+  "clickhouse": "26.10.10.3",
+  "storage": "SeaweedFS 4.54, isolated local S3/REST",
+  "findings": {
+    "catalog_discovery": {
+      "attached_read_passed": false,
+      "explicit_scan_passed": false,
+      "native_passthrough_passed": true,
+      "native_catalog_tables": 0,
+      "passthrough_control": [
+        {
+          "rows": 10000,
+          "amount_total": 50005000
+        }
+      ],
+      "full_body_verification": false,
+      "interpretation": "The native query can read the Iceberg table; ordinary attachment and explicit table scanner cannot discover it. Pinned discovery source relies on system.tables/system.columns. End-to-end architecture remains unqualified."
+    },
+    "rollback": {
+      "rows_after_rollback": [
+        {
+          "id": 1,
+          "body": "acknowledged"
+        },
+        {
+          "id": 2,
+          "body": "rollback-control"
+        }
+      ],
+      "interpretation": "Documented non-transactional boundary: the row written inside BEGIN remained after ROLLBACK."
+    },
+    "timestamp": {
+      "client": {
+        "id": 1,
+        "observed_nanoseconds": 1767225600123456000,
+        "observed_timestamp": "2026-01-01 00:00:00.123456+00"
+      },
+      "native": {
+        "id": 1,
+        "native_nanoseconds": 1767225600123456789
+      },
+      "lost_nanoseconds": 789,
+      "interpretation": "Documented DateTime64(9) -> microsecond TIMESTAMPTZ mapping; native pass-through integer nanoseconds preserve the original value."
+    },
+    "installation": {
+      "official_community_install_passed": true,
+      "signature_enforcement_disabled": false,
+      "interpretation": "Direct path LOAD was rejected because 2.0 treats a file without install-origin metadata as core-signed; official community INSTALL/LOAD worked. Initial direct-file failure is a harness/integration mistake, not evidence of an invalid upstream binary."
+    }
+  },
+  "reference_client_settings": [
+    {
+      "name": "ch_connect_timeout_ms",
+      "value": "3000"
+    },
+    {
+      "name": "ch_debug_show_queries",
+      "value": "false"
+    },
+    {
+      "name": "ch_default_table_engine",
+      "value": "MergeTree"
+    },
+    {
+      "name": "ch_filter_pushdown",
+      "value": "true"
+    },
+    {
+      "name": "ch_insert_block_size",
+      "value": "10000"
+    },
+    {
+      "name": "ch_mutations_sync",
+      "value": "2"
+    },
+    {
+      "name": "ch_order_pushdown",
+      "value": "true"
+    },
+    {
+      "name": "ch_pool_acquire_mode",
+      "value": "wait"
+    },
+    {
+      "name": "ch_pool_idle_timeout_millis",
+      "value": "60000"
+    },
+    {
+      "name": "ch_pool_max_connections",
+      "value": "2"
+    },
+    {
+      "name": "ch_pool_wait_timeout_millis",
+      "value": "5000"
+    },
+    {
+      "name": "ch_receive_timeout_ms",
+      "value": "5000"
+    }
+  ],
+  "resource_observations": {
+    "clickhouse": {
+      "samples": 19,
+      "observed_seconds": 22.19,
+      "cpu_core_seconds": {
+        "total": 5.006024000000001,
+        "user": 3.1077959999999996,
+        "system": 1.898227
+      },
+      "cpu_percent_one_core_100": 22.559819738621005,
+      "charged_memory_bytes_min_mean_max": [
+        1202049024,
+        1233580463.1578948,
+        1251516416
+      ],
+      "lifetime_peak_memory_bytes": 1614176256,
+      "allocated_disk_bytes_first_peak_last": [
+        387293184,
+        419389440,
+        419389440
+      ],
+      "native_block_io": {
+        "254:0": {
+          "observed_seconds": 22.19,
+          "rbytes": 0,
+          "wbytes": 16384,
+          "rios": 0,
+          "wios": 4,
+          "rbytes_per_second": 0.0,
+          "wbytes_per_second": 738.3506083821541,
+          "rios_per_second": 0.0,
+          "wios_per_second": 0.18026137899954933
+        }
+      },
+      "scope": "Native cgroup CPU across all threads including probes; sampled charged memory and per-generation lifetime peak. Intervals use native /proc/uptime with centisecond resolution; full probe brackets retain uncertainty. Approximate du allocated bytes, not open-deleted or unique physical storage. Workload /results binds share one witness directory: do not sum them. Device I/O is Docker-VM accounting, not physical SSD latency/queue depth; do not sum stacked devices. Missing devices/counters are unavailable, not zero. CPU and byte/IOPS deltas exclude restart bridges and unobserved initial/final edges. Raw samples retain network counters and timing uncertainty."
+    },
+    "native-settings": {
+      "samples": 18,
+      "observed_seconds": 20.949999999999996,
+      "cpu_core_seconds": {
+        "total": 0.6255059999999999,
+        "user": 0.3284560000000001,
+        "system": 0.29705
+      },
+      "cpu_percent_one_core_100": 2.9857088305489263,
+      "charged_memory_bytes_min_mean_max": [
+        2232320,
+        17194097.777777776,
+        19673088
+      ],
+      "lifetime_peak_memory_bytes": 76161024,
+      "allocated_disk_bytes_first_peak_last": [
+        58535936,
+        58781696,
+        58781696
+      ],
+      "native_block_io": null,
+      "scope": "Native cgroup CPU across all threads including probes; sampled charged memory and per-generation lifetime peak. Intervals use native /proc/uptime with centisecond resolution; full probe brackets retain uncertainty. Approximate du allocated bytes, not open-deleted or unique physical storage. Workload /results binds share one witness directory: do not sum them. Device I/O is Docker-VM accounting, not physical SSD latency/queue depth; do not sum stacked devices. Missing devices/counters are unavailable, not zero. CPU and byte/IOPS deltas exclude restart bridges and unobserved initial/final edges. Raw samples retain network counters and timing uncertainty."
+    },
+    "storage": {
+      "samples": 20,
+      "observed_seconds": 23.45,
+      "cpu_core_seconds": {
+        "total": 0.38043099999999996,
+        "user": 0.193353,
+        "system": 0.187079
+      },
+      "cpu_percent_one_core_100": 1.6223070362473346,
+      "charged_memory_bytes_min_mean_max": [
+        717987840,
+        718755020.8,
+        719433728
+      ],
+      "lifetime_peak_memory_bytes": 1079885824,
+      "allocated_disk_bytes_first_peak_last": [
+        3215015936,
+        3215015936,
+        3215015936
+      ],
+      "native_block_io": {
+        "254:0": {
+          "observed_seconds": 23.45,
+          "rbytes": 0,
+          "wbytes": 0,
+          "rios": 0,
+          "wios": 0,
+          "rbytes_per_second": 0.0,
+          "wbytes_per_second": 0.0,
+          "rios_per_second": 0.0,
+          "wios_per_second": 0.0
+        }
+      },
+      "scope": "Native cgroup CPU across all threads including probes; sampled charged memory and per-generation lifetime peak. Intervals use native /proc/uptime with centisecond resolution; full probe brackets retain uncertainty. Approximate du allocated bytes, not open-deleted or unique physical storage. Workload /results binds share one witness directory: do not sum them. Device I/O is Docker-VM accounting, not physical SSD latency/queue depth; do not sum stacked devices. Missing devices/counters are unavailable, not zero. CPU and byte/IOPS deltas exclude restart bridges and unobserved initial/final edges. Raw samples retain network counters and timing uncertainty."
+    }
+  },
+  "other_production_measurements": {
+    "compression": "Not measured for the two-row/one-row MergeTree controls or the existing ten-thousand-row Iceberg read; do not use this as a storage or performance comparison.",
+    "latency": "No individual request latency distribution was measured; resource windows include the failed-client hold/fencing interval."
+  },
+  "remaining_test_groups": [
+    "2M-row full-body round trip through DuckDB -> ClickHouse <-> Iceberg, including types",
+    "Partial inserts, ambiguous acknowledgement and safe retry",
+    "ClickHouse crash/restart under live independent readers/writers",
+    "S3/catalog outage/recovery under live load",
+    "Compaction during live reads/writes and full reconciliation"
+  ],
+  "evidence": [
+    {
+      "path": "results/current/duckdb-clickhouse-runtime/9dbf250e-3de6-417e-a294-1461d057cae0/probe.sql",
+      "sha256": "e3f9263db48233c154fcb03f0130e736ba70621541bff6000798f2988d3a4dc2"
+    },
+    {
+      "path": "results/current/duckdb-clickhouse-runtime/9dbf250e-3de6-417e-a294-1461d057cae0/result.json",
+      "sha256": "f22d0594cfb3d102a99e2a5d93e40f666775b988b02f53c81360a3fa14c56f78"
+    },
+    {
+      "path": "results/current/duckdb-clickhouse-runtime/9dbf250e-3de6-417e-a294-1461d057cae0/stderr.log",
+      "sha256": "f8ae172b968d104c32aa7f97cec321627811a88eecde2bfa8dfae6bf5a6bfa38"
+    },
+    {
+      "path": "results/current/duckdb-clickhouse-runtime/9dbf250e-3de6-417e-a294-1461d057cae0/native-exit.txt",
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    {
+      "path": "results/current/duckdb-clickhouse-runtime/9dbf250e-3de6-417e-a294-1461d057cae0/connector.json",
+      "sha256": "87ef1e5766db1c0a6795a7654941fb58ae38fa1b2aecfcf18195b8ca4f926032"
+    },
+    {
+      "path": "results/current/duckdb-clickhouse-runtime/9dbf250e-3de6-417e-a294-1461d057cae0/rollback-rows.json",
+      "sha256": "7ae945448d8e62b3cd2fc944d06437f4d7f5f9ffc151d3089a5a76f645540f40"
+    },
+    {
+      "path": "results/current/duckdb-clickhouse-runtime/9dbf250e-3de6-417e-a294-1461d057cae0/timestamp-client.json",
+      "sha256": "f8db520fff658d6d678f03ac68fc9d1b0b6daf01ae8b761934a0bbbe26ffae6b"
+    },
+    {
+      "path": "results/current/duckdb-clickhouse-runtime/9dbf250e-3de6-417e-a294-1461d057cae0/timestamp-native.json",
+      "sha256": "ca6f32296aafca8bf901b6ee260cc911395025ab7f04d8041ebb9509515c8c23"
+    },
+    {
+      "path": "results/current/duckdb-clickhouse-runtime/9dbf250e-3de6-417e-a294-1461d057cae0/iceberg-passthrough.json",
+      "sha256": "2aba2c57758e87173fe2110460f38c831ac5296e73c1cebce1e39b70b472a0d1"
+    },
+    {
+      "path": "results/current/duckdb-clickhouse-runtime/9dbf250e-3de6-417e-a294-1461d057cae0/native-catalog.json",
+      "sha256": "b45c681534d92e14f44e6f5577b0701bd30dc73726b1f68a68cb4bbeca87093c"
+    },
+    {
+      "path": "results/current/duckdb-clickhouse-runtime/9dbf250e-3de6-417e-a294-1461d057cae0/connector-catalog.json",
+      "sha256": "ff29438b9f00b5e64193c4287003cbfda48709ed7041cdd4b7ff7473c6d44fb9"
+    },
+    {
+      "path": "results/current/duckdb-clickhouse-runtime/9dbf250e-3de6-417e-a294-1461d057cae0/resource-summary.json",
+      "sha256": "7b94d80d523f890cd494887f685aece26eab68b7c9ad1fe60de9986683ab494d"
+    },
+    {
+      "path": "results/current/duckdb-clickhouse-runtime/9dbf250e-3de6-417e-a294-1461d057cae0/storage-before.json",
+      "sha256": "a666069521aa2c215a391d57d2680d810d99db08bae257bf03b129463b291a09"
+    },
+    {
+      "path": "results/current/duckdb-clickhouse-runtime/9dbf250e-3de6-417e-a294-1461d057cae0/clickhouse-before.json",
+      "sha256": "e263831c3460b58070c038fdc63ae75ae95a95aab362905765f70da1bb3dd874"
+    },
+    {
+      "path": "results/current/duckdb-clickhouse-runtime/9dbf250e-3de6-417e-a294-1461d057cae0/probe-controller.py",
+      "sha256": "168d172117dcc2c14c145fbe9175457771c9428ed63049224b0782532d8888b8"
+    },
+    {
+      "path": "results/current/duckdb-clickhouse-runtime/3a03c569-2dc1-471e-85fc-5857a511ac81/probe.sql",
+      "sha256": "2e0bd5d5e236164ab64ab141555de037d4dff051d3c487482c6dc80bb925e477"
+    },
+    {
+      "path": "results/current/duckdb-clickhouse-runtime/3a03c569-2dc1-471e-85fc-5857a511ac81/probe-controller.py",
+      "sha256": "66d51379ff9012f18c348955c26c206ab2b457ca4eb91b1c5517ac17db01e556"
+    },
+    {
+      "path": "results/current/duckdb-clickhouse-runtime/3a03c569-2dc1-471e-85fc-5857a511ac81/result.json",
+      "sha256": "f803bbb01bbde6b50c7190dddbb05ee868c08192f731b62661a80962ef4dbf16"
+    },
+    {
+      "path": "results/current/duckdb-clickhouse-runtime/3a03c569-2dc1-471e-85fc-5857a511ac81/stderr.log",
+      "sha256": "e38ec2a457a4ce13eea889f5d9abeab74bc49d2413b7053cf05c8a9162bbf297"
+    },
+    {
+      "path": "results/current/duckdb-clickhouse-runtime/3a03c569-2dc1-471e-85fc-5857a511ac81/native-exit.txt",
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    {
+      "path": "results/current/duckdb-clickhouse-runtime/3a03c569-2dc1-471e-85fc-5857a511ac81/iceberg-passthrough.json",
+      "sha256": "2aba2c57758e87173fe2110460f38c831ac5296e73c1cebce1e39b70b472a0d1"
+    },
+    {
+      "path": "results/current/duckdb-clickhouse-runtime/3a03c569-2dc1-471e-85fc-5857a511ac81/resource-summary.json",
+      "sha256": "7e938aa3226acaf1d9cdbf74f2224b97f09a018d7a8af4c9844d5aa6f3272369"
+    },
+    {
+      "path": "results/current/duckdb-clickhouse-probe/abc582fc-dc51-4246-adaf-80f687dddb01/probe.sql",
+      "sha256": "7938e48d339d8ad3541b9137436120d80bea3d2f9257039e8e2b7f343d032429"
+    },
+    {
+      "path": "results/current/duckdb-clickhouse-probe/abc582fc-dc51-4246-adaf-80f687dddb01/probe-controller.py",
+      "sha256": "1d4d30791345ea65ab5de21b03d2d6372278bc4a346e5cfe11e12db84cc1f1a6"
+    },
+    {
+      "path": "results/current/duckdb-clickhouse-probe/abc582fc-dc51-4246-adaf-80f687dddb01/result.json",
+      "sha256": "522655440d67254c69d9aae4471a190d6fe125dda8423bd9a6116b2852c8cb4c"
+    },
+    {
+      "path": "results/current/duckdb-clickhouse-probe/abc582fc-dc51-4246-adaf-80f687dddb01/connector.json",
+      "sha256": "1e2d04d739cd58961da54c8f39d21bb69a4cbba7de5642673467ddfbe5fdd440"
+    },
+    {
+      "path": "results/current/duckdb-clickhouse-probe/abc582fc-dc51-4246-adaf-80f687dddb01/settings.json",
+      "sha256": "085ff3f78855f9601ad591a6e78faf761dc918a3f088b85b6dfd7718f55d9410"
+    },
+    {
+      "path": "results/current/duckdb-clickhouse-probe/abc582fc-dc51-4246-adaf-80f687dddb01/resource-summary.json",
+      "sha256": "0ef35833f36d725a5bec8c7f36370988c56df898ce86e3b0f15e3b3015144786"
+    },
+    {
+      "path": "results/current/duckdb-clickhouse-research/d8782d6c-97c9-4c5f-a99b-61d0e402ae49/manifest.json",
+      "sha256": "d09277c1d67bbd0b254a8133167a4dc452530fbeffd52cbf7a8e7178080bf8f0"
+    },
+    {
+      "path": "results/current/duckdb-clickhouse-research/d8782d6c-97c9-4c5f-a99b-61d0e402ae49/source-manifest.json",
+      "sha256": "46edf96a89c25ac97907a0b89adb9daf22a50abcb53d8efe3c660cda9026ab23"
+    },
+    {
+      "path": "results/current/duckdb-clickhouse-research/d8782d6c-97c9-4c5f-a99b-61d0e402ae49/duckdb-source-manifest.json",
+      "sha256": "ab0f1dd29d1a071d066db80d4e57525ca86d673616c47c2f3189ddf3a8cb4257"
+    },
+    {
+      "path": "results/current/duckdb-clickhouse-research/d8782d6c-97c9-4c5f-a99b-61d0e402ae49/README.md",
+      "sha256": "28daa9df242019a13f6f1450529f801530eb9f1ad95e4c6e3b08dabd84de651c"
+    }
+  ]
+}

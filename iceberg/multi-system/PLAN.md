@@ -1,5 +1,10 @@
 # Iceberg multi-system architecture and test plan
 
+Current priority is **DuckDB as the application SQL client → ClickHouse ↔
+Iceberg**, rather than a direct DuckDB S3 client. See
+`DUCKDB_CLICKHOUSE_FINDINGS.md` for measured connector boundaries and the five
+remaining test groups. The new connector architecture remains unqualified.
+
 Current checkpoint (2026-11-22): the default `LAB_PROFILE=current` uses isolated
 project/image/volume/result names and DuckDB 2.0.1, SeaweedFS 4.54, ClickHouse
 26.10.10.3 and Spark 4.1.4 / Iceberg 1.12.0. Actual Make runs pass direct DuckDB,
