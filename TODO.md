@@ -5,6 +5,11 @@ Candidate databases and systems to add as examples. Branch names follow the exis
 
 ## Break and recover: all existing and future examples
 
+**Current goal priority (2026-11-22):** finish and publish the active DuckDB/ZFS,
+ZFS repair and Rust embedded runs, then focus on **Tigris, DuckDB and Iceberg-related
+projects** before other systems. Investigate failure mechanisms and verified
+recovery, with matched comparisons after correctness/recovery gates pass.
+
 Apply the [production-test requirements](AGENTS.md#non-functional--production-tests) to every
 system, including older examples. Deliberately find how it breaks, measure the
 availability/data-loss boundary, and demonstrate recovery. Multiple replicas and
@@ -429,6 +434,7 @@ Plan and source links: [`observability/README.md`](observability/README.md), inc
 - [x] [Initial candidate research](rust/EMBEDDED_DATABASE_SURVEY.md): Fjall 3.1.13,
   redb 5.0.0 and Turso 0.8.4 documentation and selected source paths reviewed;
   sync/transaction, migration and experimental-feature boundaries recorded.
-  Research only: examples, runtime settings and all tests remain unverified.
-- [ ] Future `rust/embedded-databases` Cargo project: Fjall LSM ingestion/compaction and redb transactional catalogs, snapshot readers, kill/reopen recovery, matched durable commits and external ACK reconciliation; compare SQLite / RocksDB. In-process engines, not invented cluster deployments.
+  The survey itself is research; executed Fjall/redb qualification is separate below.
+- [x] [`rust/embedded-databases`](rust/embedded-databases/) durable catalog foundation: native Fjall SyncAll/redb Immediate atomic pairs, independent live Rust actors, owner SIGKILL, retained reopen and byte-checked offline fresh-copy restore. The [100k checkpoint](rust/embedded-databases/RESULTS_100K.json) verifies 101,550/101,561 cumulative acknowledged pairs with zero loss or wrong/partial bodies; phase-local recovered reads, typed native lock rejection and CPU/memory/compression/disk/byte/IOPS evidence are checked. The [million-pair profile](rust/embedded-databases/RESULTS.json) also verifies 1,000,789/1,000,778 ACKed pairs with zero loss/wrong/partial data; one applied redb intent remains unacknowledged. Shared-host functional diagnostics, not a performance winner or SQL replacement.
+- [ ] Rust embedded follow-ups: Fjall prefix/range scans during flush/compaction, redb conflicting transactional updates and long-held snapshot space, bounded EIO/full-disk/pressure, format migration, and isolated repeated single/batch/cache comparisons. Add SQLite / RocksDB on matching contracts; no invented clustering.
 - [ ] Qdrant extensions: existing single/cluster examples remain covered; add matched-corpus comparisons with Milvus / Weaviate / pgvector plus skew, shard relocation and permanent disk replacement after the current batch.

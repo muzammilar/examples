@@ -1,26 +1,27 @@
-# examples-rust
-Example codes in rust for fun
-
-## Examples
+# Rust examples
 
 - [`hello-web-app`](hello-web-app): Actix web server and CLI sharing a library.
-- [`kv-store`](kv-store): Replicated key-value store: openraft over a write-ahead log, with a Docker Compose cluster.
+- [`kv-store`](kv-store): replicated key-value store using openraft over a write-ahead log, with a Docker Compose cluster.
+- [`embedded-databases`](embedded-databases): Fjall/redb durable atomic catalog pairs, independent Rust readers/writers, owner SIGKILL/reopen, full acknowledged-body reconciliation and offline fresh-copy restore. Docker builds the pinned Cargo project; no host Rust toolchain is required.
 
-## Planned embedded database project
+The [100,000-pair checkpoint](embedded-databases/RESULTS_100K.json) verifies
+**101,550 Fjall / 101,561 redb cumulative acknowledged pairs**, including the
+100,000-pair seed on each engine and preserved earlier live histories. Both lose
+zero acknowledged data and return no wrong or partial pairs. CPU, memory,
+compression, disk allocation, read/write bytes and IOPS accompany the results.
+These are process-recovery observations under shared-host functional load, not a
+performance ranking. Neither is a SQL-compatible SQLite replacement.
 
-Future `rust/embedded-databases`: one Cargo project with separate adapters and the
-same deterministic datasets, durable commit rules, throughput/latency measurements
-and external acknowledged-write reconciliation after a killed process. These
-engines are in-process libraries; do not invent native replication or cluster HA.
+The [million-pair qualification](embedded-databases/RESULTS.json) additionally
+verifies **1,000,789 Fjall / 1,000,778 redb acknowledged pairs**, with zero loss or
+wrong/partial bodies after owner crash and fresh-copy restore. One redb intent
+committed without an acknowledgement and remains classified as unacknowledged.
+Each backend starts with **528,000,000 logical key/value bytes**, before native
+metadata or export framing. These larger-fixture results remain functional
+recovery observations under the same 2-CPU/2-GiB service budget.
 
-| Engine | Potential example | Comparison |
-|---|---|---|
-| [Fjall](https://github.com/fjall-rs/fjall) | LSM ingestion, atomic batches, prefix/range scans during compaction, durable kill/reopen | redb / RocksDB |
-| [redb](https://github.com/cberner/redb) | Transactional catalog updates, snapshot readers, writer contention and crash recovery | Fjall / SQLite |
-
-Documentation backlog only; implementation remains deferred until active
-experiments finish. Research does not start another lab or qualify runtime behavior.
-
-The [embedded database research pass](EMBEDDED_DATABASE_SURVEY.md) reviews pinned
-Fjall/redb/Turso releases, durability defaults, concurrency/experimental boundaries
-and the first correctness/recovery tests. It contains no executed results.
+Later passes cover Fjall compaction/prefix scans, redb conflicting updates and
+snapshot space pinning, format migration, pressure and isolated repeated
+comparisons with SQLite/RocksDB. These libraries do not supply native clustering
+or replicated HA in this example. See the [candidate research](EMBEDDED_DATABASE_SURVEY.md)
+for pinned source findings; Turso remains a separate future SQL example.

@@ -1,10 +1,12 @@
 # Rust embedded database survey
 
-**Research pass, 2026-11-22. No examples have been compiled or run.** This reviews
-the three deferred embedded candidates, not every repository system. Finish the
-active CedarDB comparison before building or running these workloads. Future
-application, test and benchmark code should use Rust, with ordinary Cargo tooling
-and small engine adapters rather than a repository-wide framework.
+**Research and initial execution pass, 2026-11-22.** This reviews three embedded
+candidates, not every repository system. After the CedarDB comparison finished,
+[Fjall/redb recovery](embedded-databases/README.md) compiled and ran in Rust with
+ordinary Cargo tooling and small native adapters. Both 100,000-pair and fresh
+million-pair retained-crash/restore profiles pass, with exact acknowledged-body
+reconciliation and explicit resource/cold-cache/physical-durability limits.
+Turso remains researched but unrun; no SQLite-compatible replacement is qualified.
 
 Official release metadata identifies Fjall **3.1.13**, redb **5.0.0** and Turso
 **0.8.4** as non-prerelease release tags. That is a version-selection starting
@@ -73,8 +75,16 @@ Upstream production usage is not evidence that our selected profile passes.
    compression, disk allocation, read/write bytes and IOPS for every experiment.
    Native compression, input compressibility and storage overhead stay separate.
 
-This is a proposed test sequence. Feature combinations, effective settings,
-runtime performance and failure/recovery outcomes are **unverified**. The existing
-[production requirements](../AGENTS.md#non-functional--production-tests) still
-apply. Fjall/redb belong in the planned `rust/embedded-databases` project; Turso
-remains a separate system candidate with its own lifecycle.
+The [implemented Rust project](embedded-databases/README.md) now tests the selected
+single-owner durable atomic-pair subset: native abort/delete/snapshot and ownership
+controls, independent live readers/writers through SIGKILL, complete external ACK/
+body reconciliation, retained reopen and verified offline fresh-copy restore.
+The million-pair cases verify 1,000,789 Fjall and 1,000,778 redb ACKed pairs with zero
+acknowledged loss or wrong/partial bodies. One additional redb intent committed
+without an ACK and remains separately reconciled. CPU/memory/compression/disk/I/O
+results are functional diagnostics under shared-host co-tenancy, not a performance
+ranking. Sustained comparisons, pressure/corruption, migrations, longer-held
+snapshots and other proposed feature combinations remain unrun. The existing
+[production requirements](../AGENTS.md#non-functional--production-tests) still apply.
+Turso remains a separate candidate; current work returns to the user's Tigris,
+DuckDB and Iceberg priorities before adding more Rust scenarios.

@@ -409,11 +409,14 @@ comparative benchmarks need isolated, matched conditions.
 The 2026-11-22 source inventory covers all **36 Makefiles in this recent cohort**;
 it is not a completed upstream/code review or a rerun of all systems. The detailed
 findings above remain the execution/gap record. The separate
-[Rust embedded survey](rust/EMBEDDED_DATABASE_SURVEY.md) is research for deferred
-candidates, outside this deployment count.
+[Rust embedded survey](rust/EMBEDDED_DATABASE_SURVEY.md) records the initial candidate
+research. The supplemental [Rust embedded project](rust/embedded-databases/)
+is outside that original deployment inventory: its executed native-process
+qualification is recorded separately below.
 
 | Work group | Present boundary | Next testing pass |
 |---|---|---|
+| Fjall/redb embedded Rust | 100k and million-pair native-process crash/reopen and fresh-copy restore pass; million-pair proofs verify 1,000,789/1,000,778 ACKed pairs with zero loss or wrong/partial data | Keep one applied redb ambiguous intent unacknowledged. These are shared-host functional observations, not a comparative performance winner. Scoped teardown and clean fixture recreation pass. Defer deeper KV tests while Tigris/DuckDB/Iceberg take priority. |
 | CedarDB/PostgreSQL | Million-row mutation correctness/recovery and twelve sustained cells pass | Explicitly prepared statistics/plans, ingestion/cache variants and bounded storage pressure remain. Keep warm-query, automatic-statistics and single-node limits visible. |
 | Rayforce/DuckDB | Native DuckDB WAL recovery passes; Rayforce strict integrity cases remain failed | Keep failed cases visible. Diagnose/retest integrity before new qualified performance rankings; timing failed cases is diagnostic only. |
 | DuckDB/ZFS and ZFS storage | Historical individual storage/recovery tests exist; current observation/history gaps remain | Preserve prior witnesses before resetting storage, add fsynced intents/outcomes and keep independent readers/writers alive through recovery. In DuckDB/ZFS, `spawn()` removes matching journals, `writer()` truncates its journal and stops after its first request error, and `reset()` destroys datasets before those writers start. A filename-only fix cannot establish historical data preservation or continuous recovery observation. |
@@ -424,8 +427,8 @@ candidates, outside this deployment count.
 This queue implements the [progressive passes](AGENTS.md#progressive-testing-across-systems):
 survey breadth first, establish missing correctness/recovery evidence, then deepen
 tests and compare stable configurations. No new live coverage is established by
-this inventory refresh. Isolate comparative measurements from other heavy jobs; parallel functional labs
-follow the resource and ownership rules in AGENTS.md.
+the target inventory alone. Isolate comparative measurements from other heavy jobs;
+parallel functional labs follow the resource and ownership rules in AGENTS.md.
 
 ## Declared-target inventory
 

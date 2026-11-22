@@ -1,0 +1,3563 @@
+{
+  "cells": [
+    {
+      "backend": "fjall",
+      "case_id": "acbd1ce2-5e83-46c4-a2d4-9101d97cba32",
+      "disk_after": {
+        "allocated_bytes": 550322176,
+        "files": 21,
+        "logical_bytes": 550253198
+      },
+      "export_compression": {
+        "codec": "gzip",
+        "compressed_bytes": 108192270,
+        "gzip_elapsed_seconds_resolution_10ms": 3.23,
+        "gzip_peak_rss_kib": 1512.0,
+        "gzip_system_cpu_seconds": 0.17,
+        "gzip_user_cpu_seconds": 2.96,
+        "level": 1,
+        "ratio": 4.902551448453758,
+        "scope": "Off-path native full-body export compressibility; not native storage compression. Gzip CPU/RSS cover compression process and coarse10ms tool counters; controller wall includes startup/sync, excludes decompression verification.",
+        "uncompressed_bytes": 530418170,
+        "verified_decompressed_sha256": "af9e17f5ede4dfb531409735112e6c44ae3d0d2afd48220a38a53445d00f46a6",
+        "wall_seconds": 3.237838627
+      },
+      "first_successful_read_after_fault_seconds": 5.43972996,
+      "first_successful_write_after_fault_seconds": 5.43981046,
+      "operation_phases": {
+        "baseline": {
+          "ended_ns": 1795319738100149294,
+          "operations": {
+            "reader": {
+              "ambiguous": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "fail": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "mismatch": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "ok": {
+                "count": 745,
+                "mean_ms": 1.485379676510067,
+                "p50_ms": 1.706791,
+                "p99_ms": 2.272,
+                "rate_per_second": 139.8496085879863,
+                "scope": "Per-request wall time including Unix socket, serialization, native API and full response. Writer intent fsync/setup excluded; operation rate includes pacing/witness overhead. Low-count p99 approximates maximum, not qualified tail behavior."
+              }
+            },
+            "reader_historical": {
+              "ambiguous": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "fail": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "mismatch": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "ok": {
+                "count": 372,
+                "mean_ms": 1.1751258924731183,
+                "p50_ms": 1.014958,
+                "p99_ms": 2.29875,
+                "rate_per_second": 69.83094549628309,
+                "scope": "Per-request wall time including Unix socket, serialization, native API and full response. Writer intent fsync/setup excluded; operation rate includes pacing/witness overhead. Low-count p99 approximates maximum, not qualified tail behavior."
+              }
+            },
+            "reader_recent": {
+              "ambiguous": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "fail": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "mismatch": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "ok": {
+                "count": 373,
+                "mean_ms": 1.7948016809651475,
+                "p50_ms": 1.825541,
+                "p99_ms": 2.241208,
+                "rate_per_second": 70.0186630917032,
+                "scope": "Per-request wall time including Unix socket, serialization, native API and full response. Writer intent fsync/setup excluded; operation rate includes pacing/witness overhead. Low-count p99 approximates maximum, not qualified tail behavior."
+              }
+            },
+            "writer": {
+              "ambiguous": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "fail": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "mismatch": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "ok": {
+                "count": 391,
+                "mean_ms": 2.0506016803069054,
+                "p50_ms": 2.32575,
+                "p99_ms": 3.074917,
+                "rate_per_second": 73.3975798092653,
+                "scope": "Per-request wall time including Unix socket, serialization, native API and full response. Writer intent fsync/setup excluded; operation rate includes pacing/witness overhead. Low-count p99 approximates maximum, not qualified tail behavior."
+              }
+            }
+          },
+          "seconds": 5.327151127,
+          "started_ns": 1795319732772998167
+        },
+        "complete": {
+          "ended_ns": 1795319771659086129,
+          "operations": {
+            "reader": {
+              "ambiguous": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "fail": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "mismatch": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "ok": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              }
+            },
+            "reader_historical": {
+              "ambiguous": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "fail": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "mismatch": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "ok": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              }
+            },
+            "reader_recent": {
+              "ambiguous": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "fail": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "mismatch": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "ok": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              }
+            },
+            "writer": {
+              "ambiguous": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "fail": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "mismatch": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "ok": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              }
+            }
+          },
+          "seconds": 0.018640708,
+          "started_ns": 1795319771640445421
+        },
+        "export-compression": {
+          "ended_ns": 1795319762751174333,
+          "operations": {
+            "reader": {
+              "ambiguous": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "fail": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "mismatch": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "ok": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              }
+            },
+            "reader_historical": {
+              "ambiguous": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "fail": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "mismatch": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "ok": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              }
+            },
+            "reader_recent": {
+              "ambiguous": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "fail": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "mismatch": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "ok": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              }
+            },
+            "writer": {
+              "ambiguous": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "fail": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "mismatch": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "ok": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              }
+            }
+          },
+          "seconds": 7.375341656,
+          "started_ns": 1795319755375832677
+        },
+        "fresh-copy-restore": {
+          "ended_ns": 1795319771640445421,
+          "operations": {
+            "reader": {
+              "ambiguous": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "fail": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "mismatch": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "ok": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              }
+            },
+            "reader_historical": {
+              "ambiguous": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "fail": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "mismatch": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "ok": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              }
+            },
+            "reader_recent": {
+              "ambiguous": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "fail": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "mismatch": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "ok": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              }
+            },
+            "writer": {
+              "ambiguous": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "fail": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "mismatch": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "ok": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              }
+            }
+          },
+          "seconds": 8.889271088,
+          "started_ns": 1795319762751174333
+        },
+        "full-body-verification": {
+          "ended_ns": 1795319755375832677,
+          "operations": {
+            "reader": {
+              "ambiguous": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "fail": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "mismatch": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "ok": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              }
+            },
+            "reader_historical": {
+              "ambiguous": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "fail": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "mismatch": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "ok": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              }
+            },
+            "reader_recent": {
+              "ambiguous": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "fail": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "mismatch": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "ok": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              }
+            },
+            "writer": {
+              "ambiguous": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "fail": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "mismatch": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "ok": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              }
+            }
+          },
+          "seconds": 6.451702794,
+          "started_ns": 1795319748924129883
+        },
+        "native-recovery": {
+          "ended_ns": 1795319743564623422,
+          "operations": {
+            "reader": {
+              "ambiguous": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "fail": {
+                "count": 72,
+                "mean_ms": 0.012348916666666666,
+                "p50_ms": 0.010083,
+                "p99_ms": 0.029042,
+                "rate_per_second": 167.4945433418302,
+                "scope": "Per-request wall time including Unix socket, serialization, native API and full response. Writer intent fsync/setup excluded; operation rate includes pacing/witness overhead. Low-count p99 approximates maximum, not qualified tail behavior."
+              },
+              "mismatch": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "ok": {
+                "count": 4,
+                "mean_ms": 1.483417,
+                "p50_ms": 1.317334,
+                "p99_ms": 1.849667,
+                "rate_per_second": 9.305252407879454,
+                "scope": "Per-request wall time including Unix socket, serialization, native API and full response. Writer intent fsync/setup excluded; operation rate includes pacing/witness overhead. Low-count p99 approximates maximum, not qualified tail behavior."
+              }
+            },
+            "reader_historical": {
+              "ambiguous": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "fail": {
+                "count": 36,
+                "mean_ms": 0.01447575,
+                "p50_ms": 0.010375,
+                "p99_ms": 0.029042,
+                "rate_per_second": 83.7472716709151,
+                "scope": "Per-request wall time including Unix socket, serialization, native API and full response. Writer intent fsync/setup excluded; operation rate includes pacing/witness overhead. Low-count p99 approximates maximum, not qualified tail behavior."
+              },
+              "mismatch": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "ok": {
+                "count": 2,
+                "mean_ms": 1.456917,
+                "p50_ms": 1.317334,
+                "p99_ms": 1.5965,
+                "rate_per_second": 4.652626203939727,
+                "scope": "Per-request wall time including Unix socket, serialization, native API and full response. Writer intent fsync/setup excluded; operation rate includes pacing/witness overhead. Low-count p99 approximates maximum, not qualified tail behavior."
+              }
+            },
+            "reader_recent": {
+              "ambiguous": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "fail": {
+                "count": 36,
+                "mean_ms": 0.010222083333333335,
+                "p50_ms": 0.009833,
+                "p99_ms": 0.024042,
+                "rate_per_second": 83.7472716709151,
+                "scope": "Per-request wall time including Unix socket, serialization, native API and full response. Writer intent fsync/setup excluded; operation rate includes pacing/witness overhead. Low-count p99 approximates maximum, not qualified tail behavior."
+              },
+              "mismatch": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "ok": {
+                "count": 2,
+                "mean_ms": 1.509917,
+                "p50_ms": 1.170167,
+                "p99_ms": 1.849667,
+                "rate_per_second": 4.652626203939727,
+                "scope": "Per-request wall time including Unix socket, serialization, native API and full response. Writer intent fsync/setup excluded; operation rate includes pacing/witness overhead. Low-count p99 approximates maximum, not qualified tail behavior."
+              }
+            },
+            "writer": {
+              "ambiguous": {
+                "count": 36,
+                "mean_ms": 0.018658555555555553,
+                "p50_ms": 0.01675,
+                "p99_ms": 0.084583,
+                "rate_per_second": 83.7472716709151,
+                "scope": "Per-request wall time including Unix socket, serialization, native API and full response. Writer intent fsync/setup excluded; operation rate includes pacing/witness overhead. Low-count p99 approximates maximum, not qualified tail behavior."
+              },
+              "fail": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "mismatch": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "ok": {
+                "count": 2,
+                "mean_ms": 1.8925835,
+                "p50_ms": 1.51675,
+                "p99_ms": 2.268417,
+                "rate_per_second": 4.652626203939727,
+                "scope": "Per-request wall time including Unix socket, serialization, native API and full response. Writer intent fsync/setup excluded; operation rate includes pacing/witness overhead. Low-count p99 approximates maximum, not qualified tail behavior."
+              }
+            }
+          },
+          "seconds": 0.42986475,
+          "started_ns": 1795319743134758672
+        },
+        "owner-sigkill": {
+          "ended_ns": 1795319743134758672,
+          "operations": {
+            "reader": {
+              "ambiguous": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "fail": {
+                "count": 910,
+                "mean_ms": 0.019235957142857144,
+                "p50_ms": 0.012334,
+                "p99_ms": 0.035625,
+                "rate_per_second": 180.7488787464774,
+                "scope": "Per-request wall time including Unix socket, serialization, native API and full response. Writer intent fsync/setup excluded; operation rate includes pacing/witness overhead. Low-count p99 approximates maximum, not qualified tail behavior."
+              },
+              "mismatch": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "ok": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              }
+            },
+            "reader_historical": {
+              "ambiguous": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "fail": {
+                "count": 455,
+                "mean_ms": 0.027253496703296704,
+                "p50_ms": 0.016875,
+                "p99_ms": 0.038792,
+                "rate_per_second": 90.3744393732387,
+                "scope": "Per-request wall time including Unix socket, serialization, native API and full response. Writer intent fsync/setup excluded; operation rate includes pacing/witness overhead. Low-count p99 approximates maximum, not qualified tail behavior."
+              },
+              "mismatch": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "ok": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              }
+            },
+            "reader_recent": {
+              "ambiguous": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "fail": {
+                "count": 455,
+                "mean_ms": 0.011218417582417583,
+                "p50_ms": 0.010125,
+                "p99_ms": 0.028333,
+                "rate_per_second": 90.3744393732387,
+                "scope": "Per-request wall time including Unix socket, serialization, native API and full response. Writer intent fsync/setup excluded; operation rate includes pacing/witness overhead. Low-count p99 approximates maximum, not qualified tail behavior."
+              },
+              "mismatch": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "ok": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              }
+            },
+            "writer": {
+              "ambiguous": {
+                "count": 456,
+                "mean_ms": 0.015322563596491229,
+                "p50_ms": 0.014625,
+                "p99_ms": 0.029334,
+                "rate_per_second": 90.57306451471835,
+                "scope": "Per-request wall time including Unix socket, serialization, native API and full response. Writer intent fsync/setup excluded; operation rate includes pacing/witness overhead. Low-count p99 approximates maximum, not qualified tail behavior."
+              },
+              "fail": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "mismatch": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "ok": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              }
+            }
+          },
+          "seconds": 5.034609378,
+          "started_ns": 1795319738100149294
+        },
+        "recovered": {
+          "ended_ns": 1795319748924129883,
+          "operations": {
+            "reader": {
+              "ambiguous": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "fail": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "mismatch": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "ok": {
+                "count": 750,
+                "mean_ms": 1.487874054666667,
+                "p50_ms": 1.65775,
+                "p99_ms": 2.255166,
+                "rate_per_second": 139.93825839330395,
+                "scope": "Per-request wall time including Unix socket, serialization, native API and full response. Writer intent fsync/setup excluded; operation rate includes pacing/witness overhead. Low-count p99 approximates maximum, not qualified tail behavior."
+              }
+            },
+            "reader_historical": {
+              "ambiguous": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "fail": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "mismatch": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "ok": {
+                "count": 375,
+                "mean_ms": 1.1323959946666666,
+                "p50_ms": 1.035167,
+                "p99_ms": 2.230417,
+                "rate_per_second": 69.96912919665198,
+                "scope": "Per-request wall time including Unix socket, serialization, native API and full response. Writer intent fsync/setup excluded; operation rate includes pacing/witness overhead. Low-count p99 approximates maximum, not qualified tail behavior."
+              }
+            },
+            "reader_recent": {
+              "ambiguous": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "fail": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "mismatch": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "ok": {
+                "count": 375,
+                "mean_ms": 1.8433521146666667,
+                "p50_ms": 1.872917,
+                "p99_ms": 2.260375,
+                "rate_per_second": 69.96912919665198,
+                "scope": "Per-request wall time including Unix socket, serialization, native API and full response. Writer intent fsync/setup excluded; operation rate includes pacing/witness overhead. Low-count p99 approximates maximum, not qualified tail behavior."
+              }
+            },
+            "writer": {
+              "ambiguous": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "fail": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "mismatch": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "ok": {
+                "count": 394,
+                "mean_ms": 1.9676615913705584,
+                "p50_ms": 2.260417,
+                "p99_ms": 5.745,
+                "rate_per_second": 73.51423174261568,
+                "scope": "Per-request wall time including Unix socket, serialization, native API and full response. Writer intent fsync/setup excluded; operation rate includes pacing/witness overhead. Low-count p99 approximates maximum, not qualified tail behavior."
+              }
+            }
+          },
+          "seconds": 5.359506461,
+          "started_ns": 1795319743564623422
+        },
+        "retained-open": {
+          "ended_ns": 1795319732772998167,
+          "operations": {
+            "reader": {
+              "ambiguous": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "fail": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "mismatch": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "ok": {
+                "count": 3,
+                "mean_ms": 2.4216526666666667,
+                "p50_ms": 2.061958,
+                "p99_ms": 3.249167,
+                "rate_per_second": 0.43298038344674633,
+                "scope": "Per-request wall time including Unix socket, serialization, native API and full response. Writer intent fsync/setup excluded; operation rate includes pacing/witness overhead. Low-count p99 approximates maximum, not qualified tail behavior."
+              }
+            },
+            "reader_historical": {
+              "ambiguous": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "fail": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "mismatch": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "ok": {
+                "count": 2,
+                "mean_ms": 2.6555625,
+                "p50_ms": 2.061958,
+                "p99_ms": 3.249167,
+                "rate_per_second": 0.28865358896449755,
+                "scope": "Per-request wall time including Unix socket, serialization, native API and full response. Writer intent fsync/setup excluded; operation rate includes pacing/witness overhead. Low-count p99 approximates maximum, not qualified tail behavior."
+              }
+            },
+            "reader_recent": {
+              "ambiguous": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "fail": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "mismatch": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "ok": {
+                "count": 1,
+                "mean_ms": 1.953833,
+                "p50_ms": 1.953833,
+                "p99_ms": 1.953833,
+                "rate_per_second": 0.14432679448224878,
+                "scope": "Per-request wall time including Unix socket, serialization, native API and full response. Writer intent fsync/setup excluded; operation rate includes pacing/witness overhead. Low-count p99 approximates maximum, not qualified tail behavior."
+              }
+            },
+            "writer": {
+              "ambiguous": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "fail": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "mismatch": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "ok": {
+                "count": 2,
+                "mean_ms": 2.526396,
+                "p50_ms": 2.338125,
+                "p99_ms": 2.714667,
+                "rate_per_second": 0.28865358896449755,
+                "scope": "Per-request wall time including Unix socket, serialization, native API and full response. Writer intent fsync/setup excluded; operation rate includes pacing/witness overhead. Low-count p99 approximates maximum, not qualified tail behavior."
+              }
+            }
+          },
+          "seconds": 6.928720364,
+          "started_ns": 1795319725844277803
+        }
+      },
+      "proof": {
+        "absent_unacknowledged_intents": 492,
+        "acknowledged_loss": 0,
+        "acknowledged_pairs_verified": 1000789,
+        "applied_unacknowledged_intents": 0,
+        "export_bytes": 530418170,
+        "export_sha256": "af9e17f5ede4dfb531409735112e6c44ae3d0d2afd48220a38a53445d00f46a6",
+        "native_records": 2001578,
+        "wrong_or_partial_pairs": 0
+      },
+      "provenance": {
+        "architecture": "aarch64",
+        "binary_sha256": "1207c25a754e51471a8ce360a8bac0bc1054abe6ec5f7fdb23f9efe656dd7aa4",
+        "cargo_lock_sha256": "17ccc5dd13cbb2bdccdc76f03223dc790b70f93ff93d296bcf646b064a32ff9d",
+        "clock_ticks_per_second": 100,
+        "co_tenancy": "Other isolated functional Docker labs may run concurrently; timing is diagnostic, no comparative performance ranking",
+        "contract_sha256": "27d1fa83464a11f5df648028793932b1faf3663d2ad8c41bcd8a5753e1944adf",
+        "cpu_max": "200000 100000\n",
+        "kernel": "6.12.76-linuxkit\n",
+        "memory_max": "2147483648\n",
+        "memory_swap_max": "0\n",
+        "process_io_scope": "/proc PID io and cgroup per-device bytes/operations; not physical host IO. IO latency/queue depth unavailable. No network path: private Unix socket only.",
+        "source_sha256": {
+          "actors.rs": "4501024bf444ed4c80f54fba066b960b7ce7c223dc63361d467b5e5f60f6ea65",
+          "engine.rs": "32902366d595f36a4de65ef188a16e28231ae6f452597cc8e87dc96c8cb934c9",
+          "main.rs": "820db2cea2ede01f92d90921ae1d3c7621d68050bf8ac9ee08e94658486d7dc7",
+          "metrics.rs": "43f4e9e4ab3da7379884db06a5b77977bc84cb43b5649b624bc73c7d829752d6",
+          "owner.rs": "0ec372bba6fa52ffc42be67c0a511254e0ecd3636743af0791d52b5779e1cf62",
+          "protocol.rs": "de66ce408602638ee44902fdb7ec109cfe9953791ca37b3cb55fbe3bf16e9356",
+          "report.rs": "35005e3cdd9be1843684f22dd4b9f9d459be8eb20febd6772a36024a6b2d43ef",
+          "suite.rs": "1f8ea8e0c1a85b297f53d087fae865bf5d743ab69e9baf94b8568775636ea213"
+        }
+      },
+      "raw_result_sha256": "3faa5cfa7e644434befc2ea609f7ef0dc5c3337db0d5eea4a08512e37c744800",
+      "read_successes_checked": 1502,
+      "resources": {
+        "phases": {
+          "baseline": {
+            "container_lifetime_peak_charged_memory_bytes": 1430319104,
+            "container_mean_charged_memory_bytes": 1396027977.142857,
+            "container_peak_sampled_charged_memory_bytes": 1396682752,
+            "database_allocated_bytes_max": 1106169856,
+            "database_allocated_bytes_min": 1105936384,
+            "database_disk_incomplete_samples": 0,
+            "database_disk_usable_samples": 7,
+            "database_logical_bytes_max": 1120447280,
+            "database_logical_bytes_min": 1120214840,
+            "io_availability": "available",
+            "io_counter_resets_excluded": 0,
+            "roles": {
+              "controller": {
+                "average_cpu_percent_one_core_100": 0.37654462410261,
+                "native_lifetime_peak_rss_bytes": 218324992,
+                "observed_cpu_core_seconds": 0.02,
+                "observed_cpu_seconds": 5.3114554609999995,
+                "peak_sampled_cpu_percent_one_core_100": 0.9812056590832298,
+                "sampled_mean_rss_bytes": 181277257.14285713,
+                "sampled_peak_rss_bytes": 181284864,
+                "usable_samples": 7
+              },
+              "owner": {
+                "average_cpu_percent_one_core_100": 3.577173928974796,
+                "native_lifetime_peak_rss_bytes": 281542656,
+                "observed_cpu_core_seconds": 0.19000000000000003,
+                "observed_cpu_seconds": 5.3114554609999995,
+                "peak_sampled_cpu_percent_one_core_100": 4.906028295416149,
+                "sampled_mean_rss_bytes": 281468342.85714287,
+                "sampled_peak_rss_bytes": 281542656,
+                "usable_samples": 7
+              },
+              "reader": {
+                "average_cpu_percent_one_core_100": 1.12963387230783,
+                "native_lifetime_peak_rss_bytes": 2854912,
+                "observed_cpu_core_seconds": 0.060000000000000005,
+                "observed_cpu_seconds": 5.3114554609999995,
+                "peak_sampled_cpu_percent_one_core_100": 1.9624113181664595,
+                "sampled_mean_rss_bytes": 2854912.0,
+                "sampled_peak_rss_bytes": 2854912,
+                "usable_samples": 7
+              },
+              "writer": {
+                "average_cpu_percent_one_core_100": 1.317906184359135,
+                "native_lifetime_peak_rss_bytes": 2883584,
+                "observed_cpu_core_seconds": 0.07,
+                "observed_cpu_seconds": 5.3114554609999995,
+                "peak_sampled_cpu_percent_one_core_100": 2.0290193718737544,
+                "sampled_mean_rss_bytes": 2881243.4285714286,
+                "sampled_peak_rss_bytes": 2883584,
+                "usable_samples": 7
+              }
+            },
+            "samples": 7,
+            "whole_container_average_cpu_percent_one_core_100": 6.856237479047554,
+            "whole_container_io_observed_seconds": 5.3114554609999995,
+            "whole_container_observed_cpu_core_seconds": 0.364166,
+            "whole_container_per_device_io": {
+              "254:0": {
+                "observed_delta": {
+                  "dbytes": 0,
+                  "dios": 0,
+                  "rbytes": 0,
+                  "rios": 0,
+                  "wbytes": 1765376,
+                  "wios": 431
+                },
+                "observed_seconds": 5.3114554609999995,
+                "rates": {
+                  "dbytes_per_second": 0.0,
+                  "dios_per_second": 0.0,
+                  "rbytes_per_second": 0.0,
+                  "rios_per_second": 0.0,
+                  "wbytes_per_second": 332371.4211598846,
+                  "wios_per_second": 81.14536649411245
+                }
+              }
+            }
+          },
+          "complete": {
+            "container_lifetime_peak_charged_memory_bytes": 2147483648,
+            "container_mean_charged_memory_bytes": 1834143744.0,
+            "container_peak_sampled_charged_memory_bytes": 1834143744,
+            "database_allocated_bytes_max": 1656709120,
+            "database_allocated_bytes_min": 1656709120,
+            "database_disk_incomplete_samples": 0,
+            "database_disk_usable_samples": 2,
+            "database_logical_bytes_max": 1670935836,
+            "database_logical_bytes_min": 1670935836,
+            "io_availability": "available",
+            "io_counter_resets_excluded": 0,
+            "roles": {
+              "controller": {
+                "average_cpu_percent_one_core_100": 0.0,
+                "native_lifetime_peak_rss_bytes": 218898432,
+                "observed_cpu_core_seconds": 0.0,
+                "observed_cpu_seconds": 0.006757084,
+                "peak_sampled_cpu_percent_one_core_100": 0.0,
+                "sampled_mean_rss_bytes": 182751232.0,
+                "sampled_peak_rss_bytes": 182751232,
+                "usable_samples": 2
+              }
+            },
+            "samples": 2,
+            "whole_container_average_cpu_percent_one_core_100": 20.70419725431858,
+            "whole_container_io_observed_seconds": 0.006757084,
+            "whole_container_observed_cpu_core_seconds": 0.001399,
+            "whole_container_per_device_io": {
+              "254:0": {
+                "observed_delta": {
+                  "dbytes": 0,
+                  "dios": 0,
+                  "rbytes": 0,
+                  "rios": 0,
+                  "wbytes": 0,
+                  "wios": 0
+                },
+                "observed_seconds": 0.006757084,
+                "rates": {
+                  "dbytes_per_second": 0.0,
+                  "dios_per_second": 0.0,
+                  "rbytes_per_second": 0.0,
+                  "rios_per_second": 0.0,
+                  "wbytes_per_second": 0.0,
+                  "wios_per_second": 0.0
+                }
+              }
+            }
+          },
+          "export-compression": {
+            "container_lifetime_peak_charged_memory_bytes": 1528860672,
+            "container_mean_charged_memory_bytes": 1062999836.4444444,
+            "container_peak_sampled_charged_memory_bytes": 1323380736,
+            "database_allocated_bytes_max": 1106386944,
+            "database_allocated_bytes_min": 1106386944,
+            "database_disk_incomplete_samples": 0,
+            "database_disk_usable_samples": 9,
+            "database_logical_bytes_max": 1120682638,
+            "database_logical_bytes_min": 1120682638,
+            "io_availability": "available",
+            "io_counter_resets_excluded": 0,
+            "roles": {
+              "controller": {
+                "average_cpu_percent_one_core_100": 46.1602230173828,
+                "native_lifetime_peak_rss_bytes": 218804224,
+                "observed_cpu_core_seconds": 3.4000000000000004,
+                "observed_cpu_seconds": 7.3656489889999985,
+                "peak_sampled_cpu_percent_one_core_100": 98.76232279380774,
+                "sampled_mean_rss_bytes": 182695253.33333334,
+                "sampled_peak_rss_bytes": 182738944,
+                "usable_samples": 9
+              }
+            },
+            "samples": 9,
+            "whole_container_average_cpu_percent_one_core_100": 113.0084533274791,
+            "whole_container_io_observed_seconds": 7.3656489889999985,
+            "whole_container_observed_cpu_core_seconds": 8.323806,
+            "whole_container_per_device_io": {
+              "254:0": {
+                "observed_delta": {
+                  "dbytes": 0,
+                  "dios": 0,
+                  "rbytes": 16384,
+                  "rios": 1,
+                  "wbytes": 0,
+                  "wios": 0
+                },
+                "observed_seconds": 7.3656489889999985,
+                "rates": {
+                  "dbytes_per_second": 0.0,
+                  "dios_per_second": 0.0,
+                  "rbytes_per_second": 2224.379687990587,
+                  "rios_per_second": 0.13576536181583174,
+                  "wbytes_per_second": 0.0,
+                  "wios_per_second": 0.0
+                }
+              }
+            }
+          },
+          "fresh-copy-restore": {
+            "container_lifetime_peak_charged_memory_bytes": 2147483648,
+            "container_mean_charged_memory_bytes": 1830722953.8461537,
+            "container_peak_sampled_charged_memory_bytes": 2147221504,
+            "database_allocated_bytes_max": 1656709120,
+            "database_allocated_bytes_min": 1106386944,
+            "database_disk_incomplete_samples": 0,
+            "database_disk_usable_samples": 13,
+            "database_logical_bytes_max": 1670935836,
+            "database_logical_bytes_min": 1120682638,
+            "io_availability": "available",
+            "io_counter_resets_excluded": 0,
+            "roles": {
+              "controller": {
+                "average_cpu_percent_one_core_100": 78.00373797289151,
+                "native_lifetime_peak_rss_bytes": 218898432,
+                "observed_cpu_core_seconds": 6.93,
+                "observed_cpu_seconds": 8.88418963,
+                "peak_sampled_cpu_percent_one_core_100": 162.58949128837378,
+                "sampled_mean_rss_bytes": 184429961.84615386,
+                "sampled_peak_rss_bytes": 204697600,
+                "usable_samples": 13
+              },
+              "owner": {
+                "average_cpu_percent_one_core_100": 14.120914210489902,
+                "native_lifetime_peak_rss_bytes": 280092672,
+                "observed_cpu_core_seconds": 0.8200000000000001,
+                "observed_cpu_seconds": 5.806989461000001,
+                "peak_sampled_cpu_percent_one_core_100": 66.48069714920496,
+                "sampled_mean_rss_bytes": 217437184.0,
+                "sampled_peak_rss_bytes": 279453696,
+                "usable_samples": 8
+              }
+            },
+            "samples": 13,
+            "whole_container_average_cpu_percent_one_core_100": 92.69780748702908,
+            "whole_container_io_observed_seconds": 8.88418963,
+            "whole_container_observed_cpu_core_seconds": 8.235449000000001,
+            "whole_container_per_device_io": {
+              "254:0": {
+                "observed_delta": {
+                  "dbytes": 0,
+                  "dios": 0,
+                  "rbytes": 2437120,
+                  "rios": 22,
+                  "wbytes": 550301696,
+                  "wios": 620
+                },
+                "observed_seconds": 8.88418963,
+                "rates": {
+                  "dbytes_per_second": 0.0,
+                  "dios_per_second": 0.0,
+                  "rbytes_per_second": 274321.0243701203,
+                  "rios_per_second": 2.476309141996556,
+                  "wbytes_per_second": 61941687.30277316,
+                  "wios_per_second": 69.78689400172112
+                }
+              }
+            }
+          },
+          "full-body-verification": {
+            "container_lifetime_peak_charged_memory_bytes": 1528860672,
+            "container_mean_charged_memory_bytes": 1258357191.1111112,
+            "container_peak_sampled_charged_memory_bytes": 1492017152,
+            "database_allocated_bytes_max": 1106386944,
+            "database_allocated_bytes_min": 1106386944,
+            "database_disk_incomplete_samples": 0,
+            "database_disk_usable_samples": 9,
+            "database_logical_bytes_max": 1120682638,
+            "database_logical_bytes_min": 1120682638,
+            "io_availability": "available",
+            "io_counter_resets_excluded": 0,
+            "roles": {
+              "controller": {
+                "average_cpu_percent_one_core_100": 74.2213200060061,
+                "native_lifetime_peak_rss_bytes": 218804224,
+                "observed_cpu_core_seconds": 4.779999999999999,
+                "observed_cpu_seconds": 6.440198045000001,
+                "peak_sampled_cpu_percent_one_core_100": 100.0002941185121,
+                "sampled_mean_rss_bytes": 183930880.0,
+                "sampled_peak_rss_bytes": 202321920,
+                "usable_samples": 9
+              },
+              "owner": {
+                "average_cpu_percent_one_core_100": 16.02131535607883,
+                "native_lifetime_peak_rss_bytes": 279953408,
+                "observed_cpu_core_seconds": 1.02,
+                "observed_cpu_seconds": 6.366518462000001,
+                "peak_sampled_cpu_percent_one_core_100": 60.54806317869305,
+                "sampled_mean_rss_bytes": 226386944.0,
+                "sampled_peak_rss_bytes": 279171072,
+                "usable_samples": 8
+              }
+            },
+            "samples": 9,
+            "whole_container_average_cpu_percent_one_core_100": 90.50538445048701,
+            "whole_container_io_observed_seconds": 6.440198045000001,
+            "whole_container_observed_cpu_core_seconds": 5.828726,
+            "whole_container_per_device_io": {
+              "254:0": {
+                "observed_delta": {
+                  "dbytes": 0,
+                  "dios": 0,
+                  "rbytes": 11100160,
+                  "rios": 88,
+                  "wbytes": 0,
+                  "wios": 1
+                },
+                "observed_seconds": 6.440198045000001,
+                "rates": {
+                  "dbytes_per_second": 0.0,
+                  "dios_per_second": 0.0,
+                  "rbytes_per_second": 1723574.325267508,
+                  "rios_per_second": 13.664176068051335,
+                  "wbytes_per_second": 0.0,
+                  "wios_per_second": 0.1552747280460379
+                }
+              }
+            }
+          },
+          "native-recovery": {
+            "container_lifetime_peak_charged_memory_bytes": 1430319104,
+            "container_mean_charged_memory_bytes": 1239984128.0,
+            "container_peak_sampled_charged_memory_bytes": 1342337024,
+            "database_allocated_bytes_max": 1106169856,
+            "database_allocated_bytes_min": 1106153472,
+            "database_disk_incomplete_samples": 0,
+            "database_disk_usable_samples": 4,
+            "database_logical_bytes_max": 1120448472,
+            "database_logical_bytes_min": 1120446622,
+            "io_availability": "available",
+            "io_counter_resets_excluded": 0,
+            "roles": {
+              "controller": {
+                "average_cpu_percent_one_core_100": 0.0,
+                "native_lifetime_peak_rss_bytes": 218324992,
+                "observed_cpu_core_seconds": 0.0,
+                "observed_cpu_seconds": 0.42525862600000003,
+                "peak_sampled_cpu_percent_one_core_100": 0.0,
+                "sampled_mean_rss_bytes": 181284864.0,
+                "sampled_peak_rss_bytes": 181284864,
+                "usable_samples": 4
+              },
+              "owner": {
+                "average_cpu_percent_one_core_100": 0.0,
+                "native_lifetime_peak_rss_bytes": 139681792,
+                "observed_cpu_core_seconds": 0.0,
+                "observed_cpu_seconds": 0.010888376,
+                "peak_sampled_cpu_percent_one_core_100": 0.0,
+                "sampled_mean_rss_bytes": 138883072.0,
+                "sampled_peak_rss_bytes": 139681792,
+                "usable_samples": 2
+              },
+              "reader": {
+                "average_cpu_percent_one_core_100": 0.0,
+                "native_lifetime_peak_rss_bytes": 2863104,
+                "observed_cpu_core_seconds": 0.0,
+                "observed_cpu_seconds": 0.42525862600000003,
+                "peak_sampled_cpu_percent_one_core_100": 0.0,
+                "sampled_mean_rss_bytes": 2860032.0,
+                "sampled_peak_rss_bytes": 2863104,
+                "usable_samples": 4
+              },
+              "writer": {
+                "average_cpu_percent_one_core_100": 0.0,
+                "native_lifetime_peak_rss_bytes": 2883584,
+                "observed_cpu_core_seconds": 0.0,
+                "observed_cpu_seconds": 0.42525862600000003,
+                "peak_sampled_cpu_percent_one_core_100": 0.0,
+                "sampled_mean_rss_bytes": 2883584.0,
+                "sampled_peak_rss_bytes": 2883584,
+                "usable_samples": 4
+              }
+            },
+            "samples": 4,
+            "whole_container_average_cpu_percent_one_core_100": 95.84191244600409,
+            "whole_container_io_observed_seconds": 0.42525862600000003,
+            "whole_container_observed_cpu_core_seconds": 0.407576,
+            "whole_container_per_device_io": {
+              "254:0": {
+                "observed_delta": {
+                  "dbytes": 0,
+                  "dios": 0,
+                  "rbytes": 86491136,
+                  "rios": 669,
+                  "wbytes": 4096,
+                  "wios": 2
+                },
+                "observed_seconds": 0.42525862600000003,
+                "rates": {
+                  "dbytes_per_second": 0.0,
+                  "dios_per_second": 0.0,
+                  "rbytes_per_second": 203384789.18943784,
+                  "rios_per_second": 1573.160329027635,
+                  "wbytes_per_second": 9631.785811206566,
+                  "wios_per_second": 4.703020415628206
+                }
+              }
+            }
+          },
+          "owner-sigkill": {
+            "container_lifetime_peak_charged_memory_bytes": 1430319104,
+            "container_mean_charged_memory_bytes": 1157846162.2857144,
+            "container_peak_sampled_charged_memory_bytes": 1396797440,
+            "database_allocated_bytes_max": 1106169856,
+            "database_allocated_bytes_min": 1106169856,
+            "database_disk_incomplete_samples": 0,
+            "database_disk_usable_samples": 7,
+            "database_logical_bytes_max": 1120448472,
+            "database_logical_bytes_min": 1120447876,
+            "io_availability": "available",
+            "io_counter_resets_excluded": 0,
+            "roles": {
+              "controller": {
+                "average_cpu_percent_one_core_100": 0.1990718341030507,
+                "native_lifetime_peak_rss_bytes": 218324992,
+                "observed_cpu_core_seconds": 0.01,
+                "observed_cpu_seconds": 5.023312336,
+                "peak_sampled_cpu_percent_one_core_100": 0.9811943062950662,
+                "sampled_mean_rss_bytes": 181284864.0,
+                "sampled_peak_rss_bytes": 181284864,
+                "usable_samples": 7
+              },
+              "owner": {
+                "average_cpu_percent_one_core_100": null,
+                "native_lifetime_peak_rss_bytes": 281542656,
+                "observed_cpu_core_seconds": null,
+                "observed_cpu_seconds": 0.0,
+                "peak_sampled_cpu_percent_one_core_100": null,
+                "sampled_mean_rss_bytes": 281542656.0,
+                "sampled_peak_rss_bytes": 281542656,
+                "usable_samples": 1
+              },
+              "reader": {
+                "average_cpu_percent_one_core_100": 1.194431004618304,
+                "native_lifetime_peak_rss_bytes": 2859008,
+                "observed_cpu_core_seconds": 0.06,
+                "observed_cpu_seconds": 5.023312336,
+                "peak_sampled_cpu_percent_one_core_100": 2.188112186266656,
+                "sampled_mean_rss_bytes": 2857837.714285714,
+                "sampled_peak_rss_bytes": 2859008,
+                "usable_samples": 7
+              },
+              "writer": {
+                "average_cpu_percent_one_core_100": 0.7962873364122028,
+                "native_lifetime_peak_rss_bytes": 2883584,
+                "observed_cpu_core_seconds": 0.04,
+                "observed_cpu_seconds": 5.023312336,
+                "peak_sampled_cpu_percent_one_core_100": 0.9811943062950662,
+                "sampled_mean_rss_bytes": 2883584.0,
+                "sampled_peak_rss_bytes": 2883584,
+                "usable_samples": 7
+              }
+            },
+            "samples": 7,
+            "whole_container_average_cpu_percent_one_core_100": 2.4258097416461344,
+            "whole_container_io_observed_seconds": 5.023312336,
+            "whole_container_observed_cpu_core_seconds": 0.121856,
+            "whole_container_per_device_io": {
+              "254:0": {
+                "observed_delta": {
+                  "dbytes": 0,
+                  "dios": 0,
+                  "rbytes": 0,
+                  "rios": 0,
+                  "wbytes": 4096,
+                  "wios": 1
+                },
+                "observed_seconds": 5.023312336,
+                "rates": {
+                  "dbytes_per_second": 0.0,
+                  "dios_per_second": 0.0,
+                  "rbytes_per_second": 0.0,
+                  "rios_per_second": 0.0,
+                  "wbytes_per_second": 815.3982324860956,
+                  "wios_per_second": 0.19907183410305068
+                }
+              }
+            }
+          },
+          "recovered": {
+            "container_lifetime_peak_charged_memory_bytes": 1430319104,
+            "container_mean_charged_memory_bytes": 1342571081.142857,
+            "container_peak_sampled_charged_memory_bytes": 1343766528,
+            "database_allocated_bytes_max": 1106386944,
+            "database_allocated_bytes_min": 1106153472,
+            "database_disk_incomplete_samples": 0,
+            "database_disk_usable_samples": 7,
+            "database_logical_bytes_max": 1120682638,
+            "database_logical_bytes_min": 1120447814,
+            "io_availability": "available",
+            "io_counter_resets_excluded": 0,
+            "roles": {
+              "controller": {
+                "average_cpu_percent_one_core_100": 0.5612815189669283,
+                "native_lifetime_peak_rss_bytes": 218324992,
+                "observed_cpu_core_seconds": 0.03,
+                "observed_cpu_seconds": 5.344911419,
+                "peak_sampled_cpu_percent_one_core_100": 2.942766503588896,
+                "sampled_mean_rss_bytes": 181284864.0,
+                "sampled_peak_rss_bytes": 181284864,
+                "usable_samples": 7
+              },
+              "owner": {
+                "average_cpu_percent_one_core_100": 3.3676891138015694,
+                "native_lifetime_peak_rss_bytes": 140087296,
+                "observed_cpu_core_seconds": 0.18,
+                "observed_cpu_seconds": 5.344911419,
+                "peak_sampled_cpu_percent_one_core_100": 4.4141497553833435,
+                "sampled_mean_rss_bytes": 139921700.57142857,
+                "sampled_peak_rss_bytes": 140087296,
+                "usable_samples": 7
+              },
+              "reader": {
+                "average_cpu_percent_one_core_100": 1.0460571553123004,
+                "native_lifetime_peak_rss_bytes": 2863104,
+                "observed_cpu_core_seconds": 0.05,
+                "observed_cpu_seconds": 4.779853543,
+                "peak_sampled_cpu_percent_one_core_100": 1.963689096971815,
+                "sampled_mean_rss_bytes": 2863104.0,
+                "sampled_peak_rss_bytes": 2863104,
+                "usable_samples": 6
+              },
+              "writer": {
+                "average_cpu_percent_one_core_100": 1.4644800174372203,
+                "native_lifetime_peak_rss_bytes": 2883584,
+                "observed_cpu_core_seconds": 0.06999999999999999,
+                "observed_cpu_seconds": 4.779853543,
+                "peak_sampled_cpu_percent_one_core_100": 1.9662032585780431,
+                "sampled_mean_rss_bytes": 2883584.0,
+                "sampled_peak_rss_bytes": 2883584,
+                "usable_samples": 6
+              }
+            },
+            "samples": 7,
+            "whole_container_average_cpu_percent_one_core_100": 6.377018687126721,
+            "whole_container_io_observed_seconds": 5.344911419,
+            "whole_container_observed_cpu_core_seconds": 0.34084600000000004,
+            "whole_container_per_device_io": {
+              "254:0": {
+                "observed_delta": {
+                  "dbytes": 0,
+                  "dios": 0,
+                  "rbytes": 0,
+                  "rios": 0,
+                  "wbytes": 1847296,
+                  "wios": 451
+                },
+                "observed_seconds": 5.344911419,
+                "rates": {
+                  "dbytes_per_second": 0.0,
+                  "dios_per_second": 0.0,
+                  "rbytes_per_second": 0.0,
+                  "rios_per_second": 0.0,
+                  "wbytes_per_second": 345617.70162051026,
+                  "wios_per_second": 84.37932168469489
+                }
+              }
+            }
+          },
+          "retained-open": {
+            "container_lifetime_peak_charged_memory_bytes": 1430319104,
+            "container_mean_charged_memory_bytes": 642165418.6666666,
+            "container_peak_sampled_charged_memory_bytes": 1393053696,
+            "database_allocated_bytes_max": 1222262784,
+            "database_allocated_bytes_min": 1105936384,
+            "database_disk_incomplete_samples": 0,
+            "database_disk_usable_samples": 9,
+            "database_logical_bytes_max": 1236522770,
+            "database_logical_bytes_min": 1120213792,
+            "io_availability": "available",
+            "io_counter_resets_excluded": 0,
+            "roles": {
+              "controller": {
+                "average_cpu_percent_one_core_100": 66.19501364709645,
+                "native_lifetime_peak_rss_bytes": 218324992,
+                "observed_cpu_core_seconds": 4.580000000000001,
+                "observed_cpu_seconds": 6.918950156,
+                "peak_sampled_cpu_percent_one_core_100": 99.6828553796629,
+                "sampled_mean_rss_bytes": 107737543.1111111,
+                "sampled_peak_rss_bytes": 206344192,
+                "usable_samples": 9
+              },
+              "owner": {
+                "average_cpu_percent_one_core_100": 14.878767315394636,
+                "native_lifetime_peak_rss_bytes": 280494080,
+                "observed_cpu_core_seconds": 0.9,
+                "observed_cpu_seconds": 6.048888197,
+                "peak_sampled_cpu_percent_one_core_100": 63.460681620296825,
+                "sampled_mean_rss_bytes": 222458880.0,
+                "sampled_peak_rss_bytes": 280051712,
+                "usable_samples": 8
+              },
+              "reader": {
+                "average_cpu_percent_one_core_100": null,
+                "native_lifetime_peak_rss_bytes": 319488,
+                "observed_cpu_core_seconds": null,
+                "observed_cpu_seconds": 0.0,
+                "peak_sampled_cpu_percent_one_core_100": null,
+                "sampled_mean_rss_bytes": 319488.0,
+                "sampled_peak_rss_bytes": 319488,
+                "usable_samples": 1
+              },
+              "writer": {
+                "average_cpu_percent_one_core_100": null,
+                "native_lifetime_peak_rss_bytes": 2068480,
+                "observed_cpu_core_seconds": null,
+                "observed_cpu_seconds": 0.0,
+                "peak_sampled_cpu_percent_one_core_100": null,
+                "sampled_mean_rss_bytes": 2068480.0,
+                "sampled_peak_rss_bytes": 2068480,
+                "usable_samples": 1
+              }
+            },
+            "samples": 9,
+            "whole_container_average_cpu_percent_one_core_100": 90.85045936555812,
+            "whole_container_io_observed_seconds": 6.048888197,
+            "whole_container_observed_cpu_core_seconds": 6.285898,
+            "whole_container_per_device_io": {
+              "254:0": {
+                "observed_delta": {
+                  "dbytes": 0,
+                  "dios": 0,
+                  "rbytes": 396021760,
+                  "rios": 3075,
+                  "wbytes": 8192,
+                  "wios": 2
+                },
+                "observed_seconds": 6.048888197,
+                "rates": {
+                  "dbytes_per_second": 0.0,
+                  "dios_per_second": 0.0,
+                  "rbytes_per_second": 65470173.543033995,
+                  "rios_per_second": 508.35788327598345,
+                  "wbytes_per_second": 1354.2984649745874,
+                  "wios_per_second": 0.3306392736754364
+                }
+              }
+            }
+          },
+          "start": {
+            "container_lifetime_peak_charged_memory_bytes": 7999488,
+            "container_mean_charged_memory_bytes": 1652736.0,
+            "container_peak_sampled_charged_memory_bytes": 1667072,
+            "database_allocated_bytes_max": 1222262784,
+            "database_allocated_bytes_min": 1222262784,
+            "database_disk_incomplete_samples": 0,
+            "database_disk_usable_samples": 2,
+            "database_logical_bytes_max": 1236522770,
+            "database_logical_bytes_min": 1236522770,
+            "io_availability": "unavailable: kernel exported no usable per-device intervals",
+            "io_counter_resets_excluded": 0,
+            "roles": {
+              "controller": {
+                "average_cpu_percent_one_core_100": 0.0,
+                "native_lifetime_peak_rss_bytes": 3108864,
+                "observed_cpu_core_seconds": 0.0,
+                "observed_cpu_seconds": 18446744073.709385,
+                "peak_sampled_cpu_percent_one_core_100": 0.0,
+                "sampled_mean_rss_bytes": 3065856.0,
+                "sampled_peak_rss_bytes": 3108864,
+                "usable_samples": 2
+              }
+            },
+            "samples": 2,
+            "whole_container_average_cpu_percent_one_core_100": null,
+            "whole_container_io_observed_seconds": 0.0,
+            "whole_container_observed_cpu_core_seconds": null,
+            "whole_container_per_device_io": {}
+          }
+        },
+        "scope": "Approx1s plus phase-boundary samples. CPU uses same-PID deltas; reset/edge intervals excluded. Owner totals include all native threads. RSS includes process mappings; cgroup memory also charges cache/kernel and all actors. Native lifetime peaks span earlier phases. Per-device cgroup IO includes writers/readers/controller/export/compression; do not add stacked devices or /proc byte counters. Physical host IO latency/queue depth unavailable. Database space includes both backends plus retained restore copies, not one table's compression ratio."
+      }
+    },
+    {
+      "backend": "redb",
+      "case_id": "d57d2447-7f71-4b5b-8f05-9f2984cdcc79",
+      "disk_after": {
+        "allocated_bytes": 556474368,
+        "files": 1,
+        "logical_bytes": 570429440
+      },
+      "export_compression": {
+        "codec": "gzip",
+        "compressed_bytes": 108191392,
+        "gzip_elapsed_seconds_resolution_10ms": 3.46,
+        "gzip_peak_rss_kib": 1636.0,
+        "gzip_system_cpu_seconds": 0.21,
+        "gzip_user_cpu_seconds": 2.93,
+        "level": 1,
+        "ratio": 4.902542246614222,
+        "scope": "Off-path native full-body export compressibility; not native storage compression. Gzip CPU/RSS cover compression process and coarse10ms tool counters; controller wall includes startup/sync, excludes decompression verification.",
+        "uncompressed_bytes": 530412870,
+        "verified_decompressed_sha256": "6057cba662c0c8f615393cb13ca08b7ce9ce9bb11e5f4615255f8e3b36d952ea",
+        "wall_seconds": 3.467436377
+      },
+      "first_successful_read_after_fault_seconds": 5.437969961,
+      "first_successful_write_after_fault_seconds": 5.438414336,
+      "operation_phases": {
+        "baseline": {
+          "ended_ns": 1795319783548295218,
+          "operations": {
+            "reader": {
+              "ambiguous": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "fail": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "mismatch": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "ok": {
+                "count": 743,
+                "mean_ms": 1.4650875437415882,
+                "p50_ms": 1.705916,
+                "p99_ms": 2.267375,
+                "rate_per_second": 139.48705163796046,
+                "scope": "Per-request wall time including Unix socket, serialization, native API and full response. Writer intent fsync/setup excluded; operation rate includes pacing/witness overhead. Low-count p99 approximates maximum, not qualified tail behavior."
+              }
+            },
+            "reader_historical": {
+              "ambiguous": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "fail": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "mismatch": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "ok": {
+                "count": 371,
+                "mean_ms": 1.1777608867924527,
+                "p50_ms": 0.991916,
+                "p99_ms": 2.3305,
+                "rate_per_second": 69.64965835489008,
+                "scope": "Per-request wall time including Unix socket, serialization, native API and full response. Writer intent fsync/setup excluded; operation rate includes pacing/witness overhead. Low-count p99 approximates maximum, not qualified tail behavior."
+              }
+            },
+            "reader_recent": {
+              "ambiguous": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "fail": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "mismatch": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "ok": {
+                "count": 372,
+                "mean_ms": 1.7516418172043011,
+                "p50_ms": 1.806667,
+                "p99_ms": 2.24775,
+                "rate_per_second": 69.83739328307038,
+                "scope": "Per-request wall time including Unix socket, serialization, native API and full response. Writer intent fsync/setup excluded; operation rate includes pacing/witness overhead. Low-count p99 approximates maximum, not qualified tail behavior."
+              }
+            },
+            "writer": {
+              "ambiguous": {
+                "count": 1,
+                "mean_ms": 4.082958,
+                "p50_ms": 4.082958,
+                "p99_ms": 4.082958,
+                "rate_per_second": 0.18773492818029672,
+                "scope": "Per-request wall time including Unix socket, serialization, native API and full response. Writer intent fsync/setup excluded; operation rate includes pacing/witness overhead. Low-count p99 approximates maximum, not qualified tail behavior."
+              },
+              "fail": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "mismatch": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "ok": {
+                "count": 385,
+                "mean_ms": 1.9542588831168832,
+                "p50_ms": 2.123625,
+                "p99_ms": 4.042583,
+                "rate_per_second": 72.27794734941423,
+                "scope": "Per-request wall time including Unix socket, serialization, native API and full response. Writer intent fsync/setup excluded; operation rate includes pacing/witness overhead. Low-count p99 approximates maximum, not qualified tail behavior."
+              }
+            }
+          },
+          "seconds": 5.326659294,
+          "started_ns": 1795319778221635924
+        },
+        "complete": {
+          "ended_ns": 1795319816636507220,
+          "operations": {
+            "reader": {
+              "ambiguous": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "fail": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "mismatch": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "ok": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              }
+            },
+            "reader_historical": {
+              "ambiguous": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "fail": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "mismatch": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "ok": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              }
+            },
+            "reader_recent": {
+              "ambiguous": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "fail": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "mismatch": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "ok": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              }
+            },
+            "writer": {
+              "ambiguous": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "fail": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "mismatch": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "ok": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              }
+            }
+          },
+          "seconds": 0.099210584,
+          "started_ns": 1795319816537296636
+        },
+        "export-compression": {
+          "ended_ns": 1795319808140141341,
+          "operations": {
+            "reader": {
+              "ambiguous": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "fail": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "mismatch": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "ok": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              }
+            },
+            "reader_historical": {
+              "ambiguous": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "fail": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "mismatch": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "ok": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              }
+            },
+            "reader_recent": {
+              "ambiguous": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "fail": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "mismatch": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "ok": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              }
+            },
+            "writer": {
+              "ambiguous": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "fail": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "mismatch": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "ok": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              }
+            }
+          },
+          "seconds": 7.762858046,
+          "started_ns": 1795319800377283295
+        },
+        "fresh-copy-restore": {
+          "ended_ns": 1795319816537296636,
+          "operations": {
+            "reader": {
+              "ambiguous": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "fail": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "mismatch": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "ok": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              }
+            },
+            "reader_historical": {
+              "ambiguous": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "fail": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "mismatch": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "ok": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              }
+            },
+            "reader_recent": {
+              "ambiguous": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "fail": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "mismatch": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "ok": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              }
+            },
+            "writer": {
+              "ambiguous": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "fail": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "mismatch": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "ok": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              }
+            }
+          },
+          "seconds": 8.397155295,
+          "started_ns": 1795319808140141341
+        },
+        "full-body-verification": {
+          "ended_ns": 1795319800377283295,
+          "operations": {
+            "reader": {
+              "ambiguous": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "fail": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "mismatch": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "ok": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              }
+            },
+            "reader_historical": {
+              "ambiguous": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "fail": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "mismatch": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "ok": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              }
+            },
+            "reader_recent": {
+              "ambiguous": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "fail": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "mismatch": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "ok": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              }
+            },
+            "writer": {
+              "ambiguous": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "fail": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "mismatch": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "ok": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              }
+            }
+          },
+          "seconds": 5.983576086,
+          "started_ns": 1795319794393707209
+        },
+        "native-recovery": {
+          "ended_ns": 1795319789027751554,
+          "operations": {
+            "reader": {
+              "ambiguous": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "fail": {
+                "count": 72,
+                "mean_ms": 0.015472833333333333,
+                "p50_ms": 0.013625,
+                "p99_ms": 0.036459,
+                "rate_per_second": 158.87501765084897,
+                "scope": "Per-request wall time including Unix socket, serialization, native API and full response. Writer intent fsync/setup excluded; operation rate includes pacing/witness overhead. Low-count p99 approximates maximum, not qualified tail behavior."
+              },
+              "mismatch": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "ok": {
+                "count": 6,
+                "mean_ms": 1.2928056666666667,
+                "p50_ms": 0.865791,
+                "p99_ms": 2.064417,
+                "rate_per_second": 13.239584804237413,
+                "scope": "Per-request wall time including Unix socket, serialization, native API and full response. Writer intent fsync/setup excluded; operation rate includes pacing/witness overhead. Low-count p99 approximates maximum, not qualified tail behavior."
+              }
+            },
+            "reader_historical": {
+              "ambiguous": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "fail": {
+                "count": 36,
+                "mean_ms": 0.02043986111111111,
+                "p50_ms": 0.019333,
+                "p99_ms": 0.036459,
+                "rate_per_second": 79.43750882542449,
+                "scope": "Per-request wall time including Unix socket, serialization, native API and full response. Writer intent fsync/setup excluded; operation rate includes pacing/witness overhead. Low-count p99 approximates maximum, not qualified tail behavior."
+              },
+              "mismatch": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "ok": {
+                "count": 3,
+                "mean_ms": 0.6387916666666666,
+                "p50_ms": 0.856875,
+                "p99_ms": 0.865791,
+                "rate_per_second": 6.619792402118707,
+                "scope": "Per-request wall time including Unix socket, serialization, native API and full response. Writer intent fsync/setup excluded; operation rate includes pacing/witness overhead. Low-count p99 approximates maximum, not qualified tail behavior."
+              }
+            },
+            "reader_recent": {
+              "ambiguous": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "fail": {
+                "count": 36,
+                "mean_ms": 0.010505805555555555,
+                "p50_ms": 0.009667,
+                "p99_ms": 0.02325,
+                "rate_per_second": 79.43750882542449,
+                "scope": "Per-request wall time including Unix socket, serialization, native API and full response. Writer intent fsync/setup excluded; operation rate includes pacing/witness overhead. Low-count p99 approximates maximum, not qualified tail behavior."
+              },
+              "mismatch": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "ok": {
+                "count": 3,
+                "mean_ms": 1.9468196666666668,
+                "p50_ms": 2.007125,
+                "p99_ms": 2.064417,
+                "rate_per_second": 6.619792402118707,
+                "scope": "Per-request wall time including Unix socket, serialization, native API and full response. Writer intent fsync/setup excluded; operation rate includes pacing/witness overhead. Low-count p99 approximates maximum, not qualified tail behavior."
+              }
+            },
+            "writer": {
+              "ambiguous": {
+                "count": 36,
+                "mean_ms": 0.01809836111111111,
+                "p50_ms": 0.018,
+                "p99_ms": 0.034875,
+                "rate_per_second": 79.43750882542449,
+                "scope": "Per-request wall time including Unix socket, serialization, native API and full response. Writer intent fsync/setup excluded; operation rate includes pacing/witness overhead. Low-count p99 approximates maximum, not qualified tail behavior."
+              },
+              "fail": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "mismatch": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "ok": {
+                "count": 4,
+                "mean_ms": 1.9755625,
+                "p50_ms": 2.194,
+                "p99_ms": 2.502,
+                "rate_per_second": 8.826389869491608,
+                "scope": "Per-request wall time including Unix socket, serialization, native API and full response. Writer intent fsync/setup excluded; operation rate includes pacing/witness overhead. Low-count p99 approximates maximum, not qualified tail behavior."
+              }
+            }
+          },
+          "seconds": 0.453186417,
+          "started_ns": 1795319788574565137
+        },
+        "owner-sigkill": {
+          "ended_ns": 1795319788574565137,
+          "operations": {
+            "reader": {
+              "ambiguous": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "fail": {
+                "count": 866,
+                "mean_ms": 0.016161846420323325,
+                "p50_ms": 0.014375,
+                "p99_ms": 0.036416,
+                "rate_per_second": 172.29476609013764,
+                "scope": "Per-request wall time including Unix socket, serialization, native API and full response. Writer intent fsync/setup excluded; operation rate includes pacing/witness overhead. Low-count p99 approximates maximum, not qualified tail behavior."
+              },
+              "mismatch": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "ok": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              }
+            },
+            "reader_historical": {
+              "ambiguous": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "fail": {
+                "count": 433,
+                "mean_ms": 0.020085057736720556,
+                "p50_ms": 0.01875,
+                "p99_ms": 0.037084,
+                "rate_per_second": 86.14738304506882,
+                "scope": "Per-request wall time including Unix socket, serialization, native API and full response. Writer intent fsync/setup excluded; operation rate includes pacing/witness overhead. Low-count p99 approximates maximum, not qualified tail behavior."
+              },
+              "mismatch": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "ok": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              }
+            },
+            "reader_recent": {
+              "ambiguous": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "fail": {
+                "count": 433,
+                "mean_ms": 0.012238635103926096,
+                "p50_ms": 0.010792,
+                "p99_ms": 0.030875,
+                "rate_per_second": 86.14738304506882,
+                "scope": "Per-request wall time including Unix socket, serialization, native API and full response. Writer intent fsync/setup excluded; operation rate includes pacing/witness overhead. Low-count p99 approximates maximum, not qualified tail behavior."
+              },
+              "mismatch": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "ok": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              }
+            },
+            "writer": {
+              "ambiguous": {
+                "count": 455,
+                "mean_ms": 0.014932052747252747,
+                "p50_ms": 0.014166,
+                "p99_ms": 0.0345,
+                "rate_per_second": 90.52438634066122,
+                "scope": "Per-request wall time including Unix socket, serialization, native API and full response. Writer intent fsync/setup excluded; operation rate includes pacing/witness overhead. Low-count p99 approximates maximum, not qualified tail behavior."
+              },
+              "fail": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "mismatch": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "ok": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              }
+            }
+          },
+          "seconds": 5.026269919,
+          "started_ns": 1795319783548295218
+        },
+        "recovered": {
+          "ended_ns": 1795319794393707209,
+          "operations": {
+            "reader": {
+              "ambiguous": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "fail": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "mismatch": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "ok": {
+                "count": 744,
+                "mean_ms": 1.4846198293010753,
+                "p50_ms": 1.686791,
+                "p99_ms": 2.289209,
+                "rate_per_second": 138.65190989916968,
+                "scope": "Per-request wall time including Unix socket, serialization, native API and full response. Writer intent fsync/setup excluded; operation rate includes pacing/witness overhead. Low-count p99 approximates maximum, not qualified tail behavior."
+              }
+            },
+            "reader_historical": {
+              "ambiguous": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "fail": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "mismatch": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "ok": {
+                "count": 372,
+                "mean_ms": 1.2087549086021505,
+                "p50_ms": 1.012875,
+                "p99_ms": 2.272209,
+                "rate_per_second": 69.32595494958484,
+                "scope": "Per-request wall time including Unix socket, serialization, native API and full response. Writer intent fsync/setup excluded; operation rate includes pacing/witness overhead. Low-count p99 approximates maximum, not qualified tail behavior."
+              }
+            },
+            "reader_recent": {
+              "ambiguous": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "fail": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "mismatch": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "ok": {
+                "count": 372,
+                "mean_ms": 1.76048475,
+                "p50_ms": 1.799334,
+                "p99_ms": 2.32725,
+                "rate_per_second": 69.32595494958484,
+                "scope": "Per-request wall time including Unix socket, serialization, native API and full response. Writer intent fsync/setup excluded; operation rate includes pacing/witness overhead. Low-count p99 approximates maximum, not qualified tail behavior."
+              }
+            },
+            "writer": {
+              "ambiguous": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "fail": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "mismatch": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "ok": {
+                "count": 386,
+                "mean_ms": 1.979262183937824,
+                "p50_ms": 2.133166,
+                "p99_ms": 3.245042,
+                "rate_per_second": 71.9349962648918,
+                "scope": "Per-request wall time including Unix socket, serialization, native API and full response. Writer intent fsync/setup excluded; operation rate includes pacing/witness overhead. Low-count p99 approximates maximum, not qualified tail behavior."
+              }
+            }
+          },
+          "seconds": 5.365955655,
+          "started_ns": 1795319789027751554
+        },
+        "retained-open": {
+          "ended_ns": 1795319778221635924,
+          "operations": {
+            "reader": {
+              "ambiguous": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "fail": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "mismatch": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "ok": {
+                "count": 5,
+                "mean_ms": 1.4524998,
+                "p50_ms": 1.493916,
+                "p99_ms": 1.765584,
+                "rate_per_second": 0.7674576809341295,
+                "scope": "Per-request wall time including Unix socket, serialization, native API and full response. Writer intent fsync/setup excluded; operation rate includes pacing/witness overhead. Low-count p99 approximates maximum, not qualified tail behavior."
+              }
+            },
+            "reader_historical": {
+              "ambiguous": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "fail": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "mismatch": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "ok": {
+                "count": 3,
+                "mean_ms": 1.2540273333333332,
+                "p50_ms": 1.479083,
+                "p99_ms": 1.493916,
+                "rate_per_second": 0.46047460856047767,
+                "scope": "Per-request wall time including Unix socket, serialization, native API and full response. Writer intent fsync/setup excluded; operation rate includes pacing/witness overhead. Low-count p99 approximates maximum, not qualified tail behavior."
+              }
+            },
+            "reader_recent": {
+              "ambiguous": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "fail": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "mismatch": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "ok": {
+                "count": 2,
+                "mean_ms": 1.7502085,
+                "p50_ms": 1.734833,
+                "p99_ms": 1.765584,
+                "rate_per_second": 0.3069830723736518,
+                "scope": "Per-request wall time including Unix socket, serialization, native API and full response. Writer intent fsync/setup excluded; operation rate includes pacing/witness overhead. Low-count p99 approximates maximum, not qualified tail behavior."
+              }
+            },
+            "writer": {
+              "ambiguous": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "fail": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "mismatch": {
+                "count": 0,
+                "p50_ms": null,
+                "p99_ms": null,
+                "rate_per_second": 0.0
+              },
+              "ok": {
+                "count": 3,
+                "mean_ms": 2.17275,
+                "p50_ms": 2.436917,
+                "p99_ms": 2.717166,
+                "rate_per_second": 0.46047460856047767,
+                "scope": "Per-request wall time including Unix socket, serialization, native API and full response. Writer intent fsync/setup excluded; operation rate includes pacing/witness overhead. Low-count p99 approximates maximum, not qualified tail behavior."
+              }
+            }
+          },
+          "seconds": 6.515017211,
+          "started_ns": 1795319771706618713
+        }
+      },
+      "proof": {
+        "absent_unacknowledged_intents": 491,
+        "acknowledged_loss": 0,
+        "acknowledged_pairs_verified": 1000778,
+        "applied_unacknowledged_intents": 1,
+        "export_bytes": 530412870,
+        "export_sha256": "6057cba662c0c8f615393cb13ca08b7ce9ce9bb11e5f4615255f8e3b36d952ea",
+        "native_records": 2001558,
+        "wrong_or_partial_pairs": 0
+      },
+      "provenance": {
+        "architecture": "aarch64",
+        "binary_sha256": "1207c25a754e51471a8ce360a8bac0bc1054abe6ec5f7fdb23f9efe656dd7aa4",
+        "cargo_lock_sha256": "17ccc5dd13cbb2bdccdc76f03223dc790b70f93ff93d296bcf646b064a32ff9d",
+        "clock_ticks_per_second": 100,
+        "co_tenancy": "Other isolated functional Docker labs may run concurrently; timing is diagnostic, no comparative performance ranking",
+        "contract_sha256": "27d1fa83464a11f5df648028793932b1faf3663d2ad8c41bcd8a5753e1944adf",
+        "cpu_max": "200000 100000\n",
+        "kernel": "6.12.76-linuxkit\n",
+        "memory_max": "2147483648\n",
+        "memory_swap_max": "0\n",
+        "process_io_scope": "/proc PID io and cgroup per-device bytes/operations; not physical host IO. IO latency/queue depth unavailable. No network path: private Unix socket only.",
+        "source_sha256": {
+          "actors.rs": "4501024bf444ed4c80f54fba066b960b7ce7c223dc63361d467b5e5f60f6ea65",
+          "engine.rs": "32902366d595f36a4de65ef188a16e28231ae6f452597cc8e87dc96c8cb934c9",
+          "main.rs": "820db2cea2ede01f92d90921ae1d3c7621d68050bf8ac9ee08e94658486d7dc7",
+          "metrics.rs": "43f4e9e4ab3da7379884db06a5b77977bc84cb43b5649b624bc73c7d829752d6",
+          "owner.rs": "0ec372bba6fa52ffc42be67c0a511254e0ecd3636743af0791d52b5779e1cf62",
+          "protocol.rs": "de66ce408602638ee44902fdb7ec109cfe9953791ca37b3cb55fbe3bf16e9356",
+          "report.rs": "35005e3cdd9be1843684f22dd4b9f9d459be8eb20febd6772a36024a6b2d43ef",
+          "suite.rs": "1f8ea8e0c1a85b297f53d087fae865bf5d743ab69e9baf94b8568775636ea213"
+        }
+      },
+      "raw_result_sha256": "2d77d208361ef2cf8067bee0e08f8f13f26498914dece5998302a5da84cf9460",
+      "read_successes_checked": 1498,
+      "resources": {
+        "phases": {
+          "baseline": {
+            "container_lifetime_peak_charged_memory_bytes": 2147483648,
+            "container_mean_charged_memory_bytes": 2112959049.142857,
+            "container_peak_sampled_charged_memory_bytes": 2113499136,
+            "database_allocated_bytes_max": 1656840192,
+            "database_allocated_bytes_min": 1656709120,
+            "database_disk_incomplete_samples": 0,
+            "database_disk_usable_samples": 7,
+            "database_logical_bytes_max": 1670935836,
+            "database_logical_bytes_min": 1670935836,
+            "io_availability": "available",
+            "io_counter_resets_excluded": 0,
+            "roles": {
+              "controller": {
+                "average_cpu_percent_one_core_100": 0.18814610539097112,
+                "native_lifetime_peak_rss_bytes": 218898432,
+                "observed_cpu_core_seconds": 0.01,
+                "observed_cpu_seconds": 5.3150183360000005,
+                "peak_sampled_cpu_percent_one_core_100": 0.9794418821836707,
+                "sampled_mean_rss_bytes": 183018057.14285713,
+                "sampled_peak_rss_bytes": 183025664,
+                "usable_samples": 7
+              },
+              "owner": {
+                "average_cpu_percent_one_core_100": 4.515506529383307,
+                "native_lifetime_peak_rss_bytes": 143351808,
+                "observed_cpu_core_seconds": 0.24000000000000002,
+                "observed_cpu_seconds": 5.3150183360000005,
+                "peak_sampled_cpu_percent_one_core_100": 5.876651293102024,
+                "sampled_mean_rss_bytes": 142969124.57142857,
+                "sampled_peak_rss_bytes": 143208448,
+                "usable_samples": 7
+              },
+              "reader": {
+                "average_cpu_percent_one_core_100": 1.1288766323458266,
+                "native_lifetime_peak_rss_bytes": 2871296,
+                "observed_cpu_core_seconds": 0.06,
+                "observed_cpu_seconds": 5.3150183360000005,
+                "peak_sampled_cpu_percent_one_core_100": 1.9666310229215722,
+                "sampled_mean_rss_bytes": 2871296.0,
+                "sampled_peak_rss_bytes": 2871296,
+                "usable_samples": 7
+              },
+              "writer": {
+                "average_cpu_percent_one_core_100": 1.69331494851874,
+                "native_lifetime_peak_rss_bytes": 2887680,
+                "observed_cpu_core_seconds": 0.09,
+                "observed_cpu_seconds": 5.3150183360000005,
+                "peak_sampled_cpu_percent_one_core_100": 2.938325646551012,
+                "sampled_mean_rss_bytes": 2885924.5714285714,
+                "sampled_peak_rss_bytes": 2887680,
+                "usable_samples": 7
+              }
+            },
+            "samples": 7,
+            "whole_container_average_cpu_percent_one_core_100": 8.334439732777621,
+            "whole_container_io_observed_seconds": 5.3150183360000005,
+            "whole_container_observed_cpu_core_seconds": 0.442977,
+            "whole_container_per_device_io": {
+              "254:0": {
+                "observed_delta": {
+                  "dbytes": 0,
+                  "dios": 0,
+                  "rbytes": 0,
+                  "rios": 0,
+                  "wbytes": 20242432,
+                  "wios": 4189
+                },
+                "observed_seconds": 5.3150183360000005,
+                "rates": {
+                  "dbytes_per_second": 0.0,
+                  "dios_per_second": 0.0,
+                  "rbytes_per_second": 0.0,
+                  "rios_per_second": 0.0,
+                  "wbytes_per_second": 3808534.744441566,
+                  "wios_per_second": 788.144035482778
+                }
+              }
+            }
+          },
+          "complete": {
+            "container_lifetime_peak_charged_memory_bytes": 2147483648,
+            "container_mean_charged_memory_bytes": 1971152896.0,
+            "container_peak_sampled_charged_memory_bytes": 1971154944,
+            "database_allocated_bytes_max": 2227552256,
+            "database_allocated_bytes_min": 2227552256,
+            "database_disk_incomplete_samples": 0,
+            "database_disk_usable_samples": 2,
+            "database_logical_bytes_max": 2241365276,
+            "database_logical_bytes_min": 2241365276,
+            "io_availability": "available",
+            "io_counter_resets_excluded": 0,
+            "roles": {
+              "controller": {
+                "average_cpu_percent_one_core_100": 127.20893546092822,
+                "native_lifetime_peak_rss_bytes": 219312128,
+                "observed_cpu_core_seconds": 0.01,
+                "observed_cpu_seconds": 0.007861083,
+                "peak_sampled_cpu_percent_one_core_100": 127.20893546092822,
+                "sampled_mean_rss_bytes": 183078912.0,
+                "sampled_peak_rss_bytes": 183078912,
+                "usable_samples": 2
+              }
+            },
+            "samples": 2,
+            "whole_container_average_cpu_percent_one_core_100": 20.50608039630163,
+            "whole_container_io_observed_seconds": 0.007861083,
+            "whole_container_observed_cpu_core_seconds": 0.001612,
+            "whole_container_per_device_io": {
+              "254:0": {
+                "observed_delta": {
+                  "dbytes": 0,
+                  "dios": 0,
+                  "rbytes": 0,
+                  "rios": 0,
+                  "wbytes": 0,
+                  "wios": 0
+                },
+                "observed_seconds": 0.007861083,
+                "rates": {
+                  "dbytes_per_second": 0.0,
+                  "dios_per_second": 0.0,
+                  "rbytes_per_second": 0.0,
+                  "rios_per_second": 0.0,
+                  "wbytes_per_second": 0.0,
+                  "wios_per_second": 0.0
+                }
+              }
+            }
+          },
+          "export-compression": {
+            "container_lifetime_peak_charged_memory_bytes": 2147483648,
+            "container_mean_charged_memory_bytes": 1777362716.4444444,
+            "container_peak_sampled_charged_memory_bytes": 1943072768,
+            "database_allocated_bytes_max": 1657118720,
+            "database_allocated_bytes_min": 1657118720,
+            "database_disk_incomplete_samples": 0,
+            "database_disk_usable_samples": 9,
+            "database_logical_bytes_max": 1670935836,
+            "database_logical_bytes_min": 1670935836,
+            "io_availability": "available",
+            "io_counter_resets_excluded": 0,
+            "roles": {
+              "controller": {
+                "average_cpu_percent_one_core_100": 43.356243804420984,
+                "native_lifetime_peak_rss_bytes": 219136000,
+                "observed_cpu_core_seconds": 3.36,
+                "observed_cpu_seconds": 7.749748837,
+                "peak_sampled_cpu_percent_one_core_100": 97.33709619527332,
+                "sampled_mean_rss_bytes": 183070720.0,
+                "sampled_peak_rss_bytes": 183070720,
+                "usable_samples": 9
+              }
+            },
+            "samples": 9,
+            "whole_container_average_cpu_percent_one_core_100": 106.86877954622933,
+            "whole_container_io_observed_seconds": 7.749748837,
+            "whole_container_observed_cpu_core_seconds": 8.282062000000002,
+            "whole_container_per_device_io": {
+              "254:0": {
+                "observed_delta": {
+                  "dbytes": 0,
+                  "dios": 0,
+                  "rbytes": 16384,
+                  "rios": 1,
+                  "wbytes": 0,
+                  "wios": 0
+                },
+                "observed_seconds": 7.749748837,
+                "rates": {
+                  "dbytes_per_second": 0.0,
+                  "dios_per_second": 0.0,
+                  "rbytes_per_second": 2114.1330312250993,
+                  "rios_per_second": 0.12903643989411007,
+                  "wbytes_per_second": 0.0,
+                  "wios_per_second": 0.0
+                }
+              }
+            }
+          },
+          "fresh-copy-restore": {
+            "container_lifetime_peak_charged_memory_bytes": 2147483648,
+            "container_mean_charged_memory_bytes": 2035056981.3333333,
+            "container_peak_sampled_charged_memory_bytes": 2147397632,
+            "database_allocated_bytes_max": 2227552256,
+            "database_allocated_bytes_min": 1657118720,
+            "database_disk_incomplete_samples": 0,
+            "database_disk_usable_samples": 12,
+            "database_logical_bytes_max": 2241365276,
+            "database_logical_bytes_min": 1670935836,
+            "io_availability": "available",
+            "io_counter_resets_excluded": 0,
+            "roles": {
+              "controller": {
+                "average_cpu_percent_one_core_100": 83.56092970375781,
+                "native_lifetime_peak_rss_bytes": 219312128,
+                "observed_cpu_core_seconds": 7.009999999999999,
+                "observed_cpu_seconds": 8.389088088,
+                "peak_sampled_cpu_percent_one_core_100": 101.62463423425321,
+                "sampled_mean_rss_bytes": 184659626.66666666,
+                "sampled_peak_rss_bytes": 202121216,
+                "usable_samples": 12
+              },
+              "owner": {
+                "average_cpu_percent_one_core_100": 8.35280184987491,
+                "native_lifetime_peak_rss_bytes": 143351808,
+                "observed_cpu_core_seconds": 0.47000000000000003,
+                "observed_cpu_seconds": 5.626854419,
+                "peak_sampled_cpu_percent_one_core_100": 43.958085285794944,
+                "sampled_mean_rss_bytes": 83114276.57142857,
+                "sampled_peak_rss_bytes": 142565376,
+                "usable_samples": 7
+              }
+            },
+            "samples": 12,
+            "whole_container_average_cpu_percent_one_core_100": 89.3871767865504,
+            "whole_container_io_observed_seconds": 8.389088088,
+            "whole_container_observed_cpu_core_seconds": 7.498769,
+            "whole_container_per_device_io": {
+              "254:0": {
+                "observed_delta": {
+                  "dbytes": 0,
+                  "dios": 0,
+                  "rbytes": 32145408,
+                  "rios": 7658,
+                  "wbytes": 570535936,
+                  "wios": 915
+                },
+                "observed_seconds": 8.389088088,
+                "rates": {
+                  "dbytes_per_second": 0.0,
+                  "dios_per_second": 0.0,
+                  "rbytes_per_second": 3831811.9517640714,
+                  "rios_per_second": 912.852495964875,
+                  "wbytes_per_second": 68009291.35743748,
+                  "wios_per_second": 109.07025774456262
+                }
+              }
+            }
+          },
+          "full-body-verification": {
+            "container_lifetime_peak_charged_memory_bytes": 2147483648,
+            "container_mean_charged_memory_bytes": 2036264504.8888888,
+            "container_peak_sampled_charged_memory_bytes": 2147225600,
+            "database_allocated_bytes_max": 1657118720,
+            "database_allocated_bytes_min": 1657053184,
+            "database_disk_incomplete_samples": 0,
+            "database_disk_usable_samples": 9,
+            "database_logical_bytes_max": 1670935836,
+            "database_logical_bytes_min": 1670935836,
+            "io_availability": "available",
+            "io_counter_resets_excluded": 0,
+            "roles": {
+              "controller": {
+                "average_cpu_percent_one_core_100": 77.52134022229575,
+                "native_lifetime_peak_rss_bytes": 219136000,
+                "observed_cpu_core_seconds": 4.63,
+                "observed_cpu_seconds": 5.972548961,
+                "peak_sampled_cpu_percent_one_core_100": 99.69294319377052,
+                "sampled_mean_rss_bytes": 184434688.0,
+                "sampled_peak_rss_bytes": 195551232,
+                "usable_samples": 9
+              },
+              "owner": {
+                "average_cpu_percent_one_core_100": 9.096540569281421,
+                "native_lifetime_peak_rss_bytes": 279138304,
+                "observed_cpu_core_seconds": 0.54,
+                "observed_cpu_seconds": 5.93632267,
+                "peak_sampled_cpu_percent_one_core_100": 40.20393033779875,
+                "sampled_mean_rss_bytes": 227561984.0,
+                "sampled_peak_rss_bytes": 279138304,
+                "usable_samples": 8
+              }
+            },
+            "samples": 9,
+            "whole_container_average_cpu_percent_one_core_100": 86.95799789861279,
+            "whole_container_io_observed_seconds": 5.972548961,
+            "whole_container_observed_cpu_core_seconds": 5.193609,
+            "whole_container_per_device_io": {
+              "254:0": {
+                "observed_delta": {
+                  "dbytes": 0,
+                  "dios": 0,
+                  "rbytes": 0,
+                  "rios": 0,
+                  "wbytes": 94208,
+                  "wios": 11
+                },
+                "observed_seconds": 5.972548961,
+                "rates": {
+                  "dbytes_per_second": 0.0,
+                  "dios_per_second": 0.0,
+                  "rbytes_per_second": 0.0,
+                  "rios_per_second": 0.0,
+                  "wbytes_per_second": 15773.499826483883,
+                  "wios_per_second": 1.8417597029055146
+                }
+              }
+            }
+          },
+          "native-recovery": {
+            "container_lifetime_peak_charged_memory_bytes": 2147483648,
+            "container_mean_charged_memory_bytes": 2068398080.0,
+            "container_peak_sampled_charged_memory_bytes": 2116255744,
+            "database_allocated_bytes_max": 1656840192,
+            "database_allocated_bytes_min": 1656840192,
+            "database_disk_incomplete_samples": 0,
+            "database_disk_usable_samples": 3,
+            "database_logical_bytes_max": 1670935836,
+            "database_logical_bytes_min": 1670935836,
+            "io_availability": "available",
+            "io_counter_resets_excluded": 0,
+            "roles": {
+              "controller": {
+                "average_cpu_percent_one_core_100": 2.2790248035545004,
+                "native_lifetime_peak_rss_bytes": 218898432,
+                "observed_cpu_core_seconds": 0.01,
+                "observed_cpu_seconds": 0.438784167,
+                "peak_sampled_cpu_percent_one_core_100": 2.340418330397895,
+                "sampled_mean_rss_bytes": 183025664.0,
+                "sampled_peak_rss_bytes": 183025664,
+                "usable_samples": 3
+              },
+              "owner": {
+                "average_cpu_percent_one_core_100": 0.0,
+                "native_lifetime_peak_rss_bytes": 142635008,
+                "observed_cpu_core_seconds": 0.0,
+                "observed_cpu_seconds": 0.011510125,
+                "peak_sampled_cpu_percent_one_core_100": 0.0,
+                "sampled_mean_rss_bytes": 142600192.0,
+                "sampled_peak_rss_bytes": 142635008,
+                "usable_samples": 2
+              },
+              "reader": {
+                "average_cpu_percent_one_core_100": 0.0,
+                "native_lifetime_peak_rss_bytes": 2879488,
+                "observed_cpu_core_seconds": 0.0,
+                "observed_cpu_seconds": 0.438784167,
+                "peak_sampled_cpu_percent_one_core_100": 0.0,
+                "sampled_mean_rss_bytes": 2878122.6666666665,
+                "sampled_peak_rss_bytes": 2879488,
+                "usable_samples": 3
+              },
+              "writer": {
+                "average_cpu_percent_one_core_100": 2.2790248035545004,
+                "native_lifetime_peak_rss_bytes": 2887680,
+                "observed_cpu_core_seconds": 0.01,
+                "observed_cpu_seconds": 0.438784167,
+                "peak_sampled_cpu_percent_one_core_100": 2.340418330397895,
+                "sampled_mean_rss_bytes": 2887680.0,
+                "sampled_peak_rss_bytes": 2887680,
+                "usable_samples": 3
+              }
+            },
+            "samples": 3,
+            "whole_container_average_cpu_percent_one_core_100": 95.18324301797334,
+            "whole_container_io_observed_seconds": 0.438784167,
+            "whole_container_observed_cpu_core_seconds": 0.417649,
+            "whole_container_per_device_io": {
+              "254:0": {
+                "observed_delta": {
+                  "dbytes": 0,
+                  "dios": 0,
+                  "rbytes": 2883584,
+                  "rios": 612,
+                  "wbytes": 131072,
+                  "wios": 35
+                },
+                "observed_seconds": 0.438784167,
+                "rates": {
+                  "dbytes_per_second": 0.0,
+                  "dios_per_second": 0.0,
+                  "rbytes_per_second": 6571759.4591328995,
+                  "rios_per_second": 1394.763179775354,
+                  "wbytes_per_second": 298716.3390514954,
+                  "wios_per_second": 79.7658681244075
+                }
+              }
+            }
+          },
+          "owner-sigkill": {
+            "container_lifetime_peak_charged_memory_bytes": 2147483648,
+            "container_mean_charged_memory_bytes": 1992974336.0,
+            "container_peak_sampled_charged_memory_bytes": 2113560576,
+            "database_allocated_bytes_max": 1656840192,
+            "database_allocated_bytes_min": 1656840192,
+            "database_disk_incomplete_samples": 0,
+            "database_disk_usable_samples": 7,
+            "database_logical_bytes_max": 1670935836,
+            "database_logical_bytes_min": 1670935836,
+            "io_availability": "available",
+            "io_counter_resets_excluded": 0,
+            "roles": {
+              "controller": {
+                "average_cpu_percent_one_core_100": 0.39874103483416995,
+                "native_lifetime_peak_rss_bytes": 218898432,
+                "observed_cpu_core_seconds": 0.02,
+                "observed_cpu_seconds": 5.0157867519999995,
+                "peak_sampled_cpu_percent_one_core_100": 2.4341691608137555,
+                "sampled_mean_rss_bytes": 183025664.0,
+                "sampled_peak_rss_bytes": 183025664,
+                "usable_samples": 7
+              },
+              "owner": {
+                "average_cpu_percent_one_core_100": null,
+                "native_lifetime_peak_rss_bytes": 143351808,
+                "observed_cpu_core_seconds": null,
+                "observed_cpu_seconds": 0.0,
+                "peak_sampled_cpu_percent_one_core_100": null,
+                "sampled_mean_rss_bytes": 143208448.0,
+                "sampled_peak_rss_bytes": 143208448,
+                "usable_samples": 1
+              },
+              "reader": {
+                "average_cpu_percent_one_core_100": 1.395593621919595,
+                "native_lifetime_peak_rss_bytes": 2875392,
+                "observed_cpu_core_seconds": 0.07,
+                "observed_cpu_seconds": 5.0157867519999995,
+                "peak_sampled_cpu_percent_one_core_100": 1.9608626521108563,
+                "sampled_mean_rss_bytes": 2874806.8571428573,
+                "sampled_peak_rss_bytes": 2875392,
+                "usable_samples": 7
+              },
+              "writer": {
+                "average_cpu_percent_one_core_100": 0.7974820696683399,
+                "native_lifetime_peak_rss_bytes": 2887680,
+                "observed_cpu_core_seconds": 0.04,
+                "observed_cpu_seconds": 5.0157867519999995,
+                "peak_sampled_cpu_percent_one_core_100": 2.4341691608137555,
+                "sampled_mean_rss_bytes": 2887680.0,
+                "sampled_peak_rss_bytes": 2887680,
+                "usable_samples": 7
+              }
+            },
+            "samples": 7,
+            "whole_container_average_cpu_percent_one_core_100": 2.536112603855771,
+            "whole_container_io_observed_seconds": 5.0157867519999995,
+            "whole_container_observed_cpu_core_seconds": 0.12720599999999999,
+            "whole_container_per_device_io": {
+              "254:0": {
+                "observed_delta": {
+                  "dbytes": 0,
+                  "dios": 0,
+                  "rbytes": 0,
+                  "rios": 0,
+                  "wbytes": 53248,
+                  "wios": 12
+                },
+                "observed_seconds": 5.0157867519999995,
+                "rates": {
+                  "dbytes_per_second": 0.0,
+                  "dios_per_second": 0.0,
+                  "rbytes_per_second": 0.0,
+                  "rios_per_second": 0.0,
+                  "wbytes_per_second": 10616.081311424941,
+                  "wios_per_second": 2.3924462090050196
+                }
+              }
+            }
+          },
+          "recovered": {
+            "container_lifetime_peak_charged_memory_bytes": 2147483648,
+            "container_mean_charged_memory_bytes": 2116877312.0,
+            "container_peak_sampled_charged_memory_bytes": 2118074368,
+            "database_allocated_bytes_max": 1657053184,
+            "database_allocated_bytes_min": 1656840192,
+            "database_disk_incomplete_samples": 0,
+            "database_disk_usable_samples": 8,
+            "database_logical_bytes_max": 1670935836,
+            "database_logical_bytes_min": 1670935836,
+            "io_availability": "available",
+            "io_counter_resets_excluded": 0,
+            "roles": {
+              "controller": {
+                "average_cpu_percent_one_core_100": 0.5603915062582421,
+                "native_lifetime_peak_rss_bytes": 218898432,
+                "observed_cpu_core_seconds": 0.03,
+                "observed_cpu_seconds": 5.353400197,
+                "peak_sampled_cpu_percent_one_core_100": 0.9808197019403485,
+                "sampled_mean_rss_bytes": 183028736.0,
+                "sampled_peak_rss_bytes": 183029760,
+                "usable_samples": 8
+              },
+              "owner": {
+                "average_cpu_percent_one_core_100": 4.4831320500659375,
+                "native_lifetime_peak_rss_bytes": 142999552,
+                "observed_cpu_core_seconds": 0.24000000000000005,
+                "observed_cpu_seconds": 5.353400197,
+                "peak_sampled_cpu_percent_one_core_100": 5.0705600116622875,
+                "sampled_mean_rss_bytes": 142857216.0,
+                "sampled_peak_rss_bytes": 142999552,
+                "usable_samples": 8
+              },
+              "reader": {
+                "average_cpu_percent_one_core_100": 1.3575933132813462,
+                "native_lifetime_peak_rss_bytes": 2879488,
+                "observed_cpu_core_seconds": 0.06999999999999999,
+                "observed_cpu_seconds": 5.156183322,
+                "peak_sampled_cpu_percent_one_core_100": 1.9590155953685728,
+                "sampled_mean_rss_bytes": 2879488.0,
+                "sampled_peak_rss_bytes": 2879488,
+                "usable_samples": 7
+              },
+              "writer": {
+                "average_cpu_percent_one_core_100": 1.745477117076017,
+                "native_lifetime_peak_rss_bytes": 2887680,
+                "observed_cpu_core_seconds": 0.09000000000000001,
+                "observed_cpu_seconds": 5.156183322,
+                "peak_sampled_cpu_percent_one_core_100": 1.961639403880697,
+                "sampled_mean_rss_bytes": 2887680.0,
+                "sampled_peak_rss_bytes": 2887680,
+                "usable_samples": 7
+              }
+            },
+            "samples": 8,
+            "whole_container_average_cpu_percent_one_core_100": 8.310269802905976,
+            "whole_container_io_observed_seconds": 5.353400197,
+            "whole_container_observed_cpu_core_seconds": 0.444882,
+            "whole_container_per_device_io": {
+              "254:0": {
+                "observed_delta": {
+                  "dbytes": 0,
+                  "dios": 0,
+                  "rbytes": 0,
+                  "rios": 0,
+                  "wbytes": 20660224,
+                  "wios": 4251
+                },
+                "observed_seconds": 5.353400197,
+                "rates": {
+                  "dbytes_per_second": 0.0,
+                  "dios_per_second": 0.0,
+                  "rbytes_per_second": 0.0,
+                  "rios_per_second": 0.0,
+                  "wbytes_per_second": 3859271.3489975613,
+                  "wios_per_second": 794.0747643679291
+                }
+              }
+            }
+          },
+          "retained-open": {
+            "container_lifetime_peak_charged_memory_bytes": 2147483648,
+            "container_mean_charged_memory_bytes": 1930748359.1111112,
+            "container_peak_sampled_charged_memory_bytes": 2147037184,
+            "database_allocated_bytes_max": 1656709120,
+            "database_allocated_bytes_min": 1656709120,
+            "database_disk_incomplete_samples": 0,
+            "database_disk_usable_samples": 9,
+            "database_logical_bytes_max": 1670935836,
+            "database_logical_bytes_min": 1670935836,
+            "io_availability": "available",
+            "io_counter_resets_excluded": 0,
+            "roles": {
+              "controller": {
+                "average_cpu_percent_one_core_100": 71.1610504590212,
+                "native_lifetime_peak_rss_bytes": 218898432,
+                "observed_cpu_core_seconds": 4.62,
+                "observed_cpu_seconds": 6.492315628000001,
+                "peak_sampled_cpu_percent_one_core_100": 98.78557807022248,
+                "sampled_mean_rss_bytes": 186813098.66666666,
+                "sampled_peak_rss_bytes": 213622784,
+                "usable_samples": 9
+              },
+              "owner": {
+                "average_cpu_percent_one_core_100": 12.841003412368865,
+                "native_lifetime_peak_rss_bytes": 143630336,
+                "observed_cpu_core_seconds": 0.83,
+                "observed_cpu_seconds": 6.463669336000001,
+                "peak_sampled_cpu_percent_one_core_100": 55.82600244796237,
+                "sampled_mean_rss_bytes": 91590144.0,
+                "sampled_peak_rss_bytes": 143630336,
+                "usable_samples": 8
+              },
+              "reader": {
+                "average_cpu_percent_one_core_100": null,
+                "native_lifetime_peak_rss_bytes": 335872,
+                "observed_cpu_core_seconds": null,
+                "observed_cpu_seconds": 0.0,
+                "peak_sampled_cpu_percent_one_core_100": null,
+                "sampled_mean_rss_bytes": 335872.0,
+                "sampled_peak_rss_bytes": 335872,
+                "usable_samples": 1
+              },
+              "writer": {
+                "average_cpu_percent_one_core_100": null,
+                "native_lifetime_peak_rss_bytes": 2797568,
+                "observed_cpu_core_seconds": null,
+                "observed_cpu_seconds": 0.0,
+                "peak_sampled_cpu_percent_one_core_100": null,
+                "sampled_mean_rss_bytes": 2797568.0,
+                "sampled_peak_rss_bytes": 2797568,
+                "usable_samples": 1
+              }
+            },
+            "samples": 9,
+            "whole_container_average_cpu_percent_one_core_100": 84.28701427268315,
+            "whole_container_io_observed_seconds": 6.492315628000001,
+            "whole_container_observed_cpu_core_seconds": 5.472179,
+            "whole_container_per_device_io": {
+              "254:0": {
+                "observed_delta": {
+                  "dbytes": 0,
+                  "dios": 0,
+                  "rbytes": 186675200,
+                  "rios": 13387,
+                  "wbytes": 0,
+                  "wios": 2
+                },
+                "observed_seconds": 6.492315628000001,
+                "rates": {
+                  "dbytes_per_second": 0.0,
+                  "dios_per_second": 0.0,
+                  "rbytes_per_second": 28753253.953783277,
+                  "rios_per_second": 2061.9761525864,
+                  "wbytes_per_second": 0.0,
+                  "wios_per_second": 0.30805649549359826
+                }
+              }
+            }
+          },
+          "start": {
+            "container_lifetime_peak_charged_memory_bytes": 2147483648,
+            "container_mean_charged_memory_bytes": 1834336256.0,
+            "container_peak_sampled_charged_memory_bytes": 1834336256,
+            "database_allocated_bytes_max": 1656709120,
+            "database_allocated_bytes_min": 1656709120,
+            "database_disk_incomplete_samples": 0,
+            "database_disk_usable_samples": 2,
+            "database_logical_bytes_max": 1670935836,
+            "database_logical_bytes_min": 1670935836,
+            "io_availability": "available",
+            "io_counter_resets_excluded": 0,
+            "roles": {
+              "controller": {
+                "average_cpu_percent_one_core_100": 0.0,
+                "native_lifetime_peak_rss_bytes": 218898432,
+                "observed_cpu_core_seconds": 0.0,
+                "observed_cpu_seconds": 18446744073.709503,
+                "peak_sampled_cpu_percent_one_core_100": 0.0,
+                "sampled_mean_rss_bytes": 183009280.0,
+                "sampled_peak_rss_bytes": 183009280,
+                "usable_samples": 2
+              }
+            },
+            "samples": 2,
+            "whole_container_average_cpu_percent_one_core_100": null,
+            "whole_container_io_observed_seconds": 18446744073.709503,
+            "whole_container_observed_cpu_core_seconds": null,
+            "whole_container_per_device_io": {
+              "254:0": {
+                "observed_delta": {
+                  "dbytes": 0,
+                  "dios": 0,
+                  "rbytes": 0,
+                  "rios": 0,
+                  "wbytes": 0,
+                  "wios": 0
+                },
+                "observed_seconds": 18446744073.709503,
+                "rates": {
+                  "dbytes_per_second": 0.0,
+                  "dios_per_second": 0.0,
+                  "rbytes_per_second": 0.0,
+                  "rios_per_second": 0.0,
+                  "wbytes_per_second": 0.0,
+                  "wios_per_second": 0.0
+                }
+              }
+            }
+          }
+        },
+        "scope": "Approx1s plus phase-boundary samples. CPU uses same-PID deltas; reset/edge intervals excluded. Owner totals include all native threads. RSS includes process mappings; cgroup memory also charges cache/kernel and all actors. Native lifetime peaks span earlier phases. Per-device cgroup IO includes writers/readers/controller/export/compression; do not add stacked devices or /proc byte counters. Physical host IO latency/queue depth unavailable. Database space includes both backends plus retained restore copies, not one table's compression ratio."
+      }
+    }
+  ],
+  "created_ns": 1795319906830322386,
+  "generation": "6ac5dc91-61a2-4652-b06e-4238f7c68a43",
+  "host_header": "captured_utc=2026-11-22T03:52:46Z\nhost_os=Darwin\nhost_architecture=arm64\nhost_cpu_model=Apple M4 Pro\nhost_logical_cpus=14\nhost_memory_bytes=51539607552\ndocker_server=29.5.3 docker_cpus=11 docker_memory_bytes=26216296448 docker_kernel=6.12.76-linuxkit storage_driver=overlayfs cgroup_version=2\nworkload_image_id=sha256:98ff3702fa2fe097de657da1c6ac0518b081e24c4fcadb6b387f37e44c248a10 architecture=arm64 os=linux\nconfigured_budget=2 CPUs / 2147483648 bytes memory / swap disabled / network none\nco_tenancy=Other isolated functional labs may run concurrently; timings are diagnostics, not a comparative benchmark\n",
+  "initial_logical_key_and_value_bytes_per_backend": 528000000,
+  "passed": true,
+  "payload_bytes_per_value": 256,
+  "scope": "Functional process-crash, atomic-pair, retained reopen and fresh-copy restore qualification; one observation per backend, concurrent isolated labs on one Docker host. No capacity, HA, physical power-loss guarantee or comparative performance winner. Cold/warm cache isolation, sustained matrix, disk loss/EIO/full disk, compaction stalls, upgrades/migration and live backup remain unrun.",
+  "seed_pairs_per_backend": 1000000,
+  "values_per_pair": 2
+}

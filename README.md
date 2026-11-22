@@ -122,13 +122,22 @@ Ignite's official October 2026 status says no next Ignite 3 release is planned a
 recommends maintained Ignite 2.x for new production deployments. Keep both in the
 research backlog and qualify them independently; see the [upstream status](https://ignite.apache.org/download/).
 
-## Planned embedded database workloads
+## Embedded database workloads
 
 | System | Potential example | Comparison |
 |---|---|---|
 | [Turso Database](https://github.com/tursodatabase/turso) | Embedded Rust SQL: concurrent inventory updates, transaction conflicts, crash/reopen and SQLite compatibility | SQLite / PostgreSQL; qualify preview features separately |
-| [Fjall](https://github.com/fjall-rs/fjall) — future `rust/embedded-databases` project | In-process LSM ingestion, scans during compaction, atomic batches and kill/reopen recovery | redb / RocksDB with matching sync/ACK rules |
-| [redb](https://github.com/cberner/redb) — same Rust project | Embedded transactional catalog, snapshot readers during writes and crash/reopen recovery | Fjall / SQLite with matching transaction boundaries |
+| [Fjall](rust/embedded-databases/) | Tested durable atomic catalog batches, owner crash/reopen and offline fresh-copy restore; compaction/scans are follow-ups | redb on the same catalog contract; RocksDB comparison unrun |
+| [redb](rust/embedded-databases/) | Tested transactional catalog pairs, snapshot readers during writes, owner crash/reopen and fresh-copy restore | Fjall on the same durable contract; SQLite comparison unrun |
+
+The [100,000-pair Rust checkpoint](rust/embedded-databases/RESULTS_100K.json)
+reconciles 101,550 Fjall / 101,561 redb cumulative acknowledged pairs with zero
+loss or wrong/partial data. These are in-process KV libraries, not SQL-compatible
+SQLite replacements; shared-host diagnostic timings do not establish a winner.
+The [million-pair profile](rust/embedded-databases/RESULTS.json) also passes,
+verifying 1,000,789 Fjall / 1,000,778 redb acknowledged pairs with zero loss or
+wrong/partial bodies; one applied redb intent remains unacknowledged.
+Turso remains planned.
 
 ## Planned observability workloads
 

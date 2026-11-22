@@ -1,0 +1,15 @@
+{
+  "profile": "single-owner-durable-atomic-pairs",
+  "required_operations": ["insert", "point-read", "ordered-scan", "delete", "atomic-cross-table-batch"],
+  "consistency": "One native owner; atomic two-table writes and snapshot pair reads. Not a serializability or linearizability qualification.",
+  "fjall": {"version": "3.1.13", "durability": "Every committed write batch uses PersistMode::SyncAll", "transactions": "Atomic batch, not read-modify-write transaction", "native_compression": "Default LZ4; native compressed/uncompressed byte ratio unavailable in this first profile"},
+  "redb": {"version": "5.0.0", "durability": "Every write transaction uses Durability::Immediate", "transactions": "Native write transaction across both tables", "native_compression": "No configured value compression in this profile"},
+  "deletes": "Hard logical removal, separately from physical space reclamation",
+  "ttl": "Not exercised; no application TTL emulation",
+  "idempotency": "No automatic mutation retry. Every request has a new immutable pair ID; ambiguous intents reconciled independently.",
+  "topology": "In-process libraries, no native cluster or replication. Owner, writer, reader and controller are independent processes in one container; fsynced witness on host bind mount outside the killed owner. This tests process crash, not container/host/disk/power failure.",
+  "payload": {"bytes_per_value": 256, "values_per_pair": 2, "seed_pairs": 100000, "customers": 10000, "seed": 20261122, "nulls": false, "key_encoding": "u64 big-endian", "distribution": "Deterministic synthetic ASCII with repeated and hashed portions; not production fitted"},
+  "client": {"protocol": "Private Unix socket request/response to native owner, full request latency includes transport/serialization", "workers": {"writer": 1, "reader": 1}, "timeout_ms": 1000, "max_in_flight_per_process": 1, "mutation_retry": false, "reconnect": "Next operation only; 10ms inter-operation delay", "reads": "Each read checks both copies in one native snapshot, for an ACKed recent ID and historical ID0"},
+  "fault": {"type": "SIGKILL actual owner process", "hold_seconds": 5, "recovery_deadline_seconds": 60, "minimum_pre_fault_acknowledgements": 20, "minimum_post_recovery_acknowledgements": 20, "acknowledged_loss_allowed": 0, "wrong_or_partial_pair_allowed": 0},
+  "qualification": "Functional/short operational diagnostics only; shared-host concurrent labs preclude a qualified comparative performance ranking"
+}
