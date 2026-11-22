@@ -1,0 +1,61 @@
+{
+  "backend": "Iceberg v2 on local SeaweedFS 4.53 mini; DuckDB 1.5.5 writers and DuckDB/ClickHouse 26.10.2.103 readers",
+  "status": "Declared acceptance contract for the new recovery profile; native qualification pending.",
+  "operations": [
+    "create a new UUID-named table",
+    "atomic append of one disjoint batch",
+    "read acknowledged recent and historical batches",
+    "ordered full-body export through both engines"
+  ],
+  "consistency": "A read may use a complete committed snapshot. Fresh connections must observe an acknowledged batch within the configured visibility bound (default 30s). No partial committed batch or wrong body is allowed. This bound is an experiment acceptance criterion, not an upstream universal freshness guarantee or general linearizability claim.",
+  "atomicity": "One native INSERT per batch. An ambiguous response may leave the complete batch present or absent; partial or duplicate application fails. No cross-table or multi-statement transaction claim.",
+  "idempotency": "No mutation retries or assumed server deduplication. Each attempt has a unique operation ID and disjoint ID range. Reconcile failed/ambiguous outcomes separately from acknowledgements.",
+  "delete_and_ttl": "Not exercised in this append-only recovery profile. No table drop/truncate/reseed on restart. Archive/TTL tests are separate scenarios.",
+  "durability": "Require zero lost acknowledged rows after SIGKILL and retained-volume restart of mini. S3 and catalog fail together; one local volume and one host, without independent storage replicas. Does not qualify physical power loss, disk loss, HA, or host-loss durability. Native metadata UUID and quiescent snapshot must match across complete exports.",
+  "retry_policy": "DuckDB http_retries=0; one submitted mutation per intent. Record setup errors as pre-submission failures and submitted errors/timeouts as ambiguous. Fresh requests may reconnect; they do not replay the failed mutation.",
+  "reference_client": {
+    "writers": 2,
+    "readers": 2,
+    "max_in_flight_per_actor": 1,
+    "duckdb_pool_connections": 1,
+    "duckdb_threads": 2,
+    "duckdb_memory_limit": "512MB",
+    "operation_timeout_seconds": 10,
+    "visibility_bound_seconds": 30,
+    "verification_timeout_seconds": 300,
+    "delay_ms": 1000,
+    "mutation_retries": 0,
+    "seed_rows": 2000000,
+    "customers": 10000,
+    "batch_rows": 10000
+  },
+  "data": "Seven non-null fields: event_id BIGINT, customer_id INTEGER, amount_cents BIGINT, writer_id INTEGER, batch_start BIGINT, batch_end BIGINT, payload_sha256 VARCHAR. SHA256 is computed from decimal ID, with deterministic customer/amount values. No arbitrary uploaded-payload capacity claim; checked code permits 1..1000000 rows per batch and 1..100000000 seed rows. Record actual serialized/export/object bytes, not an inferred input size.",
+  "topology": {
+    "active_cpus": 7,
+    "active_memory_bytes": 6979321856,
+    "tool_phase_cpus": 4,
+    "tool_phase_memory_bytes": 4831838208,
+    "storage_copies": 1,
+    "failure_domain": "single local Docker Desktop VM and host disk",
+    "network": "example-owned internal Docker Compose network; no external cloud access or host AWS configuration"
+  },
+  "expected_phases": {
+    "baseline": "All four independent actors make successful progress before injection. Native healthy-phase resource intervals are required.",
+    "fault": "Prove exact owned storage process exited by SIGKILL without OOM, hold down 20s; readers and writers stay alive. Errors/ambiguous writes are expected, corruption is not.",
+    "recovery": "Restart the same storage container/volume, observe changed process generation and native service health. Query survivor must not restart.",
+    "recovered": "Require fresh successful reads and writes from every actor. Stop actors cleanly, then verify every acknowledged body and all ambiguous ranges through both engines at one quiescent snapshot. Retain all histories and reverify earlier fixture tables after subsequent faults."
+  },
+  "limits": [
+    "Functional co-tenancy is recorded; no capacity comparison or universal performance winner.",
+    "Recent/historical read age does not establish cold engine or OS caches.",
+    "Operation deadlines may need controller fencing if native I/O does not honor cancellation; forced termination remains a failed lifecycle.",
+    "Separate catalog/S3 outages, partitions, compactor crashes, retention, backup/restore, and physical disk failure remain unqualified."
+  ],
+  "extension_revisions": {
+    "httpfs": "827222f",
+    "avro": "f9d5902",
+    "iceberg": "45163a28",
+    "policy": "Image build rejects different installed revisions before any SUT workload. Requalify source-dependent metadata interpretation when changing a pin."
+  },
+  "storage_measurement": "At one explicit catalog metadata-location/snapshot ID, enumerate unique live data files and inspect native Parquet footers. Match native file rows with the complete body oracle. Report whole-object bytes separately from the ratio of total uncompressed/compressed column-chunk bytes; no CSV-versus-disk compression claim."
+}

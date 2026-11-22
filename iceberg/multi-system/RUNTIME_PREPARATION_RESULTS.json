@@ -1,0 +1,132 @@
+{
+  "passed": true,
+  "scope": "Canonical app Dockerfile image preparation, native extension loading and pre-engine CLI rejection only. No backend setup, data-path, chaos or recovery qualification.",
+  "image_id": "sha256:f093efce63bbd3b407c2db824edf14b8086a991d5d1448ebdbc0ed149e664a58",
+  "image_owner": "iceberg-multi-system",
+  "image_size_bytes": 89059559,
+  "source_manifest_matches_frozen_and_current": true,
+  "lab_sha256": "0298123747a3a1195dad3bbbf365fb1548e959fd6861395fec0954bfd8e76346",
+  "lab_bytes": 76468104,
+  "duckdb_version": "v1.5.5",
+  "extensions": [
+    {
+      "install_mode": "REPOSITORY",
+      "installed": true,
+      "installed_from": "https://extensions.duckdb.org",
+      "loaded": true,
+      "name": "avro",
+      "version": "f9d5902"
+    },
+    {
+      "install_mode": "REPOSITORY",
+      "installed": true,
+      "installed_from": "https://extensions.duckdb.org",
+      "loaded": true,
+      "name": "httpfs",
+      "version": "827222f"
+    },
+    {
+      "install_mode": "REPOSITORY",
+      "installed": true,
+      "installed_from": "https://extensions.duckdb.org",
+      "loaded": true,
+      "name": "iceberg",
+      "version": "45163a28"
+    }
+  ],
+  "build": {
+    "builder_name": "iceberg-multi-system-build",
+    "buildkit_pin": "moby/buildkit@sha256:baf6138eb8c37644800c7c913fba051e840ebb9ba13eaf92d92ef9a1712d0b4c",
+    "actual_caps": {
+      "cpus": 2,
+      "memory_bytes": 4294967296,
+      "swap_bytes": 0
+    },
+    "run_ancestry_proved": true,
+    "max_parallelism": 1,
+    "memory_peak_bytes": 4024848384,
+    "cpu_core_seconds_between_counter_snapshots": 90.971928,
+    "oom_kill": 0,
+    "charged_io_raw_in": "real-build-counters-after.txt",
+    "builder_stopped_exit_code": 1,
+    "builder_shutdown_log": "Explicit SIGTERM/SIGINT forced shutdown after successful image export; Pid0/notrunning/noOOM confirmed.",
+    "co_tenancy": "Shared Docker Desktop host with active DuckDB/ZFS recovery lab; build diagnostics not comparative workload performance."
+  },
+  "runtime_probe": {
+    "cpus": 1,
+    "memory_bytes": 2147483648,
+    "swap_bytes": 0,
+    "network": "none",
+    "user": "app",
+    "main_negative_guards": 3,
+    "native_extensions_loaded": 3,
+    "memory_peak_bytes": 72753152
+  },
+  "preserved_failed_attempts": [
+    "create-first-failure.txt",
+    "probe-first-failure.log",
+    "inspection-helper-first.go",
+    "inspection-helper-first-sha256.json",
+    "runtime-probe.log",
+    "runtime-probe-ended-first.json"
+  ],
+  "native_compression": "Not applicable: no database dataset in this image-preparation task. Image/artifact size is not native database compression.",
+  "cleanup": {
+    "verified_exact_owned_containers_absent": true,
+    "owned_builder_container_and_state_volume_absent": true,
+    "built_runtime_image_and_evidence_preserved": true,
+    "shared_sdk_cache_and_other_resources_untouched": true
+  },
+  "inspection_helper_final_source_sha256": "0c9f4543ee5dcc433dd196fdd5d51b6d1510315c0f4564dfaefbb8ff0ce0bfbd",
+  "date": "2026-11-22",
+  "source_sha256": {
+    "archive.go": "ec768eec27bf9f8e1caaeaf1bdbc525ec042adf4c70404cbc7319a7b0552ce2b",
+    "benchmark.go": "00028ed50f05efe965a91103152d791ea893e59d50e0818500dc8e118ed0b640",
+    "isolation.go": "ed0e74d73250f281a56b59f2787243038268955771fb72f83532825da28b74c3",
+    "isolation_test.go": "a5930919aaf1972d466822865a63036cbc231efe4f00d206a09b1ecbb3823c54",
+    "main.go": "55f7b9a5c1daf40335fafced6e1ed42f5f808bdd419be57470c779f4aa2cc16a",
+    "native.go": "16fc4df4c18ae2833c310c48d67fb68b8b2b61e7cb76eb27f1f7e5d89eadf211",
+    "recovery_history.go": "11b486553cc3ce47e97ae334ef25b5babe8fe00cd8acc4a8f57be45288283967",
+    "recovery_history_test.go": "67b787b7399577472862781d7251152d39f3fb05749ef22ff5b6c57225566291",
+    "recovery_native.go": "53c120c78e33f68546b5e252d91a6103ed642364aaecf8ce407cfa0c3f1065ab",
+    "workload.go": "e0afdb820f62afc94e25bea501eebb636c5640707bb3d60bdca67be41cda0aa6",
+    "go.mod": "5db3b967ed8eb850220a66d9fd8c564632afc55b53a026e3d93bf3aa54280180",
+    "go.sum": "57e57bee2784485ff50cf3143261ca959720821f802d658ad725c5cca57742f9",
+    "Dockerfile": "c1fcd184c9ff4da5b5d44f381986e6f21107eaad5b6d1322cb449c4e3e2ad43b"
+  },
+  "extension_files": {
+    "/opt/duckdb/extensions/v1.5.5/linux_arm64/avro.duckdb_extension": {
+      "bytes": 11009878,
+      "sha256": "3b914e31ca60e6866090a14a9fd8198574eef4898a3840547e2d2b660f7666fe"
+    },
+    "/opt/duckdb/extensions/v1.5.5/linux_arm64/avro.duckdb_extension.info": {
+      "bytes": 123,
+      "sha256": "586d72d3767448489a3d98cb0d9f862ed41220ba909b0a986a391315cb9d560c"
+    },
+    "/opt/duckdb/extensions/v1.5.5/linux_arm64/httpfs.duckdb_extension": {
+      "bytes": 19861758,
+      "sha256": "eba6e263e395a83966090f1f11ade63630b1b21422f0f2813858d179d42ea1e9"
+    },
+    "/opt/duckdb/extensions/v1.5.5/linux_arm64/httpfs.duckdb_extension.info": {
+      "bytes": 125,
+      "sha256": "3782af402816c53aeb8792a8769d78281f9c78e07f1c5da96a1c468aa5337a15"
+    },
+    "/opt/duckdb/extensions/v1.5.5/linux_arm64/iceberg.duckdb_extension": {
+      "bytes": 45451990,
+      "sha256": "84e53979bccccf99cb0ffb389a5d4396092660750e571d34dea8ed38ba58dc60"
+    },
+    "/opt/duckdb/extensions/v1.5.5/linux_arm64/iceberg.duckdb_extension.info": {
+      "bytes": 127,
+      "sha256": "1483987c33c0c25fc1d465bb5efdfef93cbc23b832a30c20e80383a351f73ee9"
+    }
+  },
+  "raw_evidence_directory": ".build/runtime-image-c88187d305044e8d92566a185a1c395f",
+  "raw_evidence_sha256": {
+    "result.json": "2422f278a95c115de94e50bb76734c20afe48ab4f95e33a7186bafff063bf42f",
+    "native-extension-proof.json": "0b40eb0ca9a1a44ce07572baf6db390ccdfee940122e55d0a37734d63dc68163",
+    "source-sha256.json": "c600741563b2fa153136e480a2395424e40e429344521786eb82341050fe0c0e",
+    "real-build-counters-after.txt": "723b6797c4a6ff7230e049111d301beddd34cd21d1b89b9b637059978a811cf1",
+    "build-metadata.json": "6eabda76bcd622b0c9b350eaa84a77a443bda8bac02c5b1df2636fefe64385e3"
+  },
+  "independent_review": "Root rehashed every manifest source against current app/ bytes and matched the runtime image ID against saved native inspection."
+}

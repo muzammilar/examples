@@ -1,0 +1,2958 @@
+{
+  "date": "2026-11-22",
+  "scope": "Local retained-volume whole-SeaweedFS-mini SIGKILL recovery. Catalog and S3 fail together. Functional trial, not HA, disk/power loss or capacity.",
+  "live_case_passed": true,
+  "all_history_reverification_passed": true,
+  "full_production_testing_complete": false,
+  "performance_comparison_qualified": false,
+  "five_command_lifecycle_complete": true,
+  "command": {
+    "command": [
+      "make",
+      "test-production",
+      "COMPOSE=docker compose --env-file /dev/null -f docker-compose.yml -f config/generated/cluster.yml",
+      "RESULTS_DIR=results/qualification-20261122/recovery",
+      "RECOVERY_ROWS=2000000",
+      "CUSTOMERS=10000",
+      "RECOVERY_BATCH_ROWS=10000",
+      "RECOVERY_WRITERS=2",
+      "RECOVERY_TIMEOUT_S=10",
+      "RECOVERY_DELAY_MS=1000",
+      "RECOVERY_VISIBILITY_S=30",
+      "RECOVERY_VERIFY_TIMEOUT_S=300",
+      "CLUSTER_DATA_CPUS=0.5"
+    ],
+    "cwd": "/Users/muzammil/github.com/muzammilar/examples/iceberg/multi-system",
+    "start_ns": 1795334983072566000,
+    "start_utc": "2026-11-22T08:09:43.072575+00:00",
+    "environment": {
+      "PATH": "/nix/store/0kcws5blwbdyxqxjd1w8hjipz61xny3k-python3-3.14.7/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/pkg/env/global/bin:/usr/local/go/bin:/opt/homebrew/bin:/Users/muzammil/.codex/packages/app-server-daemon/releases/0.171.0-aarch64-apple-darwin/codex-path:/Users/muzammil/.codex/tmp/arg0-macos/codex-arg0nC3lhG:/Users/muzammil/.codex/tmp/arg0-macos/codex-arg0dSeOpl:/Users/muzammil/.codex/packages/app-server-daemon/releases/0.170.0-aarch64-apple-darwin/codex-path:/Users/muzammil/.codex/tmp/arg0-macos/codex-arg0yZP9fg:/Users/muzammil/.codex/packages/app-server-daemon/releases/0.169.1-aarch64-apple-darwin/codex-path:/Users/muzammil/.codex/tmp/arg0-macos/codex-arg0x10A6t:/Users/muzammil/.codex/packages/app-server-daemon/releases/0.169.0-aarch64-apple-darwin/codex-path:/Users/muzammil/.codex/tmp/arg0-macos/codex-arg01mc4FF:/Users/muzammil/.codex/packages/app-server-daemon/releases/0.168.0-aarch64-apple-darwin/codex-path:/Users/muzammil/.codex/tmp/arg0-macos/codex-arg0RX800S:/Users/muzammil/.codex/packages/app-server-daemon/releases/0.167.2-aarch64-apple-darwin/codex-path:/Users/muzammil/.codex/tmp/arg0-macos/codex-arg09E4azW:/Users/muzammil/.codex/packages/app-server-daemon/releases/0.167.1-aarch64-apple-darwin/codex-path:/Users/muzammil/.codex/tmp/arg0-macos/codex-arg0GLOGYO:/Users/muzammil/.codex/packages/app-server-daemon/releases/0.167.0-aarch64-apple-darwin/codex-path:/Users/muzammil/.codex/tmp/arg0-macos/codex-arg00qlAPr:/Users/muzammil/.nvm/versions/node/v22.20.0/lib/node_modules/@openai/codex/node_modules/@openai/codex-darwin-arm64/vendor/aarch64-apple-darwin/codex-path:/nix/store/9zplskjn8pn8rkvhhh2mwqvv2vwd18ii-corepack/bin:/nix/store/isqxa82c7f65sbhi51npr0547yz87bh5-go-1.26.8/bin:/nix/store/7cr3l1m9yyng2hscs8lj4x4bj0hm7908-nodejs-24.21.0/bin:/nix/store/yzgjmz7nmmaqph3sqpzrsmnckxlxhs8s-docker-compose-5.5.1/bin:/nix/store/fkmyi189k6mgav93ximg71r96flih4xa-buf-1.73.0/bin:/nix/store/829sb6226a37vass89i0ybxm1zik7kjy-protobuf-36.2/bin:/nix/store/pfcqb99ryyygq1d9n0swknss7i4qqk59-protoc-gen-go-1.36.12/bin:/nix/store/95hkzj7ijqc2a995h4xkpqmvxd6ccn44-protoc-gen-go-grpc-1.6.2/bin:/nix/store/5773887lji3nh9dd0yqj3z8cfx39l3np-protoc-gen-connect-go-1.21.0/bin:/nix/store/5r397cx0sv3jkhqq9i4mph70c20kqryj-foundationdb-client-7.3.68/bin:/nix/store/rjvxap8r2a368wchqc41l1xbwg7pxv9n-fdbcli-7.3.68/bin:/nix/store/3n6hyhf1l8273gpwxavsvjf7fxdb3ni8-kubectl-1.37.1/bin:/nix/store/fgrxz4hr8f71hkhsddbvk8nxadpg67bv-libiconv-115.100.1/bin:/nix/store/wvbygf0dw7z7p32wjm85llavg3zbc256-golangci-lint-2.14.0/bin:/nix/store/j2akdvlq7kmnb6pq2plgxw4kfhr3ypzw-gotests-1.9.0/bin:/nix/store/g2f47qc508hnppj4rggfipqddbkvjvrx-gomodifytags-1.17.0/bin:/nix/store/nc0qn9sifc1srsci62qqaaqlsadvzvki-gore-0.7.0/bin:/nix/store/xzqwvfwi1i0gc9xfiag4rpq2a5l4abmw-gotools-0.44.0/bin:/nix/store/wraa15qxw1y50m87p4acjr19cqnvnszy-delve-1.27.2/bin:/nix/store/xw6qjz1s06wc64g988bgnim3wc6xwmiz-gopls-0.23.0/bin:/nix/store/hivsdrq0pw6vcgpxnq03wmjrnzzynvs4-lua-5.2.4/bin:/nix/store/chmwf1jsb0h2k016cazr0zrh2dkv9lfc-lua-language-server-3.19.1/bin:/nix/store/72sc4gd0f0bay36sipg6lsyag5b062r1-vscode-json-languageserver-1.138.0/bin:/nix/store/l8b8jknvv01hyd99wkgazy0qb9lrcv7j-yaml-language-server-1.24.0/bin:/nix/store/pisf34rkrc89pyxi42ib3nn579qp6dss-python3.14-yamllint-1.37.1/bin:/nix/store/0kcws5blwbdyxqxjd1w8hjipz61xny3k-python3-3.14.7/bin:/nix/store/bz0ghsayh5s01kb5dzfvjg2gprm3mzgs-awscli2-2.35.11/bin:/nix/store/kv6i00gjhp1hj4fv37m8y0p72p238h57-docker-buildx-0.35.0/bin:/nix/store/8lpwwsx0817p60jjxlzj338brn0vmgaz-goose-3.28.0/bin:/nix/store/8nvfl73jq2nrdwx3lavpidchrwh6rf3b-parallel-20260822/bin:/nix/store/mxfz7nc7ryhw8ba5hi6sjr3pbrz201kq-postgresql-17.11-dev/bin:/nix/store/wblc0vp0k8cvdg0hvy9dsqzn6b2vgpq6-postgresql-17.11/bin:/nix/store/aikj4g0bxqb3vhj3zy03ndizwjinh9c5-valkey-9.1.2/bin:/nix/store/zxycxx1kbx27vlbiwj590cbfzkj7yqry-clickhouse-26.2.5.45-stable/bin:/nix/store/9kr42m7dmb7sp8ax8h0hpxp5kczwqcx6-gemini-cli-0.47.0/bin:/nix/store/psci5myh0k7wsk73sfdfw5gwg9n4bf68-google-cloud-sdk-583.0.0/bin:/nix/store/6sxcfsi0m39bk89sal2nydxbbxvm5ny9-duckdb-1.5.5/bin:/nix/store/k4m5yk0qb7hfslwsq1zjajz1d94j12bj-git-cliff-2.14.2/bin:/nix/store/lw5h7x6kxqdx6m8wnsqjjzj6fd1i9x2j-ripgrep-15.2.0/bin:/nix/store/v1zb8pqd25hsj0wd748nfczsa8ygciba-clang-wrapper-21.1.8/bin:/nix/store/9zr22p7w74pz6jviy2qy9g4bnn0zlafa-clang-21.1.8/bin:/nix/store/82fb09q2gbhbhpc8ykkqwkcdj6h9c7f1-coreutils-9.11/bin:/nix/store/i9v22pprimqa6an4vc31x7blw6sgja3l-cctools-binutils-darwin-wrapper-1010.6/bin:/nix/store/pp0azykqgazflz5s78alb0cnfn8mm7aq-cctools-binutils-darwin-1010.6/bin:/nix/store/cyfhvbjl8axx1zns5n49zyhfmz2bji5c-xcbuild-0.1.1-unstable-2019-11-20-xcrun/bin:/nix/store/rp24rai9i94b9lzzfnafh83fhy336vr7-findutils-4.11.0/bin:/nix/store/i5gfxrhmkxqjdk4r8ar1gq80sg180z9d-diffutils-3.12/bin:/nix/store/s5mhqidsrm8aw2982k3mv82ajanirjm8-gnused-4.10/bin:/nix/store/f14505vy0sckbv11qb22s7yd2a7dxq1r-gnugrep-3.12/bin:/nix/store/49jhcfya6jlc7p2hibbl2y5sfz132j3i-gawk-5.4.1/bin:/nix/store/0q138fb69xkyrz7hpm8narc1nj3hkhcy-gnutar-1.35/bin:/nix/store/x4szkfg49740sfm5z2ziajqy570mya4c-gzip-1.14/bin:/nix/store/47b7frqp1jfgaqrwh9c30j94mix9jkj2-bzip2-1.0.8-bin/bin:/nix/store/8l4wgxmhdxfvc9g18y76bnxl1ghgcp7n-gnumake-4.4.1/bin:/nix/store/f0b9dbw2gl596cm03pvdsss72381qhlp-bash-5.3p15/bin:/nix/store/fcrx1cjd50jbfcf9rdgpvsbkpkdh9h76-patch-2.8/bin:/nix/store/ajvv41ick20iki4rnbdyk0846ldxzahc-xz-5.8.4-bin/bin:/nix/store/y44vpziwbzfm8020dzlqqbybyyy7lb6g-file-5.48/bin:/Users/muzammil/github.com/inngest/monorepo/.direnv/bin:/Users/muzammil/.bun/bin:/Users/muzammil/.local/bin:/Users/muzammil/.nvm/versions/node/v22.20.0/bin:/Users/muzammil/.krew/bin:/Users/muzammil/.nix-profile/bin:/nix/var/nix/profiles/default/bin:/opt/homebrew/sbin:/etc/profiles/per-user/muzammil/bin:/run/current-system/sw/bin:/Users/muzammil/github.com/inngest/monorepo/bin:/Users/muzammil/go/bin",
+      "HOME": "/Users/muzammil",
+      "TMPDIR": "/var/folders/fm/7xtt1k_x5ks9wrqgzr9qv2wm0000gn/T/",
+      "USER": "muzammil",
+      "LOGNAME": "muzammil",
+      "LANG": "C.UTF-8",
+      "LC_ALL": "C.UTF-8",
+      "DOCKER_CONTEXT": "desktop-linux"
+    },
+    "context": {
+      "context": "desktop-linux",
+      "endpoint": "unix:///Users/muzammil/.docker/run/docker.sock",
+      "daemon": {
+        "ID": "172e5e0a-2d95-4fb5-a6b4-fb16552caec8",
+        "Name": "docker-desktop",
+        "ServerVersion": "29.5.3",
+        "Architecture": "aarch64",
+        "NCPU": 11,
+        "MemTotal": 26216296448,
+        "KernelVersion": "6.12.76-linuxkit",
+        "OperatingSystem": "Docker Desktop"
+      }
+    },
+    "source_sha256": {
+      "Makefile": "adf568801e8dbaa73d7fc9232de118c1f897a95b0c67002b56798f75479be928",
+      "docker-compose.yml": "969ab4517b5c4e157a78a4bc06e31d85c80bedffe5fd069e7342e49b1f34a1e0",
+      "docker-compose.recovery.yml": "a932a542aa0a0f964af914ec1b7bdaf0bcbf08f2d23711c2033cbc19eaec5f5d",
+      "config/generated/cluster.yml": "950b0639504c547ee6f6b28dcd935da0b94211a39c20d380033205b9378ffa94",
+      "config/clickhouse.xml": "bc00e22e156df00e0622b487cfdb6067fe2163e00a61bb4cf221010069fc745c",
+      "config/generated/remote.xml": "147b6caefe4cecf3ce1f901696385fb4eb9d5a9bbe7fd232e13fc2bafdc9ccbf",
+      "scripts/cluster-config.py": "d9cd3c84a3ca6ef6ee4989514e001593a1aafb9b656c8bc5be4ac23321b18dce",
+      "recovery_control.py": "74802d4a2b4d42126f7b6dd1d9b0b3c763392994149ac0548db12149361daaef",
+      "recovery_resources.py": "fb0181dacbfe2a5e5141d25b257d4ecc8d721839e6e41ca42c7f193a3a657a90",
+      "recovery_report.py": "fd09b59ccb78958a7bb46f5a4b6b78675184a57dd9bc1733af28ba7be5d47597",
+      "recovery_cleanup.py": "7aa46030dc0d5ec584d8d971257e9bcee84770591d33093b7b1a8fd2f1eb14dc",
+      "recovery_retirement.py": "0d9cb0f8675aa4731b31bec147269557cc0494aee604806f8856c84f7129234f",
+      "recovery-contract.json": "89a69e4ed1ce129d3b50a6a1cee1d438464854c80d6095616641b650e5186fc9",
+      "app/Dockerfile": "992adb738225337532e760ab1a90e310065222cdf61a16cfe27c9d808c108353",
+      "app/go.mod": "5db3b967ed8eb850220a66d9fd8c564632afc55b53a026e3d93bf3aa54280180",
+      "app/go.sum": "57e57bee2784485ff50cf3143261ca959720821f802d658ad725c5cca57742f9",
+      "app/archive.go": "ec768eec27bf9f8e1caaeaf1bdbc525ec042adf4c70404cbc7319a7b0552ce2b",
+      "app/benchmark.go": "00028ed50f05efe965a91103152d791ea893e59d50e0818500dc8e118ed0b640",
+      "app/isolation.go": "ed0e74d73250f281a56b59f2787243038268955771fb72f83532825da28b74c3",
+      "app/isolation_test.go": "a5930919aaf1972d466822865a63036cbc231efe4f00d206a09b1ecbb3823c54",
+      "app/main.go": "3f9695d082437e09d13d80dbb34132730ca1ba05cc373a8894463faaa06cc09e",
+      "app/native.go": "16fc4df4c18ae2833c310c48d67fb68b8b2b61e7cb76eb27f1f7e5d89eadf211",
+      "app/recovery_catalog_test.go": "e9912d50441e9daa2e76b73a51083b900fed727ff8c950d0a64f6dd0fe327dfa",
+      "app/recovery_history.go": "11b486553cc3ce47e97ae334ef25b5babe8fe00cd8acc4a8f57be45288283967",
+      "app/recovery_history_test.go": "67b787b7399577472862781d7251152d39f3fb05749ef22ff5b6c57225566291",
+      "app/recovery_native.go": "26bfa0d5a678478b4e271d2da72831ecdd4013adf41ec2542b2eddc635055a99",
+      "app/recovery_storage.go": "bbc94b46cfa47254db6488f7ba74295e2cda6abdb2819bad12c36dbfc1e11ed0",
+      "app/recovery_storage_test.go": "d7316188177a308647b9723286f7fa6ca18fde34c1dfccf8ebcde2084486be6c",
+      "app/workload.go": "e0afdb820f62afc94e25bea501eebb636c5640707bb3d60bdca67be41cda0aa6"
+    },
+    "ended_ns": 1795335310637585000,
+    "exit_code": 0,
+    "duration_s": 327.565019,
+    "sources_unchanged": true
+  },
+  "case": {
+    "kind": "iceberg-storage-crash",
+    "run_id": "a1c8fa94-e7a1-4788-a8c0-355f540834b2",
+    "project": "iceberg-multi-system",
+    "context": {
+      "context": "desktop-linux",
+      "endpoint": "unix:///Users/muzammil/.docker/run/docker.sock",
+      "daemon": {
+        "ID": "172e5e0a-2d95-4fb5-a6b4-fb16552caec8",
+        "Name": "docker-desktop",
+        "ServerVersion": "29.5.3",
+        "Architecture": "aarch64",
+        "NCPU": 11,
+        "MemTotal": 26216296448,
+        "KernelVersion": "6.12.76-linuxkit",
+        "OperatingSystem": "Docker Desktop"
+      }
+    },
+    "volume": {
+      "Name": "iceberg-multi-system_storage",
+      "CreatedAt": "2026-11-22T06:47:36Z",
+      "Mountpoint": "/var/lib/docker/volumes/iceberg-multi-system_storage/_data"
+    },
+    "storage": {
+      "id": "64bf739b25a6a2f74153c7749c485a6254330a0450a40c21fd9de1923741202e",
+      "image_id": "sha256:ccad23e18639c8b98cee17e7100b95830a06077b56d8e5b006d6dcf8ec5e94a0",
+      "state": {
+        "Status": "running",
+        "Running": true,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 59895,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-11-22T07:31:16.520242631Z",
+        "FinishedAt": "2026-11-22T07:30:56.365800886Z",
+        "Health": {
+          "Status": "healthy",
+          "FailingStreak": 0,
+          "Log": [
+            {
+              "Start": "2026-11-22T08:09:35.47023325Z",
+              "End": "2026-11-22T08:09:35.500101209Z",
+              "ExitCode": 0,
+              "Output": ""
+            },
+            {
+              "Start": "2026-11-22T08:09:38.502542085Z",
+              "End": "2026-11-22T08:09:38.541281335Z",
+              "ExitCode": 0,
+              "Output": ""
+            },
+            {
+              "Start": "2026-11-22T08:09:41.544193628Z",
+              "End": "2026-11-22T08:09:41.580862545Z",
+              "ExitCode": 0,
+              "Output": ""
+            },
+            {
+              "Start": "2026-11-22T08:09:44.582138671Z",
+              "End": "2026-11-22T08:09:44.609379588Z",
+              "ExitCode": 0,
+              "Output": ""
+            },
+            {
+              "Start": "2026-11-22T08:09:47.609629506Z",
+              "End": "2026-11-22T08:09:47.659155465Z",
+              "ExitCode": 0,
+              "Output": ""
+            }
+          ]
+        }
+      },
+      "restart_count": 0
+    },
+    "query": {
+      "id": "e83cc46644c1eadcf3b48d8629215449182429e33a10e87faf83d7ed7c6e6de4",
+      "image_id": "sha256:b2bfa4d8399ee9973868cc5c1754cb506a6f4b86fbddc41010cc090beb55c85e",
+      "state": {
+        "Status": "running",
+        "Running": true,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 50930,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-11-22T07:01:15.618623422Z",
+        "FinishedAt": "0001-01-01T00:00:00Z",
+        "Health": {
+          "Status": "healthy",
+          "FailingStreak": 0,
+          "Log": [
+            {
+              "Start": "2026-11-22T08:09:37.937235835Z",
+              "End": "2026-11-22T08:09:37.990911752Z",
+              "ExitCode": 0,
+              "Output": "1\n"
+            },
+            {
+              "Start": "2026-11-22T08:09:40.99204142Z",
+              "End": "2026-11-22T08:09:41.050713461Z",
+              "ExitCode": 0,
+              "Output": "1\n"
+            },
+            {
+              "Start": "2026-11-22T08:09:44.051365505Z",
+              "End": "2026-11-22T08:09:44.105833005Z",
+              "ExitCode": 0,
+              "Output": "1\n"
+            },
+            {
+              "Start": "2026-11-22T08:09:47.107106464Z",
+              "End": "2026-11-22T08:09:47.185316423Z",
+              "ExitCode": 0,
+              "Output": "1\n"
+            },
+            {
+              "Start": "2026-11-22T08:09:50.186798257Z",
+              "End": "2026-11-22T08:09:50.251799258Z",
+              "ExitCode": 0,
+              "Output": "1\n"
+            }
+          ]
+        }
+      },
+      "restart_count": 0
+    },
+    "source_sha256": {
+      "Makefile": "adf568801e8dbaa73d7fc9232de118c1f897a95b0c67002b56798f75479be928",
+      "docker-compose.yml": "969ab4517b5c4e157a78a4bc06e31d85c80bedffe5fd069e7342e49b1f34a1e0",
+      "docker-compose.recovery.yml": "a932a542aa0a0f964af914ec1b7bdaf0bcbf08f2d23711c2033cbc19eaec5f5d",
+      "config/generated/cluster.yml": "950b0639504c547ee6f6b28dcd935da0b94211a39c20d380033205b9378ffa94",
+      "config/clickhouse.xml": "bc00e22e156df00e0622b487cfdb6067fe2163e00a61bb4cf221010069fc745c",
+      "config/generated/remote.xml": "147b6caefe4cecf3ce1f901696385fb4eb9d5a9bbe7fd232e13fc2bafdc9ccbf",
+      "scripts/cluster-config.py": "d9cd3c84a3ca6ef6ee4989514e001593a1aafb9b656c8bc5be4ac23321b18dce",
+      "recovery_control.py": "74802d4a2b4d42126f7b6dd1d9b0b3c763392994149ac0548db12149361daaef",
+      "recovery_resources.py": "fb0181dacbfe2a5e5141d25b257d4ecc8d721839e6e41ca42c7f193a3a657a90",
+      "recovery_report.py": "fd09b59ccb78958a7bb46f5a4b6b78675184a57dd9bc1733af28ba7be5d47597",
+      "recovery_cleanup.py": "7aa46030dc0d5ec584d8d971257e9bcee84770591d33093b7b1a8fd2f1eb14dc",
+      "recovery_retirement.py": "0d9cb0f8675aa4731b31bec147269557cc0494aee604806f8856c84f7129234f",
+      "recovery-contract.json": "89a69e4ed1ce129d3b50a6a1cee1d438464854c80d6095616641b650e5186fc9",
+      "app/Dockerfile": "992adb738225337532e760ab1a90e310065222cdf61a16cfe27c9d808c108353",
+      "app/go.mod": "5db3b967ed8eb850220a66d9fd8c564632afc55b53a026e3d93bf3aa54280180",
+      "app/go.sum": "57e57bee2784485ff50cf3143261ca959720821f802d658ad725c5cca57742f9",
+      "app/archive.go": "ec768eec27bf9f8e1caaeaf1bdbc525ec042adf4c70404cbc7319a7b0552ce2b",
+      "app/benchmark.go": "00028ed50f05efe965a91103152d791ea893e59d50e0818500dc8e118ed0b640",
+      "app/isolation.go": "ed0e74d73250f281a56b59f2787243038268955771fb72f83532825da28b74c3",
+      "app/isolation_test.go": "a5930919aaf1972d466822865a63036cbc231efe4f00d206a09b1ecbb3823c54",
+      "app/main.go": "3f9695d082437e09d13d80dbb34132730ca1ba05cc373a8894463faaa06cc09e",
+      "app/native.go": "16fc4df4c18ae2833c310c48d67fb68b8b2b61e7cb76eb27f1f7e5d89eadf211",
+      "app/recovery_catalog_test.go": "e9912d50441e9daa2e76b73a51083b900fed727ff8c950d0a64f6dd0fe327dfa",
+      "app/recovery_history.go": "11b486553cc3ce47e97ae334ef25b5babe8fe00cd8acc4a8f57be45288283967",
+      "app/recovery_history_test.go": "67b787b7399577472862781d7251152d39f3fb05749ef22ff5b6c57225566291",
+      "app/recovery_native.go": "26bfa0d5a678478b4e271d2da72831ecdd4013adf41ec2542b2eddc635055a99",
+      "app/recovery_storage.go": "bbc94b46cfa47254db6488f7ba74295e2cda6abdb2819bad12c36dbfc1e11ed0",
+      "app/recovery_storage_test.go": "d7316188177a308647b9723286f7fa6ca18fde34c1dfccf8ebcde2084486be6c",
+      "app/workload.go": "e0afdb820f62afc94e25bea501eebb636c5640707bb3d60bdca67be41cda0aa6"
+    },
+    "created_ns": 1795334994793932000,
+    "scope": "Whole SeaweedFS mini process outage: S3 and catalog fail together. Retained-volume, one-host functional recovery; not HA, disk/power loss or capacity."
+  },
+  "profile": {
+    "images": {
+      "storage": "sha256:ccad23e18639c8b98cee17e7100b95830a06077b56d8e5b006d6dcf8ec5e94a0",
+      "clickhouse": "sha256:b2bfa4d8399ee9973868cc5c1754cb506a6f4b86fbddc41010cc090beb55c85e",
+      "recovery-tools": "sha256:f0c11f6345836d38f02766aa71b05315ed60724fd9d3a382605c1f9d1f681cd4",
+      "recovery-writer": "sha256:f0c11f6345836d38f02766aa71b05315ed60724fd9d3a382605c1f9d1f681cd4",
+      "recovery-reader": "sha256:f0c11f6345836d38f02766aa71b05315ed60724fd9d3a382605c1f9d1f681cd4"
+    },
+    "network_ids": [
+      "368dfb051ede912e67b46a00ce63a71b4487477602ccfb06f40568e67921ca76"
+    ],
+    "rendered": {
+      "name": "iceberg-multi-system",
+      "networks": {
+        "default": {
+          "name": "iceberg-multi-system_default",
+          "ipam": {},
+          "internal": true
+        }
+      },
+      "services": {
+        "clickhouse": {
+          "cpus": 2,
+          "command": null,
+          "entrypoint": null,
+          "environment": {
+            "CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT": "1",
+            "CLICKHOUSE_PASSWORD": "local-reader",
+            "CLICKHOUSE_USER": "default"
+          },
+          "hostname": "clickhouse",
+          "healthcheck": {
+            "test": [
+              "CMD",
+              "clickhouse-client",
+              "--password",
+              "local-reader",
+              "--query",
+              "SELECT 1"
+            ],
+            "timeout": "5s",
+            "interval": "3s",
+            "retries": 60,
+            "start_period": "15s"
+          },
+          "image": "clickhouse/clickhouse-server:26.10.2.103",
+          "mem_limit": "1610612736",
+          "memswap_limit": "1610612736",
+          "networks": {
+            "default": null
+          },
+          "volumes": [
+            {
+              "type": "bind",
+              "source": "/Users/muzammil/github.com/muzammilar/examples/iceberg/multi-system/config/clickhouse.xml",
+              "target": "/etc/clickhouse-server/config.d/lab.xml",
+              "read_only": true,
+              "bind": {}
+            },
+            {
+              "type": "bind",
+              "source": "/Users/muzammil/github.com/muzammilar/examples/iceberg/multi-system/config/generated/remote.xml",
+              "target": "/etc/clickhouse-server/config.d/remote.xml",
+              "read_only": true,
+              "bind": {}
+            },
+            {
+              "type": "volume",
+              "source": "clickhouse",
+              "target": "/var/lib/clickhouse",
+              "volume": {}
+            }
+          ]
+        },
+        "recovery-reader": {
+          "profiles": [
+            "production"
+          ],
+          "cpus": 1,
+          "command": null,
+          "entrypoint": null,
+          "environment": {
+            "AWS_EC2_METADATA_DISABLED": "true",
+            "CATALOG_URL": "http://storage:8181",
+            "CLICKHOUSE_ADDR": "clickhouse:9000",
+            "CLICKHOUSE_PASSWORD": "local-reader",
+            "CUSTOMERS": "10000",
+            "RECOVERY_BATCH_ROWS": "10000",
+            "RECOVERY_DELAY_MS": "1000",
+            "RECOVERY_READERS": "2",
+            "RECOVERY_TIMEOUT_S": "10",
+            "RECOVERY_VERIFY_TIMEOUT_S": "300",
+            "RECOVERY_VISIBILITY_S": "30",
+            "RESULTS_DIR": "/results",
+            "ROWS": "2000000",
+            "S3_ENDPOINT": "storage:8333",
+            "WRITERS": "2"
+          },
+          "image": "iceberg-multi-runner:dev",
+          "mem_limit": "1073741824",
+          "memswap_limit": "1073741824",
+          "networks": {
+            "default": null
+          },
+          "pull_policy": "never",
+          "volumes": [
+            {
+              "type": "bind",
+              "source": "/Users/muzammil/github.com/muzammilar/examples/iceberg/multi-system/results/qualification-20261122/recovery/production/a1c8fa94-e7a1-4788-a8c0-355f540834b2",
+              "target": "/results",
+              "bind": {}
+            }
+          ]
+        },
+        "recovery-tools": {
+          "profiles": [
+            "production"
+          ],
+          "cpus": 1,
+          "command": null,
+          "entrypoint": null,
+          "environment": {
+            "AWS_EC2_METADATA_DISABLED": "true",
+            "CATALOG_URL": "http://storage:8181",
+            "CLICKHOUSE_ADDR": "clickhouse:9000",
+            "CLICKHOUSE_PASSWORD": "local-reader",
+            "CUSTOMERS": "10000",
+            "RECOVERY_BATCH_ROWS": "10000",
+            "RECOVERY_DELAY_MS": "1000",
+            "RECOVERY_READERS": "2",
+            "RECOVERY_TIMEOUT_S": "10",
+            "RECOVERY_VERIFY_TIMEOUT_S": "300",
+            "RECOVERY_VISIBILITY_S": "30",
+            "RESULTS_DIR": "/results",
+            "ROWS": "2000000",
+            "S3_ENDPOINT": "storage:8333",
+            "WRITERS": "2"
+          },
+          "image": "iceberg-multi-runner:dev",
+          "mem_limit": "2147483648",
+          "memswap_limit": "2147483648",
+          "networks": {
+            "default": null
+          },
+          "pull_policy": "never",
+          "volumes": [
+            {
+              "type": "bind",
+              "source": "/Users/muzammil/github.com/muzammilar/examples/iceberg/multi-system/results/qualification-20261122/recovery/production/a1c8fa94-e7a1-4788-a8c0-355f540834b2",
+              "target": "/results",
+              "bind": {}
+            }
+          ]
+        },
+        "recovery-writer": {
+          "profiles": [
+            "production"
+          ],
+          "cpus": 1,
+          "command": null,
+          "entrypoint": null,
+          "environment": {
+            "AWS_EC2_METADATA_DISABLED": "true",
+            "CATALOG_URL": "http://storage:8181",
+            "CLICKHOUSE_ADDR": "clickhouse:9000",
+            "CLICKHOUSE_PASSWORD": "local-reader",
+            "CUSTOMERS": "10000",
+            "RECOVERY_BATCH_ROWS": "10000",
+            "RECOVERY_DELAY_MS": "1000",
+            "RECOVERY_READERS": "2",
+            "RECOVERY_TIMEOUT_S": "10",
+            "RECOVERY_VERIFY_TIMEOUT_S": "300",
+            "RECOVERY_VISIBILITY_S": "30",
+            "RESULTS_DIR": "/results",
+            "ROWS": "2000000",
+            "S3_ENDPOINT": "storage:8333",
+            "WRITERS": "2"
+          },
+          "image": "iceberg-multi-runner:dev",
+          "mem_limit": "1073741824",
+          "memswap_limit": "1073741824",
+          "networks": {
+            "default": null
+          },
+          "pull_policy": "never",
+          "volumes": [
+            {
+              "type": "bind",
+              "source": "/Users/muzammil/github.com/muzammilar/examples/iceberg/multi-system/results/qualification-20261122/recovery/production/a1c8fa94-e7a1-4788-a8c0-355f540834b2",
+              "target": "/results",
+              "bind": {}
+            }
+          ]
+        },
+        "storage": {
+          "cpus": 1,
+          "command": [
+            "mini",
+            "-dir=/data",
+            "-ip=storage",
+            "-ip.bind=0.0.0.0",
+            "-s3.port=8333",
+            "-s3.port.iceberg=8181",
+            "-volume.max=4",
+            "-master.volumeSizeLimitMB=256"
+          ],
+          "entrypoint": null,
+          "environment": {
+            "AWS_ACCESS_KEY_ID": "demo",
+            "AWS_SECRET_ACCESS_KEY": "demo",
+            "S3_TABLE_BUCKET": "warehouse"
+          },
+          "healthcheck": {
+            "test": [
+              "CMD",
+              "wget",
+              "-q",
+              "-O",
+              "/dev/null",
+              "http://127.0.0.1:8181/v1/config"
+            ],
+            "timeout": "5s",
+            "interval": "3s",
+            "retries": 60,
+            "start_period": "10s"
+          },
+          "image": "chrislusf/seaweedfs:4.53",
+          "mem_limit": "1073741824",
+          "memswap_limit": "1073741824",
+          "networks": {
+            "default": null
+          },
+          "ports": [
+            {
+              "mode": "ingress",
+              "host_ip": "127.0.0.1",
+              "target": 8333,
+              "published": "18333",
+              "protocol": "tcp"
+            },
+            {
+              "mode": "ingress",
+              "host_ip": "127.0.0.1",
+              "target": 8181,
+              "published": "18181",
+              "protocol": "tcp"
+            }
+          ],
+          "volumes": [
+            {
+              "type": "volume",
+              "source": "storage",
+              "target": "/data",
+              "volume": {}
+            }
+          ]
+        }
+      },
+      "volumes": {
+        "clickhouse": {
+          "name": "iceberg-multi-system_clickhouse"
+        },
+        "storage": {
+          "name": "iceberg-multi-system_storage"
+        }
+      },
+      "x-recovery": {
+        "cpus": 1,
+        "environment": {
+          "AWS_EC2_METADATA_DISABLED": "true",
+          "CATALOG_URL": "http://storage:8181",
+          "CLICKHOUSE_ADDR": "clickhouse:9000",
+          "CLICKHOUSE_PASSWORD": "local-reader",
+          "CUSTOMERS": "10000",
+          "RECOVERY_BATCH_ROWS": "10000",
+          "RECOVERY_DELAY_MS": "1000",
+          "RECOVERY_READERS": "2",
+          "RECOVERY_TIMEOUT_S": "10",
+          "RECOVERY_VERIFY_TIMEOUT_S": "300",
+          "RECOVERY_VISIBILITY_S": "30",
+          "RESULTS_DIR": "/results",
+          "ROWS": "2000000",
+          "S3_ENDPOINT": "storage:8333",
+          "WRITERS": "2"
+        },
+        "image": "iceberg-multi-runner:dev",
+        "mem_limit": "1g",
+        "memswap_limit": "1g",
+        "profiles": [
+          "production"
+        ],
+        "pull_policy": "never",
+        "volumes": [
+          "./results/qualification-20261122/recovery/production/a1c8fa94-e7a1-4788-a8c0-355f540834b2:/results"
+        ]
+      }
+    },
+    "live_budget": {
+      "cpus": 7,
+      "memory_bytes": 6979321856
+    },
+    "tool_budget": {
+      "cpus": 4,
+      "memory_bytes": 4831838208
+    }
+  },
+  "phases": [
+    {
+      "phase": "baseline",
+      "host_ns": 1795335114137363000
+    },
+    {
+      "phase": "fault",
+      "host_ns": 1795335128513088000
+    },
+    {
+      "phase": "recovery",
+      "host_ns": 1795335151701529000
+    },
+    {
+      "phase": "recovered",
+      "host_ns": 1795335161904673000
+    },
+    {
+      "phase": "stopping",
+      "host_ns": 1795335189668493000
+    },
+    {
+      "phase": "finished",
+      "host_ns": 1795335214091994000
+    }
+  ],
+  "native_fault": {
+    "before-kill": {
+      "id": "64bf739b25a6a2f74153c7749c485a6254330a0450a40c21fd9de1923741202e",
+      "image_id": "sha256:ccad23e18639c8b98cee17e7100b95830a06077b56d8e5b006d6dcf8ec5e94a0",
+      "state": {
+        "Status": "running",
+        "Running": true,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 59895,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-11-22T07:31:16.520242631Z",
+        "FinishedAt": "2026-11-22T07:30:56.365800886Z",
+        "Health": {
+          "Status": "healthy",
+          "FailingStreak": 0,
+          "Log": [
+            {
+              "Start": "2026-11-22T08:11:55.012063593Z",
+              "End": "2026-11-22T08:11:55.039912635Z",
+              "ExitCode": 0,
+              "Output": ""
+            },
+            {
+              "Start": "2026-11-22T08:11:58.040980553Z",
+              "End": "2026-11-22T08:11:58.066327595Z",
+              "ExitCode": 0,
+              "Output": ""
+            },
+            {
+              "Start": "2026-11-22T08:12:01.067619763Z",
+              "End": "2026-11-22T08:12:01.092755679Z",
+              "ExitCode": 0,
+              "Output": ""
+            },
+            {
+              "Start": "2026-11-22T08:12:04.099932833Z",
+              "End": "2026-11-22T08:12:04.129908833Z",
+              "ExitCode": 0,
+              "Output": ""
+            },
+            {
+              "Start": "2026-11-22T08:12:07.131191793Z",
+              "End": "2026-11-22T08:12:07.16432071Z",
+              "ExitCode": 0,
+              "Output": ""
+            }
+          ]
+        }
+      },
+      "restart_count": 0
+    },
+    "after-kill": {
+      "id": "64bf739b25a6a2f74153c7749c485a6254330a0450a40c21fd9de1923741202e",
+      "image_id": "sha256:ccad23e18639c8b98cee17e7100b95830a06077b56d8e5b006d6dcf8ec5e94a0",
+      "state": {
+        "Status": "exited",
+        "Running": false,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 0,
+        "ExitCode": 137,
+        "Error": "",
+        "StartedAt": "2026-11-22T07:31:16.520242631Z",
+        "FinishedAt": "2026-11-22T08:12:11.564067087Z",
+        "Health": {
+          "Status": "unhealthy",
+          "FailingStreak": 0,
+          "Log": [
+            {
+              "Start": "2026-11-22T08:11:58.040980553Z",
+              "End": "2026-11-22T08:11:58.066327595Z",
+              "ExitCode": 0,
+              "Output": ""
+            },
+            {
+              "Start": "2026-11-22T08:12:01.067619763Z",
+              "End": "2026-11-22T08:12:01.092755679Z",
+              "ExitCode": 0,
+              "Output": ""
+            },
+            {
+              "Start": "2026-11-22T08:12:04.099932833Z",
+              "End": "2026-11-22T08:12:04.129908833Z",
+              "ExitCode": 0,
+              "Output": ""
+            },
+            {
+              "Start": "2026-11-22T08:12:07.131191793Z",
+              "End": "2026-11-22T08:12:07.16432071Z",
+              "ExitCode": 0,
+              "Output": ""
+            },
+            {
+              "Start": "2026-11-22T08:12:10.166093753Z",
+              "End": "2026-11-22T08:12:10.200612544Z",
+              "ExitCode": 0,
+              "Output": ""
+            }
+          ]
+        }
+      },
+      "restart_count": 0
+    },
+    "reopened": {
+      "id": "64bf739b25a6a2f74153c7749c485a6254330a0450a40c21fd9de1923741202e",
+      "image_id": "sha256:ccad23e18639c8b98cee17e7100b95830a06077b56d8e5b006d6dcf8ec5e94a0",
+      "state": {
+        "Status": "running",
+        "Running": true,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 6803,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-11-22T08:12:31.727412763Z",
+        "FinishedAt": "2026-11-22T08:12:11.564067087Z",
+        "Health": {
+          "Status": "healthy",
+          "FailingStreak": 0,
+          "Log": [
+            {
+              "Start": "2026-11-22T08:12:01.067619763Z",
+              "End": "2026-11-22T08:12:01.092755679Z",
+              "ExitCode": 0,
+              "Output": ""
+            },
+            {
+              "Start": "2026-11-22T08:12:04.099932833Z",
+              "End": "2026-11-22T08:12:04.129908833Z",
+              "ExitCode": 0,
+              "Output": ""
+            },
+            {
+              "Start": "2026-11-22T08:12:07.131191793Z",
+              "End": "2026-11-22T08:12:07.16432071Z",
+              "ExitCode": 0,
+              "Output": ""
+            },
+            {
+              "Start": "2026-11-22T08:12:10.166093753Z",
+              "End": "2026-11-22T08:12:10.200612544Z",
+              "ExitCode": 0,
+              "Output": ""
+            },
+            {
+              "Start": "2026-11-22T08:12:36.817454168Z",
+              "End": "2026-11-22T08:12:36.859248793Z",
+              "ExitCode": 0,
+              "Output": ""
+            }
+          ]
+        }
+      },
+      "restart_count": 0
+    },
+    "query-survivor-final": {
+      "id": "e83cc46644c1eadcf3b48d8629215449182429e33a10e87faf83d7ed7c6e6de4",
+      "image_id": "sha256:b2bfa4d8399ee9973868cc5c1754cb506a6f4b86fbddc41010cc090beb55c85e",
+      "state": {
+        "Status": "running",
+        "Running": true,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 50930,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-11-22T07:01:15.618623422Z",
+        "FinishedAt": "0001-01-01T00:00:00Z",
+        "Health": {
+          "Status": "healthy",
+          "FailingStreak": 0,
+          "Log": [
+            {
+              "Start": "2026-11-22T08:13:21.27764805Z",
+              "End": "2026-11-22T08:13:21.391168425Z",
+              "ExitCode": 0,
+              "Output": "1\n"
+            },
+            {
+              "Start": "2026-11-22T08:13:24.391562509Z",
+              "End": "2026-11-22T08:13:24.446822801Z",
+              "ExitCode": 0,
+              "Output": "1\n"
+            },
+            {
+              "Start": "2026-11-22T08:13:27.447584303Z",
+              "End": "2026-11-22T08:13:27.501995303Z",
+              "ExitCode": 0,
+              "Output": "1\n"
+            },
+            {
+              "Start": "2026-11-22T08:13:30.502749471Z",
+              "End": "2026-11-22T08:13:30.555435262Z",
+              "ExitCode": 0,
+              "Output": "1\n"
+            },
+            {
+              "Start": "2026-11-22T08:13:33.557106875Z",
+              "End": "2026-11-22T08:13:33.610045541Z",
+              "ExitCode": 0,
+              "Output": "1\n"
+            }
+          ]
+        }
+      },
+      "restart_count": 0
+    }
+  },
+  "verification": {
+    "actor_lifecycle_passed": true,
+    "config_sha256": "705c9ce21e378cbf0694621b7a4e2b400693cdb5eda1ab4de92cb1c03ba87e2b",
+    "diagnostic": false,
+    "exports": {
+      "clickhouse": {
+        "run_id": "a1c8fa94-e7a1-4788-a8c0-355f540834b2",
+        "verification_id": "9887041a-158a-4600-92b2-aaab9309cb6f",
+        "config_sha256": "705c9ce21e378cbf0694621b7a4e2b400693cdb5eda1ab4de92cb1c03ba87e2b",
+        "csv_file": "clickhouse-rows.csv",
+        "csv_sha256": "8aaa01c238967407da63a8156a28ce0ae117fe01d7af652f8228c16c64d2720e",
+        "proof": {
+          "rows_verified": 2490000,
+          "acknowledged_batches": 249,
+          "acknowledged_rows": 2490000,
+          "ambiguous_batches_applied": 0,
+          "ambiguous_batches_absent": 17,
+          "known_failed_batches_absent": 40,
+          "canonical_body_sha256": "ed13d16eb77d49a486d6e6c006265fec98f3ef9a038ee78657dba60b3406917f"
+        },
+        "started_ns": 1795335206992874427,
+        "ended_ns": 1795335212532198513,
+        "duration_ns": 5539324253,
+        "native_counters": {
+          "files": {
+            "/proc/self/io": {
+              "raw": "rchar: 1355642747\nwchar: 499738289\nsyscr: 151655\nsyscw: 122691\nread_bytes: 0\nwrite_bytes: 499722673\ncancelled_write_bytes: 0\n"
+            },
+            "/proc/self/status": {
+              "raw": "Name:\tlab\nUmask:\t0022\nState:\tS (sleeping)\nTgid:\t1\nNgid:\t0\nPid:\t1\nPPid:\t0\nTracerPid:\t0\nUid:\t501\t501\t501\t501\nGid:\t20\t20\t20\t20\nFDSize:\t64\nGroups:\t20 \nNStgid:\t1\nNSpid:\t1\nNSpgid:\t1\nNSsid:\t1\nKthread:\t0\nVmPeak:\t 5290360 kB\nVmSize:\t 5290360 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t  950752 kB\nVmRSS:\t  121604 kB\nRssAnon:\t   60240 kB\nRssFile:\t   61364 kB\nRssShmem:\t       0 kB\nVmData:\t 1198396 kB\nVmStk:\t     132 kB\nVmExe:\t   59796 kB\nVmLib:\t   47740 kB\nVmPTE:\t    1988 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffff\nThreads:\t6\nSigQ:\t0/99998\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000000001000\nSigCgt:\tfffffffd7fc1eeff\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t00000000a80425fb\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t2\nSeccomp_filters:\t1\nSpeculation_Store_Bypass:\tvulnerable\nSpeculationIndirectBranch:\tunknown\nCpus_allowed:\t7ff\nCpus_allowed_list:\t0-10\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t39525\nnonvoluntary_ctxt_switches:\t1925\n"
+            },
+            "/sys/fs/cgroup/cpu.stat": {
+              "raw": "usage_usec 9334963\nuser_usec 7746515\nsystem_usec 1588447\nnice_usec 0\nnr_periods 201\nnr_throttled 32\nthrottled_usec 2156379\nnr_bursts 0\nburst_usec 0\n"
+            },
+            "/sys/fs/cgroup/io.stat": {
+              "raw": ""
+            },
+            "/sys/fs/cgroup/memory.current": {
+              "raw": "585695232\n"
+            },
+            "/sys/fs/cgroup/memory.peak": {
+              "raw": "1018150912\n"
+            }
+          },
+          "scope": "Raw cumulative process/container counters. Cgroup peaks and totals can include earlier work in this container; unavailable counters are not zero.",
+          "utc_ns": 1795335212532320180
+        }
+      },
+      "duckdb": {
+        "run_id": "a1c8fa94-e7a1-4788-a8c0-355f540834b2",
+        "verification_id": "9887041a-158a-4600-92b2-aaab9309cb6f",
+        "config_sha256": "705c9ce21e378cbf0694621b7a4e2b400693cdb5eda1ab4de92cb1c03ba87e2b",
+        "csv_file": "duckdb-rows.csv",
+        "csv_sha256": "8aaa01c238967407da63a8156a28ce0ae117fe01d7af652f8228c16c64d2720e",
+        "proof": {
+          "rows_verified": 2490000,
+          "acknowledged_batches": 249,
+          "acknowledged_rows": 2490000,
+          "ambiguous_batches_applied": 0,
+          "ambiguous_batches_absent": 17,
+          "known_failed_batches_absent": 40,
+          "canonical_body_sha256": "ed13d16eb77d49a486d6e6c006265fec98f3ef9a038ee78657dba60b3406917f"
+        },
+        "started_ns": 1795335200316709299,
+        "ended_ns": 1795335206965693761,
+        "duration_ns": 6648984628,
+        "native_counters": {
+          "files": {
+            "/proc/self/io": {
+              "raw": "rchar: 577084087\nwchar: 249872358\nsyscr: 80779\nsyscw: 61736\nread_bytes: 0\nwrite_bytes: 249858820\ncancelled_write_bytes: 0\n"
+            },
+            "/proc/self/status": {
+              "raw": "Name:\tlab\nUmask:\t0022\nState:\tS (sleeping)\nTgid:\t1\nNgid:\t0\nPid:\t1\nPPid:\t0\nTracerPid:\t0\nUid:\t501\t501\t501\t501\nGid:\t20\t20\t20\t20\nFDSize:\t64\nGroups:\t20 \nNStgid:\t1\nNSpid:\t1\nNSpgid:\t1\nNSsid:\t1\nKthread:\t0\nVmPeak:\t 5234040 kB\nVmSize:\t 5234040 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t  950752 kB\nVmRSS:\t  583272 kB\nRssAnon:\t  522284 kB\nRssFile:\t   60988 kB\nRssShmem:\t       0 kB\nVmData:\t 1133820 kB\nVmStk:\t     132 kB\nVmExe:\t   59796 kB\nVmLib:\t   47740 kB\nVmPTE:\t    2180 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffff\nThreads:\t7\nSigQ:\t0/99998\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000000001000\nSigCgt:\tfffffffd7fc1eeff\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t00000000a80425fb\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t2\nSeccomp_filters:\t1\nSpeculation_Store_Bypass:\tvulnerable\nSpeculationIndirectBranch:\tunknown\nCpus_allowed:\t7ff\nCpus_allowed_list:\t0-10\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t23149\nnonvoluntary_ctxt_switches:\t1359\n"
+            },
+            "/sys/fs/cgroup/cpu.stat": {
+              "raw": "usage_usec 5762555\nuser_usec 4695491\nsystem_usec 1067063\nnice_usec 0\nnr_periods 146\nnr_throttled 24\nthrottled_usec 2116792\nnr_bursts 0\nburst_usec 0\n"
+            },
+            "/sys/fs/cgroup/io.stat": {
+              "raw": ""
+            },
+            "/sys/fs/cgroup/memory.current": {
+              "raw": "918208512\n"
+            },
+            "/sys/fs/cgroup/memory.peak": {
+              "raw": "1018150912\n"
+            }
+          },
+          "scope": "Raw cumulative process/container counters. Cgroup peaks and totals can include earlier work in this container; unavailable counters are not zero.",
+          "utc_ns": 1795335206965859927
+        }
+      }
+    },
+    "history_sha256": {
+      "bootstrap.jsonl": "5558a2d9d024c3935b7bec3d0fa932ddd37f2710af692489ca8a6e529969e3f9",
+      "config.json": "705c9ce21e378cbf0694621b7a4e2b400693cdb5eda1ab4de92cb1c03ba87e2b",
+      "reader-000.jsonl": "7455d1082318559e1c56d964aceb60b6fc99b16a4023cd6692efc42863eff99f",
+      "reader-001.jsonl": "cbe48a80634ef8040889e5920543c37e77ff15cc510b4246107f36a36249cafc",
+      "seed-checks.jsonl": "d0436238ac70a40ec3ddcc406928c50e68223e123a6eded3e08f7889e58c96b4",
+      "seed-complete.json": "8f6c0bc28d6087332dce1b5cd3457b7207fa9876680833dc0e06fa4050845456",
+      "seed.jsonl": "20649d65cc57f6da17af6c3b70c67ec2e8854e7f82ff36c43599f7a0832f4df7",
+      "writer-000.jsonl": "7a2d285df35ad171f4d92bf15b80e7c6a5b28224df1064b771107fa04becefc4",
+      "writer-001.jsonl": "8306276fbe1568d0b49fb03d489fe6ff9458f746e77eefced235db2ddcfa8ac5"
+    },
+    "integrity_passed": true,
+    "passed": true,
+    "qualification_issues": null,
+    "qualified": true,
+    "reader_contract_passed": true,
+    "run_id": "a1c8fa94-e7a1-4788-a8c0-355f540834b2",
+    "scope": "Both engines independently stream every body from one quiescent catalog snapshot; Go reconciles each against durable intents/outcomes. Diagnostic prefix replay never qualifies a malformed/incomplete journal or failed actor. Whole-batch unacknowledged application remains ambiguous. Same-host/process-fault evidence, not physical power-loss durability or a performance ranking.",
+    "snapshot": {
+      "table_uuid": "bd418f8c-1fdb-4c2a-a970-e3577b92b823",
+      "snapshot_id": 915621009308797112,
+      "metadata_location": "s3://warehouse/lab/recovery_a1c8fa94e7a14788a8c0355f540834b2-bd418f8c-1fdb-4c2a-a970-e3577b92b823/metadata/v250.metadata.json"
+    },
+    "storage_metrics": {
+      "file": "storage-metrics.json",
+      "sha256": "86f21da55365b66ea621bd517c6f403dd24fc12125251148d0d85a6a98df9699",
+      "snapshot": {
+        "table_uuid": "bd418f8c-1fdb-4c2a-a970-e3577b92b823",
+        "snapshot_id": 915621009308797112,
+        "metadata_location": "s3://warehouse/lab/recovery_a1c8fa94e7a14788a8c0355f540834b2-bd418f8c-1fdb-4c2a-a970-e3577b92b823/metadata/v250.metadata.json"
+      }
+    },
+    "strict_mutation_history_passed": true,
+    "utc_ns": 1795335213501008180,
+    "verification_id": "9887041a-158a-4600-92b2-aaab9309cb6f"
+  },
+  "body_proofs": {
+    "duckdb": {
+      "run_id": "a1c8fa94-e7a1-4788-a8c0-355f540834b2",
+      "verification_id": "9887041a-158a-4600-92b2-aaab9309cb6f",
+      "config_sha256": "705c9ce21e378cbf0694621b7a4e2b400693cdb5eda1ab4de92cb1c03ba87e2b",
+      "csv_file": "duckdb-rows.csv",
+      "csv_sha256": "8aaa01c238967407da63a8156a28ce0ae117fe01d7af652f8228c16c64d2720e",
+      "proof": {
+        "rows_verified": 2490000,
+        "acknowledged_batches": 249,
+        "acknowledged_rows": 2490000,
+        "ambiguous_batches_applied": 0,
+        "ambiguous_batches_absent": 17,
+        "known_failed_batches_absent": 40,
+        "canonical_body_sha256": "ed13d16eb77d49a486d6e6c006265fec98f3ef9a038ee78657dba60b3406917f",
+        "ambiguous_batch_detail_count": 17
+      },
+      "started_ns": 1795335200316709299,
+      "ended_ns": 1795335206965693761,
+      "duration_ns": 6648984628,
+      "native_counters": {
+        "files": {
+          "/proc/self/io": {
+            "raw": "rchar: 577084087\nwchar: 249872358\nsyscr: 80779\nsyscw: 61736\nread_bytes: 0\nwrite_bytes: 249858820\ncancelled_write_bytes: 0\n"
+          },
+          "/proc/self/status": {
+            "raw": "Name:\tlab\nUmask:\t0022\nState:\tS (sleeping)\nTgid:\t1\nNgid:\t0\nPid:\t1\nPPid:\t0\nTracerPid:\t0\nUid:\t501\t501\t501\t501\nGid:\t20\t20\t20\t20\nFDSize:\t64\nGroups:\t20 \nNStgid:\t1\nNSpid:\t1\nNSpgid:\t1\nNSsid:\t1\nKthread:\t0\nVmPeak:\t 5234040 kB\nVmSize:\t 5234040 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t  950752 kB\nVmRSS:\t  583272 kB\nRssAnon:\t  522284 kB\nRssFile:\t   60988 kB\nRssShmem:\t       0 kB\nVmData:\t 1133820 kB\nVmStk:\t     132 kB\nVmExe:\t   59796 kB\nVmLib:\t   47740 kB\nVmPTE:\t    2180 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffff\nThreads:\t7\nSigQ:\t0/99998\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000000001000\nSigCgt:\tfffffffd7fc1eeff\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t00000000a80425fb\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t2\nSeccomp_filters:\t1\nSpeculation_Store_Bypass:\tvulnerable\nSpeculationIndirectBranch:\tunknown\nCpus_allowed:\t7ff\nCpus_allowed_list:\t0-10\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t23149\nnonvoluntary_ctxt_switches:\t1359\n"
+          },
+          "/sys/fs/cgroup/cpu.stat": {
+            "raw": "usage_usec 5762555\nuser_usec 4695491\nsystem_usec 1067063\nnice_usec 0\nnr_periods 146\nnr_throttled 24\nthrottled_usec 2116792\nnr_bursts 0\nburst_usec 0\n"
+          },
+          "/sys/fs/cgroup/io.stat": {
+            "raw": ""
+          },
+          "/sys/fs/cgroup/memory.current": {
+            "raw": "918208512\n"
+          },
+          "/sys/fs/cgroup/memory.peak": {
+            "raw": "1018150912\n"
+          }
+        },
+        "scope": "Raw cumulative process/container counters. Cgroup peaks and totals can include earlier work in this container; unavailable counters are not zero.",
+        "utc_ns": 1795335206965859927
+      }
+    },
+    "clickhouse": {
+      "run_id": "a1c8fa94-e7a1-4788-a8c0-355f540834b2",
+      "verification_id": "9887041a-158a-4600-92b2-aaab9309cb6f",
+      "config_sha256": "705c9ce21e378cbf0694621b7a4e2b400693cdb5eda1ab4de92cb1c03ba87e2b",
+      "csv_file": "clickhouse-rows.csv",
+      "csv_sha256": "8aaa01c238967407da63a8156a28ce0ae117fe01d7af652f8228c16c64d2720e",
+      "started_ns": 1795335206992874427,
+      "ended_ns": 1795335212532198513,
+      "duration_ns": 5539324253,
+      "native_counters": {
+        "files": {
+          "/proc/self/io": {
+            "raw": "rchar: 1355642747\nwchar: 499738289\nsyscr: 151655\nsyscw: 122691\nread_bytes: 0\nwrite_bytes: 499722673\ncancelled_write_bytes: 0\n"
+          },
+          "/proc/self/status": {
+            "raw": "Name:\tlab\nUmask:\t0022\nState:\tS (sleeping)\nTgid:\t1\nNgid:\t0\nPid:\t1\nPPid:\t0\nTracerPid:\t0\nUid:\t501\t501\t501\t501\nGid:\t20\t20\t20\t20\nFDSize:\t64\nGroups:\t20 \nNStgid:\t1\nNSpid:\t1\nNSpgid:\t1\nNSsid:\t1\nKthread:\t0\nVmPeak:\t 5290360 kB\nVmSize:\t 5290360 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t  950752 kB\nVmRSS:\t  121604 kB\nRssAnon:\t   60240 kB\nRssFile:\t   61364 kB\nRssShmem:\t       0 kB\nVmData:\t 1198396 kB\nVmStk:\t     132 kB\nVmExe:\t   59796 kB\nVmLib:\t   47740 kB\nVmPTE:\t    1988 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffff\nThreads:\t6\nSigQ:\t0/99998\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000000001000\nSigCgt:\tfffffffd7fc1eeff\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t00000000a80425fb\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t2\nSeccomp_filters:\t1\nSpeculation_Store_Bypass:\tvulnerable\nSpeculationIndirectBranch:\tunknown\nCpus_allowed:\t7ff\nCpus_allowed_list:\t0-10\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t39525\nnonvoluntary_ctxt_switches:\t1925\n"
+          },
+          "/sys/fs/cgroup/cpu.stat": {
+            "raw": "usage_usec 9334963\nuser_usec 7746515\nsystem_usec 1588447\nnice_usec 0\nnr_periods 201\nnr_throttled 32\nthrottled_usec 2156379\nnr_bursts 0\nburst_usec 0\n"
+          },
+          "/sys/fs/cgroup/io.stat": {
+            "raw": ""
+          },
+          "/sys/fs/cgroup/memory.current": {
+            "raw": "585695232\n"
+          },
+          "/sys/fs/cgroup/memory.peak": {
+            "raw": "1018150912\n"
+          }
+        },
+        "scope": "Raw cumulative process/container counters. Cgroup peaks and totals can include earlier work in this container; unavailable counters are not zero.",
+        "utc_ns": 1795335212532320180
+      },
+      "same_complete_body_proof_as_duckdb": true
+    }
+  },
+  "parquet_storage": {
+    "config_sha256": "705c9ce21e378cbf0694621b7a4e2b400693cdb5eda1ab4de92cb1c03ba87e2b",
+    "duration_ns": 935791083,
+    "encoded_parquet_chunk_compression_ratio": 1.127799236206556,
+    "ended_ns": 1795335213482690264,
+    "excluded_deleted_entries": 0,
+    "passed": true,
+    "run_id": "a1c8fa94-e7a1-4788-a8c0-355f540834b2",
+    "scope": "Committed live Parquet files at the verified snapshot. Compression ratio sums encoded column-chunk uncompressed/compressed page bytes, including page headers once per leaf column/row group; not CSV/raw logical/RAM/allocated-disk compression. File/footer bytes are separate. Native counters are cumulative within this verifier container and include earlier full-body exports; duration covers only storage measurement/setup/save preparation.",
+    "snapshot": {
+      "table_uuid": "bd418f8c-1fdb-4c2a-a970-e3577b92b823",
+      "snapshot_id": 915621009308797112,
+      "metadata_location": "s3://warehouse/lab/recovery_a1c8fa94e7a14788a8c0355f540834b2-bd418f8c-1fdb-4c2a-a970-e3577b92b823/metadata/v250.metadata.json"
+    },
+    "started_ns": 1795335212546899430,
+    "totals": {
+      "files": 249,
+      "rows": 2490000,
+      "file_bytes": 194661254,
+      "footer_bytes": 271659,
+      "column_chunks": 1743,
+      "compressed_chunk_bytes": 194351498,
+      "uncompressed_chunk_bytes": 219189471
+    },
+    "verification_id": "9887041a-158a-4600-92b2-aaab9309cb6f"
+  },
+  "operation_summary": {
+    "scope": "Derived observations only, not a correctness verdict or capacity benchmark. Seed is separate. Counts use native start/end phase labels; rates use host phase durations. Crossing-phase requests retain both labels. Failed and successful latencies stay separate.",
+    "journal_status": {
+      "phases.jsonl": "complete",
+      "writer-000.jsonl": "complete",
+      "writer-001.jsonl": "complete",
+      "reader-000.jsonl": "complete",
+      "reader-001.jsonl": "complete"
+    },
+    "pending_write_intents": [],
+    "read_attempt_boundary": "Read journals are written after completion; an interrupted in-flight read can be absent. Do not interpret recorded read counts as every attempted read.",
+    "phases": {
+      "baseline": {
+        "host_phase_seconds": 14.375725,
+        "counts": {
+          "read_completed_ok": 21,
+          "read_successful_rows": 210000,
+          "write_completed_ok": 23,
+          "write_intents_started": 23,
+          "write_successful_rows": 230000
+        },
+        "successful_request_rates_per_second": {
+          "read": 1.4607958902942286,
+          "write": 1.5999193084174885
+        },
+        "successful_row_rates_per_second": {
+          "read": 14607.958902942288,
+          "write": 15999.193084174885
+        }
+      },
+      "fault": {
+        "host_phase_seconds": 23.188441,
+        "counts": {
+          "read_completed_fail": 18,
+          "read_completed_ok": 6,
+          "read_successful_rows": 60000,
+          "write_completed_fail": 34,
+          "write_completed_ok": 5,
+          "write_intents_started": 39,
+          "write_successful_rows": 50000
+        },
+        "successful_request_rates_per_second": {
+          "read": 0.2587496071857526,
+          "write": 0.21562467265479382
+        },
+        "successful_row_rates_per_second": {
+          "read": 2587.4960718575257,
+          "write": 2156.246726547938
+        }
+      },
+      "recovered": {
+        "host_phase_seconds": 27.76382,
+        "counts": {
+          "read_completed_ok": 46,
+          "read_successful_rows": 460000,
+          "write_completed_ambiguous": 17,
+          "write_completed_ok": 21,
+          "write_intents_started": 36,
+          "write_successful_rows": 210000
+        },
+        "successful_request_rates_per_second": {
+          "read": 1.6568325252072662,
+          "write": 0.7563800658554911
+        },
+        "successful_row_rates_per_second": {
+          "read": 16568.325252072664,
+          "write": 7563.800658554911
+        }
+      },
+      "recovery": {
+        "host_phase_seconds": 10.203144,
+        "counts": {
+          "read_completed_fail": 4,
+          "read_completed_ok": 11,
+          "read_successful_rows": 110000,
+          "write_completed_fail": 6,
+          "write_intents_started": 8
+        },
+        "successful_request_rates_per_second": {
+          "read": 1.0780990643668265,
+          "write": 0.0
+        },
+        "successful_row_rates_per_second": {
+          "read": 10780.990643668265,
+          "write": 0.0
+        }
+      },
+      "stopping": {
+        "host_phase_seconds": 24.423501,
+        "counts": {
+          "read_completed_ok": 1,
+          "read_successful_rows": 10000
+        },
+        "successful_request_rates_per_second": {
+          "read": 0.04094417094420656,
+          "write": 0.0
+        },
+        "successful_row_rates_per_second": {
+          "read": 409.44170944206564,
+          "write": 0.0
+        }
+      }
+    },
+    "latencies": [
+      {
+        "operation": "read",
+        "engine": "clickhouse",
+        "started_phase": "baseline",
+        "ended_phase": "baseline",
+        "result": "ok",
+        "locality": "historical",
+        "latency": {
+          "samples": 6,
+          "mean_ms": 41.916096833333334,
+          "min_ms": 37.965458,
+          "max_ms": 47.55075,
+          "p50_ms": 39.503875,
+          "p95_ms": 47.55075,
+          "p99_ms": 47.55075,
+          "p999_ms": 47.55075,
+          "method": "nearest rank over recorded request durations; small samples do not establish tail behavior"
+        }
+      },
+      {
+        "operation": "read",
+        "engine": "clickhouse",
+        "started_phase": "baseline",
+        "ended_phase": "baseline",
+        "result": "ok",
+        "locality": "recent",
+        "latency": {
+          "samples": 6,
+          "mean_ms": 71.4145835,
+          "min_ms": 39.588375,
+          "max_ms": 206.684125,
+          "p50_ms": 44.796958,
+          "p95_ms": 206.684125,
+          "p99_ms": 206.684125,
+          "p999_ms": 206.684125,
+          "method": "nearest rank over recorded request durations; small samples do not establish tail behavior"
+        }
+      },
+      {
+        "operation": "read",
+        "engine": "clickhouse",
+        "started_phase": "fault",
+        "ended_phase": "fault",
+        "result": "fail",
+        "locality": "historical",
+        "latency": {
+          "samples": 1,
+          "mean_ms": 10001.798214,
+          "min_ms": 10001.798214,
+          "max_ms": 10001.798214,
+          "p50_ms": 10001.798214,
+          "p95_ms": 10001.798214,
+          "p99_ms": 10001.798214,
+          "p999_ms": 10001.798214,
+          "method": "nearest rank over recorded request durations; small samples do not establish tail behavior"
+        }
+      },
+      {
+        "operation": "read",
+        "engine": "clickhouse",
+        "started_phase": "fault",
+        "ended_phase": "fault",
+        "result": "ok",
+        "locality": "historical",
+        "latency": {
+          "samples": 1,
+          "mean_ms": 54.464167,
+          "min_ms": 54.464167,
+          "max_ms": 54.464167,
+          "p50_ms": 54.464167,
+          "p95_ms": 54.464167,
+          "p99_ms": 54.464167,
+          "p999_ms": 54.464167,
+          "method": "nearest rank over recorded request durations; small samples do not establish tail behavior"
+        }
+      },
+      {
+        "operation": "read",
+        "engine": "clickhouse",
+        "started_phase": "fault",
+        "ended_phase": "fault",
+        "result": "ok",
+        "locality": "recent",
+        "latency": {
+          "samples": 2,
+          "mean_ms": 50.3716455,
+          "min_ms": 50.017916,
+          "max_ms": 50.725375,
+          "p50_ms": 50.017916,
+          "p95_ms": 50.725375,
+          "p99_ms": 50.725375,
+          "p999_ms": 50.725375,
+          "method": "nearest rank over recorded request durations; small samples do not establish tail behavior"
+        }
+      },
+      {
+        "operation": "read",
+        "engine": "clickhouse",
+        "started_phase": "fault",
+        "ended_phase": "recovery",
+        "result": "fail",
+        "locality": "recent",
+        "latency": {
+          "samples": 1,
+          "mean_ms": 10000.543921,
+          "min_ms": 10000.543921,
+          "max_ms": 10000.543921,
+          "p50_ms": 10000.543921,
+          "p95_ms": 10000.543921,
+          "p99_ms": 10000.543921,
+          "p999_ms": 10000.543921,
+          "method": "nearest rank over recorded request durations; small samples do not establish tail behavior"
+        }
+      },
+      {
+        "operation": "read",
+        "engine": "clickhouse",
+        "started_phase": "recovered",
+        "ended_phase": "recovered",
+        "result": "ok",
+        "locality": "historical",
+        "latency": {
+          "samples": 13,
+          "mean_ms": 47.58470515384615,
+          "min_ms": 34.074875,
+          "max_ms": 65.234458,
+          "p50_ms": 46.472333,
+          "p95_ms": 65.234458,
+          "p99_ms": 65.234458,
+          "p999_ms": 65.234458,
+          "method": "nearest rank over recorded request durations; small samples do not establish tail behavior"
+        }
+      },
+      {
+        "operation": "read",
+        "engine": "clickhouse",
+        "started_phase": "recovered",
+        "ended_phase": "recovered",
+        "result": "ok",
+        "locality": "recent",
+        "latency": {
+          "samples": 13,
+          "mean_ms": 46.812471153846154,
+          "min_ms": 38.086625,
+          "max_ms": 67.497833,
+          "p50_ms": 43.906917,
+          "p95_ms": 67.497833,
+          "p99_ms": 67.497833,
+          "p999_ms": 67.497833,
+          "method": "nearest rank over recorded request durations; small samples do not establish tail behavior"
+        }
+      },
+      {
+        "operation": "read",
+        "engine": "clickhouse",
+        "started_phase": "recovery",
+        "ended_phase": "recovery",
+        "result": "ok",
+        "locality": "historical",
+        "latency": {
+          "samples": 3,
+          "mean_ms": 547.052639,
+          "min_ms": 37.96975,
+          "max_ms": 1554.981584,
+          "p50_ms": 48.206583,
+          "p95_ms": 1554.981584,
+          "p99_ms": 1554.981584,
+          "p999_ms": 1554.981584,
+          "method": "nearest rank over recorded request durations; small samples do not establish tail behavior"
+        }
+      },
+      {
+        "operation": "read",
+        "engine": "clickhouse",
+        "started_phase": "recovery",
+        "ended_phase": "recovery",
+        "result": "ok",
+        "locality": "recent",
+        "latency": {
+          "samples": 3,
+          "mean_ms": 44.731472333333336,
+          "min_ms": 39.901292,
+          "max_ms": 48.918375,
+          "p50_ms": 45.37475,
+          "p95_ms": 48.918375,
+          "p99_ms": 48.918375,
+          "p999_ms": 48.918375,
+          "method": "nearest rank over recorded request durations; small samples do not establish tail behavior"
+        }
+      },
+      {
+        "operation": "read",
+        "engine": "clickhouse",
+        "started_phase": "stopping",
+        "ended_phase": "stopping",
+        "result": "ok",
+        "locality": "historical",
+        "latency": {
+          "samples": 1,
+          "mean_ms": 43.088667,
+          "min_ms": 43.088667,
+          "max_ms": 43.088667,
+          "p50_ms": 43.088667,
+          "p95_ms": 43.088667,
+          "p99_ms": 43.088667,
+          "p999_ms": 43.088667,
+          "method": "nearest rank over recorded request durations; small samples do not establish tail behavior"
+        }
+      },
+      {
+        "operation": "read",
+        "engine": "duckdb",
+        "started_phase": "baseline",
+        "ended_phase": "baseline",
+        "result": "ok",
+        "locality": "historical",
+        "latency": {
+          "samples": 4,
+          "mean_ms": 333.873052,
+          "min_ms": 300.669833,
+          "max_ms": 360.225334,
+          "p50_ms": 317.495041,
+          "p95_ms": 360.225334,
+          "p99_ms": 360.225334,
+          "p999_ms": 360.225334,
+          "method": "nearest rank over recorded request durations; small samples do not establish tail behavior"
+        }
+      },
+      {
+        "operation": "read",
+        "engine": "duckdb",
+        "started_phase": "baseline",
+        "ended_phase": "baseline",
+        "result": "ok",
+        "locality": "recent",
+        "latency": {
+          "samples": 5,
+          "mean_ms": 348.8154,
+          "min_ms": 288.252917,
+          "max_ms": 421.819041,
+          "p50_ms": 325.068666,
+          "p95_ms": 421.819041,
+          "p99_ms": 421.819041,
+          "p999_ms": 421.819041,
+          "method": "nearest rank over recorded request durations; small samples do not establish tail behavior"
+        }
+      },
+      {
+        "operation": "read",
+        "engine": "duckdb",
+        "started_phase": "baseline",
+        "ended_phase": "fault",
+        "result": "ok",
+        "locality": "historical",
+        "latency": {
+          "samples": 1,
+          "mean_ms": 338.351001,
+          "min_ms": 338.351001,
+          "max_ms": 338.351001,
+          "p50_ms": 338.351001,
+          "p95_ms": 338.351001,
+          "p99_ms": 338.351001,
+          "p999_ms": 338.351001,
+          "method": "nearest rank over recorded request durations; small samples do not establish tail behavior"
+        }
+      },
+      {
+        "operation": "read",
+        "engine": "duckdb",
+        "started_phase": "fault",
+        "ended_phase": "fault",
+        "result": "fail",
+        "locality": "historical",
+        "latency": {
+          "samples": 8,
+          "mean_ms": 195.75585425,
+          "min_ms": 177.415791,
+          "max_ms": 205.82725,
+          "p50_ms": 196.959875,
+          "p95_ms": 205.82725,
+          "p99_ms": 205.82725,
+          "p999_ms": 205.82725,
+          "method": "nearest rank over recorded request durations; small samples do not establish tail behavior"
+        }
+      },
+      {
+        "operation": "read",
+        "engine": "duckdb",
+        "started_phase": "fault",
+        "ended_phase": "fault",
+        "result": "fail",
+        "locality": "recent",
+        "latency": {
+          "samples": 9,
+          "mean_ms": 176.1240602222222,
+          "min_ms": 107.787458,
+          "max_ms": 198.325708,
+          "p50_ms": 192.129459,
+          "p95_ms": 198.325708,
+          "p99_ms": 198.325708,
+          "p999_ms": 198.325708,
+          "method": "nearest rank over recorded request durations; small samples do not establish tail behavior"
+        }
+      },
+      {
+        "operation": "read",
+        "engine": "duckdb",
+        "started_phase": "fault",
+        "ended_phase": "fault",
+        "result": "ok",
+        "locality": "historical",
+        "latency": {
+          "samples": 1,
+          "mean_ms": 350.353625,
+          "min_ms": 350.353625,
+          "max_ms": 350.353625,
+          "p50_ms": 350.353625,
+          "p95_ms": 350.353625,
+          "p99_ms": 350.353625,
+          "p999_ms": 350.353625,
+          "method": "nearest rank over recorded request durations; small samples do not establish tail behavior"
+        }
+      },
+      {
+        "operation": "read",
+        "engine": "duckdb",
+        "started_phase": "fault",
+        "ended_phase": "fault",
+        "result": "ok",
+        "locality": "recent",
+        "latency": {
+          "samples": 1,
+          "mean_ms": 255.696,
+          "min_ms": 255.696,
+          "max_ms": 255.696,
+          "p50_ms": 255.696,
+          "p95_ms": 255.696,
+          "p99_ms": 255.696,
+          "p999_ms": 255.696,
+          "method": "nearest rank over recorded request durations; small samples do not establish tail behavior"
+        }
+      },
+      {
+        "operation": "read",
+        "engine": "duckdb",
+        "started_phase": "recovered",
+        "ended_phase": "recovered",
+        "result": "ok",
+        "locality": "historical",
+        "latency": {
+          "samples": 10,
+          "mean_ms": 372.3491625,
+          "min_ms": 320.554041,
+          "max_ms": 495.264959,
+          "p50_ms": 340.506,
+          "p95_ms": 495.264959,
+          "p99_ms": 495.264959,
+          "p999_ms": 495.264959,
+          "method": "nearest rank over recorded request durations; small samples do not establish tail behavior"
+        }
+      },
+      {
+        "operation": "read",
+        "engine": "duckdb",
+        "started_phase": "recovered",
+        "ended_phase": "recovered",
+        "result": "ok",
+        "locality": "recent",
+        "latency": {
+          "samples": 10,
+          "mean_ms": 385.31241689999996,
+          "min_ms": 286.526459,
+          "max_ms": 465.647167,
+          "p50_ms": 370.5545,
+          "p95_ms": 465.647167,
+          "p99_ms": 465.647167,
+          "p999_ms": 465.647167,
+          "method": "nearest rank over recorded request durations; small samples do not establish tail behavior"
+        }
+      },
+      {
+        "operation": "read",
+        "engine": "duckdb",
+        "started_phase": "recovery",
+        "ended_phase": "recovery",
+        "result": "fail",
+        "locality": "historical",
+        "latency": {
+          "samples": 2,
+          "mean_ms": 153.0236045,
+          "min_ms": 112.342167,
+          "max_ms": 193.705042,
+          "p50_ms": 112.342167,
+          "p95_ms": 193.705042,
+          "p99_ms": 193.705042,
+          "p999_ms": 193.705042,
+          "method": "nearest rank over recorded request durations; small samples do not establish tail behavior"
+        }
+      },
+      {
+        "operation": "read",
+        "engine": "duckdb",
+        "started_phase": "recovery",
+        "ended_phase": "recovery",
+        "result": "fail",
+        "locality": "recent",
+        "latency": {
+          "samples": 1,
+          "mean_ms": 184.028541,
+          "min_ms": 184.028541,
+          "max_ms": 184.028541,
+          "p50_ms": 184.028541,
+          "p95_ms": 184.028541,
+          "p99_ms": 184.028541,
+          "p999_ms": 184.028541,
+          "method": "nearest rank over recorded request durations; small samples do not establish tail behavior"
+        }
+      },
+      {
+        "operation": "read",
+        "engine": "duckdb",
+        "started_phase": "recovery",
+        "ended_phase": "recovery",
+        "result": "ok",
+        "locality": "historical",
+        "latency": {
+          "samples": 2,
+          "mean_ms": 359.489771,
+          "min_ms": 342.123625,
+          "max_ms": 376.855917,
+          "p50_ms": 342.123625,
+          "p95_ms": 376.855917,
+          "p99_ms": 376.855917,
+          "p999_ms": 376.855917,
+          "method": "nearest rank over recorded request durations; small samples do not establish tail behavior"
+        }
+      },
+      {
+        "operation": "read",
+        "engine": "duckdb",
+        "started_phase": "recovery",
+        "ended_phase": "recovery",
+        "result": "ok",
+        "locality": "recent",
+        "latency": {
+          "samples": 3,
+          "mean_ms": 375.902139,
+          "min_ms": 357.872459,
+          "max_ms": 399.737,
+          "p50_ms": 370.096958,
+          "p95_ms": 399.737,
+          "p99_ms": 399.737,
+          "p999_ms": 399.737,
+          "method": "nearest rank over recorded request durations; small samples do not establish tail behavior"
+        }
+      },
+      {
+        "operation": "write",
+        "engine": "duckdb",
+        "started_phase": "baseline",
+        "ended_phase": "baseline",
+        "result": "ok",
+        "locality": null,
+        "latency": {
+          "samples": 23,
+          "mean_ms": 196.7410654347826,
+          "min_ms": 140.2025,
+          "max_ms": 245.554626,
+          "p50_ms": 200.895542,
+          "p95_ms": 242.612709,
+          "p99_ms": 245.554626,
+          "p999_ms": 245.554626,
+          "method": "nearest rank over recorded request durations; small samples do not establish tail behavior"
+        }
+      },
+      {
+        "operation": "write",
+        "engine": "duckdb",
+        "started_phase": "fault",
+        "ended_phase": "fault",
+        "result": "fail",
+        "locality": null,
+        "latency": {
+          "samples": 34,
+          "mean_ms": 195.3533886470588,
+          "min_ms": 108.258667,
+          "max_ms": 295.408542,
+          "p50_ms": 197.40725,
+          "p95_ms": 291.268708,
+          "p99_ms": 295.408542,
+          "p999_ms": 295.408542,
+          "method": "nearest rank over recorded request durations; small samples do not establish tail behavior"
+        }
+      },
+      {
+        "operation": "write",
+        "engine": "duckdb",
+        "started_phase": "fault",
+        "ended_phase": "fault",
+        "result": "ok",
+        "locality": null,
+        "latency": {
+          "samples": 5,
+          "mean_ms": 178.45005840000002,
+          "min_ms": 136.731625,
+          "max_ms": 225.13275,
+          "p50_ms": 171.284125,
+          "p95_ms": 225.13275,
+          "p99_ms": 225.13275,
+          "p999_ms": 225.13275,
+          "method": "nearest rank over recorded request durations; small samples do not establish tail behavior"
+        }
+      },
+      {
+        "operation": "write",
+        "engine": "duckdb",
+        "started_phase": "recovered",
+        "ended_phase": "recovered",
+        "result": "ambiguous",
+        "locality": null,
+        "latency": {
+          "samples": 15,
+          "mean_ms": 209.75584726666668,
+          "min_ms": 150.479834,
+          "max_ms": 287.30625,
+          "p50_ms": 204.1475,
+          "p95_ms": 287.30625,
+          "p99_ms": 287.30625,
+          "p999_ms": 287.30625,
+          "method": "nearest rank over recorded request durations; small samples do not establish tail behavior"
+        }
+      },
+      {
+        "operation": "write",
+        "engine": "duckdb",
+        "started_phase": "recovered",
+        "ended_phase": "recovered",
+        "result": "ok",
+        "locality": null,
+        "latency": {
+          "samples": 21,
+          "mean_ms": 201.8503869047619,
+          "min_ms": 139.468292,
+          "max_ms": 265.611542,
+          "p50_ms": 200.198417,
+          "p95_ms": 264.530083,
+          "p99_ms": 265.611542,
+          "p999_ms": 265.611542,
+          "method": "nearest rank over recorded request durations; small samples do not establish tail behavior"
+        }
+      },
+      {
+        "operation": "write",
+        "engine": "duckdb",
+        "started_phase": "recovery",
+        "ended_phase": "recovered",
+        "result": "ambiguous",
+        "locality": null,
+        "latency": {
+          "samples": 2,
+          "mean_ms": 11507.9890265,
+          "min_ms": 11507.862214,
+          "max_ms": 11508.115839,
+          "p50_ms": 11507.862214,
+          "p95_ms": 11508.115839,
+          "p99_ms": 11508.115839,
+          "p999_ms": 11508.115839,
+          "method": "nearest rank over recorded request durations; small samples do not establish tail behavior"
+        }
+      },
+      {
+        "operation": "write",
+        "engine": "duckdb",
+        "started_phase": "recovery",
+        "ended_phase": "recovery",
+        "result": "fail",
+        "locality": null,
+        "latency": {
+          "samples": 6,
+          "mean_ms": 193.380542,
+          "min_ms": 175.975917,
+          "max_ms": 199.947667,
+          "p50_ms": 195.084667,
+          "p95_ms": 199.947667,
+          "p99_ms": 199.947667,
+          "p999_ms": 199.947667,
+          "method": "nearest rank over recorded request durations; small samples do not establish tail behavior"
+        }
+      }
+    ],
+    "export_csv_bytes": {
+      "recovery-a1c8fa94-e7a1-4788-a8c0-355f540834b2/verifications/9887041a-158a-4600-92b2-aaab9309cb6f/clickhouse-rows.csv": 249607187,
+      "recovery-a1c8fa94-e7a1-4788-a8c0-355f540834b2/verifications/9887041a-158a-4600-92b2-aaab9309cb6f/duckdb-rows.csv": 249607187
+    },
+    "compression": {
+      "measured": true,
+      "scope": "Sum of uncompressed/compressed Parquet column-chunk bytes for unique live files at one explicit committed snapshot. After encoding, including page headers; not CSV/raw application bytes, RSS or allocated disk. Verification qualification remains separate.",
+      "codec_level": {
+        "value": null,
+        "reason": "Parquet footer records codec, not writer level; no explicit level override is used in this profile."
+      },
+      "verifications": {
+        "9887041a-158a-4600-92b2-aaab9309cb6f": {
+          "qualified_verification": true,
+          "snapshot": {
+            "table_uuid": "bd418f8c-1fdb-4c2a-a970-e3577b92b823",
+            "snapshot_id": 915621009308797112,
+            "metadata_location": "s3://warehouse/lab/recovery_a1c8fa94e7a14788a8c0355f540834b2-bd418f8c-1fdb-4c2a-a970-e3577b92b823/metadata/v250.metadata.json"
+          },
+          "totals": {
+            "files": 249,
+            "rows": 2490000,
+            "file_bytes": 194661254,
+            "footer_bytes": 271659,
+            "column_chunks": 1743,
+            "compressed_chunk_bytes": 194351498,
+            "uncompressed_chunk_bytes": 219189471
+          },
+          "encoded_parquet_chunk_compression_ratio": 1.127799236206556
+        }
+      },
+      "unavailable_reason": null
+    }
+  },
+  "resource_summary": {
+    "clickhouse": {
+      "samples": 60,
+      "unavailable_samples": 0,
+      "observed_seconds": 214.4799999999999,
+      "cpu_core_seconds": {
+        "total": 34.132825,
+        "user": 23.154145,
+        "system": 10.978678999999998
+      },
+      "cpu_percent_one_core_100": 15.914222771353979,
+      "charged_memory_bytes_min_mean_max": [
+        1092423680,
+        1400626585.6,
+        1545019392
+      ],
+      "lifetime_peak_memory_bytes": 1611137024,
+      "allocated_disk_bytes_first_peak_last": [
+        413421568,
+        480051200,
+        191238144
+      ],
+      "native_block_io": {
+        "254:0": {
+          "observed_seconds": 214.4799999999999,
+          "rbytes": 32768,
+          "wbytes": 84918272,
+          "rios": 6,
+          "wios": 10432,
+          "rbytes_per_second": 152.7788138754197,
+          "wbytes_per_second": 395926.29615815013,
+          "rios_per_second": 0.027974636329727725,
+          "wios_per_second": 48.63856769861994
+        }
+      },
+      "identity_or_counter_gaps": 0
+    },
+    "reader-000": {
+      "samples": 25,
+      "unavailable_samples": 1,
+      "observed_seconds": 64.28,
+      "cpu_core_seconds": {
+        "total": 16.826633,
+        "user": 14.685116000000003,
+        "system": 2.1415159999999998
+      },
+      "cpu_percent_one_core_100": 26.177089296826384,
+      "charged_memory_bytes_min_mean_max": [
+        66686976,
+        75715543.04,
+        93949952
+      ],
+      "lifetime_peak_memory_bytes": 104124416,
+      "allocated_disk_bytes_first_peak_last": [
+        741376,
+        1093632,
+        1093632
+      ],
+      "native_block_io": null,
+      "identity_or_counter_gaps": 0
+    },
+    "reader-001": {
+      "samples": 25,
+      "unavailable_samples": 1,
+      "observed_seconds": 64.19999999999999,
+      "cpu_core_seconds": {
+        "total": 0.821577,
+        "user": 0.621604,
+        "system": 0.19997199999999998
+      },
+      "cpu_percent_one_core_100": 1.2797149532710284,
+      "charged_memory_bytes_min_mean_max": [
+        19824640,
+        20424130.56,
+        21716992
+      ],
+      "lifetime_peak_memory_bytes": 22908928,
+      "allocated_disk_bytes_first_peak_last": [
+        741376,
+        1093632,
+        1093632
+      ],
+      "native_block_io": null,
+      "identity_or_counter_gaps": 0
+    },
+    "storage": {
+      "samples": 47,
+      "unavailable_samples": 14,
+      "observed_seconds": 194.46999999999997,
+      "cpu_core_seconds": {
+        "total": 26.42983000000001,
+        "user": 22.790543999999993,
+        "system": 3.639285000000001
+      },
+      "cpu_percent_one_core_100": 13.590697794004223,
+      "charged_memory_bytes_min_mean_max": [
+        488308736,
+        872099142.8085107,
+        1073688576
+      ],
+      "lifetime_peak_memory_bytes": 1074118656,
+      "allocated_disk_bytes_first_peak_last": [
+        308846592,
+        599375872,
+        599375872
+      ],
+      "native_block_io": {
+        "254:0": {
+          "observed_seconds": 194.46999999999997,
+          "rbytes": 131346432,
+          "wbytes": 307486720,
+          "rios": 517,
+          "wios": 782,
+          "rbytes_per_second": 675407.1682007508,
+          "wbytes_per_second": 1581152.46567594,
+          "rios_per_second": 2.658507738982877,
+          "wios_per_second": 4.02118578701085
+        }
+      },
+      "identity_or_counter_gaps": 1
+    },
+    "tool-1e1d39f5ff3c44b1b96f64d4d1e4b196": {
+      "samples": 5,
+      "unavailable_samples": 0,
+      "observed_seconds": 16.83,
+      "cpu_core_seconds": {
+        "total": 9.098494,
+        "user": 7.569635,
+        "system": 1.528858
+      },
+      "cpu_percent_one_core_100": 54.06116458704695,
+      "charged_memory_bytes_min_mean_max": [
+        3051520,
+        398529331.2,
+        942923776
+      ],
+      "lifetime_peak_memory_bytes": 1018150912,
+      "allocated_disk_bytes_first_peak_last": [
+        1175552,
+        505315328,
+        505315328
+      ],
+      "native_block_io": null,
+      "identity_or_counter_gaps": 0
+    },
+    "tool-8f336baf193e460fb08418bd2d65dace": {
+      "samples": 26,
+      "unavailable_samples": 1,
+      "observed_seconds": 107.66,
+      "cpu_core_seconds": {
+        "total": 102.513217,
+        "user": 91.35100800000004,
+        "system": 11.162209
+      },
+      "cpu_percent_one_core_100": 95.21941018019692,
+      "charged_memory_bytes_min_mean_max": [
+        2297856,
+        104671389.53846154,
+        130887680
+      ],
+      "lifetime_peak_memory_bytes": 134610944,
+      "allocated_disk_bytes_first_peak_last": [
+        32768,
+        434176,
+        434176
+      ],
+      "native_block_io": null,
+      "identity_or_counter_gaps": 0
+    },
+    "writer-000": {
+      "samples": 26,
+      "unavailable_samples": 1,
+      "observed_seconds": 68.56,
+      "cpu_core_seconds": {
+        "total": 11.774606000000002,
+        "user": 10.852866999999998,
+        "system": 0.92174
+      },
+      "cpu_percent_one_core_100": 17.174162777129524,
+      "charged_memory_bytes_min_mean_max": [
+        43593728,
+        62009816.615384616,
+        75390976
+      ],
+      "lifetime_peak_memory_bytes": 83443712,
+      "allocated_disk_bytes_first_peak_last": [
+        733184,
+        1093632,
+        1093632
+      ],
+      "native_block_io": null,
+      "identity_or_counter_gaps": 0
+    },
+    "writer-001": {
+      "samples": 25,
+      "unavailable_samples": 1,
+      "observed_seconds": 64.31,
+      "cpu_core_seconds": {
+        "total": 10.015989999999999,
+        "user": 9.264212,
+        "system": 0.751777
+      },
+      "cpu_percent_one_core_100": 15.574545171823976,
+      "charged_memory_bytes_min_mean_max": [
+        46653440,
+        55794073.6,
+        73572352
+      ],
+      "lifetime_peak_memory_bytes": 84168704,
+      "allocated_disk_bytes_first_peak_last": [
+        741376,
+        1093632,
+        1093632
+      ],
+      "native_block_io": null,
+      "identity_or_counter_gaps": 0
+    }
+  },
+  "phase_resources": {
+    "baseline": {
+      "clickhouse": {
+        "samples": 3,
+        "unavailable_samples": 0,
+        "observed_seconds": 8.77,
+        "cpu_core_seconds": {
+          "total": 1.350502,
+          "user": 0.930274,
+          "system": 0.420229
+        },
+        "cpu_percent_one_core_100": 15.399110604332956,
+        "charged_memory_bytes_min_mean_max": [
+          1430757376,
+          1433018368,
+          1436151808
+        ],
+        "lifetime_peak_memory_bytes": 1611137024,
+        "allocated_disk_bytes_first_peak_last": [
+          450695168,
+          453799936,
+          453799936
+        ],
+        "native_block_io": {
+          "254:0": {
+            "observed_seconds": 8.77,
+            "rbytes": 0,
+            "wbytes": 0,
+            "rios": 0,
+            "wios": 0,
+            "rbytes_per_second": 0.0,
+            "wbytes_per_second": 0.0,
+            "rios_per_second": 0.0,
+            "wios_per_second": 0.0
+          }
+        },
+        "identity_or_counter_gaps": 0
+      },
+      "reader-000": {
+        "samples": 2,
+        "unavailable_samples": 0,
+        "observed_seconds": 4.49,
+        "cpu_core_seconds": {
+          "total": 1.427271,
+          "user": 1.195375,
+          "system": 0.231895
+        },
+        "cpu_percent_one_core_100": 31.787772828507794,
+        "charged_memory_bytes_min_mean_max": [
+          66686976,
+          71208960,
+          75730944
+        ],
+        "lifetime_peak_memory_bytes": 96432128,
+        "allocated_disk_bytes_first_peak_last": [
+          741376,
+          753664,
+          753664
+        ],
+        "native_block_io": null,
+        "identity_or_counter_gaps": 0
+      },
+      "reader-001": {
+        "samples": 2,
+        "unavailable_samples": 0,
+        "observed_seconds": 4.4,
+        "cpu_core_seconds": {
+          "total": 0.066197,
+          "user": 0.053083,
+          "system": 0.013113
+        },
+        "cpu_percent_one_core_100": 1.5044772727272728,
+        "charged_memory_bytes_min_mean_max": [
+          20848640,
+          21282816,
+          21716992
+        ],
+        "lifetime_peak_memory_bytes": 22044672,
+        "allocated_disk_bytes_first_peak_last": [
+          741376,
+          753664,
+          753664
+        ],
+        "native_block_io": null,
+        "identity_or_counter_gaps": 0
+      },
+      "storage": {
+        "samples": 4,
+        "unavailable_samples": 0,
+        "observed_seconds": 13.18,
+        "cpu_core_seconds": {
+          "total": 2.274857,
+          "user": 2.03553,
+          "system": 0.23932799999999999
+        },
+        "cpu_percent_one_core_100": 17.25991654021244,
+        "charged_memory_bytes_min_mean_max": [
+          1071046656,
+          1072885760,
+          1073680384
+        ],
+        "lifetime_peak_memory_bytes": 1074118656,
+        "allocated_disk_bytes_first_peak_last": [
+          540774400,
+          560701440,
+          560701440
+        ],
+        "native_block_io": {
+          "254:0": {
+            "observed_seconds": 13.18,
+            "rbytes": 8192,
+            "wbytes": 44400640,
+            "rios": 2,
+            "wios": 107,
+            "rbytes_per_second": 621.5477996965099,
+            "wbytes_per_second": 3368789.0743550835,
+            "rios_per_second": 0.15174506828528073,
+            "wios_per_second": 8.11836115326252
+          }
+        },
+        "identity_or_counter_gaps": 0
+      },
+      "tool-8f336baf193e460fb08418bd2d65dace": {
+        "samples": 0,
+        "unavailable_samples": 1,
+        "observed_seconds": 0.0,
+        "cpu_core_seconds": null,
+        "cpu_percent_one_core_100": null,
+        "charged_memory_bytes_min_mean_max": null,
+        "lifetime_peak_memory_bytes": null,
+        "allocated_disk_bytes_first_peak_last": null,
+        "native_block_io": null,
+        "identity_or_counter_gaps": 0
+      },
+      "writer-000": {
+        "samples": 3,
+        "unavailable_samples": 0,
+        "observed_seconds": 8.77,
+        "cpu_core_seconds": {
+          "total": 1.863166,
+          "user": 1.702862,
+          "system": 0.160305
+        },
+        "cpu_percent_one_core_100": 21.244766248574688,
+        "charged_memory_bytes_min_mean_max": [
+          43593728,
+          46142805.333333336,
+          48799744
+        ],
+        "lifetime_peak_memory_bytes": 59887616,
+        "allocated_disk_bytes_first_peak_last": [
+          733184,
+          753664,
+          753664
+        ],
+        "native_block_io": null,
+        "identity_or_counter_gaps": 0
+      },
+      "writer-001": {
+        "samples": 2,
+        "unavailable_samples": 0,
+        "observed_seconds": 4.51,
+        "cpu_core_seconds": {
+          "total": 0.746656,
+          "user": 0.69354,
+          "system": 0.053115
+        },
+        "cpu_percent_one_core_100": 16.555565410199556,
+        "charged_memory_bytes_min_mean_max": [
+          48115712,
+          48420864,
+          48726016
+        ],
+        "lifetime_peak_memory_bytes": 56528896,
+        "allocated_disk_bytes_first_peak_last": [
+          741376,
+          753664,
+          753664
+        ],
+        "native_block_io": null,
+        "identity_or_counter_gaps": 0
+      }
+    },
+    "fault": {
+      "clickhouse": {
+        "samples": 15,
+        "unavailable_samples": 0,
+        "observed_seconds": 19.84,
+        "cpu_core_seconds": {
+          "total": 3.8701849999999998,
+          "user": 2.2161720000000003,
+          "system": 1.654013
+        },
+        "cpu_percent_one_core_100": 19.50698084677419,
+        "charged_memory_bytes_min_mean_max": [
+          1438519296,
+          1442546483.2,
+          1460789248
+        ],
+        "lifetime_peak_memory_bytes": 1611137024,
+        "allocated_disk_bytes_first_peak_last": [
+          454103040,
+          470290432,
+          470290432
+        ],
+        "native_block_io": {
+          "254:0": {
+            "observed_seconds": 19.84,
+            "rbytes": 0,
+            "wbytes": 4558848,
+            "rios": 0,
+            "wios": 311,
+            "rbytes_per_second": 0.0,
+            "wbytes_per_second": 229780.64516129033,
+            "rios_per_second": 0.0,
+            "wios_per_second": 15.675403225806452
+          }
+        },
+        "identity_or_counter_gaps": 0
+      },
+      "reader-000": {
+        "samples": 15,
+        "unavailable_samples": 0,
+        "observed_seconds": 19.81,
+        "cpu_core_seconds": {
+          "total": 3.9444909999999993,
+          "user": 3.6077579999999996,
+          "system": 0.336732
+        },
+        "cpu_percent_one_core_100": 19.911615345784956,
+        "charged_memory_bytes_min_mean_max": [
+          72503296,
+          73067724.8,
+          75259904
+        ],
+        "lifetime_peak_memory_bytes": 96432128,
+        "allocated_disk_bytes_first_peak_last": [
+          770048,
+          946176,
+          946176
+        ],
+        "native_block_io": null,
+        "identity_or_counter_gaps": 0
+      },
+      "reader-001": {
+        "samples": 15,
+        "unavailable_samples": 0,
+        "observed_seconds": 19.81,
+        "cpu_core_seconds": {
+          "total": 0.165602,
+          "user": 0.08002800000000002,
+          "system": 0.08557399999999998
+        },
+        "cpu_percent_one_core_100": 0.8359515396264514,
+        "charged_memory_bytes_min_mean_max": [
+          19824640,
+          20275200,
+          20717568
+        ],
+        "lifetime_peak_memory_bytes": 22908928,
+        "allocated_disk_bytes_first_peak_last": [
+          770048,
+          946176,
+          946176
+        ],
+        "native_block_io": null,
+        "identity_or_counter_gaps": 0
+      },
+      "storage": {
+        "samples": 0,
+        "unavailable_samples": 14,
+        "observed_seconds": 0.0,
+        "cpu_core_seconds": null,
+        "cpu_percent_one_core_100": null,
+        "charged_memory_bytes_min_mean_max": null,
+        "lifetime_peak_memory_bytes": null,
+        "allocated_disk_bytes_first_peak_last": null,
+        "native_block_io": null,
+        "identity_or_counter_gaps": 0
+      },
+      "writer-000": {
+        "samples": 15,
+        "unavailable_samples": 0,
+        "observed_seconds": 19.83,
+        "cpu_core_seconds": {
+          "total": 4.311332999999999,
+          "user": 3.98443,
+          "system": 0.32690300000000005
+        },
+        "cpu_percent_one_core_100": 21.74146747352496,
+        "charged_memory_bytes_min_mean_max": [
+          60395520,
+          61459114.666666664,
+          64991232
+        ],
+        "lifetime_peak_memory_bytes": 69976064,
+        "allocated_disk_bytes_first_peak_last": [
+          765952,
+          946176,
+          946176
+        ],
+        "native_block_io": null,
+        "identity_or_counter_gaps": 0
+      },
+      "writer-001": {
+        "samples": 15,
+        "unavailable_samples": 0,
+        "observed_seconds": 19.83,
+        "cpu_core_seconds": {
+          "total": 3.7910460000000006,
+          "user": 3.527241,
+          "system": 0.263805
+        },
+        "cpu_percent_one_core_100": 19.11773071104388,
+        "charged_memory_bytes_min_mean_max": [
+          46653440,
+          50358135.46666667,
+          54218752
+        ],
+        "lifetime_peak_memory_bytes": 56877056,
+        "allocated_disk_bytes_first_peak_last": [
+          770048,
+          946176,
+          946176
+        ],
+        "native_block_io": null,
+        "identity_or_counter_gaps": 0
+      }
+    },
+    "recovery": {
+      "clickhouse": {
+        "samples": 2,
+        "unavailable_samples": 0,
+        "observed_seconds": 4.54,
+        "cpu_core_seconds": {
+          "total": 1.068272,
+          "user": 0.816062,
+          "system": 0.252211
+        },
+        "cpu_percent_one_core_100": 23.530220264317183,
+        "charged_memory_bytes_min_mean_max": [
+          1461231616,
+          1463851008,
+          1466470400
+        ],
+        "lifetime_peak_memory_bytes": 1611137024,
+        "allocated_disk_bytes_first_peak_last": [
+          471642112,
+          473784320,
+          473784320
+        ],
+        "native_block_io": {
+          "254:0": {
+            "observed_seconds": 4.54,
+            "rbytes": 0,
+            "wbytes": 0,
+            "rios": 0,
+            "wios": 0,
+            "rbytes_per_second": 0.0,
+            "wbytes_per_second": 0.0,
+            "rios_per_second": 0.0,
+            "wios_per_second": 0.0
+          }
+        },
+        "identity_or_counter_gaps": 0
+      },
+      "reader-000": {
+        "samples": 2,
+        "unavailable_samples": 0,
+        "observed_seconds": 4.44,
+        "cpu_core_seconds": {
+          "total": 1.395564,
+          "user": 1.162346,
+          "system": 0.233217
+        },
+        "cpu_percent_one_core_100": 31.43162162162162,
+        "charged_memory_bytes_min_mean_max": [
+          78516224,
+          79945728,
+          81375232
+        ],
+        "lifetime_peak_memory_bytes": 98086912,
+        "allocated_disk_bytes_first_peak_last": [
+          958464,
+          962560,
+          962560
+        ],
+        "native_block_io": null,
+        "identity_or_counter_gaps": 0
+      },
+      "reader-001": {
+        "samples": 2,
+        "unavailable_samples": 0,
+        "observed_seconds": 4.43,
+        "cpu_core_seconds": {
+          "total": 0.07441,
+          "user": 0.05954,
+          "system": 0.014869
+        },
+        "cpu_percent_one_core_100": 1.6796839729119641,
+        "charged_memory_bytes_min_mean_max": [
+          19836928,
+          20248576,
+          20660224
+        ],
+        "lifetime_peak_memory_bytes": 22908928,
+        "allocated_disk_bytes_first_peak_last": [
+          958464,
+          962560,
+          962560
+        ],
+        "native_block_io": null,
+        "identity_or_counter_gaps": 0
+      },
+      "storage": {
+        "samples": 3,
+        "unavailable_samples": 0,
+        "observed_seconds": 8.96,
+        "cpu_core_seconds": {
+          "total": 0.9440580000000001,
+          "user": 0.783825,
+          "system": 0.16023199999999999
+        },
+        "cpu_percent_one_core_100": 10.536361607142856,
+        "charged_memory_bytes_min_mean_max": [
+          488308736,
+          559138133.3333334,
+          596221952
+        ],
+        "lifetime_peak_memory_bytes": 596254720,
+        "allocated_disk_bytes_first_peak_last": [
+          548282368,
+          548999168,
+          548999168
+        ],
+        "native_block_io": {
+          "254:0": {
+            "observed_seconds": 8.96,
+            "rbytes": 143360,
+            "wbytes": 4202496,
+            "rios": 4,
+            "wios": 23,
+            "rbytes_per_second": 15999.999999999998,
+            "wbytes_per_second": 469028.57142857136,
+            "rios_per_second": 0.4464285714285714,
+            "wios_per_second": 2.5669642857142856
+          }
+        },
+        "identity_or_counter_gaps": 0
+      },
+      "writer-000": {
+        "samples": 2,
+        "unavailable_samples": 0,
+        "observed_seconds": 4.51,
+        "cpu_core_seconds": {
+          "total": 0.055646,
+          "user": 0.047376,
+          "system": 0.00827
+        },
+        "cpu_percent_one_core_100": 1.2338359201773836,
+        "charged_memory_bytes_min_mean_max": [
+          64626688,
+          67233792,
+          69840896
+        ],
+        "lifetime_peak_memory_bytes": 70549504,
+        "allocated_disk_bytes_first_peak_last": [
+          958464,
+          962560,
+          962560
+        ],
+        "native_block_io": null,
+        "identity_or_counter_gaps": 0
+      },
+      "writer-001": {
+        "samples": 2,
+        "unavailable_samples": 0,
+        "observed_seconds": 4.44,
+        "cpu_core_seconds": {
+          "total": 0.015714,
+          "user": 0.009426,
+          "system": 0.006289
+        },
+        "cpu_percent_one_core_100": 0.35391891891891886,
+        "charged_memory_bytes_min_mean_max": [
+          64122880,
+          64548864,
+          64974848
+        ],
+        "lifetime_peak_memory_bytes": 64974848,
+        "allocated_disk_bytes_first_peak_last": [
+          958464,
+          962560,
+          962560
+        ],
+        "native_block_io": null,
+        "identity_or_counter_gaps": 0
+      }
+    },
+    "recovered": {
+      "clickhouse": {
+        "samples": 6,
+        "unavailable_samples": 0,
+        "observed_seconds": 22.16,
+        "cpu_core_seconds": {
+          "total": 3.888176,
+          "user": 2.770285,
+          "system": 1.117891
+        },
+        "cpu_percent_one_core_100": 17.54592057761733,
+        "charged_memory_bytes_min_mean_max": [
+          1469100032,
+          1471541930.6666667,
+          1474822144
+        ],
+        "lifetime_peak_memory_bytes": 1611137024,
+        "allocated_disk_bytes_first_peak_last": [
+          475574272,
+          480051200,
+          477110272
+        ],
+        "native_block_io": {
+          "254:0": {
+            "observed_seconds": 22.16,
+            "rbytes": 0,
+            "wbytes": 0,
+            "rios": 0,
+            "wios": 0,
+            "rbytes_per_second": 0.0,
+            "wbytes_per_second": 0.0,
+            "rios_per_second": 0.0,
+            "wios_per_second": 0.0
+          }
+        },
+        "identity_or_counter_gaps": 0
+      },
+      "reader-000": {
+        "samples": 6,
+        "unavailable_samples": 0,
+        "observed_seconds": 22.17,
+        "cpu_core_seconds": {
+          "total": 6.704224999999999,
+          "user": 5.753724999999999,
+          "system": 0.9504999999999999
+        },
+        "cpu_percent_one_core_100": 30.240076680198463,
+        "charged_memory_bytes_min_mean_max": [
+          77537280,
+          82427221.33333333,
+          93949952
+        ],
+        "lifetime_peak_memory_bytes": 104124416,
+        "allocated_disk_bytes_first_peak_last": [
+          970752,
+          1093632,
+          1093632
+        ],
+        "native_block_io": null,
+        "identity_or_counter_gaps": 0
+      },
+      "reader-001": {
+        "samples": 6,
+        "unavailable_samples": 0,
+        "observed_seconds": 22.18,
+        "cpu_core_seconds": {
+          "total": 0.34899800000000003,
+          "user": 0.29065199999999997,
+          "system": 0.058345
+        },
+        "cpu_percent_one_core_100": 1.5734806131650136,
+        "charged_memory_bytes_min_mean_max": [
+          19918848,
+          20568746.666666668,
+          20922368
+        ],
+        "lifetime_peak_memory_bytes": 22908928,
+        "allocated_disk_bytes_first_peak_last": [
+          970752,
+          1093632,
+          1093632
+        ],
+        "native_block_io": null,
+        "identity_or_counter_gaps": 0
+      },
+      "storage": {
+        "samples": 6,
+        "unavailable_samples": 0,
+        "observed_seconds": 22.18,
+        "cpu_core_seconds": {
+          "total": 3.4888529999999998,
+          "user": 3.043313,
+          "system": 0.445539
+        },
+        "cpu_percent_one_core_100": 15.729724977457169,
+        "charged_memory_bytes_min_mean_max": [
+          595980288,
+          644308992,
+          708341760
+        ],
+        "lifetime_peak_memory_bytes": 709648384,
+        "allocated_disk_bytes_first_peak_last": [
+          552566784,
+          596025344,
+          596025344
+        ],
+        "native_block_io": {
+          "254:0": {
+            "observed_seconds": 22.18,
+            "rbytes": 77824,
+            "wbytes": 16011264,
+            "rios": 3,
+            "wios": 61,
+            "rbytes_per_second": 3508.7466185752933,
+            "wbytes_per_second": 721878.4490532011,
+            "rios_per_second": 0.1352569882777277,
+            "wios_per_second": 2.7502254283137963
+          }
+        },
+        "identity_or_counter_gaps": 0
+      },
+      "writer-000": {
+        "samples": 6,
+        "unavailable_samples": 0,
+        "observed_seconds": 22.17,
+        "cpu_core_seconds": {
+          "total": 3.818459,
+          "user": 3.527443,
+          "system": 0.291017
+        },
+        "cpu_percent_one_core_100": 17.22354082092918,
+        "charged_memory_bytes_min_mean_max": [
+          63496192,
+          69578752,
+          75390976
+        ],
+        "lifetime_peak_memory_bytes": 83443712,
+        "allocated_disk_bytes_first_peak_last": [
+          970752,
+          1093632,
+          1093632
+        ],
+        "native_block_io": null,
+        "identity_or_counter_gaps": 0
+      },
+      "writer-001": {
+        "samples": 6,
+        "unavailable_samples": 0,
+        "observed_seconds": 22.18,
+        "cpu_core_seconds": {
+          "total": 3.6956309999999997,
+          "user": 3.3924830000000004,
+          "system": 0.30314800000000003
+        },
+        "cpu_percent_one_core_100": 16.661997294860235,
+        "charged_memory_bytes_min_mean_max": [
+          59248640,
+          68923392,
+          73572352
+        ],
+        "lifetime_peak_memory_bytes": 84168704,
+        "allocated_disk_bytes_first_peak_last": [
+          970752,
+          1093632,
+          1093632
+        ],
+        "native_block_io": null,
+        "identity_or_counter_gaps": 0
+      }
+    },
+    "stopping": {
+      "clickhouse": {
+        "samples": 6,
+        "unavailable_samples": 0,
+        "observed_seconds": 21.119999999999997,
+        "cpu_core_seconds": {
+          "total": 4.156046,
+          "user": 2.3576639999999998,
+          "system": 1.798382
+        },
+        "cpu_percent_one_core_100": 19.678248106060607,
+        "charged_memory_bytes_min_mean_max": [
+          1092423680,
+          1231639893.3333333,
+          1545019392
+        ],
+        "lifetime_peak_memory_bytes": 1611137024,
+        "allocated_disk_bytes_first_peak_last": [
+          448937984,
+          448937984,
+          191238144
+        ],
+        "native_block_io": {
+          "254:0": {
+            "observed_seconds": 21.119999999999997,
+            "rbytes": 0,
+            "wbytes": 0,
+            "rios": 0,
+            "wios": 0,
+            "rbytes_per_second": 0.0,
+            "wbytes_per_second": 0.0,
+            "rios_per_second": 0.0,
+            "wios_per_second": 0.0
+          }
+        },
+        "identity_or_counter_gaps": 0
+      },
+      "reader-000": {
+        "samples": 0,
+        "unavailable_samples": 1,
+        "observed_seconds": 0.0,
+        "cpu_core_seconds": null,
+        "cpu_percent_one_core_100": null,
+        "charged_memory_bytes_min_mean_max": null,
+        "lifetime_peak_memory_bytes": null,
+        "allocated_disk_bytes_first_peak_last": null,
+        "native_block_io": null,
+        "identity_or_counter_gaps": 0
+      },
+      "reader-001": {
+        "samples": 0,
+        "unavailable_samples": 1,
+        "observed_seconds": 0.0,
+        "cpu_core_seconds": null,
+        "cpu_percent_one_core_100": null,
+        "charged_memory_bytes_min_mean_max": null,
+        "lifetime_peak_memory_bytes": null,
+        "allocated_disk_bytes_first_peak_last": null,
+        "native_block_io": null,
+        "identity_or_counter_gaps": 0
+      },
+      "storage": {
+        "samples": 6,
+        "unavailable_samples": 0,
+        "observed_seconds": 21.060000000000002,
+        "cpu_core_seconds": {
+          "total": 1.3726249999999998,
+          "user": 0.9447490000000001,
+          "system": 0.427875
+        },
+        "cpu_percent_one_core_100": 6.517687559354224,
+        "charged_memory_bytes_min_mean_max": [
+          708472832,
+          839929856,
+          922689536
+        ],
+        "lifetime_peak_memory_bytes": 923668480,
+        "allocated_disk_bytes_first_peak_last": [
+          596025344,
+          599375872,
+          599375872
+        ],
+        "native_block_io": {
+          "254:0": {
+            "observed_seconds": 21.060000000000002,
+            "rbytes": 125964288,
+            "wbytes": 4096,
+            "rios": 463,
+            "wios": 1,
+            "rbytes_per_second": 5981210.256410256,
+            "wbytes_per_second": 194.49192782526114,
+            "rios_per_second": 21.984805318138648,
+            "wios_per_second": 0.047483380816714146
+          }
+        },
+        "identity_or_counter_gaps": 0
+      },
+      "tool-1e1d39f5ff3c44b1b96f64d4d1e4b196": {
+        "samples": 5,
+        "unavailable_samples": 0,
+        "observed_seconds": 16.83,
+        "cpu_core_seconds": {
+          "total": 9.098494,
+          "user": 7.569635,
+          "system": 1.528858
+        },
+        "cpu_percent_one_core_100": 54.06116458704695,
+        "charged_memory_bytes_min_mean_max": [
+          3051520,
+          398529331.2,
+          942923776
+        ],
+        "lifetime_peak_memory_bytes": 1018150912,
+        "allocated_disk_bytes_first_peak_last": [
+          1175552,
+          505315328,
+          505315328
+        ],
+        "native_block_io": null,
+        "identity_or_counter_gaps": 0
+      },
+      "writer-000": {
+        "samples": 0,
+        "unavailable_samples": 1,
+        "observed_seconds": 0.0,
+        "cpu_core_seconds": null,
+        "cpu_percent_one_core_100": null,
+        "charged_memory_bytes_min_mean_max": null,
+        "lifetime_peak_memory_bytes": null,
+        "allocated_disk_bytes_first_peak_last": null,
+        "native_block_io": null,
+        "identity_or_counter_gaps": 0
+      },
+      "writer-001": {
+        "samples": 0,
+        "unavailable_samples": 1,
+        "observed_seconds": 0.0,
+        "cpu_core_seconds": null,
+        "cpu_percent_one_core_100": null,
+        "charged_memory_bytes_min_mean_max": null,
+        "lifetime_peak_memory_bytes": null,
+        "allocated_disk_bytes_first_peak_last": null,
+        "native_block_io": null,
+        "identity_or_counter_gaps": 0
+      }
+    }
+  },
+  "original_failure": {
+    "run_id": "36e77aab-4a09-4bf8-8192-2b4ed20a7696",
+    "passed": false,
+    "status": "failed-but-archived",
+    "data_preservation_passed": true,
+    "receipt_sha256": "a07507d71de8c5af3111c52cefa4bbb54f9caf4c5eba05ccddd04f3e127a1d31",
+    "original_artifact_seal_sha256": "4c75645eac8e9674c48243e6f26563c4d048561741fc6f9479468b87540bc141",
+    "original_source_seal_sha256": "aee902261dfcc4e9f329d83396090480a54e934377c13e023b7a2a063103eeae",
+    "archived_artifacts": 229,
+    "native_fences": 9,
+    "corrected_verification": "7b0e7457-44a9-4a3a-82f6-79df60f9369d",
+    "observer_error": {
+      "observer_exit_code": 1,
+      "error": "Observer attempted exclusive-create over its own start record after the native Make command returned. Original start record and command log preserved.",
+      "native_make_exit_code": "not persisted before observer error",
+      "native_retirement_receipt": "recovery/production/36e77aab-4a09-4bf8-8192-2b4ed20a7696/retirements/b2f6d877-cda1-4b4e-9a7f-f56e6609d517/receipt.json",
+      "native_receipt_status": "failed-but-archived",
+      "native_data_preservation_passed": true,
+      "fixed_observer": "Uses a separate immutable .result.json completion record for subsequent commands.",
+      "recorded_ns": 1795334995204138000
+    }
+  },
+  "history_reverifications": [
+    {
+      "passed": true,
+      "verification_id": "9e098035-40a8-4e2e-a250-5c14fc1d744f",
+      "verification_sha256": "24f4133c2b67ed3ffa4649c5c1f6ee5dba4fb11d31c8dcf552e22c5acb2f10f5",
+      "run_id": "36e77aab-4a09-4bf8-8192-2b4ed20a7696",
+      "invocation": {
+        "run_id": "36e77aab-4a09-4bf8-8192-2b4ed20a7696",
+        "verification_id": "9e098035-40a8-4e2e-a250-5c14fc1d744f",
+        "started_ns": 1795335244754855000
+      },
+      "volume": {
+        "Name": "iceberg-multi-system_storage",
+        "CreatedAt": "2026-11-22T06:47:36Z",
+        "Mountpoint": "/var/lib/docker/volumes/iceberg-multi-system_storage/_data"
+      },
+      "case_sha256": "8425544b35b0c0b121e8915057e0fc18995c4aa693e80eebf10eb71bdc7d29da",
+      "base_result_sha256": "a07507d71de8c5af3111c52cefa4bbb54f9caf4c5eba05ccddd04f3e127a1d31",
+      "fixture": {
+        "fingerprint": "ea6d3cbbd0267bce3b6242c0528802b0798a0ac812cfb4c9a520f6eaae0314cf",
+        "latest_operation_ns": 1795335189865693336,
+        "last_case": "a1c8fa94-e7a1-4788-a8c0-355f540834b2"
+      },
+      "completed_ns": 1795335276896470000,
+      "sealed_artifact_count": 251
+    },
+    {
+      "passed": true,
+      "verification_id": "15199d5c-8458-45d0-8489-0b9a9a54111a",
+      "verification_sha256": "d3fb9672e99dab626e8f2d008687d3dabb772c959b8d3f8f41afe19a94ca925c",
+      "run_id": "a1c8fa94-e7a1-4788-a8c0-355f540834b2",
+      "invocation": {
+        "run_id": "a1c8fa94-e7a1-4788-a8c0-355f540834b2",
+        "verification_id": "15199d5c-8458-45d0-8489-0b9a9a54111a",
+        "started_ns": 1795335276897007000
+      },
+      "volume": {
+        "Name": "iceberg-multi-system_storage",
+        "CreatedAt": "2026-11-22T06:47:36Z",
+        "Mountpoint": "/var/lib/docker/volumes/iceberg-multi-system_storage/_data"
+      },
+      "case_sha256": "122ec681e2d9ecc8afcd9be9dabecb94d59cbc8a0471c133f89c9851bb972b57",
+      "base_result_sha256": "0fd9bfadfb5f30fab48063d9d35ac42df75f3fb90568897a357432fac0fb37d9",
+      "fixture": {
+        "fingerprint": "ea6d3cbbd0267bce3b6242c0528802b0798a0ac812cfb4c9a520f6eaae0314cf",
+        "latest_operation_ns": 1795335189865693336,
+        "last_case": "a1c8fa94-e7a1-4788-a8c0-355f540834b2"
+      },
+      "completed_ns": 1795335306911312000,
+      "sealed_artifact_count": 112
+    }
+  ],
+  "artifact_sha256": {
+    "results/qualification-20261122/06-production-fixed.result.json": "f548597b1dcaa6e6cbaedad02df7e37b6d56f8745a0fc8142bc2dbdda86a05a8",
+    "results/qualification-20261122/recovery/production/a1c8fa94-e7a1-4788-a8c0-355f540834b2/result.json": "0fd9bfadfb5f30fab48063d9d35ac42df75f3fb90568897a357432fac0fb37d9",
+    "results/qualification-20261122/recovery/production/a1c8fa94-e7a1-4788-a8c0-355f540834b2/case.json": "122ec681e2d9ecc8afcd9be9dabecb94d59cbc8a0471c133f89c9851bb972b57",
+    "results/qualification-20261122/recovery/production/a1c8fa94-e7a1-4788-a8c0-355f540834b2/profile.json": "c7953d71bd0cea8dcbb9ee654148ae834c1b90c33b0b833ac2f285224fdb173b",
+    "results/qualification-20261122/recovery/production/a1c8fa94-e7a1-4788-a8c0-355f540834b2/operation-summary.json": "80daa9f8fa9efd060092d7d16339b49a65e2779bbe5eb28f3c54c2a0c952fe86",
+    "results/qualification-20261122/recovery/production/a1c8fa94-e7a1-4788-a8c0-355f540834b2/resource-summary.json": "53f550b63d14f4be5fc7ccdfc4169520e08dd047b1bf048ef7a23f9bc0b507e5",
+    "results/qualification-20261122/recovery/production/a1c8fa94-e7a1-4788-a8c0-355f540834b2/phase-resources.json": "00a1b462f6ada0651d618a380bcb00e7462cb2a93fe53e0981888e0dcdd7f883",
+    "results/qualification-20261122/recovery/production/36e77aab-4a09-4bf8-8192-2b4ed20a7696/retirements/b2f6d877-cda1-4b4e-9a7f-f56e6609d517/receipt.json": "a07507d71de8c5af3111c52cefa4bbb54f9caf4c5eba05ccddd04f3e127a1d31",
+    "results/qualification-20261122/recovery/production/a1c8fa94-e7a1-4788-a8c0-355f540834b2/recovery-a1c8fa94-e7a1-4788-a8c0-355f540834b2/verifications/9887041a-158a-4600-92b2-aaab9309cb6f/verify-duckdb-catalog.json": "f07cb302a601d1f04332b041059b63e4502c4926230330785c07a04edfaed526",
+    "results/qualification-20261122/recovery/production/a1c8fa94-e7a1-4788-a8c0-355f540834b2/recovery-a1c8fa94-e7a1-4788-a8c0-355f540834b2/verifications/9887041a-158a-4600-92b2-aaab9309cb6f/verified.json": "c244311b47fdc119738f404559f9ddad567cd0fba6ae5e40296cfac84aa4dd63",
+    "results/qualification-20261122/recovery/production/a1c8fa94-e7a1-4788-a8c0-355f540834b2/recovery-a1c8fa94-e7a1-4788-a8c0-355f540834b2/verifications/9887041a-158a-4600-92b2-aaab9309cb6f/verify-start-catalog.json": "8c03bbea1ca6bc4ae90524d758b22a5aeb9cc24cbc9daa9b068dc20a82c06c86",
+    "results/qualification-20261122/recovery/production/a1c8fa94-e7a1-4788-a8c0-355f540834b2/recovery-a1c8fa94-e7a1-4788-a8c0-355f540834b2/verifications/9887041a-158a-4600-92b2-aaab9309cb6f/duckdb-proof.json": "495e103a1198538d4d539f7bf53d7aa78791b21d645333f3584521c8050bb875",
+    "results/qualification-20261122/recovery/production/a1c8fa94-e7a1-4788-a8c0-355f540834b2/recovery-a1c8fa94-e7a1-4788-a8c0-355f540834b2/verifications/9887041a-158a-4600-92b2-aaab9309cb6f/clickhouse-proof.json": "9bf771c2920c83a4d880e212041853439a6b6f37a655c3795cdfb1c3d5ed65ba",
+    "results/qualification-20261122/recovery/production/a1c8fa94-e7a1-4788-a8c0-355f540834b2/recovery-a1c8fa94-e7a1-4788-a8c0-355f540834b2/verifications/9887041a-158a-4600-92b2-aaab9309cb6f/storage-metrics.json": "86f21da55365b66ea621bd517c6f403dd24fc12125251148d0d85a6a98df9699",
+    "results/qualification-20261122/recovery/production/a1c8fa94-e7a1-4788-a8c0-355f540834b2/recovery-a1c8fa94-e7a1-4788-a8c0-355f540834b2/verifications/9887041a-158a-4600-92b2-aaab9309cb6f/invocation.json": "aadc044490806dcc1a6a0a9c42a4d0f2a864afb70daceed2be3540a3186f6297",
+    "results/qualification-20261122/recovery/production/a1c8fa94-e7a1-4788-a8c0-355f540834b2/recovery-a1c8fa94-e7a1-4788-a8c0-355f540834b2/verifications/9887041a-158a-4600-92b2-aaab9309cb6f/verify-storage-catalog.json": "e5060aa96c7cee5e19e8d5449f86cf4095a33628fd1bf70e4c0640320e4b221c",
+    "results/qualification-20261122/recovery/production/a1c8fa94-e7a1-4788-a8c0-355f540834b2/recovery-a1c8fa94-e7a1-4788-a8c0-355f540834b2/verifications/9887041a-158a-4600-92b2-aaab9309cb6f/verify-clickhouse-catalog.json": "e518e2b959a625d8d70348c36ae2ad18147d62bfb8d60cb9a560ac328dd551c1",
+    "results/qualification-20261122/recovery/production/36e77aab-4a09-4bf8-8192-2b4ed20a7696/reverifications/9e098035-40a8-4e2e-a250-5c14fc1d744f/receipt.json": "b5617ad6b446e2be74c79d264d0785848c3c10c9dfeb0bb718ac90930007aaee",
+    "results/qualification-20261122/recovery/production/a1c8fa94-e7a1-4788-a8c0-355f540834b2/reverifications/15199d5c-8458-45d0-8489-0b9a9a54111a/receipt.json": "db5343f12dec52e78e2cf6b64b256f39be35c6f6e0704b3afb3c9c4f277ff9e0",
+    "results/qualification-20261122/07-down.result.json": "478adad28e1596856c6e38b61662afd0eae504f7d54879b6fd3a70b9e0601a3f",
+    "results/qualification-20261122/08-docker-down.result.json": "e7e84e9f9b81ee6bd23735a67fa178b29649c0dce07b9bc73cab09a99046b135",
+    "results/qualification-20261122/final-teardown-check.json": "846484ef4f3364e7da2c8df6d8d4b060bcdb13a9abd589106b55f3b7d4391fa5",
+    "results/lifecycle/2b7c8915-025f-4939-a2a0-a3699157e8c8/intent.json": "0c8ce5748e8a44446fbc1dbb6138fc58e608a3e8487732a4e6cf95180c7c383f",
+    "results/lifecycle/2b7c8915-025f-4939-a2a0-a3699157e8c8/receipt.json": "3f5839d59dba361a1979c272e658d379147673f324f0048222764fd692dd91ec",
+    "results/lifecycle/6e777a86-e8d5-4c88-81cd-e862ea6663d7/intent.json": "13a31c5af0e1e718ce8528657136e8be63ac24218fb165a53b068411e00d2183",
+    "results/lifecycle/6e777a86-e8d5-4c88-81cd-e862ea6663d7/receipt.json": "87cf3ebee857482b12cfbb0c32dfab8fa84780695b60f1835efe312e6f549800",
+    "results/lifecycle/ca3d690f-4b8a-4663-83ff-134a38dff7e4/intent.json": "095c68caf1bcb4ca58705caaa2b27d00a0674f345aefb397f406806371ea9529",
+    "results/lifecycle/ca3d690f-4b8a-4663-83ff-134a38dff7e4/receipt.json": "abdaf40e88e8426655276fdd01b092a58eb0f6fa0ad83d86b513791b20537566",
+    "results/lifecycle/f758c83f-e9dc-4cf7-a0f2-e2c41d1e4ad3/intent.json": "d8c752a83518e543fae1cb80b98f5b50fcaae2e7934b97ea7038485d2498db77",
+    "results/lifecycle/f758c83f-e9dc-4cf7-a0f2-e2c41d1e4ad3/receipt.json": "f29c61248d795575e71a8c1be28d8f4753c5d76724a1b94d61e2bb08e2251c6f"
+  },
+  "limitations": [
+    "One functional trial, fixed pacing and small percentile samples; no capacity or comparative winner claim.",
+    "Recent/historical acknowledged reads do not establish cold OS or engine caches.",
+    "Request timers include setup/query/fetch/validation/close as documented; configured cancellation is not qualified as a strict native deadline.",
+    "Parquet ratio is encoded uncompressed/compressed column-chunk bytes; not input/CSV/RAM/allocated-disk compression.",
+    "Sampler excludes unobserved edges and cannot bridge restarts; native process/cgroup counters complement samples.",
+    "Recovery readers can use cached complete snapshots; successful outage reads are not a general fresh-data availability claim.",
+    "Original failed run remains failed; later passing data preservation cannot replace its verdict.",
+    "Separate catalog/S3/network, compactor, TTL/archive faults, backup/restore and disk loss remain unqualified."
+  ],
+  "resource_scope_notes": [
+    "Native cgroup CPU across all threads including probes; sampled charged memory and per-generation lifetime peak. Intervals use native /proc/uptime with centisecond resolution; full probe brackets retain uncertainty. Approximate du allocated bytes, not open-deleted or unique physical storage. Workload /results binds share one witness directory: do not sum them. Device I/O is Docker-VM accounting, not physical SSD latency/queue depth; do not sum stacked devices. Missing devices/counters are unavailable, not zero. CPU and byte/IOPS deltas exclude restart bridges and unobserved initial/final edges. Raw samples retain network counters and timing uncertainty."
+  ],
+  "lifecycle_note": "docker-up/up/test/down/docker-down completed across documented instrumentation fixes. Not an uninterrupted first-attempt pass or the full production matrix.",
+  "final_teardown": {
+    "passed": true,
+    "foreign_container_count": 9,
+    "foreign_containers_unchanged": true,
+    "owned_inventory": {
+      "containers": [],
+      "volumes": [],
+      "networks": []
+    },
+    "owned_image_tags": {},
+    "offline_closed_history_checks_passed": true
+  },
+  "cleanup_commands": {
+    "07-down": {
+      "command": [
+        "make",
+        "down",
+        "COMPOSE=docker compose --env-file /dev/null -f docker-compose.yml -f config/generated/cluster.yml",
+        "RESULTS_DIR=results/qualification-20261122/recovery",
+        "CLUSTER_DATA_CPUS=0.5"
+      ],
+      "duration_s": 32.435069,
+      "exit_code": 0,
+      "sources_unchanged": true
+    },
+    "08-docker-down": {
+      "command": [
+        "make",
+        "docker-down",
+        "COMPOSE=docker compose --env-file /dev/null -f docker-compose.yml -f config/generated/cluster.yml",
+        "RESULTS_DIR=results/qualification-20261122/recovery",
+        "CLUSTER_DATA_CPUS=0.5"
+      ],
+      "duration_s": 25.161363,
+      "exit_code": 0,
+      "sources_unchanged": true
+    }
+  }
+}

@@ -1,6 +1,17 @@
 # Iceberg multi-system architecture and test plan
 
-Status: all five normal data paths and native replica recovery have passed live tests; see README.md for measured numbers. The broader fault/concurrency matrix below is a roadmap, not a claim that every listed test has run.
+Status: all five normal data paths and native replica recovery passed the historical
+2026-11-14 run; see README.md for its measured numbers and limits. All five paths
+also passed the isolated 2026-11-22 functional rerun, including compaction and
+2,100,000-row native replica readback. Short-lived tool resource sampling remains
+incomplete, so this is not a fresh performance qualification. The first continuous
+recovery run failed its snapshot-ID metrics recorder, despite complete body checks;
+its preserved 2,480,000 acknowledged rows passed a separate corrected verification.
+The fresh two-million-row crash case, all-history checks and guarded teardown now
+pass: 2,490,000 acknowledged rows in the new table and 2,480,000 in the old table
+were freshly checked through each engine. The original failed verdict remains
+unchanged. See `LIVE_RECOVERY_RESULTS.json`. The broader fault/concurrency matrix below is a roadmap, not
+a claim that every listed test has run.
 
 ## Shared components
 
@@ -10,6 +21,41 @@ Status: all five normal data paths and native replica recovery have passed live 
 - A Spark/Iceberg maintenance job performs data-file and manifest rewrites through the same catalog. It owns compaction, independently of the current writer/reader engine.
 - Reuse the already-tested DuckDB 1.5.5 / duckdb-go v2.10505.0 and ClickHouse 26.10.2.103 as compatibility starting points. Pin the Spark/Iceberg runtime and extension artifacts before execution. Verify actual versions in every result.
 - Run architectures serially to keep resource use bounded. The nine-node ClickHouse topology is enabled only for its scenarios. All containers still share one host and physical Docker disk.
+- Use only example-owned local Docker/Compose services and an internal network.
+  Never read, mount or use host AWS configuration/credentials, metadata discovery
+  or real cloud resources. SeaweedFS is the local S3 reference, not a Tigris test.
+
+### Initial continuous recovery qualification
+
+The first new case is a retained-volume SIGKILL/restart of the SeaweedFS mini
+process, with two independent writers and DuckDB/ClickHouse readers kept live.
+Mini hosts both S3 and the catalog; this case does not isolate those dependencies
+or demonstrate high availability. It uses a new UUID table, 2,000,000 seed rows,
+10,000 customers and 10,000-row batches, with durable external intent/outcome
+journals and complete post-recovery exports through both engines.
+
+The active profile is capped at 7 CPUs / 6.5 GiB across storage, query and four
+workload processes. Seed/verification tools run after those actors stop, at a
+whole-profile cap of 4 CPUs / 4.5 GiB. Do not overlap this with the nine-node
+serving topology or another lab whose combined caps exceed the Docker budget.
+Report native CPU, memory, disk bytes/I/O, object size/compression and phase-tagged
+operation latencies; these functional runs are not capacity comparisons.
+
+The normal matrix also needs exit-time metrics for short-lived tools: sampling
+alone missed complete Spark runs and serving-node CPU/I/O intervals. Reuse the
+runner's native cgroup/process counters for normal Go modes, and instrument the
+tracked archive worker before its final exit (including its ambiguous-write exit
+42). For Spark, measure its JVM as well as Python, retain counters before JVM
+shutdown, and save a unique report even when compaction fails. Distinguish
+application elapsed time from whole-container lifetime; empty `io.stat` is
+unavailable, while `/proc/self/io` character counts are not physical disk I/O.
+Keep base-server sampling and these reports separate. Rebuild from tracked source
+and rerun the normal matrix before claiming complete resource measurements.
+
+Before destructive cleanup, preserve and reverify all recovery tables on the
+current volume against their original witnesses, including earlier cases after
+later faults. Failed or incomplete qualification must retain its native state
+and diagnostic exports; a successful subset cannot replace the failed verdict.
 
 The workload is append-heavy customer-order analytics, plus sealed-period archival. Native ClickHouse copies are serving caches; Iceberg remains the interoperability/archive layer. This is not an OLTP replacement or an engine-speed ranking.
 
@@ -69,6 +115,23 @@ Many small batch files make the effect observable. File count is measured, not a
 Compaction is an Iceberg metadata commit. It is not a ClickHouse MergeTree merge, TTL storage move, or an object-store vacuum. An interrupted rewrite must leave a readable committed snapshot; unreferenced candidate files are not part of table contents.
 
 Snapshot expiration and orphan-file removal are separate commands, disabled during baseline, concurrent writer and pinned-reader tests. Never delete old files merely because a compaction completed. A later cleanup test needs explicit snapshot retention and an in-flight-write grace period.
+
+Measure Parquet compression from the exact catalog metadata location and explicit
+snapshot ID. Enumerate unique live data files, exclude tombstones and reject
+unsupported active delete files. Do not glob the warehouse or filter manifests
+to the latest sequence: older manifests can still contain live files. At the
+pinned Iceberg extension `45163a28`, the source renders data-file content as
+`EXISTING`, so the collector must validate and record native labels rather than
+assume a `content='DATA'` filter. This source finding still needs native snapshot
+qualification. [Pinned metadata implementation](https://github.com/duckdb/duckdb-iceberg/blob/45163a28/src/function/metadata/iceberg_metadata.cpp),
+[content conversion](https://github.com/duckdb/duckdb-iceberg/blob/45163a28/src/core/metadata/manifest/iceberg_manifest.cpp).
+
+Sum each row-group/leaf-column's compressed and uncompressed chunk sizes once.
+Their weighted ratio measures encoded Parquet page compression, including page
+headers; whole-object/footer bytes and allocated storage remain separate.
+Reconcile file row counts with the complete body oracle and recheck the snapshot
+after inspection. [DuckDB 1.5.5 footer metadata](https://github.com/duckdb/duckdb/blob/v1.5.5/extension/parquet/parquet_metadata.cpp),
+[Parquet byte definitions](https://github.com/apache/parquet-format/blob/master/src/main/thrift/parquet.thrift#L861-L881).
 
 ## Archive safety
 

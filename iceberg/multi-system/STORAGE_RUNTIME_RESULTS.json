@@ -1,0 +1,127 @@
+{
+  "passed": true,
+  "scope": "Updated canonical runtime image preparation plus offline native extension/main guards. Native local Parquet SQL controls passed in SDK/full package. No S3/Iceberg live snapshot collection or backend fault/recovery run yet.",
+  "image_id": "sha256:5b93e1b5026f821d424fefcea1218f21bfb279e0478df55b24051eba69ca41f1",
+  "image_owner": "iceberg-multi-system",
+  "image_size_bytes": 89073412,
+  "source_manifest_matches_frozen_and_current": true,
+  "source_file_count": 15,
+  "lab_sha256": "9492e8e2a732e24f17219d784c1e071bc012b5527d8601e78df8e68da4a2aa50",
+  "lab_bytes": 76473208,
+  "duckdb_version": "v1.5.5",
+  "extensions": [
+    {
+      "install_mode": "REPOSITORY",
+      "installed": true,
+      "installed_from": "https://extensions.duckdb.org",
+      "loaded": true,
+      "name": "avro",
+      "version": "f9d5902"
+    },
+    {
+      "install_mode": "REPOSITORY",
+      "installed": true,
+      "installed_from": "https://extensions.duckdb.org",
+      "loaded": true,
+      "name": "httpfs",
+      "version": "827222f"
+    },
+    {
+      "install_mode": "REPOSITORY",
+      "installed": true,
+      "installed_from": "https://extensions.duckdb.org",
+      "loaded": true,
+      "name": "iceberg",
+      "version": "45163a28"
+    }
+  ],
+  "build": {
+    "builder_pin": "moby/buildkit@sha256:baf6138eb8c37644800c7c913fba051e840ebb9ba13eaf92d92ef9a1712d0b4c",
+    "cpus": 2,
+    "memory_max_bytes": 4294967296,
+    "swap_max_bytes": 0,
+    "max_parallelism": 1,
+    "native_run_ancestor_cap_proved": true,
+    "cpu_core_seconds_between_counter_snapshots": 89.145014,
+    "memory_peak_bytes": 3942027264,
+    "native_block_io_raw": "real-build-counters-after.txt",
+    "started_utc": "2026-11-22T06:36:31.231880138Z",
+    "ended_utc": "2026-11-22T06:40:40.58012642Z",
+    "started_epoch_ns": 1795329391231880138,
+    "ended_epoch_ns": 1795329640580126420,
+    "builder_stop_exit_code": 1,
+    "builder_stop_scope": "Owned daemon explicitly stopped after successful image export; Pid0/notrunning/noOOM. Daemon shutdown log retained.",
+    "co_tenancy": "Concurrent DuckDB/ZFS functional lab6CPU7GiB; aggregate8CPU11GiB. Diagnostic build metrics are not a system performance comparison."
+  },
+  "runtime_probe": {
+    "cpus": 1,
+    "memory_max_bytes": 2147483648,
+    "swap_max_bytes": 0,
+    "network": "none",
+    "actual_main_negative_guards_passed": 3,
+    "native_extensions_loaded": 3,
+    "memory_peak_bytes": 70787072,
+    "started_epoch_ns": 1795329692780074889,
+    "ended_epoch_ns": 1795329693148027833
+  },
+  "native_compression_scope": "Actual live-S3 metrics remain unrun. SDK local Parquet SQL control4096rows/4chunks:20020filebytes,2491footerbytes,17423compressedchunkbytes,34200uncompressedchunkbytes,ratio1.962923; this is an API correctness control, not a workload benchmark.",
+  "cleanup": {
+    "owned_probe_container_absent": true,
+    "dedicated_builder_and_state_volume_absent": true,
+    "built_runner_image_preserved": true,
+    "old_checkpoint_and_shared_sdk_cache_untouched": true
+  },
+  "date": "2026-11-22",
+  "source_sha256": {
+    "Dockerfile": "992adb738225337532e760ab1a90e310065222cdf61a16cfe27c9d808c108353",
+    "archive.go": "ec768eec27bf9f8e1caaeaf1bdbc525ec042adf4c70404cbc7319a7b0552ce2b",
+    "benchmark.go": "00028ed50f05efe965a91103152d791ea893e59d50e0818500dc8e118ed0b640",
+    "go.mod": "5db3b967ed8eb850220a66d9fd8c564632afc55b53a026e3d93bf3aa54280180",
+    "go.sum": "57e57bee2784485ff50cf3143261ca959720821f802d658ad725c5cca57742f9",
+    "isolation.go": "ed0e74d73250f281a56b59f2787243038268955771fb72f83532825da28b74c3",
+    "isolation_test.go": "a5930919aaf1972d466822865a63036cbc231efe4f00d206a09b1ecbb3823c54",
+    "main.go": "3f9695d082437e09d13d80dbb34132730ca1ba05cc373a8894463faaa06cc09e",
+    "native.go": "16fc4df4c18ae2833c310c48d67fb68b8b2b61e7cb76eb27f1f7e5d89eadf211",
+    "recovery_history.go": "11b486553cc3ce47e97ae334ef25b5babe8fe00cd8acc4a8f57be45288283967",
+    "recovery_history_test.go": "67b787b7399577472862781d7251152d39f3fb05749ef22ff5b6c57225566291",
+    "recovery_native.go": "8726596ed0669b89d3f2234847fad0093ee1ebc4ae3d3251375a36e285c1576f",
+    "recovery_storage.go": "ca6424a1742120237f483fc93d42e1429b23c04a50ded5d157dc599385842c4a",
+    "recovery_storage_test.go": "71d5de1c6b415906aa255c6512f40abc5574ec93ae6d4122d7f96faa1f6a6bf5",
+    "workload.go": "e0afdb820f62afc94e25bea501eebb636c5640707bb3d60bdca67be41cda0aa6"
+  },
+  "offline_sdk": {
+    "sdk_image": "sha256:4fa7c968ba93f1635670522dbb01a2c78150443e1385746924566079f36570ea",
+    "native_sql_executed": true,
+    "package_result": [
+      "ok  \texample/iceberg-multi-system\t0.076s"
+    ],
+    "native_parquet_control": [
+      "native local Parquet control only: rows=4096 chunks=4 file_bytes=20020 footer_bytes=2491 compressed_chunk_bytes=17423 uncompressed_chunk_bytes=34200 encoded_page_ratio=1.962923"
+    ],
+    "cpu_core_seconds": 3.811783,
+    "memory_peak_bytes": 955092992,
+    "io_stat_raw": "254:0 rbytes=0 wbytes=368640 rios=0 wios=90 dbytes=0 dios=0\n",
+    "caps": {
+      "cpus": 1,
+      "memory_bytes": 2147483648,
+      "swap_bytes": 0,
+      "network": "none"
+    },
+    "started_epoch_ns": 1795329135407816464,
+    "ended_epoch_ns": 1795329141041269258,
+    "cleanup": {
+      "owned_sdk_container_absent": true,
+      "source_logs_binary_and_shared_cache_preserved": true
+    }
+  },
+  "raw_evidence_directories": [
+    ".build/runtime-image-f3b492b377394fd8873c85b87169098f",
+    ".build/storage-native-acdcd1cc78f643dd947906527123eb89"
+  ],
+  "raw_evidence_sha256": {
+    ".build/runtime-image-f3b492b377394fd8873c85b87169098f/result.json": "01777a93c3903c1f4a707ed79ec0e7b3d9401bcc32ec2f6ab734bf25f7733317",
+    ".build/runtime-image-f3b492b377394fd8873c85b87169098f/native-extension-proof.json": "5873776ba7169957c08deed4c76e30f999a0fcc673bca292b39e065cf75b54e1",
+    ".build/storage-native-acdcd1cc78f643dd947906527123eb89/result.json": "9cd6879f23276058e8a54d5f88ecab8443cc49849ab8ade8481cb9838288b311"
+  },
+  "independent_review": "Root independently rehashed all15 application source files against the SDK freeze; controller/report/cleanup bind native compression evidence to verification identity and snapshot."
+}

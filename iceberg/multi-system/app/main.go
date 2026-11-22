@@ -144,6 +144,14 @@ func main() {
 	}
 	var err error
 	switch os.Args[1] {
+	case "recovery-seed":
+		err = recoverySeed()
+	case "recovery-write":
+		err = recoveryWriter()
+	case "recovery-read":
+		err = recoveryReader()
+	case "recovery-verify":
+		err = recoveryVerify()
 	case "extensions":
 		var db *sql.DB
 		db, err = sql.Open("duckdb", "")
@@ -152,6 +160,13 @@ func main() {
 			for _, q := range []string{"SET extension_directory='/opt/duckdb/extensions'", "FORCE INSTALL httpfs FROM 'https://extensions.duckdb.org'", "FORCE INSTALL avro FROM 'https://extensions.duckdb.org'", "FORCE INSTALL iceberg FROM 'https://extensions.duckdb.org'", "LOAD iceberg"} {
 				if _, err = db.Exec(q); err != nil {
 					break
+				}
+			}
+			if err == nil {
+				var installed int
+				err = db.QueryRow("SELECT count(*) FROM duckdb_extensions() WHERE installed AND ((extension_name='httpfs' AND extension_version='827222f') OR (extension_name='avro' AND extension_version='f9d5902') OR (extension_name='iceberg' AND extension_version='45163a28'))").Scan(&installed)
+				if err == nil && installed != 3 {
+					err = fmt.Errorf("extension revisions differ from the qualified HTTPFS/Avro/Iceberg pins: matched %d/3", installed)
 				}
 			}
 		}

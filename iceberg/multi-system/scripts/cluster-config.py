@@ -1,6 +1,11 @@
 """Render this example's fixed three-shard, three-replica topology."""
 from pathlib import Path
+from decimal import Decimal
+import os
 from xml.etree import ElementTree as ET
+data_cpus = Decimal(os.environ.get('CLUSTER_DATA_CPUS', '0.5'))
+if not data_cpus.is_finite() or not 0 < data_cpus <= 4:
+    raise ValueError('CLUSTER_DATA_CPUS must be finite and greater than zero, at most 4')
 out=Path(__file__).resolve().parents[1]/'config'/'generated'
 out.mkdir(parents=True,exist_ok=True)
 remote=ET.Element('clickhouse')
@@ -32,7 +37,8 @@ for shard in range(1,4):
       - ./config/generated/{name}.xml:/etc/clickhouse-server/config.d/topology.xml:ro
       - {name}:/var/lib/clickhouse
     mem_limit: 1280m
-    cpus: 1
+    memswap_limit: 1280m
+    cpus: {data_cpus}
     healthcheck:
       test: [CMD, clickhouse-client, --password, local-reader, --query, 'SELECT 1']
       interval: 3s
@@ -58,6 +64,7 @@ for i in range(1,4):
       - ./config/generated/keeper{i}.xml:/etc/lab/keeper.xml:ro
       - keeper{i}:/var/lib/clickhouse
     mem_limit: 256m
+    memswap_limit: 256m
     cpus: 0.5
     healthcheck:
       test: [CMD, clickhouse-keeper-client, --host, '127.0.0.1', --port, '9181', --query, ruok]

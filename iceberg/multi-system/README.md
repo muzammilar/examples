@@ -7,8 +7,10 @@ The single-server, ClickHouse-only examples are separately indexed under
 
 ## Quick start
 
-Prerequisites: Docker with Compose v2, Make and Python 3.9+. Allow 16 GiB Docker RAM
-and 8 GiB free Docker disk including images. The native serving case runs nine
+Prerequisites: local Linux Docker with Compose v2, Make and Python 3.11+ (including
+the `python3` selected by Make). Recovery controls require a local Unix Docker
+socket/context. Allow 20 GiB Docker RAM
+and 12 GiB free Docker disk including images/build cache. The native serving case runs nine
 ClickHouse data servers, three Keeper nodes and a separate query coordinator.
 Run from this directory.
 
@@ -28,6 +30,11 @@ beside a particular run. `make benchmark QUERY_RUNS=20` reruns prepared baseline
 and customer filters after compaction (2 warmups, 20 timed iterations).
 Additional commands: `make probe`, `make status`,
 `make cli`, `make cluster-failure-test` (after `cluster-test`).
+`make cluster-down` stops the native serving tier and Keepers, retaining their
+volumes and the storage/query services. Run it after the normal matrix before
+`make test-production`; the separate recovery profile refuses other active
+topologies. Run `make verify-history` again after subsequent faults, before
+teardown, to recheck earlier recovery acknowledgements.
 
 ## Architectures
 
@@ -73,15 +80,32 @@ The shared ClickHouse worker also has `make unit-test`: negative reconciliation
 cases and a simulated lost append acknowledgement that must never be replayed.
 These run before the full live matrix.
 
+The current nine-copy serving profile assigns **0.5 CPU per data server**
+(`CLUSTER_DATA_CPUS`, default `0.5`), 0.5 per Keeper, 2 to the query coordinator,
+1 to storage and 2 to the active workload/compactor. The serial full-stack configured
+budget is **11 CPUs / 16.5 GiB**, with no extra container swap, fitting this 11-CPU
+Docker VM; do not overlap it with
+another lab. Larger per-node overrides require a larger verified CPU budget.
+Historical November 14 results below used 1 CPU per data server and must not be
+treated as measurements of this revised budget. This resource change does not
+alter the three shards or three replicas per shard.
+
 ## Directory structure
 
 ```text
 multi-system/
 ├── Makefile                 # five-command lifecycle, matrix, benchmark
 ├── docker-compose.yml       # SeaweedFS, coordinator and Dockerized clients
+├── docker-compose.recovery.yml # bounded live writers/readers and one-shot tools
 ├── app/                     # DuckDB load/archive, cross-engine oracle, native generations
 ├── config/                  # query limits; generated 3-shard/3-replica/Keeper topology
 ├── scripts/                 # topology renderer and architecture matrix runner
+├── recovery-contract.json   # declared semantics, limits and reference client
+├── recovery_control.py      # native fault, phase/progress and workload lifecycle
+├── recovery_cleanup.py      # fixture index, all-history verification and teardown
+├── recovery_resources.py    # native CPU, memory, disk/I/O sampling
+├── recovery_report.py       # offline operation/latency/compression summaries
+├── test_recovery_*.py       # controller, report and cleanup negative controls
 ├── PLAN.md                  # unimplemented experiments, explicitly separate from results
 └── results/                 # ignored JSON metrics and acknowledgement journals
 ```
@@ -123,10 +147,153 @@ were removed after healthy stopped-state/ownership checks.
 [Source/image/counter evidence](LOCAL_ISOLATION_RESULTS.json) is compact; raw logs,
 compiled binary and caches stay ignored under `.build/`.
 
-The final runtime image, native service-network isolation and five-path rerun
-remain pending; offline SDK checks do not establish them or qualify the new
-recovery code. Runtime extensions/JARs must be installed during image build,
-since the running lab has no outbound network.
+The initial recovery-runner runtime image also built successfully. In a network-disabled
+container, DuckDB 1.5.5 loaded its preinstalled HTTPFS, Avro and Iceberg extensions;
+three actual entry-point rejection probes passed. The bounded image builder used
+**90.972 CPU core-seconds** between counter snapshots and peaked at **3.75 GiB**
+charged memory under a 2-CPU/4-GiB cap, with no OOM. Runtime probes peaked at
+**69.38 MiB** under 1 CPU/2 GiB. Source/binary and extension hashes are recorded in
+[`RUNTIME_PREPARATION_RESULTS.json`](RUNTIME_PREPARATION_RESULTS.json), including
+preserved failed helper attempts. These are build/control costs. The five-path
+rerun and live recovery qualification remain pending. Runtime extensions/JARs
+must be installed during image build, since the running lab has no outbound
+network.
+
+Native preparation then passed for SeaweedFS **4.53 / 4ab66fb76** and ClickHouse
+**26.10.2.103**: owned internal networks, actual CPU/memory/swap caps, native
+resource probes and one unreleased workload container's source/image/witness
+checks. The probe container was stopped and removed without opening its START
+gate. Authenticated local catalog discovery and `make verify-history` passed on
+the **empty** fixture, along with **53 host controls**. Make used an explicit
+Python 3.14 PATH prefix after preserving a Python 3.9 prerequisite failure.
+Idle probes sampled about **4.1 seconds**, with **129.70 MiB** storage and
+**546.72 MiB** query lifetime peak memory; these include setup and are not load
+benchmarks. [`NATIVE_PREFLIGHT_RESULTS.json`](NATIVE_PREFLIGHT_RESULTS.json)
+retains counters, image digests and the earlier Desktop bind-alias failure.
+The separate guarded `make down` and `make docker-down` commands then passed for
+this empty fixture. Final native inventories found no owned containers, volumes,
+network or built image tags; all preflight evidence remains. This validates empty
+fixture cleanup, not acknowledged-data recovery or data-bearing history teardown.
+These initial preparation results precede the current-snapshot Parquet
+instrumentation. Its updated image has now passed the canonical Docker build,
+native local-Parquet SQL checks, offline extension loading and entry-point guards.
+The bounded 2-CPU/4-GiB builder used **89.145 CPU core-seconds** between counter
+snapshots and peaked at **3.67 GiB** charged memory. Its state and probe containers
+were removed; the new runner image remains. The local SQL control validates footer
+APIs, not an Iceberg/S3 workload compression result.
+[`STORAGE_RUNTIME_RESULTS.json`](STORAGE_RUNTIME_RESULTS.json) records the 15-file
+source freeze and counters. Live snapshot inspection and recovery remain pending.
+
+## Live recovery qualification (2026-11-22)
+
+`make storage-crash` / `make test-production` exercise a separate,
+UUID-named DuckDB → Iceberg → ClickHouse workload. The corrected live crash case
+and fresh checks of both recovery tables **passed**; the full production matrix
+and comparative performance qualification remain incomplete. See
+[`LIVE_RECOVERY_RESULTS.json`](LIVE_RECOVERY_RESULTS.json) and
+[`NORMAL_PATH_RESULTS.json`](NORMAL_PATH_RESULTS.json) for curated evidence.
+On 2026-11-22, all five normal paths passed a fresh functional rerun with
+2,000,000 input rows per case, Spark compaction and 2,100,000-row native replica
+readback after an append/repair. The initial invocation failed a host-test fixture
+assumption about `RESULTS_DIR`; its corrected rerun passed in 91.545 s. Sampling
+missed several short-lived tools and most serving-node CPU/I/O intervals, so this
+does not qualify a new full-stack performance comparison.
+
+The first live crash run failed its metrics recorder: decoding a catalog response
+through floating point rounded the 64-bit snapshot ID. Both engines nevertheless
+verified all **2,480,000 acknowledged rows**, with zero missing/wrong bodies;
+two ambiguous batches were absent. A subsequent collector attempt exposed a
+case-sensitive `parquet` format check. Both bugs now have native Go regression
+tests. A separate corrected, read-only verification preserved the same table UUID,
+metadata location and exact snapshot ID, and checked all bodies again. Its
+248 live Parquet files contain **193,916,505 bytes**; encoded column chunks total
+218,309,192 uncompressed versus 193,607,993 compressed bytes (**1.128×**).
+This ratio excludes file/footer overhead and is not logical-input compression.
+Original failures and exports remain preserved; this corrected data check does
+not replace the original failed verdict.
+
+The fresh corrected `make test-production` passed in **327.565 s** with frozen
+sources. It verified **2,490,000 acknowledged rows** (2,000,000 seed plus 490,000
+live writes) through each engine. All 17 ambiguous batches and 40 pre-submission
+failed batches were absent; no acknowledged body was missing, partial, duplicate
+or wrong. After this outage, both engines freshly reverified this table and the
+earlier 2,480,000-row table: **4,970,000 acknowledged rows per engine**.
+The new table has 249 live Parquet files / 194,661,254 bytes, with **1.128×**
+encoded column-chunk compression. The owned storage process was held down for
+20 seconds; phase timings include inspection and startup overhead. Query survivor
+identity stayed unchanged. Historical cached reads during outage do not establish
+fresh-data availability.
+
+| Observation | Baseline | Recovered |
+|---|---:|---:|
+| Successful 10,000-row append requests | 23 | 21 |
+| Append p50 | 200.896 ms | 200.198 ms |
+| Append p99 | 245.555 ms | 265.612 ms |
+| Successful append requests/s | 1.600 | 0.756 |
+
+These are paced fault-workload observations, not capacity. Phase attribution uses
+completion time; requests crossing boundaries are separately labeled in JSON.
+Recovered-phase ambiguous attempts remain in error counts instead of being hidden
+by retry. Small p99 sample counts are effectively maxima. CPU samples recorded
+34.133 core-seconds for ClickHouse and 26.430 for storage; their native lifetime
+charged-memory peaks were 1,611,137,024 and 1,074,118,656 bytes respectively.
+Those peaks can include earlier work in the same containers. Per-role/per-phase
+CPU, charged memory, allocated disk, block read/write bytes and IOPS are in the
+report; unobserved intervals and unavailable counters are explicitly retained.
+`make down` and `make docker-down` then passed in 32.435 s and 25.161 s.
+Owned containers, networks, volumes and image tags were removed, all nine
+unrelated containers stayed unchanged, and both closed histories passed offline
+checks. Large raw exports/journals remain ignored; only curated JSON is committed.
+`test-production` runs the crash case and then re-verifies all registered recovery
+tables on the current volume, including acknowledgements from earlier cases.
+
+The intended default is **2,000,000 seed rows**, **10,000 customers** and
+**10,000-row batches**, with two independent Go writers and one reader per engine.
+The checked-in [`recovery-contract.json`](recovery-contract.json) declares the
+acceptance criteria, client settings and failure boundaries before execution.
+Each batch has deterministic values, SHA-256 payloads and explicit ID bounds.
+Intents/outcomes are fsynced outside S3; failed or interrupted mutations are
+reconciled without blind retries. Both engines must stream and verify every
+acknowledged body after recovery against unchanged witnesses and one quiescent
+catalog snapshot. Earlier verification exports remain in unique directories.
+`make verify-history` re-exports earlier recovery tables on the current volume
+after later faults, preserving their original results and writing separate
+verification receipts. Cleanup rejects failed/incomplete cases, missing witnesses
+and stale verification evidence; do not remove the journals to bypass a failure.
+The identified snapshot-ID recorder failure has a separate, narrowly allowlisted
+`make retire-failed-case` workflow. Pass `FAILED_CASE`, `SOURCE_MANIFEST` and
+`ORIGINAL_MANIFEST` paths to its immutable original seals; optionally pass a
+finalized `COMPLETED_VERIFICATION` directory. It rehashes original evidence,
+checks container fencing and verifies the same native table with the corrected
+image. Its receipt retains `passed: false` and records data preservation
+separately. It cannot retire other failed cases or authorize mutation replay.
+Later faults still require `make verify-history` before teardown.
+Write durations include engine/connection setup, the native insert and connection
+close; the preceding intent fsync and following outcome fsync are outside that
+timer. Read durations include connection/query setup, fetching, full-body validation
+and engine close. Raw durations are nanoseconds; reports must label their units.
+Recent versus historical reads describe acknowledged batch age, not proof of a
+cold engine or OS cache.
+`operation-summary.json` derives per-phase counts/rates and separate successful,
+failed and ambiguous request latency distributions from the preserved journals.
+It labels crossing-phase requests, pending write intents and percentile sample
+counts. Read records are emitted after completion, so an interrupted in-flight
+read may have no record. Snapshot-bound native Parquet compression measurement
+passed in the corrected live run. It compares uncompressed versus
+compressed column-chunk bytes after encoding; CSV size versus allocated storage
+is not a compression ratio. Image builds reject HTTPFS, Avro or Iceberg extension
+revisions that differ from the recorded pins.
+
+The initial case kills the actual SeaweedFS **mini process** while clients stay
+live, holds it down, and restarts the same container/volume. Catalog and S3 fail
+together in this deployment; it is neither an independent catalog outage nor an
+HA/disk-loss test. The intended active profile is **7 CPUs / 6.5 GiB** in total,
+with 1 CPU/1 GiB per writer/reader, 1 CPU/1 GiB storage and 2 CPUs/1.5 GiB query
+server. Seed/verification tools use 1 CPU/2 GiB after other clients stop. Native
+CPU, memory/peak, disk bytes, I/O and network observations accompany phase-tagged
+read/write histories. Failure evidence and native data stay retained until
+verification and cleanup guards pass. Separate catalog/network, compactor and
+archive/TTL interruption cases remain unrun work in `PLAN.md`.
 
 ## Limitations by architecture
 

@@ -1,0 +1,246 @@
+{
+  "date": "2026-11-22",
+  "passed": true,
+  "scope": "Preparation only: local service bootstrap, actual internal-network/caps/owned-bind validation, native resource probes, unreleased workload gate and authenticated read-only catalog discovery. No application seed, workload recovery, HA, disk loss, full native teardown or capacity qualification.",
+  "versions": {
+    "storage": "version 30GB 4.53 4ab66fb76 linux arm64",
+    "clickhouse": "26.10.2.103"
+  },
+  "images": {
+    "storage": {
+      "id": "sha256:ccad23e18639c8b98cee17e7100b95830a06077b56d8e5b006d6dcf8ec5e94a0",
+      "repo_digests": [
+        "chrislusf/seaweedfs@sha256:ccad23e18639c8b98cee17e7100b95830a06077b56d8e5b006d6dcf8ec5e94a0"
+      ],
+      "size_bytes": 270613634
+    },
+    "clickhouse": {
+      "id": "sha256:b2bfa4d8399ee9973868cc5c1754cb506a6f4b86fbddc41010cc090beb55c85e",
+      "repo_digests": [
+        "clickhouse/clickhouse-server@sha256:b2bfa4d8399ee9973868cc5c1754cb506a6f4b86fbddc41010cc090beb55c85e"
+      ],
+      "size_bytes": 282476189
+    }
+  },
+  "runtime_image_results": "RUNTIME_PREPARATION_RESULTS.json",
+  "native_resource_samples": {
+    "idle_baseline": {
+      "clickhouse": {
+        "samples": 2,
+        "unavailable_samples": 0,
+        "observed_seconds": 4.12,
+        "cpu_core_seconds": {
+          "total": 0.150454,
+          "user": 0.089579,
+          "system": 0.060875
+        },
+        "cpu_percent_one_core_100": 3.6517961165048547,
+        "charged_memory_bytes_min_mean_max": [
+          495804416,
+          496441344,
+          497078272
+        ],
+        "lifetime_peak_memory_bytes": 573280256,
+        "allocated_disk_bytes_first_peak_last": [
+          12529664,
+          13029376,
+          13029376
+        ],
+        "native_block_io": {
+          "254:0": {
+            "observed_seconds": 4.12,
+            "rbytes": 0,
+            "wbytes": 3031040,
+            "rios": 0,
+            "wios": 474,
+            "rbytes_per_second": 0.0,
+            "wbytes_per_second": 735689.3203883495,
+            "rios_per_second": 0.0,
+            "wios_per_second": 115.04854368932038
+          }
+        },
+        "identity_or_counter_gaps": 0,
+        "scope": "Native cgroup CPU across all threads including probes; sampled charged memory and per-generation lifetime peak. Intervals use native /proc/uptime with centisecond resolution; full probe brackets retain uncertainty. Approximate du allocated bytes, not open-deleted or unique physical storage. Workload /results binds share one witness directory: do not sum them. Device I/O is Docker-VM accounting, not physical SSD latency/queue depth; do not sum stacked devices. Missing devices/counters are unavailable, not zero. CPU and byte/IOPS deltas exclude restart bridges and unobserved initial/final edges. Raw samples retain network counters and timing uncertainty."
+      },
+      "storage": {
+        "samples": 2,
+        "unavailable_samples": 0,
+        "observed_seconds": 4.13,
+        "cpu_core_seconds": {
+          "total": 0.023996,
+          "user": 0.01648,
+          "system": 0.007515
+        },
+        "cpu_percent_one_core_100": 0.5810169491525424,
+        "charged_memory_bytes_min_mean_max": [
+          133324800,
+          133564416,
+          133804032
+        ],
+        "lifetime_peak_memory_bytes": 135999488,
+        "allocated_disk_bytes_first_peak_last": [
+          512000,
+          512000,
+          512000
+        ],
+        "native_block_io": {
+          "254:0": {
+            "observed_seconds": 4.13,
+            "rbytes": 0,
+            "wbytes": 0,
+            "rios": 0,
+            "wios": 0,
+            "rbytes_per_second": 0.0,
+            "wbytes_per_second": 0.0,
+            "rios_per_second": 0.0,
+            "wios_per_second": 0.0
+          }
+        },
+        "identity_or_counter_gaps": 0,
+        "scope": "Native cgroup CPU across all threads including probes; sampled charged memory and per-generation lifetime peak. Intervals use native /proc/uptime with centisecond resolution; full probe brackets retain uncertainty. Approximate du allocated bytes, not open-deleted or unique physical storage. Workload /results binds share one witness directory: do not sum them. Device I/O is Docker-VM accounting, not physical SSD latency/queue depth; do not sum stacked devices. Missing devices/counters are unavailable, not zero. CPU and byte/IOPS deltas exclude restart bridges and unobserved initial/final edges. Raw samples retain network counters and timing uncertainty."
+      }
+    },
+    "unreleased_tool": {
+      "gated-tool": {
+        "samples": 2,
+        "unavailable_samples": 0,
+        "observed_seconds": 1.07,
+        "cpu_core_seconds": {
+          "total": 0.014866,
+          "user": 0.00636,
+          "system": 0.008505
+        },
+        "cpu_percent_one_core_100": 1.3893457943925234,
+        "charged_memory_bytes_min_mean_max": [
+          2187264,
+          2523136,
+          2859008
+        ],
+        "lifetime_peak_memory_bytes": 5750784,
+        "allocated_disk_bytes_first_peak_last": [
+          20480,
+          24576,
+          24576
+        ],
+        "native_block_io": {
+          "254:0": {
+            "observed_seconds": 1.07,
+            "rbytes": 200704,
+            "wbytes": 0,
+            "rios": 3,
+            "wios": 0,
+            "rbytes_per_second": 187573.83177570094,
+            "wbytes_per_second": 0.0,
+            "rios_per_second": 2.803738317757009,
+            "wios_per_second": 0.0
+          }
+        },
+        "identity_or_counter_gaps": 0,
+        "scope": "Native cgroup CPU across all threads including probes; sampled charged memory and per-generation lifetime peak. Intervals use native /proc/uptime with centisecond resolution; full probe brackets retain uncertainty. Approximate du allocated bytes, not open-deleted or unique physical storage. Workload /results binds share one witness directory: do not sum them. Device I/O is Docker-VM accounting, not physical SSD latency/queue depth; do not sum stacked devices. Missing devices/counters are unavailable, not zero. CPU and byte/IOPS deltas exclude restart bridges and unobserved initial/final edges. Raw samples retain network counters and timing uncertainty."
+      }
+    }
+  },
+  "reference_budget": {
+    "baseline_cpus": 3,
+    "baseline_memory_bytes": 2684354560,
+    "unreleased_tool_cpus": 1,
+    "unreleased_tool_memory_bytes": 2147483648,
+    "concurrent_duckdb_lab_cpus": 6,
+    "concurrent_duckdb_lab_memory_bytes": 7516192768
+  },
+  "host_control_tests": 53,
+  "actual_make_verify_history": {
+    "exit_code": 0,
+    "python_executable": "/nix/store/0kcws5blwbdyxqxjd1w8hjipz61xny3k-python3-3.14.7/bin/python3",
+    "path_prefix": "/nix/store/0kcws5blwbdyxqxjd1w8hjipz61xny3k-python3-3.14.7/bin",
+    "current_recovery_tables": 0,
+    "scope": "Empty fixture only, not re-export of acknowledged data."
+  },
+  "preserved_failed_attempts": [
+    {
+      "path": "results/native-preflight-20261122",
+      "reason": "Owned Docker Desktop /host_mnt bind alias was not yet supported; guard rejected it before data."
+    },
+    {
+      "path": "results/native-preflight-desktop-fix-20261122/make-verify-history-empty.json",
+      "reason": "Sanitized PATH selected Python3.9; prerequisite rejected it before native history checks."
+    }
+  ],
+  "negative_auth_probe": "Anonymous local namespace listing returned403. Explicit local demo OAuth subsequently passed; no host credential discovery.",
+  "cleanup": "Guarded make down and separate make docker-down passed for this empty fixture. Healthy final inventory showed no owned containers, volumes, networks or built image tags. Raw preflight evidence and shared caches/public images retained; unrelated resources untouched. Data-bearing history/teardown remains unqualified.",
+  "compression": {
+    "measured": false,
+    "reason": "No application dataset in this preflight; image bytes and idle service disk allocation are not database compression."
+  },
+  "resource_limits": "Two samples per role over1.07\u20134.13s, shared-host functional diagnostics. Counters include probe work; no percentile/capacity/performance winner claim.",
+  "raw_artifact_sha256": {
+    "results/native-preflight-desktop-fix-20261122/result.json": "a4567e2e3e38e0623f13f124ed8c50a39e41eb73b5d00e564a802ee665af5c79",
+    "results/native-preflight-desktop-fix-20261122/resource-summary.json": "8d3538a2508186131f52dcfd4b1ef36e3ad27c868ef77489ad7fb6ecba02166a",
+    "results/native-preflight-desktop-fix-20261122/authenticated-catalog-list.json": "1c1b33ca68a012dbcf09604a716310a8df351b445249333dcbb3516fa63aed5f",
+    "results/native-preflight-desktop-fix-20261122/make-verify-history-empty-python314.json": "066aa3ae3b9fca4ec93bfcb432a83265e6705e5e4f9a86002273862bbe57ed0d",
+    "results/native-preflight-desktop-fix-20261122/make-verify-history-empty-python314.log": "3a537e3fddb5761d102eff3e169def2c76a4cc562d1546df5a1a6e45daec0603",
+    "results/gated-preflight/cb0d5738-1ef6-42e6-938e-5d77433bd66f/result.json": "cd26444ddca4ead397b677ce9b5280d7d1766b22ca62a7969c5613d724971c0e",
+    "results/gated-preflight/cb0d5738-1ef6-42e6-938e-5d77433bd66f/resource-summary.json": "fcc0ceb2bd43a7c269dd481e815bb0be69f528a6538658de2c118451d8631bbe",
+    "results/native-preflight-desktop-fix-20261122/make-down-empty.json": "558ef1072f2f23d226272dc1fe8514581b347b080ae69ca3247932001cc876ca",
+    "results/native-preflight-desktop-fix-20261122/make-down-empty.log": "0439c1ae32e159302ff29450673e09f8a9ef26a691c6b93b2ef528bb8835c39e",
+    "results/native-preflight-desktop-fix-20261122/make-docker-down-empty.json": "7e28e642581bd7f9805043981c15b6c01d2b611df39ee683d0244d387600edcd",
+    "results/native-preflight-desktop-fix-20261122/make-docker-down-empty.log": "c411ec4dc3af11827a63283ee04afe75cc7ffb5562ddd6abd31272397be69aa1"
+  },
+  "actual_empty_fixture_cleanup": {
+    "down": {
+      "argv": [
+        "make",
+        "down"
+      ],
+      "exit_code": 0,
+      "started_ns": 1795328321190790000,
+      "ended_ns": 1795328338321837000,
+      "python_executable": "/nix/store/0kcws5blwbdyxqxjd1w8hjipz61xny3k-python3-3.14.7/bin/python3",
+      "scope": "Empty current owned fixture only, with authenticated native discovery and healthy absence/ownership checks. All preflight evidence retained; no acknowledged workload table existed."
+    },
+    "docker-down": {
+      "argv": [
+        "make",
+        "docker-down"
+      ],
+      "exit_code": 0,
+      "started_ns": 1795328338322216000,
+      "ended_ns": 1795328349510175000,
+      "python_executable": "/nix/store/0kcws5blwbdyxqxjd1w8hjipz61xny3k-python3-3.14.7/bin/python3",
+      "scope": "Empty current owned fixture only, with authenticated native discovery and healthy absence/ownership checks. All preflight evidence retained; no acknowledged workload table existed."
+    }
+  },
+  "empty_fixture_cleanup_receipts": [
+    {
+      "path": "results/lifecycle/6e777a86-e8d5-4c88-81cd-e862ea6663d7/receipt.json",
+      "action": "docker-down",
+      "sha256": "87cf3ebee857482b12cfbb0c32dfab8fa84780695b60f1835efe312e6f549800",
+      "image_tags_after": {},
+      "remaining_owned_resources": {
+        "containers": [],
+        "volumes": [],
+        "networks": []
+      }
+    },
+    {
+      "path": "results/lifecycle/ca3d690f-4b8a-4663-83ff-134a38dff7e4/receipt.json",
+      "action": "down",
+      "sha256": "abdaf40e88e8426655276fdd01b092a58eb0f6fa0ad83d86b513791b20537566",
+      "image_tags_after": {
+        "iceberg-multi-runner:dev": "sha256:f093efce63bbd3b407c2db824edf14b8086a991d5d1448ebdbc0ed149e664a58"
+      },
+      "remaining_owned_resources": {
+        "containers": [
+          "b85a162cb49d84851589fca80d53006e9137a492b70b3730d1aa55f84b468aee"
+        ],
+        "volumes": [
+          "iceberg-multi-system_clickhouse",
+          "iceberg-multi-system_storage"
+        ],
+        "networks": [
+          "ffb0d44a277902fcb1b7e96d9bde558d8a84be2ba8cd60e2c5936944feb78d91"
+        ]
+      }
+    }
+  ]
+}

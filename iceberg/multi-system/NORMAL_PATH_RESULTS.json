@@ -1,0 +1,726 @@
+{
+  "date": "2026-11-22",
+  "scope": "Five normal architecture functional rerun. Not a capacity comparison, full production qualification or complete resource benchmark.",
+  "functional_passed": true,
+  "full_production_testing_complete": false,
+  "performance_comparison_qualified": false,
+  "command": [
+    "make",
+    "test",
+    "COMPOSE=docker compose --env-file /dev/null -f docker-compose.yml -f config/generated/cluster.yml",
+    "RESULTS_DIR=results/qualification-20261122/normal-fixed-fixture",
+    "ROWS=2000000",
+    "CUSTOMERS=10000",
+    "BATCH_ROWS=100000",
+    "CLUSTER_DATA_CPUS=0.5",
+    "ARCH=all"
+  ],
+  "duration_s": 91.544739,
+  "versions": {
+    "duckdb": "1.5.5",
+    "clickhouse": "26.10.2.103",
+    "seaweedfs": "4.53",
+    "spark": "4.0.1",
+    "iceberg": "1.10.1"
+  },
+  "source_sha256": {
+    "Makefile": "7d2e4b2d92ddf8743a138ee1e7884a770111f4ad1c0fbb5450d42b38ebfc5696",
+    "docker-compose.yml": "969ab4517b5c4e157a78a4bc06e31d85c80bedffe5fd069e7342e49b1f34a1e0",
+    "prepare.py": "fc165ab2eb8b4b53656dbf8f8c4378e8064a2db74e69ad5f1ef80e45ac663178",
+    "scripts/cluster-config.py": "d9cd3c84a3ca6ef6ee4989514e001593a1aafb9b656c8bc5be4ac23321b18dce",
+    "scripts/test.sh": "adfc122b663d9e1c3d1a1c7d51ec1c05d777cd48b13aedcc4bbb677a46142c3d",
+    "recovery_resources.py": "fb0181dacbfe2a5e5141d25b257d4ecc8d721839e6e41ca42c7f193a3a657a90",
+    "test_recovery_control.py": "a7a5bcbc827cf9cf9d09e00979ea9f7d017564e26c97f647b8500aaf936d30cb",
+    "app/Dockerfile": "992adb738225337532e760ab1a90e310065222cdf61a16cfe27c9d808c108353",
+    "app/archive.go": "ec768eec27bf9f8e1caaeaf1bdbc525ec042adf4c70404cbc7319a7b0552ce2b",
+    "app/benchmark.go": "00028ed50f05efe965a91103152d791ea893e59d50e0818500dc8e118ed0b640",
+    "app/go.mod": "5db3b967ed8eb850220a66d9fd8c564632afc55b53a026e3d93bf3aa54280180",
+    "app/go.sum": "57e57bee2784485ff50cf3143261ca959720821f802d658ad725c5cca57742f9",
+    "app/isolation.go": "ed0e74d73250f281a56b59f2787243038268955771fb72f83532825da28b74c3",
+    "app/isolation_test.go": "a5930919aaf1972d466822865a63036cbc231efe4f00d206a09b1ecbb3823c54",
+    "app/main.go": "3f9695d082437e09d13d80dbb34132730ca1ba05cc373a8894463faaa06cc09e",
+    "app/native.go": "16fc4df4c18ae2833c310c48d67fb68b8b2b61e7cb76eb27f1f7e5d89eadf211",
+    "app/recovery_history.go": "11b486553cc3ce47e97ae334ef25b5babe8fe00cd8acc4a8f57be45288283967",
+    "app/recovery_history_test.go": "67b787b7399577472862781d7251152d39f3fb05749ef22ff5b6c57225566291",
+    "app/recovery_native.go": "8726596ed0669b89d3f2234847fad0093ee1ebc4ae3d3251375a36e285c1576f",
+    "app/recovery_storage.go": "ca6424a1742120237f483fc93d42e1429b23c04a50ded5d157dc599385842c4a",
+    "app/recovery_storage_test.go": "71d5de1c6b415906aa255c6512f40abc5574ec93ae6d4122d7f96faa1f6a6bf5",
+    "app/workload.go": "e0afdb820f62afc94e25bea501eebb636c5640707bb3d60bdca67be41cda0aa6"
+  },
+  "resource_measurement_coverage": {
+    "qualified_for_full_per_architecture_resources": false,
+    "partial": true,
+    "samples": 92,
+    "unavailable_records": 37,
+    "observed_generations": 24,
+    "no_usable_samples": [
+      "ch-workload-62ff401cd4c6",
+      "compactor-5e7fbe6324f5",
+      "compactor-7d99a912349d",
+      "compactor-c93e178dd8f5",
+      "compactor-e969bd5d35af",
+      "compactor-fc6b19136724",
+      "runner-16d349067509",
+      "runner-4818396b3bb0",
+      "runner-695134e377d3",
+      "runner-7fe5d52bba6f"
+    ],
+    "no_cpu_io_interval": [
+      "ch-workload-62ff401cd4c6",
+      "ch11-af42e426e320",
+      "ch12-0af07e90b4fc",
+      "ch13-912fb0297cc3",
+      "ch21-130fc36cb6ec",
+      "ch22-1b9c16d8c851",
+      "ch23-66897604e8d0",
+      "ch32-2a41ea9276d2",
+      "ch33-a3f6c4ae5eed",
+      "compactor-5e7fbe6324f5",
+      "compactor-7d99a912349d",
+      "compactor-c93e178dd8f5",
+      "compactor-e969bd5d35af",
+      "compactor-fc6b19136724",
+      "keeper1-bc0c610ec6c7",
+      "keeper2-2d671a78bbe7",
+      "keeper3-f16f21091895",
+      "runner-16d349067509",
+      "runner-4818396b3bb0",
+      "runner-695134e377d3",
+      "runner-7fe5d52bba6f"
+    ],
+    "short_or_missed_tools": "Unavailable; no fabricated zeros or inferred peaks. Discovery0.5s and serial native probes missed some subsecond tools and probes raced --rm removal. Base services have usable repeated intervals; most short cluster members only one usable sample. This prevents full resource/comparative benchmark qualification."
+  },
+  "baseline_oracle_scope": "Existing deterministic row/id/amount/derived-field and replica/routing invariants, not the dedicated recovery full-payload+fsynced-intent/ACK oracle. Graceful ch21 retained-volume stop/start, not process/disk/physical-power-loss failure.",
+  "initial_failure": {
+    "artifact": "results/qualification-20261122/03-test.json",
+    "reason": "Host fixture assumed default RESULTS_DIR; failed before native data load. Preserved; corrected fixture was rerun."
+  },
+  "limitations": [
+    "One functional trial per architecture; historical timings are not rerun capacity claims.",
+    "Compaction file bytes are not an encoded compression ratio.",
+    "Short-lived Spark tools and several serving/reader CPU and I/O intervals were missed by host sampling.",
+    "Native replica repair check duration does not measure election or outage duration.",
+    "Single Docker VM and host disk; no independent-host durability."
+  ],
+  "architecture_artifacts": {
+    "ch-archive/after-compaction.json": {
+      "amount_cents": 5000500000,
+      "clickhouse": "26.10.2.103",
+      "clickhouse_check_seconds": 0.054683125,
+      "duckdb": "v1.5.5",
+      "duckdb_check_seconds": 0.074577042,
+      "duplicate_ids": 0,
+      "invalid_rows": 0,
+      "missing_ids": 0,
+      "rows": 1000000,
+      "unique_ids": 1000000
+    },
+    "ch-archive/archive-authorization.json": {
+      "archived_rows": 1000000,
+      "snapshot": 6978518322132915694
+    },
+    "ch-archive/archive.json": {
+      "amount_cents": 10001000000,
+      "archived_rows": 1000000,
+      "batch_rows": 100000,
+      "clickhouse": "26.10.2.103",
+      "customers": 10000,
+      "duplicate_ids": 0,
+      "hot_rows": 1000000,
+      "load_seconds": 0.204754375,
+      "missing_ids": 0,
+      "mode": "archive",
+      "rows": 2000000,
+      "snapshot": 6978518322132915694,
+      "ttl_seconds": 0.945165292
+    },
+    "ch-archive/lab-events-compaction.json": {
+      "table": "lab.events",
+      "target_file_bytes": 134217728,
+      "spark_version": "4.0.1",
+      "iceberg_version": "1.10.1",
+      "before": {
+        "files": 10,
+        "bytes": 6922634,
+        "min_bytes": 691354,
+        "max_bytes": 700415,
+        "snapshot": 6978518322132915694,
+        "rows": 1000000
+      },
+      "rewrite": [
+        {
+          "rewritten_data_files_count": 10,
+          "added_data_files_count": 1,
+          "rewritten_bytes_count": 6922634,
+          "failed_data_files_count": 0,
+          "removed_delete_files_count": 0
+        }
+      ],
+      "manifests": [
+        {
+          "rewritten_manifests_count": 11,
+          "added_manifests_count": 1
+        }
+      ],
+      "seconds": 2.2020695419996628,
+      "after": {
+        "files": 1,
+        "bytes": 2453261,
+        "min_bytes": 2453261,
+        "max_bytes": 2453261,
+        "snapshot": 7598965587210271657,
+        "rows": 1000000
+      },
+      "retained_snapshot_rows": 1000000
+    },
+    "ch-archive/verify.json": {
+      "amount_cents": 5000500000,
+      "clickhouse": "26.10.2.103",
+      "clickhouse_check_seconds": 0.05536325,
+      "duckdb": "v1.5.5",
+      "duckdb_check_seconds": 0.065622416,
+      "duplicate_ids": 0,
+      "invalid_rows": 0,
+      "missing_ids": 0,
+      "rows": 1000000,
+      "unique_ids": 1000000
+    },
+    "ch-direct/after-compaction.json": {
+      "amount_cents": 10001000000,
+      "clickhouse": "26.10.2.103",
+      "clickhouse_check_seconds": 0.07182375,
+      "duckdb": "v1.5.5",
+      "duckdb_check_seconds": 0.162708292,
+      "duplicate_ids": 0,
+      "invalid_rows": 0,
+      "missing_ids": 0,
+      "rows": 2000000,
+      "unique_ids": 2000000
+    },
+    "ch-direct/direct.json": {
+      "amount_cents": 10001000000,
+      "batch_rows": 100000,
+      "clickhouse": "26.10.2.103",
+      "customers": 10000,
+      "duplicate_ids": 0,
+      "load_seconds": 0.719603458,
+      "missing_ids": 0,
+      "mode": "direct",
+      "rows": 2000000,
+      "snapshot": 8611189664202756129
+    },
+    "ch-direct/lab-events-compaction.json": {
+      "table": "lab.events",
+      "target_file_bytes": 134217728,
+      "spark_version": "4.0.1",
+      "iceberg_version": "1.10.1",
+      "before": {
+        "files": 20,
+        "bytes": 13726692,
+        "min_bytes": 684462,
+        "max_bytes": 721789,
+        "snapshot": 8611189664202756129,
+        "rows": 2000000
+      },
+      "rewrite": [
+        {
+          "rewritten_data_files_count": 20,
+          "added_data_files_count": 1,
+          "rewritten_bytes_count": 13726692,
+          "failed_data_files_count": 0,
+          "removed_delete_files_count": 0
+        }
+      ],
+      "manifests": [
+        {
+          "rewritten_manifests_count": 21,
+          "added_manifests_count": 1
+        }
+      ],
+      "seconds": 2.764298668000265,
+      "after": {
+        "files": 1,
+        "bytes": 6515304,
+        "min_bytes": 6515304,
+        "max_bytes": 6515304,
+        "snapshot": 308053400435123958,
+        "rows": 2000000
+      },
+      "retained_snapshot_rows": 2000000
+    },
+    "ch-direct/verify.json": {
+      "amount_cents": 10001000000,
+      "clickhouse": "26.10.2.103",
+      "clickhouse_check_seconds": 0.10432675,
+      "duckdb": "v1.5.5",
+      "duckdb_check_seconds": 0.141374875,
+      "duplicate_ids": 0,
+      "invalid_rows": 0,
+      "missing_ids": 0,
+      "rows": 2000000,
+      "unique_ids": 2000000
+    },
+    "ch-sharded/lab-events-compaction.json": {
+      "table": "lab.events",
+      "target_file_bytes": 134217728,
+      "spark_version": "4.0.1",
+      "iceberg_version": "1.10.1",
+      "before": {
+        "files": 20,
+        "bytes": 17297012,
+        "min_bytes": 864793,
+        "max_bytes": 865556,
+        "snapshot": 7234863599176404910,
+        "rows": 2000000
+      },
+      "rewrite": [
+        {
+          "rewritten_data_files_count": 20,
+          "added_data_files_count": 1,
+          "rewritten_bytes_count": 17297012,
+          "failed_data_files_count": 0,
+          "removed_delete_files_count": 0
+        }
+      ],
+      "manifests": [
+        {
+          "rewritten_manifests_count": 21,
+          "added_manifests_count": 1
+        }
+      ],
+      "seconds": 2.7259521260020847,
+      "after": {
+        "files": 1,
+        "bytes": 6517399,
+        "min_bytes": 6517399,
+        "max_bytes": 6517399,
+        "snapshot": 4018726390557054011,
+        "rows": 2000000
+      },
+      "retained_snapshot_rows": 2000000
+    },
+    "ch-sharded/load.json": {
+      "batch_rows": 100000,
+      "customers": 10000,
+      "rows": 2000000,
+      "seconds": 0.570319958
+    },
+    "ch-sharded/native.json": {
+      "duplicate_ids": 0,
+      "generation": "serving_1795332023965472509",
+      "missing_ids": 0,
+      "replicas_per_shard": 3,
+      "rows": 2000000,
+      "seconds": 2.2300777099999998,
+      "shards": 3,
+      "verified_replicas": 9
+    },
+    "ch-sharded/ownership-serving_1795332023965472509.json": {
+      "generation": {
+        "name": "serving_1795332023965472509",
+        "rows": 2000000,
+        "customers": 10000
+      },
+      "replicas": [
+        {
+          "amount_cents": 3356032400,
+          "expected_amount_cents": 3356032400,
+          "expected_rows": 671400,
+          "host": "ch11",
+          "invalid_or_wrong_shard_rows": 0,
+          "rows": 671400,
+          "shard": 1,
+          "unique_ids": 671400
+        },
+        {
+          "amount_cents": 3356032400,
+          "expected_amount_cents": 3356032400,
+          "expected_rows": 671400,
+          "host": "ch12",
+          "invalid_or_wrong_shard_rows": 0,
+          "rows": 671400,
+          "shard": 1,
+          "unique_ids": 671400
+        },
+        {
+          "amount_cents": 3356032400,
+          "expected_amount_cents": 3356032400,
+          "expected_rows": 671400,
+          "host": "ch13",
+          "invalid_or_wrong_shard_rows": 0,
+          "rows": 671400,
+          "shard": 1,
+          "unique_ids": 671400
+        },
+        {
+          "amount_cents": 3279654400,
+          "expected_amount_cents": 3279654400,
+          "expected_rows": 655400,
+          "host": "ch21",
+          "invalid_or_wrong_shard_rows": 0,
+          "rows": 655400,
+          "shard": 2,
+          "unique_ids": 655400
+        },
+        {
+          "amount_cents": 3279654400,
+          "expected_amount_cents": 3279654400,
+          "expected_rows": 655400,
+          "host": "ch22",
+          "invalid_or_wrong_shard_rows": 0,
+          "rows": 655400,
+          "shard": 2,
+          "unique_ids": 655400
+        },
+        {
+          "amount_cents": 3279654400,
+          "expected_amount_cents": 3279654400,
+          "expected_rows": 655400,
+          "host": "ch23",
+          "invalid_or_wrong_shard_rows": 0,
+          "rows": 655400,
+          "shard": 2,
+          "unique_ids": 655400
+        },
+        {
+          "amount_cents": 3365313200,
+          "expected_amount_cents": 3365313200,
+          "expected_rows": 673200,
+          "host": "ch31",
+          "invalid_or_wrong_shard_rows": 0,
+          "rows": 673200,
+          "shard": 3,
+          "unique_ids": 673200
+        },
+        {
+          "amount_cents": 3365313200,
+          "expected_amount_cents": 3365313200,
+          "expected_rows": 673200,
+          "host": "ch32",
+          "invalid_or_wrong_shard_rows": 0,
+          "rows": 673200,
+          "shard": 3,
+          "unique_ids": 673200
+        },
+        {
+          "amount_cents": 3365313200,
+          "expected_amount_cents": 3365313200,
+          "expected_rows": 673200,
+          "host": "ch33",
+          "invalid_or_wrong_shard_rows": 0,
+          "rows": 673200,
+          "shard": 3,
+          "unique_ids": 673200
+        }
+      ],
+      "skipped_node": ""
+    },
+    "ch-sharded/ownership-serving_1795332028287838053.json": {
+      "generation": {
+        "name": "serving_1795332028287838053",
+        "rows": 2100000,
+        "customers": 10000
+      },
+      "replicas": [
+        {
+          "amount_cents": 3523834020,
+          "expected_amount_cents": 3523834020,
+          "expected_rows": 704970,
+          "host": "ch11",
+          "invalid_or_wrong_shard_rows": 0,
+          "rows": 704970,
+          "shard": 1,
+          "unique_ids": 704970
+        },
+        {
+          "amount_cents": 3523834020,
+          "expected_amount_cents": 3523834020,
+          "expected_rows": 704970,
+          "host": "ch12",
+          "invalid_or_wrong_shard_rows": 0,
+          "rows": 704970,
+          "shard": 1,
+          "unique_ids": 704970
+        },
+        {
+          "amount_cents": 3523834020,
+          "expected_amount_cents": 3523834020,
+          "expected_rows": 704970,
+          "host": "ch13",
+          "invalid_or_wrong_shard_rows": 0,
+          "rows": 704970,
+          "shard": 1,
+          "unique_ids": 704970
+        },
+        {
+          "amount_cents": 3443637120,
+          "expected_amount_cents": 3443637120,
+          "expected_rows": 688170,
+          "host": "ch21",
+          "invalid_or_wrong_shard_rows": 0,
+          "rows": 688170,
+          "shard": 2,
+          "unique_ids": 688170
+        },
+        {
+          "amount_cents": 3443637120,
+          "expected_amount_cents": 3443637120,
+          "expected_rows": 688170,
+          "host": "ch22",
+          "invalid_or_wrong_shard_rows": 0,
+          "rows": 688170,
+          "shard": 2,
+          "unique_ids": 688170
+        },
+        {
+          "amount_cents": 3443637120,
+          "expected_amount_cents": 3443637120,
+          "expected_rows": 688170,
+          "host": "ch23",
+          "invalid_or_wrong_shard_rows": 0,
+          "rows": 688170,
+          "shard": 2,
+          "unique_ids": 688170
+        },
+        {
+          "amount_cents": 3533578860,
+          "expected_amount_cents": 3533578860,
+          "expected_rows": 706860,
+          "host": "ch31",
+          "invalid_or_wrong_shard_rows": 0,
+          "rows": 706860,
+          "shard": 3,
+          "unique_ids": 706860
+        },
+        {
+          "amount_cents": 3533578860,
+          "expected_amount_cents": 3533578860,
+          "expected_rows": 706860,
+          "host": "ch32",
+          "invalid_or_wrong_shard_rows": 0,
+          "rows": 706860,
+          "shard": 3,
+          "unique_ids": 706860
+        },
+        {
+          "amount_cents": 3533578860,
+          "expected_amount_cents": 3533578860,
+          "expected_rows": 706860,
+          "host": "ch33",
+          "invalid_or_wrong_shard_rows": 0,
+          "rows": 706860,
+          "shard": 3,
+          "unique_ids": 706860
+        }
+      ],
+      "skipped_node": ""
+    },
+    "ch-sharded/replica-outage.json": {
+      "published_new_generation": false,
+      "published_rows": 2000000,
+      "source_rows": 2100000,
+      "verified_replicas": 8
+    },
+    "ch-sharded/replica-recovery.json": {
+      "duplicate_ids": 0,
+      "missing_ids": 0,
+      "rows": 2100000,
+      "seconds": 1.005562042,
+      "verified_replicas": 9
+    },
+    "ch-sharded/source-append.json": {
+      "acknowledged_added_rows": 100000,
+      "rows_after": 2100000,
+      "rows_before": 2000000
+    },
+    "ch-sharded/staged-generation.json": {
+      "name": "serving_1795332028287838053",
+      "rows": 2100000,
+      "customers": 10000
+    },
+    "ch-sharded/verify.json": {
+      "amount_cents": 10001000000,
+      "clickhouse": "26.10.2.103",
+      "clickhouse_check_seconds": 0.071809375,
+      "duckdb": "v1.5.5",
+      "duckdb_check_seconds": 0.213344208,
+      "duplicate_ids": 0,
+      "invalid_rows": 0,
+      "missing_ids": 0,
+      "rows": 2000000,
+      "unique_ids": 2000000
+    },
+    "duck-archive/after-compaction.json": {
+      "amount_cents": 5000500000,
+      "clickhouse": "26.10.2.103",
+      "clickhouse_check_seconds": 0.06079375,
+      "duckdb": "v1.5.5",
+      "duckdb_check_seconds": 0.084100291,
+      "duplicate_ids": 0,
+      "invalid_rows": 0,
+      "missing_ids": 0,
+      "rows": 1000000,
+      "unique_ids": 1000000
+    },
+    "duck-archive/duck-archive.json": {
+      "archived_rows": 1000000,
+      "duplicate_ids": 0,
+      "hot_rows": 1000000,
+      "missing_ids": 0,
+      "resumed": false,
+      "rows": 2000000,
+      "seconds": 0.790274167
+    },
+    "duck-archive/lab-events-compaction.json": {
+      "table": "lab.events",
+      "target_file_bytes": 134217728,
+      "spark_version": "4.0.1",
+      "iceberg_version": "1.10.1",
+      "before": {
+        "files": 10,
+        "bytes": 9244523,
+        "min_bytes": 864778,
+        "max_bytes": 1033095,
+        "snapshot": 7707021464628841367,
+        "rows": 1000000
+      },
+      "rewrite": [
+        {
+          "rewritten_data_files_count": 10,
+          "added_data_files_count": 1,
+          "rewritten_bytes_count": 9244523,
+          "failed_data_files_count": 0,
+          "removed_delete_files_count": 0
+        }
+      ],
+      "manifests": [
+        {
+          "rewritten_manifests_count": 11,
+          "added_manifests_count": 1
+        }
+      ],
+      "seconds": 2.1032377099982114,
+      "after": {
+        "files": 1,
+        "bytes": 3274934,
+        "min_bytes": 3274934,
+        "max_bytes": 3274934,
+        "snapshot": 8596114165171198792,
+        "rows": 1000000
+      },
+      "retained_snapshot_rows": 1000000
+    },
+    "duck-archive/verify.json": {
+      "amount_cents": 5000500000,
+      "clickhouse": "26.10.2.103",
+      "clickhouse_check_seconds": 0.071041125,
+      "duckdb": "v1.5.5",
+      "duckdb_check_seconds": 0.086210834,
+      "duplicate_ids": 0,
+      "invalid_rows": 0,
+      "missing_ids": 0,
+      "rows": 1000000,
+      "unique_ids": 1000000
+    },
+    "duck-direct/after-compaction.json": {
+      "amount_cents": 10001000000,
+      "clickhouse": "26.10.2.103",
+      "clickhouse_check_seconds": 0.070968959,
+      "duckdb": "v1.5.5",
+      "duckdb_check_seconds": 0.173791833,
+      "duplicate_ids": 0,
+      "invalid_rows": 0,
+      "missing_ids": 0,
+      "rows": 2000000,
+      "unique_ids": 2000000
+    },
+    "duck-direct/before-compaction.json": {
+      "amount_cents": 10001000000,
+      "clickhouse": "26.10.2.103",
+      "clickhouse_check_seconds": 0.174910458,
+      "duckdb": "v1.5.5",
+      "duckdb_check_seconds": 0.215360375,
+      "duplicate_ids": 0,
+      "invalid_rows": 0,
+      "missing_ids": 0,
+      "rows": 2000000,
+      "unique_ids": 2000000
+    },
+    "duck-direct/lab-events-compaction.json": {
+      "table": "lab.events",
+      "target_file_bytes": 134217728,
+      "spark_version": "4.0.1",
+      "iceberg_version": "1.10.1",
+      "before": {
+        "files": 20,
+        "bytes": 17297012,
+        "min_bytes": 864793,
+        "max_bytes": 865556,
+        "snapshot": 154604940793563633,
+        "rows": 2000000
+      },
+      "rewrite": [
+        {
+          "rewritten_data_files_count": 20,
+          "added_data_files_count": 1,
+          "rewritten_bytes_count": 17297012,
+          "failed_data_files_count": 0,
+          "removed_delete_files_count": 0
+        }
+      ],
+      "manifests": [
+        {
+          "rewritten_manifests_count": 21,
+          "added_manifests_count": 1
+        }
+      ],
+      "seconds": 2.9392723349992593,
+      "after": {
+        "files": 1,
+        "bytes": 6517399,
+        "min_bytes": 6517399,
+        "max_bytes": 6517399,
+        "snapshot": 1910434490779537594,
+        "rows": 2000000
+      },
+      "retained_snapshot_rows": 2000000
+    },
+    "duck-direct/load.json": {
+      "batch_rows": 100000,
+      "customers": 10000,
+      "rows": 2000000,
+      "seconds": 0.889334209
+    }
+  },
+  "artifact_sha256": {
+    "results/qualification-20261122/normal-fixed-fixture/ch-archive/after-compaction.json": "8ef65879f3d6a87eb6dd2d2ee9a051ecc0706d8eef16b0322a2aa4a609e39498",
+    "results/qualification-20261122/normal-fixed-fixture/ch-archive/archive-authorization.json": "6df9770263cc563715eda952be2a8b34fed8b4679ac10525e3d14a706b53c41d",
+    "results/qualification-20261122/normal-fixed-fixture/ch-archive/archive.json": "1c742f03132fb80021d37e38878a55317db5e4ac297fa16559782018c52a8e5d",
+    "results/qualification-20261122/normal-fixed-fixture/ch-archive/lab-events-compaction.json": "e98bc9628c178a7b7ba0e0d73815a95da2462c2be7cf7ed50599a484de548f41",
+    "results/qualification-20261122/normal-fixed-fixture/ch-archive/verify.json": "cf9645e8906a49b268ff8dae482465b28668e8c7b9994d93f3cc470bc459421f",
+    "results/qualification-20261122/normal-fixed-fixture/ch-direct/after-compaction.json": "a02241f298b4365ef4bf40811cfaf2d13823d261450ef55b688cd63204cf9df5",
+    "results/qualification-20261122/normal-fixed-fixture/ch-direct/direct.json": "840ff5ce69824c43457bea6130dc1a30382d2cf628f7d92afe76120dbbb75485",
+    "results/qualification-20261122/normal-fixed-fixture/ch-direct/lab-events-compaction.json": "b4559e612920250f08bfe26a7469f8d92cd87d246686ab17dea29e9b8651d211",
+    "results/qualification-20261122/normal-fixed-fixture/ch-direct/verify.json": "3f42ff6e3a48149b8100be79a34b2af7bd397604187d9c9a216c2ead54428ead",
+    "results/qualification-20261122/normal-fixed-fixture/ch-sharded/lab-events-compaction.json": "013340658476743c7911c697412e07141358687c9e74c2455f14542c02335a70",
+    "results/qualification-20261122/normal-fixed-fixture/ch-sharded/load.json": "4db43cb7b9a59350c8a497c4a6fd51b690de01054111654da37ad0c43faf4134",
+    "results/qualification-20261122/normal-fixed-fixture/ch-sharded/native.json": "1e8b0888cf44b63362144057cf93667866bb61a4d759fce1536ca5a76d4c60a6",
+    "results/qualification-20261122/normal-fixed-fixture/ch-sharded/ownership-serving_1795332023965472509.json": "42738c8dff278f6f1baa32c966bcd088c791a183a0a01e6c5677c25ed7989711",
+    "results/qualification-20261122/normal-fixed-fixture/ch-sharded/ownership-serving_1795332028287838053.json": "11c221f488cf3a7688250d8ee1c573f76b55c1553200865dc9f61bf089889767",
+    "results/qualification-20261122/normal-fixed-fixture/ch-sharded/replica-outage.json": "92784af02f0a1764439bab7afff84aae5b1ab6cc28eccea3f2a2c36b24c67420",
+    "results/qualification-20261122/normal-fixed-fixture/ch-sharded/replica-recovery.json": "169111b7bd1a44a514c3d4c57432749dd76daf5b37bd90605cf86850a429d876",
+    "results/qualification-20261122/normal-fixed-fixture/ch-sharded/source-append.json": "8e997bfdebd054a9fce236dad87a9de3c5d26e5881658ac3594d4bbee4d260c5",
+    "results/qualification-20261122/normal-fixed-fixture/ch-sharded/staged-generation.json": "416343ae0f22237b4f61fe6c356fbc48bce3004ee26ef844162849134935dc56",
+    "results/qualification-20261122/normal-fixed-fixture/ch-sharded/verify.json": "d66eca0fbc30bf96b3bc377523ace07162a185dc77fcc87bf242f61f80ff10c5",
+    "results/qualification-20261122/normal-fixed-fixture/duck-archive/after-compaction.json": "0fbc229e7f416a293142d254d28d5862598dd69708eb75129b8c08b123aceead",
+    "results/qualification-20261122/normal-fixed-fixture/duck-archive/duck-archive.json": "e27d9aa46bbaee412fa483df77ea2794db6dc651d7e42b05e8b740aa7eaa420e",
+    "results/qualification-20261122/normal-fixed-fixture/duck-archive/lab-events-compaction.json": "7c6e31cead5778109e456128fa4d812ce9e064e76df6d6c6fd19ddb3270d9a0a",
+    "results/qualification-20261122/normal-fixed-fixture/duck-archive/verify.json": "8b92cccc87a7a37b0562cb7b6962f8ccf424bc0112971ca48147ed1478a8df1c",
+    "results/qualification-20261122/normal-fixed-fixture/duck-direct/after-compaction.json": "cbf2bc99080e8b6ee9413460ff6a3acbab876cef09df8401507899b84506084f",
+    "results/qualification-20261122/normal-fixed-fixture/duck-direct/before-compaction.json": "19429eda7a93758da90fa1bd9c465b3780b03df290b8d75cbdba7626c58e9980",
+    "results/qualification-20261122/normal-fixed-fixture/duck-direct/lab-events-compaction.json": "aef75a465d79c92eb9124a85e27ddddd8f1fff7a4a6156127b7e980dd2be6913",
+    "results/qualification-20261122/normal-fixed-fixture/duck-direct/load.json": "6f774c357181a21e1b87324dc1be1ef605ed04c0c25e475ee334180f25c75f59",
+    "results/qualification-20261122/03b-test-fixed-fixture.json": "91353041eeac709f00767d9a81530c441b6d824da58a45f6f7c1eeea36a69594",
+    "results/qualification-20261122/03b-test-fixed-fixture.log": "ac44422a8cf31520075aa039dbdf57e3a8a5e00ba8708bfe96c60af89adc3cc2"
+  }
+}

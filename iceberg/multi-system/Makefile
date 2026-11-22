@@ -9,14 +9,27 @@ TARGET_FILE_BYTES ?= 134217728
 TABLE ?= lab.events
 RESULTS_DIR ?= results/manual
 export ROWS CUSTOMERS BATCH_ROWS TARGET_FILE_BYTES TABLE RESULTS_DIR
+RECOVERY_ROWS ?= 2000000
+RECOVERY_BATCH_ROWS ?= 10000
+RECOVERY_WRITERS ?= 2
+RECOVERY_TIMEOUT_S ?= 10
+RECOVERY_DELAY_MS ?= 1000
+RECOVERY_VISIBILITY_S ?= 30
+RECOVERY_VERIFY_TIMEOUT_S ?= 300
+export RECOVERY_ROWS RECOVERY_BATCH_ROWS RECOVERY_WRITERS RECOVERY_TIMEOUT_S
+export RECOVERY_DELAY_MS RECOVERY_VISIBILITY_S RECOVERY_VERIFY_TIMEOUT_S
 LOCAL_UID := $(shell id -u)
 export LOCAL_UID
 LOCAL_USER := $(shell id -u):$(shell id -g)
+CLUSTER_DATA_CPUS ?= 0.5
+export CLUSTER_DATA_CPUS
+CLUSTER_NODES := $(foreach shard,1 2 3,$(foreach replica,1 2 3,ch$(shard)$(replica))) keeper1 keeper2 keeper3
 RUN := $(COMPOSE) run --rm --user $(LOCAL_USER)
 .NOTPARALLEL:
 
-.PHONY: prepare unit-test config test-case cluster-up cluster-test cluster-failure-test
+.PHONY: prepare unit-test config test-case cluster-up cluster-down cluster-test cluster-failure-test
 .PHONY: docker-up up test probe load verify compact status cli down docker-down
+.PHONY: recovery-unit-test storage-crash verify-history retire-failed-case test-production
 
 docker-up: config
 	@docker info >/dev/null
@@ -34,8 +47,26 @@ ARCH ?= all
 export ARCH
 
 unit-test: config prepare
+	$(MAKE) recovery-unit-test
 	$(COMPOSE) build runner
 	docker run --rm --network none --cpus=2 --memory=1g --memory-swap=1g --user $(LOCAL_USER) -e GOMAXPROCS=2 -e GOCACHE=/tmp/go-cache -e GOMODCACHE=/tmp/go-mod-cache -v "$(CURDIR)/.build/clickhouse-archive-workload:/src:ro" -w /src golang:1.27.4-bookworm go test ./...
+
+recovery-unit-test:
+	python3 -c 'import sys; assert sys.version_info >= (3, 11), "Recovery controls require Python 3.11+; check the python3 selected by Make"'
+	python3 -m unittest test_recovery_resources.py test_recovery_control.py test_recovery_report.py test_recovery_cleanup.py test_recovery_retirement.py
+
+storage-crash: config recovery-unit-test
+	python3 recovery_control.py storage-crash
+
+verify-history: config recovery-unit-test
+	python3 recovery_cleanup.py verify-history
+
+retire-failed-case: config recovery-unit-test
+	python3 recovery_cleanup.py retire-failed-case --case "$(FAILED_CASE)" --source-manifest "$(SOURCE_MANIFEST)" --original-manifest "$(ORIGINAL_MANIFEST)" --completed-verification "$(COMPLETED_VERIFICATION)"
+
+test-production:
+	$(MAKE) storage-crash
+	$(MAKE) verify-history
 
 test: config unit-test
 	sh scripts/test.sh "$(ARCH)"
@@ -86,6 +117,9 @@ config:
 cluster-up: config
 	$(COMPOSE) --profile cluster up -d --wait
 
+cluster-down: config
+	$(COMPOSE) --profile cluster stop $(CLUSTER_NODES)
+
 cluster-test: load
 	$(MAKE) compact
 	$(MAKE) cluster-up
@@ -106,11 +140,10 @@ cli:
 	$(COMPOSE) exec clickhouse clickhouse-client --password local-reader
 
 down:
-	$(COMPOSE) --profile cluster rm -sf clickhouse ch11 ch12 ch13 ch21 ch22 ch23 ch31 ch32 ch33
+	python3 recovery_cleanup.py down
 
 docker-down:
-	$(COMPOSE) --profile cluster --profile tools down --volumes --remove-orphans
-	@for image in iceberg-multi-runner:dev iceberg-multi-compactor:dev iceberg-multi-ch-workload:dev; do if docker image inspect "$$image" >/dev/null 2>&1; then docker image rm "$$image" || exit $$?; fi; done
+	python3 recovery_cleanup.py docker-down
 
 .PHONY: benchmark benchmark-case
 benchmark: config
