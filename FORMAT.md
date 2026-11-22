@@ -221,6 +221,12 @@ comparisons for stable evaluated configurations that pass their relevant gates.
 
 ## Benchmarks
 
+- Independent functional/recovery examples may run in parallel within a verified
+  combined resource budget, with separate owned infrastructure and histories.
+  Keep each example's fault cases serial. Isolate comparative benchmark trials
+  from competing jobs on the same host; label shared-host functional timings as
+  diagnostics and record actual co-tenancy. See the
+  [execution rules](AGENTS.md#progressive-testing-across-systems).
 - Follow the [evaluation stages and test concepts](AGENTS.md#evaluation-stages-and-backend-contract)
   and [mandatory measurements for every experiment](AGENTS.md#mandatory-measurements-for-every-experiment).
   These apply to single-system, correctness, fault/recovery and comparative runs.

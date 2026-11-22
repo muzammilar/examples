@@ -135,9 +135,11 @@ evidence of an executed test.
 Keep the five-command Quick start. Expose independent, repeatable Make targets
 for operational cases (`failover`, `scale-out`, `scale-in`, `rolling-restart`,
 `disk-failure`, etc.). Document a serial `test-production` target that runs the
-applicable matrix and exits nonzero on failure. Do not run destructive cases in
-parallel or hide them inside a benchmark. List unsupported, blocked and unrun
-cases explicitly, with version-specific upstream reasons for unsupported cases.
+applicable matrix and exits nonzero on failure. Run destructive cases serially
+within each example; independent examples may run concurrently under the resource
+and isolation rules below. Do not hide faults inside a benchmark. List unsupported,
+blocked and unrun cases explicitly, with version-specific upstream reasons for
+unsupported cases.
 
 ### Progressive testing across systems
 
@@ -175,6 +177,21 @@ future agent can resume. Prioritize genuine correctness/durability failures and
 unvisited systems over repeatedly polishing an already well-covered example.
 Finish and preserve an active experiment before switching its lab to another
 system; avoid overlapping heavyweight benchmarks that spoil comparisons.
+
+Run independent functional and recovery experiments in parallel when their
+clusters, contexts, storage, networks, ports, journals and controllers are isolated.
+Budget their **combined** CPU, memory and disk headroom, including workload actors,
+witnesses, builds and dependencies; verify effective limits and runtime health.
+Queue work that would exceed the host/VM budget. An unused role may be stopped
+only when it is outside that test's declared topology; never reduce required
+replication or durability to fit another experiment. Keep faults and lifecycle
+operations serial within each owned example and preserve separate result histories.
+
+Isolate comparative benchmark trials from other resource-intensive jobs on the
+same host. Record actual co-tenancy in every run. Timings collected during
+parallel functional tests are diagnostics; they do not establish an uncontended
+performance winner. Compare intentional contention only as an explicit workload
+with matching budgets and competing load on both systems.
 
 These passes schedule the work; the evaluation stages and evidence requirements
 below still gate qualification. An early pass does not waive missing production
