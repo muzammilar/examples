@@ -1,0 +1,19 @@
+# Current stable storage for fresh labs; the base file retains the 4.53 regression.
+services:
+  storage:
+    image: chrislusf/seaweedfs:4.54@sha256:4b42c212543a0acd4c0e675215ecdcaf62a186ef98def76c7e12701871222d15
+    command:
+      - mini
+      - -dir=/data
+      - -ip=storage
+      - -ip.bind=0.0.0.0
+      - -s3.port=8333
+      - -s3.port.iceberg=8181
+      - -volume.max=16
+      - -master.volumeSizeLimitMB=256
+      - -s3.readerCacheSizeMB=256
+      - -s3.cacheCapacityMB=0
+      - -metricsIp=127.0.0.1
+      - -metricsPort=9327
+    environment:
+      GOMEMLIMIT: 600MiB

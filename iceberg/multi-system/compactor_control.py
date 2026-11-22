@@ -153,8 +153,7 @@ def start_helper(case, role, service, extra, registry, sampler, plan, metadata):
     if (
         not value["State"]["Running"]
         or value["Image"] != plan["images"][service]
-        or value["Config"].get("Labels", {}).get("org.examples.owner")
-        != control.PROJECT
+        or value["Config"].get("Labels", {}).get("org.examples.owner") != control.OWNER
     ):
         raise RuntimeError("maintenance helper image/ownership differs")
     proof = helper_sources(value, service, metadata)
@@ -310,7 +309,9 @@ def replacement_ids(observation):
 def compactor_crash():
     context = control.local_docker()
     results = cleanup.results_root()
-    base = (control.ROOT / os.environ.get("RESULTS_DIR", "results/manual")).resolve()
+    base = control.lab.validate_results(
+        os.environ.get("RESULTS_DIR", control.lab.DEFAULT_RESULTS), control.ROOT
+    )
     if not base.is_relative_to(results.resolve()) or results.is_symlink():
         raise RuntimeError("RESULTS_DIR must stay in this example's results")
     if shutil.disk_usage(control.ROOT).free < 8 * control.GIB:
@@ -335,6 +336,8 @@ def compactor_crash():
     case.mkdir(parents=True)
     metadata = {
         "kind": "iceberg-compactor-crash",
+        "lab_profile": control.lab.PROFILE,
+        "maintenance_versions": control.lab.MAINTENANCE,
         "duckdb_version": control.DUCKDB_VERSION,
         "run_id": case.name,
         "project": control.PROJECT,

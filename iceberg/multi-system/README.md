@@ -16,13 +16,22 @@ Run from this directory.
 
 1. `make docker-up` — render the topology and start SeaweedFS S3 and REST catalog infrastructure.
 2. `make up` — build Dockerized clients and the Spark compactor; start the ClickHouse query server.
-3. `make test` — run all five architectures serially, including compaction and replica recovery.
+3. `make test ARCH=duck-direct` — verify the supported DuckDB-written path and compaction through both engines.
 4. `make down` — remove ClickHouse application containers, preserving infrastructure state.
 5. `make docker-down` — remove this example's containers, network, volumes and built image tags.
 
-`make test ARCH=duck-direct` selects one architecture. The others are
+The default `LAB_PROFILE=current` selects DuckDB **2.0.1**, SeaweedFS **4.54**,
+ClickHouse **26.10.10.3**, and Spark **4.1.4 / Iceberg 1.12.0**. Its fixed Compose
+project is `iceberg-multi-system-current`; images, volumes and results are
+separate from the preserved `LAB_PROFILE=historical` fixture. Keep the same
+profile for every lifecycle command. Neither profile uses host cloud credentials.
+
+`make test` attempts all five architectures and currently **fails** on the
+ClickHouse-written manifest compatibility check. `ARCH=duck-direct` selects one
+architecture without claiming that the complete matrix passes. The others are
 `ch-direct`, `ch-archive`, `duck-archive` and `ch-sharded`. Each test resets its
-own Iceberg table and saves JSON under `results/manual/<architecture>/`.
+own Iceberg table and saves JSON under `results/current/manual/<architecture>/`
+(`results/manual/` for the historical profile).
 Use `make test ROWS=4000000 CUSTOMERS=20000 BATCH_ROWS=100000` to change counts.
 `TARGET_FILE_BYTES=134217728` controls the compaction target. `make compact`
 maintains `TABLE=lab.events`; specify the same `RESULTS_DIR` to retain its metrics
@@ -77,7 +86,58 @@ changed after the full five-path run. Cleanup passed and nine unrelated
 containers stayed unchanged. Normal-path encoded compression, full startup/exit
 cost and repeated cold/warm capacity trials remain incomplete.
 
-## Cold backup and restore
+## Current-version results (2026-11-22)
+
+The actual Make workflows passed these cases, with 2,000,000 input rows and
+10,000 customers unless the final count below differs:
+
+| Case | Final acknowledged/verified rows | Outcome |
+|---|---:|---|
+| DuckDB direct ingestion and compaction | 2,000,000 | Both engines pass the full deterministic row oracle |
+| DuckDB archive handoff | 1,000,000 cold + 1,000,000 hot | Verified export precedes local deletion |
+| Three ClickHouse shards × three replicas | 2,100,000 logical rows | All nine replicas pass placement/body checks after one stopped replica rejoins |
+| Storage process SIGKILL, retained volume | 2,400,000 | Both engines reconcile every acknowledged body; two ambiguous batches are absent |
+| Spark output interruption and fresh compactor recovery | 3,910,000 | Two writers and two independent readers remain live; both final exports match |
+
+The compactor case's healthy rewrite reduced **221 → 19 files** in **9.276 s**;
+the recovery rewrite reduced **132 → 22** in **11.909 s**. Appends continued,
+so these are different committed snapshots. Its final 42-file snapshot has
+**177,116,908 file bytes** and **1.7773×** encoded Parquet chunk compression.
+These are single-run functional diagnostics with fixed-rate workloads, not
+capacity comparisons. Phase-specific successful/failed latencies, CPU, memory,
+allocated disk, read/write bytes and I/O are in
+[`CURRENT_RECOVERY_RESULTS.json`](CURRENT_RECOVERY_RESULTS.json) and
+[`CURRENT_ARCHITECTURE_RESULTS.json`](CURRENT_ARCHITECTURE_RESULTS.json).
+
+Two failures remain explicit. ClickHouse's fresh v2 manifests omit required
+Avro `content` metadata, which DuckDB rejects; independent header inspection
+confirms this on 26.10.10.3. See the unposted
+[`CLICKHOUSE_MANIFEST_ISSUE.md`](CLICKHOUSE_MANIFEST_ISSUE.md) and
+[`CURRENT_INTEROP_RESULTS.json`](CURRENT_INTEROP_RESULTS.json).
+An earlier 3.8-million-row recovery run completed compaction but failed its final
+ClickHouse ordered export at the **1 GiB server memory limit**. The same retained
+snapshot passes with **64 MiB external-sort spilling**, without raising caps.
+Lowering the Parquet reader watermark alone failed. The subsequent fresh
+3.91-million-row case uses spilling plus a **256 MiB approximate Parquet reader
+budget**, with a **1 GiB temporary-query-disk cap**. See
+[`CLICKHOUSE_READ_MEMORY_RESULTS.json`](CLICKHOUSE_READ_MEMORY_RESULTS.json).
+The original operational failure stays failed; a diagnostic readback cannot
+reclassify it. Its preservation/all-history closure and current cold restore
+remain unfinished, so teardown must retain its state and refuse unsafe cleanup.
+
+All 13 ClickHouse roles use the same current release. The native-serving test
+used **0.25 CPU / 1,280 MiB per data replica**, **0.5 CPU / 256 MiB per Keeper**,
+plus the **2 CPU / 1,536 MiB query coordinator** and **1 CPU / 1 GiB storage**.
+With a running 2 CPU / 2 GiB tool, this is **8.75 CPUs / 16.5 GiB** in configured
+caps. It tests one-host retained-volume replica recovery, not host/disk loss or
+continuous production availability. The historical storage service remained
+unchanged throughout the separate current runs. All **207 host controls** pass.
+
+## Historical cold backup and restore
+
+The following existing checkpoint/readback results use
+`LAB_PROFILE=historical DUCKDB_VERSION=2.0.1`; see the exact commands in
+`COLD_STORAGE.md`. They do not qualify cold restore of the new current fixture.
 
 `make cold-storage` takes a deliberate maintenance outage with workload actors
 stopped. The reviewed run restored **146 files** from a **569,685,468-byte**
@@ -95,8 +155,10 @@ live-compactor work.
 
 New commands default to **DuckDB 2.0.1**, using the official shared C library
 through the Go binding. This lane currently requires Linux ARM64. Export
-`DUCKDB_VERSION=1.5.5` before the lifecycle commands to reproduce the historical
-lane. Keep that choice consistent across commands. Existing architecture and
+`LAB_PROFILE=historical DUCKDB_VERSION=1.5.5` before the lifecycle commands to
+reproduce the historical engine lane. The preserved historical storage can also
+be inspected with DuckDB 2.0.1; the profile controls resources, not just the engine.
+Keep that choice consistent across commands. Existing architecture and
 performance numbers below remain historical 1.5.5 results unless labeled otherwise.
 
 The same **2,790,000-row snapshot** passes healthy manifest reads on both engines.
@@ -121,8 +183,8 @@ which 2.0.1 rejects. Native header inspection confirms the omission; the full
 | `ch-archive` | ClickHouse hot → verified Iceberg archive → TTL deletes hot copies | Safe hot/cold retention boundary |
 | `duck-archive` | Local DuckDB hot → verified Iceberg archive → local transactional deletion | Embedded hot storage with a portable cold archive |
 
-All five use SeaweedFS 4.53 for S3 objects and its persistent REST catalog. No
-MinIO is used. Spark 4.0.1 / Iceberg 1.10.1 owns data-file bin packing and manifest
+The historical five-path baseline uses SeaweedFS 4.53 for S3 objects and its
+persistent REST catalog. No MinIO is used. Historical Spark 4.0.1 / Iceberg 1.10.1 owns data-file bin packing and manifest
 rewrites through that same catalog. It verifies that row counts survive and
 that the old snapshot remains readable. Snapshot expiration and orphan deletion
 are separate retention operations and do not run here.

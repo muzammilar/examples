@@ -372,6 +372,16 @@ func recoveryQuery(ctx context.Context, c recoveryConfig, e recoveryEvent, engin
 	return recoveryQuerySQL(ctx, c, recoverySelect(c, e, engine), engine, e.Hi-e.Lo+1)
 }
 
+// Full-body ORDER BY must spill within the lab's existing server memory cap.
+// Parquet's watermark schedules parallel reads; it is not a hard RSS limit.
+func recoveryClickHouseMemorySettings() clickhouse.Settings {
+	return clickhouse.Settings{
+		"max_bytes_before_external_sort":             int64(64) << 20,
+		"max_temporary_data_on_disk_size_for_query":  int64(1) << 30,
+		"input_format_parquet_memory_high_watermark": int64(256) << 20,
+	}
+}
+
 func recoveryQuerySQL(ctx context.Context, c recoveryConfig, query, engine string, resultLimit int64) (recoveryRowStream, func() error, error) {
 	if engine == "duckdb" {
 		db, err := recoveryDuck(ctx, c)
@@ -397,7 +407,14 @@ func recoveryQuerySQL(ctx context.Context, c recoveryConfig, query, engine strin
 	if deadline, ok := ctx.Deadline(); ok {
 		seconds = max(1, int64((time.Until(deadline)+time.Second-1)/time.Second))
 	}
-	bounded := clickhouse.Context(ctx, clickhouse.WithSettings(clickhouse.Settings{"max_result_rows": resultLimit, "max_rows_to_read": 100000000, "max_bytes_to_read": int64(16) << 30, "max_execution_time": seconds, "timeout_before_checking_execution_speed": 0, "result_overflow_mode": "throw"}))
+	settings := recoveryClickHouseMemorySettings()
+	settings["max_result_rows"] = resultLimit
+	settings["max_rows_to_read"] = 100000000
+	settings["max_bytes_to_read"] = int64(16) << 30
+	settings["max_execution_time"] = seconds
+	settings["timeout_before_checking_execution_speed"] = 0
+	settings["result_overflow_mode"] = "throw"
+	bounded := clickhouse.Context(ctx, clickhouse.WithSettings(settings))
 	rows, err := conn.Query(bounded, query)
 	if err != nil {
 		_ = conn.Close()
@@ -775,21 +792,25 @@ func recoveryVerify() (returned error) {
 }
 
 type recoveryExportProof struct {
-	RunID          string         `json:"run_id"`
-	VerificationID string         `json:"verification_id"`
-	ConfigHash     string         `json:"config_sha256"`
-	File           string         `json:"csv_file"`
-	FileSHA        string         `json:"csv_sha256"`
-	Proof          recoveryProof  `json:"proof"`
-	StartedNS      int64          `json:"started_ns"`
-	EndedNS        int64          `json:"ended_ns"`
-	DurationNS     int64          `json:"duration_ns"`
-	NativeCounters map[string]any `json:"native_counters"`
+	RunID              string              `json:"run_id"`
+	VerificationID     string              `json:"verification_id"`
+	ConfigHash         string              `json:"config_sha256"`
+	File               string              `json:"csv_file"`
+	FileSHA            string              `json:"csv_sha256"`
+	Proof              recoveryProof       `json:"proof"`
+	StartedNS          int64               `json:"started_ns"`
+	EndedNS            int64               `json:"ended_ns"`
+	DurationNS         int64               `json:"duration_ns"`
+	NativeCounters     map[string]any      `json:"native_counters"`
+	ReadMemorySettings clickhouse.Settings `json:"read_memory_settings,omitempty"`
 }
 
 func recoveryExport(ctx context.Context, root string, c recoveryConfig, digest, verificationID string, attempts []recoveryAttempt, engine string) (recoveryExportProof, error) {
 	started := time.Now()
 	report := recoveryExportProof{RunID: c.RunID, VerificationID: verificationID, ConfigHash: digest, File: engine + "-rows.csv", StartedNS: started.UnixNano()}
+	if engine == "clickhouse" {
+		report.ReadMemorySettings = recoveryClickHouseMemorySettings()
+	}
 	limit := int64(1)
 	for _, attempt := range attempts {
 		limit += attempt.Intent.Hi - attempt.Intent.Lo

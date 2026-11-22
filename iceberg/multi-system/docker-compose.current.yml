@@ -1,0 +1,42 @@
+# Fresh current tests own a different project, images, volumes and result ledger.
+services:
+  storage:
+    ports: !reset []
+  clickhouse:
+    image: &current_clickhouse_image clickhouse/clickhouse-server:26.10.10.3@sha256:b0784219f1821b8a9918732b8e6728dbed9246e13949c46e40d7c2a084d9ef9d
+  runner:
+    image: iceberg-multi-current-runner-duckdb2:dev
+  recovery-tools:
+    image: iceberg-multi-current-runner-duckdb2:dev
+  recovery-writer:
+    image: iceberg-multi-current-runner-duckdb2:dev
+  recovery-reader:
+    image: iceberg-multi-current-runner-duckdb2:dev
+  ch-workload:
+    image: iceberg-multi-current-ch-workload:dev
+  compaction-upload-gate:
+    image: iceberg-multi-current-upload-gate:dev
+  ch11:
+    image: *current_clickhouse_image
+  ch12:
+    image: *current_clickhouse_image
+  ch13:
+    image: *current_clickhouse_image
+  ch21:
+    image: *current_clickhouse_image
+  ch22:
+    image: *current_clickhouse_image
+  ch23:
+    image: *current_clickhouse_image
+  ch31:
+    image: *current_clickhouse_image
+  ch32:
+    image: *current_clickhouse_image
+  ch33:
+    image: *current_clickhouse_image
+  keeper1:
+    image: *current_clickhouse_image
+  keeper2:
+    image: *current_clickhouse_image
+  keeper3:
+    image: *current_clickhouse_image

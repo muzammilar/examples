@@ -17,6 +17,14 @@ recovery case remains failed. These are correctness/error-handling diagnostics;
 the older benchmark and ZFS/Quack findings below do not establish 2.0.1 performance
 or recovery behavior.
 
+The fresh current Iceberg fixture also passes storage-process recovery with
+**2.4 million acknowledged rows** and Spark compactor-crash recovery with
+**3.91 million**, checked body-for-body through both engines. Direct DuckDB,
+archive handoff and three-shard/three-copy serving paths pass. ClickHouse-written
+v2 manifests still omit required metadata, so the complete cross-engine matrix
+fails. The earlier memory-failed recovery remains failed; see
+[`current results and limitations`](../iceberg/multi-system/README.md#current-version-results-2026-11-22).
+
 ## Benchmark
 
 TPC-H SF1 on 4 CPUs / 6 GB (Apple M4 Pro, Docker VM aarch64, 2026-09-28): all 22 queries in 0.43 s

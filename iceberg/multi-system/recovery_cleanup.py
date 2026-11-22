@@ -44,6 +44,13 @@ IMAGES = (
     "iceberg-multi-ch-workload:dev",
     "iceberg-multi-upload-gate:dev",
 )
+if control.lab.PROFILE == "current":
+    IMAGES = (
+        "iceberg-multi-current-runner-duckdb2:dev",
+        "iceberg-multi-compactor-current:dev",
+        "iceberg-multi-current-ch-workload:dev",
+        "iceberg-multi-current-upload-gate:dev",
+    )
 CASE_KINDS = {"iceberg-storage-crash", "iceberg-compactor-crash"}
 PREFAULT_ARCHIVE_ID = "f1b2af24-f6c2-4bd2-8e44-a35392666f23"
 COMPOUND_ARCHIVE_ID = "2b463a19-1a8c-43bf-b84d-5a0fa03f5836"
@@ -89,8 +96,8 @@ def volume_key(value):
 
 
 def results_root():
-    results = control.ROOT / "results"
-    if results.is_symlink():
+    results = control.ROOT / control.lab.RESULTS_SUBDIR
+    if (control.ROOT / "results").is_symlink() or results.is_symlink():
         raise RuntimeError("results must be an owned directory, not a symlink")
     return results
 
@@ -121,6 +128,7 @@ def index_records():
             or path.parent.name != "production"
         ):
             raise RuntimeError("invalid indexed case path")
+        control.lab.validate_results(control.ROOT / path, control.ROOT)
         regular(control.ROOT / path, results)
         seen.add(identifier)
         records.append(value)
@@ -131,6 +139,7 @@ def register_fixture(case, metadata=None):
     """Filesystem only; caller holds controller.lock, before seed or another mutation."""
     root, results = control.ROOT.resolve(), results_root()
     case = regular(Path(case).absolute(), results).resolve()
+    control.lab.validate_results(case, control.ROOT)
     metadata = metadata or load(case / "case.json", results)
     if (
         metadata.get("run_id") != valid_uuid(case.name)
@@ -184,6 +193,10 @@ def cases_by_volume():
         regular(path, results).resolve()
         for path in results.glob("**/production/*")
         if path.is_dir()
+        and not (
+            control.lab.PROFILE == "historical"
+            and path.is_relative_to(control.ROOT / "results/current")
+        )
     }
     if actual != indexed:
         raise RuntimeError("missing or unregistered recovery case; retain storage")
@@ -1033,7 +1046,7 @@ def image_inventory():
             (value,) = json.loads(control.call(["docker", "image", "inspect", name]))
             if (
                 value["Config"].get("Labels", {}).get("org.examples.owner")
-                != control.PROJECT
+                != control.OWNER
             ):
                 raise RuntimeError(
                     "refuse image without matching ownership label: " + name
@@ -1138,7 +1151,7 @@ def teardown(action):
             if (
                 current["Id"] != images[name]
                 or current["Config"].get("Labels", {}).get("org.examples.owner")
-                != control.PROJECT
+                != control.OWNER
             ):
                 raise RuntimeError("owned image identity changed before removal")
             control.call(["docker", "image", "rm", name])

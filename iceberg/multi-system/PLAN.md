@@ -1,5 +1,26 @@
 # Iceberg multi-system architecture and test plan
 
+Current checkpoint (2026-11-22): the default `LAB_PROFILE=current` uses isolated
+project/image/volume/result names and DuckDB 2.0.1, SeaweedFS 4.54, ClickHouse
+26.10.10.3 and Spark 4.1.4 / Iceberg 1.12.0. Actual Make runs pass direct DuckDB,
+DuckDB archive and three-shard/three-copy serving with 2.1-million-row replica
+recovery. Fresh live storage-crash and compactor-output-crash cases reconcile
+2.4 million and 3.91 million acknowledged rows respectively. All 207 controls
+pass. Current CH-written manifests still omit required Avro metadata; that
+compatibility failure blocks a full five-path pass. See `CURRENT_*_RESULTS.json`.
+
+The previous current compactor case remains failed at its 3.8-million-row final
+ordered ClickHouse export: native memory was exhausted with external sorting
+disabled. Exact-snapshot controls pass with bounded sort spilling; lowering only
+the Parquet budget fails. The fresh 3.91-million-row retry passes without raising
+caps. Preserve that predecessor, finish its all-history closure and qualify a
+current cold restore before teardown. Remaining useful cases are archive
+interruption/resume, isolated catalog/S3/network failures, DuckDB 2.0.1 WAL and
+file-format recovery, then repeated comparative benchmarks on stable paths.
+
+The following earlier checkpoints describe the **historical profile**. Its
+original volume and failed outcomes remain intact and separate from current runs.
+
 Status: all five normal data paths and native replica recovery passed the historical
 2026-11-14 run; see README.md for its measured numbers and limits. All five paths
 also passed the isolated 2026-11-22 functional rerun, including compaction and
@@ -17,11 +38,11 @@ a claim that every listed test has run.
 
 ## Shared components
 
-- SeaweedFS 4.53 provides S3-compatible object storage and an Iceberg REST catalog, persisted on example-owned volumes. No MinIO.
+- SeaweedFS 4.54 (historical: 4.53) provides S3-compatible object storage and an Iceberg REST catalog, persisted on example-owned volumes. No MinIO.
 - Iceberg v2 tables contain Parquet data. The REST catalog's committed metadata location is authoritative; readers must not choose the newest-looking JSON file from an object listing.
 - Go clients use DuckDB's Go driver and the ClickHouse Go client. DuckDB processes use independent local databases and attach the shared catalog; no shared writable `.duckdb` file.
 - A Spark/Iceberg maintenance job performs data-file and manifest rewrites through the same catalog. It owns compaction, independently of the current writer/reader engine.
-- Default to actual DuckDB 2.0.1 through the official shared C ABI and Go binding v2.20000.0; keep native 1.5.5 / binding v2.10505.0 as a labeled historical regression lane. Existing normal-matrix results are historical. Pin and verify core, driver and extension versions separately; see `DUCKDB_VERSIONS.md`. ClickHouse 26.10.2.103 and SeaweedFS 4.53 remain fixed comparison components; separately qualify newer releases.
+- Default to actual DuckDB 2.0.1 through the official shared C ABI and Go binding v2.20000.0; keep native 1.5.5 / binding v2.10505.0 as a labeled historical regression lane. Pin and verify core, driver and extension versions separately; see `DUCKDB_VERSIONS.md`. The manifest-I/O comparison retains ClickHouse 26.10.2.103 and SeaweedFS 4.53; fresh current paths use the separately qualified versions above.
 - Run architectures serially to keep resource use bounded. The nine-node ClickHouse topology is enabled only for its scenarios. All containers still share one host and physical Docker disk.
 - Use only example-owned local Docker/Compose services and an internal network.
   Never read, mount or use host AWS configuration/credentials, metadata discovery
@@ -231,11 +252,12 @@ original retained snapshot. The noexec-scratch failure remains recorded; final
 success is published only after Spark/sampler shutdown, positive fencing and
 container removal. See `MAINTENANCE_RESULTS.json` for resource and storage numbers.
 
-Before selecting this image for live faults, wire the maintenance override into
-both lifecycle and controller selection, freeze its build pins, and update the
-version-specific evidence/cleanup gates. Then run the actual S3/REST compactor
-interruption against the fresh bounded 4.54 fixture. Offline Hadoop-catalog
-success does not close that operational requirement.
+The current fixed profile now selects this image through both Make and the
+controllers, with version-specific evidence checks and separate cleanup gates.
+The fresh bounded 4.54 S3/REST compactor interruption passes independently, with
+3.91 million acknowledged rows and all bodies verified. The historical failed
+case and current memory-failed predecessor retain their verdicts. Offline
+Hadoop-catalog success is a separate prerequisite, not the operational evidence.
 
 ## Archive safety
 

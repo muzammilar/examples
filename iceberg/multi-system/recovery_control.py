@@ -8,6 +8,7 @@ import fcntl
 import hashlib
 import json
 import os
+import re
 from pathlib import Path
 import shutil
 import signal
@@ -19,16 +20,19 @@ import traceback
 from urllib.parse import urlsplit
 import uuid
 
+import lab_profiles as lab
 from recovery_resources import ResourceSampler, summarize
 from recovery_report import operation_summary
 
 ROOT = Path(__file__).resolve().parent
-PROJECT = "iceberg-multi-system"
+PROJECT, OWNER = lab.PROJECT, lab.OWNER
 COMPOSE = [
     "docker",
     "compose",
     "--env-file",
     "/dev/null",
+    "--project-name",
+    PROJECT,
     "-f",
     "docker-compose.yml",
     "-f",
@@ -51,6 +55,11 @@ if DUCKDB_VERSION not in {"1.5.5", "2.0.1"}:
     raise RuntimeError("DUCKDB_VERSION must be stable 2.0.1 or historical 1.5.5")
 if DUCKDB_VERSION == "2.0.1":
     COMPOSE += ["-f", "docker-compose.duckdb2.yml"]
+if lab.PROFILE == "current":
+    if DUCKDB_VERSION != "2.0.1":
+        raise RuntimeError("current lab requires DuckDB 2.0.1")
+    for filename in lab.CURRENT_FILES:
+        COMPOSE += ["-f", filename]
 GO_ROLES = ("recovery-tools", "recovery-writer", "recovery-reader")
 BASE_ROLES = ("storage", "clickhouse", *GO_ROLES)
 AUXILIARY_ROLES = ("recovery-compactor", "compaction-upload-gate")
@@ -73,6 +82,7 @@ def local_environment():
         "DOCKER_HOST",
         "DOCKER_CONFIG",
         "DUCKDB_VERSION",
+        "LAB_PROFILE",
         "LOCAL_UID",
         "RECOVERY_ROWS",
         "RECOVERY_CUSTOMERS",
@@ -261,6 +271,11 @@ def sources():
         *sorted((ROOT / "app").glob("*.go")),
     ]
     optional = [
+        ROOT / "lab_profiles.py",
+        *[ROOT / name for name in lab.CURRENT_FILES],
+        ROOT / "maintenance_control.py",
+        ROOT / "maintenance_smoke.py",
+        ROOT / "test_maintenance_control.py",
         ROOT / "prefault_archive.py",
         ROOT / "compound_archive.py",
         ROOT / "test_compound_archive.py",
@@ -371,6 +386,73 @@ def check_mounts(value, case=None):
         raise RuntimeError("workload must bind only its owned witness directory")
 
 
+def current_settings(storage, query):
+    def get(port, path):
+        return call(
+            [
+                "docker",
+                "exec",
+                storage["Id"],
+                "curl",
+                "--noproxy",
+                "*",
+                "--proto",
+                "=http",
+                "--connect-timeout",
+                "2",
+                "--max-time",
+                "5",
+                "--fail",
+                "--silent",
+                "--show-error",
+                f"http://127.0.0.1:{port}/{path}",
+            ]
+        )
+
+    version = call(["docker", "exec", storage["Id"], "weed", "version"])
+    query_version = call(
+        [
+            "docker",
+            "exec",
+            query["Id"],
+            "clickhouse-client",
+            "--password",
+            "local-reader",
+            "--query",
+            "SELECT version()",
+        ]
+    ).strip()
+    metrics, topology = get(9327, "metrics"), json.loads(get(9333, "dir/status"))
+    memory = re.findall(r"^go_gc_gomemlimit_bytes ([^\n]+)", metrics, re.MULTILINE)
+    required = {
+        "-volume.max=16",
+        "-master.volumeSizeLimitMB=256",
+        "-s3.readerCacheSizeMB=256",
+        "-s3.cacheCapacityMB=0",
+    }
+    if (
+        not re.search(r"\b4\.54\b", version)
+        or "5ef99c1d8" not in version
+        or query_version != "26.10.10.3"
+        or len(memory) != 1
+        or float(memory[0]) != 629145600
+        or topology.get("Topology", {}).get("Max") != 16
+        or not required <= set(storage["Config"]["Cmd"])
+    ):
+        raise RuntimeError("current native versions or bounded storage settings differ")
+    return {
+        "storage_version": version.strip(),
+        "clickhouse_version": query_version,
+        "effective_go_memory_limit_bytes": 629145600,
+        "native_volume_slots": 16,
+        "reader_budget_MiB": 256,
+        "reader_budget_scope": "Explicit native argv; no independent runtime getter",
+        "metrics": metrics,
+        "topology": topology,
+        "observed_ns": time.time_ns(),
+    }
+
+
 def profile(case, storage, query, *, auxiliary=False):
     """Check rendered limits before creating anything; exact clients are checked again behind their gate."""
     config = json.loads(
@@ -411,7 +493,7 @@ def profile(case, storage, query, *, auxiliary=False):
                 "workload image does not identify the selected DuckDB engine"
             )
         if name in (*GO_ROLES, *AUXILIARY_ROLES):
-            if image["Config"].get("Labels", {}).get("org.examples.owner") != PROJECT:
+            if image["Config"].get("Labels", {}).get("org.examples.owner") != OWNER:
                 raise RuntimeError("workload image lacks this example's owner label")
             env = item.get("environment", {})
             if (
@@ -482,6 +564,9 @@ def profile(case, storage, query, *, auxiliary=False):
                 "compactor inspection overlap requires 11 CPUs / 10.75 GiB"
             )
     return {
+        "native_settings": current_settings(storage, query)
+        if lab.PROFILE == "current"
+        else None,
         "images": images,
         "network_ids": network_ids,
         "rendered": config,
@@ -614,7 +699,7 @@ def start_client(case, role, service_name, command, extra, clients, sampler, pla
     if (
         not value["State"]["Running"]
         or value["Image"] != plan["images"][service_name]
-        or value["Config"].get("Labels", {}).get("org.examples.owner") != PROJECT
+        or value["Config"].get("Labels", {}).get("org.examples.owner") != OWNER
     ):
         raise RuntimeError("gated client is not running the expected built image")
     proof = built_source_proof(value)
@@ -1052,8 +1137,10 @@ def finish_metrics(case, sampler):
 
 def storage_crash():
     context = local_docker()
-    results_root = ROOT / "results"
-    base = (ROOT / os.environ.get("RESULTS_DIR", "results/manual")).resolve()
+    results_root = ROOT / lab.RESULTS_SUBDIR
+    base = lab.validate_results(
+        os.environ.get("RESULTS_DIR", lab.DEFAULT_RESULTS), ROOT
+    )
     if results_root.is_symlink() or not base.is_relative_to(results_root.resolve()):
         raise RuntimeError(
             "RESULTS_DIR must stay inside this example's ignored results/"
@@ -1078,6 +1165,7 @@ def storage_crash():
         case / "case.json",
         {
             "kind": "iceberg-storage-crash",
+            "lab_profile": lab.PROFILE,
             "duckdb_version": DUCKDB_VERSION,
             "run_id": case.name,
             "project": PROJECT,

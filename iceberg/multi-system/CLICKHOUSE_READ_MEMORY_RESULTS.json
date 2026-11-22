@@ -1,0 +1,439 @@
+{
+  "date": "2026-11-22",
+  "original_operational_passed": false,
+  "diagnostic_scope": "Same retained 3.8M-row snapshot; ordered whole-body exports, no table reload or manifest repair. One warm read per variant; not a capacity/performance comparison.",
+  "engine": "ClickHouse 26.10.10.3",
+  "query": "Seven explicit columns ORDER BY event_id LIMIT 3800001",
+  "rows": 3800000,
+  "golden_canonical_body_sha256": "f6a5030dc86070c81d9ba72f543bc0b032a8c6eb12869f89ea4110bcc681c2b2",
+  "budgets": {
+    "server_memory_bytes": 1073741824,
+    "container_memory_bytes": 1610612736,
+    "query_memory_bytes": 805306368,
+    "query_threads": 2,
+    "query_temp_disk_bytes": 1073741824,
+    "query_max_rows_to_read": 100000000,
+    "query_max_bytes_to_read": 17179869184
+  },
+  "observed_defaults": {
+    "max_bytes_before_external_sort": 0,
+    "input_format_parquet_memory_high_watermark": 4294967296,
+    "parquet_scope": "Approximate Parquet v3 scheduling budget across files, not hard RSS"
+  },
+  "trials": [
+    {
+      "exit_code": 0,
+      "query_wall_s": 2.8915177499875426,
+      "settings": {
+        "max_bytes_before_external_sort": 67108864
+      },
+      "bodies_verified": true,
+      "rows": 3800000,
+      "canonical_body_sha256": "f6a5030dc86070c81d9ba72f543bc0b032a8c6eb12869f89ea4110bcc681c2b2",
+      "resources": {
+        "clickhouse": {
+          "samples": 6,
+          "unavailable_samples": 0,
+          "observed_seconds": 6.970000000000001,
+          "cpu_core_seconds": {
+            "total": 3.836426,
+            "user": 1.4809780000000001,
+            "system": 2.3554489999999997
+          },
+          "cpu_percent_one_core_100": 55.041979913916784,
+          "charged_memory_bytes_min_mean_max": [
+            1069703168,
+            1257435136,
+            1610612736
+          ],
+          "lifetime_peak_memory_bytes": 1611034624,
+          "allocated_disk_bytes_first_peak_last": [
+            797843456,
+            1013940224,
+            811450368
+          ],
+          "native_block_io": {
+            "254:0": {
+              "observed_seconds": 6.970000000000001,
+              "rbytes": 18137088,
+              "wbytes": 218894336,
+              "rios": 1301,
+              "wios": 2802,
+              "rbytes_per_second": 2602164.705882353,
+              "wbytes_per_second": 31405213.19942611,
+              "rios_per_second": 186.65710186513627,
+              "wios_per_second": 402.00860832137727
+            }
+          },
+          "identity_or_counter_gaps": 0,
+          "memory_stat_bytes_min_mean_max": {
+            "anon": [
+              581357568,
+              650849621.3333334,
+              930418688
+            ],
+            "file": [
+              11657216,
+              122957141.33333333,
+              476938240
+            ],
+            "kernel": [
+              307392512,
+              312765781.3333333,
+              320778240
+            ]
+          },
+          "memory_stat_samples": 6,
+          "memory_stat_scope": "Sampled native cgroup byte gauges, not Go heap or process RSS. File includes charged file cache; kernel includes its subcategories. Counters are read nonatomically; do not infer an exact partition of memory.current."
+        },
+        "storage": {
+          "samples": 6,
+          "unavailable_samples": 0,
+          "observed_seconds": 6.949999999999999,
+          "cpu_core_seconds": {
+            "total": 0.40286200000000005,
+            "user": 0.19264000000000003,
+            "system": 0.210223
+          },
+          "cpu_percent_one_core_100": 5.796575539568346,
+          "charged_memory_bytes_min_mean_max": [
+            836861952,
+            876058624,
+            884809728
+          ],
+          "lifetime_peak_memory_bytes": 1074933760,
+          "allocated_disk_bytes_first_peak_last": [
+            908111872,
+            908111872,
+            908111872
+          ],
+          "native_block_io": {
+            "254:0": {
+              "observed_seconds": 6.949999999999999,
+              "rbytes": 2605056,
+              "wbytes": 0,
+              "rios": 5,
+              "wios": 0,
+              "rbytes_per_second": 374828.201438849,
+              "wbytes_per_second": 0.0,
+              "rios_per_second": 0.7194244604316548,
+              "wios_per_second": 0.0
+            }
+          },
+          "identity_or_counter_gaps": 0,
+          "memory_stat_bytes_min_mean_max": {
+            "anon": [
+              571723776,
+              616671914.6666666,
+              628912128
+            ],
+            "file": [
+              223318016,
+              225488896,
+              225923072
+            ],
+            "kernel": [
+              11239424,
+              11396437.333333334,
+              11468800
+            ]
+          },
+          "memory_stat_samples": 6,
+          "memory_stat_scope": "Sampled native cgroup byte gauges, not Go heap or process RSS. File includes charged file cache; kernel includes its subcategories. Counters are read nonatomically; do not infer an exact partition of memory.current."
+        }
+      }
+    },
+    {
+      "exit_code": 241,
+      "query_wall_s": 0.6604047080036253,
+      "settings": {
+        "input_format_parquet_memory_high_watermark": 268435456
+      },
+      "bodies_verified": false,
+      "error": "Received exception from server (version 26.10.10):\nCode: 241. DB::Exception: Received from localhost:9000. DB::Exception: (total) memory limit exceeded: would use 1.01 GiB (attempt to allocate chunk of 11.43 MiB), current RSS: 1018.65 MiB, maximum: 1.00 GiB. OvercommitTracker decision: Query was selected to stop by OvercommitTracker. Untracked memory across all threads: -17.81 MiB: read stage: ColumnData: column: payload_sha256: (in file/uri warehouse/lab/recovery_6191b730b1aa4cbf837113952cf26a54-d9c95d1e-f660-44df-aa1e-a93ab324a041/data/00001-3-a4633ff8-9520-4237-b158-7c6dea80bd7e-0-00001.parquet): While executing ParquetV3BlockInputFormat: While executing ReadFromObjectStorage. (MEMORY_LIMIT_EXCEEDED)\n(query: SELECT event_id,customer_id,amount_cents,writer_id,batch_start,batch_end,payload_sha256 FROM lake.`lab.recovery_6191b730b1aa4cbf837113952cf26a54` ORDER BY event_id LIMIT 3800001 FORMAT CSVWithNames)\n",
+      "resources": {
+        "clickhouse": {
+          "samples": 1,
+          "unavailable_samples": 0,
+          "observed_seconds": 0.0,
+          "cpu_core_seconds": null,
+          "cpu_percent_one_core_100": null,
+          "charged_memory_bytes_min_mean_max": [
+            1147674624,
+            1147674624,
+            1147674624
+          ],
+          "lifetime_peak_memory_bytes": 1611034624,
+          "allocated_disk_bytes_first_peak_last": [
+            811511808,
+            811511808,
+            811511808
+          ],
+          "native_block_io": null,
+          "identity_or_counter_gaps": 0,
+          "memory_stat_bytes_min_mean_max": {
+            "anon": [
+              636776448,
+              636776448,
+              636776448
+            ],
+            "file": [
+              27484160,
+              27484160,
+              27484160
+            ],
+            "kernel": [
+              312799232,
+              312799232,
+              312799232
+            ]
+          },
+          "memory_stat_samples": 1,
+          "memory_stat_scope": "Sampled native cgroup byte gauges, not Go heap or process RSS. File includes charged file cache; kernel includes its subcategories. Counters are read nonatomically; do not infer an exact partition of memory.current."
+        },
+        "storage": {
+          "samples": 1,
+          "unavailable_samples": 0,
+          "observed_seconds": 0.0,
+          "cpu_core_seconds": null,
+          "cpu_percent_one_core_100": null,
+          "charged_memory_bytes_min_mean_max": [
+            884092928,
+            884092928,
+            884092928
+          ],
+          "lifetime_peak_memory_bytes": 1074933760,
+          "allocated_disk_bytes_first_peak_last": [
+            908111872,
+            908111872,
+            908111872
+          ],
+          "native_block_io": null,
+          "identity_or_counter_gaps": 0,
+          "memory_stat_bytes_min_mean_max": {
+            "anon": [
+              629006336,
+              629006336,
+              629006336
+            ],
+            "file": [
+              225923072,
+              225923072,
+              225923072
+            ],
+            "kernel": [
+              11468800,
+              11468800,
+              11468800
+            ]
+          },
+          "memory_stat_samples": 1,
+          "memory_stat_scope": "Sampled native cgroup byte gauges, not Go heap or process RSS. File includes charged file cache; kernel includes its subcategories. Counters are read nonatomically; do not infer an exact partition of memory.current."
+        }
+      }
+    },
+    {
+      "exit_code": 0,
+      "query_wall_s": 2.6103239997755736,
+      "settings": {
+        "max_bytes_before_external_sort": 67108864,
+        "input_format_parquet_memory_high_watermark": 268435456
+      },
+      "bodies_verified": true,
+      "rows": 3800000,
+      "canonical_body_sha256": "f6a5030dc86070c81d9ba72f543bc0b032a8c6eb12869f89ea4110bcc681c2b2",
+      "resources": {
+        "clickhouse": {
+          "samples": 6,
+          "unavailable_samples": 0,
+          "observed_seconds": 6.700000000000001,
+          "cpu_core_seconds": {
+            "total": 3.5493590000000004,
+            "user": 1.713383,
+            "system": 1.835975
+          },
+          "cpu_percent_one_core_100": 52.975507462686565,
+          "charged_memory_bytes_min_mean_max": [
+            1084669952,
+            1181567658.6666667,
+            1600647168
+          ],
+          "lifetime_peak_memory_bytes": 1611034624,
+          "allocated_disk_bytes_first_peak_last": [
+            812347392,
+            1033015296,
+            823734272
+          ],
+          "native_block_io": {
+            "254:0": {
+              "observed_seconds": 6.700000000000001,
+              "rbytes": 28389376,
+              "wbytes": 233381888,
+              "rios": 1264,
+              "wios": 3071,
+              "rbytes_per_second": 4237220.298507462,
+              "wbytes_per_second": 34833117.611940295,
+              "rios_per_second": 188.65671641791042,
+              "wios_per_second": 458.3582089552238
+            }
+          },
+          "identity_or_counter_gaps": 0,
+          "memory_stat_bytes_min_mean_max": {
+            "anon": [
+              584040448,
+              656919893.3333334,
+              955600896
+            ],
+            "file": [
+              23150592,
+              47213226.666666664,
+              161415168
+            ],
+            "kernel": [
+              313122816,
+              315795456,
+              317542400
+            ]
+          },
+          "memory_stat_samples": 6,
+          "memory_stat_scope": "Sampled native cgroup byte gauges, not Go heap or process RSS. File includes charged file cache; kernel includes its subcategories. Counters are read nonatomically; do not infer an exact partition of memory.current."
+        },
+        "storage": {
+          "samples": 6,
+          "unavailable_samples": 0,
+          "observed_seconds": 6.7,
+          "cpu_core_seconds": {
+            "total": 0.263885,
+            "user": 0.151905,
+            "system": 0.11198
+          },
+          "cpu_percent_one_core_100": 3.9385820895522388,
+          "charged_memory_bytes_min_mean_max": [
+            885096448,
+            891038378.6666666,
+            895344640
+          ],
+          "lifetime_peak_memory_bytes": 1074933760,
+          "allocated_disk_bytes_first_peak_last": [
+            908111872,
+            908111872,
+            908111872
+          ],
+          "native_block_io": {
+            "254:0": {
+              "observed_seconds": 6.7,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0,
+              "rbytes_per_second": 0.0,
+              "wbytes_per_second": 0.0,
+              "rios_per_second": 0.0,
+              "wios_per_second": 0.0
+            }
+          },
+          "identity_or_counter_gaps": 0,
+          "memory_stat_bytes_min_mean_max": {
+            "anon": [
+              629383168,
+              638638080,
+              645812224
+            ],
+            "file": [
+              225923072,
+              225923072,
+              225923072
+            ],
+            "kernel": [
+              11509760,
+              11555498.666666666,
+              11624448
+            ]
+          },
+          "memory_stat_samples": 6,
+          "memory_stat_scope": "Sampled native cgroup byte gauges, not Go heap or process RSS. File includes charged file cache; kernel includes its subcategories. Counters are read nonatomically; do not infer an exact partition of memory.current."
+        }
+      }
+    }
+  ],
+  "heads_unchanged": true,
+  "resources_scope": "Native server/storage cgroup CPU, charged-memory samples, allocated disk and per-device read/write bytes/IOPS. Lifetime memory peaks include earlier queries; short failed trials may lack two samples and remain unavailable. Device counters are Docker-VM accounting, not physical SSD performance.",
+  "compression_scope": "Native DuckDB footer inspection of the exact same immutable snapshot after the read matrix; hash-bound to the witness-reconciled diagnostic proof. Encoded Parquet column-chunk uncompressed/compressed bytes, not CSV-to-disk or RAM compression. Current file bytes exclude older snapshots, orphan outputs and other tables.",
+  "evidence": [
+    {
+      "path": "results/current/qualification-20261122/read-memory-2150e79d744d4977a4e685989839de9f/summary.json",
+      "sha256": "41b346643ca8fc679fc3c5eb99ab5a033d0558dd51b58576ea3db5bea5f109c3"
+    },
+    {
+      "path": "results/current/qualification-20261122/read-memory-2150e79d744d4977a4e685989839de9f/heads-before.json",
+      "sha256": "e17bcd814d4427bec8304a2ecd36f815ef25190ede6e5bce7cc75455c23fb1a8"
+    },
+    {
+      "path": "results/current/qualification-20261122/read-memory-2150e79d744d4977a4e685989839de9f/schema.jsonl",
+      "sha256": "19b38496c2c6c89dc56ca09e6bda253daeb2eb9f099eb461b9745dc1d7b33601"
+    },
+    {
+      "path": "results/current/qualification-20261122/read-memory-2150e79d744d4977a4e685989839de9f/pipeline.txt",
+      "sha256": "a4d60a6dfc21db50253e8639bc011cf54b35681a43918465080ee0f97f17b30c"
+    },
+    {
+      "path": "results/current/qualification-20261122/read-memory-2150e79d744d4977a4e685989839de9f/sort-spill-only/result.json",
+      "sha256": "ce692e3c17056949b04e5a85dcdc15492598218107453deeea733bb822f2cfde"
+    },
+    {
+      "path": "results/current/qualification-20261122/read-memory-2150e79d744d4977a4e685989839de9f/parquet-budget-only/result.json",
+      "sha256": "143a9cec07b4ef2ea662554b1f5684fa2b4b89934f86a6117af552b64dc85e90"
+    },
+    {
+      "path": "results/current/qualification-20261122/read-memory-2150e79d744d4977a4e685989839de9f/bounded-reader-and-sort/result.json",
+      "sha256": "147c111506594f6662e898430453ab12f9f571ff01e061283360bdfa0d80bd48"
+    },
+    {
+      "path": "results/current/qualification-20261122/live/production/6191b730-b1aa-4cbf-8371-13952cf26a54/recovery-6191b730-b1aa-4cbf-8371-13952cf26a54/verifications/66150984-0457-4b4e-87c8-7cbc34dcddcd/verified.json",
+      "sha256": "0611e2514179990701be616751a2f76d8e4288529b070382fb58cde9e23bd93a"
+    },
+    {
+      "path": "results/current/qualification-20261122/live/production/6191b730-b1aa-4cbf-8371-13952cf26a54/recovery-6191b730-b1aa-4cbf-8371-13952cf26a54/verifications/66150984-0457-4b4e-87c8-7cbc34dcddcd/storage-metrics.json",
+      "sha256": "6169cd39b2511525e636dc37543aade0125e6dea65ecf9b77dd646bb586f38ca"
+    },
+    {
+      "path": "results/current/qualification-20261122/live/production/6191b730-b1aa-4cbf-8371-13952cf26a54/reverifications/66150984-0457-4b4e-87c8-7cbc34dcddcd/wrapper-failure.json",
+      "sha256": "b21ea97ac6290f171999a586579cacc65d51d0a8c9be86f9f26d9251e9c88339"
+    }
+  ],
+  "outcome": "External sorting alone and external sorting plus bounded reader scheduling both returned every expected body. Reader watermark alone failed code241. Keep original compactor test FAILED; new source uses 64MiB external sort, 256MiB approximate Parquet budget and 1GiB query temporary disk cap, with unchanged server/container caps. A fresh live rerun is required.",
+  "native_resource_scope": [
+    "Native cgroup CPU across all threads including probes; sampled charged memory and per-generation lifetime peak. Intervals use native /proc/uptime with centisecond resolution; full probe brackets retain uncertainty. Approximate du allocated bytes, not open-deleted or unique physical storage. Workload /results binds share one witness directory: do not sum them. Device I/O is Docker-VM accounting, not physical SSD latency/queue depth; do not sum stacked devices. Missing devices/counters are unavailable, not zero. CPU and byte/IOPS deltas exclude restart bridges and unobserved initial/final edges. Raw samples retain network counters and timing uncertainty."
+  ],
+  "native_snapshot_storage": {
+    "totals": {
+      "files": 43,
+      "rows": 3800000,
+      "file_bytes": 172912140,
+      "footer_bytes": 51602,
+      "column_chunks": 301,
+      "compressed_chunk_bytes": 172786863,
+      "uncompressed_chunk_bytes": 305904664
+    },
+    "encoded_parquet_chunk_compression_ratio": 1.7704162150336626
+  },
+  "snapshot": {
+    "table_uuid": "d9c95d1e-f660-44df-aa1e-a93ab324a041",
+    "snapshot_id": 1075081727671484799,
+    "metadata_location": "s3://warehouse/lab/recovery_6191b730b1aa4cbf837113952cf26a54-d9c95d1e-f660-44df-aa1e-a93ab324a041/metadata/v383.metadata.json"
+  },
+  "go_diagnostic": {
+    "original_operational_passed": false,
+    "passed": false,
+    "integrity_passed": true,
+    "qualified": false,
+    "clickhouse_read_memory_settings": {
+      "input_format_parquet_memory_high_watermark": 268435456,
+      "max_bytes_before_external_sort": 67108864,
+      "max_temporary_data_on_disk_size_for_query": 1073741824
+    },
+    "expected_exit_code": 1,
+    "wrapper_status": "Failed: expected diagnostic exit1 was incorrectly treated as unclean exit. Process fencing verified separately; raw wrapper failure retained.",
+    "wrapper_resource_collector_closed_cleanly": false
+  }
+}

@@ -314,7 +314,7 @@ def run(
         control.save_text(destination / filename, data.decode("utf-8"))
     (image,) = json.loads(control.call(["docker", "image", "inspect", cold.IMAGE]))
     if (
-        image["Config"].get("Labels", {}).get("org.examples.owner") != control.PROJECT
+        image["Config"].get("Labels", {}).get("org.examples.owner") != control.OWNER
         or image["Config"]["Labels"].get("org.examples.duckdb.version") != "2.0.1"
     ):
         raise RuntimeError("require the actual current-version owned runner")

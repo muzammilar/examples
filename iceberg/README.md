@@ -19,6 +19,13 @@ The existing [20-million-row analytical benchmark](benchmarks/) already exercise
 
 ## Known issues
 
+The current [multi-system fixture](multi-system/README.md#current-version-results-2026-11-22)
+uses DuckDB 2.0.1, ClickHouse 26.10.10.3 and SeaweedFS 4.54. DuckDB-written paths
+and fresh storage/compactor recovery pass, reconciling 2.4 million and 3.91 million
+acknowledged rows. ClickHouse-written manifests omit required v2 `content`
+metadata, which DuckDB rejects; the full current matrix is not qualified.
+Historical five-path passes above do not establish current interoperability.
+
 The local REST fixture and Trino coordinator are single processes. Their presence does not provide catalog or coordinator HA. Four MinIO nodes share one Docker disk; see the example's failure-domain limits.
 
 [Hoglake](https://github.com/PostHog/hoglake) is recorded in the documentation backlog for future investigation; no Hoglake example is implemented here.

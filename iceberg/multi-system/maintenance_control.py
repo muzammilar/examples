@@ -64,7 +64,7 @@ def run():
     root.mkdir(parents=True)
     run_id, name = root.name, "iceberg-maintenance-smoke-" + root.name.replace("-", "")
     (image,) = json.loads(control.call(["docker", "image", "inspect", IMAGE]))
-    if image["Config"]["Labels"].get("org.examples.owner") != control.PROJECT:
+    if image["Config"]["Labels"].get("org.examples.owner") != control.OWNER:
         raise RuntimeError("current maintenance image lacks example ownership")
     image_id = image["Id"]
     frozen = {}

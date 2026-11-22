@@ -1,5 +1,17 @@
 # Cold storage checkpoint and restoration
 
+The executed results and commands here belong to the **historical storage
+fixture**, including its separate 4.53→4.54 restored-copy upgrade. Before using
+them, select that fixture explicitly:
+
+```sh
+export LAB_PROFILE=historical DUCKDB_VERSION=2.0.1
+```
+
+The main Makefile now defaults to the separate current fixture. Do not point its
+results at these historical paths or treat this backup as a checkpoint of the
+new current volume. Current-fixture cold restoration remains unqualified.
+
 `make cold-storage` runs with only this example's storage and query services
 active. It takes the controller lock, verifies the actual PID 1 and stop signal,
 then shuts down the query service **before** storage. Both must exit zero without

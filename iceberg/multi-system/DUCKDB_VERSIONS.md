@@ -6,18 +6,21 @@ library and Go binding `v2.20000.0`. The binding normally bundles 2.0.0;
 that this runner actually uses **2.0.1**. The historical lane retains native
 1.5.5 and binding `v2.10505.0`. Both currently target Linux ARM64 here.
 
-`DUCKDB_VERSION` defaults to `2.0.1`. To run the historical regression, export
-`DUCKDB_VERSION=1.5.5` before the lifecycle commands; do not mix versions silently
+`LAB_PROFILE=current` and `DUCKDB_VERSION=2.0.1` are the defaults. To run the historical regression, export
+`LAB_PROFILE=historical DUCKDB_VERSION=1.5.5` before the lifecycle commands; do not mix versions silently
 between commands. Each lane has its own image and Go dependency lockfiles.
 Original native database files and failure witnesses remain unchanged.
 
-The comparison holds **SeaweedFS 4.53**, ClickHouse 26.10.2.103 and the existing
+The manifest-I/O engine comparison below holds **SeaweedFS 4.53**, ClickHouse 26.10.2.103 and the existing
 Spark 4.0.1 / Iceberg 1.10.1 maintenance image fixed as the common storage and
 reader baseline. It does not qualify the latest release of every component.
 SeaweedFS **4.54** now passes separate cold-upgrade readbacks of both retained
 tables on a verified restored copy; see `COLD_STORAGE.md`. The original 4.53
 baseline remains intact. The 4.53 OOM has not been reproduced on 4.54, and cold
-compatibility does not qualify continuous compactor recovery.
+compatibility does not qualify continuous compactor recovery. The separate fresh
+current fixture now uses **4.54 / ClickHouse 26.10.10.3 / Spark 4.1.4 / Iceberg
+1.12.0** and passes the current recovery cases below. Fixed profile names keep
+its images, volumes and result ledger separate from the retained historical data.
 
 ## Manifest I/O failure
 
@@ -88,13 +91,41 @@ both tables declare format version **2**. The DuckDB-written manifest contains
 ClickHouse output. No committed object was rewritten by the inspection.
 Do not patch committed manifests, weaken validation or report the five-path
 2.0.1 matrix as passed. Historical 1.5.5 normal-path results remain historical.
+The fresh current fixture reproduces the same failure with **ClickHouse
+26.10.10.3 / SeaweedFS 4.54**. See the independent header/body inspection in
+[`CURRENT_INTEROP_RESULTS.json`](CURRENT_INTEROP_RESULTS.json) and the unposted
+[`upstream report draft`](CLICKHOUSE_MANIFEST_ISSUE.md).
+
+## Fresh current recovery and supported paths
+
+The current Make workflows pass DuckDB direct ingestion, archive handoff and
+the three-shard/three-copy native ClickHouse serving path. Each begins with
+**2,000,000 rows / 10,000 customers**; replica recovery verifies **2,100,000**
+logical rows and placement on all nine copies. ClickHouse-written paths remain
+blocked by the conformance failure above.
+
+Retained-volume storage-process recovery reconciles **2,400,000 acknowledged
+rows**; two ambiguous batches remain absent. A fresh Spark compactor-output crash
+and subsequent native recovery reconcile **3,910,000 acknowledged rows**, with
+independent readers and writers live throughout. Both engines verify every body.
+These checks use Spark for maintenance; they do not qualify DuckDB-native
+compaction or every failure boundary.
+
+The earlier current compactor case remains failed: its **3.8-million-row** final
+ClickHouse ordered export exceeded the **1 GiB native server cap**. Read-only
+controls against that exact snapshot establish external-sort spilling as the
+observed fix; reducing the Parquet budget alone failed. A bounded diagnostic
+export passes while preserving the original failed verdict. See
+[`CURRENT_RECOVERY_RESULTS.json`](CURRENT_RECOVERY_RESULTS.json) and
+[`CLICKHOUSE_READ_MEMORY_RESULTS.json`](CLICKHOUSE_READ_MEMORY_RESULTS.json).
 
 ## Maintenance dependency qualification
 
 The separately selected **Spark 4.1.4 / Iceberg 1.12.0** image now passes an offline
 2-million-row compaction/append/retained-snapshot Make check with full bodies,
-200 recovery controls and explicit resource measurements. It does not replace
-the historical live-fault lane or qualify S3/REST interruption recovery.
+200 recovery controls and explicit resource measurements. Its later integration
+into the fresh current S3/REST fixture also passes the compactor-crash case above;
+the offline check alone does not establish that result.
 See [`MAINTENANCE_RESULTS.json`](MAINTENANCE_RESULTS.json).
 
 Spark's [release page](https://spark.apache.org/downloads.html) lists 4.3.0 as newer,
@@ -107,11 +138,11 @@ with matching release references, instead of a hardcoded version string.
 
 ## Remaining qualification
 
-- Complete the current-version normal architecture matrix and live compactor
-  recovery, with bounded backend resources and sufficient volume slots.
-- Extend the successful cold 4.53→4.54 upgrade to bounded-memory/capacity settings
-  and live compactor recovery on a fresh fixture; do not assume in-place downgrade
-  compatibility.
+- Resolve/retest ClickHouse-written manifest compatibility before qualifying the
+  complete current-version normal architecture matrix.
+- Preserve the earlier current memory-failed case, close all-history verification
+  and qualify current-fixture cold backup/restore; keep teardown fail-closed until
+  the required evidence exists. Do not assume in-place downgrade compatibility.
 - Rerun Quack deadlines, native WAL recovery and owned-copy file-format migration
   on 2.0.1. Historical 1.5.5 timeout and beta-protocol findings do not establish
   current Quack behavior.

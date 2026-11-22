@@ -7,9 +7,25 @@ endif
 ifeq ($(filter 1.5.5 2.0.1,$(DUCKDB_VERSION)),)
 $(error DUCKDB_VERSION must be 2.0.1 or the historical 1.5.5 lane)
 endif
-COMPOSE := docker compose -f docker-compose.yml -f config/generated/cluster.yml -f docker-compose.recovery.yml
+LAB_PROFILE ?= current
+export LAB_PROFILE
+ifneq ($(words $(LAB_PROFILE)),1)
+$(error Select exactly one LAB_PROFILE)
+endif
+ifeq ($(filter historical current,$(LAB_PROFILE)),)
+$(error LAB_PROFILE must be historical or current)
+endif
+LAB_PROJECT := iceberg-multi-system$(if $(filter current,$(LAB_PROFILE)),-current,)
+COMPOSE := docker compose --project-name $(LAB_PROJECT) --env-file /dev/null -f docker-compose.yml -f config/generated/cluster.yml -f docker-compose.recovery.yml
 ifeq ($(DUCKDB_VERSION),2.0.1)
 COMPOSE += -f docker-compose.duckdb2.yml
+endif
+ifeq ($(LAB_PROFILE),current)
+ifneq ($(DUCKDB_VERSION),2.0.1)
+$(error The current lab requires DuckDB 2.0.1)
+endif
+COMPOSE += -f docker-compose.storage-current.yml -f docker-compose.maintenance-current.yml -f docker-compose.current.yml
+RESULTS_DIR ?= results/current/manual
 endif
 QUERY_RUNS ?= 20
 export QUERY_RUNS
@@ -64,7 +80,7 @@ unit-test: config prepare
 
 recovery-unit-test:
 	python3 -c 'import sys; assert sys.version_info >= (3, 11), "Recovery controls require Python 3.11+; check the python3 selected by Make"'
-	python3 -m unittest test_recovery_resources.py test_recovery_control.py test_recovery_report.py test_recovery_cleanup.py test_recovery_retirement.py test_compactor_cleanup.py test_compactor_control.py test_prefault_archive.py test_manifest_control.py test_cold_storage.py test_cold_readback.py test_cold_upgrade.py test_cold_cleanup.py test_compound_archive.py test_maintenance_control.py
+	LAB_PROFILE=historical python3 -m unittest test_recovery_resources.py test_recovery_control.py test_recovery_report.py test_recovery_cleanup.py test_recovery_retirement.py test_compactor_cleanup.py test_compactor_control.py test_prefault_archive.py test_manifest_control.py test_cold_storage.py test_cold_readback.py test_cold_upgrade.py test_cold_cleanup.py test_compound_archive.py test_maintenance_control.py test_lab_profiles.py
 
 storage-crash: config recovery-unit-test
 	python3 recovery_control.py storage-crash
@@ -119,21 +135,22 @@ else
 	@echo 'invalid ARCH'; exit 2
 endif
 
-probe:
+probe: config
 	$(RUN) runner probe
 
-load:
+load: config
 	@mkdir -p "$(RESULTS_DIR)"
 	$(RUN) runner load
 
-verify:
+verify: config
 	$(RUN) runner verify
 
-compact:
+compact: config
 	@mkdir -p "$(RESULTS_DIR)"
 	$(RUN) compactor
 
 config:
+	python3 lab_profiles.py
 	python3 scripts/cluster-config.py
 
 cluster-up: config

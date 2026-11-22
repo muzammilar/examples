@@ -478,6 +478,22 @@ def check_compactor_case(case, metadata, result, manifest):
                 or value["state"]["OOMKilled"]
             ):
                 raise RuntimeError("unrelated survivor exited/restarted")
+    expected_versions = metadata.get(
+        "maintenance_versions", {"spark_version": "4.0.1", "iceberg_version": "1.10.1"}
+    )
+    expected_profile = metadata.get("lab_profile", "historical")
+    declared_versions = (
+        {"spark_version": "4.1.4", "iceberg_version": "1.12.0"}
+        if expected_profile == "current"
+        else {"spark_version": "4.0.1", "iceberg_version": "1.10.1"}
+    )
+    if (
+        expected_profile not in {"historical", "current"}
+        or expected_versions != declared_versions
+    ):
+        raise RuntimeError(
+            "maintenance release declaration is not a pinned lab profile"
+        )
     for report_key in ("baseline_report", "recovered_report"):
         report_path, recovered = reference(case, evidence[report_key], manifest)
         compacted = recovered["compaction_result"]
@@ -503,8 +519,8 @@ def check_compactor_case(case, metadata, result, manifest):
             or recovered["stop"]["passed"] is not True
             or report_path.parent
             != case / "maintenance" / expected_invocation / "spark"
-            or compacted["spark_version"] != "4.0.1"
-            or compacted["iceberg_version"] != "1.10.1"
+            or compacted["spark_version"] != expected_versions["spark_version"]
+            or compacted["iceberg_version"] != expected_versions["iceberg_version"]
             or recovered["configuration"] != effective
             or effective["live_writers"] is not True
             or effective["rewrite_manifests"] is not False

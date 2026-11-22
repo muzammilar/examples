@@ -13,7 +13,7 @@ import recovery_cleanup as cleanup
 from recovery_resources import ResourceSampler
 
 LABEL = "org.examples.cold-storage"
-IMAGE = "iceberg-multi-runner-duckdb2:dev"
+IMAGE = control.lab.GO_IMAGE
 BACKUP = r"""
 set -eu
 cd /source
@@ -278,7 +278,7 @@ def run():
     if volume_users(source) != {services["storage"]["Id"]}:
         raise RuntimeError("source has an unexpected live volume user")
     (image,) = json.loads(control.call(["docker", "image", "inspect", IMAGE]))
-    if image["Config"].get("Labels", {}).get("org.examples.owner") != control.PROJECT:
+    if image["Config"].get("Labels", {}).get("org.examples.owner") != control.OWNER:
         raise RuntimeError("checkpoint utility image is not example-owned")
     run_id = uuid.uuid4()
     directory = cleanup.regular(

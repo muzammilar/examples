@@ -1,0 +1,2805 @@
+{
+  "date": "2026-11-22",
+  "profile": "current",
+  "scope": "One functional trial per supported architecture; workflow timings, not capacity benchmarks.",
+  "versions": {
+    "duckdb": "2.0.1",
+    "clickhouse": "26.10.10.3",
+    "seaweedfs": "4.54",
+    "spark": "4.1.4",
+    "iceberg": "1.12.0"
+  },
+  "dataset": {
+    "input_rows": 2000000,
+    "customers": 10000,
+    "batch_rows": 100000,
+    "schema": "event_id BIGINT, customer_id INTEGER, amount_cents BIGINT; deterministic synthetic values, not a string-heavy corpus"
+  },
+  "cases": {
+    "duck-direct": {
+      "workflow": {
+        "exit_code": 0,
+        "duration_s": 12.139530290849507,
+        "sources_unchanged": true
+      },
+      "controls": {
+        "after-compaction.json": {
+          "amount_cents": 10001000000,
+          "clickhouse": "26.10.10.3",
+          "clickhouse_check_seconds": 0.092757958,
+          "duckdb": "v2.0.1",
+          "duckdb_check_seconds": 0.156395458,
+          "duplicate_ids": 0,
+          "invalid_rows": 0,
+          "missing_ids": 0,
+          "rows": 2000000,
+          "unique_ids": 2000000
+        }
+      },
+      "compaction": {
+        "before": {
+          "rows": 2000000,
+          "files": 20,
+          "bytes": 17297191,
+          "snapshot": 7437763642496140336
+        },
+        "after": {
+          "rows": 2000000,
+          "files": 1,
+          "bytes": 6517399,
+          "snapshot": 4038353515489222377
+        },
+        "data_rewrite_seconds": 2.2711762090002594,
+        "retained_snapshot_rows": 2000000
+      },
+      "backend_resources": {
+        "clickhouse": {
+          "samples": 11,
+          "unavailable_samples": 0,
+          "observed_seconds": 11.869999999999997,
+          "cpu_core_seconds": {
+            "total": 3.023511,
+            "user": 1.759159,
+            "system": 1.2643509999999998
+          },
+          "cpu_percent_one_core_100": 25.4718702611626,
+          "charged_memory_bytes_min_mean_max": [
+            1386373120,
+            1394568098.909091,
+            1451298816
+          ],
+          "lifetime_peak_memory_bytes": 1611399168,
+          "allocated_disk_bytes_first_peak_last": [
+            422785024,
+            427536384,
+            427536384
+          ],
+          "native_block_io": {
+            "254:16": {
+              "observed_seconds": 11.869999999999997,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0,
+              "rbytes_per_second": 0.0,
+              "wbytes_per_second": 0.0,
+              "rios_per_second": 0.0,
+              "wios_per_second": 0.0
+            },
+            "254:0": {
+              "observed_seconds": 11.869999999999997,
+              "rbytes": 0,
+              "wbytes": 7794688,
+              "rios": 0,
+              "wios": 511,
+              "rbytes_per_second": 0.0,
+              "wbytes_per_second": 656671.2721145747,
+              "rios_per_second": 0.0,
+              "wios_per_second": 43.04970513900591
+            }
+          },
+          "identity_or_counter_gaps": 0,
+          "memory_stat_bytes_min_mean_max": {
+            "anon": [
+              644251648,
+              650835781.8181819,
+              700379136
+            ],
+            "file": [
+              438935552,
+              441771101.09090906,
+              443621376
+            ],
+            "kernel": [
+              132202496,
+              132576349.0909091,
+              132816896
+            ]
+          },
+          "memory_stat_samples": 11
+        },
+        "storage": {
+          "samples": 11,
+          "unavailable_samples": 0,
+          "observed_seconds": 11.869999999999997,
+          "cpu_core_seconds": {
+            "total": 1.0841589999999999,
+            "user": 0.7827630000000002,
+            "system": 0.30139699999999997
+          },
+          "cpu_percent_one_core_100": 9.133605728727886,
+          "charged_memory_bytes_min_mean_max": [
+            850989056,
+            989901544.7272727,
+            1059672064
+          ],
+          "lifetime_peak_memory_bytes": 1077964800,
+          "allocated_disk_bytes_first_peak_last": [
+            1640812544,
+            1662013440,
+            1662013440
+          ],
+          "native_block_io": {
+            "254:0": {
+              "observed_seconds": 11.869999999999997,
+              "rbytes": 12288,
+              "wbytes": 25001984,
+              "rios": 3,
+              "wios": 66,
+              "rbytes_per_second": 1035.2148272957036,
+              "wbytes_per_second": 2106317.1019376586,
+              "rios_per_second": 0.25273799494524013,
+              "wios_per_second": 5.560235888795283
+            }
+          },
+          "identity_or_counter_gaps": 0,
+          "memory_stat_bytes_min_mean_max": {
+            "anon": [
+              397283328,
+              521185466.1818182,
+              583143424
+            ],
+            "file": [
+              177876992,
+              192223790.54545453,
+              199090176
+            ],
+            "kernel": [
+              16617472,
+              17320122.181818184,
+              17698816
+            ]
+          },
+          "memory_stat_samples": 11
+        }
+      },
+      "compactor_resources": {
+        "samples": 12,
+        "clock_ticks_per_second": 100,
+        "container": {
+          "observed_seconds": 7.534843878000001,
+          "cpu_core_seconds": 12.835424999999999,
+          "cpu_percent_one_core_100": 170.3475905781733,
+          "cpu_counter_resolution_seconds": 1e-06,
+          "cpu_utilization_min_interval_seconds": 0.0,
+          "cpu_short_intervals_suppressed": 0,
+          "cpu_interval_percent_min_mean_max": {
+            "min": 80.51198393775574,
+            "mean": 156.97630840526296,
+            "max": 189.50896756241792
+          },
+          "sampled_memory_bytes_min_mean_max": {
+            "min": 174972928,
+            "mean": 443217920,
+            "max": 655622144
+          },
+          "lifetime_peak_memory_bytes": 657244160,
+          "generations": [],
+          "io": {
+            "254:0": {
+              "observed_seconds": 7.534843878000001,
+              "counters": {
+                "rbytes": 0,
+                "wbytes": 6828032,
+                "rios": 0,
+                "wios": 32
+              },
+              "per_second": {
+                "rbytes": 0.0,
+                "wbytes": 906194.223869226,
+                "rios": 0.0,
+                "wios": 4.246936037179561
+              }
+            }
+          },
+          "identity_or_counter_gaps": 0
+        },
+        "python": {
+          "observed_seconds": 7.534843878000001,
+          "cpu_core_seconds": 0.36,
+          "cpu_percent_one_core_100": 4.777803041827006,
+          "cpu_counter_resolution_seconds": 0.01,
+          "cpu_utilization_min_interval_seconds": 0.1,
+          "cpu_short_intervals_suppressed": 3,
+          "cpu_interval_percent_min_mean_max": {
+            "min": 0.0,
+            "mean": 4.519684292077618,
+            "max": 31.97093576580122
+          },
+          "sampled_memory_bytes_min_mean_max": {
+            "min": 17113088,
+            "mean": 38668288,
+            "max": 43438080
+          },
+          "lifetime_peak_memory_bytes": 43782144,
+          "generations": [
+            {
+              "pid": 53,
+              "start_ticks": 1772246
+            }
+          ],
+          "io": {
+            "process": {
+              "observed_seconds": 7.534843878000001,
+              "counters": {
+                "rchar": 3383125,
+                "wchar": 55238,
+                "syscr": 794,
+                "syscw": 12,
+                "read_bytes": 0,
+                "write_bytes": 55238,
+                "cancelled_write_bytes": 0
+              },
+              "per_second": {
+                "rchar": 448997.35877447197,
+                "wchar": 7331.007900678894,
+                "syscr": 105.37710042251786,
+                "syscw": 1.5926010139423354,
+                "read_bytes": 0.0,
+                "write_bytes": 7331.007900678894,
+                "cancelled_write_bytes": 0.0
+              }
+            }
+          },
+          "identity_or_counter_gaps": 0
+        },
+        "jvm": {
+          "observed_seconds": 7.533847753000001,
+          "cpu_core_seconds": 12.49,
+          "cpu_percent_one_core_100": 165.7851394067055,
+          "cpu_counter_resolution_seconds": 0.01,
+          "cpu_utilization_min_interval_seconds": 0.1,
+          "cpu_short_intervals_suppressed": 2,
+          "cpu_interval_percent_min_mean_max": {
+            "min": 130.74992429529468,
+            "mean": 167.8894714465581,
+            "max": 186.9807676069981
+          },
+          "sampled_memory_bytes_min_mean_max": {
+            "min": 180563968,
+            "mean": 447969093.8181818,
+            "max": 630198272
+          },
+          "lifetime_peak_memory_bytes": 631209984,
+          "generations": [
+            {
+              "pid": 1,
+              "start_ticks": 1772165
+            }
+          ],
+          "io": {
+            "process": {
+              "observed_seconds": 7.533847753000001,
+              "counters": {
+                "rchar": 72999594,
+                "wchar": 14032376,
+                "syscr": 34730,
+                "syscw": 2846,
+                "read_bytes": 0,
+                "write_bytes": 7217152,
+                "cancelled_write_bytes": 86016
+              },
+              "per_second": {
+                "rchar": 9689549.934285749,
+                "wchar": 1862577.59116678,
+                "syscr": 4609.862203038336,
+                "syscw": 377.7618148530695,
+                "read_bytes": 0.0,
+                "write_bytes": 957963.6112404991,
+                "cancelled_write_bytes": 11417.27345973353
+              }
+            }
+          },
+          "identity_or_counter_gaps": 0
+        }
+      },
+      "tool_resources": [
+        {
+          "duration_ns": 393232792,
+          "ended_ns": 1795379615267325763,
+          "error": "",
+          "mode": "verify",
+          "native_after": {
+            "files": {
+              "/proc/self/io": {
+                "raw": "rchar: 84266103\nwchar: 8622\nsyscr: 10503\nsyscw: 21\nread_bytes: 0\nwrite_bytes: 275\ncancelled_write_bytes: 0\n"
+              },
+              "/proc/self/status": {
+                "raw": "Name:\tlab\nUmask:\t0022\nState:\tS (sleeping)\nTgid:\t1\nNgid:\t0\nPid:\t1\nPPid:\t0\nTracerPid:\t0\nUid:\t501\t501\t501\t501\nGid:\t20\t20\t20\t20\nFDSize:\t64\nGroups:\t20 \nNStgid:\t1\nNSpid:\t1\nNSpgid:\t1\nNSsid:\t1\nKthread:\t0\nVmPeak:\t 2686112 kB\nVmSize:\t 2612516 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t  223896 kB\nVmRSS:\t  127352 kB\nRssAnon:\t   49696 kB\nRssFile:\t   77656 kB\nRssShmem:\t       0 kB\nVmData:\t  302124 kB\nVmStk:\t     132 kB\nVmExe:\t   10692 kB\nVmLib:\t   95936 kB\nVmPTE:\t     608 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffff\nThreads:\t5\nSigQ:\t0/99998\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000000000000\nSigCgt:\tfffffffd7fc1feff\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t00000000a80425fb\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t2\nSeccomp_filters:\t1\nSpeculation_Store_Bypass:\tvulnerable\nSpeculationIndirectBranch:\tunknown\nCpus_allowed:\t7ff\nCpus_allowed_list:\t0-10\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t41\nnonvoluntary_ctxt_switches:\t1\n"
+              },
+              "/sys/fs/cgroup/cpu.stat": {
+                "raw": "usage_usec 414232\nuser_usec 373521\nsystem_usec 40710\nnice_usec 0\nnr_periods 4\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n"
+              },
+              "/sys/fs/cgroup/io.stat": {
+                "raw": ""
+              },
+              "/sys/fs/cgroup/memory.current": {
+                "raw": "57053184\n"
+              },
+              "/sys/fs/cgroup/memory.peak": {
+                "raw": "153800704\n"
+              }
+            },
+            "scope": "Raw cumulative process/container counters. Cgroup peaks and totals can include earlier work in this container; unavailable counters are not zero.",
+            "utc_ns": 1795379615267325221
+          },
+          "native_before": {
+            "files": {
+              "/proc/self/io": {
+                "raw": "rchar: 69362\nwchar: 6550\nsyscr: 70\nsyscw: 7\nread_bytes: 0\nwrite_bytes: 0\ncancelled_write_bytes: 0\n"
+              },
+              "/proc/self/status": {
+                "raw": "Name:\tlab\nUmask:\t0022\nState:\tR (running)\nTgid:\t1\nNgid:\t0\nPid:\t1\nPPid:\t0\nTracerPid:\t0\nUid:\t501\t501\t501\t501\nGid:\t20\t20\t20\t20\nFDSize:\t64\nGroups:\t20 \nNStgid:\t1\nNSpid:\t1\nNSpgid:\t1\nNSsid:\t1\nKthread:\t0\nVmPeak:\t 1708452 kB\nVmSize:\t 1642916 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t   33652 kB\nVmRSS:\t   33652 kB\nRssAnon:\t    9920 kB\nRssFile:\t   23732 kB\nRssShmem:\t       0 kB\nVmData:\t  112876 kB\nVmStk:\t     132 kB\nVmExe:\t   10692 kB\nVmLib:\t   49652 kB\nVmPTE:\t     228 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffff\nThreads:\t5\nSigQ:\t0/99998\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000000000000\nSigCgt:\tfffffffd7fc1feff\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t00000000a80425fb\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t2\nSeccomp_filters:\t1\nSpeculation_Store_Bypass:\tvulnerable\nSpeculationIndirectBranch:\tunknown\nCpus_allowed:\t7ff\nCpus_allowed_list:\t0-10\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t18\nnonvoluntary_ctxt_switches:\t0\n"
+              },
+              "/sys/fs/cgroup/cpu.stat": {
+                "raw": "usage_usec 15966\nuser_usec 6985\nsystem_usec 8981\nnice_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n"
+              },
+              "/sys/fs/cgroup/io.stat": {
+                "raw": ""
+              },
+              "/sys/fs/cgroup/memory.current": {
+                "raw": "11808768\n"
+              },
+              "/sys/fs/cgroup/memory.peak": {
+                "raw": "11808768\n"
+              }
+            },
+            "scope": "Raw cumulative process/container counters. Cgroup peaks and totals can include earlier work in this container; unavailable counters are not zero.",
+            "utc_ns": 1795379614874158304
+          },
+          "passed": true,
+          "process_cpu": {
+            "system_core_seconds": 0.030859,
+            "user_core_seconds": 0.367045,
+            "utilization_percent_one_core_100": 101.18789889730255
+          },
+          "process_lifetime_peak_rss_bytes": 229269504,
+          "scope": "Application dispatch including engine setup, execution, validation and close, plus counter probes; excludes process startup and report write/fsync. Raw native counters include all engine threads and cgroup cache/kernel charges. Peaks are lifetime values, not deltas. Empty/missing I/O counters are unavailable, not zero; process rchar/wchar are not physical disk bytes. Server resource costs are separate.",
+          "started_ns": 1795379614874092929
+        },
+        {
+          "duration_ns": 876848793,
+          "ended_ns": 1795379604539141633,
+          "error": "",
+          "mode": "load",
+          "native_after": {
+            "files": {
+              "/proc/self/io": {
+                "raw": "rchar: 84256600\nwchar: 8443\nsyscr: 10946\nsyscw: 52\nread_bytes: 0\nwrite_bytes: 1265\ncancelled_write_bytes: 0\n"
+              },
+              "/proc/self/status": {
+                "raw": "Name:\tlab\nUmask:\t0022\nState:\tR (running)\nTgid:\t1\nNgid:\t0\nPid:\t1\nPPid:\t0\nTracerPid:\t0\nUid:\t501\t501\t501\t501\nGid:\t20\t20\t20\t20\nFDSize:\t64\nGroups:\t20 \nNStgid:\t1\nNSpid:\t1\nNSpgid:\t1\nNSsid:\t1\nKthread:\t0\nVmPeak:\t 2641284 kB\nVmSize:\t 2566412 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t  172036 kB\nVmRSS:\t  133524 kB\nRssAnon:\t   54428 kB\nRssFile:\t   79096 kB\nRssShmem:\t       0 kB\nVmData:\t  256716 kB\nVmStk:\t     132 kB\nVmExe:\t   10692 kB\nVmLib:\t   95936 kB\nVmPTE:\t     640 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffff\nThreads:\t5\nSigQ:\t1/99998\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000000000000\nSigCgt:\tfffffffd7fc1feff\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t00000000a80425fb\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t2\nSeccomp_filters:\t1\nSpeculation_Store_Bypass:\tvulnerable\nSpeculationIndirectBranch:\tunknown\nCpus_allowed:\t7ff\nCpus_allowed_list:\t0-10\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t117\nnonvoluntary_ctxt_switches:\t32\n"
+              },
+              "/sys/fs/cgroup/cpu.stat": {
+                "raw": "usage_usec 560114\nuser_usec 453426\nsystem_usec 106688\nnice_usec 0\nnr_periods 9\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n"
+              },
+              "/sys/fs/cgroup/io.stat": {
+                "raw": ""
+              },
+              "/sys/fs/cgroup/memory.current": {
+                "raw": "68227072\n"
+              },
+              "/sys/fs/cgroup/memory.peak": {
+                "raw": "99037184\n"
+              }
+            },
+            "scope": "Raw cumulative process/container counters. Cgroup peaks and totals can include earlier work in this container; unavailable counters are not zero.",
+            "utc_ns": 1795379604539141216
+          },
+          "native_before": {
+            "files": {
+              "/proc/self/io": {
+                "raw": "rchar: 69329\nwchar: 6550\nsyscr: 70\nsyscw: 7\nread_bytes: 0\nwrite_bytes: 0\ncancelled_write_bytes: 0\n"
+              },
+              "/proc/self/status": {
+                "raw": "Name:\tlab\nUmask:\t0022\nState:\tR (running)\nTgid:\t1\nNgid:\t0\nPid:\t1\nPPid:\t0\nTracerPid:\t0\nUid:\t501\t501\t501\t501\nGid:\t20\t20\t20\t20\nFDSize:\t64\nGroups:\t20 \nNStgid:\t1\nNSpid:\t1\nNSpgid:\t1\nNSsid:\t1\nKthread:\t0\nVmPeak:\t 1642916 kB\nVmSize:\t 1642916 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t   31604 kB\nVmRSS:\t   31604 kB\nRssAnon:\t    7872 kB\nRssFile:\t   23732 kB\nRssShmem:\t       0 kB\nVmData:\t  112876 kB\nVmStk:\t     132 kB\nVmExe:\t   10692 kB\nVmLib:\t   49652 kB\nVmPTE:\t     220 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffff\nThreads:\t5\nSigQ:\t0/99998\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000000000000\nSigCgt:\tfffffffd7fc1feff\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t00000000a80425fb\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t2\nSeccomp_filters:\t1\nSpeculation_Store_Bypass:\tvulnerable\nSpeculationIndirectBranch:\tunknown\nCpus_allowed:\t7ff\nCpus_allowed_list:\t0-10\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t18\nnonvoluntary_ctxt_switches:\t1\n"
+              },
+              "/sys/fs/cgroup/cpu.stat": {
+                "raw": "usage_usec 23217\nuser_usec 14774\nsystem_usec 8442\nnice_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n"
+              },
+              "/sys/fs/cgroup/io.stat": {
+                "raw": ""
+              },
+              "/sys/fs/cgroup/memory.current": {
+                "raw": "9150464\n"
+              },
+              "/sys/fs/cgroup/memory.peak": {
+                "raw": "10006528\n"
+              }
+            },
+            "scope": "Raw cumulative process/container counters. Cgroup peaks and totals can include earlier work in this container; unavailable counters are not zero.",
+            "utc_ns": 1795379603662353591
+          },
+          "passed": true,
+          "process_cpu": {
+            "system_core_seconds": 0.098165,
+            "user_core_seconds": 0.438342,
+            "utilization_percent_one_core_100": 61.18580584052877
+          },
+          "process_lifetime_peak_rss_bytes": 176164864,
+          "scope": "Application dispatch including engine setup, execution, validation and close, plus counter probes; excludes process startup and report write/fsync. Raw native counters include all engine threads and cgroup cache/kernel charges. Peaks are lifetime values, not deltas. Empty/missing I/O counters are unavailable, not zero; process rchar/wchar are not physical disk bytes. Server resource costs are separate.",
+          "started_ns": 1795379603662292841
+        },
+        {
+          "duration_ns": 481198625,
+          "ended_ns": 1795379605476602883,
+          "error": "",
+          "mode": "verify",
+          "native_after": {
+            "files": {
+              "/proc/self/io": {
+                "raw": "rchar: 84269408\nwchar: 8646\nsyscr: 10637\nsyscw: 24\nread_bytes: 0\nwrite_bytes: 275\ncancelled_write_bytes: 0\n"
+              },
+              "/proc/self/status": {
+                "raw": "Name:\tlab\nUmask:\t0022\nState:\tR (running)\nTgid:\t1\nNgid:\t0\nPid:\t1\nPPid:\t0\nTracerPid:\t0\nUid:\t501\t501\t501\t501\nGid:\t20\t20\t20\t20\nFDSize:\t64\nGroups:\t20 \nNStgid:\t1\nNSpid:\t1\nNSpgid:\t1\nNSsid:\t1\nKthread:\t0\nVmPeak:\t 2710032 kB\nVmSize:\t 2633508 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t  247192 kB\nVmRSS:\t  135872 kB\nRssAnon:\t   58264 kB\nRssFile:\t   77608 kB\nRssShmem:\t       0 kB\nVmData:\t  329492 kB\nVmStk:\t     132 kB\nVmExe:\t   10692 kB\nVmLib:\t   95936 kB\nVmPTE:\t     668 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffff\nThreads:\t5\nSigQ:\t0/99998\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000000000000\nSigCgt:\tfffffffd7fc1feff\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t00000000a80425fb\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t2\nSeccomp_filters:\t1\nSpeculation_Store_Bypass:\tvulnerable\nSpeculationIndirectBranch:\tunknown\nCpus_allowed:\t7ff\nCpus_allowed_list:\t0-10\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t40\nnonvoluntary_ctxt_switches:\t60\n"
+              },
+              "/sys/fs/cgroup/cpu.stat": {
+                "raw": "usage_usec 485055\nuser_usec 417066\nsystem_usec 67988\nnice_usec 0\nnr_periods 5\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n"
+              },
+              "/sys/fs/cgroup/io.stat": {
+                "raw": ""
+              },
+              "/sys/fs/cgroup/memory.current": {
+                "raw": "83664896\n"
+              },
+              "/sys/fs/cgroup/memory.peak": {
+                "raw": "178274304\n"
+              }
+            },
+            "scope": "Raw cumulative process/container counters. Cgroup peaks and totals can include earlier work in this container; unavailable counters are not zero.",
+            "utc_ns": 1795379605476602467
+          },
+          "native_before": {
+            "files": {
+              "/proc/self/io": {
+                "raw": "rchar: 69363\nwchar: 6550\nsyscr: 70\nsyscw: 7\nread_bytes: 0\nwrite_bytes: 0\ncancelled_write_bytes: 0\n"
+              },
+              "/proc/self/status": {
+                "raw": "Name:\tlab\nUmask:\t0022\nState:\tR (running)\nTgid:\t1\nNgid:\t0\nPid:\t1\nPPid:\t0\nTracerPid:\t0\nUid:\t501\t501\t501\t501\nGid:\t20\t20\t20\t20\nFDSize:\t64\nGroups:\t20 \nNStgid:\t1\nNSpid:\t1\nNSpgid:\t1\nNSsid:\t1\nKthread:\t0\nVmPeak:\t 1642916 kB\nVmSize:\t 1642916 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t   33656 kB\nVmRSS:\t   33656 kB\nRssAnon:\t    9924 kB\nRssFile:\t   23732 kB\nRssShmem:\t       0 kB\nVmData:\t  116972 kB\nVmStk:\t     132 kB\nVmExe:\t   10692 kB\nVmLib:\t   49652 kB\nVmPTE:\t     224 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffff\nThreads:\t5\nSigQ:\t0/99998\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000000000000\nSigCgt:\tfffffffd7fc1feff\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t00000000a80425fb\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t2\nSeccomp_filters:\t1\nSpeculation_Store_Bypass:\tvulnerable\nSpeculationIndirectBranch:\tunknown\nCpus_allowed:\t7ff\nCpus_allowed_list:\t0-10\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t18\nnonvoluntary_ctxt_switches:\t5\n"
+              },
+              "/sys/fs/cgroup/cpu.stat": {
+                "raw": "usage_usec 14418\nuser_usec 9982\nsystem_usec 4436\nnice_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n"
+              },
+              "/sys/fs/cgroup/io.stat": {
+                "raw": ""
+              },
+              "/sys/fs/cgroup/memory.current": {
+                "raw": "12247040\n"
+              },
+              "/sys/fs/cgroup/memory.peak": {
+                "raw": "12247040\n"
+              }
+            },
+            "scope": "Raw cumulative process/container counters. Cgroup peaks and totals can include earlier work in this container; unavailable counters are not zero.",
+            "utc_ns": 1795379604995510550
+          },
+          "passed": true,
+          "process_cpu": {
+            "system_core_seconds": 0.063203,
+            "user_core_seconds": 0.406879,
+            "utilization_percent_one_core_100": 97.68980532727001
+          },
+          "process_lifetime_peak_rss_bytes": 253124608,
+          "scope": "Application dispatch including engine setup, execution, validation and close, plus counter probes; excludes process startup and report write/fsync. Raw native counters include all engine threads and cgroup cache/kernel charges. Peaks are lifetime values, not deltas. Empty/missing I/O counters are unavailable, not zero; process rchar/wchar are not physical disk bytes. Server resource costs are separate.",
+          "started_ns": 1795379604995404300
+        }
+      ],
+      "evidence": [
+        {
+          "path": "results/current/qualification-20261122/duck-direct/workflow-result.json",
+          "sha256": "7e9cbfa9a31e7a0620b2bafa3ff98a4d14842a40e897ffc174f29c8785755d8c"
+        },
+        {
+          "path": "results/current/qualification-20261122/duck-direct/invocation.json",
+          "sha256": "bdacef5868f62c7a67f8782761b87ab6a8a911f6df76df5ddcbfcd46f2b046fe"
+        },
+        {
+          "path": "results/current/qualification-20261122/duck-direct/resources.json",
+          "sha256": "460a0ecca6454f291dc912520943f5be5cb1c2f83c93244a4e771d5c5d75bdea"
+        },
+        {
+          "path": "results/current/qualification-20261122/duck-direct/lab-events-compaction.json",
+          "sha256": "9404df8eb3e3bd5f5a9def0172ef87cb44b2ae8eac1ddeea22c063467fb16032"
+        },
+        {
+          "path": "results/current/qualification-20261122/duck-direct/after-compaction.json",
+          "sha256": "cf7437ec6de43111813e7aa07b7fa3fcc5485d10364d615765899f8d0fd2dc94"
+        },
+        {
+          "path": "results/current/qualification-20261122/duck-direct/compaction-6f1c9a77-89ec-417b-8178-7245a80d516e-resources.json",
+          "sha256": "b928ce9b110f9e6502b15d1397c0452c76e701dab0c30fd87eb8634ef3e94303"
+        }
+      ]
+    },
+    "duck-archive": {
+      "workflow": {
+        "exit_code": 0,
+        "duration_s": 10.556501833023503,
+        "sources_unchanged": true
+      },
+      "controls": {
+        "after-compaction.json": {
+          "amount_cents": 5000500000,
+          "clickhouse": "26.10.10.3",
+          "clickhouse_check_seconds": 0.050508416,
+          "duckdb": "v2.0.1",
+          "duckdb_check_seconds": 0.079841583,
+          "duplicate_ids": 0,
+          "invalid_rows": 0,
+          "missing_ids": 0,
+          "rows": 1000000,
+          "unique_ids": 1000000
+        },
+        "duck-archive.json": {
+          "archived_rows": 1000000,
+          "duplicate_ids": 0,
+          "hot_rows": 1000000,
+          "missing_ids": 0,
+          "resumed": false,
+          "rows": 2000000,
+          "seconds": 0.923643459
+        },
+        "verify.json": {
+          "amount_cents": 5000500000,
+          "clickhouse": "26.10.10.3",
+          "clickhouse_check_seconds": 0.08960025,
+          "duckdb": "v2.0.1",
+          "duckdb_check_seconds": 0.078681083,
+          "duplicate_ids": 0,
+          "invalid_rows": 0,
+          "missing_ids": 0,
+          "rows": 1000000,
+          "unique_ids": 1000000
+        }
+      },
+      "compaction": {
+        "before": {
+          "rows": 1000000,
+          "files": 10,
+          "bytes": 8648886,
+          "snapshot": 8663768910339853607
+        },
+        "after": {
+          "rows": 1000000,
+          "files": 1,
+          "bytes": 3274116,
+          "snapshot": 8342962606575361482
+        },
+        "data_rewrite_seconds": 1.7179553759997361,
+        "retained_snapshot_rows": 1000000
+      },
+      "backend_resources": {
+        "clickhouse": {
+          "samples": 9,
+          "unavailable_samples": 0,
+          "observed_seconds": 9.51,
+          "cpu_core_seconds": {
+            "total": 2.666366,
+            "user": 1.5343939999999998,
+            "system": 1.1319730000000001
+          },
+          "cpu_percent_one_core_100": 28.037497371188223,
+          "charged_memory_bytes_min_mean_max": [
+            1274187776,
+            1377896675.5555556,
+            1415008256
+          ],
+          "lifetime_peak_memory_bytes": 1611399168,
+          "allocated_disk_bytes_first_peak_last": [
+            427610112,
+            439394304,
+            327692288
+          ],
+          "native_block_io": {
+            "254:16": {
+              "observed_seconds": 9.51,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0,
+              "rbytes_per_second": 0.0,
+              "wbytes_per_second": 0.0,
+              "rios_per_second": 0.0,
+              "wios_per_second": 0.0
+            },
+            "254:0": {
+              "observed_seconds": 9.51,
+              "rbytes": 0,
+              "wbytes": 438272,
+              "rios": 0,
+              "wios": 45,
+              "rbytes_per_second": 0.0,
+              "wbytes_per_second": 46085.38380651946,
+              "rios_per_second": 0.0,
+              "wios_per_second": 4.73186119873817
+            }
+          },
+          "identity_or_counter_gaps": 0,
+          "memory_stat_bytes_min_mean_max": {
+            "anon": [
+              647692288,
+              652681216,
+              669888512
+            ],
+            "file": [
+              345260032,
+              425916188.4444444,
+              455270400
+            ],
+            "kernel": [
+              108146688,
+              131169393.77777778,
+              137338880
+            ]
+          },
+          "memory_stat_samples": 9
+        },
+        "storage": {
+          "samples": 9,
+          "unavailable_samples": 0,
+          "observed_seconds": 9.469999999999999,
+          "cpu_core_seconds": {
+            "total": 0.540574,
+            "user": 0.41152199999999994,
+            "system": 0.129053
+          },
+          "cpu_percent_one_core_100": 5.708278775079198,
+          "charged_memory_bytes_min_mean_max": [
+            1060777984,
+            1069949383.1111112,
+            1073561600
+          ],
+          "lifetime_peak_memory_bytes": 1077964800,
+          "allocated_disk_bytes_first_peak_last": [
+            1662013440,
+            1674309632,
+            1674309632
+          ],
+          "native_block_io": {
+            "254:0": {
+              "observed_seconds": 9.469999999999999,
+              "rbytes": 0,
+              "wbytes": 8921088,
+              "rios": 0,
+              "wios": 33,
+              "rbytes_per_second": 0.0,
+              "wbytes_per_second": 942036.7476240761,
+              "rios_per_second": 0.0,
+              "wios_per_second": 3.4846884899683213
+            }
+          },
+          "identity_or_counter_gaps": 0,
+          "memory_stat_bytes_min_mean_max": {
+            "anon": [
+              584458240,
+              589174556.4444444,
+              599764992
+            ],
+            "file": [
+              195657728,
+              202914474.66666666,
+              207171584
+            ],
+            "kernel": [
+              17620992,
+              17952768,
+              18149376
+            ]
+          },
+          "memory_stat_samples": 9
+        }
+      },
+      "compactor_resources": {
+        "samples": 11,
+        "clock_ticks_per_second": 100,
+        "container": {
+          "observed_seconds": 6.889972836999999,
+          "cpu_core_seconds": 12.193889,
+          "cpu_percent_one_core_100": 176.98021876831388,
+          "cpu_counter_resolution_seconds": 1e-06,
+          "cpu_utilization_min_interval_seconds": 0.0,
+          "cpu_short_intervals_suppressed": 0,
+          "cpu_interval_percent_min_mean_max": {
+            "min": 41.34287579990529,
+            "mean": 159.08190645475136,
+            "max": 203.32655093632786
+          },
+          "sampled_memory_bytes_min_mean_max": {
+            "min": 184098816,
+            "mean": 450669847.27272725,
+            "max": 704901120
+          },
+          "lifetime_peak_memory_bytes": 708882432,
+          "generations": [],
+          "io": {
+            "254:0": {
+              "observed_seconds": 6.889972836999999,
+              "counters": {
+                "rbytes": 0,
+                "wbytes": 3502080,
+                "rios": 0,
+                "wios": 22
+              },
+              "per_second": {
+                "rbytes": 0.0,
+                "wbytes": 508286.474105297,
+                "rios": 0.0,
+                "wios": 3.1930459699140323
+              }
+            }
+          },
+          "identity_or_counter_gaps": 0
+        },
+        "python": {
+          "observed_seconds": 6.889972836999999,
+          "cpu_core_seconds": 0.32999999999999996,
+          "cpu_percent_one_core_100": 4.789568954871047,
+          "cpu_counter_resolution_seconds": 0.01,
+          "cpu_utilization_min_interval_seconds": 0.1,
+          "cpu_short_intervals_suppressed": 1,
+          "cpu_interval_percent_min_mean_max": {
+            "min": 0.0,
+            "mean": 3.7660082465653812,
+            "max": 28.996485365005388
+          },
+          "sampled_memory_bytes_min_mean_max": {
+            "min": 17387520,
+            "mean": 38399255.27272727,
+            "max": 43520000
+          },
+          "lifetime_peak_memory_bytes": 43741184,
+          "generations": [
+            {
+              "pid": 53,
+              "start_ticks": 1773467
+            }
+          ],
+          "io": {
+            "process": {
+              "observed_seconds": 6.889972836999999,
+              "counters": {
+                "rchar": 3379761,
+                "wchar": 48724,
+                "syscr": 766,
+                "syscw": 11,
+                "read_bytes": 0,
+                "write_bytes": 48724,
+                "cancelled_write_bytes": 0
+              },
+              "per_second": {
+                "rchar": 490533.2836510282,
+                "wchar": 7071.725992640514,
+                "syscr": 111.1760551342795,
+                "syscw": 1.5965229849570162,
+                "read_bytes": 0.0,
+                "write_bytes": 7071.725992640514,
+                "cancelled_write_bytes": 0.0
+              }
+            }
+          },
+          "identity_or_counter_gaps": 0
+        },
+        "jvm": {
+          "observed_seconds": 6.889178503999999,
+          "cpu_core_seconds": 11.860000000000001,
+          "cpu_percent_one_core_100": 172.15405281070656,
+          "cpu_counter_resolution_seconds": 0.01,
+          "cpu_utilization_min_interval_seconds": 0.1,
+          "cpu_short_intervals_suppressed": 0,
+          "cpu_interval_percent_min_mean_max": {
+            "min": 39.58441431771457,
+            "mean": 164.1371476603644,
+            "max": 201.67641925313688
+          },
+          "sampled_memory_bytes_min_mean_max": {
+            "min": 190107648,
+            "mean": 458166272,
+            "max": 680288256
+          },
+          "lifetime_peak_memory_bytes": 685244416,
+          "generations": [
+            {
+              "pid": 1,
+              "start_ticks": 1773387
+            }
+          ],
+          "io": {
+            "process": {
+              "observed_seconds": 6.889178503999999,
+              "counters": {
+                "rchar": 60689308,
+                "wchar": 7310336,
+                "syscr": 34381,
+                "syscw": 1737,
+                "read_bytes": 0,
+                "write_bytes": 3878912,
+                "cancelled_write_bytes": 73728
+              },
+              "per_second": {
+                "rchar": 8809367.904280972,
+                "wchar": 1061133.1954536333,
+                "syscr": 4990.580514068213,
+                "syscw": 252.13456132563005,
+                "read_bytes": 0.0,
+                "write_bytes": 563044.2000810145,
+                "cancelled_write_bytes": 10702.00169108581
+              }
+            }
+          },
+          "identity_or_counter_gaps": 0
+        }
+      },
+      "tool_resources": [
+        {
+          "duration_ns": 277353041,
+          "ended_ns": 1795379626716996421,
+          "error": "",
+          "mode": "verify",
+          "native_after": {
+            "files": {
+              "/proc/self/io": {
+                "raw": "rchar: 84266094\nwchar: 8660\nsyscr: 10487\nsyscw: 26\nread_bytes: 0\nwrite_bytes: 274\ncancelled_write_bytes: 0\n"
+              },
+              "/proc/self/status": {
+                "raw": "Name:\tlab\nUmask:\t0022\nState:\tS (sleeping)\nTgid:\t1\nNgid:\t0\nPid:\t1\nPPid:\t0\nTracerPid:\t0\nUid:\t501\t501\t501\t501\nGid:\t20\t20\t20\t20\nFDSize:\t64\nGroups:\t20 \nNStgid:\t1\nNSpid:\t1\nNSpgid:\t1\nNSsid:\t1\nKthread:\t0\nVmPeak:\t 2759180 kB\nVmSize:\t 2676000 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t  167752 kB\nVmRSS:\t  116812 kB\nRssAnon:\t   39140 kB\nRssFile:\t   77672 kB\nRssShmem:\t       0 kB\nVmData:\t  238840 kB\nVmStk:\t     132 kB\nVmExe:\t   10692 kB\nVmLib:\t   95936 kB\nVmPTE:\t     576 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffff\nThreads:\t5\nSigQ:\t0/99998\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000000000000\nSigCgt:\tfffffffd7fc1feff\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t00000000a80425fb\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t2\nSeccomp_filters:\t1\nSpeculation_Store_Bypass:\tvulnerable\nSpeculationIndirectBranch:\tunknown\nCpus_allowed:\t7ff\nCpus_allowed_list:\t0-10\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t40\nnonvoluntary_ctxt_switches:\t3\n"
+              },
+              "/sys/fs/cgroup/cpu.stat": {
+                "raw": "usage_usec 340829\nuser_usec 314138\nsystem_usec 26691\nnice_usec 0\nnr_periods 3\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n"
+              },
+              "/sys/fs/cgroup/io.stat": {
+                "raw": ""
+              },
+              "/sys/fs/cgroup/memory.current": {
+                "raw": "48754688\n"
+              },
+              "/sys/fs/cgroup/memory.peak": {
+                "raw": "95993856\n"
+              }
+            },
+            "scope": "Raw cumulative process/container counters. Cgroup peaks and totals can include earlier work in this container; unavailable counters are not zero.",
+            "utc_ns": 1795379626716996087
+          },
+          "native_before": {
+            "files": {
+              "/proc/self/io": {
+                "raw": "rchar: 69364\nwchar: 6550\nsyscr: 70\nsyscw: 7\nread_bytes: 0\nwrite_bytes: 0\ncancelled_write_bytes: 0\n"
+              },
+              "/proc/self/status": {
+                "raw": "Name:\tlab\nUmask:\t0022\nState:\tR (running)\nTgid:\t1\nNgid:\t0\nPid:\t1\nPPid:\t0\nTracerPid:\t0\nUid:\t501\t501\t501\t501\nGid:\t20\t20\t20\t20\nFDSize:\t64\nGroups:\t20 \nNStgid:\t1\nNSpid:\t1\nNSpgid:\t1\nNSsid:\t1\nKthread:\t0\nVmPeak:\t 1708452 kB\nVmSize:\t 1642916 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t   31604 kB\nVmRSS:\t   31604 kB\nRssAnon:\t    7872 kB\nRssFile:\t   23732 kB\nRssShmem:\t       0 kB\nVmData:\t  112876 kB\nVmStk:\t     132 kB\nVmExe:\t   10692 kB\nVmLib:\t   49652 kB\nVmPTE:\t     212 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffff\nThreads:\t5\nSigQ:\t0/99998\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000000000000\nSigCgt:\tfffffffd7fc1feff\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t00000000a80425fb\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t2\nSeccomp_filters:\t1\nSpeculation_Store_Bypass:\tvulnerable\nSpeculationIndirectBranch:\tunknown\nCpus_allowed:\t7ff\nCpus_allowed_list:\t0-10\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t18\nnonvoluntary_ctxt_switches:\t1\n"
+              },
+              "/sys/fs/cgroup/cpu.stat": {
+                "raw": "usage_usec 14944\nuser_usec 7472\nsystem_usec 7472\nnice_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n"
+              },
+              "/sys/fs/cgroup/io.stat": {
+                "raw": ""
+              },
+              "/sys/fs/cgroup/memory.current": {
+                "raw": "10182656\n"
+              },
+              "/sys/fs/cgroup/memory.peak": {
+                "raw": "10182656\n"
+              }
+            },
+            "scope": "Raw cumulative process/container counters. Cgroup peaks and totals can include earlier work in this container; unavailable counters are not zero.",
+            "utc_ns": 1795379626439711754
+          },
+          "passed": true,
+          "process_cpu": {
+            "system_core_seconds": 0.019253,
+            "user_core_seconds": 0.306349,
+            "utilization_percent_one_core_100": 117.39622497955592
+          },
+          "process_lifetime_peak_rss_bytes": 171778048,
+          "scope": "Application dispatch including engine setup, execution, validation and close, plus counter probes; excludes process startup and report write/fsync. Raw native counters include all engine threads and cgroup cache/kernel charges. Peaks are lifetime values, not deltas. Empty/missing I/O counters are unavailable, not zero; process rchar/wchar are not physical disk bytes. Server resource costs are separate.",
+          "started_ns": 1795379626439643379
+        },
+        {
+          "duration_ns": 1066137000,
+          "ended_ns": 1795379617772540000,
+          "error": "",
+          "mode": "duck-archive",
+          "native_after": {
+            "files": {
+              "/proc/self/io": {
+                "raw": "rchar: 168435887\nwchar: 10153729\nsyscr: 21223\nsyscw: 1020\nread_bytes: 0\nwrite_bytes: 10145343\ncancelled_write_bytes: 0\n"
+              },
+              "/proc/self/status": {
+                "raw": "Name:\tlab\nUmask:\t0022\nState:\tS (sleeping)\nTgid:\t1\nNgid:\t0\nPid:\t1\nPPid:\t0\nTracerPid:\t0\nUid:\t501\t501\t501\t501\nGid:\t20\t20\t20\t20\nFDSize:\t64\nGroups:\t20 \nNStgid:\t1\nNSpid:\t1\nNSpgid:\t1\nNSsid:\t1\nKthread:\t0\nVmPeak:\t 3278188 kB\nVmSize:\t 3170420 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t  274272 kB\nVmRSS:\t  148668 kB\nRssAnon:\t   64936 kB\nRssFile:\t   83732 kB\nRssShmem:\t       0 kB\nVmData:\t  411936 kB\nVmStk:\t     132 kB\nVmExe:\t   10692 kB\nVmLib:\t   95936 kB\nVmPTE:\t     756 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffff\nThreads:\t5\nSigQ:\t0/99998\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000000000000\nSigCgt:\tfffffffd7fc1feff\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t00000000a80425fb\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t2\nSeccomp_filters:\t1\nSpeculation_Store_Bypass:\tvulnerable\nSpeculationIndirectBranch:\tunknown\nCpus_allowed:\t7ff\nCpus_allowed_list:\t0-10\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t212\nnonvoluntary_ctxt_switches:\t281\n"
+              },
+              "/sys/fs/cgroup/cpu.stat": {
+                "raw": "usage_usec 1013046\nuser_usec 892233\nsystem_usec 120813\nnice_usec 0\nnr_periods 11\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n"
+              },
+              "/sys/fs/cgroup/io.stat": {
+                "raw": ""
+              },
+              "/sys/fs/cgroup/memory.current": {
+                "raw": "90144768\n"
+              },
+              "/sys/fs/cgroup/memory.peak": {
+                "raw": "227213312\n"
+              }
+            },
+            "scope": "Raw cumulative process/container counters. Cgroup peaks and totals can include earlier work in this container; unavailable counters are not zero.",
+            "utc_ns": 1795379617772539542
+          },
+          "native_before": {
+            "files": {
+              "/proc/self/io": {
+                "raw": "rchar: 69325\nwchar: 6550\nsyscr: 69\nsyscw: 7\nread_bytes: 0\nwrite_bytes: 0\ncancelled_write_bytes: 0\n"
+              },
+              "/proc/self/status": {
+                "raw": "Name:\tlab\nUmask:\t0022\nState:\tR (running)\nTgid:\t1\nNgid:\t0\nPid:\t1\nPPid:\t0\nTracerPid:\t0\nUid:\t501\t501\t501\t501\nGid:\t20\t20\t20\t20\nFDSize:\t64\nGroups:\t20 \nNStgid:\t1\nNSpid:\t1\nNSpgid:\t1\nNSsid:\t1\nKthread:\t0\nVmPeak:\t 1642660 kB\nVmSize:\t 1642660 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t   33652 kB\nVmRSS:\t   33652 kB\nRssAnon:\t    9920 kB\nRssFile:\t   23732 kB\nRssShmem:\t       0 kB\nVmData:\t  116716 kB\nVmStk:\t     132 kB\nVmExe:\t   10692 kB\nVmLib:\t   49652 kB\nVmPTE:\t     220 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffff\nThreads:\t5\nSigQ:\t0/99998\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000000000000\nSigCgt:\tfffffffd7fc1feff\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t00000000a80425fb\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t2\nSeccomp_filters:\t1\nSpeculation_Store_Bypass:\tvulnerable\nSpeculationIndirectBranch:\tunknown\nCpus_allowed:\t7ff\nCpus_allowed_list:\t0-10\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t18\nnonvoluntary_ctxt_switches:\t5\n"
+              },
+              "/sys/fs/cgroup/cpu.stat": {
+                "raw": "usage_usec 15926\nuser_usec 8431\nsystem_usec 7494\nnice_usec 0\nnr_periods 1\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n"
+              },
+              "/sys/fs/cgroup/io.stat": {
+                "raw": ""
+              },
+              "/sys/fs/cgroup/memory.current": {
+                "raw": "11538432\n"
+              },
+              "/sys/fs/cgroup/memory.peak": {
+                "raw": "11538432\n"
+              }
+            },
+            "scope": "Raw cumulative process/container counters. Cgroup peaks and totals can include earlier work in this container; unavailable counters are not zero.",
+            "utc_ns": 1795379616707013764
+          },
+          "passed": true,
+          "process_cpu": {
+            "system_core_seconds": 0.113111,
+            "user_core_seconds": 0.88312,
+            "utilization_percent_one_core_100": 93.44305656777695
+          },
+          "process_lifetime_peak_rss_bytes": 280854528,
+          "scope": "Application dispatch including engine setup, execution, validation and close, plus counter probes; excludes process startup and report write/fsync. Raw native counters include all engine threads and cgroup cache/kernel charges. Peaks are lifetime values, not deltas. Empty/missing I/O counters are unavailable, not zero; process rchar/wchar are not physical disk bytes. Server resource costs are separate.",
+          "started_ns": 1795379616706938597
+        }
+      ],
+      "evidence": [
+        {
+          "path": "results/current/qualification-20261122/duck-archive/workflow-result.json",
+          "sha256": "9ee5e0e9346748ae0dc90da2a3daa284fd4de4121abad57ccd7fba484cb024a0"
+        },
+        {
+          "path": "results/current/qualification-20261122/duck-archive/invocation.json",
+          "sha256": "38312201171f3dfdf78afd52cabe4accdd489a4cbdf4fa2139be7ee1adad4f29"
+        },
+        {
+          "path": "results/current/qualification-20261122/duck-archive/resources.json",
+          "sha256": "b5fff42db02ccf819be3c6afe0d74dbf3099aa70e02bef9d6f535cb501a2ca58"
+        },
+        {
+          "path": "results/current/qualification-20261122/duck-archive/lab-events-compaction.json",
+          "sha256": "8354dd51a8358ab4bb6adbb47462d19d23766a0e3c868df7ff8b4626f75c67bc"
+        },
+        {
+          "path": "results/current/qualification-20261122/duck-archive/after-compaction.json",
+          "sha256": "d4ec6c42c441b1815c9a17d233459ca4a95be8548e494477ba9d15ccdeaffa92"
+        },
+        {
+          "path": "results/current/qualification-20261122/duck-archive/duck-archive.json",
+          "sha256": "9f60a6a33522f878aa2395624b3ba64b06fb853dcf6087e20640d62e51855406"
+        },
+        {
+          "path": "results/current/qualification-20261122/duck-archive/verify.json",
+          "sha256": "b03edf9a11c9c49feb2688835477a256a4730d89d1f8320631f6abf80e9caf58"
+        },
+        {
+          "path": "results/current/qualification-20261122/duck-archive/compaction-d54e57ed-06b3-4870-8b03-bbf8ba7059ca-resources.json",
+          "sha256": "0c63ff66a29461a88c2edeed1878443c4e09f74c2a9216212afbff7f69a50d78"
+        }
+      ]
+    },
+    "sharded": {
+      "workflow": {
+        "exit_code": 0,
+        "duration_s": 32.342709416057914,
+        "sources_unchanged": true
+      },
+      "controls": {
+        "verify.json": {
+          "amount_cents": 10001000000,
+          "clickhouse": "26.10.10.3",
+          "clickhouse_check_seconds": 0.090071667,
+          "duckdb": "v2.0.1",
+          "duckdb_check_seconds": 0.217820583,
+          "duplicate_ids": 0,
+          "invalid_rows": 0,
+          "missing_ids": 0,
+          "rows": 2000000,
+          "unique_ids": 2000000
+        },
+        "replica-recovery.json": {
+          "duplicate_ids": 0,
+          "missing_ids": 0,
+          "rows": 2100000,
+          "seconds": 2.055236042,
+          "verified_replicas": 9
+        }
+      },
+      "compaction": {
+        "before": {
+          "rows": 2000000,
+          "files": 20,
+          "bytes": 17297191,
+          "snapshot": 1256374075152682315
+        },
+        "after": {
+          "rows": 2000000,
+          "files": 1,
+          "bytes": 6517399,
+          "snapshot": 4679570794310574170
+        },
+        "data_rewrite_seconds": 2.3357812510002987,
+        "retained_snapshot_rows": 2000000
+      },
+      "backend_resources": {
+        "ch11": {
+          "samples": 11,
+          "unavailable_samples": 0,
+          "observed_seconds": 20.39,
+          "cpu_core_seconds": {
+            "total": 2.0383430000000002,
+            "user": 1.338821,
+            "system": 0.699521
+          },
+          "cpu_percent_one_core_100": 9.996777832270721,
+          "charged_memory_bytes_min_mean_max": [
+            269570048,
+            346120936.72727275,
+            411439104
+          ],
+          "lifetime_peak_memory_bytes": 420171776,
+          "allocated_disk_bytes_first_peak_last": [
+            212992,
+            9056256,
+            9056256
+          ],
+          "native_block_io": {
+            "254:0": {
+              "observed_seconds": 20.39,
+              "rbytes": 0,
+              "wbytes": 8642560,
+              "rios": 0,
+              "wios": 330,
+              "rbytes_per_second": 0.0,
+              "wbytes_per_second": 423862.67778322706,
+              "rios_per_second": 0.0,
+              "wios_per_second": 16.184404119666503
+            }
+          },
+          "identity_or_counter_gaps": 0,
+          "memory_stat_bytes_min_mean_max": {
+            "anon": [
+              242937856,
+              293657506.90909094,
+              357945344
+            ],
+            "file": [
+              188416,
+              5561623.2727272725,
+              8790016
+            ],
+            "kernel": [
+              6819840,
+              9472186.181818182,
+              10522624
+            ]
+          },
+          "memory_stat_samples": 11
+        },
+        "ch12": {
+          "samples": 11,
+          "unavailable_samples": 0,
+          "observed_seconds": 20.07,
+          "cpu_core_seconds": {
+            "total": 1.653701,
+            "user": 1.0452270000000001,
+            "system": 0.608473
+          },
+          "cpu_percent_one_core_100": 8.239666168410563,
+          "charged_memory_bytes_min_mean_max": [
+            311844864,
+            359304471.27272725,
+            420511744
+          ],
+          "lifetime_peak_memory_bytes": 427274240,
+          "allocated_disk_bytes_first_peak_last": [
+            229376,
+            9043968,
+            9043968
+          ],
+          "native_block_io": {
+            "254:0": {
+              "observed_seconds": 20.07,
+              "rbytes": 0,
+              "wbytes": 8626176,
+              "rios": 0,
+              "wios": 326,
+              "rbytes_per_second": 0.0,
+              "wbytes_per_second": 429804.4843049327,
+              "rios_per_second": 0.0,
+              "wios_per_second": 16.243148978574986
+            }
+          },
+          "identity_or_counter_gaps": 0,
+          "memory_stat_bytes_min_mean_max": {
+            "anon": [
+              285327360,
+              315010699.6363636,
+              376545280
+            ],
+            "file": [
+              192512,
+              5642053.818181818,
+              8790016
+            ],
+            "kernel": [
+              8056832,
+              9533998.545454545,
+              10506240
+            ]
+          },
+          "memory_stat_samples": 11
+        },
+        "ch13": {
+          "samples": 11,
+          "unavailable_samples": 0,
+          "observed_seconds": 20.55,
+          "cpu_core_seconds": {
+            "total": 1.9200879999999998,
+            "user": 1.263328,
+            "system": 0.65676
+          },
+          "cpu_percent_one_core_100": 9.343493917274937,
+          "charged_memory_bytes_min_mean_max": [
+            254816256,
+            361966498.90909094,
+            420065280
+          ],
+          "lifetime_peak_memory_bytes": 469118976,
+          "allocated_disk_bytes_first_peak_last": [
+            212992,
+            9043968,
+            9043968
+          ],
+          "native_block_io": {
+            "254:0": {
+              "observed_seconds": 20.55,
+              "rbytes": 0,
+              "wbytes": 8630272,
+              "rios": 0,
+              "wios": 326,
+              "rbytes_per_second": 0.0,
+              "wbytes_per_second": 419964.57420924574,
+              "rios_per_second": 0.0,
+              "wios_per_second": 15.863746958637469
+            }
+          },
+          "identity_or_counter_gaps": 0,
+          "memory_stat_bytes_min_mean_max": {
+            "anon": [
+              237150208,
+              296770094.54545456,
+              357142528
+            ],
+            "file": [
+              192512,
+              5300224,
+              8794112
+            ],
+            "kernel": [
+              6549504,
+              9242810.181818182,
+              10567680
+            ]
+          },
+          "memory_stat_samples": 11
+        },
+        "ch21": {
+          "samples": 9,
+          "unavailable_samples": 2,
+          "observed_seconds": 13.59,
+          "cpu_core_seconds": {
+            "total": 1.369934,
+            "user": 0.843689,
+            "system": 0.526244
+          },
+          "cpu_percent_one_core_100": 10.080456217807212,
+          "charged_memory_bytes_min_mean_max": [
+            13787136,
+            213076650.66666666,
+            307908608
+          ],
+          "lifetime_peak_memory_bytes": 378679296,
+          "allocated_disk_bytes_first_peak_last": [
+            229376,
+            6967296,
+            6967296
+          ],
+          "native_block_io": {
+            "254:0": {
+              "observed_seconds": 11.79,
+              "rbytes": 0,
+              "wbytes": 6152192,
+              "rios": 0,
+              "wios": 111,
+              "rbytes_per_second": 0.0,
+              "wbytes_per_second": 521814.41899915185,
+              "rios_per_second": 0.0,
+              "wios_per_second": 9.414758269720103
+            }
+          },
+          "identity_or_counter_gaps": 1,
+          "memory_stat_bytes_min_mean_max": {
+            "anon": [
+              13594624,
+              189571982.2222222,
+              271556608
+            ],
+            "file": [
+              8192,
+              1852302.2222222222,
+              3813376
+            ],
+            "kernel": [
+              1564672,
+              7459726.222222222,
+              9121792
+            ]
+          },
+          "memory_stat_samples": 9
+        },
+        "ch22": {
+          "samples": 11,
+          "unavailable_samples": 0,
+          "observed_seconds": 20.2,
+          "cpu_core_seconds": {
+            "total": 1.6987770000000002,
+            "user": 1.0787169999999997,
+            "system": 0.6200600000000001
+          },
+          "cpu_percent_one_core_100": 8.409787128712873,
+          "charged_memory_bytes_min_mean_max": [
+            298012672,
+            378811112.72727275,
+            445231104
+          ],
+          "lifetime_peak_memory_bytes": 462159872,
+          "allocated_disk_bytes_first_peak_last": [
+            229376,
+            8908800,
+            8908800
+          ],
+          "native_block_io": {
+            "254:0": {
+              "observed_seconds": 20.2,
+              "rbytes": 0,
+              "wbytes": 8491008,
+              "rios": 0,
+              "wios": 327,
+              "rbytes_per_second": 0.0,
+              "wbytes_per_second": 420346.9306930693,
+              "rios_per_second": 0.0,
+              "wios_per_second": 16.18811881188119
+            }
+          },
+          "identity_or_counter_gaps": 0,
+          "memory_stat_bytes_min_mean_max": {
+            "anon": [
+              266997760,
+              295103767.27272725,
+              349523968
+            ],
+            "file": [
+              192512,
+              5515822.545454546,
+              8634368
+            ],
+            "kernel": [
+              7598080,
+              9481122.909090908,
+              11096064
+            ]
+          },
+          "memory_stat_samples": 11
+        },
+        "ch23": {
+          "samples": 11,
+          "unavailable_samples": 0,
+          "observed_seconds": 20.299999999999997,
+          "cpu_core_seconds": {
+            "total": 1.951975,
+            "user": 1.3159669999999999,
+            "system": 0.636007
+          },
+          "cpu_percent_one_core_100": 9.615640394088672,
+          "charged_memory_bytes_min_mean_max": [
+            294428672,
+            358666984.72727275,
+            395235328
+          ],
+          "lifetime_peak_memory_bytes": 462503936,
+          "allocated_disk_bytes_first_peak_last": [
+            229376,
+            8916992,
+            8916992
+          ],
+          "native_block_io": {
+            "254:0": {
+              "observed_seconds": 20.299999999999997,
+              "rbytes": 0,
+              "wbytes": 8499200,
+              "rios": 0,
+              "wios": 326,
+              "rbytes_per_second": 0.0,
+              "wbytes_per_second": 418679.8029556651,
+              "rios_per_second": 0.0,
+              "wios_per_second": 16.059113300492612
+            }
+          },
+          "identity_or_counter_gaps": 0,
+          "memory_stat_bytes_min_mean_max": {
+            "anon": [
+              270450688,
+              294489739.6363636,
+              309420032
+            ],
+            "file": [
+              192512,
+              5471138.909090909,
+              8654848
+            ],
+            "kernel": [
+              7319552,
+              9507933.090909092,
+              10661888
+            ]
+          },
+          "memory_stat_samples": 11
+        },
+        "ch31": {
+          "samples": 11,
+          "unavailable_samples": 0,
+          "observed_seconds": 20.28,
+          "cpu_core_seconds": {
+            "total": 1.686068,
+            "user": 1.0663939999999998,
+            "system": 0.619673
+          },
+          "cpu_percent_one_core_100": 8.31394477317554,
+          "charged_memory_bytes_min_mean_max": [
+            274235392,
+            355733876.3636364,
+            410628096
+          ],
+          "lifetime_peak_memory_bytes": 451252224,
+          "allocated_disk_bytes_first_peak_last": [
+            229376,
+            9125888,
+            9125888
+          ],
+          "native_block_io": {
+            "254:0": {
+              "observed_seconds": 20.28,
+              "rbytes": 0,
+              "wbytes": 8728576,
+              "rios": 0,
+              "wios": 336,
+              "rbytes_per_second": 0.0,
+              "wbytes_per_second": 430403.1558185404,
+              "rios_per_second": 0.0,
+              "wios_per_second": 16.568047337278106
+            }
+          },
+          "identity_or_counter_gaps": 0,
+          "memory_stat_bytes_min_mean_max": {
+            "anon": [
+              249999360,
+              276562292.3636364,
+              292073472
+            ],
+            "file": [
+              192512,
+              5716526.545454546,
+              8929280
+            ],
+            "kernel": [
+              7946240,
+              9453195.636363637,
+              10285056
+            ]
+          },
+          "memory_stat_samples": 11
+        },
+        "ch32": {
+          "samples": 11,
+          "unavailable_samples": 0,
+          "observed_seconds": 19.989999999999995,
+          "cpu_core_seconds": {
+            "total": 1.824526,
+            "user": 1.136567,
+            "system": 0.687959
+          },
+          "cpu_percent_one_core_100": 9.127193596798403,
+          "charged_memory_bytes_min_mean_max": [
+            296349696,
+            351026082.90909094,
+            425934848
+          ],
+          "lifetime_peak_memory_bytes": 429387776,
+          "allocated_disk_bytes_first_peak_last": [
+            229376,
+            9068544,
+            9068544
+          ],
+          "native_block_io": {
+            "254:0": {
+              "observed_seconds": 19.989999999999995,
+              "rbytes": 0,
+              "wbytes": 8765440,
+              "rios": 0,
+              "wios": 326,
+              "rbytes_per_second": 0.0,
+              "wbytes_per_second": 438491.2456228115,
+              "rios_per_second": 0.0,
+              "wios_per_second": 16.308154077038523
+            }
+          },
+          "identity_or_counter_gaps": 0,
+          "memory_stat_bytes_min_mean_max": {
+            "anon": [
+              269012992,
+              295102650.1818182,
+              368599040
+            ],
+            "file": [
+              192512,
+              5629765.818181818,
+              8839168
+            ],
+            "kernel": [
+              7974912,
+              9531019.636363637,
+              10506240
+            ]
+          },
+          "memory_stat_samples": 11
+        },
+        "ch33": {
+          "samples": 11,
+          "unavailable_samples": 0,
+          "observed_seconds": 20.009999999999998,
+          "cpu_core_seconds": {
+            "total": 1.686028,
+            "user": 1.076142,
+            "system": 0.609886
+          },
+          "cpu_percent_one_core_100": 8.42592703648176,
+          "charged_memory_bytes_min_mean_max": [
+            298467328,
+            339759104,
+            390283264
+          ],
+          "lifetime_peak_memory_bytes": 423649280,
+          "allocated_disk_bytes_first_peak_last": [
+            229376,
+            9060352,
+            9060352
+          ],
+          "native_block_io": {
+            "254:0": {
+              "observed_seconds": 20.009999999999998,
+              "rbytes": 0,
+              "wbytes": 8642560,
+              "rios": 0,
+              "wios": 324,
+              "rbytes_per_second": 0.0,
+              "wbytes_per_second": 431912.04397801106,
+              "rios_per_second": 0.0,
+              "wios_per_second": 16.191904047976013
+            }
+          },
+          "identity_or_counter_gaps": 0,
+          "memory_stat_bytes_min_mean_max": {
+            "anon": [
+              266272768,
+              289463575.27272725,
+              328130560
+            ],
+            "file": [
+              192512,
+              5668119.2727272725,
+              8830976
+            ],
+            "kernel": [
+              7991296,
+              9473303.272727273,
+              10379264
+            ]
+          },
+          "memory_stat_samples": 11
+        },
+        "clickhouse": {
+          "samples": 22,
+          "unavailable_samples": 0,
+          "observed_seconds": 34.81,
+          "cpu_core_seconds": {
+            "total": 7.222002000000001,
+            "user": 4.051679999999999,
+            "system": 3.170322
+          },
+          "cpu_percent_one_core_100": 20.746917552427462,
+          "charged_memory_bytes_min_mean_max": [
+            1400279040,
+            1410220962.909091,
+            1441968128
+          ],
+          "lifetime_peak_memory_bytes": 1611399168,
+          "allocated_disk_bytes_first_peak_last": [
+            434814976,
+            445534208,
+            445534208
+          ],
+          "native_block_io": {
+            "254:16": {
+              "observed_seconds": 34.81,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0,
+              "rbytes_per_second": 0.0,
+              "wbytes_per_second": 0.0,
+              "rios_per_second": 0.0,
+              "wios_per_second": 0.0
+            },
+            "254:0": {
+              "observed_seconds": 34.81,
+              "rbytes": 0,
+              "wbytes": 10756096,
+              "rios": 0,
+              "wios": 805,
+              "rbytes_per_second": 0.0,
+              "wbytes_per_second": 308994.426888825,
+              "rios_per_second": 0.0,
+              "wios_per_second": 23.12553863832232
+            }
+          },
+          "identity_or_counter_gaps": 0,
+          "memory_stat_bytes_min_mean_max": {
+            "anon": [
+              632320000,
+              638498257.4545455,
+              671281152
+            ],
+            "file": [
+              449961984,
+              453975877.8181818,
+              460480512
+            ],
+            "kernel": [
+              148611072,
+              149276858.1818182,
+              150159360
+            ]
+          },
+          "memory_stat_samples": 22
+        },
+        "keeper1": {
+          "samples": 12,
+          "unavailable_samples": 0,
+          "observed_seconds": 21.91,
+          "cpu_core_seconds": {
+            "total": 0.9123160000000001,
+            "user": 0.35156299999999996,
+            "system": 0.5607519999999999
+          },
+          "cpu_percent_one_core_100": 4.163925148334094,
+          "charged_memory_bytes_min_mean_max": [
+            193851392,
+            216880469.33333334,
+            223576064
+          ],
+          "lifetime_peak_memory_bytes": 251273216,
+          "allocated_disk_bytes_first_peak_last": [
+            20480,
+            104894464,
+            104894464
+          ],
+          "native_block_io": {
+            "254:0": {
+              "observed_seconds": 21.91,
+              "rbytes": 0,
+              "wbytes": 1806336,
+              "rios": 0,
+              "wios": 444,
+              "rbytes_per_second": 0.0,
+              "wbytes_per_second": 82443.45047923323,
+              "rios_per_second": 0.0,
+              "wios_per_second": 20.264719306252854
+            }
+          },
+          "identity_or_counter_gaps": 0,
+          "memory_stat_bytes_min_mean_max": {
+            "anon": [
+              182218752,
+              197968213.33333334,
+              201371648
+            ],
+            "file": [
+              12288,
+              140288,
+              217088
+            ],
+            "kernel": [
+              3629056,
+              4519936,
+              4747264
+            ]
+          },
+          "memory_stat_samples": 12
+        },
+        "keeper2": {
+          "samples": 10,
+          "unavailable_samples": 1,
+          "observed_seconds": 18.16,
+          "cpu_core_seconds": {
+            "total": 0.661377,
+            "user": 0.25184100000000004,
+            "system": 0.40953599999999996
+          },
+          "cpu_percent_one_core_100": 3.641943832599119,
+          "charged_memory_bytes_min_mean_max": [
+            222003200,
+            223868928,
+            224911360
+          ],
+          "lifetime_peak_memory_bytes": 254734336,
+          "allocated_disk_bytes_first_peak_last": [
+            104894464,
+            104894464,
+            104894464
+          ],
+          "native_block_io": {
+            "254:0": {
+              "observed_seconds": 18.16,
+              "rbytes": 0,
+              "wbytes": 1474560,
+              "rios": 0,
+              "wios": 365,
+              "rbytes_per_second": 0.0,
+              "wbytes_per_second": 81198.23788546256,
+              "rios_per_second": 0.0,
+              "wios_per_second": 20.099118942731277
+            }
+          },
+          "identity_or_counter_gaps": 0,
+          "memory_stat_bytes_min_mean_max": {
+            "anon": [
+              203145216,
+              203431936,
+              204230656
+            ],
+            "file": [
+              45056,
+              151552,
+              217088
+            ],
+            "kernel": [
+              4505600,
+              4623564.8,
+              4714496
+            ]
+          },
+          "memory_stat_samples": 10
+        },
+        "keeper3": {
+          "samples": 10,
+          "unavailable_samples": 1,
+          "observed_seconds": 18.150000000000002,
+          "cpu_core_seconds": {
+            "total": 0.704579,
+            "user": 0.252417,
+            "system": 0.45216199999999995
+          },
+          "cpu_percent_one_core_100": 3.881977961432506,
+          "charged_memory_bytes_min_mean_max": [
+            206057472,
+            208597401.6,
+            210419712
+          ],
+          "lifetime_peak_memory_bytes": 238305280,
+          "allocated_disk_bytes_first_peak_last": [
+            104894464,
+            104894464,
+            104894464
+          ],
+          "native_block_io": {
+            "254:0": {
+              "observed_seconds": 18.150000000000002,
+              "rbytes": 0,
+              "wbytes": 1413120,
+              "rios": 0,
+              "wios": 349,
+              "rbytes_per_second": 0.0,
+              "wbytes_per_second": 77857.85123966941,
+              "rios_per_second": 0.0,
+              "wios_per_second": 19.228650137741045
+            }
+          },
+          "identity_or_counter_gaps": 0,
+          "memory_stat_bytes_min_mean_max": {
+            "anon": [
+              192823296,
+              194199961.6,
+              195641344
+            ],
+            "file": [
+              45056,
+              151552,
+              217088
+            ],
+            "kernel": [
+              4513792,
+              4597760,
+              4632576
+            ]
+          },
+          "memory_stat_samples": 10
+        },
+        "storage": {
+          "samples": 22,
+          "unavailable_samples": 0,
+          "observed_seconds": 34.71999999999999,
+          "cpu_core_seconds": {
+            "total": 0.7480789999999998,
+            "user": 0.47356300000000007,
+            "system": 0.274517
+          },
+          "cpu_percent_one_core_100": 2.154605414746544,
+          "charged_memory_bytes_min_mean_max": [
+            874024960,
+            953258914.9090909,
+            999677952
+          ],
+          "lifetime_peak_memory_bytes": 1077964800,
+          "allocated_disk_bytes_first_peak_last": [
+            1633030144,
+            1640787968,
+            1640787968
+          ],
+          "native_block_io": {
+            "254:0": {
+              "observed_seconds": 34.71999999999999,
+              "rbytes": 0,
+              "wbytes": 25694208,
+              "rios": 0,
+              "wios": 71,
+              "rbytes_per_second": 0.0,
+              "wbytes_per_second": 740040.5529953919,
+              "rios_per_second": 0.0,
+              "wios_per_second": 2.0449308755760374
+            }
+          },
+          "identity_or_counter_gaps": 0,
+          "memory_stat_bytes_min_mean_max": {
+            "anon": [
+              429801472,
+              503171816.72727275,
+              546013184
+            ],
+            "file": [
+              170090496,
+              175009978.1818182,
+              177848320
+            ],
+            "kernel": [
+              16072704,
+              16411554.909090908,
+              16826368
+            ]
+          },
+          "memory_stat_samples": 22
+        }
+      },
+      "compactor_resources": {
+        "samples": 12,
+        "clock_ticks_per_second": 100,
+        "container": {
+          "observed_seconds": 7.484159337,
+          "cpu_core_seconds": 13.36631,
+          "cpu_percent_one_core_100": 178.594674406783,
+          "cpu_counter_resolution_seconds": 1e-06,
+          "cpu_utilization_min_interval_seconds": 0.0,
+          "cpu_short_intervals_suppressed": 0,
+          "cpu_interval_percent_min_mean_max": {
+            "min": 75.24512546643074,
+            "mean": 169.78056917861701,
+            "max": 192.5272126914992
+          },
+          "sampled_memory_bytes_min_mean_max": {
+            "min": 167485440,
+            "mean": 471591253.3333333,
+            "max": 715218944
+          },
+          "lifetime_peak_memory_bytes": 718901248,
+          "generations": [],
+          "io": {
+            "254:0": {
+              "observed_seconds": 7.484159337,
+              "counters": {
+                "rbytes": 0,
+                "wbytes": 6828032,
+                "rios": 0,
+                "wios": 33
+              },
+              "per_second": {
+                "rbytes": 0.0,
+                "wbytes": 912331.190791696,
+                "rios": 0.0,
+                "wios": 4.409312858540494
+              }
+            }
+          },
+          "identity_or_counter_gaps": 0
+        },
+        "python": {
+          "observed_seconds": 7.484159337,
+          "cpu_core_seconds": 0.37,
+          "cpu_percent_one_core_100": 4.943775023212069,
+          "cpu_counter_resolution_seconds": 0.01,
+          "cpu_utilization_min_interval_seconds": 0.1,
+          "cpu_short_intervals_suppressed": 2,
+          "cpu_interval_percent_min_mean_max": {
+            "min": 0.0,
+            "mean": 3.995292005021364,
+            "max": 32.967463849480055
+          },
+          "sampled_memory_bytes_min_mean_max": {
+            "min": 17371136,
+            "mean": 38853290.666666664,
+            "max": 43634688
+          },
+          "lifetime_peak_memory_bytes": 43778048,
+          "generations": [
+            {
+              "pid": 53,
+              "start_ticks": 1731665
+            }
+          ],
+          "io": {
+            "process": {
+              "observed_seconds": 7.484159337,
+              "counters": {
+                "rchar": 3383134,
+                "wchar": 55246,
+                "syscr": 794,
+                "syscw": 12,
+                "read_bytes": 0,
+                "write_bytes": 55246,
+                "cancelled_write_bytes": 0
+              },
+              "per_second": {
+                "rchar": 452039.2802535011,
+                "wchar": 7381.7241873614585,
+                "syscr": 106.09073968730765,
+                "syscw": 1.603386494014725,
+                "read_bytes": 0.0,
+                "write_bytes": 7381.7241873614585,
+                "cancelled_write_bytes": 0.0
+              }
+            }
+          },
+          "identity_or_counter_gaps": 0
+        },
+        "jvm": {
+          "observed_seconds": 7.483381878,
+          "cpu_core_seconds": 12.99,
+          "cpu_percent_one_core_100": 173.58462005244735,
+          "cpu_counter_resolution_seconds": 0.01,
+          "cpu_utilization_min_interval_seconds": 0.1,
+          "cpu_short_intervals_suppressed": 1,
+          "cpu_interval_percent_min_mean_max": {
+            "min": 131.86985539792025,
+            "mean": 175.27614688843508,
+            "max": 192.6203291511356
+          },
+          "sampled_memory_bytes_min_mean_max": {
+            "min": 172670976,
+            "mean": 479230882.90909094,
+            "max": 689745920
+          },
+          "lifetime_peak_memory_bytes": 693022720,
+          "generations": [
+            {
+              "pid": 1,
+              "start_ticks": 1731581
+            }
+          ],
+          "io": {
+            "process": {
+              "observed_seconds": 7.483381878,
+              "counters": {
+                "rchar": 73000397,
+                "wchar": 14032384,
+                "syscr": 34752,
+                "syscw": 2846,
+                "read_bytes": 0,
+                "write_bytes": 7217152,
+                "cancelled_write_bytes": 86016
+              },
+              "per_second": {
+                "rchar": 9755000.906022185,
+                "wchar": 1875139.3726482228,
+                "syscr": 4643.8896967379915,
+                "syscw": 380.3093369278408,
+                "read_bytes": 0.0,
+                "write_bytes": 964423.8551045116,
+                "cancelled_write_bytes": 11494.268420655359
+              }
+            }
+          },
+          "identity_or_counter_gaps": 0
+        }
+      },
+      "tool_resources": [
+        {
+          "duration_ns": 3410882918,
+          "ended_ns": 1795379218248888260,
+          "error": "",
+          "mode": "native",
+          "native_after": {
+            "files": {
+              "/proc/self/io": {
+                "raw": "rchar: 238799\nwchar: 41037\nsyscr: 685\nsyscw: 214\nread_bytes: 0\nwrite_bytes: 2610\ncancelled_write_bytes: 0\n"
+              },
+              "/proc/self/status": {
+                "raw": "Name:\tlab\nUmask:\t0022\nState:\tS (sleeping)\nTgid:\t1\nNgid:\t0\nPid:\t1\nPPid:\t0\nTracerPid:\t0\nUid:\t501\t501\t501\t501\nGid:\t20\t20\t20\t20\nFDSize:\t64\nGroups:\t20 \nNStgid:\t1\nNSpid:\t1\nNSpgid:\t1\nNSsid:\t1\nKthread:\t0\nVmPeak:\t 1709108 kB\nVmSize:\t 1709108 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t   36596 kB\nVmRSS:\t   36596 kB\nRssAnon:\t   11012 kB\nRssFile:\t   25584 kB\nRssShmem:\t       0 kB\nVmData:\t  117628 kB\nVmStk:\t     132 kB\nVmExe:\t   10692 kB\nVmLib:\t   49652 kB\nVmPTE:\t     240 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffff\nThreads:\t5\nSigQ:\t0/99998\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000000000000\nSigCgt:\tfffffffd7fc1feff\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t00000000a80425fb\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t2\nSeccomp_filters:\t1\nSpeculation_Store_Bypass:\tvulnerable\nSpeculationIndirectBranch:\tunknown\nCpus_allowed:\t7ff\nCpus_allowed_list:\t0-10\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t209\nnonvoluntary_ctxt_switches:\t22\n"
+              },
+              "/sys/fs/cgroup/cpu.stat": {
+                "raw": "usage_usec 45742\nuser_usec 24725\nsystem_usec 21016\nnice_usec 0\nnr_periods 23\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n"
+              },
+              "/sys/fs/cgroup/io.stat": {
+                "raw": ""
+              },
+              "/sys/fs/cgroup/memory.current": {
+                "raw": "12402688\n"
+              },
+              "/sys/fs/cgroup/memory.peak": {
+                "raw": "13099008\n"
+              }
+            },
+            "scope": "Raw cumulative process/container counters. Cgroup peaks and totals can include earlier work in this container; unavailable counters are not zero.",
+            "utc_ns": 1795379218248887135
+          },
+          "native_before": {
+            "files": {
+              "/proc/self/io": {
+                "raw": "rchar: 88311\nwchar: 6550\nsyscr: 76\nsyscw: 7\nread_bytes: 0\nwrite_bytes: 0\ncancelled_write_bytes: 0\n"
+              },
+              "/proc/self/status": {
+                "raw": "Name:\tlab\nUmask:\t0022\nState:\tR (running)\nTgid:\t1\nNgid:\t0\nPid:\t1\nPPid:\t0\nTracerPid:\t0\nUid:\t501\t501\t501\t501\nGid:\t20\t20\t20\t20\nFDSize:\t64\nGroups:\t20 \nNStgid:\t1\nNSpid:\t1\nNSpgid:\t1\nNSsid:\t1\nKthread:\t0\nVmPeak:\t 1708524 kB\nVmSize:\t 1708524 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t   33668 kB\nVmRSS:\t   33668 kB\nRssAnon:\t    9936 kB\nRssFile:\t   23732 kB\nRssShmem:\t       0 kB\nVmData:\t  117044 kB\nVmStk:\t     132 kB\nVmExe:\t   10692 kB\nVmLib:\t   49652 kB\nVmPTE:\t     220 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffff\nThreads:\t5\nSigQ:\t0/99998\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000000000000\nSigCgt:\tfffffffd7fc1feff\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t00000000a80425fb\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t2\nSeccomp_filters:\t1\nSpeculation_Store_Bypass:\tvulnerable\nSpeculationIndirectBranch:\tunknown\nCpus_allowed:\t7ff\nCpus_allowed_list:\t0-10\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t20\nnonvoluntary_ctxt_switches:\t11\n"
+              },
+              "/sys/fs/cgroup/cpu.stat": {
+                "raw": "usage_usec 15181\nuser_usec 8675\nsystem_usec 6506\nnice_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n"
+              },
+              "/sys/fs/cgroup/io.stat": {
+                "raw": ""
+              },
+              "/sys/fs/cgroup/memory.current": {
+                "raw": "11317248\n"
+              },
+              "/sys/fs/cgroup/memory.peak": {
+                "raw": "11788288\n"
+              }
+            },
+            "scope": "Raw cumulative process/container counters. Cgroup peaks and totals can include earlier work in this container; unavailable counters are not zero.",
+            "utc_ns": 1795379214838099716
+          },
+          "passed": true,
+          "process_cpu": {
+            "system_core_seconds": 0.014231,
+            "user_core_seconds": 0.01574,
+            "utilization_percent_one_core_100": 0.8786874460520547
+          },
+          "process_lifetime_peak_rss_bytes": 36827136,
+          "scope": "Application dispatch including engine setup, execution, validation and close, plus counter probes; excludes process startup and report write/fsync. Raw native counters include all engine threads and cgroup cache/kernel charges. Peaks are lifetime values, not deltas. Empty/missing I/O counters are unavailable, not zero; process rchar/wchar are not physical disk bytes. Server resource costs are separate.",
+          "started_ns": 1795379214838005216
+        },
+        {
+          "duration_ns": 840664208,
+          "ended_ns": 1795379199719405501,
+          "error": "",
+          "mode": "load",
+          "native_after": {
+            "files": {
+              "/proc/self/io": {
+                "raw": "rchar: 84256601\nwchar: 8446\nsyscr: 10953\nsyscw: 52\nread_bytes: 0\nwrite_bytes: 1268\ncancelled_write_bytes: 0\n"
+              },
+              "/proc/self/status": {
+                "raw": "Name:\tlab\nUmask:\t0022\nState:\tS (sleeping)\nTgid:\t1\nNgid:\t0\nPid:\t1\nPPid:\t0\nTracerPid:\t0\nUid:\t501\t501\t501\t501\nGid:\t20\t20\t20\t20\nFDSize:\t64\nGroups:\t20 \nNStgid:\t1\nNSpid:\t1\nNSpgid:\t1\nNSsid:\t1\nKthread:\t0\nVmPeak:\t 2666336 kB\nVmSize:\t 2591500 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t  179944 kB\nVmRSS:\t  141472 kB\nRssAnon:\t   62376 kB\nRssFile:\t   79096 kB\nRssShmem:\t       0 kB\nVmData:\t  288276 kB\nVmStk:\t     132 kB\nVmExe:\t   10692 kB\nVmLib:\t   95936 kB\nVmPTE:\t     648 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffff\nThreads:\t6\nSigQ:\t0/99998\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000000000000\nSigCgt:\tfffffffd7fc1feff\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t00000000a80425fb\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t2\nSeccomp_filters:\t1\nSpeculation_Store_Bypass:\tvulnerable\nSpeculationIndirectBranch:\tunknown\nCpus_allowed:\t7ff\nCpus_allowed_list:\t0-10\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t43\nnonvoluntary_ctxt_switches:\t0\n"
+              },
+              "/sys/fs/cgroup/cpu.stat": {
+                "raw": "usage_usec 514740\nuser_usec 426641\nsystem_usec 88099\nnice_usec 0\nnr_periods 9\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n"
+              },
+              "/sys/fs/cgroup/io.stat": {
+                "raw": ""
+              },
+              "/sys/fs/cgroup/memory.current": {
+                "raw": "76275712\n"
+              },
+              "/sys/fs/cgroup/memory.peak": {
+                "raw": "107917312\n"
+              }
+            },
+            "scope": "Raw cumulative process/container counters. Cgroup peaks and totals can include earlier work in this container; unavailable counters are not zero.",
+            "utc_ns": 1795379199719404959
+          },
+          "native_before": {
+            "files": {
+              "/proc/self/io": {
+                "raw": "rchar: 69322\nwchar: 6550\nsyscr: 70\nsyscw: 7\nread_bytes: 0\nwrite_bytes: 0\ncancelled_write_bytes: 0\n"
+              },
+              "/proc/self/status": {
+                "raw": "Name:\tlab\nUmask:\t0022\nState:\tR (running)\nTgid:\t1\nNgid:\t0\nPid:\t1\nPPid:\t0\nTracerPid:\t0\nUid:\t501\t501\t501\t501\nGid:\t20\t20\t20\t20\nFDSize:\t64\nGroups:\t20 \nNStgid:\t1\nNSpid:\t1\nNSpgid:\t1\nNSsid:\t1\nKthread:\t0\nVmPeak:\t 1708196 kB\nVmSize:\t 1642660 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t   33660 kB\nVmRSS:\t   33660 kB\nRssAnon:\t    9928 kB\nRssFile:\t   23732 kB\nRssShmem:\t       0 kB\nVmData:\t  116716 kB\nVmStk:\t     132 kB\nVmExe:\t   10692 kB\nVmLib:\t   49652 kB\nVmPTE:\t     220 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffff\nThreads:\t5\nSigQ:\t0/99998\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000000000000\nSigCgt:\tfffffffd7fc1feff\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t00000000a80425fb\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t2\nSeccomp_filters:\t1\nSpeculation_Store_Bypass:\tvulnerable\nSpeculationIndirectBranch:\tunknown\nCpus_allowed:\t7ff\nCpus_allowed_list:\t0-10\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t18\nnonvoluntary_ctxt_switches:\t0\n"
+              },
+              "/sys/fs/cgroup/cpu.stat": {
+                "raw": "usage_usec 22001\nuser_usec 15715\nsystem_usec 6286\nnice_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n"
+              },
+              "/sys/fs/cgroup/io.stat": {
+                "raw": ""
+              },
+              "/sys/fs/cgroup/memory.current": {
+                "raw": "12070912\n"
+              },
+              "/sys/fs/cgroup/memory.peak": {
+                "raw": "12075008\n"
+              }
+            },
+            "scope": "Raw cumulative process/container counters. Cgroup peaks and totals can include earlier work in this container; unavailable counters are not zero.",
+            "utc_ns": 1795379198878846167
+          },
+          "passed": true,
+          "process_cpu": {
+            "system_core_seconds": 0.081826,
+            "user_core_seconds": 0.410422,
+            "utilization_percent_one_core_100": 58.55465182359709
+          },
+          "process_lifetime_peak_rss_bytes": 184262656,
+          "scope": "Application dispatch including engine setup, execution, validation and close, plus counter probes; excludes process startup and report write/fsync. Raw native counters include all engine threads and cgroup cache/kernel charges. Peaks are lifetime values, not deltas. Empty/missing I/O counters are unavailable, not zero; process rchar/wchar are not physical disk bytes. Server resource costs are separate.",
+          "started_ns": 1795379198878741292
+        },
+        {
+          "duration_ns": 464451250,
+          "ended_ns": 1795379213853010341,
+          "error": "",
+          "mode": "verify",
+          "native_after": {
+            "files": {
+              "/proc/self/io": {
+                "raw": "rchar: 84285254\nwchar: 8641\nsyscr: 10517\nsyscw: 23\nread_bytes: 0\nwrite_bytes: 275\ncancelled_write_bytes: 0\n"
+              },
+              "/proc/self/status": {
+                "raw": "Name:\tlab\nUmask:\t0022\nState:\tS (sleeping)\nTgid:\t1\nNgid:\t0\nPid:\t1\nPPid:\t0\nTracerPid:\t0\nUid:\t501\t501\t501\t501\nGid:\t20\t20\t20\t20\nFDSize:\t64\nGroups:\t20 \nNStgid:\t1\nNSpid:\t1\nNSpgid:\t1\nNSsid:\t1\nKthread:\t0\nVmPeak:\t 2829608 kB\nVmSize:\t 2753964 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t  181836 kB\nVmRSS:\t   90304 kB\nRssAnon:\t   12636 kB\nRssFile:\t   77668 kB\nRssShmem:\t       0 kB\nVmData:\t  317560 kB\nVmStk:\t     132 kB\nVmExe:\t   10692 kB\nVmLib:\t   95936 kB\nVmPTE:\t     664 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffff\nThreads:\t6\nSigQ:\t0/99998\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000000000000\nSigCgt:\tfffffffd7fc1feff\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t00000000a80425fb\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t2\nSeccomp_filters:\t1\nSpeculation_Store_Bypass:\tvulnerable\nSpeculationIndirectBranch:\tunknown\nCpus_allowed:\t7ff\nCpus_allowed_list:\t0-10\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t34\nnonvoluntary_ctxt_switches:\t112\n"
+              },
+              "/sys/fs/cgroup/cpu.stat": {
+                "raw": "usage_usec 496097\nuser_usec 388509\nsystem_usec 107587\nnice_usec 0\nnr_periods 5\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n"
+              },
+              "/sys/fs/cgroup/io.stat": {
+                "raw": ""
+              },
+              "/sys/fs/cgroup/memory.current": {
+                "raw": "15372288\n"
+              },
+              "/sys/fs/cgroup/memory.peak": {
+                "raw": "109924352\n"
+              }
+            },
+            "scope": "Raw cumulative process/container counters. Cgroup peaks and totals can include earlier work in this container; unavailable counters are not zero.",
+            "utc_ns": 1795379213853009591
+          },
+          "native_before": {
+            "files": {
+              "/proc/self/io": {
+                "raw": "rchar: 88309\nwchar: 6550\nsyscr: 76\nsyscw: 7\nread_bytes: 0\nwrite_bytes: 0\ncancelled_write_bytes: 0\n"
+              },
+              "/proc/self/status": {
+                "raw": "Name:\tlab\nUmask:\t0022\nState:\tR (running)\nTgid:\t1\nNgid:\t0\nPid:\t1\nPPid:\t0\nTracerPid:\t0\nUid:\t501\t501\t501\t501\nGid:\t20\t20\t20\t20\nFDSize:\t64\nGroups:\t20 \nNStgid:\t1\nNSpid:\t1\nNSpgid:\t1\nNSsid:\t1\nKthread:\t0\nVmPeak:\t 1708524 kB\nVmSize:\t 1708524 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t   26564 kB\nVmRSS:\t   26564 kB\nRssAnon:\t    2836 kB\nRssFile:\t   23728 kB\nRssShmem:\t       0 kB\nVmData:\t  117044 kB\nVmStk:\t     132 kB\nVmExe:\t   10692 kB\nVmLib:\t   49652 kB\nVmPTE:\t     228 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffff\nThreads:\t5\nSigQ:\t0/99998\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000000000000\nSigCgt:\tfffffffd7fc1feff\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t00000000a80425fb\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t2\nSeccomp_filters:\t1\nSpeculation_Store_Bypass:\tvulnerable\nSpeculationIndirectBranch:\tunknown\nCpus_allowed:\t7ff\nCpus_allowed_list:\t0-10\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t15\nnonvoluntary_ctxt_switches:\t14\n"
+              },
+              "/sys/fs/cgroup/cpu.stat": {
+                "raw": "usage_usec 17875\nuser_usec 8043\nsystem_usec 9831\nnice_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n"
+              },
+              "/sys/fs/cgroup/io.stat": {
+                "raw": ""
+              },
+              "/sys/fs/cgroup/memory.current": {
+                "raw": "4640768\n"
+              },
+              "/sys/fs/cgroup/memory.peak": {
+                "raw": "4640768\n"
+              }
+            },
+            "scope": "Raw cumulative process/container counters. Cgroup peaks and totals can include earlier work in this container; unavailable counters are not zero.",
+            "utc_ns": 1795379213388635091
+          },
+          "passed": true,
+          "process_cpu": {
+            "system_core_seconds": 0.09768,
+            "user_core_seconds": 0.380247,
+            "utilization_percent_one_core_100": 102.90143475768447
+          },
+          "process_lifetime_peak_rss_bytes": 186200064,
+          "scope": "Application dispatch including engine setup, execution, validation and close, plus counter probes; excludes process startup and report write/fsync. Raw native counters include all engine threads and cgroup cache/kernel charges. Peaks are lifetime values, not deltas. Empty/missing I/O counters are unavailable, not zero; process rchar/wchar are not physical disk bytes. Server resource costs are separate.",
+          "started_ns": 1795379213388559049
+        },
+        {
+          "duration_ns": 2350131127,
+          "ended_ns": 1795379224345405013,
+          "error": "",
+          "mode": "native-stage",
+          "native_after": {
+            "files": {
+              "/proc/self/io": {
+                "raw": "rchar: 213035\nwchar: 37165\nsyscr: 619\nsyscw: 195\nread_bytes: 0\nwrite_bytes: 2365\ncancelled_write_bytes: 0\n"
+              },
+              "/proc/self/status": {
+                "raw": "Name:\tlab\nUmask:\t0022\nState:\tS (sleeping)\nTgid:\t1\nNgid:\t0\nPid:\t1\nPPid:\t0\nTracerPid:\t0\nUid:\t501\t501\t501\t501\nGid:\t20\t20\t20\t20\nFDSize:\t64\nGroups:\t20 \nNStgid:\t1\nNSpid:\t1\nNSpgid:\t1\nNSsid:\t1\nKthread:\t0\nVmPeak:\t 1708196 kB\nVmSize:\t 1643500 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t   32480 kB\nVmRSS:\t   32480 kB\nRssAnon:\t    6892 kB\nRssFile:\t   25588 kB\nRssShmem:\t       0 kB\nVmData:\t  117556 kB\nVmStk:\t     132 kB\nVmExe:\t   10692 kB\nVmLib:\t   49652 kB\nVmPTE:\t     236 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffff\nThreads:\t5\nSigQ:\t0/99998\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000000000000\nSigCgt:\tfffffffd7fc1feff\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t00000000a80425fb\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t2\nSeccomp_filters:\t1\nSpeculation_Store_Bypass:\tvulnerable\nSpeculationIndirectBranch:\tunknown\nCpus_allowed:\t7ff\nCpus_allowed_list:\t0-10\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t200\nnonvoluntary_ctxt_switches:\t23\n"
+              },
+              "/sys/fs/cgroup/cpu.stat": {
+                "raw": "usage_usec 40738\nuser_usec 16974\nsystem_usec 23764\nnice_usec 0\nnr_periods 19\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n"
+              },
+              "/sys/fs/cgroup/io.stat": {
+                "raw": ""
+              },
+              "/sys/fs/cgroup/memory.current": {
+                "raw": "8204288\n"
+              },
+              "/sys/fs/cgroup/memory.peak": {
+                "raw": "8896512\n"
+              }
+            },
+            "scope": "Raw cumulative process/container counters. Cgroup peaks and totals can include earlier work in this container; unavailable counters are not zero.",
+            "utc_ns": 1795379224345401346
+          },
+          "native_before": {
+            "files": {
+              "/proc/self/io": {
+                "raw": "rchar: 86763\nwchar: 6550\nsyscr: 76\nsyscw: 7\nread_bytes: 0\nwrite_bytes: 0\ncancelled_write_bytes: 0\n"
+              },
+              "/proc/self/status": {
+                "raw": "Name:\tlab\nUmask:\t0022\nState:\tR (running)\nTgid:\t1\nNgid:\t0\nPid:\t1\nPPid:\t0\nTracerPid:\t0\nUid:\t501\t501\t501\t501\nGid:\t20\t20\t20\t20\nFDSize:\t64\nGroups:\t20 \nNStgid:\t1\nNSpid:\t1\nNSpgid:\t1\nNSsid:\t1\nKthread:\t0\nVmPeak:\t 1708196 kB\nVmSize:\t 1642660 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t   28392 kB\nVmRSS:\t   28392 kB\nRssAnon:\t    4660 kB\nRssFile:\t   23732 kB\nRssShmem:\t       0 kB\nVmData:\t  112620 kB\nVmStk:\t     132 kB\nVmExe:\t   10692 kB\nVmLib:\t   49652 kB\nVmPTE:\t     220 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffff\nThreads:\t5\nSigQ:\t0/99998\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000000000000\nSigCgt:\tfffffffd7fc1feff\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t00000000a80425fb\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t2\nSeccomp_filters:\t1\nSpeculation_Store_Bypass:\tvulnerable\nSpeculationIndirectBranch:\tunknown\nCpus_allowed:\t7ff\nCpus_allowed_list:\t0-10\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t15\nnonvoluntary_ctxt_switches:\t13\n"
+              },
+              "/sys/fs/cgroup/cpu.stat": {
+                "raw": "usage_usec 15796\nuser_usec 8362\nsystem_usec 7433\nnice_usec 0\nnr_periods 1\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n"
+              },
+              "/sys/fs/cgroup/io.stat": {
+                "raw": ""
+              },
+              "/sys/fs/cgroup/memory.current": {
+                "raw": "6651904\n"
+              },
+              "/sys/fs/cgroup/memory.peak": {
+                "raw": "6651904\n"
+              }
+            },
+            "scope": "Raw cumulative process/container counters. Cgroup peaks and totals can include earlier work in this container; unavailable counters are not zero.",
+            "utc_ns": 1795379221995347845
+          },
+          "passed": true,
+          "process_cpu": {
+            "system_core_seconds": 0.015875,
+            "user_core_seconds": 0.00827,
+            "utilization_percent_one_core_100": 1.0273894814891322
+          },
+          "process_lifetime_peak_rss_bytes": 32571392,
+          "scope": "Application dispatch including engine setup, execution, validation and close, plus counter probes; excludes process startup and report write/fsync. Raw native counters include all engine threads and cgroup cache/kernel charges. Peaks are lifetime values, not deltas. Empty/missing I/O counters are unavailable, not zero; process rchar/wchar are not physical disk bytes. Server resource costs are separate.",
+          "started_ns": 1795379221995273803
+        },
+        {
+          "duration_ns": 247319708,
+          "ended_ns": 1795379221403937594,
+          "error": "",
+          "mode": "append-source",
+          "native_after": {
+            "files": {
+              "/proc/self/io": {
+                "raw": "rchar: 84274023\nwchar: 6673\nsyscr: 10436\nsyscw: 12\nread_bytes: 0\nwrite_bytes: 91\ncancelled_write_bytes: 0\n"
+              },
+              "/proc/self/status": {
+                "raw": "Name:\tlab\nUmask:\t0022\nState:\tS (sleeping)\nTgid:\t1\nNgid:\t0\nPid:\t1\nPPid:\t0\nTracerPid:\t0\nUid:\t501\t501\t501\t501\nGid:\t20\t20\t20\t20\nFDSize:\t64\nGroups:\t20 \nNStgid:\t1\nNSpid:\t1\nNSpgid:\t1\nNSsid:\t1\nKthread:\t0\nVmPeak:\t 2602656 kB\nVmSize:\t 2506460 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t  103452 kB\nVmRSS:\t   92828 kB\nRssAnon:\t   14052 kB\nRssFile:\t   78776 kB\nRssShmem:\t       0 kB\nVmData:\t  196260 kB\nVmStk:\t     132 kB\nVmExe:\t   10692 kB\nVmLib:\t   95936 kB\nVmPTE:\t     560 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffff\nThreads:\t5\nSigQ:\t0/99998\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000000000000\nSigCgt:\tfffffffd7fc1feff\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t00000000a80425fb\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t2\nSeccomp_filters:\t1\nSpeculation_Store_Bypass:\tvulnerable\nSpeculationIndirectBranch:\tunknown\nCpus_allowed:\t7ff\nCpus_allowed_list:\t0-10\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t42\nnonvoluntary_ctxt_switches:\t77\n"
+              },
+              "/sys/fs/cgroup/cpu.stat": {
+                "raw": "usage_usec 338627\nuser_usec 276171\nsystem_usec 62455\nnice_usec 0\nnr_periods 4\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n"
+              },
+              "/sys/fs/cgroup/io.stat": {
+                "raw": ""
+              },
+              "/sys/fs/cgroup/memory.current": {
+                "raw": "17870848\n"
+              },
+              "/sys/fs/cgroup/memory.peak": {
+                "raw": "29368320\n"
+              }
+            },
+            "scope": "Raw cumulative process/container counters. Cgroup peaks and totals can include earlier work in this container; unavailable counters are not zero.",
+            "utc_ns": 1795379221403936969
+          },
+          "native_before": {
+            "files": {
+              "/proc/self/io": {
+                "raw": "rchar: 86749\nwchar: 6550\nsyscr: 77\nsyscw: 7\nread_bytes: 0\nwrite_bytes: 0\ncancelled_write_bytes: 0\n"
+              },
+              "/proc/self/status": {
+                "raw": "Name:\tlab\nUmask:\t0022\nState:\tR (running)\nTgid:\t1\nNgid:\t0\nPid:\t1\nPPid:\t0\nTracerPid:\t0\nUid:\t501\t501\t501\t501\nGid:\t20\t20\t20\t20\nFDSize:\t64\nGroups:\t20 \nNStgid:\t1\nNSpid:\t1\nNSpgid:\t1\nNSsid:\t1\nKthread:\t0\nVmPeak:\t 1642660 kB\nVmSize:\t 1642660 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t   31608 kB\nVmRSS:\t   31608 kB\nRssAnon:\t    7876 kB\nRssFile:\t   23732 kB\nRssShmem:\t       0 kB\nVmData:\t  112620 kB\nVmStk:\t     132 kB\nVmExe:\t   10692 kB\nVmLib:\t   49652 kB\nVmPTE:\t     212 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffff\nThreads:\t5\nSigQ:\t0/99998\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000000000000\nSigCgt:\tfffffffd7fc1feff\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t00000000a80425fb\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t2\nSeccomp_filters:\t1\nSpeculation_Store_Bypass:\tvulnerable\nSpeculationIndirectBranch:\tunknown\nCpus_allowed:\t7ff\nCpus_allowed_list:\t0-10\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t17\nnonvoluntary_ctxt_switches:\t50\n"
+              },
+              "/sys/fs/cgroup/cpu.stat": {
+                "raw": "usage_usec 27095\nuser_usec 12146\nsystem_usec 14949\nnice_usec 0\nnr_periods 2\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n"
+              },
+              "/sys/fs/cgroup/io.stat": {
+                "raw": ""
+              },
+              "/sys/fs/cgroup/memory.current": {
+                "raw": "9338880\n"
+              },
+              "/sys/fs/cgroup/memory.peak": {
+                "raw": "9940992\n"
+              }
+            },
+            "scope": "Raw cumulative process/container counters. Cgroup peaks and totals can include earlier work in this container; unavailable counters are not zero.",
+            "utc_ns": 1795379221156783178
+          },
+          "passed": true,
+          "process_cpu": {
+            "system_core_seconds": 0.047407,
+            "user_core_seconds": 0.263714,
+            "utilization_percent_one_core_100": 125.7970917546126
+          },
+          "process_lifetime_peak_rss_bytes": 105934848,
+          "scope": "Application dispatch including engine setup, execution, validation and close, plus counter probes; excludes process startup and report write/fsync. Raw native counters include all engine threads and cgroup cache/kernel charges. Peaks are lifetime values, not deltas. Empty/missing I/O counters are unavailable, not zero; process rchar/wchar are not physical disk bytes. Server resource costs are separate.",
+          "started_ns": 1795379221156617886
+        },
+        {
+          "duration_ns": 2057077126,
+          "ended_ns": 1795379230681102126,
+          "error": "",
+          "mode": "native-recover",
+          "native_after": {
+            "files": {
+              "/proc/self/io": {
+                "raw": "rchar: 224290\nwchar: 39888\nsyscr: 673\nsyscw: 209\nread_bytes: 0\nwrite_bytes: 2521\ncancelled_write_bytes: 0\n"
+              },
+              "/proc/self/status": {
+                "raw": "Name:\tlab\nUmask:\t0022\nState:\tR (running)\nTgid:\t1\nNgid:\t0\nPid:\t1\nPPid:\t0\nTracerPid:\t0\nUid:\t501\t501\t501\t501\nGid:\t20\t20\t20\t20\nFDSize:\t64\nGroups:\t20 \nNStgid:\t1\nNSpid:\t1\nNSpgid:\t1\nNSsid:\t1\nKthread:\t0\nVmPeak:\t 1708196 kB\nVmSize:\t 1643492 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t   38204 kB\nVmRSS:\t   38204 kB\nRssAnon:\t   12620 kB\nRssFile:\t   25584 kB\nRssShmem:\t       0 kB\nVmData:\t  117548 kB\nVmStk:\t     132 kB\nVmExe:\t   10692 kB\nVmLib:\t   49652 kB\nVmPTE:\t     236 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffff\nThreads:\t5\nSigQ:\t0/99998\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000000000000\nSigCgt:\tfffffffd7fc1feff\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t00000000a80425fb\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t2\nSeccomp_filters:\t1\nSpeculation_Store_Bypass:\tvulnerable\nSpeculationIndirectBranch:\tunknown\nCpus_allowed:\t7ff\nCpus_allowed_list:\t0-10\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t199\nnonvoluntary_ctxt_switches:\t39\n"
+              },
+              "/sys/fs/cgroup/cpu.stat": {
+                "raw": "usage_usec 44664\nuser_usec 18519\nsystem_usec 26145\nnice_usec 0\nnr_periods 19\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n"
+              },
+              "/sys/fs/cgroup/io.stat": {
+                "raw": ""
+              },
+              "/sys/fs/cgroup/memory.current": {
+                "raw": "14053376\n"
+              },
+              "/sys/fs/cgroup/memory.peak": {
+                "raw": "14553088\n"
+              }
+            },
+            "scope": "Raw cumulative process/container counters. Cgroup peaks and totals can include earlier work in this container; unavailable counters are not zero.",
+            "utc_ns": 1795379230681101793
+          },
+          "native_before": {
+            "files": {
+              "/proc/self/io": {
+                "raw": "rchar: 88317\nwchar: 6550\nsyscr: 76\nsyscw: 7\nread_bytes: 0\nwrite_bytes: 0\ncancelled_write_bytes: 0\n"
+              },
+              "/proc/self/status": {
+                "raw": "Name:\tlab\nUmask:\t0022\nState:\tR (running)\nTgid:\t1\nNgid:\t0\nPid:\t1\nPPid:\t0\nTracerPid:\t0\nUid:\t501\t501\t501\t501\nGid:\t20\t20\t20\t20\nFDSize:\t64\nGroups:\t20 \nNStgid:\t1\nNSpid:\t1\nNSpgid:\t1\nNSsid:\t1\nKthread:\t0\nVmPeak:\t 1708196 kB\nVmSize:\t 1642660 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t   31612 kB\nVmRSS:\t   31612 kB\nRssAnon:\t    7880 kB\nRssFile:\t   23732 kB\nRssShmem:\t       0 kB\nVmData:\t  112620 kB\nVmStk:\t     132 kB\nVmExe:\t   10692 kB\nVmLib:\t   49652 kB\nVmPTE:\t     216 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffff\nThreads:\t5\nSigQ:\t0/99998\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000000000000\nSigCgt:\tfffffffd7fc1feff\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t00000000a80425fb\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t2\nSeccomp_filters:\t1\nSpeculation_Store_Bypass:\tvulnerable\nSpeculationIndirectBranch:\tunknown\nCpus_allowed:\t7ff\nCpus_allowed_list:\t0-10\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t19\nnonvoluntary_ctxt_switches:\t22\n"
+              },
+              "/sys/fs/cgroup/cpu.stat": {
+                "raw": "usage_usec 14244\nuser_usec 9157\nsystem_usec 5087\nnice_usec 0\nnr_periods 1\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n"
+              },
+              "/sys/fs/cgroup/io.stat": {
+                "raw": ""
+              },
+              "/sys/fs/cgroup/memory.current": {
+                "raw": "9617408\n"
+              },
+              "/sys/fs/cgroup/memory.peak": {
+                "raw": "9617408\n"
+              }
+            },
+            "scope": "Raw cumulative process/container counters. Cgroup peaks and totals can include earlier work in this container; unavailable counters are not zero.",
+            "utc_ns": 1795379228624101334
+          },
+          "passed": true,
+          "process_cpu": {
+            "system_core_seconds": 0.020982,
+            "user_core_seconds": 0.009222,
+            "utilization_percent_one_core_100": 1.4682969159611376
+          },
+          "process_lifetime_peak_rss_bytes": 38576128,
+          "scope": "Application dispatch including engine setup, execution, validation and close, plus counter probes; excludes process startup and report write/fsync. Raw native counters include all engine threads and cgroup cache/kernel charges. Peaks are lifetime values, not deltas. Empty/missing I/O counters are unavailable, not zero; process rchar/wchar are not physical disk bytes. Server resource costs are separate.",
+          "started_ns": 1795379228624024959
+        }
+      ],
+      "evidence": [
+        {
+          "path": "results/current/qualification-20261122/sharded/workflow-result.json",
+          "sha256": "8adfae138ac9a32e555ffab295654a2ebbd6718ce1667a2c81eb88922ca91c0d"
+        },
+        {
+          "path": "results/current/qualification-20261122/sharded/invocation.json",
+          "sha256": "97c51514d010f305dac2b137245707d71c285d607e9db392ed31d9961665ee77"
+        },
+        {
+          "path": "results/current/qualification-20261122/sharded/resources.json",
+          "sha256": "2a694ccac349701730c676af8cfb5e67930b452be19751ea67f1507c49424cf2"
+        },
+        {
+          "path": "results/current/qualification-20261122/sharded/lab-events-compaction.json",
+          "sha256": "50b210e46f00330fca76c2f6cbf9308591dfc28a7b5cae9910bbb213b0ebe775"
+        },
+        {
+          "path": "results/current/qualification-20261122/sharded/verify.json",
+          "sha256": "f548886d1adaa1ab5c7f64de902d6a3710b29ea2d5f0fe62b90a95ec26c5240e"
+        },
+        {
+          "path": "results/current/qualification-20261122/sharded/replica-recovery.json",
+          "sha256": "0b267ed1c3090d8607f1d5e29a2de1e65be3247474da35addb0b985339c0bb8f"
+        },
+        {
+          "path": "results/current/qualification-20261122/sharded/compaction-27bfa322-d077-42b6-b6ca-d745373c84bf-resources.json",
+          "sha256": "6916d4fe2271f4aa02db7f2f286e48fc4216f630b991407ff1ce2d2d0d464e72"
+        },
+        {
+          "path": "results/current/qualification-20261122/sharded/ownership-serving_1795379214838105758.json",
+          "sha256": "165a8c7ad5177be0c43ae800a8104164bd3351957042e7be5b71f00cec766f90"
+        },
+        {
+          "path": "results/current/qualification-20261122/sharded/ownership-serving_1795379221995352095.json",
+          "sha256": "b4025d5b1413bede4b0ffe7a87c2776c7b6ea12a04f976b709c5a3b832197ca5"
+        },
+        {
+          "path": "results/current/qualification-20261122/sharded/native-versions.json",
+          "sha256": "6b40540b5ab4d1c055ea34ebb1eb0e202c6bf923adac9d2842914db6b9436e36"
+        },
+        {
+          "path": "results/current/qualification-20261122/sharded/observer.json",
+          "sha256": "d11ad2ea79c76d355ef73fd9d962ba7eab1459d6689bd6973c1692672bff85df"
+        },
+        {
+          "path": "results/current/qualification-20261122/sharded/effective-role-budgets.json",
+          "sha256": "c14dc27619fe53c8d41ca6342bb275c85b3f50fe78c9b212ceb59cb7dc06a1e8"
+        }
+      ],
+      "replica_ownership": [
+        {
+          "generation": {
+            "name": "serving_1795379214838105758",
+            "rows": 2000000,
+            "customers": 10000
+          },
+          "replicas": [
+            {
+              "amount_cents": 3356032400,
+              "expected_amount_cents": 3356032400,
+              "expected_rows": 671400,
+              "host": "ch11",
+              "invalid_or_wrong_shard_rows": 0,
+              "rows": 671400,
+              "shard": 1,
+              "unique_ids": 671400
+            },
+            {
+              "amount_cents": 3356032400,
+              "expected_amount_cents": 3356032400,
+              "expected_rows": 671400,
+              "host": "ch12",
+              "invalid_or_wrong_shard_rows": 0,
+              "rows": 671400,
+              "shard": 1,
+              "unique_ids": 671400
+            },
+            {
+              "amount_cents": 3356032400,
+              "expected_amount_cents": 3356032400,
+              "expected_rows": 671400,
+              "host": "ch13",
+              "invalid_or_wrong_shard_rows": 0,
+              "rows": 671400,
+              "shard": 1,
+              "unique_ids": 671400
+            },
+            {
+              "amount_cents": 3279654400,
+              "expected_amount_cents": 3279654400,
+              "expected_rows": 655400,
+              "host": "ch21",
+              "invalid_or_wrong_shard_rows": 0,
+              "rows": 655400,
+              "shard": 2,
+              "unique_ids": 655400
+            },
+            {
+              "amount_cents": 3279654400,
+              "expected_amount_cents": 3279654400,
+              "expected_rows": 655400,
+              "host": "ch22",
+              "invalid_or_wrong_shard_rows": 0,
+              "rows": 655400,
+              "shard": 2,
+              "unique_ids": 655400
+            },
+            {
+              "amount_cents": 3279654400,
+              "expected_amount_cents": 3279654400,
+              "expected_rows": 655400,
+              "host": "ch23",
+              "invalid_or_wrong_shard_rows": 0,
+              "rows": 655400,
+              "shard": 2,
+              "unique_ids": 655400
+            },
+            {
+              "amount_cents": 3365313200,
+              "expected_amount_cents": 3365313200,
+              "expected_rows": 673200,
+              "host": "ch31",
+              "invalid_or_wrong_shard_rows": 0,
+              "rows": 673200,
+              "shard": 3,
+              "unique_ids": 673200
+            },
+            {
+              "amount_cents": 3365313200,
+              "expected_amount_cents": 3365313200,
+              "expected_rows": 673200,
+              "host": "ch32",
+              "invalid_or_wrong_shard_rows": 0,
+              "rows": 673200,
+              "shard": 3,
+              "unique_ids": 673200
+            },
+            {
+              "amount_cents": 3365313200,
+              "expected_amount_cents": 3365313200,
+              "expected_rows": 673200,
+              "host": "ch33",
+              "invalid_or_wrong_shard_rows": 0,
+              "rows": 673200,
+              "shard": 3,
+              "unique_ids": 673200
+            }
+          ],
+          "skipped_node": ""
+        },
+        {
+          "generation": {
+            "name": "serving_1795379221995352095",
+            "rows": 2100000,
+            "customers": 10000
+          },
+          "replicas": [
+            {
+              "amount_cents": 3523834020,
+              "expected_amount_cents": 3523834020,
+              "expected_rows": 704970,
+              "host": "ch11",
+              "invalid_or_wrong_shard_rows": 0,
+              "rows": 704970,
+              "shard": 1,
+              "unique_ids": 704970
+            },
+            {
+              "amount_cents": 3523834020,
+              "expected_amount_cents": 3523834020,
+              "expected_rows": 704970,
+              "host": "ch12",
+              "invalid_or_wrong_shard_rows": 0,
+              "rows": 704970,
+              "shard": 1,
+              "unique_ids": 704970
+            },
+            {
+              "amount_cents": 3523834020,
+              "expected_amount_cents": 3523834020,
+              "expected_rows": 704970,
+              "host": "ch13",
+              "invalid_or_wrong_shard_rows": 0,
+              "rows": 704970,
+              "shard": 1,
+              "unique_ids": 704970
+            },
+            {
+              "amount_cents": 3443637120,
+              "expected_amount_cents": 3443637120,
+              "expected_rows": 688170,
+              "host": "ch21",
+              "invalid_or_wrong_shard_rows": 0,
+              "rows": 688170,
+              "shard": 2,
+              "unique_ids": 688170
+            },
+            {
+              "amount_cents": 3443637120,
+              "expected_amount_cents": 3443637120,
+              "expected_rows": 688170,
+              "host": "ch22",
+              "invalid_or_wrong_shard_rows": 0,
+              "rows": 688170,
+              "shard": 2,
+              "unique_ids": 688170
+            },
+            {
+              "amount_cents": 3443637120,
+              "expected_amount_cents": 3443637120,
+              "expected_rows": 688170,
+              "host": "ch23",
+              "invalid_or_wrong_shard_rows": 0,
+              "rows": 688170,
+              "shard": 2,
+              "unique_ids": 688170
+            },
+            {
+              "amount_cents": 3533578860,
+              "expected_amount_cents": 3533578860,
+              "expected_rows": 706860,
+              "host": "ch31",
+              "invalid_or_wrong_shard_rows": 0,
+              "rows": 706860,
+              "shard": 3,
+              "unique_ids": 706860
+            },
+            {
+              "amount_cents": 3533578860,
+              "expected_amount_cents": 3533578860,
+              "expected_rows": 706860,
+              "host": "ch32",
+              "invalid_or_wrong_shard_rows": 0,
+              "rows": 706860,
+              "shard": 3,
+              "unique_ids": 706860
+            },
+            {
+              "amount_cents": 3533578860,
+              "expected_amount_cents": 3533578860,
+              "expected_rows": 706860,
+              "host": "ch33",
+              "invalid_or_wrong_shard_rows": 0,
+              "rows": 706860,
+              "shard": 3,
+              "unique_ids": 706860
+            }
+          ],
+          "skipped_node": ""
+        }
+      ],
+      "effective_role_budgets": {
+        "clickhouse": {
+          "effective_cpu_limit": 2.0,
+          "effective_memory_bytes": 1610612736,
+          "effective_memory_swap_bytes": 1610612736,
+          "id": "95665bd78d5d20eae59e4281653645453cdfd90dd22b5fc5895c770df852ecaa",
+          "image": "sha256:b0784219f1821b8a9918732b8e6728dbed9246e13949c46e40d7c2a084d9ef9d",
+          "state": "running"
+        },
+        "storage": {
+          "effective_cpu_limit": 1.0,
+          "effective_memory_bytes": 1073741824,
+          "effective_memory_swap_bytes": 1073741824,
+          "id": "3fe0aab231a51014cbc5758abd290814a210d05c36fb8712a3eaf661960b795c",
+          "image": "sha256:4b42c212543a0acd4c0e675215ecdcaf62a186ef98def76c7e12701871222d15",
+          "state": "running"
+        },
+        "keeper1": {
+          "effective_cpu_limit": 0.5,
+          "effective_memory_bytes": 268435456,
+          "effective_memory_swap_bytes": 268435456,
+          "id": "bde2a6a7e05639a1d48ae746d00fb4d1c73fb49b85096b0be4e736a4ec9f3bc3",
+          "image": "sha256:b0784219f1821b8a9918732b8e6728dbed9246e13949c46e40d7c2a084d9ef9d",
+          "state": "exited"
+        },
+        "ch13": {
+          "effective_cpu_limit": 0.25,
+          "effective_memory_bytes": 1342177280,
+          "effective_memory_swap_bytes": 1342177280,
+          "id": "2b2bb5437ce642cf25f9684a882b521dd75d41db183eaef895ffe7b04470edab",
+          "image": "sha256:b0784219f1821b8a9918732b8e6728dbed9246e13949c46e40d7c2a084d9ef9d",
+          "state": "exited"
+        },
+        "ch11": {
+          "effective_cpu_limit": 0.25,
+          "effective_memory_bytes": 1342177280,
+          "effective_memory_swap_bytes": 1342177280,
+          "id": "b255dfd673cd0b6e7ccf1c7a05bc8457ba73a0a71c4ea50fc77aee443baecd8c",
+          "image": "sha256:b0784219f1821b8a9918732b8e6728dbed9246e13949c46e40d7c2a084d9ef9d",
+          "state": "exited"
+        },
+        "ch23": {
+          "effective_cpu_limit": 0.25,
+          "effective_memory_bytes": 1342177280,
+          "effective_memory_swap_bytes": 1342177280,
+          "id": "b6153edc2b528f99576f07f74810939c8f3912413f5709d229e2bc1528c2e75c",
+          "image": "sha256:b0784219f1821b8a9918732b8e6728dbed9246e13949c46e40d7c2a084d9ef9d",
+          "state": "exited"
+        },
+        "ch22": {
+          "effective_cpu_limit": 0.25,
+          "effective_memory_bytes": 1342177280,
+          "effective_memory_swap_bytes": 1342177280,
+          "id": "e9f8fba067e28a7c65585ea96fd0fb35ccbab417c25f2041a0dfb754ddbf7206",
+          "image": "sha256:b0784219f1821b8a9918732b8e6728dbed9246e13949c46e40d7c2a084d9ef9d",
+          "state": "exited"
+        },
+        "ch12": {
+          "effective_cpu_limit": 0.25,
+          "effective_memory_bytes": 1342177280,
+          "effective_memory_swap_bytes": 1342177280,
+          "id": "48a9689ab9637231d6f47ba0034f3f8da041bb52e2026aac5c94d6388b869205",
+          "image": "sha256:b0784219f1821b8a9918732b8e6728dbed9246e13949c46e40d7c2a084d9ef9d",
+          "state": "exited"
+        },
+        "ch33": {
+          "effective_cpu_limit": 0.25,
+          "effective_memory_bytes": 1342177280,
+          "effective_memory_swap_bytes": 1342177280,
+          "id": "8292d2de56d409ee6730a6e7021dfc20463a8113229f4d5ce1a32092ef44d336",
+          "image": "sha256:b0784219f1821b8a9918732b8e6728dbed9246e13949c46e40d7c2a084d9ef9d",
+          "state": "exited"
+        },
+        "ch32": {
+          "effective_cpu_limit": 0.25,
+          "effective_memory_bytes": 1342177280,
+          "effective_memory_swap_bytes": 1342177280,
+          "id": "9cc2a33ffb8984eda2d36cf4ac684afa2d0547db6103151ea853b84ad392b272",
+          "image": "sha256:b0784219f1821b8a9918732b8e6728dbed9246e13949c46e40d7c2a084d9ef9d",
+          "state": "exited"
+        },
+        "ch21": {
+          "effective_cpu_limit": 0.25,
+          "effective_memory_bytes": 1342177280,
+          "effective_memory_swap_bytes": 1342177280,
+          "id": "e2b6cf7ff9afef2c3718e77dcbe0167ea3be37e0a1447219a9cba6128084f70c",
+          "image": "sha256:b0784219f1821b8a9918732b8e6728dbed9246e13949c46e40d7c2a084d9ef9d",
+          "state": "exited"
+        },
+        "ch31": {
+          "effective_cpu_limit": 0.25,
+          "effective_memory_bytes": 1342177280,
+          "effective_memory_swap_bytes": 1342177280,
+          "id": "b382e08a025dfdd7513da806212dfbbf43d0d42c3cddad9b368f4655c86d4c05",
+          "image": "sha256:b0784219f1821b8a9918732b8e6728dbed9246e13949c46e40d7c2a084d9ef9d",
+          "state": "exited"
+        },
+        "keeper2": {
+          "effective_cpu_limit": 0.5,
+          "effective_memory_bytes": 268435456,
+          "effective_memory_swap_bytes": 268435456,
+          "id": "053509599edbfee59186ebe84653073b6a2efb480c548c1fb205344c09ba0d37",
+          "image": "sha256:b0784219f1821b8a9918732b8e6728dbed9246e13949c46e40d7c2a084d9ef9d",
+          "state": "exited"
+        },
+        "keeper3": {
+          "effective_cpu_limit": 0.5,
+          "effective_memory_bytes": 268435456,
+          "effective_memory_swap_bytes": 268435456,
+          "id": "ac1e507147f00c4f4779e916f24886d8f261ba93652fa1b8d75ca55d809efb43",
+          "image": "sha256:b0784219f1821b8a9918732b8e6728dbed9246e13949c46e40d7c2a084d9ef9d",
+          "state": "exited"
+        }
+      },
+      "native_versions": {
+        "ch11": {
+          "version": "26.10.10.3",
+          "image": "sha256:b0784219f1821b8a9918732b8e6728dbed9246e13949c46e40d7c2a084d9ef9d",
+          "id": "b255dfd673cd0b6e7ccf1c7a05bc8457ba73a0a71c4ea50fc77aee443baecd8c"
+        },
+        "ch12": {
+          "version": "26.10.10.3",
+          "image": "sha256:b0784219f1821b8a9918732b8e6728dbed9246e13949c46e40d7c2a084d9ef9d",
+          "id": "48a9689ab9637231d6f47ba0034f3f8da041bb52e2026aac5c94d6388b869205"
+        },
+        "ch13": {
+          "version": "26.10.10.3",
+          "image": "sha256:b0784219f1821b8a9918732b8e6728dbed9246e13949c46e40d7c2a084d9ef9d",
+          "id": "2b2bb5437ce642cf25f9684a882b521dd75d41db183eaef895ffe7b04470edab"
+        },
+        "ch21": {
+          "version": "26.10.10.3",
+          "image": "sha256:b0784219f1821b8a9918732b8e6728dbed9246e13949c46e40d7c2a084d9ef9d",
+          "id": "e2b6cf7ff9afef2c3718e77dcbe0167ea3be37e0a1447219a9cba6128084f70c"
+        },
+        "ch22": {
+          "version": "26.10.10.3",
+          "image": "sha256:b0784219f1821b8a9918732b8e6728dbed9246e13949c46e40d7c2a084d9ef9d",
+          "id": "e9f8fba067e28a7c65585ea96fd0fb35ccbab417c25f2041a0dfb754ddbf7206"
+        },
+        "ch23": {
+          "version": "26.10.10.3",
+          "image": "sha256:b0784219f1821b8a9918732b8e6728dbed9246e13949c46e40d7c2a084d9ef9d",
+          "id": "b6153edc2b528f99576f07f74810939c8f3912413f5709d229e2bc1528c2e75c"
+        },
+        "ch31": {
+          "version": "26.10.10.3",
+          "image": "sha256:b0784219f1821b8a9918732b8e6728dbed9246e13949c46e40d7c2a084d9ef9d",
+          "id": "b382e08a025dfdd7513da806212dfbbf43d0d42c3cddad9b368f4655c86d4c05"
+        },
+        "ch32": {
+          "version": "26.10.10.3",
+          "image": "sha256:b0784219f1821b8a9918732b8e6728dbed9246e13949c46e40d7c2a084d9ef9d",
+          "id": "9cc2a33ffb8984eda2d36cf4ac684afa2d0547db6103151ea853b84ad392b272"
+        },
+        "ch33": {
+          "version": "26.10.10.3",
+          "image": "sha256:b0784219f1821b8a9918732b8e6728dbed9246e13949c46e40d7c2a084d9ef9d",
+          "id": "8292d2de56d409ee6730a6e7021dfc20463a8113229f4d5ce1a32092ef44d336"
+        },
+        "clickhouse": {
+          "version": "26.10.10.3",
+          "image": "sha256:b0784219f1821b8a9918732b8e6728dbed9246e13949c46e40d7c2a084d9ef9d",
+          "id": "95665bd78d5d20eae59e4281653645453cdfd90dd22b5fc5895c770df852ecaa"
+        },
+        "keeper1": {
+          "version": "ClickHouse keeper version 26.10.10.3 (official build).",
+          "image": "sha256:b0784219f1821b8a9918732b8e6728dbed9246e13949c46e40d7c2a084d9ef9d",
+          "id": "bde2a6a7e05639a1d48ae746d00fb4d1c73fb49b85096b0be4e736a4ec9f3bc3"
+        },
+        "keeper2": {
+          "version": "ClickHouse keeper version 26.10.10.3 (official build).",
+          "image": "sha256:b0784219f1821b8a9918732b8e6728dbed9246e13949c46e40d7c2a084d9ef9d",
+          "id": "053509599edbfee59186ebe84653073b6a2efb480c548c1fb205344c09ba0d37"
+        },
+        "keeper3": {
+          "version": "ClickHouse keeper version 26.10.10.3 (official build).",
+          "image": "sha256:b0784219f1821b8a9918732b8e6728dbed9246e13949c46e40d7c2a084d9ef9d",
+          "id": "ac1e507147f00c4f4779e916f24886d8f261ba93652fa1b8d75ca55d809efb43"
+        }
+      }
+    }
+  },
+  "limitations": [
+    "Current ClickHouse-written manifests fail conformance; ch-direct/ch-archive full-size cases are not qualified.",
+    "Native serving stops one replica with retained volume; this is not disk loss, independent-host durability or a continuously observed production workload.",
+    "Resource observations include co-tenancy with the preserved idle historical storage; current trials were serial. CPU samples exclude unobserved startup/exit edges.",
+    "No cold OS cache or sustained/repeated capacity comparison; query-check timings include correctness execution at an already-used fixture.",
+    "File bytes before/after compaction are measured, but encoded column-chunk compression was not collected for these three normal-path snapshots. Recovery-snapshot compression is reported separately.",
+    "Allocated disk is per-service filesystem allocation; block read/write bytes and I/O counts are Docker-VM counters, not physical host SSD latency. Missing counters stay unavailable."
+  ],
+  "environment": {
+    "context": "desktop-linux",
+    "endpoint": "unix:///Users/muzammil/.docker/run/docker.sock",
+    "daemon": {
+      "ID": "172e5e0a-2d95-4fb5-a6b4-fb16552caec8",
+      "Name": "docker-desktop",
+      "ServerVersion": "29.5.3",
+      "Architecture": "aarch64",
+      "NCPU": 11,
+      "MemTotal": 26216296448,
+      "KernelVersion": "6.12.76-linuxkit",
+      "OperatingSystem": "Docker Desktop"
+    },
+    "scope": "One Apple M4 Pro host, shared Docker VM; preserved historical storage remained running. CPU/memory settings are caps, not reserved independent machines."
+  }
+}

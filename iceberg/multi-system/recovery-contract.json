@@ -1,6 +1,6 @@
 {
-  "backend": "Iceberg v2 on local SeaweedFS 4.53 mini; DuckDB 1.5.5 writers and DuckDB/ClickHouse 26.10.2.103 readers",
-  "status": "Declared acceptance contract for the new recovery profile; native qualification pending.",
+  "backend": "Iceberg v2 on fixed local current/historical Compose profiles; lab_profiles.py selects versions, project and result namespace.",
+  "status": "Acceptance contract; qualification is determined by dated per-run evidence, not this declaration.",
   "operations": [
     "create a new UUID-named table",
     "atomic append of one disjoint batch",
@@ -27,7 +27,13 @@
     "mutation_retries": 0,
     "seed_rows": 2000000,
     "customers": 10000,
-    "batch_rows": 10000
+    "batch_rows": 10000,
+    "clickhouse_read_memory_settings": {
+      "max_bytes_before_external_sort": 67108864,
+      "max_temporary_data_on_disk_size_for_query": 1073741824,
+      "input_format_parquet_memory_high_watermark": 268435456,
+      "scope": "Native per-query settings for ordered recovery reads; retain existing 1GiB server/1.5GiB container caps. Parquet watermark is approximate; not a hard RSS limit."
+    }
   },
   "data": "Seven non-null fields: event_id BIGINT, customer_id INTEGER, amount_cents BIGINT, writer_id INTEGER, batch_start BIGINT, batch_end BIGINT, payload_sha256 VARCHAR. SHA256 is computed from decimal ID, with deterministic customer/amount values. No arbitrary uploaded-payload capacity claim; checked code permits 1..1000000 rows per batch and 1..100000000 seed rows. Record actual serialized/export/object bytes, not an inferred input size.",
   "topology": {
@@ -49,13 +55,37 @@
     "Functional co-tenancy is recorded; no capacity comparison or universal performance winner.",
     "Recent/historical read age does not establish cold engine or OS caches.",
     "Operation deadlines may need controller fencing if native I/O does not honor cancellation; forced termination remains a failed lifecycle.",
-    "Separate catalog/S3 outages, partitions, compactor crashes, retention, backup/restore, and physical disk failure remain unqualified."
+    "This storage-crash contract does not qualify isolated catalog/S3 outages, partitions, retention, backup/restore or physical disk failure. Compactor-output interruption has its own dated current-case evidence and failed predecessors."
   ],
   "extension_revisions": {
-    "httpfs": "827222f",
-    "avro": "f9d5902",
-    "iceberg": "45163a28",
-    "policy": "Image build rejects different installed revisions before any SUT workload. Requalify source-dependent metadata interpretation when changing a pin."
+    "1.5.5": {
+      "httpfs": "827222f",
+      "avro": "f9d5902",
+      "iceberg": "45163a28"
+    },
+    "2.0.1": {
+      "httpfs": "f71cfdb4bf",
+      "avro": "4176191c96",
+      "iceberg": "f979b5b28a"
+    },
+    "policy": "Native version/binary hashes are recorded per run. Match the selected engine and checked image artifacts; do not infer native version from a Go binding."
   },
-  "storage_measurement": "At one explicit catalog metadata-location/snapshot ID, enumerate unique live data files and inspect native Parquet footers. Match native file rows with the complete body oracle. Report whole-object bytes separately from the ratio of total uncompressed/compressed column-chunk bytes; no CSV-versus-disk compression claim."
+  "storage_measurement": "At one explicit catalog metadata-location/snapshot ID, enumerate unique live data files and inspect native Parquet footers. Match native file rows with the complete body oracle. Report whole-object bytes separately from the ratio of total uncompressed/compressed column-chunk bytes; no CSV-versus-disk compression claim.",
+  "profiles": {
+    "historical": {
+      "storage": "SeaweedFS 4.53",
+      "query": "ClickHouse 26.10.2.103",
+      "duckdb": "1.5.5 historical regression or 2.0.1 selected explicitly",
+      "maintenance": "Spark 4.0.1 / Iceberg 1.10.1"
+    },
+    "current": {
+      "storage": "SeaweedFS 4.54",
+      "query": "ClickHouse 26.10.10.3",
+      "duckdb": "2.0.1",
+      "maintenance": "Spark 4.1.4 / Iceberg 1.12.0",
+      "storage_go_memory_limit_bytes": 629145600,
+      "storage_reader_budget_MiB": 256,
+      "storage_volume_slots": 16
+    }
+  }
 }

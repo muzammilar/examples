@@ -1,0 +1,212 @@
+{
+  "date": "2026-11-22",
+  "passed": false,
+  "versions": {
+    "duckdb": "2.0.1",
+    "duckdb_go": "v2.20000.0",
+    "clickhouse": "26.10.10.3",
+    "seaweedfs": "4.54 / 5ef99c1d8",
+    "spark": "4.1.4",
+    "iceberg": "1.12.0 / 212aa894e919ff9fdf89160da4aadcbe6858ac01"
+  },
+  "current_query_image": "sha256:b0784219f1821b8a9918732b8e6728dbed9246e13949c46e40d7c2a084d9ef9d",
+  "current_workload_image": "sha256:f30ac1bf5782ce0776357b9cfe7f7eedb3de6c094777bf3a58c1c1b6ce44db6b",
+  "error": "Invalid Configuration Error: Manifest 's3://warehouse/lab/reverse-e6584bac-3f70-4736-b39e-892ce0a5c11c/metadata/7d4f8876-a6b6-4df0-b759-1d373313ab58.avro' has invalid Avro key-value metadata, content is missing",
+  "native_probe_duration_s": 0.568979542,
+  "client_cpu": {
+    "system_core_seconds": 0.054109,
+    "user_core_seconds": 0.459898,
+    "utilization_percent_one_core_100": 90.33839743925274
+  },
+  "client_process_peak_rss_bytes": 127987712,
+  "backend_resources": {
+    "clickhouse": {
+      "samples": 1,
+      "unavailable_samples": 0,
+      "observed_seconds": 0.0,
+      "cpu_core_seconds": null,
+      "cpu_percent_one_core_100": null,
+      "charged_memory_bytes_min_mean_max": [
+        516153344,
+        516153344,
+        516153344
+      ],
+      "lifetime_peak_memory_bytes": 591757312,
+      "allocated_disk_bytes_first_peak_last": [
+        17125376,
+        17125376,
+        17125376
+      ],
+      "native_block_io": null,
+      "identity_or_counter_gaps": 0,
+      "memory_stat_bytes_min_mean_max": {
+        "anon": [
+          332746752,
+          332746752,
+          332746752
+        ],
+        "file": [
+          16314368,
+          16314368,
+          16314368
+        ],
+        "kernel": [
+          13553664,
+          13553664,
+          13553664
+        ]
+      },
+      "memory_stat_samples": 1
+    },
+    "storage": {
+      "samples": 1,
+      "unavailable_samples": 0,
+      "observed_seconds": 0.0,
+      "cpu_core_seconds": null,
+      "cpu_percent_one_core_100": null,
+      "charged_memory_bytes_min_mean_max": [
+        123273216,
+        123273216,
+        123273216
+      ],
+      "lifetime_peak_memory_bytes": 161038336,
+      "allocated_disk_bytes_first_peak_last": [
+        528384,
+        528384,
+        528384
+      ],
+      "native_block_io": null,
+      "identity_or_counter_gaps": 0,
+      "memory_stat_bytes_min_mean_max": {
+        "anon": [
+          113266688,
+          113266688,
+          113266688
+        ],
+        "file": [
+          548864,
+          548864,
+          548864
+        ],
+        "kernel": [
+          2887680,
+          2887680,
+          2887680
+        ]
+      },
+      "memory_stat_samples": 1
+    }
+  },
+  "header_inspection": [
+    {
+      "table": "lab.probe",
+      "format_version": 2,
+      "metadata_location": "s3://warehouse/lab/probe-f3318b57-b8bc-4229-bd59-fd48ec385c6b/metadata/v2.metadata.json",
+      "snapshot_id": 2378379607543794173,
+      "manifests": [
+        {
+          "path": "s3://warehouse/lab/probe-f3318b57-b8bc-4229-bd59-fd48ec385c6b/metadata/e9fc0981-020b-4bb0-a4d0-85f72c54f322-m0.avro",
+          "bytes": 3288,
+          "header_keys": [
+            "avro.codec",
+            "avro.schema",
+            "schema",
+            "schema-id",
+            "partition-spec",
+            "partition-spec-id",
+            "format-version",
+            "content"
+          ],
+          "metadata": {
+            "avro.codec": "deflate",
+            "schema": "{\"type\":\"struct\",\"fields\":[{\"name\":\"event_id\",\"id\":1,\"required\":false,\"type\":\"long\"},{\"name\":\"customer_id\",\"id\":2,\"required\":false,\"type\":\"int\"},{\"name\":\"amount_cents\",\"id\":3,\"required\":false,\"type\":\"long\"}],\"schema-id\":0}",
+            "schema-id": "0",
+            "partition-spec": "[]",
+            "partition-spec-id": "0",
+            "format-version": "2",
+            "content": "data"
+          },
+          "avro_schema_sha256": "5c0378838ae61cc41e649330a14b95d443270a18fbafb5c3186671f0d5bc740c"
+        }
+      ]
+    },
+    {
+      "table": "lab.reverse",
+      "format_version": 2,
+      "metadata_location": "s3://warehouse/lab/reverse-e6584bac-3f70-4736-b39e-892ce0a5c11c/metadata/v2.metadata.json",
+      "snapshot_id": 4188009435542094040,
+      "manifests": [
+        {
+          "path": "s3://warehouse/lab/reverse-e6584bac-3f70-4736-b39e-892ce0a5c11c/metadata/7d4f8876-a6b6-4df0-b759-1d373313ab58.avro",
+          "bytes": 9704,
+          "header_keys": [
+            "avro.codec",
+            "avro.schema",
+            "format-version",
+            "partition-spec",
+            "partition-spec-id",
+            "schema",
+            "schema-id"
+          ],
+          "metadata": {
+            "avro.codec": "null",
+            "format-version": "2",
+            "partition-spec": "[]",
+            "partition-spec-id": "0",
+            "schema": "{\n    \"fields\" : [\n        {\n            \"id\" : 1,\n            \"name\" : \"event_id\",\n            \"required\" : false,\n            \"type\" : \"long\"\n        },\n        {\n            \"id\" : 2,\n            \"name\" : \"customer_id\",\n            \"required\" : false,\n            \"type\" : \"int\"\n        },\n        {\n            \"id\" : 3,\n            \"name\" : \"amount_cents\",\n            \"required\" : false,\n            \"type\" : \"long\"\n        }\n    ],\n    \"identifier-field-ids\" : [\n\n    ],\n    \"schema-id\" : 0,\n    \"type\" : \"struct\"\n}",
+            "schema-id": "0"
+          },
+          "avro_schema_sha256": "cb1312de92256e7c6fd50714590efd64998c07e7c7d7a61c3d656621bd2f00c3"
+        }
+      ]
+    }
+  ],
+  "complete_body_controls": {
+    "probe": {
+      "rows": 10000,
+      "all_bodies_verified": true,
+      "csv_sha256": "b6bd095ce8ef39eabfc3b4f658752254e332a6e5bf183fa1ff675e7be45db844"
+    },
+    "reverse": {
+      "rows": 20000,
+      "all_bodies_verified": true,
+      "csv_sha256": "1d8ad1223d1778c04b27e68cab97cd6f3d37e2ac96a6bb3ee537e73f7d538186"
+    }
+  },
+  "evidence": [
+    {
+      "path": "results/current/qualification-20261122/probe/workflow.json",
+      "sha256": "59430243d2aa70309b0529bf7f4ed3bdbc483145029f0c6341953d6ac01d7c78"
+    },
+    {
+      "path": "results/current/qualification-20261122/probe/profile.json",
+      "sha256": "52c64a313da671c95c9119af084be26395ce16dc4bd23cf60d8e7af0eae13900"
+    },
+    {
+      "path": "results/current/qualification-20261122/probe/console.log",
+      "sha256": "fad88289a5d93e95ac0a7330792dfcdad520c283b9739e9524bfd1069307df50"
+    },
+    {
+      "path": "results/current/qualification-20261122/manifest-inspection/headers.json",
+      "sha256": "8e1cb28a213ab040531c0a4a7c07b6ba0aad94274f18cafd2c94fbcef8a85606"
+    },
+    {
+      "path": "results/current/qualification-20261122/manifest-inspection/workflow.json",
+      "sha256": "2c7428a5059d82f0015365bb4f717c4b9d5c8eded001fc67a766647984c3ecdb"
+    },
+    {
+      "path": "results/current/qualification-20261122/manifest-inspection/probe-body.json",
+      "sha256": "013555cc9374482b8089dde3a082f7b092a7e2c73978144dc53af1d21e2cde2a"
+    },
+    {
+      "path": "results/current/qualification-20261122/manifest-inspection/reverse-body.json",
+      "sha256": "d6c1a0587a6647cc1b9acf54edb837d55e2dacfdab238f941edac5e58c299507"
+    }
+  ],
+  "limitations": [
+    "10k/20k-row protocol controls, not performance benchmarks or equal-data capacity comparison.",
+    "Header inspection succeeded; it does not mark the invalid ClickHouse output conformant.",
+    "Native memory control/storage compression of the separate3.8M-row fixture is in CLICKHOUSE_READ_MEMORY_RESULTS.json; no Parquet compression ratio was measured for these tiny header-only controls.",
+    "Failed probe tables remain; no committed manifest was rewritten."
+  ]
+}
