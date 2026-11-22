@@ -109,10 +109,24 @@ runner rejects endpoint/profile/credential-discovery overrides before opening
 an engine. Credentials remain explicit lab values; host AWS configuration is
 never mounted or used. Standalone standard-library guard tests pass, and all
 **17 rendered services** remain on the internal network without forwarding
-synthetic host credential variables. The full Docker build, native network
-isolation checks and five-path rerun are still pending; these preflight checks
-do not establish them. Runtime extensions/JARs must be installed during image
-build, since the running lab has no outbound network.
+synthetic host credential variables.
+
+The committed isolation source (`7453215`, before the recovery-workload additions)
+also passed full-package Go tests, native ARM64 compilation and two real binary
+rejection probes inside a Docker SDK container with **networking disabled**.
+The synthetic non-local endpoint and profile overrides were rejected before
+engine setup. Limits were **1 CPU / 2 GiB**, with **75.533 CPU core-seconds** and
+**823.84 MiB peak charged memory** for tests/build/probes together. These are
+compiler/control costs, not engine benchmark numbers. Public dependency download
+ran separately without host AWS configuration or credentials; both SDK containers
+were removed after healthy stopped-state/ownership checks.
+[Source/image/counter evidence](LOCAL_ISOLATION_RESULTS.json) is compact; raw logs,
+compiled binary and caches stay ignored under `.build/`.
+
+The final runtime image, native service-network isolation and five-path rerun
+remain pending; offline SDK checks do not establish them or qualify the new
+recovery code. Runtime extensions/JARs must be installed during image build,
+since the running lab has no outbound network.
 
 ## Limitations by architecture
 

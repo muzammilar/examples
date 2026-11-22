@@ -1,0 +1,80 @@
+{
+  "passed": true,
+  "captured_ns": 1795324100654806000,
+  "source_commit": "74532154e1e39629c385eb783a7ce5a32acf60d9",
+  "source_sha256": {
+    "Dockerfile": "e13709a5df83c8fc6acf8a75d1a9b95b9fad7caf1dbf6485f1b374eb199ca14e",
+    "archive.go": "ec768eec27bf9f8e1caaeaf1bdbc525ec042adf4c70404cbc7319a7b0552ce2b",
+    "benchmark.go": "00028ed50f05efe965a91103152d791ea893e59d50e0818500dc8e118ed0b640",
+    "go.mod": "5db3b967ed8eb850220a66d9fd8c564632afc55b53a026e3d93bf3aa54280180",
+    "go.sum": "57e57bee2784485ff50cf3143261ca959720821f802d658ad725c5cca57742f9",
+    "isolation.go": "ed0e74d73250f281a56b59f2787243038268955771fb72f83532825da28b74c3",
+    "isolation_test.go": "a5930919aaf1972d466822865a63036cbc231efe4f00d206a09b1ecbb3823c54",
+    "main.go": "fd1d61a90276f6e7fc99e0ed9ff2d6e38b1d0fe8fcd198a990b34459150e8978",
+    "native.go": "16fc4df4c18ae2833c310c48d67fb68b8b2b61e7cb76eb27f1f7e5d89eadf211",
+    "workload.go": "e0afdb820f62afc94e25bea501eebb636c5640707bb3d60bdca67be41cda0aa6"
+  },
+  "go_version": "go version go1.27.4 linux/arm64",
+  "binary_sha256": "d665eee5b645e313de8d3a05818d58c69c0446b4750368d64d40d8c835a7c92e",
+  "binary_bytes": 76213480,
+  "native_go_package_tests_passed": true,
+  "offline_binary_rejected_endpoint_override": true,
+  "offline_binary_rejected_profile_discovery": true,
+  "containers": {
+    "dependencies": {
+      "id": "396f1fecc01a624ba3cbac2f7d251eb186172265e79c5c4d78d0d7f3d4a01519",
+      "image_id": "sha256:4fa7c968ba93f1635670522dbb01a2c78150443e1385746924566079f36570ea",
+      "state": {
+        "Status": "exited",
+        "Running": false,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 0,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-11-22T05:00:36.92432071Z",
+        "FinishedAt": "2026-11-22T05:01:00.83294418Z"
+      },
+      "cpu_limit": 1,
+      "memory_limit_bytes": 2147483648,
+      "network_mode": "bridge",
+      "host_aws_configuration_mounted_or_forwarded": false
+    },
+    "offline": {
+      "id": "d258b5b9120119ab25f2d66b2fd54f1f96c8e2b80a7413790e36036b888d9c2e",
+      "image_id": "sha256:4fa7c968ba93f1635670522dbb01a2c78150443e1385746924566079f36570ea",
+      "state": {
+        "Status": "exited",
+        "Running": false,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 0,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-11-22T05:02:17.17180859Z",
+        "FinishedAt": "2026-11-22T05:03:45.816937131Z"
+      },
+      "cpu_limit": 1,
+      "memory_limit_bytes": 2147483648,
+      "network_mode": "none",
+      "host_aws_configuration_mounted_or_forwarded": false
+    }
+  },
+  "resource_observations": {
+    "dependencies": {
+      "cpu_stat": "usage_usec 4027614\nuser_usec 2560662\nsystem_usec 1466951\nnice_usec 0\nnr_periods 238\nnr_throttled 1\nthrottled_usec 1216\nnr_bursts 0\nburst_usec 0\n",
+      "peak_charged_memory_bytes": 240144384,
+      "native_io_stat": ""
+    },
+    "offline": {
+      "cpu_stat": "usage_usec 75532534\nuser_usec 68734027\nsystem_usec 6798506\nnice_usec 0\nnr_periods 886\nnr_throttled 7\nthrottled_usec 2494\nnr_bursts 0\nburst_usec 0\n",
+      "peak_charged_memory_bytes": 863862784,
+      "native_io_stat": "254:0 rbytes=0 wbytes=286490624 rios=0 wios=2024 dbytes=0 dios=0\n"
+    }
+  },
+  "scope": "Public Go dependency acquisition only, then native ARM64 full-package tests/build and rejected synthetic endpoint/profile probes with network=none. No host AWS configuration, credentials or cloud resources. Source snapshot excludes ongoing recovery code. Not final runtime-image, SUT network isolation, five-architecture or recovery qualification."
+}
