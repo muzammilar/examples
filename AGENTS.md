@@ -634,13 +634,17 @@ Before adding or materially changing an example for a technology, and before des
   Connect extension). Prefer the languages above for application code and suitable
   non-Java languages for test/inspection tools. Using a system's existing JVM-based
   command-line tools does not require writing custom Java.
-- Management and controller/testing code may use Go, Rust, C++, Python or any
-  other suitable language. Python is optional, not the default requirement.
-  Choose the language that fits the example and its existing tooling; this covers
+- For **new tests and benchmarks**, the general preference is **Rust, then C++,
+  then Go, then Python**, in that order. Apply this to benchmark workloads and
+  test/controller tools; Python is allowed but is not the default. Management
+  code may also use another suitable language when justified. Choose the language
+  that fits the system and existing tooling; this covers
   infrastructure orchestration, fault injection, recovery coordination, test
   assertions, result collection and report generation. These tools need not use
   the application's language. Keep this boundary clear; a workload generator is
   application code even when invoked by `make test`.
+  Preserve a suitable existing harness rather than rewriting it solely to change
+  languages; explain meaningful departures from the preferred order in the README.
 - Follow the language's established idioms, standard library, and ecosystem conventions. Prefer standard-library facilities for common tasks; use a focused, mature library when the standard library does not provide the needed capability.
 - Apply the database/system's own best practices as well as the language's. Read
   official guidance and pinned-version source, and use relevant available skills
