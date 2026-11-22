@@ -117,8 +117,11 @@ v2 data-file rewriting on **2,000,000 rows / 10,000 customers**: rollback,
 independent ClickHouse/REST verification. Its current Make run passes **215
 controls**; the committed CALL profile is **2,149.995 ms**. These are functional
 observations, with CPU/memory/compression/disk/I/O in
-[`DUCKDB_MAINTENANCE.md`](DUCKDB_MAINTENANCE.md). Native live-fault recovery,
-and concurrent-append conflicts remain unrun. Separate native ten-row controls
+[`DUCKDB_MAINTENANCE.md`](DUCKDB_MAINTENANCE.md). Native live-fault recovery
+remains unrun. A separate [controlled append conflict](DUCKDB_CONFLICTS.md) rejects
+the stale rewrite with `Conflict_409`, preserves 110,000 acknowledged rows and
+passes fresh-transaction replanning; continuous-writer progress is still unrun.
+Separate native ten-row controls
 now verify v3 and pending data/schema rejection, unchanged committed metadata and
 complete bodies; `make duckdb-rejections` passes 217 controls. See
 [`DUCKDB_REJECTIONS.md`](DUCKDB_REJECTIONS.md) for pinned client settings and resources.

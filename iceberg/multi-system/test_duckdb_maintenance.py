@@ -7,9 +7,20 @@ from unittest.mock import Mock, patch
 
 import duckdb_maintenance as maintenance
 import duckdb_rejections as rejections
+import duckdb_conflicts as conflicts
 
 
 class NativeMaintenance(unittest.TestCase):
+    def test_stale_rewrite_success_cannot_pass_a_conflict_rejection_test(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            for name in ("seed", "append", "observer", "after", "replan", "rewrite"):
+                (root / (name + "-exit.txt")).write_text("0\n")
+            with self.assertRaisesRegex(
+                RuntimeError, "unexpected native CLI outcome: rewrite"
+            ):
+                conflicts.verify(root, conflicts.ROWS)
+
     def test_rejection_requires_the_specific_native_error_not_just_exit_one(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

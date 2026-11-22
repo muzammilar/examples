@@ -82,12 +82,15 @@ recovery-unit-test:
 	python3 -c 'import sys; assert sys.version_info >= (3, 11), "Recovery controls require Python 3.11+; check the python3 selected by Make"'
 	LAB_PROFILE=historical python3 -m unittest test_recovery_resources.py test_recovery_control.py test_recovery_report.py test_recovery_cleanup.py test_recovery_retirement.py test_compactor_cleanup.py test_compactor_control.py test_prefault_archive.py test_manifest_control.py test_cold_storage.py test_cold_readback.py test_cold_upgrade.py test_cold_cleanup.py test_compound_archive.py test_maintenance_control.py test_lab_profiles.py test_duckdb_maintenance.py
 
-.PHONY: duckdb-maintenance duckdb-rejections
+.PHONY: duckdb-maintenance duckdb-rejections duckdb-conflicts
 duckdb-maintenance: config recovery-unit-test ## Native DuckDB v2 compaction, rollback, retained snapshot and no-op checks
 	python3 duckdb_maintenance.py
 
 duckdb-rejections: config recovery-unit-test ## Native pending-write/schema and v3 compaction rejection controls
 	python3 duckdb_maintenance.py --rejections
+
+duckdb-conflicts: config recovery-unit-test ## Append after native rewrite staging; reject stale commit and replan
+	python3 duckdb_maintenance.py --conflicts
 
 storage-crash: config recovery-unit-test
 	python3 recovery_control.py storage-crash

@@ -402,9 +402,15 @@ def finish_cli(root, planned, sampler, originals):
     return errors
 
 
-def run(rejections=False):
+def run(mode="baseline"):
+    import duckdb_conflicts
     import duckdb_rejections
 
+    if mode not in {"baseline", "rejections", "conflicts"}:
+        raise ValueError("unknown native maintenance scenario")
+    scenario = {"rejections": duckdb_rejections, "conflicts": duckdb_conflicts}.get(
+        mode
+    )
     if control.lab.PROFILE != "current":
         raise RuntimeError("DuckDB-native maintenance requires the current profile")
     context = control.local_docker()
@@ -419,15 +425,21 @@ def run(rejections=False):
             ("BATCH_ROWS", "100000"),
         )
     ]
-    if rejections:
+    if mode == "rejections":
         rows, customers, batch = 10, 10, 2
+    elif mode == "conflicts":
+        rows, customers, batch = (
+            duckdb_conflicts.ROWS,
+            duckdb_conflicts.CUSTOMERS,
+            duckdb_conflicts.APPEND_ROWS,
+        )
     run_id = uuid.uuid4()
     table = "duck_compact_" + run_id.hex
     sql = program(table, rows, customers, batch)
-    artifacts = duckdb_rejections.artifacts(table) if rejections else {"run.sql": sql}
+    artifacts = scenario.artifacts(table) if scenario else {"run.sql": sql}
     root = cleanup.regular(
         cleanup.results_root()
-        / ("duckdb-rejections" if rejections else "duckdb-maintenance")
+        / ("duckdb-" + mode if scenario else "duckdb-maintenance")
         / str(run_id),
         cleanup.results_root(),
     )
@@ -438,7 +450,7 @@ def run(rejections=False):
     settings = control.current_settings(storage, query)
     # Reserve room for seed, rollback output and committed replacement. This
     # healthy test must not accidentally become a storage-capacity experiment.
-    required_slots = 1 if rejections else max(3, (rows * 384 + 255999999) // 256000000)
+    required_slots = 1 if scenario else max(3, (rows * 384 + 255999999) // 256000000)
     free_slots = settings["topology"]["Topology"].get("Free")
     if type(free_slots) is not int or free_slots < required_slots:
         raise RuntimeError(
@@ -466,7 +478,7 @@ def run(rejections=False):
             "context": context,
             "table": table,
             "rows": rows,
-            "mode": "rejections" if rejections else "baseline",
+            "mode": mode,
             "customers": customers,
             "batch_rows": batch,
             "source_sha256": frozen,
@@ -529,7 +541,7 @@ def run(rejections=False):
                 "while ! test -f /results/release; do sleep .1; done; exec "
                 + (
                     "/bin/sh /results/run.sh"
-                    if rejections
+                    if scenario
                     else "duckdb -batch -bail -json :memory: < /results/run.sql"
                 ),
             ],
@@ -574,11 +586,11 @@ def run(rejections=False):
             sampler, ["storage", "clickhouse", "duckdb-cli"], time.time_ns()
         )
         control.save_text(root / "release", "release\n")
-        if rejections:
+        if scenario:
             deadline = time.monotonic() + 120
             while not (root / "native-complete").exists():
                 if time.monotonic() >= deadline:
-                    raise TimeoutError("native rejection sequence timed out")
+                    raise TimeoutError("native maintenance sequence timed out")
                 if not planned()["State"]["Running"]:
                     break  # Retain the ordinary exit/log diagnostics below.
                 time.sleep(0.1)
@@ -600,13 +612,11 @@ def run(rejections=False):
         if logs.returncode:
             raise RuntimeError("native CLI logs could not be retained")
         cold_storage.stopped(value)
-        result = (
-            duckdb_rejections.verify(root, rows) if rejections else verify(root, rows)
-        )
+        result = scenario.verify(root, rows) if scenario else verify(root, rows)
         result["clickhouse_readback"] = independent_readback(
             root, table, rows, customers, query
         )
-        if not rejections:
+        if not scenario:
             result["authoritative_catalog"] = authoritative_catalog(
                 root, table, storage, result
             )
@@ -627,8 +637,10 @@ def run(rejections=False):
                 "cleanup_errors": cleanup_errors,
                 "completed_ns": time.time_ns(),
                 "scope": (
-                    "Ten-row native expected-rejection controls; independent body readback; no live-fault or performance qualification."
-                    if rejections
+                    "Native "
+                    + mode
+                    + " controls; independent body readback; no live-fault or performance qualification."
+                    if scenario
                     else "Healthy native transaction/compaction and independent-engine body checks only. Live readers/writers and faults remain separate qualification gates."
                 ),
             },
@@ -640,8 +652,15 @@ def run(rejections=False):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--rejections", action="store_true")
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument(
+        "--rejections", dest="mode", action="store_const", const="rejections"
+    )
+    group.add_argument(
+        "--conflicts", dest="mode", action="store_const", const="conflicts"
+    )
+    parser.set_defaults(mode="baseline")
     args = parser.parse_args()
     with cold_storage.controller_lock() as lock:
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        run(rejections=args.rejections)
+        run(mode=args.mode)

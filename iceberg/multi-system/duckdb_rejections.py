@@ -12,12 +12,8 @@ ERRORS = {
 }
 
 
-def artifacts(table):
-    if not re.fullmatch(r"duck_compact_[0-9a-f]{32}", table):
-        raise ValueError("fresh owned table identifier required")
-    qualified = "lake.lab." + table
-    v3 = qualified + "_v3"
-    connect = """SET threads=2; SET memory_limit='1GB';
+def connection_sql():
+    return """SET threads=2; SET memory_limit='1GB';
 SET temp_directory='/results/spill'; SET max_temp_directory_size='1GB';
 SET extension_directories=['/opt/duckdb/extensions']; LOAD httpfs; LOAD avro; LOAD iceberg;
 SET http_timeout=30; SET http_retries=3; SET http_retry_wait_ms=100; SET http_retry_backoff=4;
@@ -26,6 +22,14 @@ CREATE SECRET local_catalog (TYPE ICEBERG, URI 'http://storage:8181', CLIENT_ID 
 ATTACH 's3://warehouse' AS lake (TYPE iceberg, SECRET local_catalog, URI 'http://storage:8181', READ_ONLY false);
 SELECT CASE WHEN version()='v2.0.1' THEN true ELSE error('require native v2.0.1') END;
 """
+
+
+def artifacts(table):
+    if not re.fullmatch(r"duck_compact_[0-9a-f]{32}", table):
+        raise ValueError("fresh owned table identifier required")
+    qualified = "lake.lab." + table
+    v3 = qualified + "_v3"
+    connect = connection_sql()
 
     def copy(query, name):
         return f"COPY ({query}) TO '/results/{name}.json' (FORMAT JSON, ARRAY true);\n"

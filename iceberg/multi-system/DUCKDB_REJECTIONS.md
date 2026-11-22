@@ -56,7 +56,9 @@ are harness failures, not successful backend-failure tests. Raw results remain
 ignored under `results/current/duckdb-rejections/`; the compact report records
 hashes and exact tested source. No earlier table or failed verdict was reset.
 
-Concurrent commits, live readers/writers during native compactor interruption,
+The separate [controlled concurrent-append test](DUCKDB_CONFLICTS.md) now passes
+stale-commit rejection and fresh-transaction replanning on 110,000 rows. Continuous
+writers/readers during native compactor interruption,
 catalog/S3 failure, deletes, retention and orphan cleanup remain separate tests.
 See the pinned [transaction validation](https://github.com/duckdb/duckdb-iceberg/blob/f979b5b28a044c49c38a26636ac01bc1f7047fa5/src/maintenance/rewrite_data_files_executor.cpp)
 and [v3 planner rejection](https://github.com/duckdb/duckdb-iceberg/blob/f979b5b28a044c49c38a26636ac01bc1f7047fa5/src/maintenance/rewrite_data_files_planner.cpp#L562-L564).

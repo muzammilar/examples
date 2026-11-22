@@ -200,8 +200,10 @@ verification. It passes 215 controls; resource and timing evidence is in
 
 Separate native controls now verify v3 and pending data/schema rejection, with
 unchanged committed metadata/bodies and pinned/dumped HTTP policy; 217 controls
-pass. See `DUCKDB_REJECTIONS.md`. Next, test concurrent append behavior and
-process/S3/catalog interruption with independent writers and readers kept live. Do not
+pass. See `DUCKDB_REJECTIONS.md`. A controlled concurrent append now rejects the
+stale rewrite with `Conflict_409`, preserves all 110,000 rows and passes fresh
+replanning (218 controls); see `DUCKDB_CONFLICTS.md`. Next, test continuous appends
+and process/S3/catalog interruption with independent writers and readers kept live. Do not
 pause writers or reduce offered load to make maintenance complete. Distinguish
 safe conflict rejection, progress/starvation, ambiguous commits and acknowledged
 loss through the durable witness; source snapshot checks do not prove which

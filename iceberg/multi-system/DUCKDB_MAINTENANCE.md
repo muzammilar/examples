@@ -102,11 +102,13 @@ rejects v3 rewrites. Its [executor](https://github.com/duckdb/duckdb-iceberg/blo
 checks the planned snapshot and rejects pending same-table data/schema changes.
 The v3 and pending data/schema rejection paths now pass separate native tests,
 with unchanged committed metadata and complete bodies; see
-[`DUCKDB_REJECTIONS.md`](DUCKDB_REJECTIONS.md). Concurrent-append behavior remains
-unrun. API details: [DuckDB 2.0 Iceberg functions](https://duckdb.org/docs/2.0/core_extensions/iceberg/iceberg_functions).
+[`DUCKDB_REJECTIONS.md`](DUCKDB_REJECTIONS.md). Controlled concurrent-append behavior is
+covered by a separate [controlled stale-commit test](DUCKDB_CONFLICTS.md): a
+concurrent append survives `Conflict_409` and a fresh rewrite transaction succeeds.
+Continuous-writer progress remains unrun. API details: [DuckDB 2.0 Iceberg functions](https://duckdb.org/docs/2.0/core_extensions/iceberg/iceberg_functions).
 
 Timeout/retry settings are now pinned/dumped for the rejection lane. Next, test
-concurrent commit conflicts and keep independent writers/readers live through process and S3/catalog
+continuous-writer conflicts and keep independent writers/readers live through process and S3/catalog
 interruptions. Do not pause writers to force a successful recovery. Committed
 deletes, partition evolution, manifest rewrites, expiration/orphan cleanup and
 repeated comparative benchmarks remain unrun here. Local DuckDB WAL/file-format

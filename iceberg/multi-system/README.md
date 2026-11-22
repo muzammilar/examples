@@ -150,6 +150,10 @@ failures are in [`DUCKDB_MAINTENANCE.md`](DUCKDB_MAINTENANCE.md).
 data/schema changes and v3 compaction, with unchanged committed state and an
 independent ten-row readback. All **217 controls** pass; pinned HTTP policy,
 resource evidence and scope are in [`DUCKDB_REJECTIONS.md`](DUCKDB_REJECTIONS.md).
+`make duckdb-conflicts` verifies an append committed after rewrite staging:
+the stale rewrite gets `Conflict_409`, all **110,000 acknowledged rows** survive,
+and a fresh transaction replans successfully (**11 → 1 files**). All **218
+controls** pass; see [`DUCKDB_CONFLICTS.md`](DUCKDB_CONFLICTS.md).
 Native compaction under live writers/readers and injected faults remains unrun;
 the earlier live compactor-crash pass uses Spark.
 
