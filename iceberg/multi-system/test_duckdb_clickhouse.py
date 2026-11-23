@@ -11,6 +11,7 @@ import duckdb_clickhouse as connector
 import duckdb_partial as partial
 import duckdb_crash as crash
 import duckdb_dependencies as dependencies
+import connector_compactor_probe as compactor_probe
 
 
 class ConnectorRoundTrip(unittest.TestCase):
@@ -197,6 +198,41 @@ class ReadOnlySourceReuse(unittest.TestCase):
             ):
                 with self.assertRaisesRegex(RuntimeError, "pre-fault source"):
                     dependencies.seed_case(2000000)
+
+
+class CompactorSourceControls(unittest.TestCase):
+    def test_noncanonical_source_is_rejected_before_any_backend_access(self):
+        with self.assertRaises(ValueError):
+            compactor_probe.source("../some-other-example")
+
+    def test_snapshot_and_row_ids_cannot_be_injected_into_native_sql(self):
+        identifier = "11111111-1111-4111-8111-111111111111"
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory).resolve()
+            case = root / "duckdb-connector-dependencies" / identifier
+            case.mkdir(parents=True)
+            for name, value in {
+                "result.json": {
+                    "passed": True,
+                    "checks": {"recovery_probe_rows_verified": 3000},
+                },
+                "invocation.json": {
+                    "table": "duck_compact_" + identifier.replace("-", "")
+                },
+                "probe-catalog-final.json": {
+                    "metadata": {
+                        "table-uuid": identifier,
+                        "current-snapshot-id": "1; DROP TABLE",
+                    }
+                },
+                "cold-input.json": {"append_first": 2000000},
+            }.items():
+                (case / name).write_text(json.dumps(value))
+            with mock.patch.object(
+                compactor_probe.cleanup, "results_root", return_value=root
+            ):
+                with self.assertRaisesRegex(RuntimeError, "bounded native IDs"):
+                    compactor_probe.source(identifier)
 
 
 if __name__ == "__main__":

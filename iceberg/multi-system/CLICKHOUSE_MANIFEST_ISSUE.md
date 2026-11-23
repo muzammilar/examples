@@ -129,3 +129,5 @@ Raw local evidence is retained under ignored `results/current/qualification-2026
 The raw resources and short probe duration are diagnostic evidence, not benchmark
 results. This draft contains no claim that a different ClickHouse release fixes
 this failure.
+
+Additional reader check (2026-11-23): the [native Spark compatibility gate](CONNECTOR_COMPACTOR_PROBE.md) reads all 3,000 complete records from another freshly created v2 table written by the same ClickHouse release. All three of that snapshot's manifests also lack `content`, as directly inspected through Avro. Spark acceptance does not establish v2 writer conformance; the specification requirement and recorded DuckDB failure remain. This result permits testing the native Spark maintenance path, not declaring all readers compatible.

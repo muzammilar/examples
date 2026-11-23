@@ -24,6 +24,9 @@ by unproven legacy diagnostic container labels.
 and a **2M-row immutable cold source**. Both timed-out archive requests committed
 1,000 rows after healing, so reconciliation prevented duplicate retries; a fresh
 healthy archive then acknowledged. Whole-source fresh-copy capacity remains guarded.
+The [read-only Spark gate](CONNECTOR_COMPACTOR_PROBE.md) verifies 3k complete
+ClickHouse-written records despite the missing v2 manifest header. This permits
+the next maintenance experiment; million-row concurrent compaction is still unrun.
 
 ## Quick start
 
@@ -290,6 +293,8 @@ multi-system/
 ├── recovery_cleanup.py      # fixture index, all-history verification and teardown
 ├── recovery_resources.py    # native CPU, memory, disk/I/O sampling
 ├── recovery_report.py       # offline operation/latency/compression summaries
+├── connector_compactor_probe.py # read-only native Spark fixture gate
+├── connector_compactor_job.py   # native pinned-snapshot body/footer/header checks
 ├── test_recovery_*.py       # controller, report and cleanup negative controls
 ├── PLAN.md                  # unimplemented experiments, explicitly separate from results
 └── results/                 # ignored JSON metrics and acknowledgement journals

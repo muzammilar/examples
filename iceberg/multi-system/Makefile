@@ -272,3 +272,7 @@ build-dependency-fault: config ## Build the isolated native network-fault helper
 
 duckdb-clickhouse-dependencies: config recovery-unit-test build-dependency-fault ## Separate S3/catalog port isolation with live DuckDB hot reads/writes
 	python3 duckdb_maintenance.py --connector-dependencies
+
+.PHONY: connector-compactor-probe
+connector-compactor-probe: config recovery-unit-test ## Read-only Spark/Iceberg compatibility gate for a preserved CH-written probe
+	python3 connector_compactor_probe.py "$(SOURCE_CASE)"

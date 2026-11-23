@@ -19,6 +19,13 @@ and an unchanged two-million-row retained cold source; see `DUCKDB_DEPENDENCIES.
 Both native-client-deadline archive requests committed 1k rows after healing;
 reconciliation prevents replay. Earlier failed deadlines stay failed. New writes
 use a separate 3k-row probe; fresh full-copy capacity remains guarded.
+Group 5 prerequisite: native Spark 4.1.4/Iceberg 1.12.0 reads the CH-written
+3k probe even though its actual v2 manifests omit content; see
+`CONNECTOR_COMPACTOR_PROBE.md`. This does not remove the format finding.
+Next use a passed native two-million-row maintenance baseline as an explicitly
+witnessed parent, preserve its old snapshot, keep hot/cold writers/readers live,
+and require measured overlap with a rewrite of the full base file. Do not mutate
+the read-only failed dependency source or remove retained data to gain capacity.
 Continue group 5 and unresolved boundaries as unqualified exploration; defer capacity
 ranking until the healthy read contract passes. Do not reset the failed fixtures.
 
