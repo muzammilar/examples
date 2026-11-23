@@ -1,6 +1,6 @@
 empty :=
 space := $(empty) $(empty)
-MODULE_DIRS := scripts tests $(sort $(wildcard projects/*/scripts projects/*/tests))
+MODULE_DIRS := scripts tests $(sort $(wildcard projects/*/scripts projects/*/tests projects/*/*/scripts projects/*/*/tests))
 export PYTHONPATH := $(subst $(space),:,$(addprefix $(CURDIR)/,$(MODULE_DIRS)))
 SHELL := /bin/sh
 DUCKDB_VERSION ?= 2.0.1
@@ -307,7 +307,7 @@ duckdb-clickhouse-dependencies: config recovery-unit-test build-dependency-fault
 
 .PHONY: connector-compactor-probe
 connector-compactor-probe: config recovery-unit-test ## Read-only Spark/Iceberg compatibility gate for a preserved CH-written probe
-	python3 projects/duckdb-clickhouse/scripts/connector_compactor_probe.py "$(SOURCE_CASE)"
+	python3 projects/duckdb-clickhouse/clickhouse-scanner/scripts/connector_compactor_probe.py "$(SOURCE_CASE)"
 
 .PHONY: connector-concurrent
 connector-concurrent: config recovery-unit-test ## Full native rewrite with independent DuckDB hot/cold writers and readers
@@ -315,7 +315,7 @@ connector-concurrent: config recovery-unit-test ## Full native rewrite with inde
 
 .PHONY: connector-concurrent-recheck
 connector-concurrent-recheck: config recovery-unit-test ## Recheck durable cold journals and all current hot/cold ACKs without rewriting
-	python3 projects/duckdb-clickhouse/scripts/connector_concurrent.py "$(CASE)"
+	python3 projects/duckdb-clickhouse/clickhouse-scanner/scripts/connector_concurrent.py "$(CASE)"
 
 .PHONY: cold-memory-diagnostic
 cold-memory-diagnostic: config recovery-unit-test ## Read-only native full-table isolation at fixed caps; not a concurrent-recovery qualification
@@ -331,7 +331,7 @@ connector-read-isolation: config recovery-unit-test ## Preserve streamed predica
 
 .PHONY: build-http duckdb-clickhouse-http-read duckdb-clickhouse-http
 build-http: config ## Build the separate signed HTTP application image; keeps legacy images
-	python3 projects/duckdb-clickhouse/scripts/build_http.py
+	python3 projects/duckdb-clickhouse/http/scripts/build_http.py
 
 duckdb-clickhouse-http-read: config recovery-unit-test build-http ## Check full generated bodies through core httpfs with one and two threads
 	python3 projects/duckdb-iceberg/scripts/duckdb_maintenance.py --connector-http-read

@@ -73,11 +73,11 @@ not a transactional rollback or exactly-once contract; ambiguous-write and
 fault/recovery tests still need porting. ACKs are fsynced during final verification,
 so this healthy test does not establish power-loss-safe live journaling.
 
-The local [Dockerfile](../../../app/Dockerfile.http) derives from the Docker-built runner
+The local [Dockerfile](../../../../app/Dockerfile.http) derives from the Docker-built runner
 created by this example's `make up`, installs the vendor-supported DuckDB 2.x
 extension repository, verifies the extension binary SHA256 and keeps unsigned
 extensions disabled. It builds a distinct image and leaves the legacy image intact.
-The [Compose override](../../../deploy/compose/docker-compose.http.yml) retains the owned internal network
+The [Compose override](../../../../deploy/compose/docker-compose.http.yml) retains the owned internal network
 and 2 CPU / 2 GiB application cap. No host credentials or cloud services are used.
 The HTTP variant removes only its owned containers, network and volumes. It
 retains immutable image caches shared with other lanes; existing preservation

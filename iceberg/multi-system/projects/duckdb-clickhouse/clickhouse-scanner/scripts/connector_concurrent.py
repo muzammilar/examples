@@ -163,7 +163,7 @@ def drive(root, hot_table, rows, identifier, query, sampler):
     control.save(root / "parent-catalog.json", before)
     control.save_text(
         root / "spark_concurrent_job.py",
-        (control.ROOT / "projects/duckdb-clickhouse/scripts/connector_concurrent_job.py").read_text(),
+        (control.ROOT / "projects/duckdb-clickhouse/clickhouse-scanner/scripts/connector_concurrent_job.py").read_text(),
     )
     stop, lock = threading.Event(), threading.Lock()
     cold_history, read_checks, failures = [], [], []

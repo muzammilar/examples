@@ -5,13 +5,18 @@ Compose services; no cloud credentials or real AWS resources are needed.
 
 | Data path | Guide | Entry point |
 |---|---|---|
-| DuckDB SQL → ClickHouse ↔ Iceberg | [HTTP application](projects/duckdb-clickhouse/docs/DUCKDB_HTTP.md) | `make duckdb-clickhouse` |
+| DuckDB SQL → ClickHouse ↔ Iceberg | [HTTP application](projects/duckdb-clickhouse/http/docs/DUCKDB_HTTP.md) | `make duckdb-clickhouse` |
 | DuckDB → Iceberg → DuckDB/ClickHouse | [Native DuckDB maintenance](projects/duckdb-iceberg/docs/DUCKDB_MAINTENANCE.md) | `make duckdb-maintenance` |
 | ClickHouse → Iceberg; hot/cold archive handoff | [Architecture guide](docs/ARCHITECTURES.md) | `make test ARCH=ch-archive` |
 | DuckDB → Iceberg archive | [Architecture guide](docs/ARCHITECTURES.md) | `make test ARCH=duck-archive` |
 | Three ClickHouse shards, three copies per shard, backed by Iceberg | [Architecture guide](docs/ARCHITECTURES.md) | `make test ARCH=ch-sharded` |
 | Storage, compactor and cold recovery | [Recovery notes](projects/cold-storage-recovery/docs/COLD_STORAGE.md) | See the guide's individual targets |
-| Previous native ClickHouse connector failures | [Preserved findings](projects/duckdb-clickhouse/docs/DUCKDB_CLICKHOUSE_FINDINGS.md) | `make duckdb-clickhouse-native` |
+| Previous native ClickHouse connector failures | [Preserved findings](projects/duckdb-clickhouse/clickhouse-scanner/docs/DUCKDB_CLICKHOUSE_FINDINGS.md) | `make duckdb-clickhouse-native` |
+
+We replaced `clickhouse_scanner` after successful native-connector queries returned
+wrong answers on a two-million-row fixture. The [rejection, measured counts and
+replacement results](projects/duckdb-clickhouse/README.md#why-we-replaced-clickhouse_scanner)
+are preserved together; the default route now uses HTTP.
 
 ## Quick start
 

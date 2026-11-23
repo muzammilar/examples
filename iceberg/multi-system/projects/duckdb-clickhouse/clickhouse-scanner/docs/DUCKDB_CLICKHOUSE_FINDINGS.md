@@ -1,9 +1,12 @@
 # DuckDB as the ClickHouse client, with Iceberg behind ClickHouse
 
 The requested path is **application reads/writes through DuckDB → ClickHouse ↔
-Iceberg**. DuckDB's `clickhouse_scanner` extension is the application connector;
-DuckDB does not access S3 directly in these probes. This differs from the existing
-direct DuckDB–Iceberg examples. **This architecture is not yet qualified.**
+Iceberg**. These preserved probes used DuckDB's `clickhouse_scanner` extension
+as the application connector; DuckDB did not access S3 directly in these probes. This differs from the existing
+direct DuckDB–Iceberg examples. **The native scanner failed qualification and
+was replaced as the default.** See the [project verdict and measured wrong-answer
+counts](../../README.md#why-we-replaced-clickhouse_scanner) and the
+[HTTP replacement](../../http/docs/DUCKDB_HTTP.md).
 
 Local diagnostic probes used DuckDB **2.0.1**, signed community connector
 **ce337c48c1**, ClickHouse **26.10.10.3** and SeaweedFS **4.54**. No host cloud
@@ -48,7 +51,7 @@ without that metadata use core keys. The successful official installation
 reports connector revision `ce337c48c1`, matching its binary footer and reviewed
 source. No unsigned-extension flag was used.
 
-The earlier [ClickHouse-written manifest issue](../../manifest-interop/docs/CLICKHOUSE_MANIFEST_ISSUE.md)
+The earlier [ClickHouse-written manifest issue](../../../manifest-interop/docs/CLICKHOUSE_MANIFEST_ISSUE.md)
 also remains relevant to independent readers: ClickHouse omits required `content`
 metadata. Reading that output through ClickHouse alone does not prove Iceberg
 interoperability with other engines.
@@ -70,12 +73,14 @@ fences the holding shell; its termination is not a DuckDB native abort. Resource
 windows include that hold/fencing interval. These probes provide no request
 latency distribution, compression result or capacity ranking.
 
-`make duckdb-clickhouse` now exercises the two-million-row round trip and fails
+`make duckdb-clickhouse-native` preserves the two-million-row native round trip and fails
 closed before advancing past a wrong body summary. The independent
 `make duckdb-clickhouse-read-repro` also returns nonzero on the observed generated
 read-query mismatch. Both run within this example's existing infrastructure
 lifecycle; their execution does not qualify the architecture. Group 1 has been
-exercised and failed; the five-group scope remains:
+exercised and failed; the preserved five-group scope is documented below.
+Experiments are stopped; this list does not authorize further runs:
+
 
 1. **Full round trip:** two million rows through DuckDB → ClickHouse → Iceberg →
    ClickHouse, complete body/type oracle and ordinary versus pass-through queries.

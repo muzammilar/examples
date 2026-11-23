@@ -39,7 +39,7 @@ key-value metadata property `content`. Native Avro header inspection checks the
 actual files, rather than inferring this from an error message. Spark nevertheless
 reads all bodies correctly. The [Iceberg v2 writing rules](https://iceberg.apache.org/spec/#version-2)
 require that property. Reader acceptance therefore does **not** clear the writer
-finding in [the manifest report](../../manifest-interop/docs/CLICKHOUSE_MANIFEST_ISSUE.md). DuckDB's recorded
+finding in [the manifest report](../../../manifest-interop/docs/CLICKHOUSE_MANIFEST_ISSUE.md). DuckDB's recorded
 rejection on the earlier ClickHouse-written fixtures remains a separate failure;
 this gate did not rerun DuckDB against this exact 3k snapshot.
 

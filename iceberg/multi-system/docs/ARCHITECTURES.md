@@ -6,39 +6,39 @@ The single-server, ClickHouse-only examples are separately indexed under
 [`clickhouse/`](../../../clickhouse/README.md#iceberg-examples).
 
 Current priority: **DuckDB as the application SQL client → ClickHouse ↔ Iceberg**.
-The active [HTTP application path](../projects/duckdb-clickhouse/docs/DUCKDB_HTTP.md) replaces `clickhouse_scanner`
+The active [HTTP application path](../projects/duckdb-clickhouse/http/docs/DUCKDB_HTTP.md) replaces `clickhouse_scanner`
 with core `httpfs` reads and signed `http_client` writes. Actual checks pass 2M
 hot writes/readback and 2.097M retained cold reads; the new full Iceberg round trip
 is capacity-blocked and HTTP fault tests remain unrun. `make duckdb-clickhouse`
 now selects HTTP; `make duckdb-clickhouse-native` preserves the old regression.
 
 The following findings describe the previous native connector:
-The [connector findings](../projects/duckdb-clickhouse/docs/DUCKDB_CLICKHOUSE_FINDINGS.md) record an Iceberg
+The [connector findings](../projects/duckdb-clickhouse/clickhouse-scanner/docs/DUCKDB_CLICKHOUSE_FINDINGS.md) record an Iceberg
 catalog-discovery failure, non-rollbackable remote writes and nanosecond precision
 loss. This connector architecture is not yet qualified; its next pass has five
 explicit test groups. Existing direct DuckDB–Iceberg results cover another path.
-The [two-million-row round trip](../projects/duckdb-clickhouse/docs/DUCKDB_CLICKHOUSE_ROUNDTRIP.md) and generated
+The [two-million-row round trip](../projects/duckdb-clickhouse/clickhouse-scanner/docs/DUCKDB_CLICKHOUSE_ROUNDTRIP.md) and generated
 read regression now run through Make and fail on intermittent wrong answers;
 native full-body checks verify all stored copies remain correct.
-[Row-level isolation](../projects/duckdb-clickhouse/docs/CONNECTOR_READ_ISOLATION.md) now saves incorrect ingestion
+[Row-level isolation](../projects/duckdb-clickhouse/clickhouse-scanner/docs/CONNECTOR_READ_ISOLATION.md) now saves incorrect ingestion
 predicate flags beside correct row values; root cause remains unassigned.
-The [partial-insert control](../projects/duckdb-clickhouse/docs/DUCKDB_PARTIAL.md) now reproduces persisted rows
+The [partial-insert control](../projects/duckdb-clickhouse/clickhouse-scanner/docs/DUCKDB_PARTIAL.md) now reproduces persisted rows
 after an error and duplicate effects on retry; corrected immutable-key replay
 passes in a separate replacement table. Transport ACK-loss injection remains unrun.
-The [live ClickHouse crash](../projects/duckdb-clickhouse/docs/DUCKDB_CRASH.md) now reconciles **2.14M ACKed rows**
+The [live ClickHouse crash](../projects/duckdb-clickhouse/clickhouse-scanner/docs/DUCKDB_CRASH.md) now reconciles **2.14M ACKed rows**
 with zero missing/wrong/duplicate bodies; independent readers and writers observe
 errors and resume after restart. Earlier-history re-verification remains blocked
 by unproven legacy diagnostic container labels.
-[S3/catalog partitions](../projects/duckdb-clickhouse/docs/DUCKDB_DEPENDENCIES.md) now verify **3.38M hot ACKed rows**
+[S3/catalog partitions](../projects/duckdb-clickhouse/clickhouse-scanner/docs/DUCKDB_DEPENDENCIES.md) now verify **3.38M hot ACKed rows**
 and a **2M-row immutable cold source**. Both timed-out archive requests committed
 1,000 rows after healing, so reconciliation prevented duplicate retries; a fresh
 healthy archive then acknowledged. Whole-source fresh-copy capacity remains guarded.
-The [read-only Spark gate](../projects/duckdb-clickhouse/docs/CONNECTOR_COMPACTOR_PROBE.md) verifies 3k complete
+The [read-only Spark gate](../projects/duckdb-clickhouse/clickhouse-scanner/docs/CONNECTOR_COMPACTOR_PROBE.md) verifies 3k complete
 ClickHouse-written records despite the missing v2 manifest header. This permits
-a [two-million-row concurrent rewrite](../projects/duckdb-clickhouse/docs/CONNECTOR_CONCURRENT.md), now executed.
+a [two-million-row concurrent rewrite](../projects/duckdb-clickhouse/clickhouse-scanner/docs/CONNECTOR_CONCURRENT.md), now executed.
 All **3.46M hot and 2.097M cold acknowledged rows** reconcile, but **32/51 cold
 reads failed with memory-limit errors**: integrity passed, availability failed.
-The [native memory diagnostic](../projects/duckdb-clickhouse/docs/COLD_MEMORY.md) also reproduces a memory error
+The [native memory diagnostic](../projects/duckdb-clickhouse/clickhouse-scanner/docs/COLD_MEMORY.md) also reproduces a memory error
 without DuckDB or concurrent writers; a 64 MiB reader watermark alone is not a
 validated fix. A follow-up also fails with 8,192-row Parquet blocks and one
 query thread; neither setting is a proven workaround. Level 5 is explicitly

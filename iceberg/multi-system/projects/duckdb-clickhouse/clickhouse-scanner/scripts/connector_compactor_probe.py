@@ -81,7 +81,7 @@ def run(identifier):
         control.save_text(path, data.decode())
     control.save_text(
         root / "spark_fixture_probe.py",
-        (control.ROOT / "projects/duckdb-clickhouse/scripts/connector_compactor_job.py").read_text(),
+        (control.ROOT / "projects/duckdb-clickhouse/clickhouse-scanner/scripts/connector_compactor_job.py").read_text(),
     )
     image = json.loads(
         control.call(
