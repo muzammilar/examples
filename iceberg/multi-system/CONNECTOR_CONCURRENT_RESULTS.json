@@ -85,7 +85,7 @@
   "new_cold_rows_acknowledged": 97000,
   "hot_seed_rows_new": 2000000,
   "hot_seed_batch_rows": 100000,
-  "dataset": "Four columns: Int64 ID, Int32 customer, Int64 cents, 64 UTF-8 hex SHA256 bytes. Customer=id%10000, cents=id%10000+1, payload=SHA256(decimal ID). No nulls/RNG. 184000000 logical bytes per 2M-row seed, excluding storage/wire framing.",
+  "dataset": "Four columns: Int64 ID, Int32 customer, Int64 cents, 64 UTF-8 hex SHA256 bytes. Customer=id%10000, cents=id%10000+1, payload=SHA256(decimal ID). No nulls/RNG. 168000000 logical bytes per 2M-row seed, excluding storage/wire framing.",
   "rewrite": [
     {
       "rewritten_data_files_count": 70,
@@ -709,5 +709,6 @@
   ],
   "integrity_passed": true,
   "availability_passed": false,
-  "verdict_reason": "Cold reads succeeded on 19/51 first attempts (37.25%), below the 95% gate; all 32 failures were ClickHouse memory-limit errors. Complete hot/cold acknowledged-data reconciliation passed."
+  "verdict_reason": "Cold reads succeeded on 19/51 first attempts (37.25%), below the 95% gate; all 32 failures were ClickHouse memory-limit errors. Complete hot/cold acknowledged-data reconciliation passed.",
+  "logical_size_correction": "Derived field-byte sum corrected to 2M*(8+4+8+64)=168M. Raw data, source hashes and measured counters unchanged."
 }

@@ -49,7 +49,7 @@ ignored.
 
 ## Resource observations and limits
 
-Four input fields represent **184,000,000 logical bytes per two-million-row
+Four input fields represent **168,000,000 logical bytes per two-million-row
 scan**, excluding framing and the diagnostic flag. Data is generated; there is
 no new persisted dataset or compression layer. Temporary tables are dropped.
 No cloud resources or host AWS configuration are used.

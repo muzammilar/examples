@@ -116,7 +116,7 @@
     "arrival": "closed loop per independent task; no retry; fresh native DuckDB C++ process per request",
     "schema": "Int64 event_id, Int32 customer_id, Int64 amount_cents, 64-character SHA256 String",
     "body": "customer=id%10000, amount=id%10000+1, payload=SHA256(decimal ID); no nulls/RNG",
-    "logical_seed_bytes": 184000000,
+    "logical_seed_bytes": 168000000,
     "logical_seed_bytes_scope": "fixed numeric widths and UTF-8 payload only; excludes wire and storage overhead"
   },
   "versions": {
@@ -852,5 +852,6 @@
     "fault_injected": true,
     "clickhouse_restored": true,
     "error": "Undefined cleanup variable; fixed before final static checks and live rerun."
-  }
+  },
+  "logical_size_correction": "Logical field bytes are 2M*(8+4+8+64)=168M; the earlier 184M estimate included engine overhead. Raw evidence and native measured uncompressed counters are unchanged."
 }

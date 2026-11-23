@@ -35,7 +35,7 @@ through signed `clickhouse_scanner` **ce337c48c1** into ClickHouse **26.10.10.3*
 The writer seeds two million rows, then sends unique 10,000-row batches; the reader
 checks 1,000 complete older/recently acknowledged bodies per request. Each task
 waits 200 ms after a request (closed loop). The four-field fixture has Int64 ID,
-Int32 customer, Int64 cents and a 64-character SHA256 payload: **184,000,000 logical
+Int32 customer, Int64 cents and a 64-character SHA256 payload: **168,000,000 logical
 seed bytes**, excluding wire/storage overhead. Generation is deterministic, with
 10,000 customers, no nulls and no RNG. The existing Python Docker/evidence controller
 is retained; database application execution is native DuckDB, not a Python binding.

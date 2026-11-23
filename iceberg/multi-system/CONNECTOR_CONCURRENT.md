@@ -22,7 +22,7 @@ the same REST catalog. No cloud resources or host AWS credentials are used.
 Independent hot/cold readers and writers stay live. Cold reads use explicit native
 query pass-through because catalog discovery remains broken. The four-column
 fixture contains ID, customer, cents and a 64-byte SHA256 hex body; two million
-records represent 184,000,000 logical bytes before framing. Successful operations
+records represent 168,000,000 logical bytes before framing. Successful operations
 are reconciled against external witnesses by ID and complete expected body.
 
 | Observation | Measured result |

@@ -70,7 +70,7 @@
     "hot_read_rows_per_request": 1000,
     "customers": 10000,
     "schema": "Int64 ID, Int32 customer, Int64 cents, SHA256 hex String (64 UTF-8 bytes)",
-    "logical_seed_bytes": 184000000,
+    "logical_seed_bytes": 168000000,
     "generation": "customer=id%10000; cents=id%10000+1; payload=SHA256(decimal ID); no NULLs/RNG",
     "cold_source_rows": 2000000,
     "cold_source_case": "8a578883-bbdd-4429-b2bf-e4743c3c10b7",
@@ -642,5 +642,6 @@
       "path": "results/current/duckdb-connector-dependencies/9f48f648-d6f0-4bb4-9b8d-a9b5349c33e8/result.json",
       "sha256": "5530bcd355220f5d55f0c127ac318c32aacfffb6895fff4208c413753b1af9d6"
     }
-  ]
+  ],
+  "logical_size_correction": "Logical field bytes are 2M*(8+4+8+64)=168M; the earlier 184M estimate included engine overhead. Raw evidence and native measured uncompressed counters are unchanged."
 }

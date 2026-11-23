@@ -19,7 +19,7 @@ The fixture uses the round-trip experiment's four fields: Int64 event ID, Int32
 customer, Int64 cents and 64-character SHA256 payload. Seed IDs are `0..1999999`,
 with deterministic `customer=id%10000`, `amount=id%10000+1` and
 `payload=SHA256(decimal ID)`. No nulls or RNG. Seed logical field bytes are
-**184,000,000**, excluding wire framing and engine overhead. Writers append fresh
+**168,000,000**, excluding wire framing and engine overhead. Writers append fresh
 10,000-row batches without retrying failed requests. Independent readers alternate
 1,000 older seed records and 1,000 records from the latest acknowledged batch,
 checking every returned field and ID in order against the host-generated oracle.

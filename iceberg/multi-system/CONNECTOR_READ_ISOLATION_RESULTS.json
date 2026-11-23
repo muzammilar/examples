@@ -584,5 +584,7 @@
       "sha256": "72f4434679ded602dff1f9f9ffd34fbeb373403a77c3f5c3dbf9e8edf8198987"
     }
   ],
-  "host_controls_after_negative_control": 248
+  "host_controls_after_negative_control": 248,
+  "logical_field_bytes_per_2m_scan": 168000000,
+  "logical_size_derivation": "2M*(8+4+8+64), excluding offsets/framing/engine overhead"
 }
