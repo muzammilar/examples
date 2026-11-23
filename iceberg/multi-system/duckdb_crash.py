@@ -68,7 +68,7 @@ def reconcile(groups, intents):
     }
 
 
-def drive(root, table, rows, identifier, query, sampler):
+def drive(root, table, rows, identifier, query, sampler, operation=None):
     stop, lock = threading.Event(), threading.Lock()
     phase, records, errors = ["baseline"], [], []
     prefix = connector.connection(max(rows * 2, 10000000), 100000)
@@ -97,19 +97,24 @@ def drive(root, table, rows, identifier, query, sampler):
         )
         control.save_text(root / (stem + ".sql"), sql)
         start = time.monotonic_ns()
+        bounded = role in {"archive", "cold-reader"}
+        command = ["docker", "exec", "-i", identifier]
+        if bounded:
+            command += [
+                "timeout",
+                "--signal=KILL",
+                "10",
+                "/bin/sh",
+                "-c",
+                'printf \'%s\\n\' "$$" > "$1"; exec duckdb -batch -bail -json :memory:',
+                "sh",
+                "/results/" + stem + "-pid.txt",
+            ]
+        else:
+            command += ["duckdb", "-batch", "-bail", "-json", ":memory:"]
         try:
             value = subprocess.run(
-                [
-                    "docker",
-                    "exec",
-                    "-i",
-                    identifier,
-                    "duckdb",
-                    "-batch",
-                    "-bail",
-                    "-json",
-                    ":memory:",
-                ],
+                command,
                 input=sql,
                 env=control.DOCKER_ENV,
                 text=True,
@@ -117,13 +122,19 @@ def drive(root, table, rows, identifier, query, sampler):
                 timeout=12,
             )
             output, stderr, code = value.stdout, value.stderr, value.returncode
-            status = "ok" if code == 0 else "ambiguous" if role != "reader" else "fail"
+            status = (
+                "ok"
+                if code == 0
+                else "ambiguous"
+                if role not in {"reader", "cold-reader"}
+                else "fail"
+            )
         except subprocess.TimeoutExpired as error:
             output, stderr, code, status = (
                 "",
                 str(error),
                 None,
-                "ambiguous" if role != "reader" else "fail",
+                "ambiguous" if role not in {"reader", "cold-reader"} else "fail",
             )
         control.save_text(root / (stem + "-stdout.json"), output)
         control.save_text(root / (stem + "-stderr.log"), stderr)
@@ -133,6 +144,16 @@ def drive(root, table, rows, identifier, query, sampler):
             "exit_code": code,
             "status": status,
         }
+        if bounded:
+            pid = int((root / (stem + "-pid.txt")).read_text())
+            listing = control.call(["docker", "exec", identifier, "ls", "-1", "/proc"])
+            control.save_text(root / (stem + "-processes.txt"), listing)
+            processes = {int(item) for item in listing.splitlines() if item.isdigit()}
+            result["native_client_pid"] = pid
+            result["native_client_fenced"] = 1 in processes and pid not in processes
+            if not result["native_client_fenced"]:
+                control.save(root / (stem + "-unfenced.json"), result)
+                raise RuntimeError("native request process not positively fenced")
         if role == "reader" and status == "ok":
             if json.loads(output) != expected(first, end - first):
                 result["status"] = "mismatch"
@@ -229,42 +250,53 @@ def drive(root, table, rows, identifier, query, sampler):
         control.wait_coverage(
             sampler, ["storage", "clickhouse", "duckdb-cli"], time.time_ns()
         )
-        with lock:
-            phase[0] = "outage"
-        control.save(
-            root / "fault-intent.json",
-            {
-                "signal": "SIGKILL",
-                "container": query["Id"],
-                "started_ns": time.time_ns(),
-            },
-        )
-        control.call(
-            [
-                "docker",
-                "kill",
-                "--signal",
-                "KILL",
-                control.owned(query["Id"], "clickhouse")["Id"],
-            ]
-        )
-        killed = True
-        fenced = control.owned(query["Id"], "clickhouse")
-        control.save(root / "target-fenced.json", control.state(fenced))
-        control.require_fenced(fenced)
-        # The native process stays down while both independent actors continue.
-        deadline = time.monotonic() + 8
-        while time.monotonic() < deadline:
-            if stop.wait(0.1):
-                raise RuntimeError("live actor stopped during outage")
-        control.save(root / "restart-intent.json", {"started_ns": time.time_ns()})
-        control.call(["docker", "start", query["Id"]])
-        with lock:
-            phase[0] = "recovery"
-        progress("recovery", minimum=4)
-        with lock:
-            phase[0] = "after"
-        progress("after", minimum=4)
+        if operation is not None:
+
+            def transition(label):
+                with lock:
+                    phase[0] = label
+                control.save(
+                    root / (label + "-phase.json"), {"started_ns": time.time_ns()}
+                )
+
+            operation(request, transition, progress)
+        else:
+            with lock:
+                phase[0] = "outage"
+            control.save(
+                root / "fault-intent.json",
+                {
+                    "signal": "SIGKILL",
+                    "container": query["Id"],
+                    "started_ns": time.time_ns(),
+                },
+            )
+            control.call(
+                [
+                    "docker",
+                    "kill",
+                    "--signal",
+                    "KILL",
+                    control.owned(query["Id"], "clickhouse")["Id"],
+                ]
+            )
+            killed = True
+            fenced = control.owned(query["Id"], "clickhouse")
+            control.save(root / "target-fenced.json", control.state(fenced))
+            control.require_fenced(fenced)
+            # The native process stays down while both independent actors continue.
+            deadline = time.monotonic() + 8
+            while time.monotonic() < deadline:
+                if stop.wait(0.1):
+                    raise RuntimeError("live actor stopped during outage")
+            control.save(root / "restart-intent.json", {"started_ns": time.time_ns()})
+            control.call(["docker", "start", query["Id"]])
+            with lock:
+                phase[0] = "recovery"
+            progress("recovery", minimum=4)
+            with lock:
+                phase[0] = "after"
+            progress("after", minimum=4)
     except BaseException as error:
         failure = error
     finally:
@@ -289,16 +321,14 @@ def drive(root, table, rows, identifier, query, sampler):
             )
     if failure:
         raise failure
-    if (
-        errors
-        or any(r["status"] == "mismatch" for r in records)
-        or not all(
-            any(
-                r["phase"] == "outage" and r["role"] == role and r["status"] != "ok"
-                for r in records
-            )
-            for role in ("writer", "reader")
+    if errors or any(r["status"] == "mismatch" for r in records):
+        raise RuntimeError("live workload failed or returned incorrect bodies")
+    if operation is None and not all(
+        any(
+            r["phase"] == "outage" and r["role"] == role and r["status"] != "ok"
+            for r in records
         )
+        for role in ("writer", "reader")
     ):
         raise RuntimeError("outage not observed by both live actors")
     if control.live_identity(control.service("storage")) != control.live_identity(
@@ -308,9 +338,18 @@ def drive(root, table, rows, identifier, query, sampler):
     after = control.owned(query["Id"], "clickhouse")
     if (
         not after["State"]["Running"]
-        or after["State"]["StartedAt"] == query["State"]["StartedAt"]
+        or (
+            operation is None
+            and after["State"]["StartedAt"] == query["State"]["StartedAt"]
+        )
+        or (
+            operation is not None
+            and control.live_identity(after) != control.live_identity(query)
+        )
     ):
-        raise RuntimeError("new ClickHouse process not established")
+        raise RuntimeError(
+            "ClickHouse process identity differs from the operation contract"
+        )
     return after
 
 
@@ -338,7 +377,7 @@ def verify(root, table, rows, query):
     control.save_text(root / "native-reconcile.jsonl", output)
     checks = reconcile(
         [json.loads(line) for line in output.splitlines()],
-        [r for r in history if r["role"] != "reader"],
+        [r for r in history if r["role"] in {"seed", "writer"}],
     )
     parts = f"SELECT sum(rows) AS rows,sum(data_uncompressed_bytes) AS uncompressed_bytes,sum(data_compressed_bytes) AS compressed_bytes,sum(bytes_on_disk) AS allocated_bytes FROM system.parts WHERE active AND database='default' AND table='{table}' LIMIT 1 SETTINGS max_execution_time=30,max_rows_to_read=100000,timeout_before_checking_execution_speed=0 FORMAT JSONEachRow"
     control.save_text(root / "native-parts.json", control.call(client + [parts]))

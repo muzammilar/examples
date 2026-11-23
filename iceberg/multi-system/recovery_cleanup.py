@@ -20,7 +20,16 @@ import recovery_control as control
 from recovery_resources import ResourceSampler
 
 VOLUME_FIELDS = ("Name", "CreatedAt", "Mountpoint")
-PROFILES = ["--profile", "cluster", "--profile", "tools", "--profile", "production"]
+PROFILES = [
+    "--profile",
+    "cluster",
+    "--profile",
+    "tools",
+    "--profile",
+    "production",
+    "--profile",
+    "dependency-fault",
+]
 SERVICES = {
     "storage",
     "clickhouse",
@@ -32,6 +41,7 @@ SERVICES = {
     "recovery-reader",
     "recovery-compactor",
     "compaction-upload-gate",
+    "dependency-fault",
     *[f"ch{s}{r}" for s in range(1, 4) for r in range(1, 4)],
     "keeper1",
     "keeper2",
@@ -43,6 +53,7 @@ IMAGES = (
     "iceberg-multi-compactor:dev",
     "iceberg-multi-ch-workload:dev",
     "iceberg-multi-upload-gate:dev",
+    "iceberg-multi-dependency-fault:dev",
 )
 if control.lab.PROFILE == "current":
     IMAGES = (
@@ -50,6 +61,7 @@ if control.lab.PROFILE == "current":
         "iceberg-multi-compactor-current:dev",
         "iceberg-multi-current-ch-workload:dev",
         "iceberg-multi-current-upload-gate:dev",
+        "iceberg-multi-current-dependency-fault:dev",
     )
 CASE_KINDS = {"iceberg-storage-crash", "iceberg-compactor-crash"}
 PREFAULT_ARCHIVE_ID = "f1b2af24-f6c2-4bd2-8e44-a35392666f23"

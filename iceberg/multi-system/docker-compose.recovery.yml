@@ -67,3 +67,16 @@ services:
     read_only: true
     cap_drop: [ALL]
     security_opt: [no-new-privileges:true]
+  dependency-fault:
+    image: iceberg-multi-dependency-fault:dev
+    profiles: [dependency-fault]
+    build: ./dependency-fault
+    network_mode: service:clickhouse
+    cap_drop: [ALL]
+    cap_add: [NET_ADMIN]
+    security_opt: [no-new-privileges:true]
+    read_only: true
+    tmpfs: ['/run:rw,nosuid,nodev,noexec,size=1m']
+    cpus: 0.25
+    mem_limit: 64m
+    memswap_limit: 64m

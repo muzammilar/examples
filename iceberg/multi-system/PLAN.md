@@ -14,7 +14,12 @@ Group 3 now passes the retained-volume SIGKILL diagnostic with 2.14M ACKed rows
 and independent live writers/readers; see `DUCKDB_CRASH.md`. This does not qualify
 persistent connection pools, physical power loss or the unresolved large-read path.
 Prior-history re-verification rejects legacy diagnostic ownership labels.
-Continue groups 2–5 as explicitly unqualified failure exploration; defer capacity
+Group 4 now passes endpoint-specific S3/catalog partitions with 3.38M hot ACKs
+and an unchanged two-million-row retained cold source; see `DUCKDB_DEPENDENCIES.md`.
+Both native-client-deadline archive requests committed 1k rows after healing;
+reconciliation prevents replay. Earlier failed deadlines stay failed. New writes
+use a separate 3k-row probe; fresh full-copy capacity remains guarded.
+Continue group 5 and unresolved boundaries as unqualified exploration; defer capacity
 ranking until the healthy read contract passes. Do not reset the failed fixtures.
 
 Current checkpoint (2026-11-22): the default `LAB_PROFILE=current` uses isolated

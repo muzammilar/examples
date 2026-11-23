@@ -4,10 +4,13 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
+from unittest import mock
+import os
 
 import duckdb_clickhouse as connector
 import duckdb_partial as partial
 import duckdb_crash as crash
+import duckdb_dependencies as dependencies
 
 
 class ConnectorRoundTrip(unittest.TestCase):
@@ -145,6 +148,55 @@ class LiveCrashReconciliation(unittest.TestCase):
     def test_rows_without_intents_fail(self):
         with self.assertRaisesRegex(RuntimeError, "outside the external intent"):
             crash.reconcile([self.group()], [])
+
+
+class DependencyReadControls(unittest.TestCase):
+    def test_correct_counts_do_not_hide_wrong_archive_bodies(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory).resolve()
+            (root / "cold-reader-000000-stdout.json").write_text(
+                json.dumps(
+                    [{"rows": 2000000, "unique_ids": 2000000, "invalid_bodies": 1}]
+                )
+            )
+            with self.assertRaisesRegex(RuntimeError, "complete-body"):
+                dependencies.checked_cold(
+                    root, {"sequence": 0, "status": "ok"}, 2000000
+                )
+
+    def test_connection_failure_is_not_a_recovered_read(self):
+        with tempfile.TemporaryDirectory() as directory:
+            with self.assertRaisesRegex(RuntimeError, "did not recover"):
+                dependencies.checked_cold(
+                    Path(directory), {"sequence": 0, "status": "fail"}, 2000000
+                )
+
+
+class ReadOnlySourceReuse(unittest.TestCase):
+    def test_a_faulted_fixture_cannot_bypass_the_fresh_copy_capacity_gate(self):
+        identifier = "11111111-1111-4111-8111-111111111111"
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory).resolve()
+            case = root / "duckdb-connector-dependencies" / identifier
+            case.mkdir(parents=True)
+            (case / "invocation.json").write_text(
+                json.dumps(
+                    {
+                        "mode": "connector-dependencies",
+                        "rows": 2000000,
+                        "table": "duck_compact_" + identifier.replace("-", ""),
+                    }
+                )
+            )
+            (case / "fault-8333-intent.json").write_text("{}")
+            with (
+                mock.patch.dict(os.environ, {"COLD_SOURCE_CASE": identifier}),
+                mock.patch.object(
+                    dependencies.cleanup, "results_root", return_value=root
+                ),
+            ):
+                with self.assertRaisesRegex(RuntimeError, "pre-fault source"):
+                    dependencies.seed_case(2000000)
 
 
 if __name__ == "__main__":

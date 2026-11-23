@@ -280,6 +280,8 @@ def sources():
         ROOT / "duckdb_clickhouse.py",
         ROOT / "duckdb_partial.py",
         ROOT / "duckdb_crash.py",
+        ROOT / "duckdb_dependencies.py",
+        ROOT / "dependency-fault/Dockerfile",
         ROOT / "test_duckdb_clickhouse.py",
         ROOT / "failed_preservation.py",
         ROOT / "failed-preservation-plans.json",

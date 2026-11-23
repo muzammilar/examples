@@ -89,8 +89,11 @@ exercised and failed; the five-group scope remains:
    with 2.14M ACKed rows and independent ordinary DuckDB reads/writes. Fresh-process
    reconnect only; persistent pools, physical power failure and earlier-history
    ownership closure remain unqualified.
-4. **S3/catalog outage:** expected failures/backpressure, visibility and recovery,
-   retaining source data until archive verification succeeds.
+4. **S3/catalog outage:** [endpoint-specific partitions](DUCKDB_DEPENDENCIES.md)
+   pass with 3.38M hot ACKs, a read-only 2M cold source and separate 3k write probe.
+   Both ambiguous 1k archive requests applied after healing, including after native
+   client fencing; no blind retries. Full service process outages and bulk-archive
+   capacity are separate unrun variants.
 5. **Concurrent maintenance:** compaction with live reads/writes, snapshot and
    retention boundaries, then complete-body reconciliation.
 

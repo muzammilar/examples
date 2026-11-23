@@ -20,6 +20,10 @@ The [live ClickHouse crash](DUCKDB_CRASH.md) now reconciles **2.14M ACKed rows**
 with zero missing/wrong/duplicate bodies; independent readers and writers observe
 errors and resume after restart. Earlier-history re-verification remains blocked
 by unproven legacy diagnostic container labels.
+[S3/catalog partitions](DUCKDB_DEPENDENCIES.md) now verify **3.38M hot ACKed rows**
+and a **2M-row immutable cold source**. Both timed-out archive requests committed
+1,000 rows after healing, so reconciliation prevented duplicate retries; a fresh
+healthy archive then acknowledged. Whole-source fresh-copy capacity remains guarded.
 
 ## Quick start
 

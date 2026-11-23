@@ -265,3 +265,10 @@ duckdb-clickhouse-partial: config recovery-unit-test ## Observe partial remote i
 .PHONY: duckdb-clickhouse-crash
 duckdb-clickhouse-crash: config recovery-unit-test ## Independent live DuckDB writers/readers across a retained-volume ClickHouse SIGKILL
 	python3 duckdb_maintenance.py --connector-crash
+
+.PHONY: duckdb-clickhouse-dependencies build-dependency-fault
+build-dependency-fault: config ## Build the isolated native network-fault helper
+	python3 -c 'import recovery_control as c; c.local_docker(); print(c.call(c.COMPOSE + ["build", "dependency-fault"], timeout=240))'
+
+duckdb-clickhouse-dependencies: config recovery-unit-test build-dependency-fault ## Separate S3/catalog port isolation with live DuckDB hot reads/writes
+	python3 duckdb_maintenance.py --connector-dependencies

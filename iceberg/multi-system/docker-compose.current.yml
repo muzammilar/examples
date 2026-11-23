@@ -40,3 +40,5 @@ services:
     image: *current_clickhouse_image
   keeper3:
     image: *current_clickhouse_image
+  dependency-fault:
+    image: iceberg-multi-current-dependency-fault:dev

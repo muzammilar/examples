@@ -1,0 +1,646 @@
+{
+  "date": "2026-11-23",
+  "case_id": "5f1f06a7-c6cd-453c-ad78-2e83c816a523",
+  "command": "COLD_SOURCE_CASE=8a578883-bbdd-4429-b2bf-e4743c3c10b7 make duckdb-clickhouse-dependencies ROWS=2000000",
+  "passed": true,
+  "production_qualified": false,
+  "host_controls_passed": 238,
+  "versions": {
+    "duckdb": "2.0.1",
+    "connector": "ce337c48c1",
+    "clickhouse": "26.10.10.3",
+    "seaweedfs": "4.54",
+    "iptables": "1.8.9, nf_tables"
+  },
+  "checks": {
+    "acknowledged_rows_verified": 3380000,
+    "acknowledged_missing_rows": 0,
+    "wrong_or_duplicate_rows": 0,
+    "unacknowledged_applied_rows": 0,
+    "production_qualified": false,
+    "scope": "Independent endpoint-specific TCP rejects in owned ClickHouse namespace; live ordinary DuckDB hot workload and explicit native pass-through cold diagnostics. No storage process crash, host network fault, power loss or complete architecture qualification.",
+    "cold_rows_verified": 2000000,
+    "recovery_probe_rows_verified": 3000,
+    "healthy_archive_acknowledged_rows": 1000,
+    "ambiguous_archive_outcomes": [
+      {
+        "dependency": "s3",
+        "ambiguous_applied_rows": 1000,
+        "recovery_acknowledged_rows": 0,
+        "retried": false
+      },
+      {
+        "dependency": "catalog",
+        "ambiguous_applied_rows": 1000,
+        "recovery_acknowledged_rows": 0,
+        "retried": false
+      }
+    ],
+    "source_snapshot_unchanged": true,
+    "dependency_ports_tested": [
+      8333,
+      8181
+    ],
+    "source_deleted": false,
+    "retry_preconditions": [
+      "no active archive",
+      "unchanged catalog snapshot",
+      "complete cold readback"
+    ]
+  },
+  "environment": {
+    "context": "desktop-linux",
+    "endpoint": "unix:///Users/muzammil/.docker/run/docker.sock",
+    "daemon": {
+      "ID": "172e5e0a-2d95-4fb5-a6b4-fb16552caec8",
+      "Name": "docker-desktop",
+      "ServerVersion": "29.5.3",
+      "Architecture": "aarch64",
+      "NCPU": 11,
+      "MemTotal": 26216296448,
+      "KernelVersion": "6.12.76-linuxkit",
+      "OperatingSystem": "Docker Desktop"
+    }
+  },
+  "runner_image_id": "sha256:f0dd3bdc601806f2b55d5ffc47c513a3710d82b744767c5cf633f873ec0a37e1",
+  "helper_image_id": "sha256:72e1296e2dd7ceb0d98a2d2fbdc4aba99932fe529e613506892ec372f927356b",
+  "dataset": {
+    "hot_seed_rows": 2000000,
+    "hot_batch_rows": 10000,
+    "hot_read_rows_per_request": 1000,
+    "customers": 10000,
+    "schema": "Int64 ID, Int32 customer, Int64 cents, SHA256 hex String (64 UTF-8 bytes)",
+    "logical_seed_bytes": 184000000,
+    "generation": "customer=id%10000; cents=id%10000+1; payload=SHA256(decimal ID); no NULLs/RNG",
+    "cold_source_rows": 2000000,
+    "cold_source_case": "8a578883-bbdd-4429-b2bf-e4743c3c10b7",
+    "cold_source_mode": "existing pre-fault fixture reused strictly read-only; no modification or promotion of its failed verdict",
+    "probe_table_rows": 3000,
+    "probe_failed_request_rows": 1000,
+    "probe_ambiguous_applied_rows": 2000,
+    "probe_healthy_acknowledged_rows": 1000
+  },
+  "phase_stats": {
+    "writer": {
+      "baseline": {
+        "ok": {
+          "requests": 11,
+          "p50_ms": 244.4895,
+          "p99_ms": 268.880125
+        }
+      },
+      "s3-outage": {
+        "ok": {
+          "requests": 47,
+          "p50_ms": 236.691792,
+          "p99_ms": 329.456
+        }
+      },
+      "s3-recovery": {
+        "ok": {
+          "requests": 5,
+          "p50_ms": 244.285708,
+          "p99_ms": 326.67075
+        }
+      },
+      "catalog-outage": {
+        "ok": {
+          "requests": 49,
+          "p50_ms": 229.62625,
+          "p99_ms": 292.105792
+        }
+      },
+      "catalog-recovery": {
+        "ok": {
+          "requests": 22,
+          "p50_ms": 240.906291,
+          "p99_ms": 389.573666
+        }
+      },
+      "after": {
+        "ok": {
+          "requests": 4,
+          "p50_ms": 250.235958,
+          "p99_ms": 264.19375
+        }
+      }
+    },
+    "reader": {
+      "baseline": {
+        "ok": {
+          "requests": 11,
+          "p50_ms": 236.024084,
+          "p99_ms": 270.473667
+        }
+      },
+      "s3-outage": {
+        "ok": {
+          "requests": 47,
+          "p50_ms": 236.230667,
+          "p99_ms": 299.936167
+        }
+      },
+      "s3-recovery": {
+        "ok": {
+          "requests": 5,
+          "p50_ms": 236.382583,
+          "p99_ms": 330.629875
+        }
+      },
+      "catalog-outage": {
+        "ok": {
+          "requests": 49,
+          "p50_ms": 222.593584,
+          "p99_ms": 319.074208
+        }
+      },
+      "catalog-recovery": {
+        "ok": {
+          "requests": 22,
+          "p50_ms": 226.523208,
+          "p99_ms": 409.278583
+        }
+      },
+      "after": {
+        "ok": {
+          "requests": 4,
+          "p50_ms": 228.249292,
+          "p99_ms": 264.760667
+        }
+      }
+    },
+    "archive": {
+      "s3-outage": {
+        "ambiguous": {
+          "requests": 1,
+          "p50_ms": 10068.602166,
+          "p99_ms": 10068.602166
+        }
+      },
+      "catalog-outage": {
+        "ambiguous": {
+          "requests": 1,
+          "p50_ms": 10038.840916,
+          "p99_ms": 10038.840916
+        }
+      },
+      "catalog-recovery": {
+        "ok": {
+          "requests": 1,
+          "p50_ms": 312.865708,
+          "p99_ms": 312.865708
+        }
+      }
+    },
+    "cold-reader": {
+      "baseline": {
+        "ok": {
+          "requests": 1,
+          "p50_ms": 645.941125,
+          "p99_ms": 645.941125
+        }
+      },
+      "s3-outage": {
+        "fail": {
+          "requests": 1,
+          "p50_ms": 10049.168125,
+          "p99_ms": 10049.168125
+        }
+      },
+      "s3-recovery": {
+        "ok": {
+          "requests": 2,
+          "p50_ms": 347.376833,
+          "p99_ms": 663.18775
+        }
+      },
+      "catalog-outage": {
+        "fail": {
+          "requests": 1,
+          "p50_ms": 10054.158042,
+          "p99_ms": 10054.158042
+        }
+      },
+      "catalog-recovery": {
+        "ok": {
+          "requests": 3,
+          "p50_ms": 327.523959,
+          "p99_ms": 592.931542
+        }
+      }
+    }
+  },
+  "resources": {
+    "clickhouse": {
+      "samples": 54,
+      "unavailable_samples": 0,
+      "observed_seconds": 69.46999999999998,
+      "cpu_core_seconds": {
+        "total": 19.90146700000001,
+        "user": 11.897552,
+        "system": 8.003915
+      },
+      "cpu_percent_one_core_100": 28.647570174175925,
+      "charged_memory_bytes_min_mean_max": [
+        1305604096,
+        1508213342.8148148,
+        1610534912
+      ],
+      "lifetime_peak_memory_bytes": 1611317248,
+      "allocated_disk_bytes_first_peak_last": [
+        2944008192,
+        3485614080,
+        3485614080
+      ],
+      "native_block_io": {
+        "254:0": {
+          "observed_seconds": 69.46999999999998,
+          "rbytes": 244580352,
+          "wbytes": 565424128,
+          "rios": 4594,
+          "wios": 15030,
+          "rbytes_per_second": 3520661.465380741,
+          "wbytes_per_second": 8139112.249892041,
+          "rios_per_second": 66.12926443068952,
+          "wios_per_second": 216.35238232330508
+        }
+      },
+      "identity_or_counter_gaps": 0,
+      "scope": "Native cgroup CPU across all threads including probes; sampled charged memory and per-generation lifetime peak. Intervals use native /proc/uptime with centisecond resolution; full probe brackets retain uncertainty. Approximate du allocated bytes, not open-deleted or unique physical storage. Workload /results binds share one witness directory: do not sum them. Device I/O is Docker-VM accounting, not physical SSD latency/queue depth; do not sum stacked devices. Missing devices/counters are unavailable, not zero. CPU and byte/IOPS deltas exclude restart bridges and unobserved initial/final edges. Raw samples retain network counters and timing uncertainty.",
+      "memory_stat_bytes_min_mean_max": {
+        "anon": [
+          542261248,
+          564227109.925926,
+          758923264
+        ],
+        "file": [
+          118816768,
+          257767348.14814815,
+          348282880
+        ],
+        "kernel": [
+          99172352,
+          112703715.55555555,
+          120897536
+        ]
+      },
+      "memory_stat_samples": 54,
+      "memory_stat_scope": "Sampled native cgroup byte gauges, not Go heap or process RSS. File includes charged file cache; kernel includes its subcategories. Counters are read nonatomically; do not infer an exact partition of memory.current."
+    },
+    "dependency-fault": {
+      "samples": 41,
+      "unavailable_samples": 0,
+      "observed_seconds": 52.7,
+      "cpu_core_seconds": {
+        "total": 0.487374,
+        "user": 0.2687280000000001,
+        "system": 0.218646
+      },
+      "cpu_percent_one_core_100": 0.92480834914611,
+      "charged_memory_bytes_min_mean_max": [
+        1462272,
+        1899445.0731707318,
+        2449408
+      ],
+      "lifetime_peak_memory_bytes": 5619712,
+      "allocated_disk_bytes_first_peak_last": [
+        0,
+        0,
+        0
+      ],
+      "native_block_io": null,
+      "identity_or_counter_gaps": 0,
+      "scope": "Native cgroup CPU across all threads including probes; sampled charged memory and per-generation lifetime peak. Intervals use native /proc/uptime with centisecond resolution; full probe brackets retain uncertainty. Approximate du allocated bytes, not open-deleted or unique physical storage. Workload /results binds share one witness directory: do not sum them. Device I/O is Docker-VM accounting, not physical SSD latency/queue depth; do not sum stacked devices. Missing devices/counters are unavailable, not zero. CPU and byte/IOPS deltas exclude restart bridges and unobserved initial/final edges. Raw samples retain network counters and timing uncertainty.",
+      "memory_stat_bytes_min_mean_max": {
+        "anon": [
+          335872,
+          386622.43902439025,
+          393216
+        ],
+        "file": [
+          0,
+          0,
+          0
+        ],
+        "kernel": [
+          905216,
+          1016007.8048780488,
+          1191936
+        ]
+      },
+      "memory_stat_samples": 41,
+      "memory_stat_scope": "Sampled native cgroup byte gauges, not Go heap or process RSS. File includes charged file cache; kernel includes its subcategories. Counters are read nonatomically; do not infer an exact partition of memory.current."
+    },
+    "duckdb-cli": {
+      "samples": 52,
+      "unavailable_samples": 1,
+      "observed_seconds": 66.98999999999998,
+      "cpu_core_seconds": {
+        "total": 58.532589,
+        "user": 50.203340000000004,
+        "system": 8.329247999999998
+      },
+      "cpu_percent_one_core_100": 87.3751141961487,
+      "charged_memory_bytes_min_mean_max": [
+        2572288,
+        59834210.461538464,
+        129945600
+      ],
+      "lifetime_peak_memory_bytes": 132919296,
+      "allocated_disk_bytes_first_peak_last": [
+        59736064,
+        83722240,
+        83722240
+      ],
+      "native_block_io": null,
+      "identity_or_counter_gaps": 0,
+      "scope": "Native cgroup CPU across all threads including probes; sampled charged memory and per-generation lifetime peak. Intervals use native /proc/uptime with centisecond resolution; full probe brackets retain uncertainty. Approximate du allocated bytes, not open-deleted or unique physical storage. Workload /results binds share one witness directory: do not sum them. Device I/O is Docker-VM accounting, not physical SSD latency/queue depth; do not sum stacked devices. Missing devices/counters are unavailable, not zero. CPU and byte/IOPS deltas exclude restart bridges and unobserved initial/final edges. Raw samples retain network counters and timing uncertainty.",
+      "memory_stat_bytes_min_mean_max": {
+        "anon": [
+          487424,
+          34274304,
+          81121280
+        ],
+        "file": [
+          0,
+          20042752,
+          58507264
+        ],
+        "kernel": [
+          1474560,
+          2699657.846153846,
+          3710976
+        ]
+      },
+      "memory_stat_samples": 52,
+      "memory_stat_scope": "Sampled native cgroup byte gauges, not Go heap or process RSS. File includes charged file cache; kernel includes its subcategories. Counters are read nonatomically; do not infer an exact partition of memory.current."
+    },
+    "storage": {
+      "samples": 54,
+      "unavailable_samples": 0,
+      "observed_seconds": 69.46000000000001,
+      "cpu_core_seconds": {
+        "total": 1.4962540000000004,
+        "user": 0.8034609999999999,
+        "system": 0.6927939999999999
+      },
+      "cpu_percent_one_core_100": 2.1541232363950478,
+      "charged_memory_bytes_min_mean_max": [
+        848793600,
+        854123178.6666666,
+        857456640
+      ],
+      "lifetime_peak_memory_bytes": 1079885824,
+      "allocated_disk_bytes_first_peak_last": [
+        3541422080,
+        3541663744,
+        3541663744
+      ],
+      "native_block_io": {
+        "254:0": {
+          "observed_seconds": 69.46000000000001,
+          "rbytes": 0,
+          "wbytes": 331776,
+          "rios": 0,
+          "wios": 35,
+          "rbytes_per_second": 0.0,
+          "wbytes_per_second": 4776.504463000288,
+          "rios_per_second": 0.0,
+          "wios_per_second": 0.5038871292830406
+        }
+      },
+      "identity_or_counter_gaps": 0,
+      "scope": "Native cgroup CPU across all threads including probes; sampled charged memory and per-generation lifetime peak. Intervals use native /proc/uptime with centisecond resolution; full probe brackets retain uncertainty. Approximate du allocated bytes, not open-deleted or unique physical storage. Workload /results binds share one witness directory: do not sum them. Device I/O is Docker-VM accounting, not physical SSD latency/queue depth; do not sum stacked devices. Missing devices/counters are unavailable, not zero. CPU and byte/IOPS deltas exclude restart bridges and unobserved initial/final edges. Raw samples retain network counters and timing uncertainty.",
+      "memory_stat_bytes_min_mean_max": {
+        "anon": [
+          405471232,
+          417711217.7777778,
+          422588416
+        ],
+        "file": [
+          359788544,
+          359860072.2962963,
+          360030208
+        ],
+        "kernel": [
+          26906624,
+          27400343.703703705,
+          27926528
+        ]
+      },
+      "memory_stat_samples": 54,
+      "memory_stat_scope": "Sampled native cgroup byte gauges, not Go heap or process RSS. File includes charged file cache; kernel includes its subcategories. Counters are read nonatomically; do not infer an exact partition of memory.current."
+    }
+  },
+  "hot_parts": {
+    "rows": 3380000,
+    "uncompressed_bytes": 310960000,
+    "compressed_bytes": 231785862,
+    "allocated_bytes": 231916911
+  },
+  "source_encoded_compression": {
+    "files": 2,
+    "column_chunks": 8,
+    "compressed_bytes": 72952027,
+    "uncompressed_bytes": 152417677,
+    "encoded_chunk_ratio": 2.089286388163005
+  },
+  "probe_encoded_compression": {
+    "files": 3,
+    "column_chunks": 12,
+    "compressed_bytes": 133908,
+    "uncompressed_bytes": 280481,
+    "encoded_chunk_ratio": 2.094579860799952
+  },
+  "source_physical_prefix": {
+    "files": 2,
+    "physical_rows": 2000000,
+    "file_bytes": 81427999
+  },
+  "probe_physical_prefix": {
+    "files": 3,
+    "physical_rows": 3000,
+    "file_bytes": 163662
+  },
+  "limits": [
+    "ClickHouse egress TCP rejection to one local endpoint at a time, not complete storage process failure.",
+    "Cold reads use explicitly labeled native pass-through because ordinary Iceberg catalog discovery remains broken.",
+    "Native 10-second SIGKILL watchdog and positive PID absence listing fence individual archive/cold-read clients. Backend commits can still finish after healing.",
+    "A failed 20-second quiescence assumption remains failed; 1,000 unacknowledged rows later observed applied.",
+    "Fresh two-million-row cold-source creation requires two free native volume slots; guarded locally. Only the read-only reuse variant was run after the final source changes.",
+    "Physical-prefix Parquet footer audit is independent direct-S3 metadata inspection, not application routing or DuckDB Iceberg interoperability qualification.",
+    "No cold OS-cache preparation, capacity comparison, process crash, independent-host durability or physical-power-loss claim.",
+    "Existing all-history verification and teardown ownership/preservation guards remain unchanged.",
+    "CPU windows include setup, verification, sampling and held container time. Shared network namespace counters must not be summed. Host controller and Docker daemon CPU are outside service cgroups.",
+    "Three-thousand-row archive write probes establish failure/correctness behavior, not bulk archive performance."
+  ],
+  "prior_runs": {
+    "pre_fault_harness_failures": [
+      "8a578883-bbdd-4429-b2bf-e4743c3c10b7",
+      "06965fbf-d7ec-4bd0-a669-f1993c234621",
+      "55b41a3f-ceef-4d2a-981d-12b8ade89e37"
+    ],
+    "quiescence_deadline_failed_case": "9f48f648-d6f0-4bb4-9b8d-a9b5349c33e8",
+    "quiescence_deadline_unacknowledged_rows_later_applied": 1000,
+    "prior_success_without_footer_audit": {
+      "case_id": "158e114f-bb39-4b99-a6d5-6410520a1711",
+      "acknowledged_hot_rows": 3370000,
+      "cold_source_rows": 2000000,
+      "unacknowledged_archive_rows_applied": 2000
+    }
+  },
+  "raw_evidence": [
+    {
+      "path": "results/current/duckdb-connector-dependencies/5f1f06a7-c6cd-453c-ad78-2e83c816a523/after-phase.json",
+      "sha256": "87080fde958c8d8b2201ae4a924ec146dcdf09bdd98cc30318a0a249f7100a5f"
+    },
+    {
+      "path": "results/current/duckdb-connector-dependencies/5f1f06a7-c6cd-453c-ad78-2e83c816a523/catalog-outage-phase.json",
+      "sha256": "467fa5644bee92372bd28dcd078170208d66baa301e107bdae8f9899f8e59511"
+    },
+    {
+      "path": "results/current/duckdb-connector-dependencies/5f1f06a7-c6cd-453c-ad78-2e83c816a523/catalog-recovery-phase.json",
+      "sha256": "5e825376eeecda896cd6eccf69a1c0b397e2a0487d235e616bb978b40d7fa74e"
+    },
+    {
+      "path": "results/current/duckdb-connector-dependencies/5f1f06a7-c6cd-453c-ad78-2e83c816a523/cold-input.json",
+      "sha256": "5b70a59feca56a6f621a12c1baab5116d297d3e8979e1b7a1814395d48ec953c"
+    },
+    {
+      "path": "results/current/duckdb-connector-dependencies/5f1f06a7-c6cd-453c-ad78-2e83c816a523/cold-source.json",
+      "sha256": "cbbbd6302004e99459eb91a56d75ef15d64e7bdc3fee48de6c59c55fc1d552f5"
+    },
+    {
+      "path": "results/current/duckdb-connector-dependencies/5f1f06a7-c6cd-453c-ad78-2e83c816a523/dependency-checks.json",
+      "sha256": "193d3f07e5a9030c403a02675b7d29cea1204642fc8e1b6f27983e503e5bc2b4"
+    },
+    {
+      "path": "results/current/duckdb-connector-dependencies/5f1f06a7-c6cd-453c-ad78-2e83c816a523/fault-8181-counters.txt",
+      "sha256": "cd2bc9abff0627e0e28feec677fa9ae102c96e18968d35d814f67ece57cb0a2f"
+    },
+    {
+      "path": "results/current/duckdb-connector-dependencies/5f1f06a7-c6cd-453c-ad78-2e83c816a523/fault-8181-healed.txt",
+      "sha256": "a84f78f9ef50af084003d51d1863a852618c8cda6edb98181c7e30a3b1516836"
+    },
+    {
+      "path": "results/current/duckdb-connector-dependencies/5f1f06a7-c6cd-453c-ad78-2e83c816a523/fault-8333-counters.txt",
+      "sha256": "cdb835673d7771afda3470b2879556c652c378aed69968460e32cb9031fd370d"
+    },
+    {
+      "path": "results/current/duckdb-connector-dependencies/5f1f06a7-c6cd-453c-ad78-2e83c816a523/fault-8333-healed.txt",
+      "sha256": "a84f78f9ef50af084003d51d1863a852618c8cda6edb98181c7e30a3b1516836"
+    },
+    {
+      "path": "results/current/duckdb-connector-dependencies/5f1f06a7-c6cd-453c-ad78-2e83c816a523/history.json",
+      "sha256": "ab56834e34b515dda532e305ad0d49dce7b55573fdd625ac9b31cc1da2fea678"
+    },
+    {
+      "path": "results/current/duckdb-connector-dependencies/5f1f06a7-c6cd-453c-ad78-2e83c816a523/invocation.json",
+      "sha256": "7740d4c37ed6bbc70320698054c9c1070e934c93c7ef65acfe84be486e5b446c"
+    },
+    {
+      "path": "results/current/duckdb-connector-dependencies/5f1f06a7-c6cd-453c-ad78-2e83c816a523/iptables-before.txt",
+      "sha256": "a84f78f9ef50af084003d51d1863a852618c8cda6edb98181c7e30a3b1516836"
+    },
+    {
+      "path": "results/current/duckdb-connector-dependencies/5f1f06a7-c6cd-453c-ad78-2e83c816a523/native-parts.json",
+      "sha256": "57c4558aa97ef164a022cbda69d34e3b4315542a8f4e346ed852efc686b596fd"
+    },
+    {
+      "path": "results/current/duckdb-connector-dependencies/5f1f06a7-c6cd-453c-ad78-2e83c816a523/native-reconcile.jsonl",
+      "sha256": "75251ef0166ecfbb0e1835c5f8777b117ddb935e4627ae0471f46698451b3d25"
+    },
+    {
+      "path": "results/current/duckdb-connector-dependencies/5f1f06a7-c6cd-453c-ad78-2e83c816a523/network-helper-stopped.json",
+      "sha256": "76afdcd43aee9b345d05b0937470778dad095620ea43918832e29f5912b4c97b"
+    },
+    {
+      "path": "results/current/duckdb-connector-dependencies/5f1f06a7-c6cd-453c-ad78-2e83c816a523/network-helper.json",
+      "sha256": "63ec904af703a5e9e7c030411cf6762cd349b527420559a377f3e2048781edfc"
+    },
+    {
+      "path": "results/current/duckdb-connector-dependencies/5f1f06a7-c6cd-453c-ad78-2e83c816a523/post-run-inspection/fb214b9e-20b8-4de8-8747-1dfec9dc6b33/artifact-manifest.json",
+      "sha256": "0b17f3d3173ec5927f8bd201efa010ec9af90227b63837e709070df64dba5ab4"
+    },
+    {
+      "path": "results/current/duckdb-connector-dependencies/5f1f06a7-c6cd-453c-ad78-2e83c816a523/post-run-inspection/fb214b9e-20b8-4de8-8747-1dfec9dc6b33/effective-settings.jsonl",
+      "sha256": "8509adb53044b98f7ffa702f66cccae0d6630debeb9792acc53505d4a14f4d00"
+    },
+    {
+      "path": "results/current/duckdb-connector-dependencies/5f1f06a7-c6cd-453c-ad78-2e83c816a523/post-run-inspection/fb214b9e-20b8-4de8-8747-1dfec9dc6b33/effective-settings.sql",
+      "sha256": "dc59063f9a68ccc5ab89130adfe821320e871e32c369b96f88678152a74eea12"
+    },
+    {
+      "path": "results/current/duckdb-connector-dependencies/5f1f06a7-c6cd-453c-ad78-2e83c816a523/post-run-inspection/fb214b9e-20b8-4de8-8747-1dfec9dc6b33/helper-absent.json",
+      "sha256": "8812b0c2ffdfe64edeb2acfb8f187ea18d575c62c1546eac775b2f8027e3f911"
+    },
+    {
+      "path": "results/current/duckdb-connector-dependencies/5f1f06a7-c6cd-453c-ad78-2e83c816a523/probe-catalog-final.json",
+      "sha256": "2794eaad5bb09be96c4d678cc25b3b4b1fd0428d1ee4ba972a202b527800d836"
+    },
+    {
+      "path": "results/current/duckdb-connector-dependencies/5f1f06a7-c6cd-453c-ad78-2e83c816a523/probe-compression.json",
+      "sha256": "b513c57e6507a45929a972ed7ace4321d12734185c57be5363c346a3bf31ba05"
+    },
+    {
+      "path": "results/current/duckdb-connector-dependencies/5f1f06a7-c6cd-453c-ad78-2e83c816a523/probe-parquet.json",
+      "sha256": "30149aecc14b8b40efa5aac6d9355e31032d0ca13fa4318fa059422569349c18"
+    },
+    {
+      "path": "results/current/duckdb-connector-dependencies/5f1f06a7-c6cd-453c-ad78-2e83c816a523/resource-summary.json",
+      "sha256": "a2d3b73d4826020dd5d4082c5a436a9f6c8270602ea4db46aeef8adda82b652f"
+    },
+    {
+      "path": "results/current/duckdb-connector-dependencies/5f1f06a7-c6cd-453c-ad78-2e83c816a523/resources.jsonl",
+      "sha256": "36766315adfe9380015540e8a0b92b9aad8606fd2b0a2954a1795cec7746e3f4"
+    },
+    {
+      "path": "results/current/duckdb-connector-dependencies/5f1f06a7-c6cd-453c-ad78-2e83c816a523/result.json",
+      "sha256": "7628451a4b09b0789b337d0925a433ca4bb341a7e903d986808ff6698314d4d3"
+    },
+    {
+      "path": "results/current/duckdb-connector-dependencies/5f1f06a7-c6cd-453c-ad78-2e83c816a523/s3-outage-phase.json",
+      "sha256": "b1c5c7c6f8d0ddd312aee1c50aa32eef655117601e6850ee6aad474219ef8fcc"
+    },
+    {
+      "path": "results/current/duckdb-connector-dependencies/5f1f06a7-c6cd-453c-ad78-2e83c816a523/s3-recovery-phase.json",
+      "sha256": "e9ef1d0dd0859e05caee3d4ca77a4b65f1afa809a1cad9a815b536b591556b49"
+    },
+    {
+      "path": "results/current/duckdb-connector-dependencies/5f1f06a7-c6cd-453c-ad78-2e83c816a523/source-catalog-after.json",
+      "sha256": "2bf27dfebc0cf246891926bf4942ffa46bd38ebd93964531c0682ea2607f986a"
+    },
+    {
+      "path": "results/current/duckdb-connector-dependencies/5f1f06a7-c6cd-453c-ad78-2e83c816a523/source-catalog-before.json",
+      "sha256": "2bf27dfebc0cf246891926bf4942ffa46bd38ebd93964531c0682ea2607f986a"
+    },
+    {
+      "path": "results/current/duckdb-connector-dependencies/5f1f06a7-c6cd-453c-ad78-2e83c816a523/source-catalog-published.json",
+      "sha256": "2bf27dfebc0cf246891926bf4942ffa46bd38ebd93964531c0682ea2607f986a"
+    },
+    {
+      "path": "results/current/duckdb-connector-dependencies/5f1f06a7-c6cd-453c-ad78-2e83c816a523/source-compression.json",
+      "sha256": "72b781814ace253c1a7bb49d7dba0a6a0520463d13092e026b02029c37309677"
+    },
+    {
+      "path": "results/current/duckdb-connector-dependencies/5f1f06a7-c6cd-453c-ad78-2e83c816a523/source-parquet.json",
+      "sha256": "d0c1e0a2af79c2d9745c754ed042c2d160eb8aac61625281600398a86e42197e"
+    },
+    {
+      "path": "results/current/duckdb-connector-dependencies/9f48f648-d6f0-4bb4-9b8d-a9b5349c33e8/post-failure-diagnostics/c3f3c884-18d3-4311-bdf9-74301aefe4d7/active.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "results/current/duckdb-connector-dependencies/9f48f648-d6f0-4bb4-9b8d-a9b5349c33e8/post-failure-diagnostics/c3f3c884-18d3-4311-bdf9-74301aefe4d7/catalog.json",
+      "sha256": "f156ddac006b97daed11d66149d578a3c6e684be34151a14008983d0e63d3d04"
+    },
+    {
+      "path": "results/current/duckdb-connector-dependencies/9f48f648-d6f0-4bb4-9b8d-a9b5349c33e8/post-failure-diagnostics/c3f3c884-18d3-4311-bdf9-74301aefe4d7/rows.json",
+      "sha256": "3c31030687e15f2985334ac0f9672ec5e150e82cfb1a28305fe5d1a55a8f77c5"
+    },
+    {
+      "path": "results/current/duckdb-connector-dependencies/9f48f648-d6f0-4bb4-9b8d-a9b5349c33e8/result.json",
+      "sha256": "5530bcd355220f5d55f0c127ac318c32aacfffb6895fff4208c413753b1af9d6"
+    }
+  ]
+}

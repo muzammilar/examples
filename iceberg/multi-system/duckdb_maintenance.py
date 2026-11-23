@@ -408,6 +408,7 @@ def run(mode="baseline"):
     import duckdb_rejections
     import duckdb_partial
     import duckdb_crash
+    import duckdb_dependencies
 
     if mode not in {
         "baseline",
@@ -417,6 +418,7 @@ def run(mode="baseline"):
         "connector-read",
         "connector-partial",
         "connector-crash",
+        "connector-dependencies",
     }:
         raise ValueError("unknown native maintenance scenario")
     scenario = {
@@ -426,6 +428,7 @@ def run(mode="baseline"):
         "connector-read": duckdb_clickhouse,
         "connector-partial": duckdb_partial,
         "connector-crash": duckdb_crash,
+        "connector-dependencies": duckdb_dependencies,
     }.get(mode)
     if control.lab.PROFILE != "current":
         raise RuntimeError("DuckDB-native maintenance requires the current profile")
@@ -453,7 +456,7 @@ def run(mode="baseline"):
     table = ("duck_frontend_" if mode == "connector" else "duck_compact_") + run_id.hex
     if mode == "connector":
         artifacts = scenario.artifacts(table, rows, customers, batch)
-    elif mode in {"connector-partial", "connector-crash"}:
+    elif mode in {"connector-partial", "connector-crash", "connector-dependencies"}:
         artifacts = scenario.artifacts(table, rows)
     elif mode == "connector-read":
         artifacts = scenario.read_artifacts(rows)
@@ -474,8 +477,10 @@ def run(mode="baseline"):
     # Reserve room for seed, rollback output and committed replacement. This
     # healthy test must not accidentally become a storage-capacity experiment.
     required_slots = 1 if scenario else max(3, (rows * 384 + 255999999) // 256000000)
-    if mode == "connector":
+    if mode in {"connector", "connector-dependencies"}:
         required_slots = (rows * 128 + 255999999) // 256000000 + 1
+        if mode == "connector-dependencies" and scenario.seed_case(rows) is not None:
+            required_slots = 1  # Existing 2M-row source is read-only; only 3k probe rows are new S3 output.
     elif mode in {"connector-read", "connector-partial", "connector-crash"}:
         required_slots = 0
     free_slots = settings["topology"]["Topology"].get("Free")
@@ -491,7 +496,13 @@ def run(mode="baseline"):
     )
     if image["Config"].get("Labels", {}).get("org.examples.owner") != control.OWNER:
         raise RuntimeError("native CLI image lacks repository ownership")
-    if mode in {"connector", "connector-read", "connector-partial", "connector-crash"}:
+    if mode in {
+        "connector",
+        "connector-read",
+        "connector-partial",
+        "connector-crash",
+        "connector-dependencies",
+    }:
         duckdb_clickhouse.prepare(root, image)
     if mode == "connector-partial":
         control.save(
@@ -632,7 +643,7 @@ def run(mode="baseline"):
         if mode == "connector":
             scenario.setup(root, table, storage)
         control.save_text(root / "release", "release\n")
-        if mode == "connector-crash":
+        if mode in {"connector-crash", "connector-dependencies"}:
             query = scenario.drive(root, table, rows, identifier, query, sampler)
             control.save_text(root / "native-complete", "complete\n")
         if scenario:
@@ -661,7 +672,7 @@ def run(mode="baseline"):
         if logs.returncode:
             raise RuntimeError("native CLI logs could not be retained")
         cold_storage.stopped(value)
-        if mode in {"connector-partial", "connector-crash"}:
+        if mode in {"connector-partial", "connector-crash", "connector-dependencies"}:
             result = scenario.verify(root, table, rows, query)
         elif mode == "connector-read":
             result = scenario.verify_read(root, rows)
@@ -693,7 +704,9 @@ def run(mode="baseline"):
                 "cleanup_errors": cleanup_errors,
                 "completed_ns": time.time_ns(),
                 "scope": (
-                    "Retained-volume ClickHouse SIGKILL with independent native DuckDB requests and external witness; no capacity or complete production qualification."
+                    "Independent local S3/catalog TCP rejection with live ordinary DuckDB hot reads/writes and native pass-through cold diagnostics; no capacity or complete architecture qualification."
+                    if mode == "connector-dependencies"
+                    else "Retained-volume ClickHouse SIGKILL with independent native DuckDB requests and external witness; no capacity or complete production qualification."
                     if mode == "connector-crash"
                     else "Read-only generated-row connector regression; no persisted fixture, independent engine export or capacity qualification."
                     if mode == "connector-read"
@@ -733,6 +746,12 @@ if __name__ == "__main__":
     )
     group.add_argument(
         "--connector-crash", dest="mode", action="store_const", const="connector-crash"
+    )
+    group.add_argument(
+        "--connector-dependencies",
+        dest="mode",
+        action="store_const",
+        const="connector-dependencies",
     )
     parser.set_defaults(mode="baseline")
     args = parser.parse_args()
