@@ -22,12 +22,14 @@ use a separate 3k-row probe; fresh full-copy capacity remains guarded.
 Group 5 prerequisite: native Spark 4.1.4/Iceberg 1.12.0 reads the CH-written
 3k probe even though its actual v2 manifests omit content; see
 `CONNECTOR_COMPACTOR_PROBE.md`. This does not remove the format finding.
-Next use a passed native two-million-row maintenance baseline as an explicitly
-witnessed parent, preserve its old snapshot, keep hot/cold writers/readers live,
-and require measured overlap with a rewrite of the full base file. Do not mutate
-the read-only failed dependency source or remove retained data to gain capacity.
-Continue group 5 and unresolved boundaries as unqualified exploration; defer capacity
-ranking until the healthy read contract passes. Do not reset the failed fixtures.
+Group 5 is now executed: see `CONNECTOR_CONCURRENT.md`. The full two-million-row
+base was rewritten while independent hot/cold readers and writers ran; ten cold
+ACK requests overlapped the native CALL. Complete 3.46M hot / 2.097M cold ACK
+reconciliation passed, but cold reads succeeded only 19/51 times: availability
+failed the 95% gate due to memory-limit errors. Preserve that failure and retained
+snapshots. Snapshot expiration/retention cleanup remains unrun. The architecture
+remains unqualified; further performance scope requires the user's 1–5 depth
+selection (usual preference 3), not automatic matrix expansion.
 
 Current checkpoint (2026-11-22): the default `LAB_PROFILE=current` uses isolated
 project/image/volume/result names and DuckDB 2.0.1, SeaweedFS 4.54, ClickHouse

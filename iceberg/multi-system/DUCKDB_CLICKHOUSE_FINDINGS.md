@@ -94,8 +94,11 @@ exercised and failed; the five-group scope remains:
    Both ambiguous 1k archive requests applied after healing, including after native
    client fencing; no blind retries. Full service process outages and bulk-archive
    capacity are separate unrun variants.
-5. **Concurrent maintenance:** compaction with live reads/writes, snapshot and
-   retention boundaries, then complete-body reconciliation.
+5. **Concurrent maintenance:** [full two-million-row rewrite](CONNECTOR_CONCURRENT.md)
+   executed with live hot/cold writers/readers and ten cold ACK intervals inside
+   the native CALL. All 3.46M hot / 2.097M cold ACK bodies reconcile. Availability
+   fails: 32/51 cold reads hit memory limits. Snapshot expiration and safe cleanup
+   remain unrun; no capacity qualification or automatic performance expansion.
 
 Apply `insert-batch-size` and `decision-ingestion-strategy`: use equivalent bounded
 10k–100k-row batches before capacity comparisons. Per `agent-query-safety`, keep

@@ -276,3 +276,11 @@ duckdb-clickhouse-dependencies: config recovery-unit-test build-dependency-fault
 .PHONY: connector-compactor-probe
 connector-compactor-probe: config recovery-unit-test ## Read-only Spark/Iceberg compatibility gate for a preserved CH-written probe
 	python3 connector_compactor_probe.py "$(SOURCE_CASE)"
+
+.PHONY: connector-concurrent
+connector-concurrent: config recovery-unit-test ## Full native rewrite with independent DuckDB hot/cold writers and readers
+	python3 duckdb_maintenance.py --connector-concurrent
+
+.PHONY: connector-concurrent-recheck
+connector-concurrent-recheck: config recovery-unit-test ## Recheck durable cold journals and all current hot/cold ACKs without rewriting
+	python3 connector_concurrent.py "$(CASE)"

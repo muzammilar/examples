@@ -12,6 +12,7 @@ import duckdb_partial as partial
 import duckdb_crash as crash
 import duckdb_dependencies as dependencies
 import connector_compactor_probe as compactor_probe
+import connector_concurrent as concurrent
 
 
 class ConnectorRoundTrip(unittest.TestCase):
@@ -233,6 +234,84 @@ class CompactorSourceControls(unittest.TestCase):
             ):
                 with self.assertRaisesRegex(RuntimeError, "bounded native IDs"):
                     compactor_probe.source(identifier)
+
+
+class ConcurrentControls(unittest.TestCase):
+    def test_other_visible_rows_cannot_mask_a_missing_acknowledged_batch(self):
+        value = {
+            "rows": 2002000,
+            "unique_ids": 2002000,
+            "invalid_bodies": 0,
+            "partial_batches": 0,
+            "acknowledged_rows": 2000000,
+        }
+        with self.assertRaisesRegex(RuntimeError, "missing"):
+            concurrent.check_read(value, 2001000, 2100000)
+        self.assertIn(
+            "batch IN (2000)", concurrent.read_oracle("owned", 2100000, 2000000, [2000])
+        )
+
+    def test_startup_acks_do_not_establish_native_rewrite_overlap(self):
+        native = {"rewrite_started_ns": 1000, "rewrite_ended_ns": 2000}
+        clocks = [{"offset_low": -10, "offset_high": 10}]
+        events = [
+            {"status": "ok", "started_ns": 500, "ended_ns": 800},
+            {"status": "ok", "started_ns": 1200, "ended_ns": 1300},
+        ]
+        start, end, matched = concurrent.call_overlap(native, clocks, events)
+        self.assertEqual((start, end), (1010, 1990))
+        self.assertEqual(matched, events[1:])
+
+    def test_cold_batches_reconcile_in_their_actual_one_thousand_row_units(self):
+        group = {
+            "batch": 0,
+            "rows": 1000,
+            "unique_ids": 1000,
+            "first_id": 0,
+            "last_id": 999,
+            "invalid_bodies": 0,
+        }
+        proof = crash.reconcile(
+            [group], [{"first": 0, "end": 1000, "status": "ok"}], batch_size=1000
+        )
+        self.assertEqual(proof["acknowledged_rows_verified"], 1000)
+
+
+class ConcurrentFinalization(unittest.TestCase):
+    def test_late_worker_error_cannot_be_hidden_by_successful_final_counts(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory).resolve()
+            (root / "cold-actor-errors.json").write_text(
+                json.dumps(["reader failed after metadata audit started"])
+            )
+            with self.assertRaisesRegex(RuntimeError, "late cold actor"):
+                concurrent.audit_journals(root)
+
+    def test_a_successful_rpc_without_its_body_proof_fails_replay(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory).resolve()
+            archive = {"sequence": 0, "status": "ok", "native_client_fenced": True}
+            (root / "cold-history.json").write_text(json.dumps([archive]))
+            (root / "concurrent-input.json").write_text(
+                json.dumps({"seed_rows": 2000000})
+            )
+            for role in ("archive", "cold-reader"):
+                (root / (role + "-000000-intent.json")).write_text("{}")
+                (root / (role + "-000000-result.json")).write_text(json.dumps(archive))
+            with self.assertRaisesRegex(RuntimeError, "no body proof"):
+                concurrent.audit_journals(root)
+
+
+class MaintenanceAvailability(unittest.TestCase):
+    def test_fast_memory_failures_do_not_disappear_from_the_denominator(self):
+        history = [{"role": "cold-reader", "status": "ok"}] * 19 + [
+            {"role": "cold-reader", "status": "fail"}
+        ] * 32
+        rates = concurrent.first_attempt_rates(history)["cold-reader"]
+        self.assertEqual(rates["attempted"], 51)
+        self.assertEqual(rates["failed_or_ambiguous"], 32)
+        self.assertAlmostEqual(rates["success_rate"], 19 / 51)
+        self.assertLess(rates["success_rate"], 0.95)
 
 
 if __name__ == "__main__":

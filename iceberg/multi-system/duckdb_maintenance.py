@@ -409,6 +409,7 @@ def run(mode="baseline"):
     import duckdb_partial
     import duckdb_crash
     import duckdb_dependencies
+    import connector_concurrent
 
     if mode not in {
         "baseline",
@@ -419,6 +420,7 @@ def run(mode="baseline"):
         "connector-partial",
         "connector-crash",
         "connector-dependencies",
+        "connector-concurrent",
     }:
         raise ValueError("unknown native maintenance scenario")
     scenario = {
@@ -429,6 +431,7 @@ def run(mode="baseline"):
         "connector-partial": duckdb_partial,
         "connector-crash": duckdb_crash,
         "connector-dependencies": duckdb_dependencies,
+        "connector-concurrent": connector_concurrent,
     }.get(mode)
     if control.lab.PROFILE != "current":
         raise RuntimeError("DuckDB-native maintenance requires the current profile")
@@ -456,7 +459,12 @@ def run(mode="baseline"):
     table = ("duck_frontend_" if mode == "connector" else "duck_compact_") + run_id.hex
     if mode == "connector":
         artifacts = scenario.artifacts(table, rows, customers, batch)
-    elif mode in {"connector-partial", "connector-crash", "connector-dependencies"}:
+    elif mode in {
+        "connector-partial",
+        "connector-crash",
+        "connector-dependencies",
+        "connector-concurrent",
+    }:
         artifacts = scenario.artifacts(table, rows)
     elif mode == "connector-read":
         artifacts = scenario.read_artifacts(rows)
@@ -502,6 +510,7 @@ def run(mode="baseline"):
         "connector-partial",
         "connector-crash",
         "connector-dependencies",
+        "connector-concurrent",
     }:
         duckdb_clickhouse.prepare(root, image)
     if mode == "connector-partial":
@@ -643,7 +652,11 @@ def run(mode="baseline"):
         if mode == "connector":
             scenario.setup(root, table, storage)
         control.save_text(root / "release", "release\n")
-        if mode in {"connector-crash", "connector-dependencies"}:
+        if mode in {
+            "connector-crash",
+            "connector-dependencies",
+            "connector-concurrent",
+        }:
             query = scenario.drive(root, table, rows, identifier, query, sampler)
             control.save_text(root / "native-complete", "complete\n")
         if scenario:
@@ -672,7 +685,12 @@ def run(mode="baseline"):
         if logs.returncode:
             raise RuntimeError("native CLI logs could not be retained")
         cold_storage.stopped(value)
-        if mode in {"connector-partial", "connector-crash", "connector-dependencies"}:
+        if mode in {
+            "connector-partial",
+            "connector-crash",
+            "connector-dependencies",
+            "connector-concurrent",
+        }:
             result = scenario.verify(root, table, rows, query)
         elif mode == "connector-read":
             result = scenario.verify_read(root, rows)
@@ -752,6 +770,12 @@ if __name__ == "__main__":
         dest="mode",
         action="store_const",
         const="connector-dependencies",
+    )
+    group.add_argument(
+        "--connector-concurrent",
+        dest="mode",
+        action="store_const",
+        const="connector-concurrent",
     )
     parser.set_defaults(mode="baseline")
     args = parser.parse_args()

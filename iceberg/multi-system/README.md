@@ -26,7 +26,10 @@ and a **2M-row immutable cold source**. Both timed-out archive requests committe
 healthy archive then acknowledged. Whole-source fresh-copy capacity remains guarded.
 The [read-only Spark gate](CONNECTOR_COMPACTOR_PROBE.md) verifies 3k complete
 ClickHouse-written records despite the missing v2 manifest header. This permits
-the next maintenance experiment; million-row concurrent compaction is still unrun.
+a [two-million-row concurrent rewrite](CONNECTOR_CONCURRENT.md), now executed.
+All **3.46M hot and 2.097M cold acknowledged rows** reconcile, but **32/51 cold
+reads failed with memory-limit errors**: integrity passed, availability failed.
+No further performance runs are scheduled without a user-selected depth (1–5).
 
 ## Quick start
 

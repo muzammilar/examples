@@ -35,7 +35,7 @@ def expected(first, count):
     ]
 
 
-def reconcile(groups, intents):
+def reconcile(groups, intents, batch_size=BATCH):
     observed = {
         int(row["batch"]): {k: int(v) for k, v in row.items()} for row in groups
     }
@@ -43,19 +43,22 @@ def reconcile(groups, intents):
         raise RuntimeError("duplicate native batch summaries")
     allowed, acknowledged, ambiguous_applied = set(), 0, 0
     for intent in intents:
-        for first in range(intent["first"], intent["end"], BATCH):
-            group = observed.get(first // BATCH)
-            allowed.add(first // BATCH)
+        for first in range(intent["first"], intent["end"], batch_size):
+            group = observed.get(first // batch_size)
+            allowed.add(first // batch_size)
             if group is not None and (
                 group["invalid_bodies"]
                 or group["rows"] != group["unique_ids"]
-                or not first <= group["first_id"] <= group["last_id"] < first + BATCH
+                or not first
+                <= group["first_id"]
+                <= group["last_id"]
+                < first + batch_size
             ):
                 raise RuntimeError("corrupt, duplicate or misplaced native bodies")
             if intent["status"] == "ok":
-                if group is None or group["rows"] != BATCH:
+                if group is None or group["rows"] != batch_size:
                     raise RuntimeError("acknowledged batch missing after restart")
-                acknowledged += BATCH
+                acknowledged += batch_size
             elif group is not None:
                 ambiguous_applied += group["rows"]
     if set(observed) - allowed:
@@ -68,7 +71,9 @@ def reconcile(groups, intents):
     }
 
 
-def drive(root, table, rows, identifier, query, sampler, operation=None):
+def drive(
+    root, table, rows, identifier, query, sampler, operation=None, seed_batch=None
+):
     stop, lock = threading.Event(), threading.Lock()
     phase, records, errors = ["baseline"], [], []
     prefix = connector.connection(max(rows * 2, 10000000), 100000)
@@ -231,16 +236,21 @@ def drive(root, table, rows, identifier, query, sampler, operation=None):
     control.save(root / "target-before.json", control.state(query))
     storage = control.service("storage")
     control.save(root / "storage-before.json", control.state(storage))
-    seed = request(
-        "seed",
-        0,
-        f"CALL clickhouse_execute('ch','CREATE TABLE default.{table} (event_id Int64,customer_id Int32,amount_cents Int64,payload_sha256 String) ENGINE=MergeTree ORDER BY (customer_id,event_id)'); "
-        + insert(0, rows),
-        0,
-        rows,
-    )
-    if seed["status"] != "ok":
-        raise RuntimeError("seed not acknowledged; preserve ambiguous native effects")
+    batch = seed_batch or rows
+    if not 1 <= batch <= rows or rows % batch:
+        raise ValueError("seed batch must divide the bounded row count")
+    for sequence, first in enumerate(range(0, rows, batch)):
+        statement = insert(first, first + batch)
+        if sequence == 0:
+            statement = (
+                f"CALL clickhouse_execute('ch','CREATE TABLE default.{table} (event_id Int64,customer_id Int32,amount_cents Int64,payload_sha256 String) ENGINE=MergeTree ORDER BY (customer_id,event_id)'); "
+                + statement
+            )
+        seed = request("seed", sequence, statement, first, first + batch)
+        if seed["status"] != "ok":
+            raise RuntimeError(
+                "seed not acknowledged; preserve ambiguous native effects"
+            )
     threads = [threading.Thread(target=writer), threading.Thread(target=reader)]
     failure, killed = None, False
     try:

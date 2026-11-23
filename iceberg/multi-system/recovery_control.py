@@ -283,6 +283,8 @@ def sources():
         ROOT / "duckdb_dependencies.py",
         ROOT / "connector_compactor_probe.py",
         ROOT / "connector_compactor_job.py",
+        ROOT / "connector_concurrent.py",
+        ROOT / "connector_concurrent_job.py",
         ROOT / "dependency-fault/Dockerfile",
         ROOT / "test_duckdb_clickhouse.py",
         ROOT / "failed_preservation.py",
