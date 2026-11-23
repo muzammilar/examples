@@ -58,6 +58,7 @@ IMAGES = (
 if control.lab.PROFILE == "current":
     IMAGES = (
         "iceberg-multi-current-runner-duckdb2:dev",
+        "iceberg-multi-current-runner-duckdb2-http:dev",
         "iceberg-multi-compactor-current:dev",
         "iceberg-multi-current-ch-workload:dev",
         "iceberg-multi-current-upload-gate:dev",

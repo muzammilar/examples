@@ -30,8 +30,12 @@ have failed across trials, while independent native stored-body checks pass.
 Row-level isolation now captures incorrect ingestion flags beside correct values;
 see `CONNECTOR_READ_ISOLATION.md`. The user requested a replacement extension;
 keep this failure evidence while qualifying a compatible alternate read/write
-path. Do not silently downgrade DuckDB or call a read-only alternative a full
-replacement.
+path. The active workflow now uses core httpfs plus http_client: generated 2M
+reads, 2M HTTP hot writes/readback and 2.097M retained cold reads pass. A new full
+Iceberg round trip is blocked by the unchanged native slot guard (1 free, 2
+required). HTTP fault cases and edge types remain open; old native fault tests
+must not be presented as HTTP qualification. See `DUCKDB_HTTP.md`. Do not silently
+downgrade DuckDB or call a read-only alternative a full replacement.
 Group 2 now reproduces late conversion partial commits and blind-retry duplicates
 with two-million-row input; corrected immutable-key replay passes under FINAL.
 See `DUCKDB_PARTIAL.md`. Transport ACK-loss injection is still unrun.

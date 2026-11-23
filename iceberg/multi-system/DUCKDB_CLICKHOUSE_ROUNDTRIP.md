@@ -8,11 +8,13 @@ No managed Tigris or real AWS resources were used.
 After the README's infrastructure setup, run:
 
 ```sh
-make duckdb-clickhouse ROWS=2000000 CUSTOMERS=10000 BATCH_ROWS=100000
+make duckdb-clickhouse-native ROWS=2000000 CUSTOMERS=10000 BATCH_ROWS=100000
 make duckdb-clickhouse-read-repro ROWS=2000000
 ```
 
-Both Make workflows were run and returned nonzero. **228 host controls pass**;
+The original round-trip target was named `duckdb-clickhouse` when executed;
+it is now preserved as `duckdb-clickhouse-native` after the HTTP switch.
+Both original Make workflows were run and returned nonzero. **228 host controls pass**;
 that does not make the live connector tests pass. The first command inserts
 through ordinary DuckDB attached ClickHouse tables, publishes to Iceberg through
 `clickhouse_execute`, reads cold rows through `clickhouse_query`, then restores

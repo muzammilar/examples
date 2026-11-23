@@ -1,0 +1,6 @@
+services:
+  runner:
+    image: iceberg-multi-current-runner-duckdb2-http:dev
+    build:
+      context: ./app
+      dockerfile: Dockerfile.http

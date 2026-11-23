@@ -14,9 +14,61 @@ import duckdb_dependencies as dependencies
 import connector_compactor_probe as compactor_probe
 import connector_concurrent as concurrent
 import connector_read_isolation as isolation
+import duckdb_http as http
 
 
 class ConnectorRoundTrip(unittest.TestCase):
+    def test_http_errors_or_missing_responses_cannot_pass_from_good_body_counts(self):
+        for status, body, missing in [
+            (403, "denied", False),
+            (200, "Code: 241", False),
+            (200, "", True),
+        ]:
+            with (
+                self.subTest(status=status, body=body, missing=missing),
+                tempfile.TemporaryDirectory() as directory,
+            ):
+                root = Path(directory).resolve()
+                row = self.fixture(root)
+                (root / "invocation.json").write_text(
+                    json.dumps({"mode": "connector-http-hot"})
+                )
+                (root / "loaded-extensions.json").write_text(
+                    json.dumps(
+                        [
+                            {
+                                "extension_name": "http_client",
+                                "extension_version": "9bf6584a9d",
+                            },
+                            {
+                                "extension_name": "httpfs",
+                                "extension_version": "f71cfdb4bf",
+                            },
+                        ]
+                    )
+                )
+                (root / "create-response.json").write_text(
+                    json.dumps([{"value": {"status": 200, "body": ""}}])
+                )
+                if not missing:
+                    (root / "insert-0-response.json").write_text(
+                        json.dumps([{"value": {"status": status, "body": body}}])
+                    )
+                (root / "hot-rows.json").write_text(json.dumps([row]))
+                with self.assertRaisesRegex(RuntimeError, "HTTP (mutation|response)"):
+                    http.verify(root, 10000)
+
+    def test_http_application_sql_does_not_load_the_legacy_scanner(self):
+        sql = http.artifacts("duck_compact_" + "a" * 32, 2000000, hot_only=True)[
+            "run.sql"
+        ]
+        self.assertNotIn("clickhouse_scanner", sql)
+        self.assertNotIn("INSERT INTO lake.", sql)
+        for value in ("http_retries=0", "JSONColumns", "read_json(", "http_post("):
+            self.assertIn(value, sql)
+        with self.assertRaises(ValueError):
+            http.artifacts("duck_compact_existing;DROP TABLE x", 2000000)
+
     def test_wrong_ingress_flags_fail_even_when_recomputed_bodies_pass(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory).resolve()

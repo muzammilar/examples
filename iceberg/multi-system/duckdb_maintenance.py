@@ -411,6 +411,7 @@ def run(mode="baseline"):
     import duckdb_dependencies
     import connector_concurrent
     import connector_read_isolation
+    import duckdb_http
 
     if mode not in {
         "baseline",
@@ -419,6 +420,9 @@ def run(mode="baseline"):
         "connector",
         "connector-read",
         "connector-read-isolation",
+        "connector-http",
+        "connector-http-hot",
+        "connector-http-read",
         "connector-partial",
         "connector-crash",
         "connector-dependencies",
@@ -431,6 +435,9 @@ def run(mode="baseline"):
         "connector": duckdb_clickhouse,
         "connector-read": duckdb_clickhouse,
         "connector-read-isolation": connector_read_isolation,
+        "connector-http": duckdb_http,
+        "connector-http-hot": duckdb_http,
+        "connector-http-read": duckdb_http,
         "connector-partial": duckdb_partial,
         "connector-crash": duckdb_crash,
         "connector-dependencies": duckdb_dependencies,
@@ -462,6 +469,10 @@ def run(mode="baseline"):
     table = ("duck_frontend_" if mode == "connector" else "duck_compact_") + run_id.hex
     if mode == "connector":
         artifacts = scenario.artifacts(table, rows, customers, batch)
+    elif mode in {"connector-http", "connector-http-hot"}:
+        artifacts = scenario.artifacts(
+            table, rows, hot_only=mode == "connector-http-hot"
+        )
     elif mode in {
         "connector-partial",
         "connector-crash",
@@ -469,7 +480,7 @@ def run(mode="baseline"):
         "connector-concurrent",
     }:
         artifacts = scenario.artifacts(table, rows)
-    elif mode in {"connector-read", "connector-read-isolation"}:
+    elif mode in {"connector-read", "connector-read-isolation", "connector-http-read"}:
         artifacts = scenario.read_artifacts(rows)
     else:
         sql = program(table, rows, customers, batch)
@@ -488,13 +499,15 @@ def run(mode="baseline"):
     # Reserve room for seed, rollback output and committed replacement. This
     # healthy test must not accidentally become a storage-capacity experiment.
     required_slots = 1 if scenario else max(3, (rows * 384 + 255999999) // 256000000)
-    if mode in {"connector", "connector-dependencies"}:
+    if mode in {"connector", "connector-http", "connector-dependencies"}:
         required_slots = (rows * 128 + 255999999) // 256000000 + 1
         if mode == "connector-dependencies" and scenario.seed_case(rows) is not None:
             required_slots = 1  # Existing 2M-row source is read-only; only 3k probe rows are new S3 output.
     elif mode in {
         "connector-read",
         "connector-read-isolation",
+        "connector-http-read",
+        "connector-http-hot",
         "connector-partial",
         "connector-crash",
     }:
@@ -508,7 +521,16 @@ def run(mode="baseline"):
     if int(docker_df.splitlines()[-1].split()[3]) * 1024 < 8 * control.GIB:
         raise RuntimeError("native maintenance requires 8 GiB Docker disk headroom")
     (image,) = json.loads(
-        control.call(["docker", "image", "inspect", control.lab.GO_IMAGE])
+        control.call(
+            [
+                "docker",
+                "image",
+                "inspect",
+                duckdb_http.IMAGE
+                if mode.startswith("connector-http")
+                else control.lab.GO_IMAGE,
+            ]
+        )
     )
     if image["Config"].get("Labels", {}).get("org.examples.owner") != control.OWNER:
         raise RuntimeError("native CLI image lacks repository ownership")
@@ -598,7 +620,11 @@ def run(mode="baseline"):
             {"name": name, "project": control.PROJECT, "service": "runner"},
         )
         identifier = control.call(
-            control.COMPOSE
+            (
+                control.COMPOSE + ["-f", "docker-compose.http.yml"]
+                if mode.startswith("connector-http")
+                else control.COMPOSE
+            )
             + [
                 "run",
                 "-d",
@@ -658,7 +684,7 @@ def run(mode="baseline"):
         control.wait_coverage(
             sampler, ["storage", "clickhouse", "duckdb-cli"], time.time_ns()
         )
-        if mode == "connector":
+        if mode in {"connector", "connector-http"}:
             scenario.setup(root, table, storage)
         control.save_text(root / "release", "release\n")
         if mode in {
@@ -701,14 +727,23 @@ def run(mode="baseline"):
             "connector-concurrent",
         }:
             result = scenario.verify(root, table, rows, query)
-        elif mode in {"connector-read", "connector-read-isolation"}:
+        elif mode in {
+            "connector-read",
+            "connector-read-isolation",
+            "connector-http-read",
+        }:
             result = scenario.verify_read(root, rows)
         else:
             result = scenario.verify(root, rows) if scenario else verify(root, rows)
-            result["clickhouse_readback"] = independent_readback(
-                root, table, rows, customers, query
-            )
-        if mode == "connector":
+            if mode == "connector-http-hot":
+                result["native_hot_readback"] = scenario.independent_hot(
+                    root, table, rows, query
+                )
+            else:
+                result["clickhouse_readback"] = independent_readback(
+                    root, table, rows, customers, query
+                )
+        if mode in {"connector", "connector-http"}:
             result["published_catalog"] = scenario.finalize(root, table, storage, rows)
         if not scenario:
             result["authoritative_catalog"] = authoritative_catalog(
@@ -791,6 +826,21 @@ if __name__ == "__main__":
         dest="mode",
         action="store_const",
         const="connector-read-isolation",
+    )
+    group.add_argument(
+        "--connector-http", dest="mode", action="store_const", const="connector-http"
+    )
+    group.add_argument(
+        "--connector-http-read",
+        dest="mode",
+        action="store_const",
+        const="connector-http-read",
+    )
+    group.add_argument(
+        "--connector-http-hot",
+        dest="mode",
+        action="store_const",
+        const="connector-http-hot",
     )
     parser.set_defaults(mode="baseline")
     args = parser.parse_args()

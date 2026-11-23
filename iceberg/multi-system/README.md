@@ -6,6 +6,13 @@ The single-server, ClickHouse-only examples are separately indexed under
 [`clickhouse/`](../../clickhouse/README.md#iceberg-examples).
 
 Current priority: **DuckDB as the application SQL client → ClickHouse ↔ Iceberg**.
+The active [HTTP application path](DUCKDB_HTTP.md) replaces `clickhouse_scanner`
+with core `httpfs` reads and signed `http_client` writes. Actual checks pass 2M
+hot writes/readback and 2.097M retained cold reads; the new full Iceberg round trip
+is capacity-blocked and HTTP fault tests remain unrun. `make duckdb-clickhouse`
+now selects HTTP; `make duckdb-clickhouse-native` preserves the old regression.
+
+The following findings describe the previous native connector:
 The [connector findings](DUCKDB_CLICKHOUSE_FINDINGS.md) record an Iceberg
 catalog-discovery failure, non-rollbackable remote writes and nanosecond precision
 loss. This connector architecture is not yet qualified; its next pass has five

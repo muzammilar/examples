@@ -30,6 +30,8 @@ endif
 QUERY_RUNS ?= 20
 export QUERY_RUNS
 ROWS ?= 2000000
+HTTP_COLD_CASE ?=
+export HTTP_COLD_CASE
 CUSTOMERS ?= 10000
 BATCH_ROWS ?= 100000
 TARGET_FILE_BYTES ?= 134217728
@@ -99,8 +101,11 @@ duckdb-rejections: config recovery-unit-test ## Native pending-write/schema and 
 duckdb-conflicts: config recovery-unit-test ## Append after native rewrite staging; reject stale commit and replan
 	python3 duckdb_maintenance.py --conflicts
 
-duckdb-clickhouse: config recovery-unit-test ## DuckDB application SQL -> ClickHouse -> Iceberg -> ClickHouse full-body round trip
+duckdb-clickhouse-native: config recovery-unit-test ## Preserved legacy clickhouse_scanner round-trip regression
 	python3 duckdb_maintenance.py --connector
+
+.PHONY: duckdb-clickhouse-native
+duckdb-clickhouse: duckdb-clickhouse-http ## Active DuckDB -> ClickHouse -> Iceberg route uses HTTP
 
 duckdb-clickhouse-read-repro: config recovery-unit-test ## Read-only generated-row regression: compare one and two DuckDB scan threads
 	python3 duckdb_maintenance.py --connector-read
@@ -296,3 +301,17 @@ cold-memory-blocks: config recovery-unit-test ## Isolate bounded Parquet output 
 .PHONY: connector-read-isolation
 connector-read-isolation: config recovery-unit-test ## Preserve streamed predicate flags and compare full locally materialized bodies
 	python3 duckdb_maintenance.py --connector-read-isolation
+
+.PHONY: build-http duckdb-clickhouse-http-read duckdb-clickhouse-http
+build-http: config ## Build the separate signed HTTP application image; keeps legacy images
+	python3 -c 'import recovery_control as c; c.local_docker(); print(c.call(c.COMPOSE + ["-f", "docker-compose.http.yml", "build", "runner"], timeout=240))'
+
+duckdb-clickhouse-http-read: config recovery-unit-test build-http ## Check full generated bodies through core httpfs with one and two threads
+	python3 duckdb_maintenance.py --connector-http-read
+
+duckdb-clickhouse-http: config recovery-unit-test build-http ## HTTP writes and complete hot/cold/restored readback through DuckDB
+	python3 duckdb_maintenance.py --connector-http
+
+.PHONY: duckdb-clickhouse-http-hot
+duckdb-clickhouse-http-hot: config recovery-unit-test build-http ## Two-million-row HTTP writes/reads plus independent native readback; no Iceberg mutations
+	python3 duckdb_maintenance.py --connector-http-hot

@@ -1,0 +1,8 @@
+# Extends the example-owned, Docker-built DuckDB 2.0.1 runner; preserves old images.
+ARG BASE_IMAGE=iceberg-multi-current-runner-duckdb2:dev
+FROM ${BASE_IMAGE}
+USER app
+RUN duckdb -batch -bail -json :memory: -c "SET extension_directory='/opt/duckdb/extensions'; SET allow_extension_repositories='allowed'; CREATE EXTENSION REPOSITORY IF NOT EXISTS query_farm WITH PREFIX 'https://duckdb-extensions.query.farm'; INSTALL http_client FROM query_farm; LOAD http_client FROM query_farm; SELECT CASE WHEN version()='v2.0.1' AND NOT current_setting('allow_unsigned_extensions') THEN true ELSE error('native version/signature policy changed') END; SELECT extension_name,extension_version,loaded FROM duckdb_extensions() WHERE extension_name IN ('http_client','httpfs')" > /opt/duckdb/extensions/http-installed.json \
+ && echo 'a33d437438656e7db3a0e6c2e649b207e431a1e4c534356793f247d7db9a2a11  /opt/duckdb/extensions/v2.0.1/linux_arm64/repositories/query_farm/http_client.duckdb_extension' | sha256sum -c -
+LABEL org.examples.owner="iceberg-multi-system" org.examples.duckdb.http="9bf6584a9d"
+ENV HOME=/home/app
