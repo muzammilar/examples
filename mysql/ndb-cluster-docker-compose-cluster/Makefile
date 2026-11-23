@@ -1,3 +1,4 @@
+export PYTHONPATH := $(CURDIR)/scripts:$(CURDIR)/tests
 SHELL := /bin/sh
 COMPOSE := docker compose --project-name mysql-ndb-cluster
 COUNT ?= 1000000
@@ -19,24 +20,24 @@ docker-up:
 images:
 	$(COMPOSE) build workload
 up: images
-	python3 control.py up
+	python3 scripts/control.py up
 test:
-	python3 control.py test
+	python3 scripts/control.py test
 	$(MAKE) subscriber-profiles
 verify:
-	python3 control.py verify
+	python3 scripts/control.py verify
 failover:
-	python3 control.py data
+	python3 scripts/control.py data
 chaos-sql:
-	python3 control.py sql
+	python3 scripts/control.py sql
 chaos-management:
-	python3 control.py management
+	python3 scripts/control.py management
 router-failure:
-	python3 control.py router
+	python3 scripts/control.py router
 subscriber-profiles:
-	python3 control.py subscribers
+	python3 scripts/control.py subscribers
 benchmark:
-	python3 control.py benchmark
+	python3 scripts/control.py benchmark
 test-production:
 	$(MAKE) test
 	@for partition in 0 1 2; do $(MAKE) failover FAULT_PARTITION=$$partition || exit 1; done
@@ -47,14 +48,14 @@ test-production:
 	$(MAKE) verify
 unit-test:
 	$(COMPOSE) build workload
-	python3 -m unittest discover -s . -p 'test_*.py'
+	python3 -m unittest discover -s tests -p 'test_*.py'
 status:
 	$(COMPOSE) ps
-	python3 control.py status
+	python3 scripts/control.py status
 cli:
 	$(COMPOSE) exec -e MYSQL_PWD=local-root sql0 mysql -uroot -Dorders
 down:
-	python3 control.py down
+	python3 scripts/control.py down
 docker-down:
 	$(COMPOSE) --profile tools down --volumes --remove-orphans --rmi local
 	@if docker image inspect mysql-ndb-workload:dev >/dev/null 2>&1; then docker image rm mysql-ndb-workload:dev; fi

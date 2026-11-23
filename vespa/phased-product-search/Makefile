@@ -1,3 +1,4 @@
+export PYTHONPATH := $(CURDIR)/scripts:$(CURDIR)/tests
 SHELL := /bin/sh
 MODE ?= cluster
 ifeq ($(filter $(MODE),single cluster sharded),)
@@ -27,15 +28,15 @@ CONFIGSERVERS := vespa-products-node0.vespa-product-search-net,vespa-products-no
 endif
 export MODE RESULTS_DIR DOCUMENTS QUERIES SEED DURATION_SECONDS UPDATE_BATCH UPDATE_CONCURRENCY
 export NODE_DOWN_SECONDS CONTROL_MEMORY IGNORE_MEMORY_FLOOR CONFIGSERVERS
-CONTROL := python3 control.py
+CONTROL := python3 scripts/control.py
 .NOTPARALLEL:
 .PHONY: config corpus build docker-up up test check-controls failover controller-crash replica-crash disk-failure rebuilt-crash test-production cold-reopen crash-reopen report benchmark status down docker-down
 config:
 	python3 scripts/config.py
 corpus:
-	python3 corpus.py
+	python3 scripts/corpus.py
 build:
-	python3 prepare_build.py
+	python3 scripts/prepare_build.py
 	docker compose build tools inventory-workload
 docker-up: config
 	$(CONTROL) docker-up
@@ -44,7 +45,7 @@ up:
 test: check-controls
 	$(CONTROL) test
 check-controls:
-	python3 -m unittest test_controls.py
+	python3 -m unittest test_controls
 failover:
 	$(CONTROL) crash
 controller-crash:
@@ -76,7 +77,7 @@ cold-reopen:
 crash-reopen:
 	$(CONTROL) crash-reopen
 report:
-	python3 report.py
+	python3 scripts/report.py
 benchmark:
 	$(CONTROL) benchmark
 status:

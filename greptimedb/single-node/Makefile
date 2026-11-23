@@ -1,3 +1,4 @@
+export PYTHONPATH := $(CURDIR)/scripts:$(CURDIR)/tests
 SHELL := /bin/sh
 COMPOSE_PROJECT_NAME ?= greptime-single
 SERIES ?= 10000
@@ -9,8 +10,8 @@ RUN := $(COMPOSE) run --rm client
 .NOTPARALLEL:
 .PHONY: docker-up up test benchmark status cli down docker-down
 docker-up:
-	python3 lifecycle.py $(COMPOSE_PROJECT_NAME)
-	python3 prepare.py telemetry-workload
+	python3 scripts/lifecycle.py $(COMPOSE_PROJECT_NAME)
+	python3 scripts/prepare.py telemetry-workload
 	mkdir -p results
 	$(COMPOSE) build client vlogs
 	$(COMPOSE) up -d --wait greptime victoria vlogs

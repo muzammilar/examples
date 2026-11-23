@@ -460,3 +460,12 @@ Native references: [Tentacle administration manual](https://docs.ceph.com/en/ten
 and [native LVM inventory](https://docs.ceph.com/en/tentacle/ceph-volume/lvm/list/).
 Pinned daemon/configuration source was also inspected; native CLI help confirmed
 the planned `--osd-fsid` option before disk injection.
+
+## File organization
+
+- [`scripts/`](scripts/): lifecycle, fault and report controllers.
+- [`tests/`](tests/): offline controller tests.
+- [`config/`](config/): contracts and configuration.
+
+The Makefile is the entry point. Generated builds and raw evidence stay in
+ignored directories; the tracked reports do not replace those raw histories.

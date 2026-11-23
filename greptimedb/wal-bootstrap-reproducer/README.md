@@ -75,3 +75,11 @@ no HA, independent-host durability, S3 recovery or live-throughput claim is made
 - [Pinned no-op preparation](https://github.com/GreptimeTeam/greptimedb/blob/v1.3.1/src/common/meta/src/wal_provider/topic_creator.rs).
 - [Pinned WAL replay starts after the flushed entry](https://github.com/GreptimeTeam/greptimedb/blob/v1.3.1/src/mito2/src/region/opener.rs).
 - [Pinned Kafka offset-to-entry mapping](https://github.com/GreptimeTeam/greptimedb/blob/v1.3.1/src/log-store/src/kafka/log_store.rs).
+
+## File organization
+
+- [`scripts/`](scripts/): lifecycle, fault and report controllers.
+- [`config/`](config/): contracts and configuration.
+
+The Makefile is the entry point. Generated builds and raw evidence stay in
+ignored directories; the tracked reports do not replace those raw histories.

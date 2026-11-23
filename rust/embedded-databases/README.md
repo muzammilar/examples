@@ -33,7 +33,7 @@ a process-crash experiment, not replication or independent-host durability.
 
 ## Contract and workload
 
-[`contract.json`](contract.json) pins the supported operations, consistency,
+[`contract.json`](config/contract.json) pins the supported operations, consistency,
 durability and client reference configuration. Fjall **3.1.13** uses explicit
 `PersistMode::SyncAll` on every atomic cross-keyspace batch. redb **5.0.0** uses
 explicit `Durability::Immediate` on every two-table write transaction. These are
@@ -76,7 +76,7 @@ the mounted Linux volume's exclusion and reported inode/device identity.
 
 ## Measurements and result status
 
-**2026-11-22: both the 100,000-pair and million-pair profiles pass.** Native ARM64 on Apple M4 Pro / 48 GiB; Docker 11 CPUs / 24.42 GiB, each complete evaluation container 2 CPUs / 2 GiB with swap disabled. Other isolated functional labs shared this host. Full million-pair evidence: [RESULTS.json](RESULTS.json); the separate [100,000-pair checkpoint](RESULTS_100K.json) remains unchanged. These are short functional observations, not capacity or recovery rankings.
+**2026-11-22: both the 100,000-pair and million-pair profiles pass.** Native ARM64 on Apple M4 Pro / 48 GiB; Docker 11 CPUs / 24.42 GiB, each complete evaluation container 2 CPUs / 2 GiB with swap disabled. Other isolated functional labs shared this host. Full million-pair evidence: [RESULTS.json](config/RESULTS.json); the separate [100,000-pair checkpoint](config/RESULTS_100K.json) remains unchanged. These are short functional observations, not capacity or recovery rankings.
 
 The fresh larger fixture contains **1,000,000 pairs / 2,000,000 native records / 528,000,000 logical key-and-value bytes per backend**. Seeding uses 1,000 atomic batch commits of 1,000 pairs each; verified pair counts are not individual commit/round-trip counts. The live phase then uses one two-record pair per synchronous request.
 
@@ -190,7 +190,7 @@ now contains only that lock.
 The local archive, manifest, verification record and one-off archiver are ignored
 under `results-archives/88201ad3534e44ea9e63e6253fb6c205.*`. Both fixture sizes'
 histories, diagnostic logs, full exports and native-state copies remain there;
-only the compact [archive summary](ARCHIVE_RESULTS.json) is tracked. The source
+only the compact [archive summary](reports/ARCHIVE_RESULTS.json) is tracked. The source
 and five-command lifecycle reproduce new experiments. This reduction of visible
 source files does not establish exact host physical-block reclamation.
 Archiving/verification took **58.548 s**, **57.169 CPU core-s** and **44.34 MiB**
@@ -208,3 +208,13 @@ peak RSS: off-path housekeeping costs, not database performance.
 - [Linux 6.12 block cgroup counters](https://github.com/torvalds/linux/blob/v6.12/block/blk-cgroup.c):
   `blkcg_print_one_stat` and zero-field omission; Linux `/proc` counters and cgroup
   v2 files are retained raw with sampling timestamps.
+
+## File organization
+
+- [`scripts/`](scripts/): lifecycle, fault and report controllers.
+- [`tests/`](tests/): offline controller tests.
+- [`reports/`](reports/): compact tracked result summaries.
+- [`config/`](config/): contracts and configuration.
+
+The Makefile is the entry point. Generated builds and raw evidence stay in
+ignored directories; the tracked reports do not replace those raw histories.

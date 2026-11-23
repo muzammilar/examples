@@ -373,3 +373,12 @@ copies otherwise), adds this example's traffic/witness modules and local
 Dockerfile, then builds from that local context. Neither `.build/` nor results
 are committed; a clean checkout needs no sibling runtime or generated state.
 The other S3 examples keep their existing controllers until separately tested.
+
+## File organization
+
+- [`scripts/`](scripts/): lifecycle, fault and report controllers.
+- [`tests/`](tests/): offline controller tests.
+- [`config/`](config/): contracts and configuration.
+
+The Makefile is the entry point. Generated builds and raw evidence stay in
+ignored directories; the tracked reports do not replace those raw histories.

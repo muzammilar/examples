@@ -91,7 +91,7 @@ worker configurations and actual RF3/ISR3/zero-lag state were checked. New setup
 request RF3 from creation. The configurable 10-second rebalance grace is a local
 lab setting; it does not weaken replication or durability.
 
-The [independent witness baseline](RECOVERY_TEST_STATUS.md)
+The [independent witness baseline](docs/RECOVERY_TEST_STATUS.md)
 verified **2,004,096 ACKs / 10,000 customers**, every source/enriched order body,
 key and partition, and **zero acknowledged loss/corruption**. Serialized input:
 **144,964,788 bytes**; enriched output: **228,691,806 bytes**. Callback p50/p99:
@@ -111,7 +111,7 @@ restore cases remain unrun.
 
 ## Recovery and diagnostic trials — 2026-11-21
 
-[Committed results](VERIFIED_RESULTS.json) retain counts, latency distributions,
+[Committed results](reports/VERIFIED_RESULTS.json) retain counts, latency distributions,
 phase markers, resource/storage measurements, image/source hashes and original
 failed verdicts. The existing ten service containers and volumes were resumed;
 no failed dataset was reset. Every new case kept independent writers/readers and
@@ -231,7 +231,7 @@ retries on empty owned infrastructure**, using `make test COUNT=1000000`:
 application removal and complete owned-resource cleanup. This was an independent
 fixture; the larger retained-state qualification below was not reused as its data.
 
-[Lifecycle results](LIFECYCLE_RESULTS.json) record a fresh **2,001,024-ACK** baseline
+[Lifecycle results](reports/LIFECYCLE_RESULTS.json) record a fresh **2,001,024-ACK** baseline
 with **10,000 customers / 104 SQL probe ACKs**, zero acknowledged loss/corruption,
 and retained-state replay after setup, application removal/recreation and native
 service stop/start. Corrected repeated setup retained all **10 service IDs/start
@@ -312,3 +312,13 @@ The Go service rebuilds its in-memory lookup from the compacted CDC topic at sta
 - [protobuf-go 1.36.12 runtime source](https://github.com/protocolbuffers/protobuf-go/tree/v1.36.12)
 - [rust-rdkafka documentation](https://docs.rs/rdkafka/0.39.0/rdkafka/)
 - [rust-rdkafka 0.39.0 source](https://github.com/fede1024/rust-rdkafka/tree/v0.39.0)
+
+## File organization
+
+- [`scripts/`](scripts/): lifecycle, fault and report controllers.
+- [`tests/`](tests/): offline controller tests.
+- [`docs/`](docs/): detailed procedures and limitations.
+- [`reports/`](reports/): compact tracked result summaries.
+
+The Makefile is the entry point. Generated builds and raw evidence stay in
+ignored directories; the tracked reports do not replace those raw histories.

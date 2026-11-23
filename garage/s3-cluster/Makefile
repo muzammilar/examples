@@ -1,3 +1,4 @@
+export PYTHONPATH := $(CURDIR)/scripts:$(CURDIR)/tests:$(CURDIR)/s3-workload
 SHELL := /bin/sh
 COMPOSE_PROJECT_NAME ?= garage-s3-cluster
 RESULTS_DIR ?= results/recovery
@@ -21,26 +22,26 @@ config:
 docker-up: config
 	$(COMPOSE) up -d --wait $(SERVICES)
 build:
-	python3 prepare_build.py
+	python3 scripts/prepare_build.py
 	$(COMPOSE) build tools
 up: config build
 	python3 scripts/bootstrap.py
 	$(MAKE) config
 	python3 scripts/runtime_config.py
-	python3 control.py up
+	python3 scripts/control.py up
 test:
 	$(RUN) unit
 	$(RUN) test
 benchmark:
-	python3 benchmark.py
+	python3 scripts/benchmark.py
 failover:
 	python3 scripts/runtime_config.py
-	python3 control.py process
+	python3 scripts/control.py process
 disk-failure:
 	python3 scripts/runtime_config.py
-	python3 control.py disk
+	python3 scripts/control.py disk
 repair:
-	python3 control.py repair
+	python3 scripts/control.py repair
 status:
 	$(COMPOSE) ps
 	$(COMPOSE) exec -T garage0 /garage status
@@ -49,14 +50,14 @@ cli:
 down:
 	$(RUN) drop
 docker-down:
-	python3 control.py docker-down
+	python3 scripts/control.py docker-down
 	rm -rf config/generated
 
 .PHONY: verify test-production unit-test gateway-failure
 verify:
-	python3 control.py verify
+	python3 scripts/control.py verify
 gateway-failure:
-	FAULT_TARGET=s3 python3 control.py process
+	FAULT_TARGET=s3 python3 scripts/control.py process
 unit-test:
 	$(RUN) unit
 	$(COMPOSE) run --rm --entrypoint python tools -m unittest -v test_traffic test_placement test_reader
@@ -70,12 +71,12 @@ test-production:
 
 .PHONY: cold-reopen
 cold-reopen:
-	python3 cold_reopen.py
+	python3 scripts/cold_reopen.py
 
 .PHONY: report
 report:
-	python3 report.py
+	python3 scripts/report.py
 
 .PHONY: recover-bootstrap
 recover-bootstrap:
-	python3 control.py recover-bootstrap
+	python3 scripts/control.py recover-bootstrap

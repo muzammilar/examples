@@ -1,0 +1,1 @@
+../../../typesense/product-search/scripts/version_history.py

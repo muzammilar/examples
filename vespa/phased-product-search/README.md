@@ -756,3 +756,11 @@ delays exercise a different failure path. Config-proxy health does not establish
 copy catch-up: the final native readback verified every stored metadata copy and
 accepted version separately. This crash targeted content0; the other selectable
 content hosts were not individually killed.
+
+## File organization
+
+- [`scripts/`](scripts/): lifecycle, fault and report controllers.
+- [`tests/`](tests/): offline controller tests.
+
+The Makefile is the entry point. Generated builds and raw evidence stay in
+ignored directories; the tracked reports do not replace those raw histories.

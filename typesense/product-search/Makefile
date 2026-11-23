@@ -1,3 +1,4 @@
+export PYTHONPATH := $(CURDIR)/scripts:$(CURDIR)/tests
 SHELL := /bin/sh
 MODE ?= cluster
 ifeq ($(filter $(MODE),single cluster sharded),)
@@ -24,7 +25,7 @@ SERVICES := ts1 ts2 ts3
 endif
 export URLS
 COMPOSE := docker compose --project-name typesense-product-search $(PROFILE)
-CONTROL := python3 control.py
+CONTROL := python3 scripts/control.py
 HEALTHY_READ_LAG ?= 10
 UPDATE_BATCH ?= 10
 DURATION_SECONDS ?= 1800
@@ -36,9 +37,9 @@ config:
 	python3 scripts/config.py
 	@mkdir -p "$(RESULTS_DIR)"
 corpus:
-	python3 corpus.py
+	python3 scripts/corpus.py
 build:
-	python3 prepare_build.py
+	python3 scripts/prepare_build.py
 	$(COMPOSE) build ts1 tools inventory-workload
 docker-up:
 	$(CONTROL) docker-up
@@ -81,9 +82,9 @@ else
 endif
 	$(MAKE) test
 report:
-	python3 report.py
+	python3 scripts/report.py
 check-controls:
-	python3 -m unittest test_controls.py
+	python3 -m unittest test_controls
 status:
 	$(COMPOSE) ps --all
 cli:

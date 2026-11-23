@@ -183,3 +183,10 @@ Sources: [pinned operator API/source](https://github.com/StarRocks/starrocks-kub
 [native scale-in procedure](https://github.com/StarRocks/starrocks-kubernetes-operator/blob/v1.11.8/doc/scale_in_shared_nothing_cluster_howto.md),
 [StarRocks primary-key tables](https://docs.starrocks.io/docs/table_design/table_types/primary_key_table/),
 [pinned clone scheduling defaults](https://github.com/StarRocks/starrocks/blob/4.1.7/fe/fe-core/src/main/java/com/starrocks/common/Config.java).
+
+## File organization
+
+- [`scripts/`](scripts/): lifecycle, fault and report controllers.
+
+The Makefile is the entry point. Generated builds and raw evidence stay in
+ignored directories; the tracked reports do not replace those raw histories.

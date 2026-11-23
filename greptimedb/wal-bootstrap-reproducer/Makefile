@@ -1,3 +1,4 @@
+export PYTHONPATH := $(CURDIR)/scripts:$(CURDIR)/tests
 SHELL := /bin/sh
 ROWS ?= 100
 CONTROL ?= 0
@@ -6,18 +7,18 @@ export ROWS CONTROL
 .PHONY: docker-up up test reproduce repair bootstrap-check status down docker-down
 
 docker-up:
-	python3 control.py infrastructure
+	python3 scripts/control.py infrastructure
 up:
-	python3 control.py seed
+	python3 scripts/control.py seed
 test:
 	docker compose run --rm -T wal-workload verify
 reproduce:
-	python3 control.py restart
+	python3 scripts/control.py restart
 repair:
 	docker compose run --rm -T wal-workload repair
 	$(MAKE) test
 bootstrap-check:
-	python3 control.py guard
+	python3 scripts/control.py guard
 status:
 	docker compose ps
 down:

@@ -18,10 +18,10 @@ The five commands were also run separately against a fresh fixture on
 2026-11-21: **2,000,000 seeded rows** passed complete body verification and native
 duplicate/missing-key controls. Setup took **61.30 s**, tests **95.32 s**, and
 both cleanup steps exited successfully. No example containers or volumes remained;
-unrelated resources were retained. See [LIFECYCLE_RESULTS.json](LIFECYCLE_RESULTS.json).
+unrelated resources were retained. See [LIFECYCLE_RESULTS.json](reports/LIFECYCLE_RESULTS.json).
 Use `make cli` for an interactive CedarDB SQL session.
 
-[Analytical contention under concurrent appends](HTAP.md) extends this same
+[Analytical contention under concurrent appends](projects/analytical-contention/docs/HTAP.md) extends this same
 infrastructure with `make benchmark-htap`: a fixed million-row aggregate, alone
 and alongside independent live writers/readers. Its qualification/results are
 tracked separately from the recovery cohort below. The completed 12-cell cohort
@@ -30,10 +30,10 @@ throughput was **3.33×** PostgreSQL alone and **2.69×** under live traffic;
 PostgreSQL used less charged memory. See the trial spread, resource costs and
 UTC/monotonic timing audit in that report.
 
-[Transactional updates and delete/reinsert](MUTABLE.md) add a separate Go
+[Transactional updates and delete/reinsert](projects/transactional-mutations/docs/MUTABLE.md) add a separate Go
 workload over data that analytical queries actually read. Four **million-row**
 healthy/SIGKILL cases verify **2,972 ACKed transactions** with zero loss or
-wrong/partial rows. The [sustained 12-cell comparison](MUTABLE_BENCHMARK.md)
+wrong/partial rows. The [sustained 12-cell comparison](projects/transactional-mutations/docs/MUTABLE_BENCHMARK.md)
 verifies another **108,440 ACKs** and 83,243 complete analytical results. CedarDB
 median query throughput is **3.29×** PostgreSQL alone and **3.03×** under live
 mutations; PostgreSQL uses less charged memory. See the automatic-statistics
@@ -58,6 +58,17 @@ single instance is expected to be unavailable. The final verifier checks every
 old/new body against a Python oracle and the durable Go witness, not just counts.
 New histories never reuse IDs. Verified CSV exports are removed only after proof
 metadata is fsynced; failed exports and histories remain evidence.
+
+## Project directories
+
+Each project keeps its own controllers, tests, guides and reports together.
+The root owns common deployment, builds and raw evidence.
+
+| Project | Directory | Parent Make target |
+|---|---|---|
+| [Analytical contention](projects/analytical-contention/README.md) | `projects/analytical-contention/` | `benchmark-htap` |
+| [Transactional mutations](projects/transactional-mutations/README.md) | `projects/transactional-mutations/` | `test-mutable` |
+
 
 ## Durability and backup boundaries
 
@@ -187,7 +198,7 @@ Request clocks bracket connection/configuration when needed, SQL and body valida
 
 Per-device kernel block counters, not logical query bytes or proof of physical host traffic. Docker Desktop sharing/cache can move I/O outside a container. Native io.stat operation counters remain in snapshots; Docker API IOPS/latency/queue fields are unavailable on this cgroup-v2 runtime rather than zero.
 
-CPU values cover observed counter intervals, **excluding reset/initial/final partial intervals**, not complete CPU totals across crashes. Native memory peaks are lifetime-since-start counters, not per-phase peaks; sampled means/maxima cover the case. Database bytes include catalog/index/WAL data. Shared backups are counted once in the disk series; restore copies, actor peaks, native client CPU/RSS, controller costs, per-device I/O bytes/rates and phase summaries are retained in [VERIFIED_RESULTS.json](VERIFIED_RESULTS.json). Raw samples/history remain ignored under `results/`.
+CPU values cover observed counter intervals, **excluding reset/initial/final partial intervals**, not complete CPU totals across crashes. Native memory peaks are lifetime-since-start counters, not per-phase peaks; sampled means/maxima cover the case. Database bytes include catalog/index/WAL data. Shared backups are counted once in the disk series; restore copies, actor peaks, native client CPU/RSS, controller costs, per-device I/O bytes/rates and phase summaries are retained in [VERIFIED_RESULTS.json](reports/VERIFIED_RESULTS.json). Raw samples/history remain ignored under `results/`.
 
 **cedar restore:** 1,000,000 baseline rows and **5,951 pre-backup ACKs** verified, **0 required missing**. **2,609 later source ACKs** were outside the restored snapshot at case end: measured snapshot RPO, not source data loss. Writes to the restore session were rejected and its complete body remained valid. The archive is mounted read-only for cloning; the database opens a separate verified copy on fresh owned storage.
 

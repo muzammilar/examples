@@ -1,3 +1,4 @@
+export PYTHONPATH := $(CURDIR)/scripts:$(CURDIR)/tests:$(CURDIR)/s3-workload
 SHELL := /bin/sh
 COMPOSE_PROJECT_NAME ?= rustfs-s3-cluster
 RESULTS_DIR ?= results/recovery
@@ -18,21 +19,21 @@ docker-up: build
 	$(COMPOSE) up --no-deps --abort-on-container-exit --exit-code-from init init
 	$(COMPOSE) up -d --wait --wait-timeout 600
 build:
-	python3 prepare_build.py
+	python3 scripts/prepare_build.py
 	$(COMPOSE) build tools
 up: build
-	python3 control.py up
+	python3 scripts/control.py up
 test:
 	$(RUN) unit
 	$(RUN) test
 benchmark:
-	python3 benchmark.py
+	python3 scripts/benchmark.py
 failover:
-	python3 control.py process
+	python3 scripts/control.py process
 disk-failure:
-	python3 control.py disk
+	python3 scripts/control.py disk
 repair:
-	python3 control.py repair
+	python3 scripts/control.py repair
 status:
 	$(COMPOSE) ps
 cli:
@@ -40,17 +41,17 @@ cli:
 down:
 	$(RUN) drop
 docker-down:
-	python3 control.py docker-down
+	python3 scripts/control.py docker-down
 
 .PHONY: verify unit-test gateway-failure test-production recover-bootstrap cold-reopen
 verify:
-	python3 control.py verify
+	python3 scripts/control.py verify
 unit-test:
 	$(RUN) unit
 	$(COMPOSE) run --rm --entrypoint python tools -m unittest -v test_traffic test_reader test_native test_physical
 	python3 -m unittest -v test_control test_teardown
 gateway-failure:
-	FAULT_TARGET=s3 python3 control.py process
+	FAULT_TARGET=s3 python3 scripts/control.py process
 test-production:
 	$(MAKE) test
 	$(MAKE) failover FAULT_TARGET=rustfs0
@@ -59,16 +60,16 @@ test-production:
 	$(MAKE) gateway-failure
 	$(MAKE) verify
 recover-bootstrap:
-	python3 control.py recover-bootstrap
+	python3 scripts/control.py recover-bootstrap
 cold-reopen:
-	python3 cold_reopen.py
+	python3 scripts/cold_reopen.py
 
 .PHONY: report
 report:
-	python3 report.py
+	python3 scripts/report.py
 
 RECOVERY_CASE ?=
 export RECOVERY_CASE
 .PHONY: recover-replacement
 recover-replacement:
-	python3 control.py recover-replacement
+	python3 scripts/control.py recover-replacement

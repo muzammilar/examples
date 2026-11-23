@@ -46,6 +46,16 @@ Each example folder:
 | `orders-workload/`, `telemetry-workload/`, `producer/`, etc. | meaningfully named workload source (Go, Rust or C++), with its Dockerfile |
 | `docker/` | service image Dockerfiles, when an upstream image needs customization |
 
+Keep roots small. Put controllers in `scripts/`, offline tests in `tests/`,
+detailed procedures in `docs/`, compact tracked summaries in `reports/`, and
+contracts/settings in `config/`. Split distinct projects into descriptive
+subdirectories and keep each project's code, tests, guides and reports together.
+Give each project a README and Make entry points. A parent lab may own shared
+infrastructure for related projects, but document that lifecycle explicitly;
+separate examples remain independently reproducible. Update imports, source
+inventories, build contexts and links with every move. Do not leave root shims,
+duplicate source copies or generated artifacts to hide broken paths.
+
 ## Make targets
 
 | Target | Required | Does |
@@ -265,10 +275,10 @@ comparisons for stable evaluated configurations that pass their relevant gates.
   disk baseline/peak/settled bytes, I/O and network alongside operation metrics.
   Include workload and dependencies as well as database roles; distinguish limits
   from measured use and whole-stack space amplification from compression ratio.
-- Before each new performance-testing effort, ask the user for a depth from 1–5
+- Before each new performance-testing effort, ask the user for a depth from 1–4
   and wait for their selection. Recommend level 3 (focused practical coverage).
-  Level 5 means exhaustive matrices, long soaks and deep tail analysis; do not
-  start it or expand an agreed scope without an explicit choice. Follow the depth
+  Never run level 5 testing; that earlier approval was revoked. Do not expand
+  an agreed scope without a new choice. Follow the depth
   table in `AGENTS.md`. Keep required measurements and honest limitations at every
   level; a smaller budget narrows claims rather than silently extending runs.
 - Performance benchmarks must explicitly report disk read/write bytes and rates,

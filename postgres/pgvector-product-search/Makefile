@@ -1,3 +1,4 @@
+export PYTHONPATH := $(CURDIR)/scripts:$(CURDIR)/tests
 SHELL := /bin/sh
 MODE ?= cluster
 ifeq ($(filter $(MODE),single cluster),)
@@ -25,13 +26,13 @@ COMPOSE_PROJECT_NAME := pgvector-product-search
 export COMPOSE_FILE COMPOSE_PROJECT_NAME
 COMPOSE := docker compose --file "$(COMPOSE_FILE)" --project-name $(COMPOSE_PROJECT_NAME) --profile $(MODE)
 RUN := $(COMPOSE) run --rm --user $(shell id -u):$(shell id -g) tools
-CONTROL := python3 control.py
+CONTROL := python3 scripts/control.py
 .NOTPARALLEL:
 .PHONY: build run corpus docker-up up test check-controls benchmark failover replica-crash disk-failure resume-disk-recovery rebuilt-crash cold-reopen crash-reopen test-production status cli down docker-down
 corpus:
-	python3 corpus.py
+	python3 scripts/corpus.py
 build:
-	python3 prepare_build.py
+	python3 scripts/prepare_build.py
 	$(COMPOSE) build tools inventory-workload
 docker-up: corpus build
 	$(CONTROL) preflight
@@ -46,7 +47,7 @@ up: build
 test: build check-controls
 	$(CONTROL) test
 check-controls:
-	python3 -m unittest test_controls.py test_replica_proofs.py
+	python3 -m unittest test_controls test_replica_proofs
 benchmark: build
 	$(CONTROL) benchmark
 failover: build

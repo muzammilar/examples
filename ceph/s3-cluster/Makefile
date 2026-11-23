@@ -1,3 +1,4 @@
+export PYTHONPATH := $(CURDIR)/scripts:$(CURDIR)/tests:$(CURDIR)/s3-workload
 SHELL := /bin/sh
 COMPOSE_PROJECT_NAME ?= ceph-s3-cluster
 RESULTS_DIR ?= results/recovery
@@ -16,15 +17,15 @@ CTL := $(COMPOSE) run --rm control
 .PHONY: build docker-up up test benchmark failover disk-failure status cli down docker-down
 build:
 	@test "$$(docker info --format '{{.Architecture}}')" = aarch64 || { echo 'This pinned Ceph guest/package lab requires an ARM64 Docker engine.'; exit 1; }
-	python3 prepare_build.py
+	python3 scripts/prepare_build.py
 	$(COMPOSE) build guests tools
 docker-up: build
 	mkdir -p $(RESULTS_DIR)
-	python3 capacity.py
+	python3 scripts/capacity.py
 	$(COMPOSE) up -d guests
 	$(CTL) /opt/lab/native/guest.py ready
 up:
-	python3 control.py up
+	python3 scripts/control.py up
 test:
 	$(RUN) unit
 	$(RUN) test
@@ -32,11 +33,11 @@ test:
 	$(CTL) /opt/lab/native/recovery.py audit
 	$(COMPOSE) run --rm --user $(shell id -u):$(shell id -g) --entrypoint python tools /app/proxy_audit.py rgw rgw0 rgw1 rgw2
 benchmark:
-	python3 benchmark.py
+	python3 scripts/benchmark.py
 failover:
-	python3 control.py guest
+	python3 scripts/control.py guest
 disk-failure:
-	python3 control.py disk
+	python3 scripts/control.py disk
 status:
 	$(COMPOSE) ps
 	$(CTL) /opt/lab/native/guest.py ssh 1 'ceph -s'
@@ -48,29 +49,29 @@ recover-guest-init:
 down:
 	$(RUN) drop
 docker-down:
-	python3 control.py docker-down
+	python3 scripts/control.py docker-down
 
 .PHONY: verify repair recover-bootstrap rebuilt-member-failure gateway-failure test-production unit-test
 verify:
-	python3 control.py verify
+	python3 scripts/control.py verify
 .PHONY: cold-reopen report
 cold-reopen:
-	python3 cold_reopen.py
+	python3 scripts/cold_reopen.py
 report:
-	python3 report.py
+	python3 scripts/report.py
 repair:
-	python3 control.py repair
+	python3 scripts/control.py repair
 recover-bootstrap:
-	python3 control.py recover-bootstrap
+	python3 scripts/control.py recover-bootstrap
 RECOVERY_CASE ?=
 export RECOVERY_CASE
 .PHONY: recover-replacement
 recover-replacement:
-	python3 control.py recover-replacement
+	python3 scripts/control.py recover-replacement
 rebuilt-member-failure:
-	python3 control.py rebuilt
+	python3 scripts/control.py rebuilt
 gateway-failure:
-	python3 control.py router
+	python3 scripts/control.py router
 test-production:
 	$(MAKE) test
 	$(MAKE) failover

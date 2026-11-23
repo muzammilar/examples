@@ -177,3 +177,12 @@ Enabling rewriting and a hot `RELOAD` alone did not change the behavior observed
 - [PostgreSQL 17 native hash-partition helper](https://www.postgresql.org/docs/17/functions-info.html)
 - [Patroni synchronous replication](https://patroni.readthedocs.io/en/latest/replication_modes.html)
 - [Patroni v4.0.6 election/synchronous implementation](https://github.com/patroni/patroni/blob/v4.0.6/patroni/ha.py)
+
+## File organization
+
+- [`scripts/`](scripts/): lifecycle, fault and report controllers.
+- [`tests/`](tests/): offline controller tests.
+- [`config/`](config/): contracts and configuration.
+
+The Makefile is the entry point. Generated builds and raw evidence stay in
+ignored directories; the tracked reports do not replace those raw histories.

@@ -1,3 +1,4 @@
+export PYTHONPATH := $(CURDIR)/scripts:$(CURDIR)/tests
 SHELL := /bin/sh
 LOCAL_UID := $(shell id -u)
 LOCAL_GID := $(shell id -g)
@@ -7,7 +8,7 @@ export LOCAL_UID LOCAL_GID SEED_PAIRS
 .PHONY: docker-up up test test-production crash-test status cli down docker-down report check-controls
 
 docker-up up test test-production crash-test status cli down docker-down report:
-	python3 run.py $@
+	python3 scripts/run.py $@
 
 check-controls:
-	python3 -m unittest test_run.py
+	python3 -m unittest test_run

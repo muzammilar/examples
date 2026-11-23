@@ -414,3 +414,12 @@ Pinned native recovery references:
 [canonical outcome semantics](https://github.com/rustfs/rustfs/blob/1.0.5/crates/heal/src/heal/outcome.rs),
 [replacement completion records](https://github.com/rustfs/rustfs/blob/1.0.5/crates/heal/src/heal/resume/replacement.rs)
 and [protected integrity workflow](https://github.com/rustfs/rustfs/blob/1.0.5/docs/operations/shard-integrity-audit.md).
+
+## File organization
+
+- [`scripts/`](scripts/): lifecycle, fault and report controllers.
+- [`tests/`](tests/): offline controller tests.
+- [`config/`](config/): contracts and configuration.
+
+The Makefile is the entry point. Generated builds and raw evidence stay in
+ignored directories; the tracked reports do not replace those raw histories.

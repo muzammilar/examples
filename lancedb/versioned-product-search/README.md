@@ -426,3 +426,11 @@ comparisons remain unrun. Replica quorum, replica repair and native shard routin
 are unsupported in this embedded shared-catalog deployment; serving workers are
 not a substitute for database replication. Losing the catalog volume requires an
 independent backup, not rebuilding it from a surviving worker.
+
+## File organization
+
+- [`scripts/`](scripts/): lifecycle, fault and report controllers.
+- [`tests/`](tests/): offline controller tests.
+
+The Makefile is the entry point. Generated builds and raw evidence stay in
+ignored directories; the tracked reports do not replace those raw histories.

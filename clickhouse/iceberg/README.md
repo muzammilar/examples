@@ -61,7 +61,7 @@ The shared compactor Dockerfile retains the historical Spark 4.0.1 / Iceberg
 1.10.1 defaults for this recorded example. Its release artifacts can now be
 selected with checked build arguments, and reports read the actual loaded
 Iceberg version/commit. The separately pinned current maintenance experiment is
-in [`iceberg/multi-system`](../../iceberg/multi-system/README.md#current-maintenance-engine-check);
+in [`iceberg/multi-system`](../../iceberg/multi-system/docs/ARCHITECTURES.md#current-maintenance-engine-check);
 its offline result does not establish a current-version rerun of this example.
 
 ## Direct-write baseline
@@ -81,7 +81,7 @@ JSONL covering Python, its JVM and container counters around startup, work and
 stop. Missing/empty device counters remain unavailable; syscall character bytes
 are not physical disk I/O. These reports survive Compose's `--rm`; server costs
 and full container lifetime require separate observations. The
-[multi-system qualification](../../iceberg/multi-system/RESOURCE_REPORT_RESULTS.json)
+[multi-system qualification](../../iceberg/multi-system/projects/cold-storage-recovery/reports/RESOURCE_REPORT_RESULTS.json)
 ran both shared worker paths and five Spark jobs; all 22 workload tools retained
 reports. The corrected process-tick aggregation also passed 15 controls in the
 actual Spark image and a fresh 2.1-million-row compaction. Historical results
@@ -197,7 +197,7 @@ not run here. Runtime JAR checksums are verified at image build.
 No host ports are published. Internal SQL HTTP/S3/catalog ports are 8123/8333/8181;
 credentials are public local-demo values. One server and one SeaweedFS mini node
 share the physical host/disk. Restart checks do not demonstrate disk-loss tolerance
-or HA. The [multi-engine example](../../iceberg/multi-system/README.md) reuses this
+or HA. The [multi-engine example](../../iceberg/multi-system/docs/ARCHITECTURES.md) reuses this
 worker and compactor, adding independent DuckDB verification and sharded serving.
 
 Official: [TTL](https://clickhouse.com/docs/guides/developer/ttl),

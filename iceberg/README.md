@@ -4,13 +4,13 @@ Website: [iceberg.apache.org](https://iceberg.apache.org/)
 GitHub: [apache/iceberg](https://github.com/apache/iceberg)
 
 - [Performance benchmark: DuckDB + Iceberg vs ClickHouse + Iceberg vs native ClickHouse](benchmarks/README.md)
-- [Shared-storage DuckDB/ClickHouse interoperability, archive and sharded serving examples](multi-system/README.md)
+- [Shared-storage DuckDB/ClickHouse interoperability, archive and sharded serving examples](multi-system/docs/ARCHITECTURES.md)
 
 - [Trino + MinIO snapshot recovery](trino-minio/README.md): 1,000,000 orders, REST catalog persistence, active Trino worker loss and MinIO node loss.
 
 | Example | Date / setup | Measured result |
 |---|---|---|
-| [Multi-system matrix](multi-system/README.md#benchmark) | 2026-11-14, Apple M4 Pro, native aarch64 Docker, bounded containers | Five architectures passed; all 9 serving replicas placed correctly. Warm native 2M-row aggregate p50/p99 4.938/12.986 ms; per-engine/path results and limits linked. |
+| [Multi-system matrix](multi-system/docs/ARCHITECTURES.md#benchmark) | 2026-11-14, Apple M4 Pro, native aarch64 Docker, bounded containers | Five architectures passed; all 9 serving replicas placed correctly. Warm native 2M-row aggregate p50/p99 4.938/12.986 ms; per-engine/path results and limits linked. |
 | [Trino snapshot recovery](trino-minio/#measured-results) | 2026-11-14, Apple M4 Pro, shared native aarch64 Docker | 1,000,000-order CTAS 4.713 s; 256-million-input reference 8.105 s, worker-loss query 54.199 s; 3 failed tasks recovered, 0 acknowledged loss |
 
 ## Representative workloads
@@ -19,7 +19,7 @@ The existing [20-million-row analytical benchmark](benchmarks/) already exercise
 
 ## Known issues
 
-The current [multi-system fixture](multi-system/README.md#current-version-results-2026-11-22)
+The current [multi-system fixture](multi-system/docs/ARCHITECTURES.md#current-version-results-2026-11-22)
 uses DuckDB 2.0.1, ClickHouse 26.10.10.3 and SeaweedFS 4.54. DuckDB-written paths
 and fresh storage/compactor recovery pass, reconciling 2.4 million and 3.91 million
 acknowledged rows. ClickHouse-written manifests omit required v2 `content`

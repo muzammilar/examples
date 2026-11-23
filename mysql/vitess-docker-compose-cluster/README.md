@@ -219,3 +219,12 @@ This example fixes one shard and three tablets; online resharding and replica ex
 - [Vitess 23 tablet startup source](https://github.com/vitessio/vitess/blob/v23.0.0/examples/common/scripts/vttablet-up.sh).
 - [Vitess 23 reparenting implementation](https://github.com/vitessio/vitess/tree/v23.0.0/go/vt/vtctl/reparentutil).
 - [Vitess 23 VTOrc source](https://github.com/vitessio/vitess/tree/v23.0.0/go/vt/vtorc).
+
+## File organization
+
+- [`scripts/`](scripts/): lifecycle, fault and report controllers.
+- [`tests/`](tests/): offline controller tests.
+- [`config/`](config/): contracts and configuration.
+
+The Makefile is the entry point. Generated builds and raw evidence stay in
+ignored directories; the tracked reports do not replace those raw histories.

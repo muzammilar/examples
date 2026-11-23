@@ -121,7 +121,7 @@ not establish host/zone fault independence.
 
 ## Archived evidence recheck — 2026-11-21
 
-The [committed verification summary](VERIFIED_RESULTS.json) records a fresh offline
+The [committed verification summary](reports/VERIFIED_RESULTS.json) records a fresh offline
 SHA-256 check of **2,321 archived files** and rechecks the final exact native-copy
 proof from each of the three archived datasets. All three pass; **16 host control
 tests** also pass. This rechecks retained evidence, not a new database fault run.
@@ -368,3 +368,12 @@ Pinned implementation references:
 [PostgreSQL 17 replication](https://www.postgresql.org/docs/17/warm-standby.html),
 [pgvector 0.8.7 vector serialization](https://github.com/pgvector/pgvector/blob/v0.8.7/src/vector.c),
 [pgx 5.7.6 transaction handling](https://github.com/jackc/pgx/blob/v5.7.6/tx.go).
+
+## File organization
+
+- [`scripts/`](scripts/): lifecycle, fault and report controllers.
+- [`tests/`](tests/): offline controller tests.
+- [`reports/`](reports/): compact tracked result summaries.
+
+The Makefile is the entry point. Generated builds and raw evidence stay in
+ignored directories; the tracked reports do not replace those raw histories.

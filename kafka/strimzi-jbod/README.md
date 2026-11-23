@@ -291,7 +291,7 @@ were removed, and 23 unrelated Docker volumes were preserved.
 
 ## Archived evidence recheck — 2026-11-21
 
-The [committed result summary](VERIFIED_RESULTS.json) preserves the core recovery
+The [committed result summary](reports/VERIFIED_RESULTS.json) preserves the core recovery
 numbers, three diagnostic benchmark trials and original case verdicts. On
 2026-11-21, all **1,535 archived file hashes** matched again and **11 controller
 tests** passed. These were offline/host checks, not new live fault experiments.
@@ -316,3 +316,12 @@ journals. The extended unrun cases above remain unqualified.
 - [Rust consumer 0.39.0 commit/offset contracts](https://github.com/fede1024/rust-rdkafka/blob/v0.39.0/src/consumer/mod.rs).
 
 - [Pinned idempotent duplicate-sequence handling: successful delivery with invalid offset/timestamp](https://github.com/confluentinc/librdkafka/blob/v2.12.1/src/rdkafka_request.c).
+
+## File organization
+
+- [`scripts/`](scripts/): lifecycle, fault and report controllers.
+- [`tests/`](tests/): offline controller tests.
+- [`reports/`](reports/): compact tracked result summaries.
+
+The Makefile is the entry point. Generated builds and raw evidence stay in
+ignored directories; the tracked reports do not replace those raw histories.

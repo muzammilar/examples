@@ -6,7 +6,7 @@ snapshots, exposes read-only clones and becomes the owner after a fenced-primary
 power cut. This tests asynchronous disaster recovery, not multi-master writes.
 
 The expanded five-command lifecycle passed on fresh guests on 2026-11-22.
-Full-body, resource and teardown evidence is in [FULL_SUITE_RESULTS.json](FULL_SUITE_RESULTS.json).
+Full-body, resource and teardown evidence is in [FULL_SUITE_RESULTS.json](reports/FULL_SUITE_RESULTS.json).
 The client timeout limitation below remains unresolved; this is functional
 recovery evidence, with no production-readiness or performance ranking claim.
 DuckLake is a separate backlog item. For filesystem-only mirror, RAIDZ2 and
@@ -133,7 +133,7 @@ VM restart and health waits; replica-promotion timing does not restart a guest.
 
 `make test-production` aliases the complete `make test`: controls, disk replacement,
 continuous retained-disk crash, replica promotion and final all-history export.
-`make crash-test` runs the continuous profile independently. Its checked-in [contract](live-contract.json) defines
+`make crash-test` runs the continuous profile independently. Its checked-in [contract](config/live-contract.json) defines
 **2,000,000 seed rows**, **10,000 customers**, four independent writers and one
 independent reader. Each batch has 1,000 unique IDs; every row includes its
 customer, amount, 64-character SHA-256 payload and complete batch bounds. A case
@@ -314,7 +314,7 @@ diagnostics under that co-tenancy. No capacity winner is claimed.
 
 ## Earlier ARC checkpoint
 
-[ARC_CHECKPOINT_RESULTS.json](ARC_CHECKPOINT_RESULTS.json) separately preserves
+[ARC_CHECKPOINT_RESULTS.json](reports/ARC_CHECKPOINT_RESULTS.json) separately preserves
 case `3ada336c8d5f4fbda0287c7aa97edcab`: **2,378,000** exact bodies, **377,000**
 acknowledged mutation rows and **1,000** applied rows with ambiguous responses,
 with zero missing acknowledged or wrong/partial/duplicate bodies. It re-exported
@@ -335,7 +335,7 @@ no failed run was erased to turn it into a pass.
 
 ## Verifier failure and recovery
 
-[VERIFIER_FAILURE_RESULTS.json](VERIFIER_FAILURE_RESULTS.json) records the first
+[VERIFIER_FAILURE_RESULTS.json](reports/VERIFIER_FAILURE_RESULTS.json) records the first
 expanded full-suite attempt. It passed disk replacement, continuous crash
 recovery and standby promotion, then **failed** its final export deadline. A
 Python CSV-rendering loop inside the software-emulated guest could not export
@@ -361,7 +361,7 @@ are hash-sealed. `make retire-failed-suite FAILED_SUITE=results/<run>/full-suite
 records **failed-but-archived**, never pass. It refuses earlier-stage failures.
 This is a recovery operation after diagnosis, not part of the normal five-command
 lifecycle. The subsequent fresh complete lifecycle is recorded above and in
-[FULL_SUITE_RESULTS.json](FULL_SUITE_RESULTS.json); the earlier attempt remains failed.
+[FULL_SUITE_RESULTS.json](reports/FULL_SUITE_RESULTS.json); the earlier attempt remains failed.
 
 ## Limitations
 
@@ -541,3 +541,13 @@ Inspected source: DuckDB v1.5.5 `local_file_system.cpp` (file locking) and
 resumable receive), and pinned OpenZFS zfs-2.2.2 `zpool_main.c` (`zpool_do_offline`,
 `zpool_do_attach_or_replace`, `zpool_do_scrub`: persistent fault and completion waits). Fencing, client journals and role selection are application
 logic supplied by this example.
+
+## File organization
+
+- [`scripts/`](scripts/): lifecycle, fault and report controllers.
+- [`tests/`](tests/): offline controller tests.
+- [`reports/`](reports/): compact tracked result summaries.
+- [`config/`](config/): contracts and configuration.
+
+The Makefile is the entry point. Generated builds and raw evidence stay in
+ignored directories; the tracked reports do not replace those raw histories.

@@ -1,3 +1,4 @@
+export PYTHONPATH := $(CURDIR)/scripts:$(CURDIR)/tests
 SHELL := /bin/sh
 COMPOSE_PROJECT_NAME ?= greptime-telemetry
 RESULTS_DIR := $(CURDIR)/results
@@ -16,8 +17,8 @@ config:
 	python3 scripts/garage_config.py
 	mkdir -p results
 dependencies: config
-	python3 lifecycle.py $(COMPOSE_PROJECT_NAME)
-	python3 prepare.py telemetry-workload
+	python3 scripts/lifecycle.py $(COMPOSE_PROJECT_NAME)
+	python3 scripts/prepare.py telemetry-workload
 	$(COMPOSE) build client vlogs
 	$(COMPOSE) up -d --wait garage0 garage1 garage2 garage3 garage4 garage5 garage6 garage7 garage8 s3 meta-store0 meta-store1 meta-store2 wal0 wal1 wal2
 	python3 scripts/garage_bootstrap.py

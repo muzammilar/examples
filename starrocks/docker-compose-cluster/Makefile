@@ -1,3 +1,4 @@
+export PYTHONPATH := $(CURDIR)/scripts:$(CURDIR)/tests
 SHELL := /bin/sh
 COMPOSE_PROJECT_NAME := starrocks-orders
 COUNT ?= 1000000
@@ -10,15 +11,15 @@ RUN := $(COMPOSE) run --rm client
 .NOTPARALLEL:
 .PHONY: docker-up up test benchmark down status docker-down failover disk-failure chaos-fe-leader comparison-failover comparison-disk-failure chaos-keeper-leader test-production
 docker-up:
-	python3 lifecycle.py $(COMPOSE_PROJECT_NAME)
-	python3 prepare.py mutable-orders docker
-	python3 config.py
+	python3 scripts/lifecycle.py $(COMPOSE_PROJECT_NAME)
+	python3 scripts/prepare.py mutable-orders docker
+	python3 scripts/config.py
 	$(COMPOSE) build sr-fe-0 sr-be-0 client
 	$(COMPOSE) up -d --no-deps sr-fe-0 sr-fe-1 sr-fe-2
-	python3 ready.py
+	python3 scripts/ready.py
 	$(COMPOSE) up -d --wait --wait-timeout 600
 up:
-	python3 ready.py all
+	python3 scripts/ready.py all
 	$(RUN) setup
 	@if test -f results/seed.json; then $(RUN) verify; else $(RUN) seed; fi
 test:
@@ -26,19 +27,19 @@ test:
 	$(RUN) verify
 	python3 -c 'import json; from pathlib import Path; r=Path("results"); assert json.load(open(r/"correctness.json")); assert not list(r.glob("fault-*.jsonl")) or json.load(open(r/"recovery-history.json")), "missing fresh recovery reconciliation"'
 benchmark:
-	python3 run_benchmark.py
+	python3 scripts/run_benchmark.py
 failover:
-	python3 fault.py starrocks process
+	python3 scripts/fault.py starrocks process
 disk-failure:
-	python3 fault.py starrocks disk
+	python3 scripts/fault.py starrocks disk
 chaos-fe-leader:
-	python3 fault.py starrocks leader
+	python3 scripts/fault.py starrocks leader
 comparison-failover:
-	python3 fault.py clickhouse process
+	python3 scripts/fault.py clickhouse process
 comparison-disk-failure:
-	python3 fault.py clickhouse disk
+	python3 scripts/fault.py clickhouse disk
 chaos-keeper-leader:
-	python3 fault.py clickhouse leader
+	python3 scripts/fault.py clickhouse leader
 test-production:
 	$(MAKE) test
 	$(MAKE) failover

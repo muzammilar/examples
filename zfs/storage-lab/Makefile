@@ -1,3 +1,4 @@
+export PYTHONPATH := $(CURDIR)/scripts:$(CURDIR)/tests
 SHELL := /bin/sh
 COMPOSE := docker compose
 LOCAL_UID := $(shell id -u)
@@ -10,7 +11,7 @@ BENCH_SECONDS ?= 10
 RESULTS_DIR ?= results/manual
 SETUP ?= all
 export LOCAL_UID LOCAL_GID DISK_GIB DATA_MIB WRITE_MIB_S BENCH_MIB BENCH_SECONDS RESULTS_DIR
-RUN := python3 run.py
+RUN := python3 scripts/run.py
 .NOTPARALLEL:
 .PHONY: report test-production unit-test build keys docker-up up test mirror-test raidz2-test replication-test benchmark status cli down docker-down
 keys:
@@ -25,7 +26,7 @@ up:
 	@mkdir -p "$(RESULTS_DIR)"
 	$(RUN) up
 unit-test:
-	python3 -m unittest test_resources.py test_lifecycle.py test_report.py test_observe_process.py
+	python3 -m unittest test_resources test_lifecycle test_report test_observe_process
 	$(COMPOSE) run --rm --entrypoint python3 runner -m unittest discover -s /opt/lab/app -p 'test_*.py'
 
 test: unit-test
@@ -53,4 +54,4 @@ docker-down:
 	$(RUN) docker-down
 
 report:
-	python3 report.py "$(RESULTS_DIR)"
+	python3 scripts/report.py "$(RESULTS_DIR)"

@@ -1,0 +1,82 @@
+# Optional production-test roles. Builds remain owned by the base runner service.
+x-recovery: &recovery
+  image: iceberg-multi-runner:dev
+  pull_policy: never
+  profiles: [production]
+  environment:
+    AWS_EC2_METADATA_DISABLED: 'true'
+    CATALOG_URL: http://storage:8181
+    S3_ENDPOINT: storage:8333
+    CLICKHOUSE_ADDR: clickhouse:9000
+    CLICKHOUSE_PASSWORD: local-reader
+    RESULTS_DIR: /results
+    ROWS: ${RECOVERY_ROWS:-2000000}
+    CUSTOMERS: ${CUSTOMERS:-10000}
+    RECOVERY_BATCH_ROWS: ${RECOVERY_BATCH_ROWS:-10000}
+    WRITERS: ${RECOVERY_WRITERS:-2}
+    RECOVERY_READERS: '2'
+    RECOVERY_TIMEOUT_S: ${RECOVERY_TIMEOUT_S:-10}
+    RECOVERY_DELAY_MS: ${RECOVERY_DELAY_MS:-1000}
+    RECOVERY_VISIBILITY_S: ${RECOVERY_VISIBILITY_S:-30}
+    RECOVERY_VERIFY_TIMEOUT_S: ${RECOVERY_VERIFY_TIMEOUT_S:-300}
+  volumes:
+    - ./${RESULTS_DIR:-results/manual}:/results
+  cpus: 1
+  mem_limit: 1g
+  memswap_limit: 1g
+services:
+  recovery-tools:
+    <<: *recovery
+    mem_limit: 2g
+    memswap_limit: 2g
+  recovery-writer:
+    <<: *recovery
+  recovery-reader:
+    <<: *recovery
+  recovery-compactor:
+    image: iceberg-multi-compactor:dev
+    pull_policy: never
+    profiles: [production]
+    environment:
+      AWS_EC2_METADATA_DISABLED: 'true'
+      AWS_REGION: us-east-1
+      CATALOG_URL: http://storage:8181
+      COMPACTION_LIVE_WRITERS: 'true'
+      REWRITE_MANIFESTS: 'false'
+      COMPACTOR_S3_ENDPOINT: http://compaction-upload-gate:8333
+      TARGET_FILE_BYTES: ${TARGET_FILE_BYTES:-134217728}
+      SPARK_USER: lab
+      HADOOP_USER_NAME: lab
+    volumes:
+      - ./${RESULTS_DIR:-results/manual}:/results
+    cpus: 2
+    mem_limit: 2g
+    memswap_limit: 2g
+  compaction-upload-gate:
+    image: iceberg-multi-upload-gate:dev
+    pull_policy: never
+    profiles: [production]
+    build: ./workloads/compaction-upload-gate
+    environment:
+      AWS_EC2_METADATA_DISABLED: 'true'
+    volumes:
+      - ./${RESULTS_DIR:-results/manual}:/results
+    cpus: 1
+    mem_limit: 256m
+    memswap_limit: 256m
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+  dependency-fault:
+    image: iceberg-multi-dependency-fault:dev
+    profiles: [dependency-fault]
+    build: ./deploy/dependency-fault
+    network_mode: service:clickhouse
+    cap_drop: [ALL]
+    cap_add: [NET_ADMIN]
+    security_opt: [no-new-privileges:true]
+    read_only: true
+    tmpfs: ['/run:rw,nosuid,nodev,noexec,size=1m']
+    cpus: 0.25
+    mem_limit: 64m
+    memswap_limit: 64m

@@ -230,3 +230,12 @@ passed. Every dataset was verified before explicit cleanup. Final inspection fou
 - [Pinned shard-visibility configuration](https://github.com/citusdata/citus/blob/v14.2.0/src/backend/distributed/shared_library_init.c).
 - [Patroni 4.0.6 Citus integration](https://github.com/patroni/patroni/blob/v4.0.6/patroni/postgresql/mpp/citus.py).
 - [Citus router planner](https://github.com/citusdata/citus/blob/v14.2.0/src/backend/distributed/planner/multi_router_planner.c).
+
+## File organization
+
+- [`scripts/`](scripts/): lifecycle, fault and report controllers.
+- [`tests/`](tests/): offline controller tests.
+- [`config/`](config/): contracts and configuration.
+
+The Makefile is the entry point. Generated builds and raw evidence stay in
+ignored directories; the tracked reports do not replace those raw histories.

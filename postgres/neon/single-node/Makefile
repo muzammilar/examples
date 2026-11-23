@@ -1,3 +1,4 @@
+export PYTHONPATH := $(CURDIR)/scripts:$(CURDIR)/tests
 SHELL := /bin/sh
 COMPOSE_PROJECT_NAME := neon-single
 ROWS ?= 1000000
@@ -7,9 +8,9 @@ RUN := $(COMPOSE) run --rm runner
 .NOTPARALLEL:
 .PHONY: docker-up up test benchmark status cli down docker-down
 docker-up:
-	python3 lifecycle.py $(COMPOSE_PROJECT_NAME)
-	python3 prepare.py orders-workload
-	python3 config.py
+	python3 scripts/lifecycle.py $(COMPOSE_PROJECT_NAME)
+	python3 scripts/prepare.py orders-workload
+	python3 scripts/config.py
 	$(COMPOSE) build runner
 	$(COMPOSE) up -d --wait broker pageserver sk0 pg0
 up:

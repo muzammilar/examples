@@ -46,33 +46,33 @@ language-specific DataFrame interfaces remain unrun. Consult the pinned
 [upstream architecture](https://github.com/RayforceDB/rayforce/tree/38fd4be3560d63a5514c1e6883685fe496d45e1a/docs/docs/architecture)
 before inferring storage or replication guarantees from in-memory query results.
 
-The [saved-snapshot profiles](duckdb-comparison/PERSISTENCE.md) now verify
+The [saved-snapshot profiles](duckdb-comparison/projects/snapshots/docs/PERSISTENCE.md) now verify
 2,000,000 trade bodies and 10,000 customer bodies after a fresh-process reopen
 on both engines. Observed native files were 13,031,576 bytes for Rayforce and
 14,954,496 bytes for DuckDB, with CPU/memory/compression/I/O evidence. These
 immutable snapshot checks do not qualify live journal or crash recovery.
-The separate [synchronous journal test](duckdb-comparison/JOURNAL.md) now recovers
+The separate [synchronous journal test](duckdb-comparison/projects/rayforce-journal/docs/JOURNAL.md) now recovers
 2,251 live ACKs and the full seed after two SIGKILLs, with independent writers,
 readers and an external witness. No acknowledged body loss was observed;
 asynchronous recovery, online backup and matched DuckDB recovery remain unrun.
-An [offline snapshot/tail restore](duckdb-comparison/JOURNAL.md#offline-restore-into-separate-storage)
+An [offline snapshot/tail restore](duckdb-comparison/projects/rayforce-journal/docs/JOURNAL.md#offline-restore-into-separate-storage)
 also rebuilt every body in separate local storage without access to original input
 CSVs: 1,614 replayed entries, zero evaluation errors and zero ACK loss. This does
 not establish online backup availability or independent-host durability.
 
-[Journal ownership tests](duckdb-comparison/FENCING.md) now reject all ten native
+[Journal ownership tests](duckdb-comparison/projects/rayforce-journal/docs/FENCING.md) now reject all ten native
 second openers on Docker-managed ext4 storage while writers/readers continue.
 The host-share bind mount failed both native and standard-library locking controls;
 that failure remains reported. Current live tests use uniquely owned volumes, and
 the two-crash volume rerun recovered all 2,255 ACKs with zero observed body loss.
 
-[Controlled torn-tail recovery](duckdb-comparison/TAIL_RECOVERY.md) now rejects
+[Controlled torn-tail recovery](duckdb-comparison/projects/rayforce-journal/docs/TAIL_RECOVERY.md) now rejects
 startup, validates 1,621 intact frames and removes only the known injected three
 bytes in a fresh copy. It restores 2,000,000 seed trades, 10,000 customers and
 2,262 live ACKs with zero missing/wrong bodies. `make test-production-recovery`
 creates its own recovery source and runs the six recovery cases serially.
 
-The [interior payload-corruption probe](duckdb-comparison/CORRUPTION.md) exposes
+The [interior payload-corruption probe](duckdb-comparison/projects/rayforce-journal/docs/CORRUPTION.md) exposes
 a **failed integrity boundary**: native replay accepts a validly encoded one-bit
 price change and returns one wrong acknowledged body. An invalid serialized type
 fails closed; an untouched backup restores all 2,000,000 seed trades, 10,000
@@ -81,28 +81,28 @@ propagates this failure. This logical edit on a fenced copy does not establish
 physical bit-rot behavior or normal process-crash data loss. General corruption
 repair remains unqualified; the distinct CRC-protected AOF subset is evaluated below.
 
-The [middle-header diagnostic](duckdb-comparison/HEADER_CORRUPTION.md) confirms
+The [middle-header diagnostic](duckdb-comparison/projects/rayforce-journal/docs/HEADER_CORRUPTION.md) confirms
 startup fails closed for one-bit magic/version damage. Native prefix validation
 does not identify a safe recovery boundary: following its truncation hint on a
 disposable copy loses **566 of 2,259 ACKs** despite clean startup. Our guard
 rejects both edits; the intact backup recovers every body. This is a logical
 file-edit experiment, not evidence of physical bit rot or ordinary crash loss.
 
-The [native AOF profile](duckdb-comparison/AOF.md) calls the public API from C++
+The [native AOF profile](duckdb-comparison/projects/rayforce-aof/docs/AOF.md) calls the public API from C++
 over 10,000 opaque 1,024-byte events. Payload corruption is rejected, while length
 and commit-marker edits yield successful opens/scans missing **5,000 / 5,000 /
 100 acknowledged records**. The strict file-edit integrity verdict remains
 **FAILED**; an intact native backup verifies every body. CPU, memory, I/O,
 compression, disk and native API timing are reported separately from buffered
 admission versus commit barriers. This is an application event-log API, not
-automatic database persistence. The [multi-segment diagnostic](duckdb-comparison/AOF_SEGMENTS.md)
+automatic database persistence. The [multi-segment diagnostic](duckdb-comparison/projects/rayforce-aof/docs/AOF_SEGMENTS.md)
 now verifies 159-segment rotation/reopen, sealed CRC scan rejection and intact-backup
 recovery. Removing the tail loses **46/49 ACK bodies** in two fixtures; the external
 witness rejects while native open succeeds. Live AOF process-crash and interrupted
 rotation tests remain open; expected file-loss detection does not erase the
 existing integrity failures.
 
-The matching [DuckDB live WAL profile](duckdb-comparison/DUCKDB_RECOVERY.md),
+The matching [DuckDB live WAL profile](duckdb-comparison/projects/duckdb-recovery/docs/DUCKDB_RECOVERY.md),
 qualified on 2026-11-22, uses native C++ Quack sessions with TLS and the same
 two-million-trade / 10,000-customer input. Both retained-volume crashes recovered
 all **2,364 ACK bodies**, with **zero loss/corruption**. Checkpointing keeps readers

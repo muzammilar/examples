@@ -82,6 +82,27 @@ materialized files**. Ignore `.build/` and verify this with `git check-ignore` a
 the staged diff. Document the link and materialization in the example README.
 Each example owns its cluster, context, state, lifecycle and results.
 
+Keep the example root small: README, Makefile and clear subdirectories. Group
+controllers in `scripts/`, tests in `tests/`, deployment files in `deploy/`,
+curated results in `reports/`, and detailed notes in `docs/` by architecture or
+workload. The root README must map each system/data path to its relevant files.
+Do not accumulate experiment scripts, JSON reports and long investigation notes
+as dozens of root files. Raw/generated evidence remains ignored.
+Distinct projects or data paths belong in descriptive project subdirectories,
+with their own README and entry points; keep each project's source, tests, notes
+and reports together. Do not flatten unrelated projects into one scripts folder.
+A single lab may share infrastructure across closely related subprojects only
+when its README makes that ownership and lifecycle explicit. Independently
+runnable examples must still own their state and be self-contained.
+
+Keep code idiomatic and focused: each module should have a clear responsibility,
+with descriptive names and small public interfaces. Prefer standard libraries and
+maintained native tooling over custom wrappers. Review the implementation in two
+or three passes for correctness, unnecessary complexity and layout. When moving
+files, update Make targets, imports, Docker build contexts, source inventories and
+documentation links together; verify them offline before declaring cleanup done.
+Do not add compatibility shims or duplicate source trees to conceal broken paths.
+
 For Docker Compose examples, normally declare the workload applications (producer,
 consumer, live writer/reader and verifier as appropriate) as services in that
 example's Compose file. Build them from its local source with a Dockerfile and
@@ -561,7 +582,7 @@ gap rather than inventing estimates or retroactively claiming coverage.
 ### Performance and other production properties
 
 Before each new performance-testing effort, **ask the user to choose a depth
-from 1 to 5**. Recommend **level 3**, their usual preference, but wait for their
+from 1 to 4**. Recommend **level 3**, their usual preference, but wait for their
 choice before starting performance runs. Record the selected level, scope and
 time budget; ask again before expanding that scope. Do not automatically escalate
 to exhaustive testing because a backlog or matrix exists.
@@ -572,7 +593,9 @@ to exhaustive testing because a backlog or matrix exists.
 | 2 | Small baseline covering the main read/write paths and resource costs. |
 | 3 | Focused practical evaluation: representative workloads, a small set of important variants and bounded tail-latency observations. Avoid exhaustive matrices and long soaks. |
 | 4 | Broader repeated comparisons, saturation and selected degraded/recovery performance. |
-| 5 | Exhaustive investigation: extensive matrices, long soaks, deep tail analysis and repeated tuning/recovery experiments. Requires explicit selection. |
+
+**Never run level 5 testing.** The user revoked the previous level-5 approval.
+Keep work bounded; their usual preference is level 3.
 
 All levels retain correctness, failure honesty and the required resource/storage
 measurements. Depth controls breadth, duration and repetitions, not evidence

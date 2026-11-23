@@ -30,9 +30,9 @@ each native replacement interval; both 512 MiB fio payloads passed full
 verification and clean scrubs. Snapshot recovery again omitted the deliberately
 unsent 64 MiB tail. All owned resources were removed after guarded native archival.
 CPU, memory, compression, disk bytes and IOPS are recorded in
-[`OBSERVER_RESULTS.json`](storage-lab/OBSERVER_RESULTS.json). The earlier explicit-
+[`OBSERVER_RESULTS.json`](storage-lab/reports/OBSERVER_RESULTS.json). The earlier explicit-
 rate checkpoint remains in
-[`OBSERVER_RESULTS_4M_OVERRIDE.json`](storage-lab/OBSERVER_RESULTS_4M_OVERRIDE.json).
+[`OBSERVER_RESULTS_4M_OVERRIDE.json`](storage-lab/config/OBSERVER_RESULTS_4M_OVERRIDE.json).
 The archive-checker and host Python-prerequisite failures stay documented.
 Native stream checks preserve evidence; their independent restore is untested.
 These shared-host functional observations do not establish capacity or

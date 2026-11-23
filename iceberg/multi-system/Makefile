@@ -1,3 +1,7 @@
+empty :=
+space := $(empty) $(empty)
+MODULE_DIRS := scripts tests $(sort $(wildcard projects/*/scripts projects/*/tests))
+export PYTHONPATH := $(subst $(space),:,$(addprefix $(CURDIR)/,$(MODULE_DIRS)))
 SHELL := /bin/sh
 DUCKDB_VERSION ?= 2.0.1
 export DUCKDB_VERSION
@@ -9,6 +13,16 @@ $(error DUCKDB_VERSION must be 2.0.1 or the historical 1.5.5 lane)
 endif
 LAB_PROFILE ?= current
 export LAB_PROFILE
+LAB_VARIANT ?=
+export LAB_VARIANT
+ifneq ($(LAB_VARIANT),)
+ifneq ($(LAB_VARIANT),http)
+$(error LAB_VARIANT must be empty or http)
+endif
+ifneq ($(LAB_PROFILE),current)
+$(error LAB_VARIANT=http requires LAB_PROFILE=current)
+endif
+endif
 ifneq ($(words $(LAB_PROFILE)),1)
 $(error Select exactly one LAB_PROFILE)
 endif
@@ -16,16 +30,19 @@ ifeq ($(filter historical current,$(LAB_PROFILE)),)
 $(error LAB_PROFILE must be historical or current)
 endif
 LAB_PROJECT := iceberg-multi-system$(if $(filter current,$(LAB_PROFILE)),-current,)
-COMPOSE := docker compose --project-name $(LAB_PROJECT) --env-file /dev/null -f docker-compose.yml -f config/generated/cluster.yml -f docker-compose.recovery.yml
+ifeq ($(LAB_VARIANT),http)
+LAB_PROJECT := iceberg-multi-system-current-http
+endif
+COMPOSE := docker compose --project-directory "$(CURDIR)" --project-name $(LAB_PROJECT) --env-file /dev/null -f deploy/compose/docker-compose.yml -f config/generated/cluster.yml -f deploy/compose/docker-compose.recovery.yml
 ifeq ($(DUCKDB_VERSION),2.0.1)
-COMPOSE += -f docker-compose.duckdb2.yml
+COMPOSE += -f deploy/compose/docker-compose.duckdb2.yml
 endif
 ifeq ($(LAB_PROFILE),current)
 ifneq ($(DUCKDB_VERSION),2.0.1)
 $(error The current lab requires DuckDB 2.0.1)
 endif
-COMPOSE += -f docker-compose.storage-current.yml -f docker-compose.maintenance-current.yml -f docker-compose.current.yml
-RESULTS_DIR ?= results/current/manual
+COMPOSE += -f deploy/compose/docker-compose.storage-current.yml -f deploy/compose/docker-compose.maintenance-current.yml -f deploy/compose/docker-compose.current.yml
+RESULTS_DIR ?= results/$(if $(filter http,$(LAB_VARIANT)),current-http,current)/manual
 endif
 QUERY_RUNS ?= 20
 export QUERY_RUNS
@@ -65,12 +82,18 @@ docker-up: config
 	$(COMPOSE) up -d --wait storage
 
 prepare:
-	python3 prepare.py
+	python3 scripts/prepare.py
 
+ifeq ($(LAB_VARIANT),http)
+up: config build-http
+	$(COMPOSE) up -d --wait storage clickhouse
+	@mkdir -p "$(RESULTS_DIR)"
+else
 up: config prepare
 	$(COMPOSE) build runner compactor ch-workload compaction-upload-gate
 	$(COMPOSE) up -d --wait storage clickhouse
 	@mkdir -p "$(RESULTS_DIR)"
+endif
 
 ARCH ?= all
 export ARCH
@@ -82,51 +105,51 @@ unit-test: config prepare
 
 recovery-unit-test:
 	python3 -c 'import sys; assert sys.version_info >= (3, 11), "Recovery controls require Python 3.11+; check the python3 selected by Make"'
-	LAB_PROFILE=historical python3 -m unittest test_recovery_resources.py test_recovery_control.py test_recovery_report.py test_recovery_cleanup.py test_recovery_retirement.py test_compactor_cleanup.py test_compactor_control.py test_prefault_archive.py test_manifest_control.py test_cold_storage.py test_cold_readback.py test_cold_upgrade.py test_cold_cleanup.py test_compound_archive.py test_maintenance_control.py test_lab_profiles.py test_duckdb_maintenance.py test_failed_preservation.py test_duckdb_clickhouse.py
+	LAB_PROFILE=historical LAB_VARIANT= python3 -m unittest $(basename $(notdir $(wildcard tests/test_*.py projects/*/tests/test_*.py)))
 
 .PHONY: preserve-failed-case check-failed-preservation
 preserve-failed-case: recovery-unit-test ## Seal reviewed original failures and independent restore proofs; does not authorize teardown
-	python3 failed_preservation.py "$(FAILED_CASE)"
+	python3 scripts/failed_preservation.py "$(FAILED_CASE)"
 
 check-failed-preservation: recovery-unit-test ## Offline replay of the latest preservation receipt; no teardown
-	python3 failed_preservation.py --replay "$(FAILED_CASE)"
+	python3 scripts/failed_preservation.py --replay "$(FAILED_CASE)"
 
 .PHONY: duckdb-maintenance duckdb-rejections duckdb-conflicts duckdb-clickhouse duckdb-clickhouse-read-repro
 duckdb-maintenance: config recovery-unit-test ## Native DuckDB v2 compaction, rollback, retained snapshot and no-op checks
-	python3 duckdb_maintenance.py
+	python3 projects/duckdb-iceberg/scripts/duckdb_maintenance.py
 
 duckdb-rejections: config recovery-unit-test ## Native pending-write/schema and v3 compaction rejection controls
-	python3 duckdb_maintenance.py --rejections
+	python3 projects/duckdb-iceberg/scripts/duckdb_maintenance.py --rejections
 
 duckdb-conflicts: config recovery-unit-test ## Append after native rewrite staging; reject stale commit and replan
-	python3 duckdb_maintenance.py --conflicts
+	python3 projects/duckdb-iceberg/scripts/duckdb_maintenance.py --conflicts
 
 duckdb-clickhouse-native: config recovery-unit-test ## Preserved legacy clickhouse_scanner round-trip regression
-	python3 duckdb_maintenance.py --connector
+	python3 projects/duckdb-iceberg/scripts/duckdb_maintenance.py --connector
 
 .PHONY: duckdb-clickhouse-native
 duckdb-clickhouse: duckdb-clickhouse-http ## Active DuckDB -> ClickHouse -> Iceberg route uses HTTP
 
 duckdb-clickhouse-read-repro: config recovery-unit-test ## Read-only generated-row regression: compare one and two DuckDB scan threads
-	python3 duckdb_maintenance.py --connector-read
+	python3 projects/duckdb-iceberg/scripts/duckdb_maintenance.py --connector-read
 
 storage-crash: config recovery-unit-test
-	python3 recovery_control.py storage-crash
+	python3 scripts/recovery_control.py storage-crash
 
 compactor-crash: config recovery-unit-test
-	python3 compactor_control.py
+	python3 projects/compactor-recovery/scripts/compactor_control.py
 
 MANIFEST_CASE ?=
 MANIFEST_INSPECTION ?=
 MANIFEST_VERIFICATION ?=
 manifest-io: config recovery-unit-test
-	python3 manifest_control.py --case "$(MANIFEST_CASE)" $(if $(MANIFEST_INSPECTION),--inspection-id "$(MANIFEST_INSPECTION)") $(if $(MANIFEST_VERIFICATION),--verification-id "$(MANIFEST_VERIFICATION)")
+	python3 projects/manifest-interop/scripts/manifest_control.py --case "$(MANIFEST_CASE)" $(if $(MANIFEST_INSPECTION),--inspection-id "$(MANIFEST_INSPECTION)") $(if $(MANIFEST_VERIFICATION),--verification-id "$(MANIFEST_VERIFICATION)")
 
 verify-history: config recovery-unit-test
-	python3 recovery_cleanup.py verify-history
+	python3 scripts/recovery_cleanup.py verify-history
 
 retire-failed-case: config recovery-unit-test
-	python3 recovery_cleanup.py retire-failed-case --case "$(FAILED_CASE)" --source-manifest "$(SOURCE_MANIFEST)" --original-manifest "$(ORIGINAL_MANIFEST)" --completed-verification "$(COMPLETED_VERIFICATION)"
+	python3 scripts/recovery_cleanup.py retire-failed-case --case "$(FAILED_CASE)" --source-manifest "$(SOURCE_MANIFEST)" --original-manifest "$(ORIGINAL_MANIFEST)" --completed-verification "$(COMPLETED_VERIFICATION)"
 
 test-production:
 	$(MAKE) storage-crash
@@ -134,8 +157,12 @@ test-production:
 	$(MAKE) compactor-crash
 	$(MAKE) verify-history
 
+ifeq ($(LAB_VARIANT),http)
+test: duckdb-clickhouse-http
+else
 test: config unit-test
 	sh scripts/test.sh "$(ARCH)"
+endif
 
 test-case: config
 ifeq ($(ARCH),duck-direct)
@@ -178,7 +205,7 @@ compact: config
 	$(RUN) compactor
 
 config:
-	python3 lab_profiles.py
+	python3 scripts/lab_profiles.py
 	python3 scripts/cluster-config.py
 
 cluster-up: config
@@ -207,10 +234,10 @@ cli:
 	$(COMPOSE) exec clickhouse clickhouse-client --password local-reader
 
 down:
-	python3 recovery_cleanup.py down
+	python3 scripts/recovery_cleanup.py down
 
 docker-down:
-	python3 recovery_cleanup.py docker-down
+	python3 scripts/recovery_cleanup.py docker-down
 
 .PHONY: benchmark benchmark-case
 benchmark: config
@@ -226,7 +253,7 @@ endif
 
 .PHONY: cold-storage
 cold-storage: config recovery-unit-test ## Cold checkpoint and byte-identical restore, retaining original state
-	python3 cold_storage.py
+	python3 projects/cold-storage-recovery/scripts/cold_storage.py
 
 COLD_CHECKPOINT ?=
 COLD_CASE ?=
@@ -234,84 +261,84 @@ COLD_VERIFICATION ?=
 .PHONY: cold-readback
 cold-readback: config recovery-unit-test ## Reconcile one witnessed table on its separate restored volume
 	@test -n "$(COLD_CHECKPOINT)" -a -n "$(COLD_CASE)" -a -n "$(COLD_VERIFICATION)" || (echo 'Set COLD_CHECKPOINT, COLD_CASE and COLD_VERIFICATION'; exit 1)
-	python3 cold_readback.py --checkpoint "$(COLD_CHECKPOINT)" --case "$(COLD_CASE)" --verification "$(COLD_VERIFICATION)"
+	python3 projects/cold-storage-recovery/scripts/cold_readback.py --checkpoint "$(COLD_CHECKPOINT)" --case "$(COLD_CASE)" --verification "$(COLD_VERIFICATION)"
 
 COLD_READBACK ?=
 .PHONY: cold-readback-cleanup cold-checkpoint-cleanup cold-upgrade
 cold-readback-cleanup: config recovery-unit-test ## Remove verified stopped readback containers, network and query cache volume
 	@test -n "$(COLD_READBACK)" || (echo 'Set COLD_READBACK'; exit 1)
-	python3 cold_cleanup.py --readback "$(COLD_READBACK)"
+	python3 projects/cold-storage-recovery/scripts/cold_cleanup.py --readback "$(COLD_READBACK)"
 
 cold-checkpoint-cleanup: config recovery-unit-test ## Remove recorded stopped checkpoint utilities, retaining all volumes and archives
 	@test -n "$(COLD_CHECKPOINT)" || (echo 'Set COLD_CHECKPOINT'; exit 1)
-	python3 cold_cleanup.py --checkpoint "$(COLD_CHECKPOINT)"
+	python3 projects/cold-storage-recovery/scripts/cold_cleanup.py --checkpoint "$(COLD_CHECKPOINT)"
 
 cold-upgrade: config recovery-unit-test ## Reconcile a restored table with pinned SeaweedFS 4.54; refuse implicit downgrade
 	@test -n "$(COLD_CHECKPOINT)" -a -n "$(COLD_CASE)" -a -n "$(COLD_VERIFICATION)" || (echo 'Set COLD_CHECKPOINT, COLD_CASE and COLD_VERIFICATION'; exit 1)
-	python3 cold_upgrade.py --checkpoint "$(COLD_CHECKPOINT)" --case "$(COLD_CASE)" --verification "$(COLD_VERIFICATION)"
+	python3 projects/cold-storage-recovery/scripts/cold_upgrade.py --checkpoint "$(COLD_CHECKPOINT)" --case "$(COLD_CASE)" --verification "$(COLD_VERIFICATION)"
 
 .PHONY: archive-compound-case
 archive-compound-case: config recovery-unit-test ## Preserve the known failed compound case without passing its live test
 	@test -n "$(FAILED_CASE)" || (echo 'Set FAILED_CASE to the registered compound-failure case'; exit 1)
-	python3 recovery_cleanup.py archive-compound-case --case "$(FAILED_CASE)"
+	python3 scripts/recovery_cleanup.py archive-compound-case --case "$(FAILED_CASE)"
 
 .PHONY: build-current-compactor
 build-current-compactor: config prepare ## Build the compatible Spark 4.1.4 / Iceberg 1.12.0 lane without starting services
-	$(COMPOSE) -f docker-compose.maintenance-current.yml build compactor
+	$(COMPOSE) -f deploy/compose/docker-compose.maintenance-current.yml build compactor
 
 .PHONY: test-current-compactor
 test-current-compactor: config recovery-unit-test ## Offline 2M-row compaction, append and retained-snapshot correctness on the current maintenance image
-	python3 maintenance_control.py
+	python3 projects/duckdb-iceberg/scripts/maintenance_control.py
 
 .PHONY: duckdb-clickhouse-partial
 duckdb-clickhouse-partial: config recovery-unit-test ## Observe partial remote inserts and blind retry after conversion errors
-	python3 duckdb_maintenance.py --connector-partial
+	python3 projects/duckdb-iceberg/scripts/duckdb_maintenance.py --connector-partial
 
 .PHONY: duckdb-clickhouse-crash
 duckdb-clickhouse-crash: config recovery-unit-test ## Independent live DuckDB writers/readers across a retained-volume ClickHouse SIGKILL
-	python3 duckdb_maintenance.py --connector-crash
+	python3 projects/duckdb-iceberg/scripts/duckdb_maintenance.py --connector-crash
 
 .PHONY: duckdb-clickhouse-dependencies build-dependency-fault
 build-dependency-fault: config ## Build the isolated native network-fault helper
 	python3 -c 'import recovery_control as c; c.local_docker(); print(c.call(c.COMPOSE + ["build", "dependency-fault"], timeout=240))'
 
 duckdb-clickhouse-dependencies: config recovery-unit-test build-dependency-fault ## Separate S3/catalog port isolation with live DuckDB hot reads/writes
-	python3 duckdb_maintenance.py --connector-dependencies
+	python3 projects/duckdb-iceberg/scripts/duckdb_maintenance.py --connector-dependencies
 
 .PHONY: connector-compactor-probe
 connector-compactor-probe: config recovery-unit-test ## Read-only Spark/Iceberg compatibility gate for a preserved CH-written probe
-	python3 connector_compactor_probe.py "$(SOURCE_CASE)"
+	python3 projects/duckdb-clickhouse/scripts/connector_compactor_probe.py "$(SOURCE_CASE)"
 
 .PHONY: connector-concurrent
 connector-concurrent: config recovery-unit-test ## Full native rewrite with independent DuckDB hot/cold writers and readers
-	python3 duckdb_maintenance.py --connector-concurrent
+	python3 projects/duckdb-iceberg/scripts/duckdb_maintenance.py --connector-concurrent
 
 .PHONY: connector-concurrent-recheck
 connector-concurrent-recheck: config recovery-unit-test ## Recheck durable cold journals and all current hot/cold ACKs without rewriting
-	python3 connector_concurrent.py "$(CASE)"
+	python3 projects/duckdb-clickhouse/scripts/connector_concurrent.py "$(CASE)"
 
 .PHONY: cold-memory-diagnostic
 cold-memory-diagnostic: config recovery-unit-test ## Read-only native full-table isolation at fixed caps; not a concurrent-recovery qualification
-	python3 cold_memory.py "$(CASE)"
+	python3 projects/cold-storage-recovery/scripts/cold_memory.py "$(CASE)"
 
 .PHONY: cold-memory-blocks
 cold-memory-blocks: config recovery-unit-test ## Isolate bounded Parquet output block sizing on the same retained table
-	python3 cold_memory.py "$(CASE)" --blocks
+	python3 projects/cold-storage-recovery/scripts/cold_memory.py "$(CASE)" --blocks
 
 .PHONY: connector-read-isolation
 connector-read-isolation: config recovery-unit-test ## Preserve streamed predicate flags and compare full locally materialized bodies
-	python3 duckdb_maintenance.py --connector-read-isolation
+	python3 projects/duckdb-iceberg/scripts/duckdb_maintenance.py --connector-read-isolation
 
 .PHONY: build-http duckdb-clickhouse-http-read duckdb-clickhouse-http
 build-http: config ## Build the separate signed HTTP application image; keeps legacy images
-	python3 -c 'import recovery_control as c; c.local_docker(); print(c.call(c.COMPOSE + ["-f", "docker-compose.http.yml", "build", "runner"], timeout=240))'
+	python3 projects/duckdb-clickhouse/scripts/build_http.py
 
 duckdb-clickhouse-http-read: config recovery-unit-test build-http ## Check full generated bodies through core httpfs with one and two threads
-	python3 duckdb_maintenance.py --connector-http-read
+	python3 projects/duckdb-iceberg/scripts/duckdb_maintenance.py --connector-http-read
 
 duckdb-clickhouse-http: config recovery-unit-test build-http ## HTTP writes and complete hot/cold/restored readback through DuckDB
-	python3 duckdb_maintenance.py --connector-http
+	python3 projects/duckdb-iceberg/scripts/duckdb_maintenance.py --connector-http
 
 .PHONY: duckdb-clickhouse-http-hot
 duckdb-clickhouse-http-hot: config recovery-unit-test build-http ## Two-million-row HTTP writes/reads plus independent native readback; no Iceberg mutations
-	python3 duckdb_maintenance.py --connector-http-hot
+	python3 projects/duckdb-iceberg/scripts/duckdb_maintenance.py --connector-http-hot

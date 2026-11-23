@@ -106,3 +106,11 @@ Applied repository ClickHouse skill rules: `query-join-use-any`, batched inserts
 immutable ReplacingMergeTree sorting keys, selective key filters and explicit
 current-state reads. Lab budgets, three hash buckets and query limits are derived
 choices for this bounded corpus, not upstream production sizing recommendations.
+
+## File organization
+
+- [`scripts/`](scripts/): lifecycle, fault and report controllers.
+- [`config/`](config/): contracts and configuration.
+
+The Makefile is the entry point. Generated builds and raw evidence stay in
+ignored directories; the tracked reports do not replace those raw histories.

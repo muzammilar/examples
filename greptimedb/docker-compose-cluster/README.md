@@ -182,3 +182,11 @@ example’s running services or generated state.
 `make test-production` runs correctness, process crash, empty-cache replacement,
 scale-out, scale-in and final historical reconciliation serially. Faults require
 a fresh lifecycle when their prior result marker exists.
+
+## File organization
+
+- [`scripts/`](scripts/): lifecycle, fault and report controllers.
+- [`config/`](config/): contracts and configuration.
+
+The Makefile is the entry point. Generated builds and raw evidence stay in
+ignored directories; the tracked reports do not replace those raw histories.

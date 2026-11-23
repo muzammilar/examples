@@ -1,3 +1,4 @@
+export PYTHONPATH := $(CURDIR)/scripts:$(CURDIR)/tests
 SHELL := /bin/sh
 COMPOSE_PROJECT_NAME := starrocks-single
 COUNT ?= 1000000
@@ -9,15 +10,15 @@ RUN := $(COMPOSE) run --rm workload
 .NOTPARALLEL:
 .PHONY: docker-up up test benchmark status down docker-down
 docker-up:
-	python3 lifecycle.py $(COMPOSE_PROJECT_NAME)
-	python3 prepare.py mutable-orders docker
-	python3 config.py
+	python3 scripts/lifecycle.py $(COMPOSE_PROJECT_NAME)
+	python3 scripts/prepare.py mutable-orders docker
+	python3 scripts/config.py
 	$(COMPOSE) build sr-fe-0 sr-be-0 workload
 	$(COMPOSE) up -d --no-deps sr-fe-0
-	python3 ready.py
+	python3 scripts/ready.py
 	$(COMPOSE) up -d --wait --wait-timeout 600
 up:
-	python3 ready.py all
+	python3 scripts/ready.py all
 	$(RUN) setup
 	@if test -f results/seed.json; then $(RUN) verify; else $(RUN) seed; fi
 test:

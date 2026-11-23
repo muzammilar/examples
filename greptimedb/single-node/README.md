@@ -78,3 +78,10 @@ The first lifecycle command runs `prepare.py` to materialize regular files in
 gitignored and is never committed. The application runs as this example’s
 Compose service or Kubernetes workload Pod; its lifecycle needs no sibling
 example’s running services or generated state.
+
+## File organization
+
+- [`scripts/`](scripts/): lifecycle, fault and report controllers.
+
+The Makefile is the entry point. Generated builds and raw evidence stay in
+ignored directories; the tracked reports do not replace those raw histories.

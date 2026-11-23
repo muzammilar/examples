@@ -177,3 +177,10 @@ Python controls faults. This example contains its own application and Dockerfile
 - [Pinned local-shard APIs](https://github.com/qdrant/qdrant/blob/v1.18.3/src/actix/api/local_shard_api.rs).
 - [Pinned write ordering](https://github.com/qdrant/qdrant/blob/v1.18.3/lib/collection/src/shards/replica_set/update.rs).
 - [Distributed deployment](https://qdrant.tech/documentation/guides/distributed_deployment/).
+
+## File organization
+
+- [`scripts/`](scripts/): lifecycle, fault and report controllers.
+
+The Makefile is the entry point. Generated builds and raw evidence stay in
+ignored directories; the tracked reports do not replace those raw histories.

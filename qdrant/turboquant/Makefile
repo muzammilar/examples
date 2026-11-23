@@ -1,3 +1,4 @@
+export PYTHONPATH := $(CURDIR)/scripts:$(CURDIR)/tests
 SHELL := /bin/sh
 COMPOSE_PROJECT_NAME := qdrant-turboquant
 POINTS ?= 100000
@@ -13,7 +14,7 @@ RUN := $(COMPOSE) run --rm vector-workload
 .NOTPARALLEL:
 .PHONY: docker-up up test benchmark failover write-leader-failure disk-failure recover test-production status down docker-down
 docker-up:
-	python3 lifecycle.py $(COMPOSE_PROJECT_NAME)
+	python3 scripts/lifecycle.py $(COMPOSE_PROJECT_NAME)
 	mkdir -p results
 	$(COMPOSE) build q0 vector-workload
 	$(COMPOSE) up -d --wait --wait-timeout 300 q0 q1 q2
@@ -27,15 +28,15 @@ test:
 	$(RUN) verify
 	python3 -c 'import json; from pathlib import Path; r=Path("results"); h=json.load(open(r/"recovery-history.json")); assert h["full_baseline"] and h["missing_acknowledged"]==0 and h["wrong_values_or_routing"]==0 and len(json.load(open(r/"physical-placement.json")))==36, "incomplete physical-copy verification"'
 benchmark:
-	python3 run_benchmark.py
+	python3 scripts/run_benchmark.py
 write-leader-failure:
-	python3 fault.py write-leader
+	python3 scripts/fault.py write-leader
 failover:
-	python3 fault.py process
+	python3 scripts/fault.py process
 disk-failure:
-	python3 fault.py disk
+	python3 scripts/fault.py disk
 recover:
-	python3 fault.py recover
+	python3 scripts/fault.py recover
 test-production:
 	$(MAKE) test
 	$(MAKE) failover

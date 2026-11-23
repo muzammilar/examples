@@ -211,3 +211,12 @@ on the host.
 - [PgDog v0.1.62 pool limits and waiter handoff](https://github.com/pgdogdev/pgdog/blob/v0.1.62/pgdog/src/backend/pool/inner.rs)
 - [PgDog v0.1.62 reload/replacement implementation](https://github.com/pgdogdev/pgdog/blob/v0.1.62/pgdog/src/backend/databases.rs)
 - [Patroni synchronous replication](https://patroni.readthedocs.io/en/latest/replication_modes.html) and [v4.0.6 election implementation](https://github.com/patroni/patroni/blob/v4.0.6/patroni/ha.py)
+
+## File organization
+
+- [`scripts/`](scripts/): lifecycle, fault and report controllers.
+- [`tests/`](tests/): offline controller tests.
+- [`config/`](config/): contracts and configuration.
+
+The Makefile is the entry point. Generated builds and raw evidence stay in
+ignored directories; the tracked reports do not replace those raw histories.

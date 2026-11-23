@@ -374,3 +374,12 @@ The observed rate ratio was 2.60×, but both runs shared a VM with varying conte
 - [NDB 8.4 data-node parameters](https://dev.mysql.com/doc/refman/8.4/en/mysql-cluster-ndbd-definition.html): replica count, node groups and storage settings.
 - [NDB partitioning](https://dev.mysql.com/doc/refman/8.4/en/mysql-cluster-nodes-groups.html): partitions, fragments and node groups.
 - [8.4.11 distribution handler source](https://github.com/mysql/mysql-server/blob/mysql-cluster-8.4.11/storage/ndb/src/kernel/blocks/dbdih/DbdihMain.cpp): partition placement, replica membership and checkpoint recovery.
+
+## File organization
+
+- [`scripts/`](scripts/): lifecycle, fault and report controllers.
+- [`tests/`](tests/): offline controller tests.
+- [`config/`](config/): contracts and configuration.
+
+The Makefile is the entry point. Generated builds and raw evidence stay in
+ignored directories; the tracked reports do not replace those raw histories.

@@ -578,3 +578,12 @@ The fault runner refuses an existing `churn.jsonl`, `churn.json`, `fault.json` o
 diagnose a failed fixture before archiving its evidence and starting a separate
 clean lifecycle. This guard does not add cross-run version reconciliation or an
 independent reader to the existing churn loop.
+
+## File organization
+
+- [`scripts/`](scripts/): lifecycle, fault and report controllers.
+- [`tests/`](tests/): offline controller tests.
+- [`config/`](config/): contracts and configuration.
+
+The Makefile is the entry point. Generated builds and raw evidence stay in
+ignored directories; the tracked reports do not replace those raw histories.

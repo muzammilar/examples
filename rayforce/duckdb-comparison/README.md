@@ -44,38 +44,52 @@ make test-production
 `ROWS=2000000` defaults to two million; `REPEATS=15`, `TRIALS=3`,
 `THREADS=1`, `CPUS=$(THREADS)`. Threads and CPU caps support 1–4; each process has a
 **4 GiB** container ceiling; current runs disable swap. Historical artifacts retain
-their original inspected limits. The [persisted snapshot profiles](PERSISTENCE.md)
+their original inspected limits. The [persisted snapshot profiles](projects/snapshots/docs/PERSISTENCE.md)
 verify full two-million-row reopens and native file footprints, separately from
-the in-memory measurements below. [DuckDB native live recovery](DUCKDB_RECOVERY.md)
+the in-memory measurements below. [DuckDB native live recovery](projects/duckdb-recovery/docs/DUCKDB_RECOVERY.md)
 adds independent C++ Quack sessions, pinned TLS/authentication, two retained-volume
 SIGKILL cycles and a checkpoint under live read/write traffic.
-[Native synchronous journal tests](JOURNAL.md)
+[Native synchronous journal tests](projects/rayforce-journal/docs/JOURNAL.md)
 add independent writers/readers through two retained-state process crashes.
-[Writer-exclusion tests](FENCING.md) use a labeled Linux volume and retain the
+[Writer-exclusion tests](projects/rayforce-journal/docs/FENCING.md) use a labeled Linux volume and retain the
 host-share lock failure separately. Do not assume a host bind mount enforces locks.
-[Controlled torn-tail recovery](TAIL_RECOVERY.md) verifies native refusal, framing
+[Controlled torn-tail recovery](projects/rayforce-journal/docs/TAIL_RECOVERY.md) verifies native refusal, framing
 validation and repair of only a known synthetic trailer in a separate copy.
 `make test-production-recovery` runs two DuckDB gates plus the six Rayforce recovery cases and creates its own
 restore/repair source. The default `make test-production` adds the [interior
-payload-corruption probe](CORRUPTION.md) and currently returns nonzero: a valid
+payload-corruption probe](projects/rayforce-journal/docs/CORRUPTION.md) and currently returns nonzero: a valid
 one-bit edit replays one wrong ACK body. That finding remains failed; snapshot
 and ingestion targets remain separate. DuckDB's live profile does not imply that
 its unrun disk-loss or WAL-corruption cases passed.
-The [middle-header diagnostic](HEADER_CORRUPTION.md) also runs before that probe:
+The [middle-header diagnostic](projects/rayforce-journal/docs/HEADER_CORRUPTION.md) also runs before that probe:
 startup rejects both edits, but blindly following its truncation hint on a
 disposable copy loses acknowledged rows. The guard rejects that unsafe repair.
-The distinct [native AOF profile](AOF.md) uses 10,000 opaque 1,024-byte events:
+The distinct [native AOF profile](projects/rayforce-aof/docs/AOF.md) uses 10,000 opaque 1,024-byte events:
 payload edits are rejected, but length/commit-marker edits yield successful native
 results with 5,000/5,000/100 missing acknowledged records. Intact-backup verification
 passes. The full production runner records both independent payload/AOF failures
 and returns nonzero; neither is hidden by the other's failure.
-The [multi-segment profile](AOF_SEGMENTS.md) additionally exercises native rotation,
+The [multi-segment profile](projects/rayforce-aof/docs/AOF_SEGMENTS.md) additionally exercises native rotation,
 sealed-file CRC rejection, exact witness detection after tail deletion and intact
 backup restore. It does not turn the separate strict-integrity failures green.
 Changing `ROWS` requires archiving the old `results/`
 directory first. Failed runs remain evidence; no automatic data reset or retry.
 An example-local lock prevents concurrent controllers. Other examples must be
 stopped independently before performance measurements.
+
+## Project directories
+
+Each project keeps its own controllers, tests, guides and reports together.
+The root owns common deployment, builds and raw evidence.
+
+| Project | Directory | Parent Make target |
+|---|---|---|
+| [Ingestion comparison](projects/ingestion/README.md) | `projects/ingestion/` | `test-ingestion` |
+| [Persisted snapshots](projects/snapshots/README.md) | `projects/snapshots/` | `test-persistence-capability` |
+| [DuckDB live recovery](projects/duckdb-recovery/README.md) | `projects/duckdb-recovery/` | `test-duckdb-recovery` |
+| [Rayforce journal recovery](projects/rayforce-journal/README.md) | `projects/rayforce-journal/` | `test-journal-recovery` |
+| [Rayforce AOF integrity](projects/rayforce-aof/README.md) | `projects/rayforce-aof/` | `test-aof-integrity` |
+
 
 ## Local evidence housekeeping
 
@@ -88,7 +102,7 @@ lock was held throughout. Known integrity failures retain their failed verdicts.
 
 The local archive, manifest, verification record and one-off archiver are under
 ignored `results-archives/193d82cf7ae249e2b1dd1089859fb19a.*`; only the compact
-[housekeeping summary](ARCHIVE_RESULTS.json) is tracked. Raw `results/` now contains
+[housekeeping summary](reports/ARCHIVE_RESULTS.json) is tracked. Raw `results/` now contains
 only its lock. Source/configuration and published results remain in Git. Re-running
 the lifecycle regenerates inputs; it does not restore old raw observations.
 The archive preserves file bodies, not original sparse allocation or inode links.
@@ -221,7 +235,7 @@ Warm latency tables report the **median of three trial p50s**, in milliseconds.
 Raw per-query CPU/latencies, p99s (only 15 samples per trial, close to the maximum),
 first-query observations, source fingerprints, exact image ID, cgroup memory
 counters, runtime inspection and resource samples live in ignored `results/runs/`.
-[Committed benchmark results](BENCHMARK_RESULTS.json) retain per-trial resources,
+[Committed benchmark results](reports/BENCHMARK_RESULTS.json) retain per-trial resources,
 query summaries, fixture/source hashes, environment and instrumentation limits.
 Three trials are a local comparison, not confidence intervals or a universal
 leaderboard. Both engines are in-memory for these runs; the CSV input is cache
@@ -246,7 +260,7 @@ Measured **2026-11-21**, **1 CPU / 1 engine thread(s), 4 GiB per process**, the 
 
 Correctness passed **48 cells**, **480,000 new rows**, **96,480,000 complete snapshot rows** and **192 invalid native-call rejections**. Every timed cell also matched the SHA256 and byte count of *every* old and new row, in ID order. A changed old body is rejected even when row counts match. Point probes read the initial old row, middle-batch result and final new row.
 
-The [backend/client contract](ingestion-contract.json) declares same-process read-your-writes, no mutation retries/deduplication and **no crash durability**. Successful batches are query-visible in RAM. Query mode parses SQL INSERT VALUES or quoted-target Rayfall insert; typed mode uses DuckDB's row-wise C Appender with a flush per ACK, versus Rayforce C vectors/table/environment plus fixed Rayfall dispatch. Keeping a Rayforce view can disable its sole-owner fast path; this test retains no such view. A buffered Appender admission without flush would have a different ACK contract and is not used. DuckDB transaction/MVCC work remains enabled; Rayforce environment mutation does not establish equivalent SQL isolation. The columnar data-chunk Appender was not evaluated in this initial run; see the separate [columnar comparison](#columnar-appender-comparison). Prepared SQL remains unrun, so this is not an exhaustive ranking of ingestion APIs.
+The [backend/client contract](config/ingestion-contract.json) declares same-process read-your-writes, no mutation retries/deduplication and **no crash durability**. Successful batches are query-visible in RAM. Query mode parses SQL INSERT VALUES or quoted-target Rayfall insert; typed mode uses DuckDB's row-wise C Appender with a flush per ACK, versus Rayforce C vectors/table/environment plus fixed Rayfall dispatch. Keeping a Rayforce view can disable its sole-owner fast path; this test retains no such view. A buffered Appender admission without flush would have a different ACK contract and is not used. DuckDB transaction/MVCC work remains enabled; Rayforce environment mutation does not establish equivalent SQL isolation. The columnar data-chunk Appender was not evaluated in this initial run; see the separate [columnar comparison](#columnar-appender-comparison). Prepared SQL remains unrun, so this is not an exhaustive ranking of ingestion APIs.
 
 Rows/s below use the **actual first-write start to last-write finish**, including intervening plan handling/logging and the middle read when more than one request exists. They exclude CSV setup, initial/final probes, export and host verification. Request latency times the native call. Query payload strings are generated outside the container; typed timings include the shared C payload generator. These are bounded fixed-workload timings, not five-minute saturation/capacity tests or language implementation rankings.
 
@@ -274,7 +288,7 @@ Medians across three fresh processes, rows/s.
 
 ### C++ trial spread and call latency
 
-Median (minimum … maximum) and inclusive IQR of measured rows/s; request p50/p99 in ms are medians of trial percentiles. Large batches have few requests; their p99 is near the maximum. All language trial/resource values remain in [INGESTION_RESULTS.json](INGESTION_RESULTS.json).
+Median (minimum … maximum) and inclusive IQR of measured rows/s; request p50/p99 in ms are medians of trial percentiles. Large batches have few requests; their p99 is near the maximum. All language trial/resource values remain in [INGESTION_RESULTS.json](projects/ingestion/reports/INGESTION_RESULTS.json).
 
 | Path | Batch | Ray rows/s | Duck rows/s | Ray p50/p99 ms | Duck p50/p99 ms |
 | --- | --- | --- | --- | --- | --- |
@@ -322,11 +336,11 @@ Measured **2026-11-21**, **1 CPU / 1 engine thread(s), 4 GiB per process**, the 
 
 Correctness passed **72 cells**, **720,072 new rows**, **144,720,072 complete snapshot rows** and **288 invalid native-call rejections**. Every timed cell also matched the SHA256 and byte count of *every* old and new row, in ID order. A changed old body is rejected even when row counts match. Point probes read the initial old row, middle-batch result and final new row.
 
-The [backend/client contract](ingestion-contract.json) declares same-process read-your-writes, no mutation retries/deduplication and **no crash durability**. Successful batches are query-visible in RAM. Query mode parses SQL INSERT VALUES or quoted-target Rayfall insert; typed mode uses DuckDB's row-wise C Appender with a flush per ACK, versus Rayforce C vectors/table/environment plus fixed Rayfall dispatch. Keeping a Rayforce view can disable its sole-owner fast path; this test retains no such view. A buffered Appender admission without flush would have a different ACK contract and is not used. DuckDB transaction/MVCC work remains enabled; Rayforce environment mutation does not establish equivalent SQL isolation. Prepared SQL remains unrun; this is not an exhaustive ranking of ingestion APIs.
+The [backend/client contract](config/ingestion-contract.json) declares same-process read-your-writes, no mutation retries/deduplication and **no crash durability**. Successful batches are query-visible in RAM. Query mode parses SQL INSERT VALUES or quoted-target Rayfall insert; typed mode uses DuckDB's row-wise C Appender with a flush per ACK, versus Rayforce C vectors/table/environment plus fixed Rayfall dispatch. Keeping a Rayforce view can disable its sole-owner fast path; this test retains no such view. A buffered Appender admission without flush would have a different ACK contract and is not used. DuckDB transaction/MVCC work remains enabled; Rayforce environment mutation does not establish equivalent SQL isolation. Prepared SQL remains unrun; this is not an exhaustive ranking of ingestion APIs.
 
 Rows/s below use the **actual first-write start to last-write finish**, including intervening plan handling/logging and the middle read when more than one request exists. They exclude CSV setup, initial/final probes, export and host verification. Request latency times the native call. Query payload strings are generated outside the container; typed timings include the shared C payload generator. These are bounded fixed-workload timings, not five-minute saturation/capacity tests or language implementation rankings.
 
-`native` retains the row-wise Appender baseline; `columnar` reuses a six-BIGINT DuckDB data chunk, copying the same generated column-major values in native vector-sized pieces and flushing only after the entire requested batch. Rayforce uses its **identical typed-column implementation in both paths**: their differences estimate trial noise, not two Rayforce APIs. Chunk creation, reset, copies and flush are timed; this is not zero-copy ingestion. The [pinned collection implementation](https://github.com/duckdb/duckdb/blob/v2.0.0/src/common/types/column/column_data_collection.cpp) copies fixed-width values before the input chunk is reused. The correctness command above records its exact batch sizes and append count, including partial final batches when the count is not divisible by the batch size. The earlier query/row-wise [baseline](INGESTION_RESULTS.json) remains a separate immutable run; compare the two paths below using this run's common image and workload.
+`native` retains the row-wise Appender baseline; `columnar` reuses a six-BIGINT DuckDB data chunk, copying the same generated column-major values in native vector-sized pieces and flushing only after the entire requested batch. Rayforce uses its **identical typed-column implementation in both paths**: their differences estimate trial noise, not two Rayforce APIs. Chunk creation, reset, copies and flush are timed; this is not zero-copy ingestion. The [pinned collection implementation](https://github.com/duckdb/duckdb/blob/v2.0.0/src/common/types/column/column_data_collection.cpp) copies fixed-width values before the input chunk is reused. The correctness command above records its exact batch sizes and append count, including partial final batches when the count is not divisible by the batch size. The earlier query/row-wise [baseline](projects/ingestion/reports/INGESTION_RESULTS.json) remains a separate immutable run; compare the two paths below using this run's common image and workload.
 
 ### Typed values / row-wise DuckDB Appender
 
@@ -352,7 +366,7 @@ Medians across 3 fresh processes, rows/s.
 
 ### C++ trial spread and call latency
 
-Median (minimum … maximum) and inclusive IQR of measured rows/s; request p50/p99 in ms are medians of trial percentiles. Large batches have few requests; their p99 is near the maximum. All language trial/resource values remain in [COLUMNAR_RESULTS.json](COLUMNAR_RESULTS.json).
+Median (minimum … maximum) and inclusive IQR of measured rows/s; request p50/p99 in ms are medians of trial percentiles. Large batches have few requests; their p99 is near the maximum. All language trial/resource values remain in [COLUMNAR_RESULTS.json](projects/ingestion/reports/COLUMNAR_RESULTS.json).
 
 | Path | Batch | Ray rows/s | Duck rows/s | Ray p50/p99 ms | Duck p50/p99 ms |
 | --- | --- | --- | --- | --- | --- |

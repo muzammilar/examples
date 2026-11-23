@@ -64,7 +64,7 @@ control plane; broker/worker process failures cannot delete them. They are not a
 independent backup against host/disk loss. Every successful case replays earlier
 histories on both clusters instead of resetting their data. Cleanup refuses an
 unqualified history. Preserve the witness and diagnose failed cases before retrying.
-After native repair, `python3 replication_control.py reconcile-history` performs
+After native repair, `python3 scripts/replication_control.py reconcile-history` performs
 read-only full-history verification and seals a separate recovery receipt; it does
 not turn failed experiments into passes. `make kind-down` moves the retired lab's
 histories into `results/production/archives/<owner>/`, with a SHA-256 manifest,
@@ -259,7 +259,7 @@ setup. This does not establish successful west replication/cutover for them.
 
 ### Archived evidence recheck — 2026-11-21
 
-The [committed archive summary](VERIFIED_RESULTS.json) records a 2026-11-21
+The [committed archive summary](reports/VERIFIED_RESULTS.json) records a 2026-11-21
 recheck of **1,054 file hashes** across both completed archives; all matched.
 **15 host controller/checkpoint tests** also passed. No live cluster faults were
 repeated for this recheck, and original failed/interrupted verdicts stay failed.
@@ -447,3 +447,13 @@ Checkpoint implementation references: [Kafka 4.3.2 native formatter](https://git
 [native checkpoint schema](https://github.com/apache/kafka/blob/4.3.2/connect/mirror-client/src/main/java/org/apache/kafka/connect/mirror/Checkpoint.java),
 [checkpoint freshness and group synchronization](https://github.com/apache/kafka/blob/4.3.2/connect/mirror/src/main/java/org/apache/kafka/connect/mirror/MirrorCheckpointTask.java),
 and [console consumer error/idle-timeout handling](https://github.com/apache/kafka/blob/4.3.2/tools/src/main/java/org/apache/kafka/tools/consumer/ConsoleConsumer.java).
+
+## File organization
+
+- [`scripts/`](scripts/): lifecycle, fault and report controllers.
+- [`tests/`](tests/): offline controller tests.
+- [`reports/`](reports/): compact tracked result summaries.
+- [`config/`](config/): contracts and configuration.
+
+The Makefile is the entry point. Generated builds and raw evidence stay in
+ignored directories; the tracked reports do not replace those raw histories.

@@ -1,3 +1,4 @@
+export PYTHONPATH := $(CURDIR)/scripts:$(CURDIR)/tests
 SHELL := /bin/sh
 CLUSTER_NAME := neon-storage
 KUBECONFIG := $(CURDIR)/results/kubeconfig
@@ -10,18 +11,18 @@ RUN := $(KUBECTL) exec client -- sh /app/entrypoint.sh
 .NOTPARALLEL:
 .PHONY: kind-up up test benchmark branch status down kind-down failover disk-failure chaos-compute compute-replacement chaos-node test-production
 kind-up:
-	python3 lifecycle.py neon-kind-support neon-storage
-	python3 prepare.py orders-workload
-	python3 config.py
+	python3 scripts/lifecycle.py neon-kind-support neon-storage
+	python3 scripts/prepare.py orders-workload
+	python3 scripts/config.py
 	$(SUPPORT) dependencies
 	docker build -f Dockerfile.safekeeper -t neon-kind-safekeeper:dev .
-	python3 import_images.py
+	python3 scripts/import_images.py
 	@kind get clusters | rg -qx '$(CLUSTER_NAME)' || kind create cluster --name $(CLUSTER_NAME) --image kindest/node:v1.34.0 --config kind-config.json
 	@for node in $$(kind get nodes --name $(CLUSTER_NAME)); do docker network connect --gw-priority -1 neon-kind-support_default $$node || docker network inspect neon-kind-support_default --format '{{range .Containers}}{{println .Name}}{{end}}' | rg -qx "$$node"; done
-	python3 pin_node_ips.py
-	python3 load_images.py
+	python3 scripts/pin_node_ips.py
+	python3 scripts/load_images.py
 up:
-	python3 config.py objects
+	python3 scripts/config.py objects
 	$(KUBECTL) apply -f storage.json
 	$(KUBECTL) rollout status statefulset/broker --timeout=180s
 	$(KUBECTL) rollout status statefulset/pageserver --timeout=300s
@@ -30,13 +31,13 @@ up:
 	$(RUN) init
 	$(KUBECTL) apply -f compute.json
 	$(KUBECTL) rollout status statefulset/compute --timeout=300s
-	python3 wait_sql.py NEON_DSN
+	python3 scripts/wait_sql.py NEON_DSN
 	@if test -f results/seed.json; then $(RUN) verify; else $(RUN) seed; fi
 test:
 	python3 -c 'from pathlib import Path; import time; r=Path("results"); [(p.rename(p.with_name(p.stem+"-before-"+str(time.time_ns())+".json"))) for n in ("correctness.json", "recovery-history.json") if (p:=r/n).exists()]'
 	$(RUN) verify
 	python3 -c 'import json; from pathlib import Path; r=Path("results"); assert json.load(open(r/"correctness.json")); assert not list(r.glob("fault-*.jsonl")) or json.load(open(r/"recovery-history.json")), "missing fresh recovery reconciliation"'
-	python3 branch_readback.py
+	python3 scripts/branch_readback.py
 benchmark:
 	python3 -c 'from pathlib import Path; import time; p=Path("results/query-benchmark.json"); p.exists() and p.rename(p.with_name("query-benchmark-before-"+str(time.time_ns())+".json"))'
 	$(RUN) benchmark
@@ -45,18 +46,18 @@ branch:
 	$(RUN) branch
 	$(KUBECTL) apply -f branch.json
 	$(KUBECTL) rollout status statefulset/branch --timeout=300s
-	python3 wait_sql.py BRANCH_DSN
+	python3 scripts/wait_sql.py BRANCH_DSN
 	$(RUN) verify-branch
 failover:
-	python3 fault.py wal-process
+	python3 scripts/fault.py wal-process
 disk-failure:
-	python3 fault.py wal-disk
+	python3 scripts/fault.py wal-disk
 chaos-compute:
-	python3 fault.py compute-process
+	python3 scripts/fault.py compute-process
 compute-replacement:
-	python3 fault.py compute-cache
+	python3 scripts/fault.py compute-cache
 chaos-node:
-	python3 fault.py node
+	python3 scripts/fault.py node
 test-production:
 	$(MAKE) test
 	$(MAKE) branch
@@ -75,7 +76,7 @@ kind-down:
 	kind delete cluster --name $(CLUSTER_NAME)
 	$(SUPPORT) docker-down
 	docker image rm neon-kind-safekeeper:dev
-	python3 import_images.py clean
+	python3 scripts/import_images.py clean
 	rm -f kind-config.json images.json storage.json compute.json branch.json results/kubeconfig
 	rm -rf config/generated .build
 
@@ -86,11 +87,11 @@ clean-build:
 # Separate dependency/storage cases; the core five-case rerun stays independent.
 .PHONY: pageserver-outage pageserver-cache chaos-s3 chaos-wal-quorum test-dependencies
 pageserver-outage pageserver-cache:
-	python3 dependency_fault.py $@
+	python3 scripts/dependency_fault.py $@
 chaos-s3:
-	python3 dependency_fault.py s3
+	python3 scripts/dependency_fault.py s3
 chaos-wal-quorum:
-	python3 dependency_fault.py wal-quorum
+	python3 scripts/dependency_fault.py wal-quorum
 test-dependencies:
 	$(MAKE) pageserver-outage
 	$(MAKE) pageserver-cache
@@ -100,8 +101,8 @@ test-dependencies:
 
 .PHONY: backup-restore
 backup-restore:
-	python3 dependency_fault.py backup
+	python3 scripts/dependency_fault.py backup
 
 .PHONY: test-fencing
 test-fencing:
-	python3 -m unittest discover -s . -p test_fencing.py
+	python3 -m unittest discover -s tests -p 'test_fencing.py'

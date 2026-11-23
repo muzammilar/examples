@@ -1,3 +1,4 @@
+export PYTHONPATH := $(CURDIR)/scripts:$(CURDIR)/tests
 SHELL := /bin/sh
 COMPOSE_PROJECT_NAME ?= neon-branching
 ROWS ?= 1000000
@@ -12,8 +13,8 @@ RUN := $(COMPOSE) run --rm runner
 .NOTPARALLEL:
 .PHONY: dependencies docker-up up test benchmark branch failover disk-failure chaos-compute compute-replacement test-production status cli down docker-down
 dependencies:
-	python3 lifecycle.py $(COMPOSE_PROJECT_NAME)
-	python3 prepare.py orders-workload
+	python3 scripts/lifecycle.py $(COMPOSE_PROJECT_NAME)
+	python3 scripts/prepare.py orders-workload
 	python3 scripts/garage_config.py
 	mkdir -p results/generated
 	$(COMPOSE) build runner

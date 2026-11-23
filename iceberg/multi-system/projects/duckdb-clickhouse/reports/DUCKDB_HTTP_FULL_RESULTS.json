@@ -1,0 +1,270 @@
+{
+  "date": "2026-11-23",
+  "scope": "Previously executed healthy HTTP full round trip and lifecycle, recorded from saved evidence during directory cleanup. No experiment was rerun after reorganization. No fault, capacity or production qualification.",
+  "case_directory": "results/current-http/duckdb-connector-http/454cea2c-aa09-4030-a9eb-126818a55e8a",
+  "project": "iceberg-multi-system-current-http",
+  "result": {
+    "passed": true,
+    "error": null,
+    "checks": {
+      "rows_per_stage": 2000000,
+      "stages_verified": [
+        "hot",
+        "cold",
+        "restored"
+      ],
+      "hot_cold_restored_bodies_correct": true,
+      "application_path": "DuckDB http_client POST and core httpfs JSONEachRow reads; no clickhouse_scanner",
+      "production_qualified": false,
+      "clickhouse_readback": {
+        "rows": {
+          "rows": 2000000,
+          "unique_ids": 2000000,
+          "first_id": 0,
+          "last_id": 1999999,
+          "amount_total_cents": 10001000000,
+          "invalid_bodies": 0
+        },
+        "duration_ns": 350129709,
+        "scope": "Docker exec, client connection, SQL, result transfer and JSON decode; not query-only latency"
+      },
+      "published_catalog": {
+        "table_uuid": "cbd2288e-8f52-4738-bd80-4061cac2de8b",
+        "snapshot_id": 713193028770030813,
+        "rows": 2000000
+      }
+    },
+    "cleanup_errors": [],
+    "completed_ns": 1795400670951401000,
+    "scope": "Native connector-http controls; independent body readback; no live-fault or performance qualification."
+  },
+  "resources": {
+    "clickhouse": {
+      "samples": 11,
+      "unavailable_samples": 0,
+      "observed_seconds": 11.829999999999998,
+      "cpu_core_seconds": {
+        "total": 7.011886,
+        "user": 5.006679,
+        "system": 2.005207
+      },
+      "cpu_percent_one_core_100": 59.27207100591716,
+      "charged_memory_bytes_min_mean_max": [
+        461160448,
+        756543115.6363636,
+        1070895104
+      ],
+      "lifetime_peak_memory_bytes": 1215762432,
+      "allocated_disk_bytes_first_peak_last": [
+        3411968,
+        533753856,
+        406872064
+      ],
+      "native_block_io": {
+        "254:0": {
+          "observed_seconds": 11.829999999999998,
+          "rbytes": 0,
+          "wbytes": 568762368,
+          "rios": 0,
+          "wios": 1571,
+          "rbytes_per_second": 0.0,
+          "wbytes_per_second": 48077968.55452241,
+          "rios_per_second": 0.0,
+          "wios_per_second": 132.79797125950975
+        }
+      },
+      "identity_or_counter_gaps": 0,
+      "scope": "Native cgroup CPU across all threads including probes; sampled charged memory and per-generation lifetime peak. Intervals use native /proc/uptime with centisecond resolution; full probe brackets retain uncertainty. Approximate du allocated bytes, not open-deleted or unique physical storage. Workload /results binds share one witness directory: do not sum them. Device I/O is Docker-VM accounting, not physical SSD latency/queue depth; do not sum stacked devices. Missing devices/counters are unavailable, not zero. CPU and byte/IOPS deltas exclude restart bridges and unobserved initial/final edges. Raw samples retain network counters and timing uncertainty.",
+      "memory_stat_bytes_min_mean_max": {
+        "anon": [
+          320811008,
+          355119848.72727275,
+          449871872
+        ],
+        "file": [
+          3252224,
+          237446981.8181818,
+          532267008
+        ],
+        "kernel": [
+          9560064,
+          17892445.09090909,
+          28020736
+        ]
+      },
+      "memory_stat_samples": 11,
+      "memory_stat_scope": "Sampled native cgroup byte gauges, not Go heap or process RSS. File includes charged file cache; kernel includes its subcategories. Counters are read nonatomically; do not infer an exact partition of memory.current."
+    },
+    "duckdb-cli": {
+      "samples": 10,
+      "unavailable_samples": 0,
+      "observed_seconds": 10.719999999999999,
+      "cpu_core_seconds": {
+        "total": 2.813772,
+        "user": 2.1045199999999995,
+        "system": 0.7092529999999999
+      },
+      "cpu_percent_one_core_100": 26.247873134328366,
+      "charged_memory_bytes_min_mean_max": [
+        2342912,
+        206581350.4,
+        980754432
+      ],
+      "lifetime_peak_memory_bytes": 1043292160,
+      "allocated_disk_bytes_first_peak_last": [
+        1318912,
+        1556480,
+        1556480
+      ],
+      "native_block_io": null,
+      "identity_or_counter_gaps": 0,
+      "scope": "Native cgroup CPU across all threads including probes; sampled charged memory and per-generation lifetime peak. Intervals use native /proc/uptime with centisecond resolution; full probe brackets retain uncertainty. Approximate du allocated bytes, not open-deleted or unique physical storage. Workload /results binds share one witness directory: do not sum them. Device I/O is Docker-VM accounting, not physical SSD latency/queue depth; do not sum stacked devices. Missing devices/counters are unavailable, not zero. CPU and byte/IOPS deltas exclude restart bridges and unobserved initial/final edges. Raw samples retain network counters and timing uncertainty.",
+      "memory_stat_bytes_min_mean_max": {
+        "anon": [
+          487424,
+          197752422.4,
+          967086080
+        ],
+        "file": [
+          0,
+          32768,
+          45056
+        ],
+        "kernel": [
+          1384448,
+          2381824,
+          4128768
+        ]
+      },
+      "memory_stat_samples": 10,
+      "memory_stat_scope": "Sampled native cgroup byte gauges, not Go heap or process RSS. File includes charged file cache; kernel includes its subcategories. Counters are read nonatomically; do not infer an exact partition of memory.current."
+    },
+    "storage": {
+      "samples": 11,
+      "unavailable_samples": 0,
+      "observed_seconds": 11.829999999999998,
+      "cpu_core_seconds": {
+        "total": 0.986946,
+        "user": 0.7577050000000001,
+        "system": 0.22924199999999997
+      },
+      "cpu_percent_one_core_100": 8.342738799661879,
+      "charged_memory_bytes_min_mean_max": [
+        123863040,
+        274852026.1818182,
+        477020160
+      ],
+      "lifetime_peak_memory_bytes": 491384832,
+      "allocated_disk_bytes_first_peak_last": [
+        454656,
+        82001920,
+        82001920
+      ],
+      "native_block_io": {
+        "254:0": {
+          "observed_seconds": 11.829999999999998,
+          "rbytes": 0,
+          "wbytes": 24576,
+          "rios": 0,
+          "wios": 6,
+          "rbytes_per_second": 0.0,
+          "wbytes_per_second": 2077.430262045647,
+          "rios_per_second": 0.0,
+          "wios_per_second": 0.507185122569738
+        }
+      },
+      "identity_or_counter_gaps": 0,
+      "scope": "Native cgroup CPU across all threads including probes; sampled charged memory and per-generation lifetime peak. Intervals use native /proc/uptime with centisecond resolution; full probe brackets retain uncertainty. Approximate du allocated bytes, not open-deleted or unique physical storage. Workload /results binds share one witness directory: do not sum them. Device I/O is Docker-VM accounting, not physical SSD latency/queue depth; do not sum stacked devices. Missing devices/counters are unavailable, not zero. CPU and byte/IOPS deltas exclude restart bridges and unobserved initial/final edges. Raw samples retain network counters and timing uncertainty.",
+      "memory_stat_bytes_min_mean_max": {
+        "anon": [
+          120459264,
+          236346647.27272728,
+          387604480
+        ],
+        "file": [
+          475136,
+          33625553.45454545,
+          82022400
+        ],
+        "kernel": [
+          2932736,
+          4264308.363636363,
+          6131712
+        ]
+      },
+      "memory_stat_samples": 11,
+      "memory_stat_scope": "Sampled native cgroup byte gauges, not Go heap or process RSS. File includes charged file cache; kernel includes its subcategories. Counters are read nonatomically; do not infer an exact partition of memory.current."
+    }
+  },
+  "parquet_footer_audit": {
+    "result": {
+      "passed": true,
+      "error": null
+    },
+    "files": [
+      {
+        "file_name": "s3://warehouse/lab/duck_compact_454cea2caa094030a9eb126818a55e8a-cbd2288e-8f52-4738-bd80-4061cac2de8b/data/data-0be675a4-cd34-406b-a2c0-5a8cf8a4b6a6.parquet",
+        "created_by": "ClickHouse version 26.10.10 (build 875446283b0f988d5e86a93e7927cd1cd6071733)",
+        "num_rows": 1050560,
+        "num_row_groups": 1,
+        "format_version": 2,
+        "encryption_algorithm": null,
+        "footer_signing_key_metadata": null,
+        "file_size_bytes": 42587894,
+        "footer_size": 879,
+        "column_orders": [
+          "ColumnOrder(TYPE_ORDER=TypeDefinedOrder())",
+          "ColumnOrder(TYPE_ORDER=TypeDefinedOrder())",
+          "ColumnOrder(TYPE_ORDER=TypeDefinedOrder())",
+          "ColumnOrder(TYPE_ORDER=TypeDefinedOrder())"
+        ]
+      },
+      {
+        "file_name": "s3://warehouse/lab/duck_compact_454cea2caa094030a9eb126818a55e8a-cbd2288e-8f52-4738-bd80-4061cac2de8b/data/data-ff8d5086-586e-4de2-be60-63be61983d7c.parquet",
+        "created_by": "ClickHouse version 26.10.10 (build 875446283b0f988d5e86a93e7927cd1cd6071733)",
+        "num_rows": 949440,
+        "num_row_groups": 1,
+        "format_version": 2,
+        "encryption_algorithm": null,
+        "footer_signing_key_metadata": null,
+        "file_size_bytes": 38894693,
+        "footer_size": 861,
+        "column_orders": [
+          "ColumnOrder(TYPE_ORDER=TypeDefinedOrder())",
+          "ColumnOrder(TYPE_ORDER=TypeDefinedOrder())",
+          "ColumnOrder(TYPE_ORDER=TypeDefinedOrder())",
+          "ColumnOrder(TYPE_ORDER=TypeDefinedOrder())"
+        ]
+      }
+    ],
+    "codecs": [
+      {
+        "compression": "ZSTD",
+        "column_chunks": 8,
+        "compressed_bytes": 73006577,
+        "uncompressed_bytes": 152563787
+      }
+    ]
+  },
+  "lifecycle": [
+    {
+      "action": "down",
+      "passed": true,
+      "receipt": "results/current-http/lifecycle/22bdd930-ef8c-4605-987f-e51d9af8d3ea/receipt.json"
+    },
+    {
+      "action": "docker-down",
+      "passed": true,
+      "receipt": "results/current-http/lifecycle/40193f0d-d59b-4c2c-a7bf-0b5e2dc13e11/receipt.json"
+    }
+  ],
+  "source_sha256": {
+    "results/current-http/duckdb-connector-http/454cea2c-aa09-4030-a9eb-126818a55e8a/result.json": "948be890ce4c7b2d22ebb820ab47a1464c555ebb7e3e086a4bd2e6520b42551e",
+    "results/current-http/duckdb-connector-http/454cea2c-aa09-4030-a9eb-126818a55e8a/resource-summary.json": "f2cc859081e7732fb0c09dc0575c3675fab04e616e6cdd661519ef037a03cae3",
+    "results/current-http/duckdb-connector-http/454cea2c-aa09-4030-a9eb-126818a55e8a/footer-audit/015f69af-5ff2-4ad3-b029-12826d69ea5c/result.json": "8753d41393008c778c4547abc370e03846677f7ea3901e9277854b71a0886085",
+    "results/current-http/duckdb-connector-http/454cea2c-aa09-4030-a9eb-126818a55e8a/footer-audit/015f69af-5ff2-4ad3-b029-12826d69ea5c/files.json": "26868ae1db2ce881968495744186eeb94a84cc14d43d061bd7a3fbd5b8d9163b",
+    "results/current-http/duckdb-connector-http/454cea2c-aa09-4030-a9eb-126818a55e8a/footer-audit/015f69af-5ff2-4ad3-b029-12826d69ea5c/codecs.json": "b44bf5a4996533d4332b87af6758b45590459ebc8c0db16b26f21ba454cf2d1c",
+    "results/current-http/lifecycle/22bdd930-ef8c-4605-987f-e51d9af8d3ea/receipt.json": "739c9289d98ac9c881f58f9a796481a0c2c5274ab9066747ac81f58252b18215",
+    "results/current-http/lifecycle/40193f0d-d59b-4c2c-a7bf-0b5e2dc13e11/receipt.json": "f3348bcd73eaa3a0596ac3644c52ab253726954e1d6bc4ccf34ad2888c49bd66"
+  }
+}

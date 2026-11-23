@@ -119,7 +119,7 @@ verified to reject the preserved failed initialization. This prevents silently
 admitting writes after that initialization failure; it does not repair existing
 unsafe WAL entries or patch the upstream listener error handling.
 
-`python3 repair_boundary_batch.py` explicitly replayed only the 34 absent hosts
+`python3 scripts/repair_boundary_batch.py` explicitly replayed only the 34 absent hosts
 from the external deterministic fixture, without dropping tables or resetting
 storage. It refuses a different fixture/count, a populated target range or a
 previous repair attempt. Its fsynced report is separate from the original failed
@@ -131,7 +131,7 @@ Do not run this fixture-specific repair automatically in production tests.
 The worker restart also exposed a dual-network kind gotcha: its entrypoint
 rediscovered the secondary Docker address and rewrote kubelet's `--node-ip`.
 The worker became Ready with the wrong InternalIP; two database members could not
-reconnect. `python3 pin_node_ips.py greptime-operator-worker3` restored its kind
+reconnect. `python3 scripts/pin_node_ips.py greptime-operator-worker3` restored its kind
 address and restarted kubelet, with volumes retained. That case is **manually
 recovered**, not an automatic node-recovery pass. The next clean setup connects
 the support network with Docker `--gw-priority -1`, retaining kind as the primary
@@ -286,7 +286,7 @@ support containers/volumes, generated identities or private kubeconfig remained.
   local storage. All logical zones share one physical machine.
 - The first two-broker crash/restart attempt failed automatic recovery. Docker
   reassigned broker addresses; stale bridge endpoints and wrong-target-node RPC
-  replies were observed. Recovery required `python3 config.py endpoints` using the
+  replies were observed. Recovery required `python3 scripts/config.py endpoints` using the
   private kubeconfig and restarting the retained `greptime-kind-support-wal0-1`
   broker, then native health and full readback. No volumes/data were reset. The
   test now refreshes endpoints and clears the survivor peer connections when its
@@ -340,3 +340,11 @@ Compose service or Kubernetes workload Pod; its lifecycle needs no sibling
 example’s running services or generated state.
 
 Kubelet override reference: [kubeadm kubelet integration](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/kubelet-integration/).
+
+## File organization
+
+- [`scripts/`](scripts/): lifecycle, fault and report controllers.
+- [`config/`](config/): contracts and configuration.
+
+The Makefile is the entry point. Generated builds and raw evidence stay in
+ignored directories; the tracked reports do not replace those raw histories.

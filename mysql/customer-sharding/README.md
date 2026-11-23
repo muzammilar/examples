@@ -238,3 +238,12 @@ A final clean-storage lifecycle with the stronger MySQL socket health check and 
 - [Vitess 23 reparenting source](https://github.com/vitessio/vitess/tree/v23.0.0/go/vt/vtctl/reparentutil): replica eligibility, promotion and repair paths.
 
 Compare NDB's shared distributed storage engine with these independent MySQL shards in the NDB example. The systems expose different transaction and recovery mechanisms even though both configurations retain three copies of customer data.
+
+## File organization
+
+- [`scripts/`](scripts/): lifecycle, fault and report controllers.
+- [`tests/`](tests/): offline controller tests.
+- [`config/`](config/): contracts and configuration.
+
+The Makefile is the entry point. Generated builds and raw evidence stay in
+ignored directories; the tracked reports do not replace those raw histories.

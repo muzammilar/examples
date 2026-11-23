@@ -1,3 +1,4 @@
+export PYTHONPATH := $(CURDIR)/scripts:$(CURDIR)/tests
 CLUSTER_NAME := kafka-cross-cluster-mirroring
 KUBECONFIG := $(CURDIR)/results/kubeconfig
 export KUBECONFIG
@@ -46,7 +47,7 @@ endif
 kind-up: kind-cluster
 
 kind-cluster:
-	python3 replication_control.py kind-up
+	python3 scripts/replication_control.py kind-up
 
 namespace:
 	$(KUBECTL) get namespace $(NAMESPACE) >/dev/null 2>&1 || kubectl --context kind-$(CLUSTER_NAME) create namespace $(NAMESPACE)
@@ -86,16 +87,16 @@ up: kind-up clusters
 images:
 	docker build --label lab.example.system=$(CLUSTER_NAME) -t $(PRODUCER_IMAGE) producer
 	docker build --label lab.example.system=$(CLUSTER_NAME) -f consumer/Dockerfile -t $(CONSUMER_IMAGE) .
-	python3 replication_control.py record-images $(PRODUCER_IMAGE) $(CONSUMER_IMAGE)
+	python3 scripts/replication_control.py record-images $(PRODUCER_IMAGE) $(CONSUMER_IMAGE)
 	$(KIND) load docker-image --name $(CLUSTER_NAME) $(PRODUCER_IMAGE) $(CONSUMER_IMAGE)
 
 topic:
-	python3 replication_control.py validate-topic
+	python3 scripts/replication_control.py validate-topic
 	TOPIC=$(TOPIC) envsubst < manifests/topic.yaml | $(KUBECTL) apply -f -
 	$(KUBECTL) wait kafkatopic/$(TOPIC) --for=condition=Ready --timeout=2m
 
 test:
-	python3 replication_control.py cutover
+	python3 scripts/replication_control.py cutover
 
 test-cutover: images topic
 	-$(KUBECTL) delete job kafka-consumer kafka-producer --ignore-not-found
@@ -116,7 +117,7 @@ test-cutover: images topic
 	$(KUBECTL) logs job/kafka-consumer
 
 verify-retained:
-	python3 replication_control.py verify-retained
+	python3 scripts/replication_control.py verify-retained
 
 verify-mirror:
 	RUN_ID=$(RUN_ID) COUNT=$(COUNT) TOPIC=$(TOPIC) GROUP_ID=dr-$(RUN_ID) BOOTSTRAP_SERVERS=$(SOURCE_ALIAS)-kafka-bootstrap:9092 envsubst < jobs/consumer.yaml | $(KUBECTL) apply -f -
@@ -129,34 +130,34 @@ verify-mirror:
 	$(KUBECTL) logs job/kafka-consumer
 
 check-controls:
-	PYTHONPYCACHEPREFIX=$(CURDIR)/results/pycache python3 -m unittest test_checkpoint_probe.py test_replication.py
+	PYTHONPYCACHEPREFIX=$(CURDIR)/results/pycache python3 -m unittest test_checkpoint_probe test_replication
 
 checkpoint-proof: images check-controls
-	python3 checkpoint_probe.py --topic "$(TOPIC)" --target-topic "$(TARGET_TOPIC)" --group "dr-$(RUN_ID)" --image "$(CONSUMER_IMAGE)"
+	python3 scripts/checkpoint_probe.py --topic "$(TOPIC)" --target-topic "$(TARGET_TOPIC)" --group "dr-$(RUN_ID)" --image "$(CONSUMER_IMAGE)"
 
 build-replication-images:
-	python3 prepare_replication.py
+	python3 scripts/prepare_replication.py
 	docker build --label lab.example.system=kafka-cross-cluster-mirroring -t kafka-mirror-witness-producer:dev .build/replication/producer
 	docker build -f replication-observer/Dockerfile -t kafka-mirror-replication-observer:dev .build/replication
-	python3 replication_control.py record-images kafka-mirror-witness-producer:dev kafka-mirror-replication-observer:dev
+	python3 scripts/replication_control.py record-images kafka-mirror-witness-producer:dev kafka-mirror-replication-observer:dev
 
 replication-images: build-replication-images kind-up
 	$(KIND) load docker-image --name $(CLUSTER_NAME) --nodes $(CLUSTER_NAME)-control-plane kafka-mirror-witness-producer:dev kafka-mirror-replication-observer:dev
 
 test-live-mirror: replication-images
-	COUNT=$(COUNT) LIVE_RATE=$(LIVE_RATE) python3 replication_control.py correctness
+	COUNT=$(COUNT) LIVE_RATE=$(LIVE_RATE) python3 scripts/replication_control.py correctness
 
 chaos-mm2-worker: replication-images
-	COUNT=$(COUNT) LIVE_RATE=$(LIVE_RATE) python3 replication_control.py mm2-worker-crash
+	COUNT=$(COUNT) LIVE_RATE=$(LIVE_RATE) python3 scripts/replication_control.py mm2-worker-crash
 
 chaos-target-broker: replication-images
-	COUNT=$(COUNT) LIVE_RATE=$(LIVE_RATE) python3 replication_control.py west-broker-crash
+	COUNT=$(COUNT) LIVE_RATE=$(LIVE_RATE) python3 scripts/replication_control.py west-broker-crash
 
 chaos-broker-disk-loss: replication-images
-	COUNT=$(COUNT) LIVE_RATE=$(LIVE_RATE) python3 replication_control.py west-empty-disk
+	COUNT=$(COUNT) LIVE_RATE=$(LIVE_RATE) python3 scripts/replication_control.py west-empty-disk
 
 test-production: replication-images
-	COUNT=$(COUNT) LIVE_RATE=$(LIVE_RATE) python3 replication_control.py test-production
+	COUNT=$(COUNT) LIVE_RATE=$(LIVE_RATE) python3 scripts/replication_control.py test-production
 
 status:
 	$(KUBECTL) get kafka,kafkanodepool,kafkamirrormaker2,pods
@@ -172,7 +173,7 @@ cli:
 	$(KUBECTL) exec -it $(SOURCE_ALIAS)-$(SOURCE_ALIAS)-brokers-3 -c kafka -- /opt/kafka/bin/kafka-topics.sh --bootstrap-server $(SOURCE_ALIAS)-kafka-bootstrap:9092 --list
 
 down:
-	python3 replication_control.py down
+	python3 scripts/replication_control.py down
 
 kind-down:
-	python3 replication_control.py kind-down
+	python3 scripts/replication_control.py kind-down

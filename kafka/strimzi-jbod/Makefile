@@ -1,3 +1,4 @@
+export PYTHONPATH := $(CURDIR)/scripts:$(CURDIR)/tests
 CLUSTER_NAME := kafka-strimzi-jbod
 NAMESPACE := kafka
 KUBECONFIG := $(CURDIR)/results/kubeconfig
@@ -20,8 +21,8 @@ DURATION_SECONDS ?= 1800
 DELIVERY_TIMEOUT_MS ?= 300000
 REBALANCE ?= kafka-jbod-rebalance
 export COUNT LIVE_RATE BURST_RATE DURATION_SECONDS DELIVERY_TIMEOUT_MS CASE_ID REBALANCE
-CONTROL := python3 control.py
-CLUSTER := python3 cluster.py
+CONTROL := python3 scripts/control.py
+CLUSTER := python3 scripts/cluster.py
 .NOTPARALLEL:
 .PHONY: build-images kind-up up namespace operator cluster images test demo chaos-broker chaos-controller chaos-disk test-production benchmark verify-history diagnose-history freeze-failed-history capture-failed-history disk-add disk-rebalance-plan disk-remove-plan disk-approve disk-remove-finish check-controls status logs cli down kind-down
 build-images:
@@ -47,7 +48,7 @@ images: build-images
 	$(CLUSTER) assert-owned
 	kind load docker-image --name $(CLUSTER_NAME) --nodes $(CLUSTER_NAME)-control-plane $(PRODUCER_IMAGE) $(CONSUMER_IMAGE)
 check-controls:
-	python3 -m unittest test_controls.py
+	python3 -m unittest test_controls
 test: images check-controls
 	$(CONTROL) correctness
 demo: test
@@ -58,7 +59,7 @@ chaos-controller: images check-controls
 chaos-disk: images check-controls
 	$(CONTROL) disk-failure
 capture-failed-history:
-	python3 capture_failed_topic.py
+	python3 scripts/capture_failed_topic.py
 freeze-failed-history: images check-controls
 	$(CONTROL) freeze-failed-history
 diagnose-history: images check-controls

@@ -1,3 +1,4 @@
+export PYTHONPATH := $(CURDIR)/scripts:$(CURDIR)/tests
 SHELL := /bin/sh
 MODE ?= cluster
 ifeq ($(filter $(MODE),single cluster),)
@@ -21,13 +22,13 @@ COMPOSE_FILE := $(CURDIR)/docker-compose.yml
 COMPOSE_PROJECT_NAME := lancedb-versioned-product-search
 export MODE RESULTS_DIR DOCUMENTS QUERIES SEED DURATION_SECONDS UPDATE_BATCH NODE_DOWN_SECONDS URLS COMPOSE_FILE COMPOSE_PROJECT_NAME
 COMPOSE := docker compose --file "$(COMPOSE_FILE)" --project-name $(COMPOSE_PROJECT_NAME) --profile $(MODE)
-CONTROL := python3 control.py
+CONTROL := python3 scripts/control.py
 .NOTPARALLEL:
 .PHONY: corpus build docker-up up test check-controls failover writer-crash reader-crash maintenance rolling-restart cold-reopen crash-reopen test-production benchmark status cli down docker-down
 corpus:
-	python3 corpus.py
+	python3 scripts/corpus.py
 build:
-	python3 prepare_build.py
+	python3 scripts/prepare_build.py
 	$(COMPOSE) build tools inventory-workload
 docker-up: corpus build
 	$(CONTROL) preflight
@@ -38,7 +39,7 @@ up: build
 test: build check-controls
 	$(CONTROL) test
 check-controls:
-	python3 -m unittest test_controls.py
+	python3 -m unittest test_controls
 failover: writer-crash
 writer-crash: build
 	$(CONTROL) writer-crash

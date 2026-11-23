@@ -457,3 +457,12 @@ The actual 2.5.0 CLI help and admin API schema are saved with the run evidence.
 The CLI JSON request encoding uses `null` for unit requests and
 `{"node":"*","body":null}` for all-node statistics; the public HTTP schema's
 query parameters are not the CLI's complete serialized request body.
+
+## File organization
+
+- [`scripts/`](scripts/): lifecycle, fault and report controllers.
+- [`tests/`](tests/): offline controller tests.
+- [`config/`](config/): contracts and configuration.
+
+The Makefile is the entry point. Generated builds and raw evidence stay in
+ignored directories; the tracked reports do not replace those raw histories.

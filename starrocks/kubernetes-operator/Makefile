@@ -1,3 +1,4 @@
+export PYTHONPATH := $(CURDIR)/scripts:$(CURDIR)/tests
 SHELL := /bin/sh
 CLUSTER_NAME := starrocks-operator
 KUBECONFIG := $(CURDIR)/results/kubeconfig
@@ -12,15 +13,15 @@ RUN := $(KUBECTL) exec orders-workload -- client
 .NOTPARALLEL:
 .PHONY: kind-up up test benchmark status down kind-down test-production
 kind-up:
-	python3 lifecycle.py starrocks-operator-support starrocks-operator
-	python3 prepare.py mutable-orders
+	python3 scripts/lifecycle.py starrocks-operator-support starrocks-operator
+	python3 scripts/prepare.py mutable-orders
 	docker build -t starrocks-operator-workload:dev .build/mutable-orders
 	docker pull starrocks/fe-ubuntu:4.1.7
 	docker pull starrocks/be-ubuntu:4.1.7
 	docker pull starrocks/operator:v1.11.8
-	python3 config.py
+	python3 scripts/config.py
 	@kind get clusters | rg -qx '$(CLUSTER_NAME)' || kind create cluster --name $(CLUSTER_NAME) --image kindest/node:v1.34.0 --config kind-config.json
-	python3 load_images.py
+	python3 scripts/load_images.py
 up:
 	$(HELM) upgrade --install orders-operator https://github.com/StarRocks/starrocks-kubernetes-operator/releases/download/v1.11.8/operator-1.11.8.tgz --namespace starrocks-lab --create-namespace --values operator-values.yaml --wait --timeout 5m
 	$(KUBECTL) apply -f cluster.json
@@ -28,7 +29,7 @@ up:
 	$(KUBECTL) rollout status statefulset/orders-be --timeout=600s
 	$(KUBECTL) apply -f workload.json
 	$(KUBECTL) wait --for=condition=Ready pod/orders-workload --timeout=120s
-	python3 operations.py ready
+	python3 scripts/operations.py ready
 	$(RUN) setup
 	@if test -f results/seed.json; then $(RUN) verify; else $(RUN) seed; fi
 test:
@@ -41,7 +42,7 @@ benchmark:
 	python3 -c 'import json; d=json.load(open("results/query-benchmark.json")); assert len(d)==3 and all(v["samples"]==20 and v["errors"]==0 for v in d.values()), "incomplete benchmark results"'
 	test -s results/query-benchmark.json
 scale-out scale-in scale-up scale-down rolling-restart failover chaos-fe-leader chaos-node chaos-operator disk-failure chaos-network chaos-write-quorum drain-test:
-	python3 operations.py $@
+	python3 scripts/operations.py $@
 test-production:
 	$(MAKE) test
 	$(MAKE) scale-out

@@ -14,6 +14,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends qemu-system-arm
 ADD --checksum=sha256:50e24e1fb79e89116e939d90aa7738f7af48c442fa1bc2510131e0b39c50348e https://cloud-images.ubuntu.com/noble/20261017/noble-server-cloudimg-arm64.img /opt/base.qcow2
 COPY --from=packages /packages.iso /opt/packages.iso
 COPY vm/boot.py /opt/lab/boot.py
-COPY capacity.py /opt/lab/capacity.py
+COPY scripts/capacity.py /opt/lab/capacity.py
 COPY native /opt/lab/native
 ENTRYPOINT ["python3", "/opt/lab/boot.py"]

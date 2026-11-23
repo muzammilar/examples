@@ -91,7 +91,7 @@ this lab. Database consistency under active WAL writes is covered separately in
 The **4 MiB/s** default passed the complete lifecycle below without a
 `WRITE_MIB_S` override. It gives finite writers enough work to remain active
 through both RAIDZ2 replacements; it does not improve a capacity number. The
-[earlier override checkpoint](OBSERVER_RESULTS_4M_OVERRIDE.json) preserves the
+[earlier override checkpoint](config/OBSERVER_RESULTS_4M_OVERRIDE.json) preserves the
 previously measured 4 MiB/s run and its tested runtime at commit `0cd5c58`, byte
 for byte. Historical **8 MiB/s** measurements retain their separate method below.
 
@@ -305,11 +305,11 @@ Putting the existing Python **3.14.7** first in the test executor's PATH satisfi
 the prerequisite; the same exact `make test` then passed without workload/source
 changes. This does not relabel the failed prerequisite attempt as a pass.
 
-[OBSERVER_RESULTS.json](OBSERVER_RESULTS.json) contains independently replayed
+[OBSERVER_RESULTS.json](reports/OBSERVER_RESULTS.json) contains independently replayed
 cases, phases, resource/storage measurements, runtime/image hashes, archive and
 cleanup proofs plus prior-failure references. The earlier explicit 4 MiB/s run
 (**317** correct bodies) remains byte-identical in
-[OBSERVER_RESULTS_4M_OVERRIDE.json](OBSERVER_RESULTS_4M_OVERRIDE.json). The original
+[OBSERVER_RESULTS_4M_OVERRIDE.json](config/OBSERVER_RESULTS_4M_OVERRIDE.json). The original
 checker-failed run remains failed under `results/continuous-20261122/`; the earlier
 passed raw cohort is `results/continuous-fixed-20261122/`.
 
@@ -418,3 +418,13 @@ Inspected source: OpenZFS zfs-2.2.2 `zpool_main.c` (fault/replace/scrub waits),
 limits), and `cmd/zstream/zstream_dump.c` (checksum diagnostics, record counts and
 zero-exit boundary), `lib/libzfs/libzfs_sendrecv.c` (compound package conclusion); fio fio-3.36 `verify.c` (CRC32C/header/offset checks), `filesetup.c` (allocation), and `engines/sync.c`
 (sync read/write). Orchestration and administrative fencing are lab code.
+
+## File organization
+
+- [`scripts/`](scripts/): lifecycle, fault and report controllers.
+- [`tests/`](tests/): offline controller tests.
+- [`reports/`](reports/): compact tracked result summaries.
+- [`config/`](config/): contracts and configuration.
+
+The Makefile is the entry point. Generated builds and raw evidence stay in
+ignored directories; the tracked reports do not replace those raw histories.

@@ -8,7 +8,7 @@ Website: https://duckdb.org/
 
 ## Current-version Iceberg evaluation
 
-[`Iceberg multi-system`](../iceberg/multi-system/DUCKDB_VERSIONS.md) adds actual
+[`Iceberg multi-system`](../iceberg/multi-system/projects/duckdb-iceberg/docs/DUCKDB_VERSIONS.md) adds actual
 DuckDB **2.0.1** alongside the historical **1.5.5** lane. On the same 2.79-million-row
 snapshot, a manifest connection failure aborts the older native process; 2.0.1
 returns an ordinary SQL error. Complete dual-engine readback checks 3.39 million
@@ -23,9 +23,9 @@ The fresh current Iceberg fixture also passes storage-process recovery with
 archive handoff and three-shard/three-copy serving paths pass. ClickHouse-written
 v2 manifests still omit required metadata, so the complete cross-engine matrix
 fails. The earlier memory-failed recovery remains failed; see
-[`current results and limitations`](../iceberg/multi-system/README.md#current-version-results-2026-11-22).
+[`current results and limitations`](../iceberg/multi-system/docs/ARCHITECTURES.md#current-version-results-2026-11-22).
 
-The [native Iceberg compaction baseline](../iceberg/multi-system/DUCKDB_MAINTENANCE.md)
+The [native Iceberg compaction baseline](../iceberg/multi-system/projects/duckdb-iceberg/docs/DUCKDB_MAINTENANCE.md)
 also passes **2,000,000-row** rollback/rewrite/retained-snapshot checks,
 **20 → 1 files**, and independent body verification, with **215 controls**.
 Its **2,149.995 ms** rewrite profile is a functional observation; native live
@@ -58,7 +58,7 @@ exact output checks, repeated warm-query measurements, first-query observations,
 CPU time and peak RSS/cgroup memory. DuckDB wins the scans and join in this
 workload; Rayforce wins the two group aggregations and bulk CSV loading. Full
 numbers and the unrun cold-cache scenarios are in that README. Its separate
-[native live WAL profile](../rayforce/duckdb-comparison/DUCKDB_RECOVERY.md)
+[native live WAL profile](../rayforce/duckdb-comparison/projects/duckdb-recovery/docs/DUCKDB_RECOVERY.md)
 tests the same two-million-trade fixture with C++ Quack sessions, pinned TLS,
 independent readers/writers, two retained-volume SIGKILLs and checkpointing under
 load. It is a single-owner recovery test; the existing ZFS lab covers different

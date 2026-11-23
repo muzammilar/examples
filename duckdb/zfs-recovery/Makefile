@@ -1,3 +1,4 @@
+export PYTHONPATH := $(CURDIR)/scripts:$(CURDIR)/tests
 SHELL := /bin/sh
 COMPOSE := docker compose
 LOCAL_UID := $(shell id -u)
@@ -35,23 +36,23 @@ up:
 	$(RUN) up
 
 test: check-controls check-native-export check-native-fencing
-	python3 production.py full-test
+	python3 scripts/production.py full-test
 
 verify-archives:
-	python3 production.py verify-archives
+	python3 scripts/production.py verify-archives
 
 disk-test:
 	@mkdir -p "$(RESULTS_DIR)"
-	python3 production.py register-fixture
+	python3 scripts/production.py register-fixture
 	$(RUN) disk-test
 
 crash-test:
 	@mkdir -p "$(RESULTS_DIR)"
-	python3 production.py crash
+	python3 scripts/production.py crash
 
 check-controls:
 	python3 -m unittest discover -s app -p 'test_*.py'
-	python3 -m unittest test_production.py
+	python3 -m unittest test_production
 
 check-native-export:
 	$(COMPOSE) run --rm --entrypoint /opt/venv/bin/python controller /opt/lab/app/export_control.py
@@ -61,23 +62,23 @@ check-native-fencing:
 
 retire-failed-suite:
 	@test -n "$(FAILED_SUITE)" || { echo 'Set FAILED_SUITE=results/<run>/full-suite-<id>'; exit 1; }
-	python3 production.py retire-failed-suite "$(FAILED_SUITE)"
+	python3 scripts/production.py retire-failed-suite "$(FAILED_SUITE)"
 
 test-production: test
 
 report-production:
 	@test -n "$(LIVE_CASE)" || { echo 'Set LIVE_CASE=results/<run>/live/<case>'; exit 1; }
-	python3 production.py report "$(LIVE_CASE)"
+	python3 scripts/production.py report "$(LIVE_CASE)"
 
 replica-test:
 	@mkdir -p "$(RESULTS_DIR)"
-	python3 production.py register-fixture
+	python3 scripts/production.py register-fixture
 	$(COMPOSE) up -d --wait standby
 	$(RUN) replica-test
 
 benchmark:
 	@mkdir -p "$(RESULTS_DIR)"
-	python3 production.py register-fixture
+	python3 scripts/production.py register-fixture
 	$(RUN) benchmark
 	$(MAKE) verify-archives
 
@@ -92,9 +93,9 @@ down:
 	$(RUN) down
 
 docker-down:
-	python3 production.py teardown-guard
+	python3 scripts/production.py teardown-guard
 	$(COMPOSE) --profile tools down --volumes --remove-orphans
 	@if docker image inspect duckdb-zfs-lab:dev >/dev/null 2>&1; then docker image rm duckdb-zfs-lab:dev; fi
-	python3 production.py verify-teardown
+	python3 scripts/production.py verify-teardown
 	@rm -f state/ssh/id_ed25519 state/ssh/id_ed25519.pub
 	@rmdir state/ssh state 2>/dev/null || true

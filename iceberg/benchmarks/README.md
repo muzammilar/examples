@@ -6,7 +6,7 @@ This is the standalone performance benchmark project. Compare these three paths 
 2. ClickHouse querying an Iceberg table.
 3. ClickHouse querying its native `MergeTree` copy.
 
-See [the next-test plan](PLAN.md) for the workload matrix and validation steps beyond the current baseline.
+See [the next-test plan](docs/PLAN.md) for the workload matrix and validation steps beyond the current baseline.
 
 The benchmark uses one root Compose file that includes a separate Compose file for each system. The Makefile runs the systems serially against the same deterministic input and shared local-filesystem Iceberg warehouse. The controller, workload generator, and all benchmark drivers are written in Go. Timings are client wall time through the Go database/native clients, including driver encoding and protocol overhead; the input generator runs outside the timed operations. This intentionally makes the client path part of the comparison. It does not include the separate SeaweedFS/S3-compatible multi-system example, the 2-shard/2-replica ClickHouse cluster, or N-writer concurrency experiment.
 
@@ -124,3 +124,10 @@ These are design hypotheses for the benchmark. The measurements should show wher
 - [ClickHouse Iceberg support matrix](https://github.com/ClickHouse/clickhouse-docs/blob/main/docs/use-cases/data_lake/support-matrix.md)
 - [ClickHouse with SeaweedFS table buckets](https://seaweedfs.com/blog/clickhouse-table-buckets/)
 - [Apache Iceberg concurrent-write reliability](https://iceberg.apache.org/docs/latest/reliability/)
+
+## File organization
+
+- [`docs/`](docs/): detailed procedures and limitations.
+
+The Makefile is the entry point. Generated builds and raw evidence stay in
+ignored directories; the tracked reports do not replace those raw histories.

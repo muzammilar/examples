@@ -15,7 +15,7 @@ execution evidence.
 
 ## Fresh qualification in this follow-up
 
-- [DuckDB/ZFS](duckdb/zfs-recovery/FULL_SUITE_RESULTS.json): fresh five-command
+- [DuckDB/ZFS](duckdb/zfs-recovery/reports/FULL_SUITE_RESULTS.json): fresh five-command
   lifecycle passed on 2026-11-22. Continuous guest-crash recovery verifies
   **2,000,000 seed + 323,000 acknowledged rows** and 180 independent read results,
   zero missing/wrong/partial/duplicate bodies. The complete disk/crash/replica/
@@ -28,13 +28,13 @@ execution evidence.
   overrides the requested HTTP timeout with 86,400 seconds; the observed 75.058 s
   ambiguous operation is not a qualified three-second deadline. Full production,
   physical host-loss and comparative performance qualification remain false.
-- [CedarDB/PostgreSQL mutable workload](cedardb/backup-recovery/MUTABLE.md):
+- [CedarDB/PostgreSQL mutable workload](cedardb/backup-recovery/projects/transactional-mutations/docs/MUTABLE.md):
   newer million-row healthy/SIGKILL qualification verifies **2,972 ACKed
   transactions**, zero acknowledged loss or wrong/partial rows, full seed/body/
   receipt/history reconciliation, native controls and 23 host controls. Native
   per-device IOPS now accompany byte counters. The failed prototype is externally
   archived before verified fixture replacement; its failed verdict remains intact.
-  The [12-cell sustained comparison](cedardb/backup-recovery/MUTABLE_BENCHMARK.md)
+  The [12-cell sustained comparison](cedardb/backup-recovery/projects/transactional-mutations/docs/MUTABLE_BENCHMARK.md)
   independently verifies 108,440 ACKs and 83,243 complete query results with zero
   loss/corruption. CedarDB throughput is 3.29×/3.03× alone/live; PostgreSQL uses
   less charged memory. Warm-query/automatic-statistics limits and observer costs
@@ -45,7 +45,7 @@ execution evidence.
   complete receipt/body replay, 19 host controls and legacy regressions pass.
   Four earlier short benchmark-harness cells pass. Preserve the PostgreSQL CASE-typing failure and invalidated
   weak prototype; resource/storage evidence is separate from a performance claim.
-- [Rayforce native AOF segments](rayforce/duckdb-comparison/AOF_SEGMENTS.md):
+- [Rayforce native AOF segments](rayforce/duckdb-comparison/projects/rayforce-aof/docs/AOF_SEGMENTS.md):
   2026-11-22, 159 native files; complete 10,000/10,003-event rotation/reopen/backup
   verification and known uncommitted-tail recovery. Full scan rejects one sealed
   CRC edit while native open checks only the tail. Deliberate final-file deletion
@@ -55,7 +55,7 @@ execution evidence.
   strict payload/AOF integrity failures still nonzero. This expected-loss offline
   diagnostic does not qualify live concurrent scans, interrupted rotation or
   physical disk recovery.
-- [DuckDB native WAL recovery](rayforce/duckdb-comparison/DUCKDB_RECOVERY.md):
+- [DuckDB native WAL recovery](rayforce/duckdb-comparison/projects/duckdb-recovery/docs/DUCKDB_RECOVERY.md):
   2026-11-22, two retained-volume SIGKILLs with independent C++ Quack writer/reader
   sessions and checkpoint under load. Final strict-phase run verifies **2,000,000
   seed trades, 10,000 customers and 2,364 live ACK bodies**, zero loss/corruption.
@@ -66,7 +66,7 @@ execution evidence.
   healthy/outage assertions and temperature-separated reporting; it is a separate
   recorded run. Resource/storage costs and gaps are explicit; no HA, device-loss,
   capacity or comparative recovery-speed claim.
-- [Kafka enrichment](kafka/connect-postgres-enrichment/VERIFIED_RESULTS.json): on
+- [Kafka enrichment](kafka/connect-postgres-enrichment/reports/VERIFIED_RESULTS.json): on
   2026-11-21, fresh broker, active Connect worker, Go processor and PostgreSQL
   SIGKILL cases passed with **8,020,480 ACKs**, live independent source/output/SQL
   observations and full historical body/partition reconciliation. Three healthy
@@ -77,7 +77,7 @@ execution evidence.
   and known stale-CDC negative control remain preserved failures. Results include
   CPU/memory/block-byte/storage samples and CRC-verified native compression.
   These are short pipeline observations, not sustained/cold-cache capacity tests.
-  [Lifecycle qualification](kafka/connect-postgres-enrichment/LIFECYCLE_RESULTS.json)
+  [Lifecycle qualification](kafka/connect-postgres-enrichment/reports/LIFECYCLE_RESULTS.json)
   now covers a separate 2,001,024-ACK retained-state fixture and a final empty-fixture
   five-command run with 1,001,024 ACKs, zero loss/corruption and scoped cleanup.
   All five final commands passed without retries; 23 controller tests pass. Four

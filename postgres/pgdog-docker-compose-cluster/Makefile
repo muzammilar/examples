@@ -1,3 +1,4 @@
+export PYTHONPATH := $(CURDIR)/scripts:$(CURDIR)/tests
 SHELL := /bin/sh
 COMPOSE := docker compose --project-name postgres-pgdog-pooling
 COUNT ?= 1000000
@@ -19,24 +20,24 @@ render-config:
 images:
 	$(COMPOSE) build workload
 up: images
-	python3 control.py up
+	python3 scripts/control.py up
 test:
-	python3 control.py test
+	python3 scripts/control.py test
 	$(MAKE) connection-burst
 verify:
-	python3 control.py verify
+	python3 scripts/control.py verify
 benchmark:
-	python3 control.py benchmark
+	python3 scripts/control.py benchmark
 failover:
-	python3 control.py failover
+	python3 scripts/control.py failover
 chaos-replica-lag:
-	python3 control.py replica-lag
+	python3 scripts/control.py replica-lag
 replica-crash:
-	python3 control.py replica-crash
+	python3 scripts/control.py replica-crash
 router-failure:
-	python3 control.py router
+	python3 scripts/control.py router
 pool-reload:
-	python3 control.py pool-reload
+	python3 scripts/control.py pool-reload
 test-production:
 	$(MAKE) test
 	$(MAKE) failover
@@ -48,24 +49,24 @@ test-production:
 	$(MAKE) verify
 unit-test:
 	$(COMPOSE) build workload
-	python3 -m unittest discover -s . -p 'test_*.py'
+	python3 -m unittest discover -s tests -p 'test_*.py'
 status:
 	$(COMPOSE) ps
-	python3 control.py status
+	python3 scripts/control.py status
 cli:
 	$(COMPOSE) run --rm client psql -h pgdog -p 6432 -U postgres -d orders
 config:
-	python3 control.py config
+	python3 scripts/control.py config
 pool-size:
-	python3 control.py pool-size
+	python3 scripts/control.py pool-size
 compare-pools:
-	python3 control.py compare-pools
+	python3 scripts/control.py compare-pools
 replica-reads:
-	python3 control.py replica-reads
+	python3 scripts/control.py replica-reads
 connection-burst:
-	python3 control.py connection-burst
+	python3 scripts/control.py connection-burst
 down:
-	python3 control.py down
+	python3 scripts/control.py down
 docker-down:
 	$(COMPOSE) --profile tools down --volumes --remove-orphans --rmi local
 	@if docker image inspect postgres-pgdog-workload:dev >/dev/null 2>&1; then docker image rm postgres-pgdog-workload:dev; fi
