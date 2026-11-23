@@ -169,6 +169,27 @@ data and service, and the verified automatic/manual recovery steps and limits.
 Record uncertainty and unrecoverable states honestly; discovering a reproducible
 failure is useful evidence even when a safe recovery has not yet been found.
 
+Document **all measured outcomes, good and bad**. The goal is to understand systems,
+including why an approach fails, not to produce a success-only collection. Report
+successful workloads and recovery alongside wrong answers, outages, corruption,
+unsupported semantics and rejected approaches. A zero exit status or healthy
+service does not override a failed independent correctness check. State the tested
+version, configuration, input, expected versus observed behavior, numeric impact,
+reproducer, evidence and unresolved attribution. Strong negative conclusions are
+appropriate when bounded by that evidence; do not soften a failure into a pass
+or blame an unisolated component.
+
+When replacing a failed connector, backend or architecture, **retain it in a
+separately named directory beside the replacement**, including source, reproducers,
+failed result summaries and limitations. Link both paths from their parent README
+and explain why the default changed. Keep raw evidence under its original ignored
+paths. A replacement's success never erases its predecessor's failures or proves
+unrun recovery cases. For example, the pinned `clickhouse_scanner` returned wrong
+answers despite successful queries; preserve its [failed qualification and
+measured results](iceberg/multi-system/projects/duckdb-clickhouse/clickhouse-scanner/README.md)
+alongside the HTTP path that replaced it. Do not delete the rejected path during
+cleanup, or silently omit it from the reported conclusions.
+
 Implement operational tests alongside functional correctness tests. Use the common
 requirements below, the deployment-specific matrix, and the applicable workload
 tests. These are requirements for new or materially changed examples, not claims
