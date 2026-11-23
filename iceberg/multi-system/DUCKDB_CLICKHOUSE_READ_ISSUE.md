@@ -66,3 +66,13 @@ Raw SQL, profiles, native exit/state, source and resource observations are bound
 in [`DUCKDB_CLICKHOUSE_ROUNDTRIP_RESULTS.json`](DUCKDB_CLICKHOUSE_ROUNDTRIP_RESULTS.json).
 See the [full failed round-trip report](DUCKDB_CLICKHOUSE_ROUNDTRIP.md) for dataset,
 limits, independent verification and scope.
+
+## Row-level counterexample (2026-11-23)
+
+`make connector-read-isolation ROWS=2000000` also fails: streamed aggregate bad
+counts are 1,189,514 (one thread) and 787,154 (two). Two-thread materialization
+stores 1,356,530 true bad-body flags beside rows whose full local recomputation
+finds zero bad bodies. All 20 saved examples pass an independent Python value/hash
+check and have `ingress_bad=true`, `recomputed_bad=false`. This narrows the failure
+beyond aggregate counting without assigning a DuckDB-core versus extension cause.
+See [row-level evidence](CONNECTOR_READ_ISOLATION.md). This remains unposted.

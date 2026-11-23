@@ -13,6 +13,8 @@ explicit test groups. Existing direct DuckDB–Iceberg results cover another pat
 The [two-million-row round trip](DUCKDB_CLICKHOUSE_ROUNDTRIP.md) and generated
 read regression now run through Make and fail on intermittent wrong answers;
 native full-body checks verify all stored copies remain correct.
+[Row-level isolation](CONNECTOR_READ_ISOLATION.md) now saves incorrect ingestion
+predicate flags beside correct row values; root cause remains unassigned.
 The [partial-insert control](DUCKDB_PARTIAL.md) now reproduces persisted rows
 after an error and duplicate effects on retry; corrected immutable-key replay
 passes in a separate replacement table. Transport ACK-loss injection remains unrun.

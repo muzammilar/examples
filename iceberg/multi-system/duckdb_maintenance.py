@@ -410,6 +410,7 @@ def run(mode="baseline"):
     import duckdb_crash
     import duckdb_dependencies
     import connector_concurrent
+    import connector_read_isolation
 
     if mode not in {
         "baseline",
@@ -417,6 +418,7 @@ def run(mode="baseline"):
         "conflicts",
         "connector",
         "connector-read",
+        "connector-read-isolation",
         "connector-partial",
         "connector-crash",
         "connector-dependencies",
@@ -428,6 +430,7 @@ def run(mode="baseline"):
         "conflicts": duckdb_conflicts,
         "connector": duckdb_clickhouse,
         "connector-read": duckdb_clickhouse,
+        "connector-read-isolation": connector_read_isolation,
         "connector-partial": duckdb_partial,
         "connector-crash": duckdb_crash,
         "connector-dependencies": duckdb_dependencies,
@@ -466,7 +469,7 @@ def run(mode="baseline"):
         "connector-concurrent",
     }:
         artifacts = scenario.artifacts(table, rows)
-    elif mode == "connector-read":
+    elif mode in {"connector-read", "connector-read-isolation"}:
         artifacts = scenario.read_artifacts(rows)
     else:
         sql = program(table, rows, customers, batch)
@@ -489,7 +492,12 @@ def run(mode="baseline"):
         required_slots = (rows * 128 + 255999999) // 256000000 + 1
         if mode == "connector-dependencies" and scenario.seed_case(rows) is not None:
             required_slots = 1  # Existing 2M-row source is read-only; only 3k probe rows are new S3 output.
-    elif mode in {"connector-read", "connector-partial", "connector-crash"}:
+    elif mode in {
+        "connector-read",
+        "connector-read-isolation",
+        "connector-partial",
+        "connector-crash",
+    }:
         required_slots = 0
     free_slots = settings["topology"]["Topology"].get("Free")
     if type(free_slots) is not int or free_slots < required_slots:
@@ -507,6 +515,7 @@ def run(mode="baseline"):
     if mode in {
         "connector",
         "connector-read",
+        "connector-read-isolation",
         "connector-partial",
         "connector-crash",
         "connector-dependencies",
@@ -692,7 +701,7 @@ def run(mode="baseline"):
             "connector-concurrent",
         }:
             result = scenario.verify(root, table, rows, query)
-        elif mode == "connector-read":
+        elif mode in {"connector-read", "connector-read-isolation"}:
             result = scenario.verify_read(root, rows)
         else:
             result = scenario.verify(root, rows) if scenario else verify(root, rows)
@@ -776,6 +785,12 @@ if __name__ == "__main__":
         dest="mode",
         action="store_const",
         const="connector-concurrent",
+    )
+    group.add_argument(
+        "--connector-read-isolation",
+        dest="mode",
+        action="store_const",
+        const="connector-read-isolation",
     )
     parser.set_defaults(mode="baseline")
     args = parser.parse_args()

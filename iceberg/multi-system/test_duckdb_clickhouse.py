@@ -13,9 +13,53 @@ import duckdb_crash as crash
 import duckdb_dependencies as dependencies
 import connector_compactor_probe as compactor_probe
 import connector_concurrent as concurrent
+import connector_read_isolation as isolation
 
 
 class ConnectorRoundTrip(unittest.TestCase):
+    def test_wrong_ingress_flags_fail_even_when_recomputed_bodies_pass(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory).resolve()
+            row = self.fixture(root)
+            for threads in (1, 2):
+                for stage in ("local", "stream", "stored"):
+                    (root / f"{stage}-{threads}.json").write_text(json.dumps([row]))
+                (root / f"flags-{threads}.json").write_text(
+                    json.dumps(
+                        [
+                            {
+                                "rows": 10000,
+                                "ingress_bad_rows": 1 if threads == 2 else 0,
+                                "null_flags": 0,
+                            }
+                        ]
+                    )
+                )
+            with self.assertRaisesRegex(RuntimeError, "flags-2"):
+                isolation.verify_read(root, 10000)
+
+    def test_materialized_success_does_not_hide_stream_failure(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory).resolve()
+            row = self.fixture(root)
+            for threads in (1, 2):
+                for stage in ("local", "stream", "stored"):
+                    value = row | {"invalid_bodies": 42} if stage == "stream" else row
+                    (root / f"{stage}-{threads}.json").write_text(json.dumps([value]))
+                (root / f"flags-{threads}.json").write_text(
+                    json.dumps(
+                        [{"rows": 10000, "ingress_bad_rows": 0, "null_flags": 0}]
+                    )
+                )
+            with self.assertRaisesRegex(RuntimeError, "stream-1, stream-2"):
+                isolation.verify_read(root, 10000)
+            self.assertEqual(
+                json.loads((root / "isolation-checks.json").read_text())[
+                    "failed_stages"
+                ],
+                ["stream-1", "stream-2"],
+            )
+
     def test_parallel_wrong_answer_fails_even_when_the_serial_control_passes(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory).resolve()

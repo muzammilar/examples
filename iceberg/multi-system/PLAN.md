@@ -27,6 +27,11 @@ remaining test groups. The new connector architecture remains unqualified.
 Group 1 now has a measured two-million-row failed round trip and a generated-row
 wrong-answer reproducer; see `DUCKDB_CLICKHOUSE_ROUNDTRIP.md`. Both thread counts
 have failed across trials, while independent native stored-body checks pass.
+Row-level isolation now captures incorrect ingestion flags beside correct values;
+see `CONNECTOR_READ_ISOLATION.md`. The user requested a replacement extension;
+keep this failure evidence while qualifying a compatible alternate read/write
+path. Do not silently downgrade DuckDB or call a read-only alternative a full
+replacement.
 Group 2 now reproduces late conversion partial commits and blind-retry duplicates
 with two-million-row input; corrected immutable-key replay passes under FINAL.
 See `DUCKDB_PARTIAL.md`. Transport ACK-loss injection is still unrun.

@@ -292,3 +292,7 @@ cold-memory-diagnostic: config recovery-unit-test ## Read-only native full-table
 .PHONY: cold-memory-blocks
 cold-memory-blocks: config recovery-unit-test ## Isolate bounded Parquet output block sizing on the same retained table
 	python3 cold_memory.py "$(CASE)" --blocks
+
+.PHONY: connector-read-isolation
+connector-read-isolation: config recovery-unit-test ## Preserve streamed predicate flags and compare full locally materialized bodies
+	python3 duckdb_maintenance.py --connector-read-isolation
