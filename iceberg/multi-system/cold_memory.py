@@ -23,9 +23,17 @@ VARIANTS = {
     "watermark64": ",input_format_parquet_memory_high_watermark=67108864",
     "watermark64-thread1": ",input_format_parquet_memory_high_watermark=67108864,max_threads=1",
 }
+BLOCK_VARIANTS = {
+    "watermark64": VARIANTS["watermark64"],
+    "watermark64-block8192": VARIANTS["watermark64"]
+    + ",input_format_parquet_max_block_size=8192",
+    "watermark64-block8192-thread1": VARIANTS["watermark64-thread1"]
+    + ",input_format_parquet_max_block_size=8192",
+}
 
 
-def run(identifier):
+def run(identifier, blocks=False):
+    variants = BLOCK_VARIANTS if blocks else VARIANTS
     case_id = uuid.UUID(identifier)
     if identifier != str(case_id) or control.lab.PROFILE != "current":
         raise ValueError("canonical current-profile concurrent case required")
@@ -71,7 +79,7 @@ def run(identifier):
             "source_case": identifier,
             "table": table,
             "expected_rows": rows,
-            "variants": VARIANTS,
+            "variants": variants,
             "query": control.state(query),
             "storage": control.state(storage),
             "scope": "Sequential native ClickHouse reads, no DuckDB application or live writers; caches uncontrolled and no capacity claim.",
@@ -99,7 +107,7 @@ def run(identifier):
     results, error = [], None
     try:
         # Rotate order instead of always giving a variant the first-cache penalty.
-        names = list(VARIANTS)
+        names = list(variants)
         for trial in range(3):
             for name in names[trial:] + names[:trial]:
                 stem = f"trial-{trial + 1}-{name}"
@@ -110,7 +118,7 @@ def run(identifier):
                         config["seed_rows"],
                         [v["first"] // concurrent.COLD_BATCH for v in history],
                     )
-                    + VARIANTS[name]
+                    + variants[name]
                     + ",result_overflow_mode='throw',max_result_rows=1,output_format_json_quote_64bit_integers=0 FORMAT JSONEachRow"
                 )
                 control.save_text(root / (stem + ".sql"), sql)
@@ -180,7 +188,10 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("case")
+    parser.add_argument(
+        "--blocks", action="store_true", help="Compare bounded Parquet output blocks"
+    )
     args = parser.parse_args()
     with cold_storage.controller_lock() as lock:
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        run(args.case)
+        run(args.case, args.blocks)

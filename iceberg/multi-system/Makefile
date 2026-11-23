@@ -288,3 +288,7 @@ connector-concurrent-recheck: config recovery-unit-test ## Recheck durable cold 
 .PHONY: cold-memory-diagnostic
 cold-memory-diagnostic: config recovery-unit-test ## Read-only native full-table isolation at fixed caps; not a concurrent-recovery qualification
 	python3 cold_memory.py "$(CASE)"
+
+.PHONY: cold-memory-blocks
+cold-memory-blocks: config recovery-unit-test ## Isolate bounded Parquet output block sizing on the same retained table
+	python3 cold_memory.py "$(CASE)" --blocks

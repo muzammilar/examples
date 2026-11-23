@@ -1,0 +1,467 @@
+{
+  "completed": true,
+  "error": null,
+  "requests": [
+    {
+      "trial": 1,
+      "variant": "watermark64",
+      "exit_code": 0,
+      "duration_ns": 971188208,
+      "status": "ok",
+      "body": {
+        "rows": 2097000,
+        "unique_ids": 2097000,
+        "invalid_bodies": 0,
+        "partial_batches": 0,
+        "acknowledged_rows": 2097000
+      }
+    },
+    {
+      "trial": 1,
+      "variant": "watermark64-block8192",
+      "exit_code": 0,
+      "duration_ns": 672427917,
+      "status": "ok",
+      "body": {
+        "rows": 2097000,
+        "unique_ids": 2097000,
+        "invalid_bodies": 0,
+        "partial_batches": 0,
+        "acknowledged_rows": 2097000
+      }
+    },
+    {
+      "trial": 1,
+      "variant": "watermark64-block8192-thread1",
+      "exit_code": 0,
+      "duration_ns": 721524834,
+      "status": "ok",
+      "body": {
+        "rows": 2097000,
+        "unique_ids": 2097000,
+        "invalid_bodies": 0,
+        "partial_batches": 0,
+        "acknowledged_rows": 2097000
+      }
+    },
+    {
+      "trial": 2,
+      "variant": "watermark64-block8192",
+      "exit_code": 241,
+      "duration_ns": 373079625,
+      "status": "fail",
+      "body": null
+    },
+    {
+      "trial": 2,
+      "variant": "watermark64-block8192-thread1",
+      "exit_code": 241,
+      "duration_ns": 270544167,
+      "status": "fail",
+      "body": null
+    },
+    {
+      "trial": 2,
+      "variant": "watermark64",
+      "exit_code": 0,
+      "duration_ns": 787341417,
+      "status": "ok",
+      "body": {
+        "rows": 2097000,
+        "unique_ids": 2097000,
+        "invalid_bodies": 0,
+        "partial_batches": 0,
+        "acknowledged_rows": 2097000
+      }
+    },
+    {
+      "trial": 3,
+      "variant": "watermark64-block8192-thread1",
+      "exit_code": 0,
+      "duration_ns": 708399042,
+      "status": "ok",
+      "body": {
+        "rows": 2097000,
+        "unique_ids": 2097000,
+        "invalid_bodies": 0,
+        "partial_batches": 0,
+        "acknowledged_rows": 2097000
+      }
+    },
+    {
+      "trial": 3,
+      "variant": "watermark64",
+      "exit_code": 0,
+      "duration_ns": 657878875,
+      "status": "ok",
+      "body": {
+        "rows": 2097000,
+        "unique_ids": 2097000,
+        "invalid_bodies": 0,
+        "partial_batches": 0,
+        "acknowledged_rows": 2097000
+      }
+    },
+    {
+      "trial": 3,
+      "variant": "watermark64-block8192",
+      "exit_code": 0,
+      "duration_ns": 666286208,
+      "status": "ok",
+      "body": {
+        "rows": 2097000,
+        "unique_ids": 2097000,
+        "invalid_bodies": 0,
+        "partial_batches": 0,
+        "acknowledged_rows": 2097000
+      }
+    }
+  ],
+  "capacity_qualified": false,
+  "concurrent_recovery_qualified": false,
+  "compression": "No rewrite or codec change. New footer measurement unavailable in this native-read isolation; earlier snapshot codec audits remain separate.",
+  "date": "2026-11-23",
+  "case_directory": "results/current/duckdb-connector-concurrent/fe20a081-ab77-4c71-9ecb-c2332dce4a7e/memory-diagnostics/81f57076-6c54-4b7b-8197-641ddda900b9",
+  "executed_command": "python3 cold_memory.py fe20a081-ab77-4c71-9ecb-c2332dce4a7e --blocks",
+  "environment": {
+    "context": "desktop-linux",
+    "endpoint": "unix:///Users/muzammil/.docker/run/docker.sock",
+    "daemon": {
+      "ID": "172e5e0a-2d95-4fb5-a6b4-fb16552caec8",
+      "Name": "docker-desktop",
+      "ServerVersion": "29.5.3",
+      "Architecture": "aarch64",
+      "NCPU": 11,
+      "MemTotal": 26216296448,
+      "KernelVersion": "6.12.76-linuxkit",
+      "OperatingSystem": "Docker Desktop"
+    }
+  },
+  "variants": {
+    "watermark64": ",input_format_parquet_memory_high_watermark=67108864",
+    "watermark64-block8192": ",input_format_parquet_memory_high_watermark=67108864,input_format_parquet_max_block_size=8192",
+    "watermark64-block8192-thread1": ",input_format_parquet_memory_high_watermark=67108864,max_threads=1,input_format_parquet_max_block_size=8192"
+  },
+  "snapshot": 5637888243077970152,
+  "snapshot_unchanged": true,
+  "expected_rows": 2097000,
+  "resources": {
+    "clickhouse": {
+      "samples": 5,
+      "unavailable_samples": 0,
+      "observed_seconds": 5.41,
+      "cpu_core_seconds": {
+        "total": 9.428043,
+        "user": 6.961736,
+        "system": 2.466307
+      },
+      "cpu_percent_one_core_100": 174.2706654343808,
+      "charged_memory_bytes_min_mean_max": [
+        1483771904,
+        1518084915.2,
+        1544220672
+      ],
+      "lifetime_peak_memory_bytes": 1611358208,
+      "allocated_disk_bytes_first_peak_last": [
+        3162595328,
+        3174469632,
+        3174469632
+      ],
+      "native_block_io": {
+        "254:0": {
+          "observed_seconds": 5.41,
+          "rbytes": 12288,
+          "wbytes": 44396544,
+          "rios": 3,
+          "wios": 7576,
+          "rbytes_per_second": 2271.3493530499077,
+          "wbytes_per_second": 8206385.212569316,
+          "rios_per_second": 0.5545286506469501,
+          "wios_per_second": 1400.369685767098
+        }
+      },
+      "identity_or_counter_gaps": 0,
+      "scope": "Native cgroup CPU across all threads including probes; sampled charged memory and per-generation lifetime peak. Intervals use native /proc/uptime with centisecond resolution; full probe brackets retain uncertainty. Approximate du allocated bytes, not open-deleted or unique physical storage. Workload /results binds share one witness directory: do not sum them. Device I/O is Docker-VM accounting, not physical SSD latency/queue depth; do not sum stacked devices. Missing devices/counters are unavailable, not zero. CPU and byte/IOPS deltas exclude restart bridges and unobserved initial/final edges. Raw samples retain network counters and timing uncertainty.",
+      "memory_stat_bytes_min_mean_max": {
+        "anon": [
+          835563520,
+          907983257.6,
+          952852480
+        ],
+        "file": [
+          132530176,
+          159014092.8,
+          233263104
+        ],
+        "kernel": [
+          226709504,
+          228815667.2,
+          230907904
+        ]
+      },
+      "memory_stat_samples": 5,
+      "memory_stat_scope": "Sampled native cgroup byte gauges, not Go heap or process RSS. File includes charged file cache; kernel includes its subcategories. Counters are read nonatomically; do not infer an exact partition of memory.current."
+    },
+    "storage": {
+      "samples": 5,
+      "unavailable_samples": 0,
+      "observed_seconds": 5.1000000000000005,
+      "cpu_core_seconds": {
+        "total": 1.29127,
+        "user": 0.746726,
+        "system": 0.544543
+      },
+      "cpu_percent_one_core_100": 25.319019607843135,
+      "charged_memory_bytes_min_mean_max": [
+        902311936,
+        955568128,
+        1046179840
+      ],
+      "lifetime_peak_memory_bytes": 1079885824,
+      "allocated_disk_bytes_first_peak_last": [
+        3651411968,
+        3651411968,
+        3651411968
+      ],
+      "native_block_io": {
+        "254:0": {
+          "observed_seconds": 5.1000000000000005,
+          "rbytes": 0,
+          "wbytes": 0,
+          "rios": 0,
+          "wios": 0,
+          "rbytes_per_second": 0.0,
+          "wbytes_per_second": 0.0,
+          "rios_per_second": 0.0,
+          "wios_per_second": 0.0
+        }
+      },
+      "identity_or_counter_gaps": 0,
+      "scope": "Native cgroup CPU across all threads including probes; sampled charged memory and per-generation lifetime peak. Intervals use native /proc/uptime with centisecond resolution; full probe brackets retain uncertainty. Approximate du allocated bytes, not open-deleted or unique physical storage. Workload /results binds share one witness directory: do not sum them. Device I/O is Docker-VM accounting, not physical SSD latency/queue depth; do not sum stacked devices. Missing devices/counters are unavailable, not zero. CPU and byte/IOPS deltas exclude restart bridges and unobserved initial/final edges. Raw samples retain network counters and timing uncertainty.",
+      "memory_stat_bytes_min_mean_max": {
+        "anon": [
+          401268736,
+          454505267.2,
+          545079296
+        ],
+        "file": [
+          318783488,
+          318783488,
+          318783488
+        ],
+        "kernel": [
+          24567808,
+          24628428.8,
+          24698880
+        ]
+      },
+      "memory_stat_samples": 5,
+      "memory_stat_scope": "Sampled native cgroup byte gauges, not Go heap or process RSS. File includes charged file cache; kernel includes its subcategories. Counters are read nonatomically; do not infer an exact partition of memory.current."
+    }
+  },
+  "source_sha256": "61bcf27e5106b06c22594779ead17330164f8da954efc8aeebaa30fb318300b5",
+  "conclusion": "Both 8192-row Parquet block variants failed once in three requests, including max_threads=1. Neither block sizing nor earlier single-threaded successes establish a reliable workaround.",
+  "post_run_memory_scope": "Asynchronous allocator/resident metrics and global tracker captured after the trial, not atomically and not at the failed requests. No leak or precise attribution established.",
+  "raw_evidence": [
+    {
+      "path": "results/current/duckdb-connector-concurrent/fe20a081-ab77-4c71-9ecb-c2332dce4a7e/memory-diagnostics/81f57076-6c54-4b7b-8197-641ddda900b9/async-memory.jsonl",
+      "sha256": "19af7feb0ee021c21ec81f770baa63c1c02901d5b18a0df940434b60daf16511"
+    },
+    {
+      "path": "results/current/duckdb-connector-concurrent/fe20a081-ab77-4c71-9ecb-c2332dce4a7e/memory-diagnostics/81f57076-6c54-4b7b-8197-641ddda900b9/async-memory.sql",
+      "sha256": "d07c6f064b2b9dbb19026e55089539a7ffc24d5afd095ac4e7b8a4c33a8db49f"
+    },
+    {
+      "path": "results/current/duckdb-connector-concurrent/fe20a081-ab77-4c71-9ecb-c2332dce4a7e/memory-diagnostics/81f57076-6c54-4b7b-8197-641ddda900b9/catalog-after.json",
+      "sha256": "93503420d54a9a6ebd174d063041e695416db5cc7b38f46a81faedbd36a6cffc"
+    },
+    {
+      "path": "results/current/duckdb-connector-concurrent/fe20a081-ab77-4c71-9ecb-c2332dce4a7e/memory-diagnostics/81f57076-6c54-4b7b-8197-641ddda900b9/catalog-before.json",
+      "sha256": "93503420d54a9a6ebd174d063041e695416db5cc7b38f46a81faedbd36a6cffc"
+    },
+    {
+      "path": "results/current/duckdb-connector-concurrent/fe20a081-ab77-4c71-9ecb-c2332dce4a7e/memory-diagnostics/81f57076-6c54-4b7b-8197-641ddda900b9/global-memory.jsonl",
+      "sha256": "ffc37fd3fc4b5b0e4ab54241acb43ad34401e1db55d8aace10f203efcd5aca05"
+    },
+    {
+      "path": "results/current/duckdb-connector-concurrent/fe20a081-ab77-4c71-9ecb-c2332dce4a7e/memory-diagnostics/81f57076-6c54-4b7b-8197-641ddda900b9/global-memory.sql",
+      "sha256": "c546a1827ad47d863d8b6a7b4f0fca0480304c6972323c9d91ba09b2e04bcb62"
+    },
+    {
+      "path": "results/current/duckdb-connector-concurrent/fe20a081-ab77-4c71-9ecb-c2332dce4a7e/memory-diagnostics/81f57076-6c54-4b7b-8197-641ddda900b9/processes.jsonl",
+      "sha256": "ab6dde70bd3ae16a70de4d0390d61bd2340c55c3fbb04a254bff7133d26a5826"
+    },
+    {
+      "path": "results/current/duckdb-connector-concurrent/fe20a081-ab77-4c71-9ecb-c2332dce4a7e/memory-diagnostics/81f57076-6c54-4b7b-8197-641ddda900b9/processes.sql",
+      "sha256": "3ab66f3ab03e1c33cd2ace26f31cd96f2bc299fb215e51ffae31254b2d707fa0"
+    },
+    {
+      "path": "results/current/duckdb-connector-concurrent/fe20a081-ab77-4c71-9ecb-c2332dce4a7e/memory-diagnostics/81f57076-6c54-4b7b-8197-641ddda900b9/resource-summary.json",
+      "sha256": "b9e1e7fde70ec51e91d3a64d2fe8e65032b85ca6847f14738b2fb9cf2e5b67e1"
+    },
+    {
+      "path": "results/current/duckdb-connector-concurrent/fe20a081-ab77-4c71-9ecb-c2332dce4a7e/memory-diagnostics/81f57076-6c54-4b7b-8197-641ddda900b9/resources.jsonl",
+      "sha256": "7b3d4ff398d6cd4ed3ab575141e522c8fd49eeefdc6ffdada967a9a91cdfea53"
+    },
+    {
+      "path": "results/current/duckdb-connector-concurrent/fe20a081-ab77-4c71-9ecb-c2332dce4a7e/memory-diagnostics/81f57076-6c54-4b7b-8197-641ddda900b9/result.json",
+      "sha256": "d2f1fb35bbb7332e35927af5308f03b14547c19f4aac38d7747bfd7c23c4613c"
+    },
+    {
+      "path": "results/current/duckdb-connector-concurrent/fe20a081-ab77-4c71-9ecb-c2332dce4a7e/memory-diagnostics/81f57076-6c54-4b7b-8197-641ddda900b9/settings.jsonl",
+      "sha256": "ca76da6fad167a099ff80f442bada5640b019ad8eead79c6205824dde9b3010f"
+    },
+    {
+      "path": "results/current/duckdb-connector-concurrent/fe20a081-ab77-4c71-9ecb-c2332dce4a7e/memory-diagnostics/81f57076-6c54-4b7b-8197-641ddda900b9/source.py",
+      "sha256": "61bcf27e5106b06c22594779ead17330164f8da954efc8aeebaa30fb318300b5"
+    },
+    {
+      "path": "results/current/duckdb-connector-concurrent/fe20a081-ab77-4c71-9ecb-c2332dce4a7e/memory-diagnostics/81f57076-6c54-4b7b-8197-641ddda900b9/started.json",
+      "sha256": "600d20b1f6cb23229358e11bf786dd9dfaf374c4caeb914751c5c496e70b30f4"
+    },
+    {
+      "path": "results/current/duckdb-connector-concurrent/fe20a081-ab77-4c71-9ecb-c2332dce4a7e/memory-diagnostics/81f57076-6c54-4b7b-8197-641ddda900b9/trial-1-watermark64-block8192-stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "results/current/duckdb-connector-concurrent/fe20a081-ab77-4c71-9ecb-c2332dce4a7e/memory-diagnostics/81f57076-6c54-4b7b-8197-641ddda900b9/trial-1-watermark64-block8192-stdout.jsonl",
+      "sha256": "50c2029b1306c360af1e876f75868c4960d25f6e9f3873b7690eeb67cb3c920b"
+    },
+    {
+      "path": "results/current/duckdb-connector-concurrent/fe20a081-ab77-4c71-9ecb-c2332dce4a7e/memory-diagnostics/81f57076-6c54-4b7b-8197-641ddda900b9/trial-1-watermark64-block8192-thread1-stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "results/current/duckdb-connector-concurrent/fe20a081-ab77-4c71-9ecb-c2332dce4a7e/memory-diagnostics/81f57076-6c54-4b7b-8197-641ddda900b9/trial-1-watermark64-block8192-thread1-stdout.jsonl",
+      "sha256": "50c2029b1306c360af1e876f75868c4960d25f6e9f3873b7690eeb67cb3c920b"
+    },
+    {
+      "path": "results/current/duckdb-connector-concurrent/fe20a081-ab77-4c71-9ecb-c2332dce4a7e/memory-diagnostics/81f57076-6c54-4b7b-8197-641ddda900b9/trial-1-watermark64-block8192-thread1.json",
+      "sha256": "9ffbdb2f5003e3494ce72044f6da0b1690731a1370ca115314b48374619f8144"
+    },
+    {
+      "path": "results/current/duckdb-connector-concurrent/fe20a081-ab77-4c71-9ecb-c2332dce4a7e/memory-diagnostics/81f57076-6c54-4b7b-8197-641ddda900b9/trial-1-watermark64-block8192-thread1.sql",
+      "sha256": "6f6a383fb6c4a50270dd43e414d8c8b52bf89502058b71bf2dc134d7a6aec539"
+    },
+    {
+      "path": "results/current/duckdb-connector-concurrent/fe20a081-ab77-4c71-9ecb-c2332dce4a7e/memory-diagnostics/81f57076-6c54-4b7b-8197-641ddda900b9/trial-1-watermark64-block8192.json",
+      "sha256": "77686a5ebbc8f642e0a317666f0dd2cccaf68da1dabb4da5ff7b2e6115a22c3f"
+    },
+    {
+      "path": "results/current/duckdb-connector-concurrent/fe20a081-ab77-4c71-9ecb-c2332dce4a7e/memory-diagnostics/81f57076-6c54-4b7b-8197-641ddda900b9/trial-1-watermark64-block8192.sql",
+      "sha256": "f1ff40a3b7ca2d9e5b6b3a08f02f6b1deb3dd7177681fb2c3a16f0e3edb4d8cf"
+    },
+    {
+      "path": "results/current/duckdb-connector-concurrent/fe20a081-ab77-4c71-9ecb-c2332dce4a7e/memory-diagnostics/81f57076-6c54-4b7b-8197-641ddda900b9/trial-1-watermark64-stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "results/current/duckdb-connector-concurrent/fe20a081-ab77-4c71-9ecb-c2332dce4a7e/memory-diagnostics/81f57076-6c54-4b7b-8197-641ddda900b9/trial-1-watermark64-stdout.jsonl",
+      "sha256": "50c2029b1306c360af1e876f75868c4960d25f6e9f3873b7690eeb67cb3c920b"
+    },
+    {
+      "path": "results/current/duckdb-connector-concurrent/fe20a081-ab77-4c71-9ecb-c2332dce4a7e/memory-diagnostics/81f57076-6c54-4b7b-8197-641ddda900b9/trial-1-watermark64.json",
+      "sha256": "414336dcffbcffa5eb22584862ee132908b5bc90e2bb8fd85df9ff224075e36d"
+    },
+    {
+      "path": "results/current/duckdb-connector-concurrent/fe20a081-ab77-4c71-9ecb-c2332dce4a7e/memory-diagnostics/81f57076-6c54-4b7b-8197-641ddda900b9/trial-1-watermark64.sql",
+      "sha256": "70a53dbad1807023695323be670a5a94ae2a0f348f26fa2dc89f5b28f30f9f78"
+    },
+    {
+      "path": "results/current/duckdb-connector-concurrent/fe20a081-ab77-4c71-9ecb-c2332dce4a7e/memory-diagnostics/81f57076-6c54-4b7b-8197-641ddda900b9/trial-2-watermark64-block8192-stderr.log",
+      "sha256": "191515d2829d3c0e0ead33d917159148817e2744b131c4e78d8103eb81fb28ab"
+    },
+    {
+      "path": "results/current/duckdb-connector-concurrent/fe20a081-ab77-4c71-9ecb-c2332dce4a7e/memory-diagnostics/81f57076-6c54-4b7b-8197-641ddda900b9/trial-2-watermark64-block8192-stdout.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "results/current/duckdb-connector-concurrent/fe20a081-ab77-4c71-9ecb-c2332dce4a7e/memory-diagnostics/81f57076-6c54-4b7b-8197-641ddda900b9/trial-2-watermark64-block8192-thread1-stderr.log",
+      "sha256": "f9346f4ac1bbba23127e205daf777901d8408d36e78b6f905dc1fafb78850823"
+    },
+    {
+      "path": "results/current/duckdb-connector-concurrent/fe20a081-ab77-4c71-9ecb-c2332dce4a7e/memory-diagnostics/81f57076-6c54-4b7b-8197-641ddda900b9/trial-2-watermark64-block8192-thread1-stdout.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "results/current/duckdb-connector-concurrent/fe20a081-ab77-4c71-9ecb-c2332dce4a7e/memory-diagnostics/81f57076-6c54-4b7b-8197-641ddda900b9/trial-2-watermark64-block8192-thread1.json",
+      "sha256": "354b100ad08a9886d58d39a7f43d703ece1284ec62c9808c60da575724e20981"
+    },
+    {
+      "path": "results/current/duckdb-connector-concurrent/fe20a081-ab77-4c71-9ecb-c2332dce4a7e/memory-diagnostics/81f57076-6c54-4b7b-8197-641ddda900b9/trial-2-watermark64-block8192-thread1.sql",
+      "sha256": "6f6a383fb6c4a50270dd43e414d8c8b52bf89502058b71bf2dc134d7a6aec539"
+    },
+    {
+      "path": "results/current/duckdb-connector-concurrent/fe20a081-ab77-4c71-9ecb-c2332dce4a7e/memory-diagnostics/81f57076-6c54-4b7b-8197-641ddda900b9/trial-2-watermark64-block8192.json",
+      "sha256": "31d4eb8b6d35d704603368b18f4b0c8805b82b6dbb1c00daa54dc4056d5f1d4c"
+    },
+    {
+      "path": "results/current/duckdb-connector-concurrent/fe20a081-ab77-4c71-9ecb-c2332dce4a7e/memory-diagnostics/81f57076-6c54-4b7b-8197-641ddda900b9/trial-2-watermark64-block8192.sql",
+      "sha256": "f1ff40a3b7ca2d9e5b6b3a08f02f6b1deb3dd7177681fb2c3a16f0e3edb4d8cf"
+    },
+    {
+      "path": "results/current/duckdb-connector-concurrent/fe20a081-ab77-4c71-9ecb-c2332dce4a7e/memory-diagnostics/81f57076-6c54-4b7b-8197-641ddda900b9/trial-2-watermark64-stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "results/current/duckdb-connector-concurrent/fe20a081-ab77-4c71-9ecb-c2332dce4a7e/memory-diagnostics/81f57076-6c54-4b7b-8197-641ddda900b9/trial-2-watermark64-stdout.jsonl",
+      "sha256": "50c2029b1306c360af1e876f75868c4960d25f6e9f3873b7690eeb67cb3c920b"
+    },
+    {
+      "path": "results/current/duckdb-connector-concurrent/fe20a081-ab77-4c71-9ecb-c2332dce4a7e/memory-diagnostics/81f57076-6c54-4b7b-8197-641ddda900b9/trial-2-watermark64.json",
+      "sha256": "0e94a69770bda7e5c9bbffa77f2e48c6b6f803aafa8b18470e4ec2ca3ec2b8e7"
+    },
+    {
+      "path": "results/current/duckdb-connector-concurrent/fe20a081-ab77-4c71-9ecb-c2332dce4a7e/memory-diagnostics/81f57076-6c54-4b7b-8197-641ddda900b9/trial-2-watermark64.sql",
+      "sha256": "70a53dbad1807023695323be670a5a94ae2a0f348f26fa2dc89f5b28f30f9f78"
+    },
+    {
+      "path": "results/current/duckdb-connector-concurrent/fe20a081-ab77-4c71-9ecb-c2332dce4a7e/memory-diagnostics/81f57076-6c54-4b7b-8197-641ddda900b9/trial-3-watermark64-block8192-stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "results/current/duckdb-connector-concurrent/fe20a081-ab77-4c71-9ecb-c2332dce4a7e/memory-diagnostics/81f57076-6c54-4b7b-8197-641ddda900b9/trial-3-watermark64-block8192-stdout.jsonl",
+      "sha256": "50c2029b1306c360af1e876f75868c4960d25f6e9f3873b7690eeb67cb3c920b"
+    },
+    {
+      "path": "results/current/duckdb-connector-concurrent/fe20a081-ab77-4c71-9ecb-c2332dce4a7e/memory-diagnostics/81f57076-6c54-4b7b-8197-641ddda900b9/trial-3-watermark64-block8192-thread1-stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "results/current/duckdb-connector-concurrent/fe20a081-ab77-4c71-9ecb-c2332dce4a7e/memory-diagnostics/81f57076-6c54-4b7b-8197-641ddda900b9/trial-3-watermark64-block8192-thread1-stdout.jsonl",
+      "sha256": "50c2029b1306c360af1e876f75868c4960d25f6e9f3873b7690eeb67cb3c920b"
+    },
+    {
+      "path": "results/current/duckdb-connector-concurrent/fe20a081-ab77-4c71-9ecb-c2332dce4a7e/memory-diagnostics/81f57076-6c54-4b7b-8197-641ddda900b9/trial-3-watermark64-block8192-thread1.json",
+      "sha256": "27dedf3aaa3a00856ab26d02ec23df166bd10682bbe56bcf380b64472e546010"
+    },
+    {
+      "path": "results/current/duckdb-connector-concurrent/fe20a081-ab77-4c71-9ecb-c2332dce4a7e/memory-diagnostics/81f57076-6c54-4b7b-8197-641ddda900b9/trial-3-watermark64-block8192-thread1.sql",
+      "sha256": "6f6a383fb6c4a50270dd43e414d8c8b52bf89502058b71bf2dc134d7a6aec539"
+    },
+    {
+      "path": "results/current/duckdb-connector-concurrent/fe20a081-ab77-4c71-9ecb-c2332dce4a7e/memory-diagnostics/81f57076-6c54-4b7b-8197-641ddda900b9/trial-3-watermark64-block8192.json",
+      "sha256": "b83665b88df651b51c7479cbff687d5cdf8cdf27cc23400ba74f496283cdd336"
+    },
+    {
+      "path": "results/current/duckdb-connector-concurrent/fe20a081-ab77-4c71-9ecb-c2332dce4a7e/memory-diagnostics/81f57076-6c54-4b7b-8197-641ddda900b9/trial-3-watermark64-block8192.sql",
+      "sha256": "f1ff40a3b7ca2d9e5b6b3a08f02f6b1deb3dd7177681fb2c3a16f0e3edb4d8cf"
+    },
+    {
+      "path": "results/current/duckdb-connector-concurrent/fe20a081-ab77-4c71-9ecb-c2332dce4a7e/memory-diagnostics/81f57076-6c54-4b7b-8197-641ddda900b9/trial-3-watermark64-stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "results/current/duckdb-connector-concurrent/fe20a081-ab77-4c71-9ecb-c2332dce4a7e/memory-diagnostics/81f57076-6c54-4b7b-8197-641ddda900b9/trial-3-watermark64-stdout.jsonl",
+      "sha256": "50c2029b1306c360af1e876f75868c4960d25f6e9f3873b7690eeb67cb3c920b"
+    },
+    {
+      "path": "results/current/duckdb-connector-concurrent/fe20a081-ab77-4c71-9ecb-c2332dce4a7e/memory-diagnostics/81f57076-6c54-4b7b-8197-641ddda900b9/trial-3-watermark64.json",
+      "sha256": "7630455c29f4a17c96074a2b6f4732b24bf3f780d699c82a141f8db7abf7f8db"
+    },
+    {
+      "path": "results/current/duckdb-connector-concurrent/fe20a081-ab77-4c71-9ecb-c2332dce4a7e/memory-diagnostics/81f57076-6c54-4b7b-8197-641ddda900b9/trial-3-watermark64.sql",
+      "sha256": "70a53dbad1807023695323be670a5a94ae2a0f348f26fa2dc89f5b28f30f9f78"
+    }
+  ]
+}

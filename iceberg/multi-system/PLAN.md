@@ -50,7 +50,9 @@ failed the 95% gate due to memory-limit errors. Preserve that failure and retain
 snapshots. Snapshot expiration/retention cleanup remains unrun. The architecture
 remains unqualified. Level 5 is approved as recorded above. The first native
 read-only diagnostic also reproduces a memory error without DuckDB or live
-writers; a 64 MiB watermark alone is not a validated fix. See `COLD_MEMORY.md`.
+writers; 64 MiB watermark and 8,192-row-block variants (including one thread)
+still fail. Inspect server-wide baseline memory before attributing this solely
+to reader buffers. See `COLD_MEMORY.md`.
 
 Current checkpoint (2026-11-22): the default `LAB_PROFILE=current` uses isolated
 project/image/volume/result names and DuckDB 2.0.1, SeaweedFS 4.54, ClickHouse

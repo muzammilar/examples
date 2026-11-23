@@ -31,7 +31,9 @@ All **3.46M hot and 2.097M cold acknowledged rows** reconcile, but **32/51 cold
 reads failed with memory-limit errors**: integrity passed, availability failed.
 The [native memory diagnostic](COLD_MEMORY.md) also reproduces a memory error
 without DuckDB or concurrent writers; a 64 MiB reader watermark alone is not a
-validated fix. Level 5 is now explicitly approved for this architecture only.
+validated fix. A follow-up also fails with 8,192-row Parquet blocks and one
+query thread; neither setting is a proven workaround. Level 5 is explicitly
+approved for this architecture only.
 
 ## Quick start
 
