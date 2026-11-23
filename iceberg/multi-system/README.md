@@ -29,7 +29,9 @@ ClickHouse-written records despite the missing v2 manifest header. This permits
 a [two-million-row concurrent rewrite](CONNECTOR_CONCURRENT.md), now executed.
 All **3.46M hot and 2.097M cold acknowledged rows** reconcile, but **32/51 cold
 reads failed with memory-limit errors**: integrity passed, availability failed.
-No further performance runs are scheduled without a user-selected depth (1–5).
+The [native memory diagnostic](COLD_MEMORY.md) also reproduces a memory error
+without DuckDB or concurrent writers; a 64 MiB reader watermark alone is not a
+validated fix. Level 5 is now explicitly approved for this architecture only.
 
 ## Quick start
 

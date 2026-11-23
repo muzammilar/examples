@@ -6,6 +6,12 @@ with DuckDB **2.0.1**, signed community `clickhouse_scanner` **ce337c48c1**
 ARM64 in isolated Docker. Connector binary SHA256:
 `e32c23138bc7eb620e428bbc6f9b62d7984cdc9d7e94cc19299ae18d852cd5ab`.
 
+On 2026-11-23, searched open DuckDB issues mentioning ClickHouse and listed the
+connector's open issues through GitHub's API. No matching open report was found;
+this is a bounded search, not proof that no related report exists. The connector
+tracker is the first reporting destination until a DuckDB-core-only reproducer
+isolates the engine. This draft has not been submitted.
+
 From this example, after infrastructure setup:
 
 ```sh

@@ -284,3 +284,7 @@ connector-concurrent: config recovery-unit-test ## Full native rewrite with inde
 .PHONY: connector-concurrent-recheck
 connector-concurrent-recheck: config recovery-unit-test ## Recheck durable cold journals and all current hot/cold ACKs without rewriting
 	python3 connector_concurrent.py "$(CASE)"
+
+.PHONY: cold-memory-diagnostic
+cold-memory-diagnostic: config recovery-unit-test ## Read-only native full-table isolation at fixed caps; not a concurrent-recovery qualification
+	python3 cold_memory.py "$(CASE)"

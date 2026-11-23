@@ -1,5 +1,25 @@
 # Iceberg multi-system architecture and test plan
 
+## Approved performance scope
+
+On 2026-11-23 the user explicitly selected **level 5** for
+**DuckDB → ClickHouse ↔ Iceberg**. This approval covers deep performance and
+recovery investigation for this architecture only; other systems still require
+their own depth selection. No wall-clock budget was specified. Work in bounded
+phases and report material findings before expanding another matrix.
+
+Preserve the current failed fixtures and fixed-resource baseline. First isolate
+the cold-read memory failure without hiding first-attempt errors or changing the
+data. Then test any supported mitigation against full-body correctness and
+unchanged caps; label separately any intentional resource/configuration sweep.
+Investigate ordinary connector wrong answers and manifest interoperability before
+qualified capacity comparisons. Follow with targeted ambiguous-ack recovery and
+safe retention/compaction boundaries, then repeated matched single/batch and
+hot/warm/cold performance trials where correctness gates permit. Unresolved
+correctness failures permit diagnostic measurements, not a performance winner.
+All work remains local, isolated and Docker/Compose-based, with no real AWS
+resources or host cloud credentials.
+
 Current priority is **DuckDB as the application SQL client → ClickHouse ↔
 Iceberg**, rather than a direct DuckDB S3 client. See
 `DUCKDB_CLICKHOUSE_FINDINGS.md` for measured connector boundaries and the five
@@ -28,8 +48,9 @@ ACK requests overlapped the native CALL. Complete 3.46M hot / 2.097M cold ACK
 reconciliation passed, but cold reads succeeded only 19/51 times: availability
 failed the 95% gate due to memory-limit errors. Preserve that failure and retained
 snapshots. Snapshot expiration/retention cleanup remains unrun. The architecture
-remains unqualified; further performance scope requires the user's 1–5 depth
-selection (usual preference 3), not automatic matrix expansion.
+remains unqualified. Level 5 is approved as recorded above. The first native
+read-only diagnostic also reproduces a memory error without DuckDB or live
+writers; a 64 MiB watermark alone is not a validated fix. See `COLD_MEMORY.md`.
 
 Current checkpoint (2026-11-22): the default `LAB_PROFILE=current` uses isolated
 project/image/volume/result names and DuckDB 2.0.1, SeaweedFS 4.54, ClickHouse
