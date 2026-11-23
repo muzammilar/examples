@@ -560,6 +560,27 @@ gap rather than inventing estimates or retroactively claiming coverage.
 
 ### Performance and other production properties
 
+Before each new performance-testing effort, **ask the user to choose a depth
+from 1 to 5**. Recommend **level 3**, their usual preference, but wait for their
+choice before starting performance runs. Record the selected level, scope and
+time budget; ask again before expanding that scope. Do not automatically escalate
+to exhaustive testing because a backlog or matrix exists.
+
+| Level | Performance scope |
+|---|---|
+| 1 | Smoke measurement of one representative path; diagnostic numbers only. |
+| 2 | Small baseline covering the main read/write paths and resource costs. |
+| 3 | Focused practical evaluation: representative workloads, a small set of important variants and bounded tail-latency observations. Avoid exhaustive matrices and long soaks. |
+| 4 | Broader repeated comparisons, saturation and selected degraded/recovery performance. |
+| 5 | Exhaustive investigation: extensive matrices, long soaks, deep tail analysis and repeated tuning/recovery experiments. Requires explicit selection. |
+
+All levels retain correctness, failure honesty and the required resource/storage
+measurements. Depth controls breadth, duration and repetitions, not evidence
+quality. Report limitations when the chosen budget cannot support a capacity or
+comparative claim; do not silently extend testing to meet that claim. Existing
+correctness/recovery work can continue within its authorized scope while the
+performance-depth question is pending.
+
 - Measure **disk read bytes, disk write bytes and disk I/O** in every performance
   benchmark, separately from disk space usage. Report cumulative bytes and read/write
   rates (bytes/s or MiB/s), read/write IOPS and I/O latency/queue depth where exposed,

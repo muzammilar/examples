@@ -265,6 +265,12 @@ comparisons for stable evaluated configurations that pass their relevant gates.
   disk baseline/peak/settled bytes, I/O and network alongside operation metrics.
   Include workload and dependencies as well as database roles; distinguish limits
   from measured use and whole-stack space amplification from compression ratio.
+- Before each new performance-testing effort, ask the user for a depth from 1–5
+  and wait for their selection. Recommend level 3 (focused practical coverage).
+  Level 5 means exhaustive matrices, long soaks and deep tail analysis; do not
+  start it or expand an agreed scope without an explicit choice. Follow the depth
+  table in `AGENTS.md`. Keep required measurements and honest limitations at every
+  level; a smaller budget narrows claims rather than silently extending runs.
 - Performance benchmarks must explicitly report disk read/write bytes and rates,
   read/write IOPS and I/O latency/queue depth where available. Distinguish disk
   space from disk activity and logical/cached I/O from physical/device I/O; state
