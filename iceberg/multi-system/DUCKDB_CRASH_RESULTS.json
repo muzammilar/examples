@@ -1,0 +1,856 @@
+{
+  "date": "2026-11-23",
+  "case_id": "04a8d19a-76a3-4d4a-97f0-bb0eab993f7b",
+  "command": "make duckdb-clickhouse-crash ROWS=2000000",
+  "passed": true,
+  "production_qualified": false,
+  "host_controls_passed": 235,
+  "checks": {
+    "acknowledged_rows_verified": 2140000,
+    "acknowledged_missing_rows": 0,
+    "wrong_or_duplicate_rows": 0,
+    "unacknowledged_applied_rows": 0,
+    "production_qualified": false,
+    "scope": "Single-node retained-volume SIGKILL with fresh native DuckDB process per request; no persistent-session reconnect, physical power loss, S3 outage or multi-replica availability claim."
+  },
+  "phase_stats": {
+    "writer": {
+      "baseline": {
+        "ok": {
+          "requests": 6,
+          "p50_ms": 229.130333,
+          "p99_ms": 293.738292,
+          "mean_ms": 245.41088216666665
+        }
+      },
+      "outage": {
+        "ambiguous": {
+          "requests": 20,
+          "p50_ms": 236.332209,
+          "p99_ms": 386.732041,
+          "mean_ms": 243.50982925
+        }
+      },
+      "recovery": {
+        "ambiguous": {
+          "requests": 2,
+          "p50_ms": 266.682,
+          "p99_ms": 302.196167,
+          "mean_ms": 284.43908350000004
+        },
+        "ok": {
+          "requests": 4,
+          "p50_ms": 207.449458,
+          "p99_ms": 668.615125,
+          "mean_ms": 333.79964575
+        }
+      },
+      "after": {
+        "ok": {
+          "requests": 4,
+          "p50_ms": 240.18725,
+          "p99_ms": 269.272459,
+          "mean_ms": 244.98737525
+        }
+      }
+    },
+    "reader": {
+      "baseline": {
+        "ok": {
+          "requests": 6,
+          "p50_ms": 228.537334,
+          "p99_ms": 266.814875,
+          "mean_ms": 239.52806266666664
+        }
+      },
+      "outage": {
+        "fail": {
+          "requests": 20,
+          "p50_ms": 240.48925,
+          "p99_ms": 388.698583,
+          "mean_ms": 242.93603339999999
+        }
+      },
+      "recovery": {
+        "fail": {
+          "requests": 2,
+          "p50_ms": 266.64825,
+          "p99_ms": 296.28425,
+          "mean_ms": 281.46625
+        },
+        "ok": {
+          "requests": 4,
+          "p50_ms": 210.971375,
+          "p99_ms": 638.792708,
+          "mean_ms": 328.98877074999996
+        }
+      },
+      "after": {
+        "ok": {
+          "requests": 4,
+          "p50_ms": 225.215458,
+          "p99_ms": 279.557959,
+          "mean_ms": 239.671448
+        }
+      }
+    }
+  },
+  "timings": {
+    "writer": {
+      "restart_request_to_first_observed_success_s": 1.990884,
+      "last_prefault_to_first_postrestart_success_s": 10.825085
+    },
+    "reader": {
+      "restart_request_to_first_observed_success_s": 1.961147,
+      "last_prefault_to_first_postrestart_success_s": 10.800126
+    }
+  },
+  "configured_hold_seconds": 8,
+  "input": {
+    "seed_rows": 2000000,
+    "writer_batch_rows": 10000,
+    "reader_rows_per_success": 1000,
+    "reader_access": "alternate older seed IDs with most recently acknowledged live batch",
+    "writer_spacing_s": 0.2,
+    "reader_spacing_s": 0.2,
+    "arrival": "closed loop per independent task; no retry; fresh native DuckDB C++ process per request",
+    "schema": "Int64 event_id, Int32 customer_id, Int64 amount_cents, 64-character SHA256 String",
+    "body": "customer=id%10000, amount=id%10000+1, payload=SHA256(decimal ID); no nulls/RNG",
+    "logical_seed_bytes": 184000000,
+    "logical_seed_bytes_scope": "fixed numeric widths and UTF-8 payload only; excludes wire and storage overhead"
+  },
+  "versions": {
+    "duckdb": "2.0.1",
+    "connector": "ce337c48c1",
+    "clickhouse": "26.10.10.3"
+  },
+  "parts": {
+    "rows": 2140000,
+    "uncompressed_bytes": 196880000,
+    "compressed_bytes": 146840546,
+    "allocated_bytes": 146927649
+  },
+  "resources": {
+    "clickhouse": {
+      "samples": 12,
+      "unavailable_samples": 7,
+      "observed_seconds": 13.83,
+      "cpu_core_seconds": {
+        "total": 5.952187999999999,
+        "user": 2.4567259999999997,
+        "system": 3.4954620000000003
+      },
+      "cpu_percent_one_core_100": 43.03823571945046,
+      "charged_memory_bytes_min_mean_max": [
+        150978560,
+        663739392,
+        972374016
+      ],
+      "lifetime_peak_memory_bytes": 1176395776,
+      "allocated_disk_bytes_first_peak_last": [
+        1888415744,
+        2057818112,
+        2057818112
+      ],
+      "native_block_io": {
+        "254:0": {
+          "observed_seconds": 13.83,
+          "rbytes": 0,
+          "wbytes": 148602880,
+          "rios": 0,
+          "wios": 2771,
+          "rbytes_per_second": 0.0,
+          "wbytes_per_second": 10744966.015907448,
+          "rios_per_second": 0.0,
+          "wios_per_second": 200.36153289949385
+        }
+      },
+      "identity_or_counter_gaps": 1,
+      "scope": "Native cgroup CPU across all threads including probes; sampled charged memory and per-generation lifetime peak. Intervals use native /proc/uptime with centisecond resolution; full probe brackets retain uncertainty. Approximate du allocated bytes, not open-deleted or unique physical storage. Workload /results binds share one witness directory: do not sum them. Device I/O is Docker-VM accounting, not physical SSD latency/queue depth; do not sum stacked devices. Missing devices/counters are unavailable, not zero. CPU and byte/IOPS deltas exclude restart bridges and unobserved initial/final edges. Raw samples retain network counters and timing uncertainty.",
+      "memory_stat_bytes_min_mean_max": {
+        "anon": [
+          147079168,
+          401849685.3333333,
+          564727808
+        ],
+        "file": [
+          139264,
+          77352277.33333333,
+          234405888
+        ],
+        "kernel": [
+          3334144,
+          26722986.666666668,
+          48635904
+        ]
+      },
+      "memory_stat_samples": 12,
+      "memory_stat_scope": "Sampled native cgroup byte gauges, not Go heap or process RSS. File includes charged file cache; kernel includes its subcategories. Counters are read nonatomically; do not infer an exact partition of memory.current."
+    },
+    "duckdb-cli": {
+      "samples": 18,
+      "unavailable_samples": 0,
+      "observed_seconds": 22.100000000000005,
+      "cpu_core_seconds": {
+        "total": 15.624492000000002,
+        "user": 13.43826,
+        "system": 2.186231
+      },
+      "cpu_percent_one_core_100": 70.6990588235294,
+      "charged_memory_bytes_min_mean_max": [
+        2396160,
+        27350129.777777776,
+        72499200
+      ],
+      "lifetime_peak_memory_bytes": 90587136,
+      "allocated_disk_bytes_first_peak_last": [
+        59707392,
+        62955520,
+        62955520
+      ],
+      "native_block_io": null,
+      "identity_or_counter_gaps": 0,
+      "scope": "Native cgroup CPU across all threads including probes; sampled charged memory and per-generation lifetime peak. Intervals use native /proc/uptime with centisecond resolution; full probe brackets retain uncertainty. Approximate du allocated bytes, not open-deleted or unique physical storage. Workload /results binds share one witness directory: do not sum them. Device I/O is Docker-VM accounting, not physical SSD latency/queue depth; do not sum stacked devices. Missing devices/counters are unavailable, not zero. CPU and byte/IOPS deltas exclude restart bridges and unobserved initial/final edges. Raw samples retain network counters and timing uncertainty.",
+      "memory_stat_bytes_min_mean_max": {
+        "anon": [
+          483328,
+          8867612.444444444,
+          39993344
+        ],
+        "file": [
+          0,
+          15897486.222222222,
+          42270720
+        ],
+        "kernel": [
+          1589248,
+          1973361.7777777778,
+          2838528
+        ]
+      },
+      "memory_stat_samples": 18,
+      "memory_stat_scope": "Sampled native cgroup byte gauges, not Go heap or process RSS. File includes charged file cache; kernel includes its subcategories. Counters are read nonatomically; do not infer an exact partition of memory.current."
+    },
+    "storage": {
+      "samples": 19,
+      "unavailable_samples": 0,
+      "observed_seconds": 23.409999999999993,
+      "cpu_core_seconds": {
+        "total": 0.330791,
+        "user": 0.18534299999999995,
+        "system": 0.145448
+      },
+      "cpu_percent_one_core_100": 1.4130328919265276,
+      "charged_memory_bytes_min_mean_max": [
+        826609664,
+        827273000.4210526,
+        828256256
+      ],
+      "lifetime_peak_memory_bytes": 1079885824,
+      "allocated_disk_bytes_first_peak_last": [
+        3296636928,
+        3296636928,
+        3296636928
+      ],
+      "native_block_io": {
+        "254:0": {
+          "observed_seconds": 23.409999999999993,
+          "rbytes": 0,
+          "wbytes": 0,
+          "rios": 0,
+          "wios": 0,
+          "rbytes_per_second": 0.0,
+          "wbytes_per_second": 0.0,
+          "rios_per_second": 0.0,
+          "wios_per_second": 0.0
+        }
+      },
+      "identity_or_counter_gaps": 0,
+      "scope": "Native cgroup CPU across all threads including probes; sampled charged memory and per-generation lifetime peak. Intervals use native /proc/uptime with centisecond resolution; full probe brackets retain uncertainty. Approximate du allocated bytes, not open-deleted or unique physical storage. Workload /results binds share one witness directory: do not sum them. Device I/O is Docker-VM accounting, not physical SSD latency/queue depth; do not sum stacked devices. Missing devices/counters are unavailable, not zero. CPU and byte/IOPS deltas exclude restart bridges and unobserved initial/final edges. Raw samples retain network counters and timing uncertainty.",
+      "memory_stat_bytes_min_mean_max": {
+        "anon": [
+          421191680,
+          421194266.94736844,
+          421199872
+        ],
+        "file": [
+          381853696,
+          381853696,
+          381853696
+        ],
+        "kernel": [
+          23552000,
+          23689539.36842105,
+          23805952
+        ]
+      },
+      "memory_stat_samples": 19,
+      "memory_stat_scope": "Sampled native cgroup byte gauges, not Go heap or process RSS. File includes charged file cache; kernel includes its subcategories. Counters are read nonatomically; do not infer an exact partition of memory.current."
+    }
+  },
+  "earlier_run": {
+    "case_id": "e33563a9-4e9c-46e1-b838-8c033c02af40",
+    "passed": true,
+    "acknowledged_rows_verified": 2140000,
+    "source_diff": "Final run adds a fail-closed check for reader mismatches at the final phase boundary."
+  },
+  "pre_fault_harness_failure": {
+    "case_id": "901420b1-6b16-43d4-bba7-e6fc86556016",
+    "passed": false,
+    "fault_injected": false,
+    "cause": "CLI setup Success JSON and SELECT result required output framing, not one json.loads call; fixed by suppressing setup stdout only."
+  },
+  "earlier_history_reverification": {
+    "passed": false,
+    "exit_code": 1,
+    "interpreter": "3.14.7 (main, Aug  5 2026, 10:29:49) [Clang 21.1.8 ]",
+    "ownership_rejected": [
+      {
+        "id": "9912edad383e60014847b47187d23ce926b18a7f454a0078c6007d61c1df3896",
+        "name": "/iceberg-duckdb-ch-runtime-3a03c5692dc1471e85fc5857a511ac81",
+        "state": "exited",
+        "service": "runner",
+        "working_dir_label": null
+      },
+      {
+        "id": "cd6b9bc4266516ce1d96ddfc9e04008901c12e1fc272edac6f9c433106d74914",
+        "name": "/iceberg-duckdb-ch-runtime-9dbf250e3de6417ea2941461d057cae0",
+        "state": "exited",
+        "service": "runner",
+        "working_dir_label": null
+      },
+      {
+        "id": "1d1ce86328ca0607151ef3836b1a63011a288b27d81043ed0a278701a049ab91",
+        "name": "/iceberg-duckdb-ch-runtime-18e2fe6fddb94b75bb564aba0633539c",
+        "state": "exited",
+        "service": "runner",
+        "working_dir_label": null
+      },
+      {
+        "id": "9a488ad737530371f6eb16386db1a509cb607592e6d0d3f87df2607fd25aa5fa",
+        "name": "/iceberg-duckdb-ch-runtime-fef2a76c732547608c32fdb6c3885d31",
+        "state": "exited",
+        "service": "runner",
+        "working_dir_label": null
+      },
+      {
+        "id": "f4bb5cb0c5c1bc0b429fc266d0158533c20cacd769707ff4cafdab27e568a5e2",
+        "name": "/iceberg-duckdb-ch-runtime-a2660135fe4e4a1bbeaba95b1b990194",
+        "state": "exited",
+        "service": "runner",
+        "working_dir_label": null
+      },
+      {
+        "id": "f88e07b6e9b36aa7d30d8b36740a5c1124df6c84d18e19b09645d18ab67b08e6",
+        "name": "/iceberg-duckdb-ch-probe-66827d949fba42a99acc74aa32be2c1c",
+        "state": "exited",
+        "service": "runner",
+        "working_dir_label": null
+      },
+      {
+        "id": "c59a41b42a321be6ac130638fc6d2ffeef6682572f056ff5ec0b921a7a0d209b",
+        "name": "/iceberg-duckdb-settings-b5330a5469454d298dc427004b0ded70",
+        "state": "exited",
+        "service": "runner",
+        "working_dir_label": null
+      }
+    ],
+    "scope": "Read-only inventory guard rejected legacy diagnostic containers before data re-verification; no cleanup authorized."
+  },
+  "artifact_sha256": {
+    "cli-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "cli-stdout.jsonstream": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "connector-artifacts.json": "2f2a7a12de1c09f6c89a491d0304506dba24d829216ace0e2a38257a7968a0cf",
+    "ended.json": "3be55c1dfe165d69e73f6946a7926d633f8180b77894945d531c70e0c7e8d7d0",
+    "fault-intent.json": "ae2746f977d35580f4f59aaac7692a1cb4b64ffbf3d62ed4a4d3c44e5167beb4",
+    "final.json": "3be55c1dfe165d69e73f6946a7926d633f8180b77894945d531c70e0c7e8d7d0",
+    "history.json": "571a7d4809ad6d3530af058a458a9da0e4249cb70a0a60fc0ada18c0b4826f4e",
+    "invocation.json": "80fc4c6e1a14412126e9e6e91b88914f557c65b0617c99ade1c0f6d77d5e78da",
+    "native-complete": "37a40f08d8548dba289b9b0bb35bcf63b359f6d37ee86044ebc6b6da080b9ec1",
+    "native-finish": "05c87768b46695e1e22d5be5cfb1eb69d048220021914a4824a0315dba4a59c1",
+    "native-parts.json": "a7356862cba5f7c3705b29e67a81d044ad78a85e3c310b2c6a4bfd18f56ad29a",
+    "native-reconcile.jsonl": "7d032dc19b4b20fb217a6b0a479ef75fa009181bcb0010db64fbe401251d52d1",
+    "native-reconcile.sql": "02d7cf3c381bbf4421c95787c05862df4f31622c6e08de8f92e0a1c975e95815",
+    "native-sha256.txt": "3b224109f985229349b94235d4e92b7f12363182f1a490d80324bd63682e8296",
+    "planned.json": "48adc64840d9a0fb4219381e22200fe0eef2de6c886df90c1cde66579c5c277c",
+    "reader-000000-intent.json": "030197536d779630df2c041e6cdca400ba6daab81fad8d308e431a0449af9b93",
+    "reader-000000-result.json": "c6e30c703d0b8bc3de9c23dfb55e4586addafc3abfd229f69ce41deb3b31a5f3",
+    "reader-000000-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "reader-000000-stdout.json": "9b773d8d550ac0bb5258f21d636a5240ed3413c1bf8e0b7a58e0689d6ac4609a",
+    "reader-000000.sql": "76551e3ad2d166494fe0a19e6f2bb407ab9da3409da2cb6d410e1069eef521ba",
+    "reader-000001-intent.json": "34e523e4f05d948b722ef13ac5c0434ad26f9ece06f7a5cdee6833ee9ddca947",
+    "reader-000001-result.json": "155749d9ba3cd2213b833300c484bd201eab1efb4a22f809ae12bc7534630b8a",
+    "reader-000001-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "reader-000001-stdout.json": "998b58fca27109315af2d695fd6015ea0dab160804ded5726c4c6e0bbabcfbd6",
+    "reader-000001.sql": "43b74e59e814d931c9e4746eed0b0c62cf8b340e7e71b1e989a3bcf6024841f7",
+    "reader-000002-intent.json": "ffbc9cf74bb47030b777bc85dbb3a00fcc14659d276e42b786530d51622a4f52",
+    "reader-000002-result.json": "302a70d39a89e3646e9535f1a38cb47934ff35400b4686065fc70a2e3e6fad6c",
+    "reader-000002-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "reader-000002-stdout.json": "9b773d8d550ac0bb5258f21d636a5240ed3413c1bf8e0b7a58e0689d6ac4609a",
+    "reader-000002.sql": "76551e3ad2d166494fe0a19e6f2bb407ab9da3409da2cb6d410e1069eef521ba",
+    "reader-000003-intent.json": "30b81442387a8c96b2ecf0c51391572771e702f535e8279d69eb8020f57d2621",
+    "reader-000003-result.json": "e5b22a9ea31d118e5c4a6a1082a2e59955fb18362405b8da6414108b6138fb12",
+    "reader-000003-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "reader-000003-stdout.json": "8e44bb9449b83a0e8e8a1cca4beb64d2d5a2bd20fb1be35dd4e264a1f48e7716",
+    "reader-000003.sql": "92b8eeb6f14526f2521241b4a663da944d381a140470bda4813cb88d8204e916",
+    "reader-000004-intent.json": "8c4458fa51b55eb53fa5f5a6dada712d38ce6019843f5307965c8128afc90270",
+    "reader-000004-result.json": "eb66f93b476188b55d0fdce61dfa07cd1433f63528a34867ef1f6a2e15e95db3",
+    "reader-000004-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "reader-000004-stdout.json": "9b773d8d550ac0bb5258f21d636a5240ed3413c1bf8e0b7a58e0689d6ac4609a",
+    "reader-000004.sql": "76551e3ad2d166494fe0a19e6f2bb407ab9da3409da2cb6d410e1069eef521ba",
+    "reader-000005-intent.json": "07f30b6914c9e7ed47f587f50ebad0a5fd626e0ebe2c91b72f0d882b6b9ae537",
+    "reader-000005-result.json": "26c02af4395b0123fa1e78ae770a3414c3b26b2c16945ae761ad1c8f7a7497ca",
+    "reader-000005-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "reader-000005-stdout.json": "fd514871fcbaa5d2415a0a3316ed0e726cfc22c9674778a9581abb3e0be6c680",
+    "reader-000005.sql": "87b0f429b1529482d735d1139b0479ea141d8b88adf342a0be417fb92447ae8b",
+    "reader-000006-intent.json": "73fe12cb65ebe96ed63da6c0c904df93518c388d8cdd9c9dcab587647e93eec9",
+    "reader-000006-result.json": "5aa206ab67f3ffd2294e1d97f24e86dbf49e1801d3cbe3987272adc539d74a64",
+    "reader-000006-stderr.log": "9f2b0c670ae2cfccb6c06cd83d79cea13e5f6e84b6cc53d2c8cac14f51ce6765",
+    "reader-000006-stdout.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "reader-000006.sql": "76551e3ad2d166494fe0a19e6f2bb407ab9da3409da2cb6d410e1069eef521ba",
+    "reader-000007-intent.json": "36e1df76c5162fce5c1bb5ce3873bbe140b885ba3fcdd735df9d68ad3c0d0ab8",
+    "reader-000007-result.json": "98491c21bf848cd8c222b4f201e4e037334fd6ad2b7f55429024bc7173bdf712",
+    "reader-000007-stderr.log": "9f2b0c670ae2cfccb6c06cd83d79cea13e5f6e84b6cc53d2c8cac14f51ce6765",
+    "reader-000007-stdout.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "reader-000007.sql": "570e368a4e66583dee6a0d1838fc4fc8cd59ecfd4b7b64a3ca92a8b70ff4460c",
+    "reader-000008-intent.json": "830aff8df9e8a2ded1e66d863ad3c6c137b72037c8e730c6d8a39c3773e87d58",
+    "reader-000008-result.json": "32eb86b01677bae6dae136de8ccc8accba28f9a64817e28e0716f30ee7477a0d",
+    "reader-000008-stderr.log": "9f2b0c670ae2cfccb6c06cd83d79cea13e5f6e84b6cc53d2c8cac14f51ce6765",
+    "reader-000008-stdout.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "reader-000008.sql": "76551e3ad2d166494fe0a19e6f2bb407ab9da3409da2cb6d410e1069eef521ba",
+    "reader-000009-intent.json": "eb82efc386c75bd326540ef5454c9fd32092e1fd94c48793046c4f01b86e4e09",
+    "reader-000009-result.json": "fdf8e34be963118e29c85e7c77af4a010232f92557286523851ccabdb172333b",
+    "reader-000009-stderr.log": "9f2b0c670ae2cfccb6c06cd83d79cea13e5f6e84b6cc53d2c8cac14f51ce6765",
+    "reader-000009-stdout.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "reader-000009.sql": "570e368a4e66583dee6a0d1838fc4fc8cd59ecfd4b7b64a3ca92a8b70ff4460c",
+    "reader-000010-intent.json": "80ce63c537d5e9dadd26d3f0bf1edea868d9a141d99771ba45e97a0316b3fd8d",
+    "reader-000010-result.json": "ec57d8723e51b4122a28e420c8999fc0492082eea621f709f856e16e030f96bd",
+    "reader-000010-stderr.log": "9f2b0c670ae2cfccb6c06cd83d79cea13e5f6e84b6cc53d2c8cac14f51ce6765",
+    "reader-000010-stdout.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "reader-000010.sql": "76551e3ad2d166494fe0a19e6f2bb407ab9da3409da2cb6d410e1069eef521ba",
+    "reader-000011-intent.json": "d25e441ac40f7c15579918f20f34a8960c926e7123bbce0f2d826452996d71cd",
+    "reader-000011-result.json": "e404aeb69442b0f25e88f28d17beb0a3d2ac48f528feb0ccbe5e8d6f7a0b3f61",
+    "reader-000011-stderr.log": "9f2b0c670ae2cfccb6c06cd83d79cea13e5f6e84b6cc53d2c8cac14f51ce6765",
+    "reader-000011-stdout.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "reader-000011.sql": "570e368a4e66583dee6a0d1838fc4fc8cd59ecfd4b7b64a3ca92a8b70ff4460c",
+    "reader-000012-intent.json": "105e5c088f9d87a4fdd5846027939d2cfb95c5e778bfca4947f1eca6769005a4",
+    "reader-000012-result.json": "e359bb101b14bc63d2fec8cfabc4fa48e77cc612c04c7554562a71782c42c137",
+    "reader-000012-stderr.log": "9f2b0c670ae2cfccb6c06cd83d79cea13e5f6e84b6cc53d2c8cac14f51ce6765",
+    "reader-000012-stdout.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "reader-000012.sql": "76551e3ad2d166494fe0a19e6f2bb407ab9da3409da2cb6d410e1069eef521ba",
+    "reader-000013-intent.json": "ef7af295b3a57ad74d705216d1dd0404c5e364278141ff8e910728b07823f060",
+    "reader-000013-result.json": "32098e30e0ef8a6d24dfbd36805d8e2f64139f0845cb2b69271deec2e24a2f6e",
+    "reader-000013-stderr.log": "9f2b0c670ae2cfccb6c06cd83d79cea13e5f6e84b6cc53d2c8cac14f51ce6765",
+    "reader-000013-stdout.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "reader-000013.sql": "570e368a4e66583dee6a0d1838fc4fc8cd59ecfd4b7b64a3ca92a8b70ff4460c",
+    "reader-000014-intent.json": "c23e9b8bec5c489467477c5a2b38c552ae7e5eacb97655df13b72bc1fbb73c0d",
+    "reader-000014-result.json": "42648b2169a2d3f37ada32238a858280cb3394ec6f23fa1fe2e97efbe529308c",
+    "reader-000014-stderr.log": "9f2b0c670ae2cfccb6c06cd83d79cea13e5f6e84b6cc53d2c8cac14f51ce6765",
+    "reader-000014-stdout.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "reader-000014.sql": "76551e3ad2d166494fe0a19e6f2bb407ab9da3409da2cb6d410e1069eef521ba",
+    "reader-000015-intent.json": "1d40681ab58386c8316ef1832a32875ec89cb8a124ef136988ff7e29af80bcdb",
+    "reader-000015-result.json": "e386f9550800de1802e4064e18e7427eae855dc4133c15c0b892ec7ea3032a4e",
+    "reader-000015-stderr.log": "9f2b0c670ae2cfccb6c06cd83d79cea13e5f6e84b6cc53d2c8cac14f51ce6765",
+    "reader-000015-stdout.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "reader-000015.sql": "570e368a4e66583dee6a0d1838fc4fc8cd59ecfd4b7b64a3ca92a8b70ff4460c",
+    "reader-000016-intent.json": "7e0bacbb35761aa3ee008e55ee9cdf353eb8978b4f01bcfea10da935c1001e19",
+    "reader-000016-result.json": "6785b8be6877337347f956a845c09847825f15b1fc39a5f604eecfa1e950d10f",
+    "reader-000016-stderr.log": "9f2b0c670ae2cfccb6c06cd83d79cea13e5f6e84b6cc53d2c8cac14f51ce6765",
+    "reader-000016-stdout.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "reader-000016.sql": "76551e3ad2d166494fe0a19e6f2bb407ab9da3409da2cb6d410e1069eef521ba",
+    "reader-000017-intent.json": "ead284ffb6d945efd4d773a28b212748ca8baadd9c66f6538f7c083c27bcb6f5",
+    "reader-000017-result.json": "86b6c09a2550a3b1d0bb8a7c5c291002c89c4f385c57e71d081123a00a65a8d6",
+    "reader-000017-stderr.log": "9f2b0c670ae2cfccb6c06cd83d79cea13e5f6e84b6cc53d2c8cac14f51ce6765",
+    "reader-000017-stdout.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "reader-000017.sql": "570e368a4e66583dee6a0d1838fc4fc8cd59ecfd4b7b64a3ca92a8b70ff4460c",
+    "reader-000018-intent.json": "dcb9daf4462e205b76c145c1593a15476b0f692421c1a14c0bc37b043598c31e",
+    "reader-000018-result.json": "0b0021ba6ba4d23e34a77926ff80f086cb64b37832bdc7dde5982830e2857e27",
+    "reader-000018-stderr.log": "9f2b0c670ae2cfccb6c06cd83d79cea13e5f6e84b6cc53d2c8cac14f51ce6765",
+    "reader-000018-stdout.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "reader-000018.sql": "76551e3ad2d166494fe0a19e6f2bb407ab9da3409da2cb6d410e1069eef521ba",
+    "reader-000019-intent.json": "7da688787bfcd7dee6271cd17b9359367581763a2cbe765dc1c81becc9fb0adb",
+    "reader-000019-result.json": "de33d9572e8daa4d4b601136b9333c8e7a468da9f2fa3c4a053927ff0118e2e8",
+    "reader-000019-stderr.log": "9f2b0c670ae2cfccb6c06cd83d79cea13e5f6e84b6cc53d2c8cac14f51ce6765",
+    "reader-000019-stdout.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "reader-000019.sql": "570e368a4e66583dee6a0d1838fc4fc8cd59ecfd4b7b64a3ca92a8b70ff4460c",
+    "reader-000020-intent.json": "e02743f1e7e7c8f28a3ced9551636812a36faa5f489b3cc06cf56a0b4f90bc0a",
+    "reader-000020-result.json": "799fb16f905eaeabe99c76fce5bcf1aec85c741611e04db77718da6ca53b4a94",
+    "reader-000020-stderr.log": "9f2b0c670ae2cfccb6c06cd83d79cea13e5f6e84b6cc53d2c8cac14f51ce6765",
+    "reader-000020-stdout.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "reader-000020.sql": "76551e3ad2d166494fe0a19e6f2bb407ab9da3409da2cb6d410e1069eef521ba",
+    "reader-000021-intent.json": "a0b0fdc540e67af3e0c0ae5cf4494dbe816fa02de1dec2ab9b295cccff4feedf",
+    "reader-000021-result.json": "44efb0a1f6c8c97c5d19d3547ffbb18df4f580f00832d19f467e2b7c8542f654",
+    "reader-000021-stderr.log": "9f2b0c670ae2cfccb6c06cd83d79cea13e5f6e84b6cc53d2c8cac14f51ce6765",
+    "reader-000021-stdout.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "reader-000021.sql": "570e368a4e66583dee6a0d1838fc4fc8cd59ecfd4b7b64a3ca92a8b70ff4460c",
+    "reader-000022-intent.json": "2af3401251f99a5d6398464395b87f45d2007e8e20a1d6a7e660da7e2b9ddfa6",
+    "reader-000022-result.json": "8c39726eb22e2b5ac9a17bf6a59782fc03848a71cdad7436dae73f0fe10c499d",
+    "reader-000022-stderr.log": "9f2b0c670ae2cfccb6c06cd83d79cea13e5f6e84b6cc53d2c8cac14f51ce6765",
+    "reader-000022-stdout.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "reader-000022.sql": "76551e3ad2d166494fe0a19e6f2bb407ab9da3409da2cb6d410e1069eef521ba",
+    "reader-000023-intent.json": "741da9ad121d9e5e2973cf15e7bb90444befe4743ea934cf8a64192f7ccaefd6",
+    "reader-000023-result.json": "f71a11c6f0a05768021d2f78d096fb69a921e480186c8a18c5ea2520e9062e43",
+    "reader-000023-stderr.log": "9f2b0c670ae2cfccb6c06cd83d79cea13e5f6e84b6cc53d2c8cac14f51ce6765",
+    "reader-000023-stdout.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "reader-000023.sql": "570e368a4e66583dee6a0d1838fc4fc8cd59ecfd4b7b64a3ca92a8b70ff4460c",
+    "reader-000024-intent.json": "14770cce919ea87fdea5c811e0bba23ae66331372cadde2502dc86726bef85fc",
+    "reader-000024-result.json": "310178e53facd58080a9919d987c85e8665afe11524b792333903819eade6472",
+    "reader-000024-stderr.log": "9f2b0c670ae2cfccb6c06cd83d79cea13e5f6e84b6cc53d2c8cac14f51ce6765",
+    "reader-000024-stdout.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "reader-000024.sql": "76551e3ad2d166494fe0a19e6f2bb407ab9da3409da2cb6d410e1069eef521ba",
+    "reader-000025-intent.json": "7f6afd2aa2ec57ff53ba81663409a5424c669cc10a67c4e9b6f24bc45aa26452",
+    "reader-000025-result.json": "ded373d054d75700b75fcd631d5b9bd44aeeac12b444c93b38fa4fec3e559160",
+    "reader-000025-stderr.log": "a6c61beff41ba1fea23d7ae0358df88aeca26887cd56bb92697cec2b4db2fca4",
+    "reader-000025-stdout.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "reader-000025.sql": "570e368a4e66583dee6a0d1838fc4fc8cd59ecfd4b7b64a3ca92a8b70ff4460c",
+    "reader-000026-intent.json": "7a1c4e92845f6284dad996f1c0f495896565ca7076eb21ace249420ab8e2ec27",
+    "reader-000026-result.json": "5ad535256a632c2748f905246ebe8bb5c4f09c25984bf6c4f0c1cc92c52877d6",
+    "reader-000026-stderr.log": "a6c61beff41ba1fea23d7ae0358df88aeca26887cd56bb92697cec2b4db2fca4",
+    "reader-000026-stdout.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "reader-000026.sql": "76551e3ad2d166494fe0a19e6f2bb407ab9da3409da2cb6d410e1069eef521ba",
+    "reader-000027-intent.json": "a62257b8c04ced8ce48dc64c8332ac66e96b22f865086377042809bd747eb188",
+    "reader-000027-result.json": "bbbc33b7dd2ab9982c3e6fa04b0aaa074b153952180f2d329d4d86c3cb8955d1",
+    "reader-000027-stderr.log": "a6c61beff41ba1fea23d7ae0358df88aeca26887cd56bb92697cec2b4db2fca4",
+    "reader-000027-stdout.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "reader-000027.sql": "570e368a4e66583dee6a0d1838fc4fc8cd59ecfd4b7b64a3ca92a8b70ff4460c",
+    "reader-000028-intent.json": "eb71a16a639b0061a5aca72d584011f653af33f99b2cc47ea01e128f047bfcae",
+    "reader-000028-result.json": "83f684b75bb1f652b61e93df16c4cba6775808eb72d930faba9bb13f257ef185",
+    "reader-000028-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "reader-000028-stdout.json": "9b773d8d550ac0bb5258f21d636a5240ed3413c1bf8e0b7a58e0689d6ac4609a",
+    "reader-000028.sql": "76551e3ad2d166494fe0a19e6f2bb407ab9da3409da2cb6d410e1069eef521ba",
+    "reader-000029-intent.json": "4d6850f16a1dd40ccdb6f1f96f74b82bbaf8e406d8686e40827a0068786e98cb",
+    "reader-000029-result.json": "dd3c439071d5d10db9f1034638d198da45633e6dbf16f22f407735f9f5927eed",
+    "reader-000029-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "reader-000029-stdout.json": "a971aff039ea7375ce7db6fe0262cf9860c5063894bdb1d72c471380bd65bcaa",
+    "reader-000029.sql": "6ba978207070cfc6d40d52457bae799fbb2b43856ec16b69fa852f145dbe3e6e",
+    "reader-000030-intent.json": "6100466f6e40492c40204ee07b8146ba2428051bf27d9ff782208a24b7041138",
+    "reader-000030-result.json": "36faac837651d4b7cd65cb5bb5429edff49c4bb68c51d86c563be8bcccb65ab3",
+    "reader-000030-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "reader-000030-stdout.json": "9b773d8d550ac0bb5258f21d636a5240ed3413c1bf8e0b7a58e0689d6ac4609a",
+    "reader-000030.sql": "76551e3ad2d166494fe0a19e6f2bb407ab9da3409da2cb6d410e1069eef521ba",
+    "reader-000031-intent.json": "ad170b15835ac97db4fb494b933d43fa418e45166016ebc1413a7152095d590c",
+    "reader-000031-result.json": "fb9f96cf610511cdc1edceee4afc4a6c1edfe4e2fba33ce288a0164af038716c",
+    "reader-000031-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "reader-000031-stdout.json": "2c175f99d8ff15c5dd06e0d804910f1ad43bacdbe6824d86ba5beba9231c239e",
+    "reader-000031.sql": "6d9805087f42b1e2c01113a7b543d07eb711b2bc395fb0297715b70d6fb7ed3c",
+    "reader-000032-intent.json": "27056c7beb0d4f30edcdc098f88da8aea15d00b0e6c35e050bdc3ead128a4d45",
+    "reader-000032-result.json": "67363d58fb4d9da8c547d9d3bdb5a37348e82c8d89be5cac6bd6a84d2a25e0a2",
+    "reader-000032-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "reader-000032-stdout.json": "9b773d8d550ac0bb5258f21d636a5240ed3413c1bf8e0b7a58e0689d6ac4609a",
+    "reader-000032.sql": "76551e3ad2d166494fe0a19e6f2bb407ab9da3409da2cb6d410e1069eef521ba",
+    "reader-000033-intent.json": "363c4b9cec9c42798bdde356e17ac64e20f6d4eed115c24ad50c74a467a199db",
+    "reader-000033-result.json": "78531ccc51a9af8450e52f5d5473156fa9e9f59d1fcf93dfb1fcb90a7b7c16f9",
+    "reader-000033-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "reader-000033-stdout.json": "65c9dee70b8c2096eda8bfca5ccf2553baff58ade11d4eb594b6835f70977bae",
+    "reader-000033.sql": "23dece624d5b630a8da11aa589fa53ea5b02a13712c1420d237e326c2cef82ae",
+    "reader-000034-intent.json": "48a8e5600518925396268208c4b6acc9cd5e540db1d177b8dc89823d5a9aa50b",
+    "reader-000034-result.json": "312de61beb4cdd69ffe12c7e3e582faf049cc73ab7a6acc85c60572dc7179bec",
+    "reader-000034-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "reader-000034-stdout.json": "9b773d8d550ac0bb5258f21d636a5240ed3413c1bf8e0b7a58e0689d6ac4609a",
+    "reader-000034.sql": "76551e3ad2d166494fe0a19e6f2bb407ab9da3409da2cb6d410e1069eef521ba",
+    "reader-000035-intent.json": "e542992f0a4844cded6016d74da07aa0409118f4873c4d25a9fb1a99a52bf84f",
+    "reader-000035-result.json": "bae2ce7b6834af1d5236a2eaa623e0713d407f3602f0f9d9ad74cb977040120f",
+    "reader-000035-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "reader-000035-stdout.json": "d54ae428b4a2ed2f8875aec07824a7061b23b904dc24559c58f8827447271ee8",
+    "reader-000035.sql": "6ba63858204eb4cd798d9043c1004d5161b9aa598c6a3b5e5d5726561f4bc53f",
+    "release": "3933e3274b63dc01fd286d6d939a626867c83a4603fc4347e0f8b8856f1b98fd",
+    "resource-summary.json": "1e5f22c31b71298f44ab7a929add731f3935a582d66e9d752a30417c1986643e",
+    "resources.jsonl": "e22c79aef42e915610d6f0de98d26db96845941ddc7a32da3c2a809c07d5d12e",
+    "restart-intent.json": "90a1a18bff0e6535d04f4a108230cf83f8615a092b0acd2d9a92eb9e9909968e",
+    "result.json": "af86ee7132428a921d1e8c18e09bc3dbf4d3cb7a4ca0cf480d2d0547e34b32e2",
+    "run.sh": "60a51a8319f20e12f55934c0bddf1098674ab8034d1b485886ae99c11fbb51d6",
+    "seed-000000-intent.json": "de84bdff1ec7c67598ff118f4e269d6eafca1b146cb282bb46054fe8f612096c",
+    "seed-000000-result.json": "121b69a8b4ed8fe94fd8c25187aa92ec642df950f7b191758a37bf702c497703",
+    "seed-000000-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "seed-000000-stdout.json": "b1d164d231b3cf4e58ab18ca224399b5416c6fd13c072fee716b250ca2442960",
+    "seed-000000.sql": "1b32bb0875da03b8ce09c9182c887686d2c6f2f91ea482e1abcd1061ec0aaf05",
+    "started.json": "d6da12544d4592391103798667808d7cf26855ca470d83e7214c597bf63769e4",
+    "storage-before.json": "3a3a81065a11af7bf1054e74da0473cfc14164877a346dba4d73ef707b3f109e",
+    "target-after.json": "75b9362e0acdceb183405173f2696a660e0705aa5c7d067dd47fbc8d3816b387",
+    "target-before.json": "dd5aa7a6738579bd5743e00e0280bd14425a325253a9a18e11d2556a6c186076",
+    "target-fenced.json": "51320f71acf5f2a19a53d5cb556c82954e30b9d402e96372c6a85a302b1a8562",
+    "writer-000000-intent.json": "6fe00c9f24fe90666e96be4d10ab6ff20cbf5151539916bce5c783771c0c2380",
+    "writer-000000-result.json": "f518dac042fe2815bbcb32e7ff04d15223c92b832215a36cc02234229eb2cd1e",
+    "writer-000000-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "writer-000000-stdout.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "writer-000000.sql": "f829f4a94211bab614b70731d8d4d75155a4ae4104d1a3fbecfc4e8f15fcd232",
+    "writer-000001-intent.json": "b7ff0f153d762414757e1d7c6db0abc29cf4902fe6d9d865175c6e675d41ea2b",
+    "writer-000001-result.json": "48705171e8aa4ac95d8c28e2a420f804b7cb1f48eeafacf681e54f4036a1286b",
+    "writer-000001-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "writer-000001-stdout.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "writer-000001.sql": "881798b5f989665789e6d2ae06d082f541016149d3e1119776e6e8ec74b2ec40",
+    "writer-000002-intent.json": "a6cc0518be3de87f65a17b7f5f742478c0172662790059a25af1c47190fabb7a",
+    "writer-000002-result.json": "61f8bbf9f0fd4da89572ac8b052c20edc2a2e3d3e66347db28a71273de744afd",
+    "writer-000002-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "writer-000002-stdout.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "writer-000002.sql": "a29ce816d645fa8c7a5b1c3d0408b0e51efebf1dfacdc246f3e7feea4a366822",
+    "writer-000003-intent.json": "8ddb801c758c3bc774b92017dddf89c51505f8b20c0f47c9c5a617d07dde37da",
+    "writer-000003-result.json": "bfb8be60dbe18c3021ab52713f36c51279735010965171b1184564509c4c2c76",
+    "writer-000003-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "writer-000003-stdout.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "writer-000003.sql": "bc1e51f113a1f690dafda80ac4e24c33c7b05a1177aa47739156794a76dbf8a4",
+    "writer-000004-intent.json": "39caeb26e4b59fa5cc6fe941e860c8d3415a2cba60e51945d445dd460b2e15bc",
+    "writer-000004-result.json": "2570592ec743142057c1e012391b414f4434bb6d6c91bf8aa882f7578424186d",
+    "writer-000004-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "writer-000004-stdout.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "writer-000004.sql": "4e4c07cc9b327c2869a6e01aae2c5338bbb7d736a94e481f8fe1446bdac71d60",
+    "writer-000005-intent.json": "0a4cb6e0abd23937e76811733ea10cd9e10c4b138b72918045a9f3b850e81167",
+    "writer-000005-result.json": "dca4cd743f6bcfede82d23e29d0a5537c63374b5993ad11336f37eebfd96bd19",
+    "writer-000005-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "writer-000005-stdout.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "writer-000005.sql": "3d9eef03f5296d8961ecfde1901b1f298c47ab70ebb7de77549a7fabf611bead",
+    "writer-000006-intent.json": "84a1d874a8c4045671392646095efcc3a380f1968535168557a9a719e7341548",
+    "writer-000006-result.json": "8ac698120305abdfcc376a84567db6de142901fcf83358c43b8beb57f9f8163d",
+    "writer-000006-stderr.log": "9f2b0c670ae2cfccb6c06cd83d79cea13e5f6e84b6cc53d2c8cac14f51ce6765",
+    "writer-000006-stdout.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "writer-000006.sql": "53cceec55b1ec8c276296d3a5ad23dee6061bb078bf00f6dd07b132446ef73f1",
+    "writer-000007-intent.json": "0637594c0e12b3967d960c104d705a71309f6c5698c37db64b0f5d3f57c0f12f",
+    "writer-000007-result.json": "4c8b5b2dfb0fd0262f38a5caa8a040dbc296562e92450d33d50bc6ab87717198",
+    "writer-000007-stderr.log": "9f2b0c670ae2cfccb6c06cd83d79cea13e5f6e84b6cc53d2c8cac14f51ce6765",
+    "writer-000007-stdout.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "writer-000007.sql": "e1faeb8eada7e683772d8461334d6627630481f51f769863363b79907f9ddc74",
+    "writer-000008-intent.json": "681f38c9917ba1610bc15b5213fdc2e40764384f42b66ed55ba134faa7b184b0",
+    "writer-000008-result.json": "bfc4aa7bcd1aa024afaeb79f9b2d8ecbadf7ac785e692adcb3b1af7a5ea0f172",
+    "writer-000008-stderr.log": "9f2b0c670ae2cfccb6c06cd83d79cea13e5f6e84b6cc53d2c8cac14f51ce6765",
+    "writer-000008-stdout.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "writer-000008.sql": "87f29105470cfa108fed1446c5c2797e907d4de0210683bdc4f3e36e3e0208de",
+    "writer-000009-intent.json": "59f2a0f447a3b8e689b15cf7dc180ca7dbf860ec7156a25cc714de5c5f4f82a8",
+    "writer-000009-result.json": "cbfcf03e647c2c24ff1b3fbe959cfac9ee90529a3a0e3ddbef986b7f46ec4ace",
+    "writer-000009-stderr.log": "9f2b0c670ae2cfccb6c06cd83d79cea13e5f6e84b6cc53d2c8cac14f51ce6765",
+    "writer-000009-stdout.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "writer-000009.sql": "f300fb5f9806b03ecddfd93c989f2f7778e796ba1af34c4c5f859655665189f8",
+    "writer-000010-intent.json": "f362e05b709cdc64dd7def11e81469569db1f150e7a7e38b28829896d0f16449",
+    "writer-000010-result.json": "2a643bd4fbaf7d7f0e669c4b58cc8a9eda411960b143646a8247ecef362814f8",
+    "writer-000010-stderr.log": "9f2b0c670ae2cfccb6c06cd83d79cea13e5f6e84b6cc53d2c8cac14f51ce6765",
+    "writer-000010-stdout.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "writer-000010.sql": "a104207e71338174bd1ea2c674af40f0f7ea3d2269fd2ed120d8576a2b1c053e",
+    "writer-000011-intent.json": "8528e39a3be9b731d9b9c98151226cc0810ba39a386a4622989a5da971454d47",
+    "writer-000011-result.json": "793151795fe11f09f6b90ade1adafdaf7bf4a042a43c539d5698056428dd7e96",
+    "writer-000011-stderr.log": "9f2b0c670ae2cfccb6c06cd83d79cea13e5f6e84b6cc53d2c8cac14f51ce6765",
+    "writer-000011-stdout.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "writer-000011.sql": "228629c1029315f99fe26daff3c2578ed3d34a63a85b57eef5af05f5a0273263",
+    "writer-000012-intent.json": "bf692b57260832f3a2495c351c712e09b179a87f970f79604fd11c00735f6693",
+    "writer-000012-result.json": "38a96bcee14fc137e6cc5526c138b766913683a972635af8be261d2c4f13cb20",
+    "writer-000012-stderr.log": "9f2b0c670ae2cfccb6c06cd83d79cea13e5f6e84b6cc53d2c8cac14f51ce6765",
+    "writer-000012-stdout.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "writer-000012.sql": "3e1c2adebfaf5e0276aeb6ec77e9589d0cb88786779cfe37330c9e9be68c8173",
+    "writer-000013-intent.json": "8a7c7362c36e50a1acf9f22aeadc3c2a181fe598712ff7f3a0b5ba83149a3a58",
+    "writer-000013-result.json": "2cd643df4854992b6728955c8255e046838b72a0d0bcb1b4edc945d950b86f9d",
+    "writer-000013-stderr.log": "9f2b0c670ae2cfccb6c06cd83d79cea13e5f6e84b6cc53d2c8cac14f51ce6765",
+    "writer-000013-stdout.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "writer-000013.sql": "94f6772c2c18e8e817fcc1b5ad2d0f577972f36a0687fa4fdff2030b7b1f1f59",
+    "writer-000014-intent.json": "3aee8d9bd3d652beda014c607da083c68ba6776eb01ec65ff7e47677b9fa8729",
+    "writer-000014-result.json": "82284024c464ab01c07bc655b596430d271cd60daf738d25d61cd6f33484770f",
+    "writer-000014-stderr.log": "9f2b0c670ae2cfccb6c06cd83d79cea13e5f6e84b6cc53d2c8cac14f51ce6765",
+    "writer-000014-stdout.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "writer-000014.sql": "67414853554607d1c35d24ac49ed31b52f2764d1ddc40abeea7843907e3d968b",
+    "writer-000015-intent.json": "b74a8e808215b991a337a21d27bc7e173c21bf07193625ba15d545d988bdda5e",
+    "writer-000015-result.json": "405dee498ba11c03912d3794eece6e9b9e459a6c74e4601246026f9216096506",
+    "writer-000015-stderr.log": "9f2b0c670ae2cfccb6c06cd83d79cea13e5f6e84b6cc53d2c8cac14f51ce6765",
+    "writer-000015-stdout.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "writer-000015.sql": "4ebcf614b9dabd90d46ea90aeb7e863631c2659e906d4c020e900e1bcc787c9d",
+    "writer-000016-intent.json": "f774082d0de05a62cfebaaa302c3e81a86c39756d27fba9773a7d05691956d27",
+    "writer-000016-result.json": "4e60ce2f156bfb8807d0411eb5ef47820f0bab727d1876c66da36f6cf950d630",
+    "writer-000016-stderr.log": "9f2b0c670ae2cfccb6c06cd83d79cea13e5f6e84b6cc53d2c8cac14f51ce6765",
+    "writer-000016-stdout.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "writer-000016.sql": "cd3dd101550f4b37949cd031c32bfa9e89dfe92353ab96e99c84729b90fbe566",
+    "writer-000017-intent.json": "c5faa054c697554141ce5cee5e64689812ccd633e4448f85818ce1762ed671dc",
+    "writer-000017-result.json": "2bac8f845f15dd9c7dfebb990115b80705d703b41f8bf75618afd15d2525c9ab",
+    "writer-000017-stderr.log": "9f2b0c670ae2cfccb6c06cd83d79cea13e5f6e84b6cc53d2c8cac14f51ce6765",
+    "writer-000017-stdout.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "writer-000017.sql": "90b0637117c5dc9d8eb22a40ec12073e5d02b4f344005f842ecbd9ea92cb44ab",
+    "writer-000018-intent.json": "68885d0824069ca949227caf5b2a84808c65bc4cc6ca801d36adc6cfd93653e8",
+    "writer-000018-result.json": "1b9ecdfcaceba27e3051dfb33ac533fb30469d7be625b6e2798f850653ad662c",
+    "writer-000018-stderr.log": "9f2b0c670ae2cfccb6c06cd83d79cea13e5f6e84b6cc53d2c8cac14f51ce6765",
+    "writer-000018-stdout.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "writer-000018.sql": "37f789f96394904b0b081958fadc4d077c6a51fb2459afd47b5c6434b9c12f45",
+    "writer-000019-intent.json": "dfca021592b2a93d2d2552d6e1463959abb93fc59d616a124caf72c67c13af02",
+    "writer-000019-result.json": "3a9ab371917fabcb9ee70b9462b18eaef7ed90fb584e59ff9cf785f8c5a2cfc9",
+    "writer-000019-stderr.log": "9f2b0c670ae2cfccb6c06cd83d79cea13e5f6e84b6cc53d2c8cac14f51ce6765",
+    "writer-000019-stdout.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "writer-000019.sql": "6dd1adc0ccb64301b764555b1adbf07dea6fd221831ea3225a10b3e890b7f6de",
+    "writer-000020-intent.json": "0b5ace85e73be389f253e0885bf1af59066554f266b353e401456bda0599e953",
+    "writer-000020-result.json": "23c90c2e7f6c3b418a8bded0cb002f16654e02c076b7bb6f30caa0d42630fba2",
+    "writer-000020-stderr.log": "9f2b0c670ae2cfccb6c06cd83d79cea13e5f6e84b6cc53d2c8cac14f51ce6765",
+    "writer-000020-stdout.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "writer-000020.sql": "6674b41a8bf06f45c9788bfdfbea3aa4dec36d5fc1025bf9bec1e7bfdc00d139",
+    "writer-000021-intent.json": "8b46a87eb0d273a47b76f7add160f4f97bbe44caf689edd18fbadc646a08dbd8",
+    "writer-000021-result.json": "5bd4e6b371d6443598a14e7eabe3ab42202247b0f1aa95c5514bc12d5aded838",
+    "writer-000021-stderr.log": "9f2b0c670ae2cfccb6c06cd83d79cea13e5f6e84b6cc53d2c8cac14f51ce6765",
+    "writer-000021-stdout.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "writer-000021.sql": "b238858e7cbe0f30fe808e64952fc328c38da4fd633e18703348b1f4aeca1745",
+    "writer-000022-intent.json": "acb4a3ab2d65e5eba05a63ae10b08f0491ccd4ae8145fdd6ecc9bf9081769cb0",
+    "writer-000022-result.json": "caddfd681949684aebc0cb7f08102c38adf2994836d12d8e74432c493774bcfa",
+    "writer-000022-stderr.log": "9f2b0c670ae2cfccb6c06cd83d79cea13e5f6e84b6cc53d2c8cac14f51ce6765",
+    "writer-000022-stdout.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "writer-000022.sql": "6da92953b057455a9d39e833beb0170493aeec770d72461cb6bef4cea878d386",
+    "writer-000023-intent.json": "6b0cc49ce0bcc5dc7836fef2937004de793072e89f0949591b8cd8a1c608c6cc",
+    "writer-000023-result.json": "50292f0ecaa5cdac42117b7a04dab362b5422acbb29f36b63862da3c1f4c211d",
+    "writer-000023-stderr.log": "9f2b0c670ae2cfccb6c06cd83d79cea13e5f6e84b6cc53d2c8cac14f51ce6765",
+    "writer-000023-stdout.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "writer-000023.sql": "46f019f51b60ca697a8a18e319b712c3f0e88eb236034c77e93c2d70daa4ed42",
+    "writer-000024-intent.json": "a8a249be3d72f45ebe66d82170770601fd63ba26edb26132079b1009e1e67c68",
+    "writer-000024-result.json": "e5e820951b505a2ff3e9bf99bbb9491f04e55e4a243a74982ada9c4a8b050f86",
+    "writer-000024-stderr.log": "9f2b0c670ae2cfccb6c06cd83d79cea13e5f6e84b6cc53d2c8cac14f51ce6765",
+    "writer-000024-stdout.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "writer-000024.sql": "6284286e5a0f10f7ab45a322f72b328478cf8afed0c7e445fd71b7a0f2c938cb",
+    "writer-000025-intent.json": "20db6c92c0df3b486cacfe515d14e05baaf5f966a7c919eb4a65c8b025a6aded",
+    "writer-000025-result.json": "fa04e34b224a1da6131f2d0acb55cd02565320849bdbdee4cfa29c6512de69a0",
+    "writer-000025-stderr.log": "a6c61beff41ba1fea23d7ae0358df88aeca26887cd56bb92697cec2b4db2fca4",
+    "writer-000025-stdout.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "writer-000025.sql": "a033fd5394ce2cd40bca30f52915cac458b551c611c9498cc1336c254d2374b9",
+    "writer-000026-intent.json": "8e3508ce4747c177d3da397c4ba667c33391374a371fb610746f54ef302a04b1",
+    "writer-000026-result.json": "2fcb6b6394703fb53dd894ee332d10ea542673f5ecc05763ad440a1ca8fc0bd1",
+    "writer-000026-stderr.log": "a6c61beff41ba1fea23d7ae0358df88aeca26887cd56bb92697cec2b4db2fca4",
+    "writer-000026-stdout.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "writer-000026.sql": "56a412cc27f202765bd24887f454d2278c787c712a2e7a1704fbc76882ce08df",
+    "writer-000027-intent.json": "a9538db304335725cdc112522468a6828115b5f37ec5c02fd5a4c16b01aaea47",
+    "writer-000027-result.json": "70b678ce103aad938797038abc38ba51aa7725bfa2586866ac9cc6792708c6e3",
+    "writer-000027-stderr.log": "a6c61beff41ba1fea23d7ae0358df88aeca26887cd56bb92697cec2b4db2fca4",
+    "writer-000027-stdout.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "writer-000027.sql": "98383dddc37a259026a99d57406ae91eec77bcaa6e1555dc636bda76f4ed8db6",
+    "writer-000028-intent.json": "e60e4847f1fecfbb8df6b418867a2b78c997637a1fc1411b0ea5de7e441d6b0c",
+    "writer-000028-result.json": "2dbbbc82088f45c44abc059c0a4fe430e417da1f70179c1a6f63502e893f5e06",
+    "writer-000028-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "writer-000028-stdout.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "writer-000028.sql": "099ec53466c089c9ce111c6e420d972688a62c6c676dc2f5fc5690e489c7afd8",
+    "writer-000029-intent.json": "396f4360cbee98df0ba03cdb5cc114c09ef936d90803e9fe15fbda66e27f672c",
+    "writer-000029-result.json": "09acce4004662dab008d732d8e35f1967e5d6d1347163248dc9cef118be54600",
+    "writer-000029-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "writer-000029-stdout.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "writer-000029.sql": "1abc8b617bee4a047f7e640a075ed43c057846a87342d6817654d1a541aea57d",
+    "writer-000030-intent.json": "72d5d84af0362294d5150de1b07b33472bc4f4f516af7d4d5b4e4d89517eb3d5",
+    "writer-000030-result.json": "b9ce04bcbabd78d976017f2f04636594e0156190d9d43907dffa5a42b631423f",
+    "writer-000030-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "writer-000030-stdout.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "writer-000030.sql": "b5ab6379ed92f2e36753b1eda06351b1570b57ab75555706d4ebcf35ae1f4ca0",
+    "writer-000031-intent.json": "889e6be0c4b7e5bbc8616081834166b74f5d36c087dee37b22dbc473d12883e6",
+    "writer-000031-result.json": "c4c0fbc3120b1f0178ffac98e1a46ba02f903609c2540d17520cced5b0e00527",
+    "writer-000031-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "writer-000031-stdout.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "writer-000031.sql": "e64348b62c8e0c135cab66461abfd689a341dee62389d69b5545d23e1aa90a3e",
+    "writer-000032-intent.json": "e5c335bafacbe79ceac69a0e816c157a19c1b4ce1c31652852fce56691100892",
+    "writer-000032-result.json": "638ff5382c918139286fee1fd2d46fb34bc0ec33f186c76d37863221cfaa83f8",
+    "writer-000032-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "writer-000032-stdout.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "writer-000032.sql": "8a9ae1d72bb7eef9098604284c7c730d1c2b9a3d6c427c31c18d46c85cf3c242",
+    "writer-000033-intent.json": "4c5593c35052e76de7fbebd48ccf51e02bdd8ac5d9655159b8dc3b93e49839b9",
+    "writer-000033-result.json": "cc83687e90faa1c96360422931a56703b33401a55db3a512b5c265211ba82bd0",
+    "writer-000033-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "writer-000033-stdout.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "writer-000033.sql": "c2be9cadcc266ee816fd8d0ed96bb7affc22495e16217b0c325b0392272cbae9",
+    "writer-000034-intent.json": "bf6b757ee824a3fd55f41185a3a42675f6344e52febab90624dd4bcaa69b27b8",
+    "writer-000034-result.json": "584892d41945cd181425ed68eee9bba750bdf68320eb3c625ddd5ca907b45cd9",
+    "writer-000034-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "writer-000034-stdout.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "writer-000034.sql": "0a61146df9f45a368e3ef5c1770306f47eb7e51ed32abcddcb7f3ac9fe750a16",
+    "writer-000035-intent.json": "e36cbd9fdf1a43bb5977bdba7d936f7606f391472168e7e83d8165a83f27dc96",
+    "writer-000035-result.json": "6d45e3214805ff5219d4642b866161dfb858bc98fe914c204746448f9d76e74c",
+    "writer-000035-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "writer-000035-stdout.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "writer-000035.sql": "c8548c529ae9f1c2f1dbae5614bae6351072fbc5000ff1672aa907316df5b48b"
+  },
+  "raw_evidence": [
+    {
+      "path": "results/current/duckdb-connector-crash/04a8d19a-76a3-4d4a-97f0-bb0eab993f7b/result.json",
+      "sha256": "af86ee7132428a921d1e8c18e09bc3dbf4d3cb7a4ca0cf480d2d0547e34b32e2"
+    },
+    {
+      "path": "results/current/duckdb-connector-crash/04a8d19a-76a3-4d4a-97f0-bb0eab993f7b/history.json",
+      "sha256": "571a7d4809ad6d3530af058a458a9da0e4249cb70a0a60fc0ada18c0b4826f4e"
+    },
+    {
+      "path": "results/current/duckdb-connector-crash/04a8d19a-76a3-4d4a-97f0-bb0eab993f7b/invocation.json",
+      "sha256": "80fc4c6e1a14412126e9e6e91b88914f557c65b0617c99ade1c0f6d77d5e78da"
+    },
+    {
+      "path": "results/current/duckdb-connector-crash/04a8d19a-76a3-4d4a-97f0-bb0eab993f7b/run.sh",
+      "sha256": "60a51a8319f20e12f55934c0bddf1098674ab8034d1b485886ae99c11fbb51d6"
+    },
+    {
+      "path": "results/current/duckdb-connector-crash/04a8d19a-76a3-4d4a-97f0-bb0eab993f7b/native-reconcile.sql",
+      "sha256": "02d7cf3c381bbf4421c95787c05862df4f31622c6e08de8f92e0a1c975e95815"
+    },
+    {
+      "path": "results/current/duckdb-connector-crash/04a8d19a-76a3-4d4a-97f0-bb0eab993f7b/native-reconcile.jsonl",
+      "sha256": "7d032dc19b4b20fb217a6b0a479ef75fa009181bcb0010db64fbe401251d52d1"
+    },
+    {
+      "path": "results/current/duckdb-connector-crash/04a8d19a-76a3-4d4a-97f0-bb0eab993f7b/native-parts.json",
+      "sha256": "a7356862cba5f7c3705b29e67a81d044ad78a85e3c310b2c6a4bfd18f56ad29a"
+    },
+    {
+      "path": "results/current/duckdb-connector-crash/04a8d19a-76a3-4d4a-97f0-bb0eab993f7b/resource-summary.json",
+      "sha256": "1e5f22c31b71298f44ab7a929add731f3935a582d66e9d752a30417c1986643e"
+    },
+    {
+      "path": "results/current/duckdb-connector-crash/04a8d19a-76a3-4d4a-97f0-bb0eab993f7b/resources.jsonl",
+      "sha256": "e22c79aef42e915610d6f0de98d26db96845941ddc7a32da3c2a809c07d5d12e"
+    },
+    {
+      "path": "results/current/duckdb-connector-crash/04a8d19a-76a3-4d4a-97f0-bb0eab993f7b/target-before.json",
+      "sha256": "dd5aa7a6738579bd5743e00e0280bd14425a325253a9a18e11d2556a6c186076"
+    },
+    {
+      "path": "results/current/duckdb-connector-crash/04a8d19a-76a3-4d4a-97f0-bb0eab993f7b/target-fenced.json",
+      "sha256": "51320f71acf5f2a19a53d5cb556c82954e30b9d402e96372c6a85a302b1a8562"
+    },
+    {
+      "path": "results/current/duckdb-connector-crash/04a8d19a-76a3-4d4a-97f0-bb0eab993f7b/target-after.json",
+      "sha256": "75b9362e0acdceb183405173f2696a660e0705aa5c7d067dd47fbc8d3816b387"
+    },
+    {
+      "path": "results/current/duckdb-connector-crash/04a8d19a-76a3-4d4a-97f0-bb0eab993f7b/storage-before.json",
+      "sha256": "3a3a81065a11af7bf1054e74da0473cfc14164877a346dba4d73ef707b3f109e"
+    },
+    {
+      "path": "results/current/duckdb-connector-crash/04a8d19a-76a3-4d4a-97f0-bb0eab993f7b/final.json",
+      "sha256": "3be55c1dfe165d69e73f6946a7926d633f8180b77894945d531c70e0c7e8d7d0"
+    },
+    {
+      "path": "results/current/duckdb-connector-crash/04a8d19a-76a3-4d4a-97f0-bb0eab993f7b/started.json",
+      "sha256": "d6da12544d4592391103798667808d7cf26855ca470d83e7214c597bf63769e4"
+    },
+    {
+      "path": "results/current/duckdb-connector-crash/04a8d19a-76a3-4d4a-97f0-bb0eab993f7b/ended.json",
+      "sha256": "3be55c1dfe165d69e73f6946a7926d633f8180b77894945d531c70e0c7e8d7d0"
+    },
+    {
+      "path": "results/current/duckdb-connector-crash/04a8d19a-76a3-4d4a-97f0-bb0eab993f7b/connector-artifacts.json",
+      "sha256": "2f2a7a12de1c09f6c89a491d0304506dba24d829216ace0e2a38257a7968a0cf"
+    },
+    {
+      "path": "results/current/duckdb-connector-crash/04a8d19a-76a3-4d4a-97f0-bb0eab993f7b/fault-intent.json",
+      "sha256": "ae2746f977d35580f4f59aaac7692a1cb4b64ffbf3d62ed4a4d3c44e5167beb4"
+    },
+    {
+      "path": "results/current/duckdb-connector-crash/04a8d19a-76a3-4d4a-97f0-bb0eab993f7b/restart-intent.json",
+      "sha256": "90a1a18bff0e6535d04f4a108230cf83f8615a092b0acd2d9a92eb9e9909968e"
+    },
+    {
+      "path": "results/current/connector-history-checks/0a2ddf6b-38a9-4557-a5c4-a4f0b76f8324/stderr.log",
+      "sha256": "cef3f1a2dfc76f11551514233530279fa64cde9df4d9d889f37f45e2653cced7"
+    },
+    {
+      "path": "results/current/connector-history-checks/0a2ddf6b-38a9-4557-a5c4-a4f0b76f8324/result.json",
+      "sha256": "b63befce6fbc38f0c4b0fc383da607949e7983b392165fa65d54053394de0950"
+    },
+    {
+      "path": "results/current/connector-history-checks/0a2ddf6b-38a9-4557-a5c4-a4f0b76f8324/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "artifact_manifest_scope": "Top-level SQL, per-request intents/results/stdout/stderr, native and resource evidence; hashes below bind each file. Full frozen controller source is separately bound by invocation.json.",
+  "earlier_final_phase_control": {
+    "case_id": "5345fa6e-81bf-4a1f-a32d-fbca5c35b8c7",
+    "passed": true,
+    "acknowledged_rows_verified": 2170000
+  },
+  "cleanup_edit_harness_failure": {
+    "case_id": "abdb933d-6642-41e8-93f0-82a1e7cc55c7",
+    "passed": false,
+    "fault_injected": true,
+    "clickhouse_restored": true,
+    "error": "Undefined cleanup variable; fixed before final static checks and live rerun."
+  }
+}

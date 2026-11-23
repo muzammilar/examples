@@ -261,3 +261,7 @@ test-current-compactor: config recovery-unit-test ## Offline 2M-row compaction, 
 .PHONY: duckdb-clickhouse-partial
 duckdb-clickhouse-partial: config recovery-unit-test ## Observe partial remote inserts and blind retry after conversion errors
 	python3 duckdb_maintenance.py --connector-partial
+
+.PHONY: duckdb-clickhouse-crash
+duckdb-clickhouse-crash: config recovery-unit-test ## Independent live DuckDB writers/readers across a retained-volume ClickHouse SIGKILL
+	python3 duckdb_maintenance.py --connector-crash

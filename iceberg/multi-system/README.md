@@ -16,6 +16,10 @@ native full-body checks verify all stored copies remain correct.
 The [partial-insert control](DUCKDB_PARTIAL.md) now reproduces persisted rows
 after an error and duplicate effects on retry; corrected immutable-key replay
 passes in a separate replacement table. Transport ACK-loss injection remains unrun.
+The [live ClickHouse crash](DUCKDB_CRASH.md) now reconciles **2.14M ACKed rows**
+with zero missing/wrong/duplicate bodies; independent readers and writers observe
+errors and resume after restart. Earlier-history re-verification remains blocked
+by unproven legacy diagnostic container labels.
 
 ## Quick start
 

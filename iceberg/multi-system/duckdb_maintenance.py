@@ -407,6 +407,7 @@ def run(mode="baseline"):
     import duckdb_conflicts
     import duckdb_rejections
     import duckdb_partial
+    import duckdb_crash
 
     if mode not in {
         "baseline",
@@ -415,6 +416,7 @@ def run(mode="baseline"):
         "connector",
         "connector-read",
         "connector-partial",
+        "connector-crash",
     }:
         raise ValueError("unknown native maintenance scenario")
     scenario = {
@@ -423,6 +425,7 @@ def run(mode="baseline"):
         "connector": duckdb_clickhouse,
         "connector-read": duckdb_clickhouse,
         "connector-partial": duckdb_partial,
+        "connector-crash": duckdb_crash,
     }.get(mode)
     if control.lab.PROFILE != "current":
         raise RuntimeError("DuckDB-native maintenance requires the current profile")
@@ -450,7 +453,7 @@ def run(mode="baseline"):
     table = ("duck_frontend_" if mode == "connector" else "duck_compact_") + run_id.hex
     if mode == "connector":
         artifacts = scenario.artifacts(table, rows, customers, batch)
-    elif mode == "connector-partial":
+    elif mode in {"connector-partial", "connector-crash"}:
         artifacts = scenario.artifacts(table, rows)
     elif mode == "connector-read":
         artifacts = scenario.read_artifacts(rows)
@@ -473,7 +476,7 @@ def run(mode="baseline"):
     required_slots = 1 if scenario else max(3, (rows * 384 + 255999999) // 256000000)
     if mode == "connector":
         required_slots = (rows * 128 + 255999999) // 256000000 + 1
-    elif mode in {"connector-read", "connector-partial"}:
+    elif mode in {"connector-read", "connector-partial", "connector-crash"}:
         required_slots = 0
     free_slots = settings["topology"]["Topology"].get("Free")
     if type(free_slots) is not int or free_slots < required_slots:
@@ -488,7 +491,7 @@ def run(mode="baseline"):
     )
     if image["Config"].get("Labels", {}).get("org.examples.owner") != control.OWNER:
         raise RuntimeError("native CLI image lacks repository ownership")
-    if mode in {"connector", "connector-read", "connector-partial"}:
+    if mode in {"connector", "connector-read", "connector-partial", "connector-crash"}:
         duckdb_clickhouse.prepare(root, image)
     if mode == "connector-partial":
         control.save(
@@ -629,6 +632,9 @@ def run(mode="baseline"):
         if mode == "connector":
             scenario.setup(root, table, storage)
         control.save_text(root / "release", "release\n")
+        if mode == "connector-crash":
+            query = scenario.drive(root, table, rows, identifier, query, sampler)
+            control.save_text(root / "native-complete", "complete\n")
         if scenario:
             deadline = time.monotonic() + 120
             while not (root / "native-complete").exists():
@@ -655,7 +661,7 @@ def run(mode="baseline"):
         if logs.returncode:
             raise RuntimeError("native CLI logs could not be retained")
         cold_storage.stopped(value)
-        if mode == "connector-partial":
+        if mode in {"connector-partial", "connector-crash"}:
             result = scenario.verify(root, table, rows, query)
         elif mode == "connector-read":
             result = scenario.verify_read(root, rows)
@@ -687,7 +693,9 @@ def run(mode="baseline"):
                 "cleanup_errors": cleanup_errors,
                 "completed_ns": time.time_ns(),
                 "scope": (
-                    "Read-only generated-row connector regression; no persisted fixture, independent engine export or capacity qualification."
+                    "Retained-volume ClickHouse SIGKILL with independent native DuckDB requests and external witness; no capacity or complete production qualification."
+                    if mode == "connector-crash"
+                    else "Read-only generated-row connector regression; no persisted fixture, independent engine export or capacity qualification."
                     if mode == "connector-read"
                     else "Native "
                     + mode
@@ -722,6 +730,9 @@ if __name__ == "__main__":
         dest="mode",
         action="store_const",
         const="connector-partial",
+    )
+    group.add_argument(
+        "--connector-crash", dest="mode", action="store_const", const="connector-crash"
     )
     parser.set_defaults(mode="baseline")
     args = parser.parse_args()

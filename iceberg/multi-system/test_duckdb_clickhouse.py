@@ -7,6 +7,7 @@ import unittest
 
 import duckdb_clickhouse as connector
 import duckdb_partial as partial
+import duckdb_crash as crash
 
 
 class ConnectorRoundTrip(unittest.TestCase):
@@ -109,6 +110,41 @@ class PartialInsertControls(unittest.TestCase):
         first = {"rows": 90, "unique_ids": 90, "wrong_values": 0}
         with self.assertRaisesRegex(RuntimeError, "native final"):
             partial.check_effects(first, first | {"rows": 180}, {"rows": 0}, {}, 100)
+
+
+class LiveCrashReconciliation(unittest.TestCase):
+    def group(self, **changes):
+        return {
+            "batch": 0,
+            "rows": 10000,
+            "unique_ids": 10000,
+            "first_id": 0,
+            "last_id": 9999,
+            "invalid_bodies": 0,
+        } | changes
+
+    def test_acknowledged_missing_batch_fails(self):
+        with self.assertRaisesRegex(RuntimeError, "acknowledged batch missing"):
+            crash.reconcile([], [{"first": 0, "end": 10000, "status": "ok"}])
+
+    def test_partial_ambiguous_request_is_not_acknowledged(self):
+        result = crash.reconcile(
+            [self.group(rows=5000, unique_ids=5000, last_id=4999)],
+            [{"first": 0, "end": 10000, "status": "ambiguous"}],
+        )
+        self.assertEqual(result["acknowledged_rows_verified"], 0)
+        self.assertEqual(result["unacknowledged_applied_rows"], 5000)
+
+    def test_matching_totals_do_not_hide_bad_bodies(self):
+        with self.assertRaisesRegex(RuntimeError, "corrupt"):
+            crash.reconcile(
+                [self.group(invalid_bodies=1)],
+                [{"first": 0, "end": 10000, "status": "ok"}],
+            )
+
+    def test_rows_without_intents_fail(self):
+        with self.assertRaisesRegex(RuntimeError, "outside the external intent"):
+            crash.reconcile([self.group()], [])
 
 
 if __name__ == "__main__":

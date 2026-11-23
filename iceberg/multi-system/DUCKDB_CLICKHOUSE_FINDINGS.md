@@ -85,8 +85,10 @@ exercised and failed; the five-group scope remains:
    immutable-key replay passes in a separate replacement table with FINAL reads.
    Transport-level ambiguous acknowledgements and live durable-witness faults
    remain unrun.
-3. **ClickHouse restart:** live independent readers/writers, persisted state,
-   reconnect behavior and acknowledged-row reconciliation.
+3. **ClickHouse restart:** [live retained-volume SIGKILL](DUCKDB_CRASH.md) passes
+   with 2.14M ACKed rows and independent ordinary DuckDB reads/writes. Fresh-process
+   reconnect only; persistent pools, physical power failure and earlier-history
+   ownership closure remain unqualified.
 4. **S3/catalog outage:** expected failures/backpressure, visibility and recovery,
    retaining source data until archive verification succeeds.
 5. **Concurrent maintenance:** compaction with live reads/writes, snapshot and
