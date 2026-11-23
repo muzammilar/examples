@@ -23,3 +23,12 @@ Explicit planner preparation, saturation and cold-cache comparisons remain unrun
 ## Benchmark
 
 pgbench + analytic queries on 4 CPUs / 6 GB (Apple M4 Pro, Docker VM aarch64, 2026-09-28): 3M orders load in 4.9 s, and most analytic queries over them take 1–100 ms (exact percentiles ~1.3 s); select-only 21.7k TPS with 16 clients. TPC-B tops out around 1.45k TPS: at scale 10 the hot branch rows cause repeatable-read serialization retries on 40–60% of transactions once there are 8+ clients. Full tables and method: [`single-node/README.md`](single-node/README.md#benchmark).
+
+## Future work / TODO
+
+Deferred follow-ups are linked below. Each example keeps its concrete checklist
+beside the measured results; experiments remain paused.
+
+| Example | Next work |
+|---|---|
+| [backup-recovery](backup-recovery/README.md#future-work--todo) | Capture explicitly prepared planner statistics and query plans for both backends before further comparisons. |

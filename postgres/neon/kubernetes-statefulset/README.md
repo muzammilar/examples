@@ -274,6 +274,17 @@ Sources: [Neon architecture](https://neon.com/docs/introduction/architecture-ove
 
 Kubelet override reference: [kubeadm kubelet integration](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/kubelet-integration/).
 
+## Future work / TODO
+
+Deferred checks for supported configurations; these are **not executed coverage**.
+Keep recorded passes, failures and limitations above. Performance work requires
+a separately selected depth; this list does not restart paused experiments.
+
+- [ ] Test broker outages and peer partitions separately from the already executed pageserver/S3/WAL-quorum cases.
+- [ ] Exercise supported scaling, drain/PDB behavior and permanent worker/local-volume rescheduling with safe fencing.
+- [ ] Qualify supported version upgrades, bounded resource/storage pressure and independent physical backup/control-plane recovery.
+- [ ] Observe layer GC/long-term storage reclamation and preserve the distinction between the completed logical restore and unrun physical recovery.
+
 ## File organization
 
 - [`scripts/`](scripts/): lifecycle, fault and report controllers.

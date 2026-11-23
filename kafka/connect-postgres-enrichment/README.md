@@ -313,6 +313,17 @@ The Go service rebuilds its in-memory lookup from the compacted CDC topic at sta
 - [rust-rdkafka documentation](https://docs.rs/rdkafka/0.39.0/rdkafka/)
 - [rust-rdkafka 0.39.0 source](https://github.com/fede1024/rust-rdkafka/tree/v0.39.0)
 
+## Future work / TODO
+
+Deferred checks for supported configurations; these are **not executed coverage**.
+Keep recorded passes, failures and limitations above. Performance work requires
+a separately selected depth; this list does not restart paused experiments.
+
+- [ ] Exercise network partitions/quorum loss across Kafka, Connect, the Go enricher and PostgreSQL dependencies.
+- [ ] Test permanent broker/database volume loss, supported scaling, bounded pressure and rolling upgrades.
+- [ ] Restore Kafka/PostgreSQL state independently and reconcile input/output bodies, customer versions and consumer offsets.
+- [ ] Extend ambiguous-commit/idempotent-replay checks without reclassifying stale-CDC or interrupted-broker failures as successes.
+
 ## File organization
 
 - [`scripts/`](scripts/): lifecycle, fault and report controllers.

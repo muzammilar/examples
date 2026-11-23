@@ -155,6 +155,12 @@ in the current database batch.
 
 ## Observability
 
+- [ ] **Planned: GreptimeDB versus Victoria stack**, with equal hardware and
+  whole-stack budgets, equivalent correctness/durability, single/batched/native
+  ingestion and separate cold/warm queries. Include recovery, CPU, memory,
+  compression, disk space and disk read/write bytes/IOPS; select performance depth
+  before running. [Comparison plan](observability/README.md#greptimedb-vs-victoria-planned-comparison).
+
 See [`observability/README.md`](observability/README.md) for the planned comparison:
 **ClickStack vs Victoria stack vs GreptimeDB vs OpenObserve vs SigNoz vs Grafana
 (Loki/Mimir/Tempo, with a Prometheus baseline)**, optional free hosted checks for

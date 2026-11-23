@@ -317,6 +317,18 @@ journals. The extended unrun cases above remain unqualified.
 
 - [Pinned idempotent duplicate-sequence handling: successful delivery with invalid offset/timestamp](https://github.com/confluentinc/librdkafka/blob/v2.12.1/src/rdkafka_request.c).
 
+## Future work / TODO
+
+Deferred checks for supported configurations; these are **not executed coverage**.
+Keep recorded passes, failures and limitations above. Performance work requires
+a separately selected depth; this list does not restart paused experiments.
+
+- [ ] Change broker/controller counts and CPU/memory through supported Strimzi APIs; verify ISR, reassignment and retained histories in both directions.
+- [ ] Test operator outage/reconciliation, rolling maintenance, worker restart and safe drain/PDB behavior.
+- [ ] Exercise peer partitions, controller/broker quorum loss, supported upgrades and bounded pressure.
+- [ ] Replace a safely fenced persistent PVC/device and verify rebuilt replicas; keep this distinct from the existing directory/process recovery.
+- [ ] Isolate the short-deadline duplicate/ambiguous-copy finding and test independent restore without changing its failed verdict.
+
 ## File organization
 
 - [`scripts/`](scripts/): lifecycle, fault and report controllers.

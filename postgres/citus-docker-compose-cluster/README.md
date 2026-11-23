@@ -231,6 +231,17 @@ passed. Every dataset was verified before explicit cleanup. Final inspection fou
 - [Patroni 4.0.6 Citus integration](https://github.com/patroni/patroni/blob/v4.0.6/patroni/postgresql/mpp/citus.py).
 - [Citus router planner](https://github.com/citusdata/citus/blob/v14.2.0/src/backend/distributed/planner/multi_router_planner.c).
 
+## Future work / TODO
+
+Deferred checks for supported configurations; these are **not executed coverage**.
+Keep recorded passes, failures and limitations above. Performance work requires
+a separately selected depth; this list does not restart paused experiments.
+
+- [ ] Partition coordinator/worker replication and lose DCS quorum; verify stale-primary rejection and all physical shard placements after recovery.
+- [ ] Test permanent owned-volume replacement and bounded resource/I/O pressure across coordinator and worker roles.
+- [ ] Exercise supported rolling upgrades and independent backup/restore with complete historical body reconciliation.
+- [ ] If further performance work is selected, compare single-record/batched paths and cold/warm queries on equal budgets.
+
 ## File organization
 
 - [`scripts/`](scripts/): lifecycle, fault and report controllers.

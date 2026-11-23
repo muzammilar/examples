@@ -579,6 +579,17 @@ diagnose a failed fixture before archiving its evidence and starting a separate
 clean lifecycle. This guard does not add cross-run version reconciliation or an
 independent reader to the existing churn loop.
 
+## Future work / TODO
+
+Deferred checks for supported configurations; these are **not executed coverage**.
+Keep recorded passes, failures and limitations above. Performance work requires
+a separately selected depth; this list does not restart paused experiments.
+
+- [ ] Exercise peer partitions and majority/minority behavior for each application-managed shard group.
+- [ ] Change supported membership counts with native draining/catch-up; keep application sharding distinct from native replication.
+- [ ] Test bounded pressure/I/O failures, supported upgrades, snapshot cadence and restore into independent storage.
+- [ ] Investigate the whole-stack reopen probe-budget failure without erasing that result or treating later persistence checks as uninterrupted availability.
+
 ## File organization
 
 - [`scripts/`](scripts/): lifecycle, fault and report controllers.

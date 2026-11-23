@@ -44,3 +44,21 @@ in the cluster README.
 The full future [observability comparison](../observability/) adds tracing and
 complete Victoria/Grafana/ClickStack/OpenObserve/SigNoz stacks. Today's metrics/logs
 baselines cover only a subset of that plan.
+
+## Future work / TODO
+
+Deferred follow-ups are linked below. Each example keeps its concrete checklist
+beside the measured results; experiments remain paused.
+
+- [ ] **Planned GreptimeDB versus Victoria comparison:** follow the
+  [equal-budget comparison contract](../observability/README.md#greptimedb-vs-victoria-planned-comparison)
+  for common metrics/logs, single/batched/native ingestion, cold/warm queries and
+  live recovery. Measure whole-stack CPU, memory, compression, storage and disk
+  read/write bytes/IOPS alongside latency/throughput. Select performance depth
+  first; the existing baselines do not establish a whole-stack winner.
+
+| Example | Next work |
+|---|---|
+| [docker-compose-cluster](docker-compose-cluster/README.md#future-work--todo) | Bring supported dependency/quorum, partition and rolling-change cases from the operator example into this Compose topology. |
+| [kubernetes-operator](kubernetes-operator/README.md#future-work--todo) | Test permanent worker loss/local-PV rescheduling and operator crash during active maintenance. |
+| [single-node](single-node/README.md#future-work--todo) | Qualify retained-volume whole-stack shutdown/cold reopen and independent restore, without borrowing clustered recovery claims. |

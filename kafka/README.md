@@ -29,3 +29,14 @@ resource budgets, latency boundaries and unrun operator cases.
 - Strimzi uses ephemeral EmptyDir volumes: Pod recreation loses local copies, container restart retains them. Directory write denial is not physical device failure. The short-deadline duplicate boundary above remains a failed experiment with an unisolated root cause.
 - The Kafka Connect pipeline runs without TLS or SASL on a local Compose network and uses demo-only PostgreSQL credentials.
 - Kafka Connect connector plugins use JVM APIs. The application join runs in a separate Go service; PostgreSQL CDC itself is handled by the Debezium connector.
+
+## Future work / TODO
+
+Deferred follow-ups are linked below. Each example keeps its concrete checklist
+beside the measured results; experiments remain paused.
+
+| Example | Next work |
+|---|---|
+| [strimzi-jbod](strimzi-jbod/README.md#future-work--todo) | Change broker/controller counts and CPU/memory through supported Strimzi APIs. |
+| [cross-cluster-mirroring](cross-cluster-mirroring/README.md#future-work--todo) | Lose the source cluster and exercise an explicitly fenced, unplanned promotion. |
+| [connect-postgres-enrichment](connect-postgres-enrichment/README.md#future-work--todo) | Exercise network partitions/quorum loss across Kafka, Connect, the Go enricher and PostgreSQL dependencies. |

@@ -28,3 +28,12 @@ Sources: [1.18 release](https://qdrant.tech/blog/qdrant-1.18.x/),
 ## Benchmark
 
 Random-vector benchmark (100k × 128-d, HNSW M=16/efC=128/ef=64) on 4 CPUs / 6 GB (Apple M4 Pro, Docker VM aarch64, 2026-09-28): insert 53k vec/s and queryable after 10.6 s; search 1,419 QPS at p99 0.9 ms with 1 client and 3,209 QPS with 8. A `tag` filter (~10%) is faster (1,979 QPS) and more accurate (recall 0.945 vs 0.591) than unfiltered search, because the payload index narrows the candidates. Full table and method: [`single-node/README.md`](single-node/README.md#benchmark).
+
+## Future work / TODO
+
+Deferred follow-ups are linked below. Each example keeps its concrete checklist
+beside the measured results; experiments remain paused.
+
+| Example | Next work |
+|---|---|
+| [turboquant](turboquant/README.md#future-work--todo) | Exercise supported shard relocation/member growth/shrink and verify native ownership plus acknowledged document/vector versions. |

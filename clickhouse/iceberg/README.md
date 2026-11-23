@@ -212,3 +212,13 @@ Applied rules: `schema-pk-prioritize-filters`, `schema-partition-lifecycle`,
 `insert-optimize-avoid-final`, `agent-discovery-schema`, `agent-query-safety`.
 The archive-before-expiry protocol is an application design, not a native TTL
 feature. Native sort/partition rules govern MergeTree; Iceberg has its own layout.
+
+## Future work / TODO
+
+Deferred checks for supported configurations; these are **not executed coverage**.
+Keep recorded passes, failures and limitations above. Performance work requires
+a separately selected depth; this list does not restart paused experiments.
+
+- [ ] Interrupt catalog/object-store access while independent readers and archive writers remain active; reconcile ambiguous publication.
+- [ ] Verify source retention until the exact exported snapshot/body oracle passes, including restart/resume and late-event handling.
+- [ ] Test compaction with concurrent readers and explicit snapshot-expiration/orphan-cleanup safety; this single-server example does not establish HA.

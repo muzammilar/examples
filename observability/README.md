@@ -2,8 +2,8 @@
 
 Future reproducible comparisons of telemetry backends, complete observability
 stacks and infrastructure monitoring. This directory is a plan, not a runnable
-example or a set of benchmark results. Finish the current StarRocks, Neon and
-GreptimeDB examples before implementing this batch.
+example or a set of benchmark results. GreptimeDB versus Victoria is an accepted
+planned comparison; the broader stack matrix remains future work.
 
 Starting reference: [ClickHouse — Top infrastructure monitoring tools comparison](https://clickhouse.com/resources/engineering/top-infrastructure-monitoring-tools-comparison).
 It is a vendor-authored overview. Use it to identify candidates and testable
@@ -20,10 +20,14 @@ results from this repository.
   variables or ignored local files, and stay within the selected free allowance.
   Do not sign up for paid plans or assume a trial is an ongoing free tier.
 
-## GreptimeDB vs Victoria: after the recovery backfills
+## GreptimeDB vs Victoria: planned comparison
 
-The requested next comparison is **GreptimeDB vs the Victoria stack**, after the
-current production-test backfills. The existing Greptime examples benchmark
+- [ ] Execute the agreed **GreptimeDB versus Victoria stack** comparison at a
+  user-selected performance depth. This is a valid planned experiment; it need
+  not wait for every optional test across the repository. Establish correctness
+  and equivalent durability/resource budgets for the selected comparison first.
+
+The existing Greptime examples benchmark
 VictoriaMetrics and VictoriaLogs as baselines; they do not qualify a complete
 Victoria stack or establish a fair whole-stack winner.
 

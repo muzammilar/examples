@@ -115,6 +115,16 @@ gitignored and is never committed. The application runs as this example’s
 Compose service or Kubernetes workload Pod; its lifecycle needs no sibling
 example’s running services or generated state.
 
+## Future work / TODO
+
+Deferred checks for supported configurations; these are **not executed coverage**.
+Keep recorded passes, failures and limitations above. Performance work requires
+a separately selected depth; this list does not restart paused experiments.
+
+- [ ] Qualify graceful whole-stack stop/start and forced cold reopen with retained storage and complete historical readback.
+- [ ] Test bounded resource pressure and supported version changes without implying availability or quorum protection from this single-copy shape.
+- [ ] Verify independent restore and its RPO; keep native branches separate from backup claims.
+
 ## File organization
 
 - [`scripts/`](scripts/): lifecycle, fault and report controllers.

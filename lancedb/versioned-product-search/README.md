@@ -427,6 +427,17 @@ are unsupported in this embedded shared-catalog deployment; serving workers are
 not a substitute for database replication. Losing the catalog volume requires an
 independent backup, not rebuilding it from a surviving worker.
 
+## Future work / TODO
+
+Deferred checks for supported configurations; these are **not executed coverage**.
+Keep recorded passes, failures and limitations above. Performance work requires
+a separately selected depth; this list does not restart paused experiments.
+
+- [ ] Inject serving-network and owned-volume I/O failures while the single writer and independent query workers remain observed.
+- [ ] Test bounded pressure, supported SDK/format upgrades and restore into an independent data directory.
+- [ ] If performance work is selected, compare cold/warm queries over the same snapshot before/after maintenance with repeated equal-budget trials.
+- [ ] Keep native replica/quorum repair marked unsupported for this embedded shared-catalog deployment; extra serving workers are not independent durable copies.
+
 ## File organization
 
 - [`scripts/`](scripts/): lifecycle, fault and report controllers.

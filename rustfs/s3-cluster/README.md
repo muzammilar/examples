@@ -415,6 +415,17 @@ Pinned native recovery references:
 [replacement completion records](https://github.com/rustfs/rustfs/blob/1.0.5/crates/heal/src/heal/resume/replacement.rs)
 and [protected integrity workflow](https://github.com/rustfs/rustfs/blob/1.0.5/docs/operations/shard-integrity-audit.md).
 
+## Future work / TODO
+
+Deferred checks for supported configurations; these are **not executed coverage**.
+Keep recorded passes, failures and limitations above. Performance work requires
+a separately selected depth; this list does not restart paused experiments.
+
+- [ ] Exercise peer partitions/quorum loss and supported pool/resource changes; verify erasure placement and complete native healing.
+- [ ] Test supported rolling upgrades and only supported rollback paths, recording format compatibility limits.
+- [ ] Inject bounded pressure, device write errors and controlled bit corruption on owned storage; distinguish these from process or volume loss.
+- [ ] Restore an independent backup and reconcile every acknowledged object body/version.
+
 ## File organization
 
 - [`scripts/`](scripts/): lifecycle, fault and report controllers.

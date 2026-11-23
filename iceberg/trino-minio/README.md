@@ -124,3 +124,13 @@ Compute task retries preserve this read query. Coordinator loss, concurrent writ
 - [Trino 484 REST catalog implementation](https://github.com/trinodb/trino/blob/484/plugin/trino-iceberg/src/main/java/io/trino/plugin/iceberg/catalog/rest/TrinoRestCatalog.java).
 - [Iceberg 1.10.1 REST fixture source](https://github.com/apache/iceberg/tree/apache-iceberg-1.10.1/open-api).
 - [Pinned MinIO erasure-server source](https://github.com/minio/minio/blob/RELEASE.2025-10-15T17-29-55Z/cmd/erasure-server-pool.go).
+
+## Future work / TODO
+
+Deferred checks for supported configurations; these are **not executed coverage**.
+Keep recorded passes, failures and limitations above. Performance work requires
+a separately selected depth; this list does not restart paused experiments.
+
+- [ ] Add independent writers/readers through catalog/object-store interruptions and reconcile ambiguous CTAS/INSERT commits.
+- [ ] Test coordinator loss, supported online compute changes and catalog failover separately from existing active-query worker recovery.
+- [ ] Verify independent restore and complete acknowledged snapshot/body state; retained shared-host storage does not prove total object-store-loss recovery.

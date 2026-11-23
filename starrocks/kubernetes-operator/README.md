@@ -184,6 +184,17 @@ Sources: [pinned operator API/source](https://github.com/StarRocks/starrocks-kub
 [StarRocks primary-key tables](https://docs.starrocks.io/docs/table_design/table_types/primary_key_table/),
 [pinned clone scheduling defaults](https://github.com/StarRocks/starrocks/blob/4.1.7/fe/fe-core/src/main/java/com/starrocks/common/Config.java).
 
+## Future work / TODO
+
+Deferred checks for supported configurations; these are **not executed coverage**.
+Keep recorded passes, failures and limitations above. Performance work requires
+a separately selected depth; this list does not restart paused experiments.
+
+- [ ] Qualify pinned supported database/operator/CRD upgrades; treat any supported rollback as a separate compatibility test.
+- [ ] Test permanent worker loss/local-PV rescheduling with explicit old-owner fencing and native tablet rebuild.
+- [ ] Exercise bounded device EIO/full-disk/OOM recovery and independent backup/restore.
+- [ ] Add fresh-write visibility-lag checks alongside the existing immutable-row reader; preserve the already observed blacklist/tablet-read recovery failures.
+
 ## File organization
 
 - [`scripts/`](scripts/): lifecycle, fault and report controllers.

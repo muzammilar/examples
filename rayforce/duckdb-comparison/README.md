@@ -583,3 +583,14 @@ C++ medians across three fresh processes. Each query appears once in the fixed o
 | --- | --- | --- | --- | --- | --- |
 | 929f9709167f481dbcac2545d9950267 | 1 | 18 | 1710 | 1.0 | 4096 |
 | 369518a6fe0a4bc59a166f3bb6b55c24 | 4 | 18 | 1710 | 4.0 | 4096 |
+
+## Future work / TODO
+
+Deferred checks for supported configurations; these are **not executed coverage**.
+Keep recorded passes, failures and limitations above. Performance work requires
+a separately selected depth; this list does not restart paused experiments.
+
+- [ ] Preserve and optionally isolate the recorded strict journal/AOF integrity failures; new durability claims require their own passing evidence.
+- [ ] Add asynchronous journal/watermark recovery, interrupted snapshot replacement, compressed frames and live AOF scan/crash/interrupted-rotation cases.
+- [ ] Test missing first/interior segments, independent online backup/restore and bounded resource/storage pressure.
+- [ ] Defer repeated recovery comparisons, prepared SQL and genuinely cold persisted queries until a performance scope/depth is selected.

@@ -38,3 +38,14 @@ The pinned Vitess image requires amd64 emulation on Apple Silicon. All local cop
 The NDB image requires amd64 emulation on Apple Silicon. All local replicas share the host disk; process-failure success does not establish storage-failure durability. See the NDB README for the measured correlated disk-full loss and exact configuration.
 
 Existing clients also live under [Go](../go/), [Python](../python/mysql-client/) and [ClickHouse named collections](../clickhouse/named-collection-mysql/).
+
+## Future work / TODO
+
+Deferred follow-ups are linked below. Each example keeps its concrete checklist
+beside the measured results; experiments remain paused.
+
+| Example | Next work |
+|---|---|
+| [ndb-cluster-docker-compose-cluster](ndb-cluster-docker-compose-cluster/README.md#future-work--todo) | Expand/reorganize node groups under live traffic. |
+| [vitess-docker-compose-cluster](vitess-docker-compose-cluster/README.md#future-work--todo) | Run online resharding and tablet expansion/shrink. |
+| [customer-sharding](customer-sharding/README.md#future-work--todo) | Reshard customer ranges online and expand/shrink tablets. |

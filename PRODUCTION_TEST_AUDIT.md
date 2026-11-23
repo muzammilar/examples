@@ -408,17 +408,14 @@ never reset a failed fixture to make a report pass. Run destructive cases serial
 
 ## Current testing pass and next work
 
-**Current goal priority (2026-11-22):** the fresh DuckDB/ZFS full lifecycle has
-passed with its data, failed-attempt and resource evidence preserved. ZFS repair-reader and Rust embedded
-follow-ups now pass with the limitations recorded below. Then prioritize
-**Tigris, DuckDB and Iceberg-related projects** before unrelated systems. Focus on
-production deployment/operations, reproducible failure mechanisms, symptoms, data/service
-impact and demonstrated recovery: Tigris S3 application/network/commit failures
-and appropriate object-store comparisons; DuckDB recovery/archival boundaries;
-and Iceberg catalog/storage/compaction interruptions and safe archive handoffs.
-Keep unobservable provider-internal faults and unrun cases explicit. Independent
-functional cases may run in parallel within the verified combined resource budget;
-comparative benchmarks need isolated, matched conditions.
+**Current scope (2026-11-23):** experiments are paused. The completed results and
+known failures remain evidence; remaining cases are deferred in each system and
+example README under **Future work / TODO**, and indexed in
+[the backlog](TODO.md#deferred-follow-ups-for-covered-systems). Continue breadth-first
+exploration when requested rather than exhausting one system's optional matrix.
+GreptimeDB versus Victoria remains an accepted focused comparison, with equivalent
+contracts/resources and a user-selected performance depth. Correctness gates
+apply to the selected configuration, not every unrelated optional backfill.
 
 **Local-only scope:** use isolated Docker/Compose and lab-only credentials. Do not
 inspect/load host AWS configuration or credentials, or access real cloud resources.
@@ -435,14 +432,14 @@ qualification is recorded separately below.
 
 | Work group | Present boundary | Next testing pass |
 |---|---|---|
-| Fjall/redb embedded Rust | 100k and million-pair native-process crash/reopen and fresh-copy restore pass; million-pair proofs verify 1,000,789/1,000,778 ACKed pairs with zero loss or wrong/partial data | Keep one applied redb ambiguous intent unacknowledged. These are shared-host functional observations, not a comparative performance winner. Scoped teardown and clean fixture recreation pass. Defer deeper KV tests while Tigris/DuckDB/Iceberg take priority. |
+| Fjall/redb embedded Rust | 100k and million-pair native-process crash/reopen and fresh-copy restore pass; million-pair proofs verify 1,000,789/1,000,778 ACKed pairs with zero loss or wrong/partial data | Keep one applied redb ambiguous intent unacknowledged. These are shared-host functional observations, not a comparative performance winner. Scoped teardown and clean fixture recreation pass. Defer deeper KV tests during breadth-first exploration; select further runs explicitly. |
 | CedarDB/PostgreSQL | Million-row mutation correctness/recovery and twelve sustained cells pass | Explicitly prepared statistics/plans, ingestion/cache variants and bounded storage pressure remain. Keep warm-query, automatic-statistics and single-node limits visible. |
 | Rayforce/DuckDB | Native DuckDB WAL recovery passes; Rayforce strict integrity cases remain failed | Keep failed cases visible. Diagnose/retest integrity before new qualified performance rankings; timing failed cases is diagnostic only. |
 | DuckDB/ZFS | Fresh five-command lifecycle and full disk/crash/replica/archive sequence pass, including 2.323 million crash-case bodies and 7.453 million checks across exported copies | Preserve the earlier ARC drift/verifier failures separately. All 30,000 asynchronous tail ACKs remain on the fenced source; they are absent on the promoted snapshot as declared RPO. Quack source overrides the requested timeout, so qualify phase-specific transport/deadline behavior next; retain the wider production/pressure/restore and fair-performance gaps. |
-| ZFS storage | Default 4 MiB/s five-command lifecycle and full mirror/RAIDZ2/replication suite pass; independent readers cover every native replacement interval | Preserve the earlier explicit-rate checkpoint and failed archive-checker/Python-prerequisite attempts separately. Native stream checks do not establish restore, fio growth is not a per-flush ACK witness, and exported-source promotion is administrative fencing. Defer deeper storage tests while the local DuckDB/Iceberg work takes priority. |
+| ZFS storage | Default 4 MiB/s five-command lifecycle and full mirror/RAIDZ2/replication suite pass; independent readers cover every native replacement interval | Preserve the earlier explicit-rate checkpoint and failed archive-checker/Python-prerequisite attempts separately. Native stream checks do not establish restore, fio growth is not a per-flush ACK witness, and exported-source promotion is administrative fencing. Defer deeper storage tests during breadth-first exploration; select further runs explicitly. |
 | Iceberg/archive examples | Native data/shard checks and archive gates exist; continuous mutation/reader and commit-ambiguity gaps remain | Add external histories and continuous observation through catalog/object-store/compaction interruptions, then verify the committed snapshot and retained source before cleanup. Do not infer HA from queries on surviving copies. |
 | Recent relational, search and S3 clusters | Core per-example proofs above pass on their recorded configurations; extended matrices and new holistic measurement requirements are incomplete | Revisit applicable quorum/partition, scaling, maintenance/upgrade, pressure and independent-restore cases across the cohort. Preserve version-specific qualification and every earlier failed attempt. |
-| GreptimeDB/Victoria | Metrics/log baselines and guarded Greptime recovery have results; normalized complete-stack comparison is unqualified | Verify equivalent contracts/budgets and stable configurations first, then follow the single/batch/native-ingestion and cold/warm-query matrix in the [observability plan](observability/README.md#greptimedb-vs-victoria-after-the-recovery-backfills). Do not extrapolate tracing support or a whole-stack winner. |
+| GreptimeDB/Victoria | Metrics/log baselines and guarded Greptime recovery have results; normalized complete-stack comparison is unqualified | Verify equivalent contracts/budgets and stable configurations first, then follow the single/batch/native-ingestion and cold/warm-query matrix in the [observability plan](observability/README.md#greptimedb-vs-victoria-planned-comparison). Do not extrapolate tracing support or a whole-stack winner. |
 
 This queue implements the [progressive passes](AGENTS.md#progressive-testing-across-systems):
 survey breadth first, establish missing correctness/recovery evidence, then deepen

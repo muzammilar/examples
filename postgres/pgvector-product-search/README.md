@@ -369,6 +369,17 @@ Pinned implementation references:
 [pgvector 0.8.7 vector serialization](https://github.com/pgvector/pgvector/blob/v0.8.7/src/vector.c),
 [pgx 5.7.6 transaction handling](https://github.com/jackc/pgx/blob/v5.7.6/tx.go).
 
+## Future work / TODO
+
+Deferred checks for supported configurations; these are **not executed coverage**.
+Keep recorded passes, failures and limitations above. Performance work requires
+a separately selected depth; this list does not restart paused experiments.
+
+- [ ] Exercise replication partitions, quorum loss and primary fencing with continued readers and external acknowledged-version histories.
+- [ ] Change supported PostgreSQL replication membership; this does not establish native pgvector sharding.
+- [ ] Test supported upgrades, bounded pressure/I/O failures and independent backup/restore.
+- [ ] If performance work is selected, add matched cold/warm, repeated comparisons with full query/recall validation and whole-stack resource measurements.
+
 ## File organization
 
 - [`scripts/`](scripts/): lifecycle, fault and report controllers.

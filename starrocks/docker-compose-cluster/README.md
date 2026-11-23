@@ -168,6 +168,17 @@ immutable ReplacingMergeTree sorting keys, selective key filters and explicit
 current-state reads. Lab budgets, three hash buckets and query limits are derived
 choices for this bounded corpus, not upstream production sizing recommendations.
 
+## Future work / TODO
+
+Deferred checks for supported configurations; these are **not executed coverage**.
+Keep recorded passes, failures and limitations above. Performance work requires
+a separately selected depth; this list does not restart paused experiments.
+
+- [ ] Exercise supported FE/BE growth and safe shrink with native tablet draining and complete acknowledged-body checks.
+- [ ] Test control/data partitions and quorum-loss behavior independently of retained-volume crashes.
+- [ ] Qualify supported version upgrades, bounded storage/memory pressure and independent backup/restore.
+- [ ] Keep Compose evidence separate from the operator's completed operational matrix.
+
 ## File organization
 
 - [`scripts/`](scripts/): lifecycle, fault and report controllers.

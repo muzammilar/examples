@@ -63,3 +63,12 @@ tests the same two-million-trade fixture with C++ Quack sessions, pinned TLS,
 independent readers/writers, two retained-volume SIGKILLs and checkpointing under
 load. It is a single-owner recovery test; the existing ZFS lab covers different
 storage/replication failure boundaries.
+
+## Future work / TODO
+
+Deferred follow-ups are linked below. Each example keeps its concrete checklist
+beside the measured results; experiments remain paused.
+
+| Example | Next work |
+|---|---|
+| [zfs-recovery](zfs-recovery/README.md#future-work--todo) | Isolate Quack connect/query/fetch/close timing and qualify a supervised deadline with explicit ambiguous-write reconciliation. |

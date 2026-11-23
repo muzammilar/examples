@@ -186,6 +186,16 @@ gitignored and is never committed. The application runs as this example’s
 Compose service or Kubernetes workload Pod; its lifecycle needs no sibling
 example’s running services or generated state.
 
+## Future work / TODO
+
+Deferred checks for supported configurations; these are **not executed coverage**.
+Keep recorded passes, failures and limitations above. Performance work requires
+a separately selected depth; this list does not restart paused experiments.
+
+- [ ] Bring supported pageserver/S3 outage, WAL-quorum-loss and restore cases from the Kubernetes scenario into this Compose deployment.
+- [ ] Test peer partitions, supported rolling changes and bounded resource pressure; verify frozen LSNs and every historical acknowledgement.
+- [ ] Qualify independent physical backup/control-plane recovery and layer-GC/retention behavior; a branch alone remains insufficient backup evidence.
+
 ## File organization
 
 - [`scripts/`](scripts/): lifecycle, fault and report controllers.

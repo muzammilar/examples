@@ -24,3 +24,13 @@ resource caps, raw results and limitations are in each linked README.
 
 These small, compressible workloads are deployment observations, not production
 capacity or engine rankings. Iceberg writes in the pinned release are beta.
+
+## Future work / TODO
+
+Deferred follow-ups are linked below. Each example keeps its concrete checklist
+beside the measured results; experiments remain paused.
+
+| Example | Next work |
+|---|---|
+| [s3-tiered-storage](s3-tiered-storage/README.md#future-work--todo) | Audit independent live readers, durable historical witnesses and native repair proof for every configured object-storage backend. |
+| [iceberg](iceberg/README.md#future-work--todo) | Interrupt catalog/object-store access while independent readers and archive writers remain active. |

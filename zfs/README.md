@@ -37,3 +37,12 @@ The archive-checker and host Python-prerequisite failures stay documented.
 Native stream checks preserve evidence; their independent restore is untested.
 These shared-host functional observations do not establish capacity or
 independent-host durability.
+
+## Future work / TODO
+
+Deferred follow-ups are linked below. Each example keeps its concrete checklist
+beside the measured results; experiments remain paused.
+
+| Example | Next work |
+|---|---|
+| [storage-lab](storage-lab/README.md#future-work--todo) | Restore the preserved native send/receive archives into separate owned pools and verify every required body against the independent oracle. |

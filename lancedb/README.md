@@ -26,3 +26,12 @@ replication, distributed consensus or automatic writer election. The writer and
 shared volume are single failure points. Native Python/Arrow SDKs handle
 indexing/version operations; the local HTTP wrapper is a standard-library lab
 service. Retained versions and unindexed updates consume additional storage.
+
+## Future work / TODO
+
+Deferred follow-ups are linked below. Each example keeps its concrete checklist
+beside the measured results; experiments remain paused.
+
+| Example | Next work |
+|---|---|
+| [versioned-product-search](versioned-product-search/README.md#future-work--todo) | Inject serving-network and owned-volume I/O failures while the single writer and independent query workers remain observed. |

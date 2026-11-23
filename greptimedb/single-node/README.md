@@ -79,6 +79,16 @@ gitignored and is never committed. The application runs as this example’s
 Compose service or Kubernetes workload Pod; its lifecycle needs no sibling
 example’s running services or generated state.
 
+## Future work / TODO
+
+Deferred checks for supported configurations; these are **not executed coverage**.
+Keep recorded passes, failures and limitations above. Performance work requires
+a separately selected depth; this list does not restart paused experiments.
+
+- [ ] Qualify retained-volume whole-stack shutdown/cold reopen and independent restore, without borrowing clustered recovery claims.
+- [ ] Exercise bounded storage/memory pressure and supported version changes.
+- [ ] Extend the planned GreptimeDB versus Victoria comparison with matched single-node budgets, single/batched ingestion and cold/warm queries.
+
 ## File organization
 
 - [`scripts/`](scripts/): lifecycle, fault and report controllers.

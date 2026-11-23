@@ -220,6 +220,17 @@ This example fixes one shard and three tablets; online resharding and replica ex
 - [Vitess 23 reparenting implementation](https://github.com/vitessio/vitess/tree/v23.0.0/go/vt/vtctl/reparentutil).
 - [Vitess 23 VTOrc source](https://github.com/vitessio/vitess/tree/v23.0.0/go/vt/vtorc).
 
+## Future work / TODO
+
+Deferred checks for supported configurations; these are **not executed coverage**.
+Keep recorded passes, failures and limitations above. Performance work requires
+a separately selected depth; this list does not restart paused experiments.
+
+- [ ] Run online resharding and tablet expansion/shrink; verify routing, native placement and every acknowledged order during cutover.
+- [ ] Test planned/rolling maintenance, supported upgrades and vertical resource changes independently of crash recovery.
+- [ ] Exercise etcd/topology quorum loss, peer partitions and stale-primary write rejection.
+- [ ] Test permanent owned-volume loss, bounded write-I/O/resource failures and restore into independent storage.
+
 ## File organization
 
 - [`scripts/`](scripts/): lifecycle, fault and report controllers.

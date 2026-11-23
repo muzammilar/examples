@@ -542,6 +542,16 @@ resumable receive), and pinned OpenZFS zfs-2.2.2 `zpool_main.c` (`zpool_do_offli
 `zpool_do_attach_or_replace`, `zpool_do_scrub`: persistent fault and completion waits). Fencing, client journals and role selection are application
 logic supplied by this example.
 
+## Future work / TODO
+
+Deferred checks for supported configurations; these are **not executed coverage**.
+Keep recorded passes, failures and limitations above. Performance work requires
+a separately selected depth; this list does not restart paused experiments.
+
+- [ ] Isolate Quack connect/query/fetch/close timing and qualify a supervised deadline with explicit ambiguous-write reconciliation.
+- [ ] Extend dependency/pressure/restore and archive-retention cases with independent readers and preserved historical acknowledgements.
+- [ ] Keep physical-host-loss durability and repeated fair recovery-performance comparisons unqualified until separately demonstrated.
+
 ## File organization
 
 - [`scripts/`](scripts/): lifecycle, fault and report controllers.

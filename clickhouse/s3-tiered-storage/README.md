@@ -146,3 +146,13 @@ Official [S3 disk/cache configuration](https://clickhouse.com/docs/operations/st
 [CHECK TABLE](https://clickhouse.com/docs/sql-reference/statements/check-table).
 Pinned native source inspected:
 [`S3ObjectStorage.cpp`](https://github.com/ClickHouse/ClickHouse/blob/v26.10.2.103-stable/src/Disks/ObjectStorages/S3/S3ObjectStorage.cpp).
+
+## Future work / TODO
+
+Deferred checks for supported configurations; these are **not executed coverage**.
+Keep recorded passes, failures and limitations above. Performance work requires
+a separately selected depth; this list does not restart paused experiments.
+
+- [ ] Audit independent live readers, durable historical witnesses and native repair proof for every configured object-storage backend.
+- [ ] Exercise local mapping/metadata loss separately from remote-object, Keeper and gateway outages.
+- [ ] Verify independent backup/restore and orphan-object retention/cleanup; surviving S3 objects alone do not reconstruct local disk metadata.

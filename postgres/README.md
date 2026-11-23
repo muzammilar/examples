@@ -46,3 +46,18 @@ single-node and Patroni three-copy deployments, transactional inventory joins,
 filtered ANN, hybrid retrieval, crash recovery and a shared ESCI evaluation.
 Both profiles were run against 100,000 products / 1,000 held-out queries. The
 example README records measured latency/recall and recovery limits.
+
+## Future work / TODO
+
+Deferred follow-ups are linked below. Each example keeps its concrete checklist
+beside the measured results; experiments remain paused.
+
+| Example | Next work |
+|---|---|
+| [customer-sharding](customer-sharding/README.md#future-work--todo) | Exercise peer partitions, DCS/quorum loss and stale-primary fencing separately for every shard. |
+| [pgdog-docker-compose-cluster](pgdog-docker-compose-cluster/README.md#future-work--todo) | Exercise DCS/quorum loss, peer partitions and stale-primary fencing while independent pooled readers/writers remain live. |
+| [citus-docker-compose-cluster](citus-docker-compose-cluster/README.md#future-work--todo) | Partition coordinator/worker replication and lose DCS quorum. |
+| [pgvector-product-search](pgvector-product-search/README.md#future-work--todo) | Exercise replication partitions, quorum loss and primary fencing with continued readers and external acknowledged-version histories. |
+| [neon/branching-recovery](neon/branching-recovery/README.md#future-work--todo) | Bring supported pageserver/S3 outage, WAL-quorum-loss and restore cases from the Kubernetes scenario into this Compose deployment. |
+| [neon/kubernetes-statefulset](neon/kubernetes-statefulset/README.md#future-work--todo) | Test broker outages and peer partitions separately from the already executed pageserver/S3/WAL-quorum cases. |
+| [neon/single-node](neon/single-node/README.md#future-work--todo) | Qualify graceful whole-stack stop/start and forced cold reopen with retained storage and complete historical readback. |

@@ -18,3 +18,12 @@ simultaneous all-node power loss. Default native RPC and block-check delays can
 make full replica restoration much slower than renewed S3 availability. Native peer discovery is required for complete cold restarts; idle repair workers
 do not prove all required native copies have returned. See the
 example for the exact tested feature subset, numbers and recovery status.
+
+## Future work / TODO
+
+Deferred follow-ups are linked below. Each example keeps its concrete checklist
+beside the measured results; experiments remain paused.
+
+| Example | Next work |
+|---|---|
+| [s3-cluster](s3-cluster/README.md#future-work--todo) | Exercise peer partitions and native quorum loss, measuring rejection, stale-read policy and convergence after healing. |

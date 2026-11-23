@@ -375,6 +375,17 @@ The observed rate ratio was 2.60×, but both runs shared a VM with varying conte
 - [NDB partitioning](https://dev.mysql.com/doc/refman/8.4/en/mysql-cluster-nodes-groups.html): partitions, fragments and node groups.
 - [8.4.11 distribution handler source](https://github.com/mysql/mysql-server/blob/mysql-cluster-8.4.11/storage/ndb/src/kernel/blocks/dbdih/DbdihMain.cpp): partition placement, replica membership and checkpoint recovery.
 
+## Future work / TODO
+
+Deferred checks for supported configurations; these are **not executed coverage**.
+Keep recorded passes, failures and limitations above. Performance work requires
+a separately selected depth; this list does not restart paused experiments.
+
+- [ ] Expand/reorganize node groups under live traffic; verify native fragment ownership and all acknowledged bodies after migration.
+- [ ] Partition data/management traffic and lose quorum deliberately; verify expected rejection and recovery rather than assuming availability.
+- [ ] Inject bounded storage errors and replace one fenced, owned data volume; verify native rebuild and restored copies.
+- [ ] Exercise supported rolling upgrades, resource pressure and independent backup/restore with the external witness.
+
 ## File organization
 
 - [`scripts/`](scripts/): lifecycle, fault and report controllers.

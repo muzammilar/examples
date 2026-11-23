@@ -374,6 +374,17 @@ Dockerfile, then builds from that local context. Neither `.build/` nor results
 are committed; a clean checkout needs no sibling runtime or generated state.
 The other S3 examples keep their existing controllers until separately tested.
 
+## Future work / TODO
+
+Deferred checks for supported configurations; these are **not executed coverage**.
+Keep recorded passes, failures and limitations above. Performance work requires
+a separately selected depth; this list does not restart paused experiments.
+
+- [ ] Exercise supported volume-server growth/drain and verify actual object placement, retained acknowledgements and native repair.
+- [ ] Partition peers and lose metadata quorum separately from gateway/data-server outages.
+- [ ] Test metadata-volume destruction, bounded device write failures/resource pressure, supported upgrades and independent restore.
+- [ ] Keep erasure coding and filer.sync cross-cluster replication as separate future scenarios with explicit durability/recovery contracts.
+
 ## File organization
 
 - [`scripts/`](scripts/): lifecycle, fault and report controllers.

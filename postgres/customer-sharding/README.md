@@ -178,6 +178,17 @@ Enabling rewriting and a hot `RELOAD` alone did not change the behavior observed
 - [Patroni synchronous replication](https://patroni.readthedocs.io/en/latest/replication_modes.html)
 - [Patroni v4.0.6 election/synchronous implementation](https://github.com/patroni/patroni/blob/v4.0.6/patroni/ha.py)
 
+## Future work / TODO
+
+Deferred checks for supported configurations; these are **not executed coverage**.
+Keep recorded passes, failures and limitations above. Performance work requires
+a separately selected depth; this list does not restart paused experiments.
+
+- [ ] Exercise peer partitions, DCS/quorum loss and stale-primary fencing separately for every shard.
+- [ ] Fail the router independently and observe routing refresh, connection recovery and acknowledged-write reconciliation.
+- [ ] Add/remove shards through a documented online migration; verify every customer's placement and duplicate/missing/version boundaries.
+- [ ] Test permanent owned-volume loss, bounded resource/I/O pressure, supported rolling upgrades and independent backup/restore.
+
 ## File organization
 
 - [`scripts/`](scripts/): lifecycle, fault and report controllers.

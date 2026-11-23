@@ -217,3 +217,14 @@ Development evidence remains separate: the original remote-replication authentic
 Remaining: disk loss/EIO/full-disk, partitions, pressure, upgrade/rollback, interrupted backup, schema/transaction anomaly workloads, sustained repeated benchmarks and genuine cold-cache behavior. A correctness/recovery pass does not establish complete production readiness.
 
 <!-- /verified-results -->
+
+## Future work / TODO
+
+Deferred checks for supported configurations; these are **not executed coverage**.
+Keep recorded passes, failures and limitations above. Performance work requires
+a separately selected depth; this list does not restart paused experiments.
+
+- [ ] Capture explicitly prepared planner statistics and query plans for both backends before further comparisons.
+- [ ] If performance work is selected, compare single/batch/bulk ingestion and separately prepared cold/warm queries at the agreed depth.
+- [ ] Test bounded storage/IO/memory pressure, including db.ballast/WAL growth, interrupted backup and supported upgrade paths.
+- [ ] Keep these single-node deployment/recovery observations distinct from unsupported native clustering/HA claims.

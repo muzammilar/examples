@@ -45,3 +45,12 @@ RocksDB decoding.
 
 Follower collection/document visibility can lag imports; the focused test waits
 for every replica. The example adds curl to the official image for readiness.
+
+## Future work / TODO
+
+Deferred follow-ups are linked below. Each example keeps its concrete checklist
+beside the measured results; experiments remain paused.
+
+| Example | Next work |
+|---|---|
+| [product-search](product-search/README.md#future-work--todo) | Exercise peer partitions and majority/minority behavior for each application-managed shard group. |

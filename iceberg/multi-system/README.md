@@ -74,3 +74,14 @@ Read [the architecture guide](docs/ARCHITECTURES.md) for ports, resource limits,
 measured results, limitations and scenario commands. The
 [plan](docs/PLAN.md) records unfinished work. The root README is an index, not a
 running log of every investigation.
+
+## Future work / TODO
+
+Deferred checks for supported configurations; these are **not executed coverage**.
+Keep recorded passes, failures and limitations above. Performance work requires
+a separately selected depth; this list does not restart paused experiments.
+
+- [ ] Keep HTTP fault/recovery, ambiguous writes and additional data types as deferred work after the healthy two-million-row round trip.
+- [ ] Extend native DuckDB compaction to continuous writers and process/catalog/S3 interruptions; verify committed snapshot state and retained source before cleanup.
+- [ ] Qualify retention cleanup, committed deletes, partition evolution and independent reader observations during shard/replica operations.
+- [ ] Preserve scanner wrong answers, manifest compatibility and cold-read memory failures in their existing projects; further diagnosis is optional and must not erase failed verdicts.

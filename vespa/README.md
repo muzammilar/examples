@@ -72,3 +72,12 @@ Two HTTP 412 conditional-failure responses during the new disk test nevertheless
 had their attempted bodies present after repair on all replicas. They remain
 non-ACK outcomes; an error response is not proof that no replica applied a write.
 See the [observed conditional-update gotcha](phased-product-search/#observed-conditional-update-gotcha).
+
+## Future work / TODO
+
+Deferred follow-ups are linked below. Each example keeps its concrete checklist
+beside the measured results; experiments remain paused.
+
+| Example | Next work |
+|---|---|
+| [phased-product-search](phased-product-search/README.md#future-work--todo) | Complete the flat profile's exact serial aggregate and retained-state setup. |

@@ -239,6 +239,17 @@ A final clean-storage lifecycle with the stronger MySQL socket health check and 
 
 Compare NDB's shared distributed storage engine with these independent MySQL shards in the NDB example. The systems expose different transaction and recovery mechanisms even though both configurations retain three copies of customer data.
 
+## Future work / TODO
+
+Deferred checks for supported configurations; these are **not executed coverage**.
+Keep recorded passes, failures and limitations above. Performance work requires
+a separately selected depth; this list does not restart paused experiments.
+
+- [ ] Reshard customer ranges online and expand/shrink tablets; verify each customer's destination and replica bodies without resetting histories.
+- [ ] Test peer partitions, topology/quorum loss and stale-primary rejection across each shard.
+- [ ] Exercise planned/rolling maintenance, supported upgrades and resource changes under independent readers/writers.
+- [ ] Replace a fenced lost volume, inject bounded storage pressure and verify independent backup/restore.
+
 ## File organization
 
 - [`scripts/`](scripts/): lifecycle, fault and report controllers.

@@ -29,3 +29,13 @@ Historical five-path passes above do not establish current interoperability.
 The local REST fixture and Trino coordinator are single processes. Their presence does not provide catalog or coordinator HA. Four MinIO nodes share one Docker disk; see the example's failure-domain limits.
 
 [Hoglake](https://github.com/PostHog/hoglake) is recorded in the documentation backlog for future investigation; no Hoglake example is implemented here.
+
+## Future work / TODO
+
+Deferred follow-ups are linked below. Each example keeps its concrete checklist
+beside the measured results; experiments remain paused.
+
+| Example | Next work |
+|---|---|
+| [trino-minio](trino-minio/README.md#future-work--todo) | Add independent writers/readers through catalog/object-store interruptions and reconcile ambiguous CTAS/INSERT commits. |
+| [multi-system](multi-system/README.md#future-work--todo) | Keep HTTP fault/recovery, ambiguous writes and additional data types as deferred work after the healthy two-million-row round trip. |

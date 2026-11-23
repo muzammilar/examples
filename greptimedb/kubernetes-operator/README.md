@@ -341,6 +341,17 @@ example’s running services or generated state.
 
 Kubelet override reference: [kubeadm kubelet integration](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/kubelet-integration/).
 
+## Future work / TODO
+
+Deferred checks for supported configurations; these are **not executed coverage**.
+Keep recorded passes, failures and limitations above. Performance work requires
+a separately selected depth; this list does not restart paused experiments.
+
+- [ ] Test permanent worker loss/local-PV rescheduling and operator crash during active maintenance.
+- [ ] Exercise invalid CR admission and supported operator/CRD upgrades; retain the completed database upgrade/drain/partition/pressure results as separate evidence.
+- [ ] Qualify bounded disk-full pressure and independent backup/restore with historical acknowledged-row reconciliation.
+- [ ] Use this deployment in the planned GreptimeDB versus Victoria comparison only with equivalent topology, durability and complete-stack resource accounting.
+
 ## File organization
 
 - [`scripts/`](scripts/): lifecycle, fault and report controllers.

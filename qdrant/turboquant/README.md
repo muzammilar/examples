@@ -178,6 +178,17 @@ Python controls faults. This example contains its own application and Dockerfile
 - [Pinned write ordering](https://github.com/qdrant/qdrant/blob/v1.18.3/lib/collection/src/shards/replica_set/update.rs).
 - [Distributed deployment](https://qdrant.tech/documentation/guides/distributed_deployment/).
 
+## Future work / TODO
+
+Deferred checks for supported configurations; these are **not executed coverage**.
+Keep recorded passes, failures and limitations above. Performance work requires
+a separately selected depth; this list does not restart paused experiments.
+
+- [ ] Exercise supported shard relocation/member growth/shrink and verify native ownership plus acknowledged document/vector versions.
+- [ ] Test partitions/quorum loss, supported rolling upgrades and independent backup/restore.
+- [ ] Inject bounded disk-full/I/O/memory pressure and measure fresh-write visibility under live queries.
+- [ ] If selected for comparison, reuse the same corpus/recall oracle and durability/resource budgets as Milvus, Weaviate or pgvector; retain earlier unequal-timing failures.
+
 ## File organization
 
 - [`scripts/`](scripts/): lifecycle, fault and report controllers.

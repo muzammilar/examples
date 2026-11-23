@@ -5,11 +5,12 @@ Candidate databases and systems to add as examples. Branch names follow the exis
 
 ## Break and recover: all existing and future examples
 
-**Current goal priority (2026-11-22):** the fresh DuckDB/ZFS full lifecycle,
-ZFS repair-reader and Rust embedded follow-ups now pass and are documented below.
-Continue with **Tigris, DuckDB and Iceberg-related projects** before other systems.
-Investigate production operations, failure mechanisms and verified
-recovery, with matched comparisons after correctness/recovery gates pass.
+**Current scope (2026-11-23):** experiments are paused. Preserve the completed
+results and failed findings, then continue breadth-first exploration when asked.
+The deferred tests linked below are future work; they do not require exhausting
+CedarDB, Rayforce, ZFS or DuckDB/Iceberg before exploring another system.
+**GreptimeDB versus Victoria is an accepted planned comparison** with its own
+bounded scope and user-selected performance depth.
 
 **Local-only scope:** all current tests use isolated Docker/Compose services and
 lab-only credentials. Never use host AWS configuration/credentials or real cloud
@@ -109,6 +110,28 @@ not remove the longer-term requirements above.
   search, object-storage, messaging and archive examples identified by the audit.
 - [ ] Extend applicable native repair, scaling, rolling changes, dependency/quorum
   loss and independent restore tests; publish only actually executed outcomes.
+
+## Deferred follow-ups for covered systems
+
+- [ ] **GreptimeDB versus Victoria:** run the [planned fair comparison](observability/README.md#greptimedb-vs-victoria-planned-comparison).
+  Match hardware and complete-stack budgets, workload/durability contracts,
+  single versus batched/native ingestion and cold versus warm queries. Report
+  correctness, recovery, latency, CPU, memory, compression, disk space and disk
+  read/write bytes/IOPS. Select performance depth before running it; completion
+  of every optional production-test backfill is not a prerequisite.
+- [ ] **CedarDB:** [planner/statistics preparation, ingestion/cache variants,
+  pressure, interrupted backup and supported upgrades](cedardb/backup-recovery/README.md#future-work--todo).
+- [ ] **Rayforce/DuckDB:** [optional integrity diagnosis, journal/snapshot/restore
+  cases and selected future comparisons](rayforce/duckdb-comparison/README.md#future-work--todo).
+- [ ] **ZFS:** [independent archive restore, replication/ACK observation,
+  guest persistence and bounded pressure](zfs/storage-lab/README.md#future-work--todo).
+- [ ] **DuckDB/ZFS:** [supervised deadlines, dependency/restore and retention
+  checks](duckdb/zfs-recovery/README.md#future-work--todo).
+- [ ] **Recent distributed examples:** use each system README's **Future work / TODO**
+  index and each example's concrete checklist for the remaining partition/quorum,
+  scaling, upgrade, pressure and independent-restore cases. See the
+  [coverage audit](PRODUCTION_TEST_AUDIT.md#controllerworkload-findings-and-required-backfills)
+  for measured context; do not rerun already-qualified cases mechanically.
 
 ## Already covered
 
@@ -291,7 +314,7 @@ Planned as a `mysql/` folder, mirroring the Postgres section with the same `orde
 - [x] [`duckdb-zfs-recovery`](duckdb/zfs-recovery/reports/FULL_SUITE_RESULTS.json): fresh five-command lifecycle passes; continuous guest-crash recovery verifies 2,000,000 seed + 323,000 acknowledged rows and 180 independent reads with zero missing/wrong/partial bodies. The full disk/crash/replica/archive sequence verifies 7,453,000 exported bodies across copies and preserves all 30,000 source acknowledgements absent from the asynchronous standby. Effective 256 MiB ARC persists across reboot; all owned resources are removed. CPU/memory/compression/disk/I/O evidence and earlier failures remain explicit. Quack overrides the requested HTTP timeout, so no three-second RPC deadline, capacity comparison or complete production qualification is claimed.
 - [ ] DuckDB/ZFS deeper pass: isolate Quack connection/query/fetch/close timings and qualify a supervised deadline with ambiguous-write reconciliation; add further dependency/pressure/restore and retention cases. Keep physical host-loss durability and repeated fair recovery-performance comparisons unqualified.
 - [x] [ZFS storage recovery follow-up](zfs/storage-lab/): default 4 MiB/s five-command lifecycle, full mirror/RAIDZ2/replication suite, 157/140 complete immutable-body reads during recovery, verified 512 MiB payloads, clean scrubs, guarded native pool archives and scoped teardown. Thirty-five controls pass; CPU/memory/compression/disk-byte/IOPS observations published. Earlier explicit-rate checkpoint and archive-checker/Python-prerequisite failures remain separate; stream validation is not restore qualification.
-- [ ] ZFS deeper pass: restore the preserved native streams, add continuous replication observation and per-flush external acknowledgements, and exercise guest restart/configuration persistence, bounded pressure and further loss combinations. Current Tigris/DuckDB/Iceberg priorities come first.
+- [ ] ZFS deeper pass: restore the preserved native streams, add continuous replication observation and per-flush external acknowledgements, and exercise guest restart/configuration persistence, bounded pressure and further loss combinations. Deferred while the repository proceeds breadth-first; select any deeper run explicitly.
 
 - [ ] `hyper-api-embedded`: Salesforce/Tableau Hyper (Umbra lineage, compiled queries) via `pip install tableauhyperapi`; free, closed source. macOS arm64 wheels stop after 0.0.26479 (newer releases: Linux x86_64 and Windows only), so pin that on a Mac. Compare with DuckDB on the same data.
 - [ ] `polars-datafusion`: Polars and DataFusion on the same Parquet files as the DuckDB example.
@@ -426,8 +449,8 @@ Plan and source links: [`observability/README.md`](observability/README.md), inc
 - [ ] `nagios/`: GPLv2 Nagios Core host/service checks, plugin-based fleet monitoring, detection/recovery and alert accounting under injected failures; exclude commercial XI features.
 - [ ] `zabbix/`: agents/proxies, discovery, supported server HA and database recovery; compare the same host/service fault schedule with Nagios Core and the modern stacks.
 
-- [ ] **After the current recovery backfills:** fair GreptimeDB vs Victoria stack
-  comparison using [the comparison contract](observability/README.md#greptimedb-vs-victoria-after-the-recovery-backfills).
+- [ ] **Planned comparison:** fair GreptimeDB vs Victoria stack
+  comparison using [the comparison contract](observability/README.md#greptimedb-vs-victoria-planned-comparison).
   Match machine class, per-node and whole-stack budgets and durability. Replay
   identical input/queries; compare single versus batched ingestion and supported
   native/protocol/query approaches, with separate cold/warm cache measurements.

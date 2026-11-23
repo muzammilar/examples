@@ -461,6 +461,17 @@ and [native LVM inventory](https://docs.ceph.com/en/tentacle/ceph-volume/lvm/lis
 Pinned daemon/configuration source was also inspected; native CLI help confirmed
 the planned `--osd-fsid` option before disk injection.
 
+## Future work / TODO
+
+Deferred checks for supported configurations; these are **not executed coverage**.
+Keep recorded passes, failures and limitations above. Performance work requires
+a separately selected depth; this list does not restart paused experiments.
+
+- [ ] Isolate individual MON, MGR, OSD and RGW daemon failures instead of inferring them from whole-guest outages.
+- [ ] Exercise monitor quorum loss and data/control partitions; record PG state, client rejection and native recovery.
+- [ ] Change supported topology/resources and perform supported rolling upgrades while tracking backfill, recovery and object bodies.
+- [ ] Test bounded full-device/write-I/O pressure and independent restore; preserve the emulator, shared-host and physical-power-loss limitations.
+
 ## File organization
 
 - [`scripts/`](scripts/): lifecycle, fault and report controllers.

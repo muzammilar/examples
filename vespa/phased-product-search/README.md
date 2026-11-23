@@ -757,6 +757,17 @@ copy catch-up: the final native readback verified every stored metadata copy and
 accepted version separately. This crash targeted content0; the other selectable
 content hosts were not individually killed.
 
+## Future work / TODO
+
+Deferred checks for supported configurations; these are **not executed coverage**.
+Keep recorded passes, failures and limitations above. Performance work requires
+a separately selected depth; this list does not restart paused experiments.
+
+- [ ] Complete the flat profile's exact serial aggregate and retained-state setup; preserve the separate single/sharded results already recorded.
+- [ ] Exercise peer partitions/quorum loss, supported topology growth/shrink and rolling upgrades under live searches/updates.
+- [ ] Test bounded pressure/write-I/O failures and restore into independent storage with complete document/version/vector verification.
+- [ ] If performance work is selected, use matched budgets, fresh-process repetitions and separately prepared cold/warm query states.
+
 ## File organization
 
 - [`scripts/`](scripts/): lifecycle, fault and report controllers.

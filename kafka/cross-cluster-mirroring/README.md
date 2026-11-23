@@ -448,6 +448,17 @@ Checkpoint implementation references: [Kafka 4.3.2 native formatter](https://git
 [checkpoint freshness and group synchronization](https://github.com/apache/kafka/blob/4.3.2/connect/mirror/src/main/java/org/apache/kafka/connect/mirror/MirrorCheckpointTask.java),
 and [console consumer error/idle-timeout handling](https://github.com/apache/kafka/blob/4.3.2/tools/src/main/java/org/apache/kafka/tools/consumer/ConsoleConsumer.java).
 
+## Future work / TODO
+
+Deferred checks for supported configurations; these are **not executed coverage**.
+Keep recorded passes, failures and limitations above. Performance work requires
+a separately selected depth; this list does not restart paused experiments.
+
+- [ ] Lose the source cluster and exercise an explicitly fenced, unplanned promotion; reconcile source acknowledgements and translated consumer offsets.
+- [ ] Exercise partitions/quorum loss, worker outage, drain/PDB and operator outage/reconciliation on the actual example-owned kind cluster.
+- [ ] Change supported broker/MM2 membership and resources, then test supported rolling upgrades and bounded pressure.
+- [ ] Extend disaster-recovery/restore scenarios with independent histories; preserve the already failed replication-policy configurations and interrupted run.
+
 ## File organization
 
 - [`scripts/`](scripts/): lifecycle, fault and report controllers.

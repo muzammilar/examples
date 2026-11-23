@@ -458,6 +458,17 @@ The CLI JSON request encoding uses `null` for unit requests and
 `{"node":"*","body":null}` for all-node statistics; the public HTTP schema's
 query parameters are not the CLI's complete serialized request body.
 
+## Future work / TODO
+
+Deferred checks for supported configurations; these are **not executed coverage**.
+Keep recorded passes, failures and limitations above. Performance work requires
+a separately selected depth; this list does not restart paused experiments.
+
+- [ ] Exercise peer partitions and native quorum loss, measuring rejection, stale-read policy and convergence after healing.
+- [ ] Change supported ring topology and resource budgets; verify block movement and draining under live traffic.
+- [ ] Test metadata-volume loss, bounded resource/device-I/O failures and supported rolling upgrades.
+- [ ] Restore independent metadata/data backups and verify full object bodies and versions against preserved witnesses.
+
 ## File organization
 
 - [`scripts/`](scripts/): lifecycle, fault and report controllers.

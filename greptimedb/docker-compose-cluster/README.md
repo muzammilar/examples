@@ -183,6 +183,17 @@ example’s running services or generated state.
 scale-out, scale-in and final historical reconciliation serially. Faults require
 a fresh lifecycle when their prior result marker exists.
 
+## Future work / TODO
+
+Deferred checks for supported configurations; these are **not executed coverage**.
+Keep recorded passes, failures and limitations above. Performance work requires
+a separately selected depth; this list does not restart paused experiments.
+
+- [ ] Bring supported dependency/quorum, partition and rolling-change cases from the operator example into this Compose topology.
+- [ ] Exercise metadata quorum loss and multiple WAL-broker failures; reconcile acknowledged rows after native recovery.
+- [ ] Test bounded full-disk/device-I/O pressure and restore into independent storage.
+- [ ] Run the planned equal-budget GreptimeDB versus Victoria comparison only after selecting performance depth; keep prior warm baselines separate.
+
 ## File organization
 
 - [`scripts/`](scripts/): lifecycle, fault and report controllers.

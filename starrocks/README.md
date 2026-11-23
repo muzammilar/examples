@@ -35,3 +35,14 @@ a rebuilt tablet; check physical copies. Retained FE quorum startup must not wai
 for one isolated peer to become healthy first. Small ClickHouse containers and
 many tiny inserts can exhaust memory. Native XOR32 checksums and single-host labs
 have explicit verification limits; see the failed-run notes in the cluster README.
+
+## Future work / TODO
+
+Deferred follow-ups are linked below. Each example keeps its concrete checklist
+beside the measured results; experiments remain paused.
+
+| Example | Next work |
+|---|---|
+| [docker-compose-cluster](docker-compose-cluster/README.md#future-work--todo) | Exercise supported FE/BE growth and safe shrink with native tablet draining and complete acknowledged-body checks. |
+| [kubernetes-operator](kubernetes-operator/README.md#future-work--todo) | Qualify pinned supported database/operator/CRD upgrades. |
+| [single-node](single-node/README.md#future-work--todo) | Qualify graceful stop/start and forced cold reopen with retained data and full acknowledged-body readback. |

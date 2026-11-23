@@ -45,3 +45,12 @@ replication slots, fast checkpoints and native quorum readiness checks. See the
 cluster README for the failed attempt, diagnosis and remaining production-test
 gaps. Copies share one physical host; pageserver/S3/controller failures and
 independent-backup restore remain unqualified.
+
+## Future work / TODO
+
+- [ ] [Compose dependency/quorum/physical-restore cases](branching-recovery/README.md#future-work--todo).
+- [ ] [Kubernetes broker/partition, scheduling, upgrade and physical-recovery cases](kubernetes-statefulset/README.md#future-work--todo).
+- [ ] [Single-node cold reopen, pressure and independent restore](single-node/README.md#future-work--todo).
+
+These remain deferred; the completed Kubernetes logical restore and existing
+process-recovery results retain their own scope.

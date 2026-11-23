@@ -109,3 +109,12 @@ all **2,364 ACK bodies**, with **zero loss/corruption**. Checkpointing keeps rea
 and writers active. CPU/memory, native codecs/archive compression, disk/block I/O
 and recovery observations are published. This is one functional observation,
 not a latency/capacity winner; native protocols and logged operations differ.
+
+## Future work / TODO
+
+Deferred follow-ups are linked below. Each example keeps its concrete checklist
+beside the measured results; experiments remain paused.
+
+| Example | Next work |
+|---|---|
+| [duckdb-comparison](duckdb-comparison/README.md#future-work--todo) | Preserve and optionally isolate the recorded strict journal/AOF integrity failures. |

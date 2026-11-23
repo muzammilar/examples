@@ -419,6 +419,17 @@ limits), and `cmd/zstream/zstream_dump.c` (checksum diagnostics, record counts a
 zero-exit boundary), `lib/libzfs/libzfs_sendrecv.c` (compound package conclusion); fio fio-3.36 `verify.c` (CRC32C/header/offset checks), `filesetup.c` (allocation), and `engines/sync.c`
 (sync read/write). Orchestration and administrative fencing are lab code.
 
+## Future work / TODO
+
+Deferred checks for supported configurations; these are **not executed coverage**.
+Keep recorded passes, failures and limitations above. Performance work requires
+a separately selected depth; this list does not restart paused experiments.
+
+- [ ] Restore the preserved native send/receive archives into separate owned pools and verify every required body against the independent oracle.
+- [ ] Add continuous replication observation and per-flush external acknowledgements; fio growth and stream validation alone do not establish these.
+- [ ] Qualify guest restart/configuration persistence, bounded owned-device pressure and controlled combinations beyond single-device tolerance.
+- [ ] Keep administrative source fencing, quantified asynchronous RPO and untested physical-host-loss boundaries explicit.
+
 ## File organization
 
 - [`scripts/`](scripts/): lifecycle, fault and report controllers.

@@ -107,6 +107,16 @@ immutable ReplacingMergeTree sorting keys, selective key filters and explicit
 current-state reads. Lab budgets, three hash buckets and query limits are derived
 choices for this bounded corpus, not upstream production sizing recommendations.
 
+## Future work / TODO
+
+Deferred checks for supported configurations; these are **not executed coverage**.
+Keep recorded passes, failures and limitations above. Performance work requires
+a separately selected depth; this list does not restart paused experiments.
+
+- [ ] Qualify graceful stop/start and forced cold reopen with retained data and full acknowledged-body readback.
+- [ ] Test bounded resource/storage pressure, independent backup/restore and supported version changes.
+- [ ] Keep quorum, replica repair and fault-tolerant availability claims in the separate clustered examples.
+
 ## File organization
 
 - [`scripts/`](scripts/): lifecycle, fault and report controllers.

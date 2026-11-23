@@ -212,6 +212,17 @@ on the host.
 - [PgDog v0.1.62 reload/replacement implementation](https://github.com/pgdogdev/pgdog/blob/v0.1.62/pgdog/src/backend/databases.rs)
 - [Patroni synchronous replication](https://patroni.readthedocs.io/en/latest/replication_modes.html) and [v4.0.6 election implementation](https://github.com/patroni/patroni/blob/v4.0.6/patroni/ha.py)
 
+## Future work / TODO
+
+Deferred checks for supported configurations; these are **not executed coverage**.
+Keep recorded passes, failures and limitations above. Performance work requires
+a separately selected depth; this list does not restart paused experiments.
+
+- [ ] Exercise DCS/quorum loss, peer partitions and stale-primary fencing while independent pooled readers/writers remain live.
+- [ ] Replace a safely fenced PostgreSQL data volume and verify native catch-up plus service from the rebuilt copy.
+- [ ] Test supported rolling upgrades, bounded resource pressure and independent backup/restore.
+- [ ] Keep backend-pooling/connection-storm observations distinct from data sharding; this example remains one replicated database group.
+
 ## File organization
 
 - [`scripts/`](scripts/): lifecycle, fault and report controllers.
