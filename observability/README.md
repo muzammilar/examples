@@ -5,6 +5,8 @@ stacks and infrastructure monitoring. This directory is a plan, not a runnable
 example or a set of benchmark results. GreptimeDB versus Victoria is an accepted
 planned comparison; the broader stack matrix remains future work.
 
+The [per-system example plans](../docs/example-plans/streaming-and-observability.md#observability) specify the incident, failure and data checks for each component.
+
 Starting reference: [ClickHouse — Top infrastructure monitoring tools comparison](https://clickhouse.com/resources/engineering/top-infrastructure-monitoring-tools-comparison).
 It is a vendor-authored overview. Use it to identify candidates and testable
 questions; verify capabilities with each project's own documentation/source and
@@ -80,11 +82,11 @@ recording dependency licenses and excluded commercial features.
 | Stack | Planned runnable edition/components | Representative clustered example |
 |---|---|---|
 | [ClickStack](https://clickhouse.com/clickstack) | Self-hosted ClickHouse + OTel Collector + ClickStack UI; include its settings-store dependency and license in the deployment inventory | High-cardinality application telemetry, trace-ID lookups, SQL log/trace correlation, replicated storage recovery and collector backlog |
-| [Victoria stack](https://docs.victoriametrics.com/victoriastack/ingestion/) | Community VictoriaMetrics + VictoriaLogs + VictoriaTraces | The same fleet metrics, application logs and deterministic traces; storage failure, replication/dedup and visibility checks per signal |
+| [Victoria stack](https://docs.victoriametrics.com/victoriastack/ingestion/) | Community VictoriaMetrics + VictoriaLogs + VictoriaTraces | Use the same fleet metrics, logs and trace trees. Budget VictoriaMetrics native replication, [VictoriaLogs sender-side replication and buffering](https://docs.victoriametrics.com/victorialogs/cluster/), and [VictoriaTraces external fan-out](https://docs.victoriametrics.com/victoriatraces/cluster/) separately. Verify each destination after an outage. |
 | [GreptimeDB](https://docs.greptime.com/user-guide/concepts/architecture/) (Rust) | Self-hosted upstream release with declared WAL, metadata and storage dependencies | Unified application telemetry, matching SQL/PromQL/trace queries, region/WAL recovery and high-cardinality ingestion |
 | [OpenObserve](https://openobserve.ai/docs/) (Rust) | AGPL community code; qualify current edition limits and dependencies before pinning | SQL/log search, metrics and trace correlation; clustered ingestion/query/compaction and object-store recovery |
 | [SigNoz](https://signoz.io/docs/architecture/) | Community code outside its separately licensed enterprise directory, with OTel and ClickHouse dependencies | Application monitoring, correlated signals, collector/ClickHouse failure and tenant queries |
-| [Grafana stack](https://grafana.com/oss/) | Grafana OSS + Loki + Tempo; Prometheus baseline and a separately identified Mimir metrics scale-out profile | Same telemetry and correlation tasks; ingester/WAL, compactor, historical object storage and query-path recovery |
+| [Grafana stack](https://grafana.com/oss/) | Grafana OSS + Loki + Tempo, with a Prometheus baseline and a separate Mimir metrics scale-out profile | Verify Loki ingestion/compaction and trace completeness during queue, live-store, block-builder and historical object-store failures in the [Tempo 3 distributed architecture](https://grafana.com/docs/tempo/latest/introduction/architecture/). Include its Kafka-compatible queue in the budget. |
 
 The original **GreptimeDB vs Victoria stack vs Prometheus + Loki + Tempo**
 comparison remains the first shared-corpus baseline. Adding ClickStack, OpenObserve
@@ -108,7 +110,7 @@ comparisons, not self-hosted OSS deployments. No hosted experiment has run here.
 |---|---|---|
 | [Honeycomb](https://www.honeycomb.io/pricing) | Published free plan; account setup reminder above. The hosted backend is not a downloadable OSS database | Same synthetic high-cardinality traces/events and investigation tasks; record sampling, retention, quotas, ingest visibility and query latency |
 | [Better Stack](https://betterstack.com/pricing) | Published free personal-project telemetry allowances; quotas vary by signal. Hosted platform, not a self-hostable OSS edition | Same allowed logs/metrics/traces and service health checks, bounded to the verified free allowance |
-| [Chronosphere](https://chronosphere.io/) | No public ongoing free tier was verified for this plan; conditional/deferred unless a no-cost evaluation is confirmed | Telemetry shaping/cardinality control and query completeness, only within confirmed access and limits |
+| [Chronosphere / Cortex XCOR](https://www.paloaltonetworks.com/cortex/xcor) | No public ongoing free tier was verified for this plan. Keep the hosted comparison deferred until no-cost access is confirmed. | Apply a [shaping rule](https://docs.chronosphere.io/control/shaping) to high-cardinality telemetry and verify the remaining site-level totals and lost label detail. The self-hosted Cortex project above has its own metrics workload. |
 
 Open-source collectors or samplers associated with a vendor are separate projects;
 they do not constitute an open-source version of that vendor's hosted backend.
@@ -162,8 +164,8 @@ subset instead of assuming TraceQL, Jaeger APIs and SQL are interchangeable.
   backpressure and recovery. Report errors and missing/duplicate telemetry.
 - Separate process crashes, permanent owned-disk loss and storage/network outages.
   Keep traffic running, reconcile acknowledged outcomes and verify native repair.
-- For Loki/Tempo and other S3 consumers use an existing Garage or SeaweedFS lab
-  where supported. Do not count local logical copies as independent host durability.
+- For Loki/Tempo and other S3 consumers, deploy an example-owned local Garage
+  or SeaweedFS service from the supported configuration. Record the shared physical host and disk.
 - Publish exact versions, hardware, caps, workloads and numeric outcomes only
   after running the tests. Document gotchas, unsupported features and limits.
 

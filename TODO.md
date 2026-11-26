@@ -3,6 +3,28 @@
 Candidate databases and systems to add as examples. Branch names follow the existing
 `<system>-single-node`, `<system>-docker-compose-cluster` and `<system>-kubernetes-{operator,helm}` convention.
 
+## Example designs to assign
+
+Start with the [handoff guide](docs/example-plans/README.md), then choose one unchecked workload below. Each design describes the deployment, the event to trigger and how a second observer can tell whether recovery worked. The [system directory index](README.md#systems) lists existing code. The [production-test audit](PRODUCTION_TEST_AUDIT.md) records what actually ran. A design is ready to assign once its local release, license and topology prerequisites are confirmed.
+
+| Area | Design backlog |
+|---|---|
+| PostgreSQL, MySQL, OLAP, HTAP and wide-column stores | [Orders, shard moves, analytical corrections and cell-level access](docs/example-plans/relational-and-analytical.md) |
+| Time-series, streaming SQL, CDC, queues, workflows and observability | [Event replay, external effects and signal completeness](docs/example-plans/streaming-and-observability.md) |
+| Document, search, KV, coordination, graph, edge and identity | [Elections, visibility, fencing, traversal and revocation](docs/example-plans/data-services.md) |
+| Lakehouse, object storage, HPC and embedded engines | [Publication, compaction, replication, fencing and restore](docs/example-plans/storage-and-lakehouse.md) |
+| Systems with existing deployments | [New workload questions using the labs already on main](docs/example-plans/existing-systems.md) |
+
+**Suggested first assignments** (independent, in addition to the accepted [GreptimeDB versus Victoria comparison](observability/README.md#greptimedb-vs-victoria-planned-comparison)):
+
+1. **MongoDB change streams** — one local replica set, one election, one persisted resume token. Deliver the recovered change stream and reconcile it against majority-acknowledged source operations.
+2. **Temporal payment retry** — one worker crash between a local payment commit and activity completion. Deliver a history showing workflow attempts and the charge count for every order. Reuse this fixture later for Restate and Inngest.
+3. **Pinot delivery tracking** — start with just the upsert table. Show which status wins for each delivery after a duplicate, a late update and server recovery. Give star-tree aggregation its own append-only table.
+4. **Apache Ozone S3** — reuse the object corpus and distinguish a metadata election from loss of a DataNode. Deliver full-body readback and native replica-placement evidence for both phases.
+5. **SlateDB writer fencing** — start two Rust processes over a lab-owned object store and resume the former writer after handoff. Deliver its actual error and the durable records visible to a fresh reader.
+
+For each assignment, start with one supported topology, a deterministic fixture, healthy operation, one failure and a fresh independent readback. Publish the commands, measured effects and remaining gaps beside the example. Preserve failures. Use the [repository guide](AGENTS.md#progressive-testing-across-systems) for later deployment shapes and production tests. Any performance campaign needs a separate depth choice.
+
 ## Break and recover: all existing and future examples
 
 **Current scope (2026-11-23):** experiments are paused. Preserve the completed
@@ -135,11 +157,11 @@ not remove the longer-term requirements above.
 
 ## Already covered
 
-On `main`: Aerospike, Airflow, ArangoDB, CedarDB, ClickHouse, CockroachDB, Dragonfly, DuckDB, Elasticsearch, FoundationDB, Garnet/Valkey (Go comparison), InfluxDB, Kafka, kdb+, Manticore Search, Memgraph, Milvus, NATS, NebulaGraph, Neo4j, OceanBase, Postgres (k8s/vagrant), MySQL and SQLite clients, Qdrant, QuestDB, Redpanda, RisingWave, RonDB, ScyllaDB, SingleStore, Skytable, TiDB, Tarantool, TigerBeetle, TiKV, TimescaleDB, Valkey, Weaviate, YDB, YugabyteDB.
+Use the [root inventory](README.md#systems), [analytical examples](README.md#analytical-database-follow-ups), [Rust embedded results](rust/embedded-databases/), and [recent coverage audit](PRODUCTION_TEST_AUDIT.md) to check deployment and test status. The top-level [PostgreSQL](postgres/) and [MySQL](mysql/) directories include replicated and sharded deployments. Tigris has a research directory only.
 
 ## Top priority
 
-Fastest in class, free, runnable locally (see the sections below for the example names).
+The first five priority systems now have local examples. Each README describes the tested edition, deployment and comparison scope.
 
 - [x] Tarantool
 - [x] RisingWave
@@ -155,8 +177,8 @@ Fastest in class, free, runnable locally (see the sections below for the example
   exact recall@10, filtered/unfiltered p50/p99 and QPS, indexing and native
   RAM/page-cache/disk accounting, oversampling/rescoring tradeoffs, peer/disk
   recovery under live reads/writes. [Release and minimum version](https://qdrant.tech/blog/qdrant-1.18.x/).
-- [ ] Postgres scale-out: Citus, PgDog, Multigres, Neon
-- [ ] MySQL sharding: Vitess, ShardingSphere, PolarDB-X, NDB Cluster
+- [ ] Extend the existing Citus and PgDog sharding cases and evaluate Multigres's supported routing. Compare Neon separately for disaggregated storage and read scaling. [PostgreSQL designs](docs/example-plans/relational-and-analytical.md#postgresql-and-its-extensions)
+- [ ] Add Vitess online resharding, ShardingSphere and PolarDB-X to the customer-order comparison. NDB and fixed-shard Vitess already have measured labs. [MySQL designs](docs/example-plans/relational-and-analytical.md#mysql-and-its-ecosystem)
 - [x] pgvector
 - [x] [StarRocks](starrocks/): single-node, Compose comparison and official operator; mutable-order correctness, benchmarks and 13 operator production cases, with failed attempts and recovery limits documented.
 - [x] Iceberg + Trino + MinIO
@@ -167,6 +189,8 @@ Fastest in class, free, runnable locally (see the sections below for the example
 
 ## Time-series
 
+Assign from the [time-series designs](docs/example-plans/streaming-and-observability.md#time-series) and the [VictoriaMetrics cluster design](docs/example-plans/streaming-and-observability.md#observability).
+
 - [x] `timescaledb-single-node`: hypertables and continuous aggregates on Postgres.
 - [x] `questdb-single-node`: ILP ingest and `SAMPLE BY` queries.
 - [ ] `victoriametrics-docker-compose-cluster`: vminsert/vmselect/vmstorage as Prometheus long-term storage.
@@ -175,35 +199,45 @@ Fastest in class, free, runnable locally (see the sections below for the example
 - [ ] `tdengine-docker-compose-cluster`: IoT time-series (AGPL); one table per device with super tables, vnodes sharding; rerun TSBS against TimescaleDB/QuestDB/InfluxDB.
 - [ ] `iotdb-docker-compose-cluster`: Apache IoTDB (Apache 2.0) ConfigNode/DataNode cluster, TsFile columnar storage; same TSBS run.
 - [ ] `dolphindb-single-node`: free Community Edition (memory/core caps); columnar time-series engine with its own scripting language, used for tick data; compare with kdb+ on the same market data.
-- [ ] `arcticdb-local`: Man Group's DataFrame time-series DB (C++ engine, Python API) on local LMDB and MinIO/S3 backends; versioned symbols, append/update.
+- [ ] `arcticdb-local`: reopen versioned market-data snapshots after corrections using LMDB and an isolated local S3-compatible service. Check symbol-level write coordination in the selected build.
 
 ## Streaming databases and CDC
 
+The [streaming SQL and CDC designs](docs/example-plans/streaming-and-observability.md#streaming-sql-and-cdc) specify event-time, changelog and replay checks.
+
 - [x] `risingwave-single-node` (top priority): Postgres-compatible incremental materialized views with built-in CDC.
-- [ ] `materialize-emulator`: strict-serializable incremental views.
-- [ ] `feldera-single-node`: incremental SQL computation (DBSP).
+- [ ] Materialize emulator for local view logic and a separately licensed self-managed kind profile for deployment/recovery. Retract a sale from the old group after its customer's region changes.
+- [ ] `feldera-single-node`: incremental SQL retractions and clean replay from retained input in Community. Native checkpoint/fault tolerance requires Enterprise.
+- [ ] Apache Flink keyed-state and event-time timer recovery during TaskManager loss and rescaling.
+- [ ] Apache Fluss replicated primary-key inventory with independent changelog reconstruction after a bucket leader fails.
 - [ ] `timeplus-proton-single-node`: C++ streaming SQL on ClickHouse code (Apache 2.0); streaming joins and windows from Kafka/Redpanda; compare with RisingWave.
 - [ ] `debezium-postgres-kafka`: CDC from Postgres into Kafka, then ClickHouse.
 - [ ] `debezium-mysql-kafka-flink-clickhouse`: end-to-end e-commerce CDC pipeline, MySQL → Debezium → Kafka → Flink → ClickHouse, orchestrated by Airflow.
   - **Source:** MySQL 8 with `binlog_format=ROW`, `binlog_row_image=FULL`, GTIDs on; `demo` schema with `products`, `orders` (`pending`/`completed`/`canceled`), `order_items` (price and cost price for margin); `debezium` user with `REPLICATION SLAVE`/`REPLICATION CLIENT`/`RELOAD`/`SHOW DATABASES`; seed data plus a load generator for inserts/updates/deletes.
-  - **Capture:** Debezium MySQL connector (`io.debezium.connector.mysql.MySqlConnector`) with an initial snapshot and then binlog streaming; `table.include.list`, schema-history topic, `ExtractNewRecordState` unwrap SMT, Avro via Schema Registry (Confluent or Apicurio).
+  - **Capture.** Preserve Debezium's change envelope and source metadata from the initial snapshot through binlog streaming. Use a local registry compatible with the selected Flink decoder and retain the schema-history topic. Place any flattened representation on a separate branch for consumers that request it. [Flink Debezium format](https://nightlies.apache.org/flink/flink-docs-stable/docs/connectors/table/formats/debezium/)
   - **Kafka, two variants:** Docker Compose (KRaft Kafka + Kafka Connect + Schema Registry, connector registered by `curl` to `:8083/connectors`) and Kubernetes with Strimzi (`Kafka` with KRaft node pools, `KafkaConnect` with a Debezium plugin image built via `spec.build`, `KafkaConnector` CR for the MySQL source, `KafkaTopic` CRs for per-table topics).
-  - **Processing:** Flink SQL with the Kafka connector and `debezium-avro-confluent` format; joins `order_items` with `products` and `orders` into per-order revenue/margin, tumbling-window aggregates, exactly-once via checkpoints.
-  - **Sink:** ClickHouse, either through the Flink ClickHouse connector or the ClickHouse Kafka Connect sink (Strimzi `KafkaConnector`); `ReplacingMergeTree(version)` keyed on primary key with `is_deleted` for Debezium deletes, plus a `SummingMergeTree` materialized view for daily revenue. Compare with ClickHouse's native `Kafka` table engine + MV as the no-Flink baseline.
+  - **Processing.** Decode inserts, before/after updates and deletes in Flink. Join the changing tables on stable keys and emit replacements/retractions for cancelled orders and corrected prices. Preserve source offsets with checkpoints and establish the sink's replay contract independently. [Flink changelog handling](https://nightlies.apache.org/flink/flink-docs-stable/docs/connectors/table/formats/debezium/)
+  - **Sink.** Write ordered, versioned results and delete markers per order to ClickHouse. Compute daily revenue from the latest surviving order states. An insert-triggered materialized view sees inserted blocks, so summing successive order versions double-counts price changes and cancellations. Compare raw Kafka ingestion using the same latest-state query and crash after sink acceptance to test duplicates. [ClickHouse incremental views](https://clickhouse.com/docs/materialized-view/incremental-materialized-view)
   - **Airflow:** DAGs that apply MySQL migrations (`migration_history` table), register/pause/restart connectors through the Connect REST API (or apply Strimzi CRs), trigger Debezium incremental snapshots via a signal table for backfills, and run nightly row-count/sum reconciliation between MySQL and ClickHouse.
   - **Ops:** Kafka UI (Conduktor, Redpanda Console or AKHQ) to browse topics and schemas; show a schema change (add column) flowing through the schema-history topic and Schema Registry compatibility rules; failure demos: restart Connect mid-stream, drop and recreate a Flink job from a savepoint.
 
 ## Message streaming and queues
 
+- [ ] Apache BookKeeper: isolate ledger-writer fencing and recovery at declared write/ACK quorums. [Storage-engine design](docs/example-plans/storage-and-lakehouse.md#embedded-engines-and-memory-grids)
+
+The [messaging designs](docs/example-plans/streaming-and-observability.md#message-streaming-and-queues) specify the acknowledgement and replay boundary for each system.
+
 - [x] `redpanda-single-node` / `redpanda-docker-compose-cluster` (top priority): Kafka API without JVM or ZooKeeper; compare with the Kafka examples.
-- [ ] `iggy-single-node`: Apache Iggy, Rust message streaming over TCP/QUIC/HTTP.
+- [ ] Apache Iggy single-node offset replay and three-node replicated partition recovery under a live producer and consumer. [Upstream clustering release](https://iggy.apache.org/blogs/2026/09/21/release-0.9.0/)
 - [ ] `fluvio-single-node`: Rust streaming with WASM SmartModules.
-- [ ] `pulsar-single-node`: broker/BookKeeper split, tiered storage.
-- [ ] `rabbitmq-streams`: classic queues vs streams.
-- [ ] `aeron-cluster`: Java/C++ microsecond messaging over UDP/IPC with Raft-replicated Aeron Cluster.
-- [ ] `kurrentdb-docker-compose-cluster`: KurrentDB (formerly EventStoreDB) event store; append-only streams, optimistic concurrency, projections, persistent subscriptions; 3-node cluster with `failover`.
+- [ ] Apache Pulsar standalone control and separate clustered BookKeeper/broker failure and tiered replay using local storage.
+- [ ] `rabbitmq-streams`: match replicated quorum queues with streams for leader-loss and replay tests. Keep classic queues as a single-copy control.
+- [ ] `aeron-cluster`: recover a deterministic order book from a snapshot and replicated log. Measure the time to a committed service reply separately from UDP/IPC transport latency.
+- [ ] KurrentDB single-node optimistic concurrency and persistent subscription redelivery. Multi-node deployments from 26.2 require Enterprise and remain conditional. [Upstream licensing](https://kurrentdb.kurrent.io/blog/licensing-in-kurrentdb-v26-2-and-beyond-what-s-free-and-what-s-licensed/)
 
 ## Durable execution and workflow engines
+
+The [durable-execution designs](docs/example-plans/streaming-and-observability.md#durable-execution) use a local payment ledger to distinguish workflow replay, external retries and duplicate effects.
 
 - [ ] `temporal-docker-compose-cluster`: workflows, activities, retries, signals; Go and Python workers backed by Postgres.
 - [ ] `restate-single-node`: Rust durable execution runtime; virtual objects, durable promises, idempotent handlers.
@@ -214,9 +248,7 @@ Fastest in class, free, runnable locally (see the sections below for the example
 
 ## Postgres and MySQL
 
-No dedicated `postgres/` or `mysql/` folder yet; existing examples live with other systems.
-Planned: Postgres, Citus, PgDog, Multigres and Neon under `postgres/`; MySQL, Vitess and friends under `mysql/`
-(see the two sections below).
+[PostgreSQL](postgres/) already includes Citus, PgDog, Neon, pgvector and customer sharding. [MySQL](mysql/) includes Vitess, NDB and customer sharding. The older related examples below remain in their original directories. See the [relational experiment designs](docs/example-plans/relational-and-analytical.md) for the proposed extensions and comparisons.
 
 | Example | Engine | What |
 |---|---|---|
@@ -231,12 +263,11 @@ Planned: Postgres, Citus, PgDog, Multigres and Neon under `postgres/`; MySQL, Vi
 
 - [x] `postgres/customer-sharding`: PgDog + Patroni, three shards with three copies each; primary failures, replica stalls and acknowledgement reconciliation.
 
-Planned as a `postgres/` folder: a plain Postgres baseline, then each scale-out option on the same
-sharded `orders` workload (distribution key `customer_id`) so results compare directly.
+Use the same orders and customer keys for the [PostgreSQL designs](docs/example-plans/relational-and-analytical.md#postgresql-and-its-extensions). Check shard placement on sharding systems and compute/storage behavior on Neon.
 
-- [ ] `postgres-single-node`: Postgres 18 baseline; async I/O, `pg_stat_statements`, `pgbench`.
+- [ ] `postgres-single-node`: plain PostgreSQL on the current stable major, with asynchronous I/O, `pg_stat_statements` and `pgbench`. Pin the release at implementation. [Release policy and current versions](https://www.postgresql.org/support/versioning/)
 - [ ] `postgres-docker-compose-cluster`: streaming replication with Patroni + etcd; `failover`, sync vs async commit.
-- [ ] `postgres-kubernetes-operator`: CloudNativePG on kind; replicas, switchover, backups to MinIO.
+- [ ] `postgres-kubernetes-operator`: CloudNativePG on kind; replicas, switchover and a point-in-time restore to a second cluster via the supported Barman Cloud plugin and an isolated local object store.
 - [x] `citus-docker-compose-cluster`: 3 replicated worker groups plus replicated coordinator; colocated distributed tables, worker/coordinator failover, replica stalls and active-write rebalancing 3 → 5 → 3.
 - [x] `pgdog-docker-compose-cluster`: separate pooling configuration example, 3 PostgreSQL copies, pool-size reload/comparison, replica routing and primary failover. Customer sharding is a separate example; online resharding remains future work.
 - [ ] `multigres-docker-compose-cluster`: Supabase's Vitess-style architecture for Postgres (gateway, pooler, orchestrator); early-stage, document what runs and what doesn't.
@@ -256,12 +287,12 @@ sharded `orders` workload (distribution key `customer_id`) so results compare di
 
 - [x] `mysql/customer-sharding`: separate Vitess workload with 3 customer shards, 3 copies per shard, live primary failures on every shard, GTID catch-up and acknowledged-data tracking.
 
-Planned as a `mysql/` folder, mirroring the Postgres section with the same `orders` workload.
+Extend the [existing MySQL labs](mysql/) with the same order corpus. The [MySQL briefs](docs/example-plans/relational-and-analytical.md#mysql-and-its-ecosystem) specify separate routing, replication and operator cases.
 
-- [ ] `mysql-single-node`: MySQL 8.4 LTS baseline; `sysbench` OLTP.
+- [ ] `mysql-single-node`: current supported stable MySQL baseline with witnessed InnoDB transactions and a separate `sysbench` workload. Retain 8.4 as an explicit compatibility profile where required.
 - [ ] `mysql-docker-compose-cluster`: InnoDB Cluster (Group Replication) + MySQL Router; single-primary `failover`.
-- [ ] `mysql-kubernetes-operator`: Oracle MySQL Operator or Percona Operator for MySQL on kind.
-- [ ] `mariadb-galera-cluster`: multi-primary synchronous replication; write conflicts and certification failures.
+- [ ] `mysql-kubernetes-operator`: Oracle MySQL Operator for InnoDB Cluster on kind. A Percona XtraDB Cluster operator scenario needs its own Galera failure and replication expectations.
+- [ ] `mariadb-galera-cluster`: virtually synchronous multi-primary replication. Check certification conflicts, replica apply lag, minority behavior and state transfer.
 - [ ] `proxysql-read-write-split`: query routing, read/write split and query rules in front of replicas.
 - [x] `vitess-docker-compose-cluster`: unsharded deployment, 3 MySQL copies, VTGate/VTctld/etcd/VTOrc, semi-sync primary failure and million-order loss tracking.
 - [ ] Extend Vitess deployment with online `Reshard` workflow and scaling measurements.
@@ -269,28 +300,30 @@ Planned as a `mysql/` folder, mirroring the Postgres section with the same `orde
 - [x] `ndb-cluster-docker-compose-cluster`: Community 8.4.11; 3 partitions × 3 copies, data/SQL/management failures, loss tracking and Vitess architecture comparison. Separate correlated disk-full crash lost 6,800 acknowledged orders.
 - [ ] `shardingsphere-proxy`: Apache ShardingSphere-Proxy in front of plain MySQL (and Postgres) shards; sharding rules, read/write split, distributed transactions.
 - [ ] `polardbx-kubernetes-operator`: PolarDB-X (Apache 2.0) on kind; CN/DN/GMS/CDC split, partitioned tables, global secondary indexes.
-- [ ] `matrixone-docker-compose-cluster`: MySQL-compatible HTAP (Apache 2.0, Go); separated storage/compute on S3 (MinIO), CN/TN/LogService; OLTP plus TPC-H on one copy of the data.
+- [ ] `matrixone-docker-compose-cluster`: MySQL-compatible HTAP (Apache 2.0, Go); separated storage/compute on isolated S3-compatible storage, CN/TN/LogService; OLTP plus TPC-H on one copy of the data.
 - [ ] Comparison example: same `orders` workload on single MySQL vs Vitess vs ShardingSphere vs PolarDB-X vs NDB/RonDB vs TiDB (existing example); then Vitess vs Citus/PgDog/Multigres for the MySQL-vs-Postgres sharding story.
 
 ## In-memory OLTP
 
-- [ ] `volt-active-data`: partitioned single-threaded in-memory SQL with stored procedures (H-Store lineage); Developer Edition is a free 100-day license, arm64 unknown.
+- [ ] `volt-active-data`: partitioned single-threaded in-memory SQL with stored procedures (H-Store lineage); gate local testing on the available Developer Edition license, supported image architecture and permitted K-safety topology. [Local developer options](https://developers.voltactivedata.com/get-started)
 - [ ] `spacetimedb-single-node`: transactional Rust modules and client subscriptions for multiplayer world state; reconnect/replay and crash recovery versus PostgreSQL + an application/WebSocket service. Qualify current license and native replication support; deferred until the current batch finishes.
 
 ## Real-time OLAP
 
-- [ ] `starrocks`: single-node, replicated Compose cluster, Kubernetes operator and clustered mutable orders/inventory joins. Compare ClickHouse; add shared-data/S3 compute-loss and cache experiments where supported.
+- [ ] [StarRocks shared-data follow-up](docs/example-plans/relational-and-analytical.md#real-time-olap): replace a compute node and refill its cache from local object storage. The [shared-nothing single-node, Compose, operator and mutable-orders comparison](starrocks/) already ran.
 - [ ] `doris-docker-compose-cluster`: mutable orders/inventory joins, replicated tablets versus storage/compute separation, compute isolation and disk rebuild; compare StarRocks / ClickHouse on identical data.
-- [ ] `pinot-docker-compose-cluster`: Kafka delivery-status upserts, duplicate/out-of-order events, segment recovery, star-tree-compatible aggregates and server loss; compare StarRocks / ClickHouse with equivalent visibility rules.
+- [ ] `pinot-docker-compose-cluster`: Kafka delivery-status upserts with duplicate/out-of-order events, segment recovery and server loss. Use a **separate append-only table** for star-tree aggregates. Pinot rejects star-tree indexing on an upsert table. [Upsert limitations](https://docs.pinot.apache.org/build-with-pinot/ingestion/upsert-dedup/upsert)
 - [ ] `druid-docker-compose-cluster`: segments, ingestion specs.
 - [ ] `databend-single-node`: Rust cloud warehouse on object storage.
 - [ ] `firebolt-core-single-node`: free self-hosted Firebolt engine; compare with ClickHouse and StarRocks.
-- [ ] `exasol-personal`: free single-user in-memory MPP; Docker image is x86-only and capped at 10 GiB.
-- [ ] `vertica-community`: free Community Edition (3 nodes, 1 TB); MPP column store with projections; compare with ClickHouse and StarRocks.
+- [ ] `exasol-docker-evaluation`: use the vendor’s separate Docker evaluation image, capped at 10 GiB of raw data. Exasol Personal uses Exasol Launcher. Verify image platform and isolation prerequisites before scheduling. [Edition differences](https://docs.exasol.com/db/latest/get_started/exasol_editions.htm)
+- [ ] `vertica-local-trial`: examine projection locality and node recovery only with an available local evaluation license and permitted topology. The former permanent Community Edition limits do not apply to new versions. [Current trial and CE upgrade restriction](https://docs.rocketsoftware.com/bundle/vertica_26.2/page/getting-started/community-edition-ce.html)
 - [ ] `cratedb-docker-compose-cluster`: industrial telemetry plus text filters, tenant skew, three shards with three copies, relocation and disk loss; compare GreptimeDB / TimescaleDB / Elasticsearch on matching query subsets.
-- [ ] `heavydb-single-node`: HeavyDB (formerly OmniSciDB/MapD, Apache 2.0) GPU-accelerated SQL; CPU mode on a Mac, GPU numbers only with an NVIDIA box.
+- [ ] `heavydb-single-node`: HeavyDB (formerly OmniSciDB/MapD, Apache 2.0) GPU-accelerated SQL; use a supported local container for the CPU profile and a separately identified compatible GPU host for the GPU profile.
 
-## Embedded analytics
+## Local analytical engines and storage
+
+[Analytical process and storage designs](docs/example-plans/relational-and-analytical.md#analytical-processes-and-local-storage) cover embedded DuckDB, separate database servers, analytical libraries and the ZFS filesystem. Deployment and recovery boundaries differ across those cases.
 
 - [x] `cedardb/backup-recovery`: synchronous million-row fixtures versus PostgreSQL, live independent actors, graceful/SIGKILL recovery, online physical backups, read-only fresh-copy restores, full ACK/body/history reconciliation and CPU/memory/compression/I/O/storage observations. CE privileges/async-commit and PostgreSQL replication-HBA gotchas documented.
 - [x] `cedardb/backup-recovery` analytical contention: [12 sustained cells](cedardb/backup-recovery/projects/analytical-contention/docs/HTAP.md), three fresh-process trials per backend/traffic condition, 60 s warmup and 300 s monotonic measurement deadlines. Complete bodies and 109,580 historical ACKs verified, zero missing. Median CedarDB query throughput was 3.33× PostgreSQL alone and 2.69× with live appends/readers; PostgreSQL used less charged memory. Resource costs and the documented 2.91 ms UTC timing discrepancy remain in the report. This immutable subset plus live appends does not cover UPDATE/DELETE contention or cold-cache behavior.
@@ -316,11 +349,16 @@ Planned as a `mysql/` folder, mirroring the Postgres section with the same `orde
 - [x] [ZFS storage recovery follow-up](zfs/storage-lab/): default 4 MiB/s five-command lifecycle, full mirror/RAIDZ2/replication suite, 157/140 complete immutable-body reads during recovery, verified 512 MiB payloads, clean scrubs, guarded native pool archives and scoped teardown. Thirty-five controls pass; CPU/memory/compression/disk-byte/IOPS observations published. Earlier explicit-rate checkpoint and archive-checker/Python-prerequisite failures remain separate; stream validation is not restore qualification.
 - [ ] ZFS deeper pass: restore the preserved native streams, add continuous replication observation and per-flush external acknowledgements, and exercise guest restart/configuration persistence, bounded pressure and further loss combinations. Deferred while the repository proceeds breadth-first; select any deeper run explicitly.
 
-- [ ] `hyper-api-embedded`: Salesforce/Tableau Hyper (Umbra lineage, compiled queries) via `pip install tableauhyperapi`; free, closed source. macOS arm64 wheels stop after 0.0.26479 (newer releases: Linux x86_64 and Windows only), so pin that on a Mac. Compare with DuckDB on the same data.
+- [ ] `hyper-api-local`: a client-managed Tableau Hyper process over local extract files. Pick a current Linux container wheel that matches the architecture (0.0.27426 ships Linux ARM64 and x86-64), then compare transaction recovery and exact analytical results with DuckDB. [Published artifacts](https://pypi.org/project/tableauhyperapi/0.0.27426/)
 - [ ] `polars-datafusion`: Polars and DataFusion on the same Parquet files as the DuckDB example.
-- [ ] `monetdb-single-node`: MonetDB (MPL 2.0), the original column store (vectorized execution lineage of DuckDB); same queries as the DuckDB example.
+- [ ] `monetdb-single-node`: a MonetDB column-store server running the same analytical queries as DuckDB, with a hot-backup/fresh-restore case.
 
 ## Lakehouse and object storage
+
+Pick a [table, catalog or storage design](docs/example-plans/storage-and-lakehouse.md) with a concrete commit/restore boundary. The checked entries below keep their original experimental scope.
+
+- [ ] Apache Hudi: compare copy-on-write and merge-on-read tables on identical order corrections. Interrupt compaction and reconcile both snapshots at the same source offset using each table's own completed instant.
+- [ ] Apache Ozone: run the S3 gateway over replicated DataNodes and persistent metadata. Separate an Ozone Manager election from DataNode loss and verify multipart object bytes and rebuilt placement.
 
 - [ ] [`tigris/`](tigris/): **self-hosted only**, as requested. Current official
   docs/public repositories did not reveal a supported self-hosted object-storage
@@ -346,7 +384,7 @@ Planned as a `mysql/` folder, mirroring the Postgres section with the same `orde
 - [x] [DuckDB native maintenance rejection controls](iceberg/multi-system/projects/duckdb-iceberg/docs/DUCKDB_REJECTIONS.md): native v3, pending-write and pending-schema rejection; unchanged committed metadata/bodies/schema, independent ten-row ClickHouse readback, pinned HTTP settings and final child-process resource capture. Initial Make workflow passes 217 controls; shared-runner regression passes 218. Continuous-append conflicts and live native compactor fault/recovery remain unfinished; these tiny controls are not benchmarks.
 - [x] [DuckDB controlled rewrite/append conflict](iceberg/multi-system/projects/duckdb-iceberg/docs/DUCKDB_CONFLICTS.md): stage a rewrite, acknowledge an independent append, verify visibility, reject stale COMMIT with actual snapshot IDs/409, preserve all 110,000 bodies and replan successfully (11 → 1 files); 218 controls and resource/compression/disk/I/O evidence. Continuous-writer progress and million-row native live-fault recovery remain unfinished; this is a bounded transaction diagnostic.
 - [x] [Current failed Iceberg case preservation receipt](iceberg/multi-system/projects/cold-storage-recovery/docs/FAILED_PRESERVATION.md): pins original seals and independently restored 3.8-million-row body proof; 76 original source files, 229 original artifacts and 16 native fences, plus final publication/offline replay and 224 controls. Operational verdict remains failed; cleanup-gate integration and native-fixture retirement are unfinished, so teardown stays blocked.
-- [ ] Priority: **DuckDB SQL client → ClickHouse ↔ Iceberg**. The active [HTTP path](iceberg/multi-system/projects/duckdb-clickhouse/http/docs/DUCKDB_HTTP.md) now uses core httpfs and signed http_client; 2M hot writes/readback and 2.097M retained cold reads pass. The retained fixture rejected the full round trip at its slot guard; a later isolated HTTP fixture passed 2M-row hot/cold/restored verification and teardown. HTTP faults/edge types remain unrun. The following findings are from the preserved native connector. [Initial findings](iceberg/multi-system/projects/duckdb-clickhouse/clickhouse-scanner/docs/DUCKDB_CLICKHOUSE_FINDINGS.md): ordinary/explicit scanner cannot discover the Iceberg catalog table although native pass-through reads it; rollback does not undo remote writes; DateTime64(9) loses sub-microsecond precision. Next pass has five groups: 2M-row complete round trip/types; partial/ambiguous insert and retry; live ClickHouse crash/restart; live S3/catalog outage; concurrent compaction/reconciliation. Existing direct DuckDB–Iceberg results do not qualify this architecture. [Partial insert/retry](iceberg/multi-system/projects/duckdb-clickhouse/clickhouse-scanner/docs/DUCKDB_PARTIAL.md) now reproduces 1,906,688 persisted rows despite a conversion error; blind retry doubles physical rows. Corrected immutable-key replay passes for 2M logical rows under FINAL; transport ACK-loss injection remains unrun. [Live ClickHouse SIGKILL](iceberg/multi-system/projects/duckdb-clickhouse/clickhouse-scanner/docs/DUCKDB_CRASH.md) passes with 2.14M ACKed rows, zero loss/wrong/duplicate bodies; fresh-process DuckDB readers/writers remain active and recover. [S3/catalog partitions](iceberg/multi-system/projects/duckdb-clickhouse/clickhouse-scanner/docs/DUCKDB_DEPENDENCIES.md) pass with 3.38M hot ACKs and unchanged 2M cold source; native-client timeouts left 2k unacknowledged archive rows applied, so no retries. Fresh healthy archive ACK and physical compression/CPU/memory/disk/I/O checks pass. [Spark reader compatibility](iceberg/multi-system/projects/duckdb-clickhouse/clickhouse-scanner/docs/CONNECTOR_COMPACTOR_PROBE.md) passes 3k complete bodies despite directly observed missing v2 headers; writer conformance remains failed. [Full two-million-row concurrent maintenance](iceberg/multi-system/projects/duckdb-clickhouse/clickhouse-scanner/docs/CONNECTOR_CONCURRENT.md) now preserves all 3.46M hot / 2.097M cold ACKs, but availability fails (32/51 cold reads hit memory limits). Retention cleanup remains unrun; earlier-history re-verification rejects legacy ownership labels. The earlier level-5 approval was revoked; experiments are stopped. Never run level 5. [Native memory isolation](iceberg/multi-system/projects/duckdb-clickhouse/clickhouse-scanner/docs/COLD_MEMORY.md) reproduces error 241 without DuckDB/concurrent writers; a 64MiB watermark alone fails once in three attempts, and the subsequent 8,192-row-block diagnostic also fails with one query thread. No validated memory workaround yet.
+- [ ] Deferred follow-up: **DuckDB SQL client → ClickHouse ↔ Iceberg**. The active [HTTP path](iceberg/multi-system/projects/duckdb-clickhouse/http/docs/DUCKDB_HTTP.md) now uses core httpfs and signed http_client; 2M hot writes/readback and 2.097M retained cold reads pass. The retained fixture rejected the full round trip at its slot guard; a later isolated HTTP fixture passed 2M-row hot/cold/restored verification and teardown. HTTP faults/edge types remain unrun. The following findings are from the preserved native connector. [Initial findings](iceberg/multi-system/projects/duckdb-clickhouse/clickhouse-scanner/docs/DUCKDB_CLICKHOUSE_FINDINGS.md): ordinary/explicit scanner cannot discover the Iceberg catalog table although native pass-through reads it; rollback does not undo remote writes; DateTime64(9) loses sub-microsecond precision. Next pass has five groups: 2M-row complete round trip/types; partial/ambiguous insert and retry; live ClickHouse crash/restart; live S3/catalog outage; concurrent compaction/reconciliation. Existing direct DuckDB–Iceberg results do not qualify this architecture. [Partial insert/retry](iceberg/multi-system/projects/duckdb-clickhouse/clickhouse-scanner/docs/DUCKDB_PARTIAL.md) now reproduces 1,906,688 persisted rows despite a conversion error; blind retry doubles physical rows. Corrected immutable-key replay passes for 2M logical rows under FINAL; transport ACK-loss injection remains unrun. [Live ClickHouse SIGKILL](iceberg/multi-system/projects/duckdb-clickhouse/clickhouse-scanner/docs/DUCKDB_CRASH.md) passes with 2.14M ACKed rows, zero loss/wrong/duplicate bodies; fresh-process DuckDB readers/writers remain active and recover. [S3/catalog partitions](iceberg/multi-system/projects/duckdb-clickhouse/clickhouse-scanner/docs/DUCKDB_DEPENDENCIES.md) pass with 3.38M hot ACKs and unchanged 2M cold source; native-client timeouts left 2k unacknowledged archive rows applied, so no retries. Fresh healthy archive ACK and physical compression/CPU/memory/disk/I/O checks pass. [Spark reader compatibility](iceberg/multi-system/projects/duckdb-clickhouse/clickhouse-scanner/docs/CONNECTOR_COMPACTOR_PROBE.md) passes 3k complete bodies despite directly observed missing v2 headers; writer conformance remains failed. [Full two-million-row concurrent maintenance](iceberg/multi-system/projects/duckdb-clickhouse/clickhouse-scanner/docs/CONNECTOR_CONCURRENT.md) now preserves all 3.46M hot / 2.097M cold ACKs, but availability fails (32/51 cold reads hit memory limits). Retention cleanup remains unrun; earlier-history re-verification rejects legacy ownership labels. The earlier level-5 approval was revoked; experiments are stopped. Never run level 5. [Native memory isolation](iceberg/multi-system/projects/duckdb-clickhouse/clickhouse-scanner/docs/COLD_MEMORY.md) reproduces error 241 without DuckDB/concurrent writers; a 64MiB watermark alone fails once in three attempts, and the subsequent 8,192-row-block diagnostic also fails with one query thread. No validated memory workaround yet.
 - [ ] [Connector group 1: two-million-row round trip](iceberg/multi-system/projects/duckdb-clickhouse/clickhouse-scanner/docs/DUCKDB_CLICKHOUSE_ROUNDTRIP.md) is implemented but **fails** on intermittent read-query wrong answers; the generated-row reproducer needs no object storage and has failed with either thread count. Independent native full-body checks pass all three stored copies (6M row copies). Final Make workflows run 228 passing host controls but correctly return nonzero; the gated rerun retains 2M acknowledged hot rows and leaves cold storage uncommitted. The other four groups now have diagnostic evidence, including failed cold-read availability. [Row-level isolation](iceberg/multi-system/projects/duckdb-clickhouse/clickhouse-scanner/docs/CONNECTOR_READ_ISOLATION.md) additionally stores 1,356,530 bad predicate flags beside correct materialized values; root cause remains unassigned. No capacity ranking before correctness passes.
 - [ ] Native DuckDB Iceberg follow-up: HTTP timeout/retry settings and v3/pending-write/schema rejections are tested (see rejection controls above), as is a controlled append/conflict/replan. Extend these to continuous append and process/S3/catalog interruption with independent live readers/writers and durable reconciliation. Keep offered load unchanged through recovery; record starvation/rejection and any loss honestly. Committed deletes, partition evolution, safe retention/cleanup and repeated comparable benchmarks remain unrun. The successful earlier live compactor-crash case uses Spark.
 - [ ] Iceberg deeper pass: measure normal-path snapshot compression and full startup/exit costs; isolate catalog/S3/network outages, compactor interruptions and archive/TTL recovery; then run comparable sustained cold/warm performance trials. Self-hosted Tigris remains blocked on an available supported server artifact; managed Tigris is outside scope. Use isolated local SeaweedFS without host AWS configuration or resources.
@@ -354,53 +392,63 @@ Planned as a `mysql/` folder, mirroring the Postgres section with the same `orde
 - [ ] Extend the Iceberg REST catalog coverage to Polaris/Nessie; DuckDB and ClickHouse readers are covered with SeaweedFS.
 - [ ] `ducklake-multi-writer`: independent DuckDB writers coordinated through a PostgreSQL DuckLake catalog; deferred at the user's request.
 - [ ] `delta-lake-duckdb`: Delta tables read from DuckDB and Spark.
-- [ ] `paimon-flink-minio`: Apache Paimon (LSM-based primary-key tables, changelog for streaming) written by Flink to MinIO; read from Spark/StarRocks/Trino; compare upsert throughput and freshness with Iceberg.
+- [ ] Paimon: write a primary-key inventory changelog from Flink to a local SeaweedFS warehouse. Check one supported reader and a changelog consumer across compaction before expanding the reader matrix. [Paimon design](docs/example-plans/storage-and-lakehouse.md#tables-and-catalogs)
 - [x] `garage/s3-cluster`: nine nodes, three zones, fsync/quorums, empty-disk replacement and physical replica audits.
 - [x] `seaweedfs/s3-cluster`: separated HA master/volume/filer/etcd/S3 roles, three-datacenter `200` replication, fsync, disk replacement and full replica-byte checks.
 - [ ] SeaweedFS extensions: erasure coding for warm volumes and `filer.sync` cross-cluster replication.
 - [x] `rustfs/s3-cluster`: four-node EC2+2, strict durability, deep heal and independent rebuilt-shard checks.
 - [x] [`ceph/s3-cluster`](ceph/s3-cluster/): three guests, nine BlueStore OSDs, three RGWs, host-domain replication, native deep scrubs, guest crash and permanent disk replacement under load, measured emulated benchmarks and operational gotchas.
 - [x] `clickhouse/s3-tiered-storage`: replicated MergeTree TTL movement to Garage, hot/cold/cache benchmarks and three separate failure tests.
-- [ ] Comparison example: 1-4 MB blob put/update/delete latency in SeaweedFS vs Aerospike (`write-block-size 8M`) vs ScyllaDB (large-cell threshold, 16 MB mutation cap); plus metadata-in-Scylla + blob-in-SeaweedFS pattern.
+- [ ] Compare 1–4 MiB blob put/update/delete and a ScyllaDB pointer to a SeaweedFS body. Verify Aerospike's `max-record-size` and the selected ScyllaDB mutation limit before comparing accepted bodies. Treat a large-cell warning separately from a rejected write. [Storage design and upstream limits](docs/example-plans/storage-and-lakehouse.md#object-and-filesystem-storage)
 
 ## Low-latency and HPC storage
 
+[Storage and embedded designs](docs/example-plans/storage-and-lakehouse.md) distinguish a process restart, a rank failure and a physical storage failure.
+
 - [x] `zfs-storage-lab`: dedicated mirror, RAIDZ2 and resumable snapshot-replication setups with fio verification and bounded benchmarks.
 
-- [ ] `daos-single-node`: DAOS (`daos-stack/daos`) over `ofi+tcp` in MD-on-SSD mode (no RDMA/PMem); `daos_server` + `daos_engine` + `daos_agent`, `dmg` pool setup, containers, `pydaos` KV API, `dfuse` POSIX mount, replication vs EC object classes.
+- [ ] DAOS: exercise KV and file bodies on one emulated Linux engine. Schedule replication/EC rebuild separately on enough engine ranks and fault domains for the chosen object class. Verify the supported storage mode before claiming persistence. [DAOS hardware and emulation](https://docs.daos.io/latest/admin/hardware/)
 - [ ] `tidehunter-embedded`: Mysten Labs' WAL-as-storage KV engine (Rust, used by Sui validators); compare write amplification and point reads with RocksDB.
-- [ ] `cockroachdb-value-separation`: Pebble blob separation (v25.4+) on vs off for large values.
-- [ ] `hazelcast-docker-compose-cluster`: Java in-memory data grid; IMap, near cache, CP subsystem; latency vs Valkey/Dragonfly.
-- [ ] `chronicle-map-embedded`: Java off-heap persisted map, microsecond latency; compare with LMDB.
+- [ ] CockroachDB with Pebble: compare large-value storage with separation enabled and disabled on a release that supports the switch. Verify blob-file use before attributing a change in compaction I/O to separation.
+- [ ] Hazelcast: compare IMap and Near Cache reads through a partition-owner change. The CP subsystem in 5.7 requires Enterprise and explicit CP members for its guarantees. [Edition and configuration](https://docs.hazelcast.com/hazelcast/5.7/cp-subsystem/cp-subsystem)
+- [ ] Chronicle Map: compare recovery of a persisted off-heap map with LMDB after a writer crash. Measure latency per operation under the stated sync policy.
 
 ## Document
 
+Designs for [replica-set change streams, BSON compatibility and transactional inventory](docs/example-plans/data-services.md#document-databases).
+
 - [ ] `mongodb-replicaset`: replica set and change streams.
 - [ ] `ferretdb-single-node`: MongoDB wire protocol on Postgres (DocumentDB extension).
-- [ ] `couchbase-single-node`: KV + N1QL + indexes.
+- [ ] Couchbase single-node query baseline and replicated inventory transactions. Measure SQL++ secondary-index visibility separately from KV durability during failover.
 
 ## Search
 
-- [ ] `opensearch-docker-compose-cluster`
-- [ ] `meilisearch-single-node`: Rust, typo-tolerant app search.
+Designs for [product search, log splits, shard recovery and relevance checks](docs/example-plans/data-services.md#search).
+
+- [ ] OpenSearch cluster: refresh visibility, shard relocation and independently checked ESCI catalog results through primary loss.
+- [ ] Meilisearch: typo-tolerant catalog search during asynchronous reindex and index swap. Native shard/replica trials require the appropriate self-hosted Enterprise build. [Edition and topology](https://www.meilisearch.com/blog/horizontal-scaling-with-sharding)
+- [ ] Apache SolrCloud: tenant routing, replica search visibility at soft/hard commits and shard leader loss during product updates. Verify recovered versions and facet counts.
 - [x] [`typesense/product-search`](typesense/product-search/): consolidated single/three-Raft-replica storefront workload and three application-managed customer shards with three replicas each, 100,000 products, typo/facet/filter tests, hybrid ranking, leader-loss reconciliation and measured benchmarks.
 - [ ] `quickwit/`: Rust log search on object storage; supported single/Compose/Kubernetes deployments plus a clustered Kafka-to-S3 immutable-log workload, split/index recovery and indexer/searcher loss. Compare matching log queries with Loki / OpenObserve / GreptimeDB; qualify release health and current licensing.
 - [x] [`vespa/phased-product-search`](vespa/phased-product-search/): single/three-content-node profiles, 100,000 products, four ranking modes, controller/node failure under load, native metadata/version verification on every physical copy and measured benchmarks.
 - [x] [Vespa storage sharding](vespa/phased-product-search/#native-storage-sharding): 3 groups × 3 content nodes plus separate control/query hosts, 900,000 replica-directed gets per phase, content-node failure with 0 acknowledged loss and four-mode benchmarks.
-- [x] `manticore-single-node` (top priority): columnar storage + secondary indexes; rerun db-benchmarks.com against the Elasticsearch example.
+- [x] Manticore [single-node](manticore/single-node/) and [million-document log search versus Elasticsearch](manticore/log-search/). The custom workload follows part of the db-benchmarks methodology.
 
 ## Key-value and cache
+
+Designs for [disk-backed carts, cache refill, leases, data grids and coordination](docs/example-plans/data-services.md#key-value-stores-and-coordination).
 
 - [ ] `redis8-single-node`: Redis 8 (AGPL option) with built-in JSON, search and vector sets.
 - [ ] `kvrocks-single-node`: Redis protocol on RocksDB.
 - [ ] `garnet-docker-compose-cluster`: Microsoft Garnet (.NET) standalone and cluster mode; Tsavorite storage with tiering to disk, checkpoints and AOF.
 - [ ] `keydb-active-replica`: multithreaded Redis fork (Snap) with active-active replicas; low priority, last release v6.3.4 (Oct 2023).
-- [ ] `pika-single-node`: Redis protocol on RocksDB (OpenAtom); compare with Kvrocks for larger-than-memory data.
-- [ ] `ocache-docker-compose-cluster`: Tigris Data's Go cache (in-memory + RocksDB) single node and 3-node cluster; gRPC/HTTP APIs, versioned CAS ops, `ocachecli bench`.
-- [x] `tarantool-single-node` / `tarantool-replicaset` (top priority): in-memory DB with WAL and Lua stored procedures; memtx vs vinyl engines, synchronous replication.
+- [ ] PikiwiDB (formerly Pika): Redis-compatible RocksDB storage. Compare larger-than-memory hashes, expiry and recovery with Kvrocks.
+- [ ] OCache: three-node consistent-hash cache. Exercise RocksDB for small objects and segmented disk storage for large objects. Quantify misses at the default replication factor of one and refill from a local origin. [Storage](https://github.com/tigrisdata/ocache) · [Cluster defaults](https://github.com/tigrisdata/ocache/blob/main/docs/cluster.md)
+- [x] Tarantool [single-node](tarantool/single-node/) and [Compose replica set](tarantool/docker-compose-cluster/): memtx and vinyl, WAL, Lua procedures and synchronous-space leader failover.
 - [ ] `memcached-extstore`: pure-cache latency baseline; extstore for large values on flash.
-- [ ] Comparison example: same workload (GET/SET, pipelines, large values, persistence on) across Valkey, Redis 8, Dragonfly, Garnet, KeyDB, Kvrocks, Pika, Tarantool, ocache and Memcached.
+- [ ] Compare logical cache reads/writes, batching, expiry, eviction and refill across Valkey, Redis 8, Dragonfly, Garnet, KeyDB, Kvrocks, PikiwiDB, Tarantool, OCache and Memcached. Compare durable writes separately for matching persistence contracts. [Memcached extstore](https://docs.memcached.org/features/flashstorage/)
 - [ ] `etcd-docker-compose-cluster`: Raft, watches, leases.
+- [ ] Apache ZooKeeper: three-member ensemble, ephemeral sequential lock and application fencing after an expired worker resumes. Compare the protected service's accepted operations with the etcd lease case.
 - [ ] `ignite2-docker-compose-cluster`: partitioned inventory reservations, colocated computation, transactions, persistent restart and rebalance under load; compare Hazelcast / PostgreSQL / Tarantool. Include single-node and supported Kubernetes deployment.
 - [ ] `ignite3-docker-compose-cluster`: distribution zones, colocated transactions, majority loss and replica rebuild; compare Ignite 2. Research lab only: official October 2026 status has no next Ignite 3 release planned and recommends Ignite 2.x for new production deployments.
 - [ ] `infinispan-docker-compose-cluster`: Red Hat Infinispan (Apache 2.0) data grid; distributed caches, RESP endpoint, cross-site replication; same grid comparison.
@@ -408,38 +456,50 @@ Planned as a `mysql/` folder, mirroring the Postgres section with the same `orde
 
 ## Graph and multi-model
 
-- [x] `memgraph-single-node` (top priority): in-memory Cypher; compare with Neo4j.
+Designs for [graph transactions, fraud traversals and storage failure boundaries](docs/example-plans/data-services.md#graph-and-multi-model-databases).
+
+- [x] [Memgraph and Neo4j fraud detection](memgraph/fraud-detection/): seeded graph and streamed transfers, planted rings and query-result hashes compared on both engines.
 - [ ] `ladybugdb-embedded`: embedded columnar graph DB, successor to the archived Kùzu.
 - [ ] `arcadedb-single-node`: Apache 2.0 multi-model.
 - [ ] `surrealdb-single-node`: SurrealDB 3.0 multi-model (document, graph, vector, time-series).
-- [ ] `dgraph-single-node`
-- [ ] `falkordb-single-node`: graph on sparse matrices (GraphBLAS) as a Redis-protocol module, OpenCypher; compare with Memgraph and Neo4j on the fraud workload.
-- [ ] `tigergraph-community`: free Community Edition (closed source, x86 only); parallel MPP graph, GSQL deep-link queries; same fraud workload.
+- [ ] Dgraph: race identity upserts, then repeat through a replicated Alpha group's leader loss and verify distinct IDs and edges.
+- [ ] FalkorDB: compare the common single-graph fraud workload with Memgraph/Neo4j. The cluster example assigns one graph key per tenant to native hash slots. [Sharding unit](https://docs.falkordb.com/operations/cluster)
+- [ ] TigerGraph Community: GSQL deep-link queries over the existing fraud graph on one server. Verify image architecture before running. [Community deployment limit](https://www.tigergraph.com/pricing/)
 - [ ] `typedb-single-node`: TypeDB 3 (Rust, MPL 2.0) strongly typed graph with TypeQL and functions; same fraud workload modelled with types and relations.
-- [ ] `janusgraph-cassandra`
+- [ ] JanusGraph on Cassandra: race external-ID inserts and verify index results against native graph traversals after a replica interruption.
 
 ## Embedded and edge SQL
 
+Designs for [SQL conflicts, read levels, edge failover, backup and embedded KV](docs/example-plans/data-services.md#embedded-and-edge-databases).
+
 - [ ] `turso-single-node`: Rust SQLite-compatible engine; inventory transactions, writer conflicts, crash/reopen and compatibility checks against SQLite. Qualify concurrent-write/replication features for the selected release; deferred until the current database batch finishes.
 - [ ] `rqlite-docker-compose-cluster`: SQLite replicated over Raft.
-- [ ] `litefs-litestream`: SQLite replication and backup to S3.
+- [ ] LiteFS: local leased primary and asynchronous SQLite replicas. Measure the promotion RPO and verify the former primary is fenced.
+- [ ] Litestream: back up SQLite to lab-owned S3-compatible storage and restore to a fresh file at a chosen recovery point. Measure the unarchived tail.
 - [x] [`lancedb/versioned-product-search`](lancedb/versioned-product-search/): 100,000-product embedded/versioned retrieval, single and three-reader serving profiles, pinned snapshots, unindexed-tail visibility, compaction, isolated writer/reader crashes and measured benchmarks. Shared-volume serving is not replicated database HA.
 - [ ] `go-embedded-kv-comparison`: LMDB/libmdbx vs Badger vs Pebble vs bbolt; point reads, writes, range scans, write amplification.
 
 ## Wide-column
 
+Pick a [wide-column workload and recovery design](docs/example-plans/relational-and-analytical.md#wide-column-stores).
+
+- [ ] `accumulo-cell-visibility`: labelled cell scans, tablet reassignment and authorization checks during compaction. Verify the exact visible cells for each user. [Upstream authorization model](https://accumulo.apache.org/docs/4.x/security/authorizations)
 - [ ] `cassandra-docker-compose-cluster`: baseline to compare with ScyllaDB.
 - [ ] `hbase-docker-compose-cluster`: HBase on HDFS with ZooKeeper; region splits, compare with ScyllaDB/Cassandra on wide rows.
 - [ ] `kudu-impala`: mutable historical sensor data, scans during updates, tablet-leader loss and replica rebuild; compare ClickHouse / TimescaleDB with mutation semantics stated. Kudu supplies storage; Impala supplies SQL.
 
 ## Identity and access
 
-- [ ] `keycloak-oidc`: Keycloak realm with OIDC/SAML login; Go and Python apps validating tokens (compare Zitadel/Authentik).
-- [ ] `spicedb-vs-openfga`: Zanzibar-style relationship authorization; same schema and checks in SpiceDB and OpenFGA backed by Postgres.
+Designs for [OIDC signing-key rotation, permission revocation, policy rollouts and short-lived access](docs/example-plans/data-services.md#identity-and-access).
+
+- [ ] Keycloak, ZITADEL and authentik: compare OIDC login and signing-key rotation on local providers. Exercise SAML assertion validation in a separate supported flow.
+- [ ] SpiceDB versus OpenFGA: use equivalent relationship models on local PostgreSQL. Measure grant/revoke visibility against the consistency option each system actually exposes.
 - [ ] `opa-vs-cedar`: policy-as-code authorization; same rules in OPA (Rego) and Cedar, called from a Go service.
 - [ ] `teleport-single-node`: short-lived certs for SSH, Postgres and k8s access with session recording.
 
 ## Observability pipeline
+
+The [per-system assignments](docs/example-plans/streaming-and-observability.md#observability) identify a concrete workload, fault and independent check for each collector, backend and stack.
 
 Plan and source links: [`observability/README.md`](observability/README.md), including
 [the requested ClickHouse comparison article](https://clickhouse.com/resources/engineering/top-infrastructure-monitoring-tools-comparison).
@@ -469,16 +529,18 @@ Plan and source links: [`observability/README.md`](observability/README.md), inc
 
 - [ ] `prometheus/`: single-node baseline, supported Compose/kind monitoring deployments and a clustered fleet-metrics workload. Compare matched PromQL/range queries and ingestion/visibility with GreptimeDB and VictoriaMetrics; separate native Prometheus HA scraping from Cortex/Mimir-backed distributed long-term storage. Do not claim native database sharding from multiple independent scrapers.
 - [ ] `loki/`: standalone, distributed Compose and supported Helm/operator deployment; clustered application-log workload with ingestion, tenant/text filters, retention/compaction and ingester/storage recovery. Compare GreptimeDB and VictoriaLogs on identical events, time ranges and durability settings.
-- [ ] `tempo/`: standalone and distributed Compose/kind deployment; clustered traces from an instrumented app, trace-ID lookup, TraceQL and ingester/object-store recovery. Compare GreptimeDB tracing only where the chosen release supports matching ingest/query semantics; document sampling and unmatched features.
+- [ ] `tempo/`: compare complete trace trees via trace-ID lookup and TraceQL after local queue or object-store outages. Tempo 3 microservices use a Kafka-compatible queue, live-stores and block-builders. Monolithic mode has a separate write path. Match the ingest/query subset when comparing GreptimeDB. [Tempo architecture](https://grafana.com/docs/tempo/latest/introduction/architecture/)
 
 - [ ] `observability/prometheus-loki-tempo`: a Rust or Go application and worker instrumented through OpenTelemetry Collector, Prometheus metrics, Loki logs, Tempo traces and Grafana correlation by trace ID. Use Garage or SeaweedFS for Loki/Tempo object storage; supported Compose/kind cluster deployments, collector/backend crashes and storage outage/recovery. Track missing/duplicate telemetry against an external request oracle, accounting for sampling and scrape semantics. Compare matched metrics/log queries with the GreptimeDB/Victoria examples; multi-signal correlation is a separate capability. Future example, after the current database batch.
 
 - [ ] `otel-collector-clickhouse`: OpenTelemetry Collector into ClickHouse, visualised in Grafana.
 - [ ] `vector-pipeline`: Vector (Rust) log shipping into ClickHouse/Quickwit.
-- [ ] `clickstack-otel`: ClickStack (HyperDX) or SigNoz; logs, traces and metrics in ClickHouse via OpenTelemetry.
+- [ ] `clickstack-otel`: ClickStack with its own collector, UI/settings store and ClickHouse data path. Run the separately listed SigNoz stack against the same incident corpus.
 - [ ] `akvorado-flows`: NetFlow/sFlow/IPFIX collection into ClickHouse through Kafka.
 
 ## Rust embedded database backlog
+
+- [ ] SlateDB: hand ownership of one local object-store prefix between two Rust writers while independent readers refresh. Verify fencing and reconcile durable acknowledgements. [Embedded-storage designs](docs/example-plans/storage-and-lakehouse.md#embedded-engines-and-memory-grids)
 
 - [x] [Initial candidate research](rust/EMBEDDED_DATABASE_SURVEY.md): Fjall 3.1.13,
   redb 5.0.0 and Turso 0.8.4 documentation and selected source paths reviewed;

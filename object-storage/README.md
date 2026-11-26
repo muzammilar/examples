@@ -148,9 +148,8 @@ checksums/scrubbing, disk replacement, replication RPO and recovery cost.
 - [RustFS 1.0.5](https://github.com/rustfs/rustfs/releases/tag/1.0.5), [reported legacy repair issue](https://github.com/rustfs/rustfs/issues/9370), [reported single-disk stalls](https://github.com/rustfs/rustfs/issues/9365).
 - [Ceph maintained releases](https://docs.ceph.com/en/latest/releases/), [S3 API](https://docs.ceph.com/en/tentacle/radosgw/s3/).
 
-## Planned managed S3 comparison
+## Planned local S3 comparisons
 
-[Tigris resilient-application experiments](../tigris/) will compare identical
-S3 data and request mixes with the four stores above. Keep managed WAN/API
-measurements separate from local disk-loss/native-repair results and disclose
-unknown provider resource budgets. This comparison is planned, not measured.
+[Apache Ozone and the existing S3 clusters](../docs/example-plans/storage-and-lakehouse.md#object-and-filesystem-storage) have proposed multipart recovery tests. Use the same object bodies and compare metadata availability, successful readback and restored storage redundancy independently.
+
+The [self-hosted Tigris comparison](../tigris/) is blocked until a supported local server distribution and its deployment terms are available. The four measured stores above provide reference results for their own configurations.

@@ -33,6 +33,8 @@ and [measurement requirements](AGENTS.md#mandatory-measurements-for-every-experi
 
 To add or test a system, follow [`FORMAT.md`](FORMAT.md): folder layout, Make targets, Compose and kind conventions, scaling, failover, benchmarks and README format.
 
+To pick the next example, use the [design backlog and suggested first assignments](TODO.md#example-designs-to-assign). It covers both missing systems and unanswered questions in existing labs. Each assignment identifies a workload, a failure to trigger and an independent check of the outcome.
+
 | System | Folder | Category | Website | GitHub |
 |--------|--------|----------|---------|--------|
 | Aerospike | [`aerospike/`](aerospike) | Key-value | [aerospike.com](https://aerospike.com/) | [aerospike/aerospike-server](https://github.com/aerospike/aerospike-server) |
@@ -96,7 +98,7 @@ disk-replacement tests, acknowledged-loss accounting and benchmark limitations.
 
 ## Analytical database follow-ups
 
-**High priority, next after the current work is complete:**
+These previously prioritized systems have measured examples. The deeper cases below remain available alongside the [broader design backlog](TODO.md#example-designs-to-assign).
 
 - **CedarDB** — [single-node analytics and witnessed backup/recovery](cedardb/README.md), including a million-row PostgreSQL operational comparison, [12 sustained append-contention cells](cedardb/backup-recovery/projects/analytical-contention/docs/HTAP.md) and [million-row UPDATE/DELETE correctness/recovery](cedardb/backup-recovery/projects/transactional-mutations/docs/MUTABLE.md). The [12-cell mutation comparison](cedardb/backup-recovery/projects/transactional-mutations/docs/MUTABLE_BENCHMARK.md) verifies 108,440 ACKs with zero loss; CedarDB has 3.29×/3.03× query throughput alone/live, while PostgreSQL uses less memory. Follow up with explicit statistics preparation, alternate ingestion/query paths, cold-cache benchmarks and bounded storage-pressure recovery; keep these single-node experiments separate from the distributed-system backlog.
 - **RayforceDB vs DuckDB** — [initial Python/C++/Rust comparison](rayforce/duckdb-comparison/README.md) measures bulk CSV loading, analytical queries, CPU/memory time series and block-I/O/input-storage accounting at equal 1/4-CPU budgets. The [single/batch append comparison](rayforce/duckdb-comparison/README.md#ingestion-comparison) adds 144 measured Python/C++/Rust trials with full-body verification and resource accounting. The separate [columnar Appender comparison](rayforce/duckdb-comparison/README.md#columnar-appender-comparison) adds 144 trials against the row-wise path on the same image. The [saved-snapshot profiles](rayforce/duckdb-comparison/projects/snapshots/docs/PERSISTENCE.md) now verify full two-million-row persisted reopens and native storage footprints. The [synchronous journal test](rayforce/duckdb-comparison/projects/rayforce-journal/docs/JOURNAL.md) adds two live-writer/reader SIGKILL/replay cycles with an external witness and zero observed ACK loss. The [native DuckDB WAL profile](rayforce/duckdb-comparison/projects/duckdb-recovery/docs/DUCKDB_RECOVERY.md) now adds pinned-TLS C++ sessions, two live-reader/writer crashes and checkpointing under load, with 2,364 ACK bodies recovered and zero loss/corruption. Follow up with repeated alternating recovery trials, async journals, corruption/restore, prepared SQL, genuinely cold persisted queries and repeated native storage/compression comparisons; document semantic differences and unsupported cases.
@@ -109,7 +111,7 @@ Proposed extensions have not been run. See
 
 | System | Potential cluster example | Comparison |
 |---|---|---|
-| [Apache Pinot](https://docs.pinot.apache.org/) | Kafka-fed delivery status, ingestion upserts, out-of-order events, segment recovery and server failure | StarRocks / ClickHouse on identical event history |
+| [Apache Pinot](https://docs.pinot.apache.org/) | Kafka-fed delivery-status upserts, out-of-order revisions and server recovery. Use a separate append-only table for star-tree aggregates | StarRocks / ClickHouse on identical event history |
 | [Apache Doris](https://doris.apache.org/docs/4.x/features-architecture/system-architecture/) | Mutable orders/inventory joins; replicated tablets versus disaggregated storage, compute isolation and disk recovery | StarRocks / ClickHouse |
 | [Apache Kudu](https://kudu.apache.org/docs/index.html) | Update historical sensor readings while scanning; tablet-leader failure and replica rebuild, SQL through Impala | ClickHouse / TimescaleDB, with mutation semantics stated |
 | [Apache Ignite 2](https://ignite.apache.org/download/) | Partitioned inventory reservations, colocated compute, transactional conflicts, rebalance and persistence recovery | Hazelcast / PostgreSQL; in-memory and durable modes separately |
