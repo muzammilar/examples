@@ -1,0 +1,90 @@
+{
+  "date": "2026-11-26",
+  "engine": "Spark 4.3.0",
+  "scope": "Functional batch and reopened readbacks, shared local host",
+  "correctness": {
+    "orders": 1000000,
+    "amount_cents": 599500000,
+    "missing": 0,
+    "wrong": 0,
+    "parquet_files": 2,
+    "codecs": [
+      "SNAPPY"
+    ],
+    "column_compressed_bytes": 5886252,
+    "column_uncompressed_bytes": 11689335,
+    "column_compression_ratio": 1.9858706355079598,
+    "parquet_file_bytes": 5895188,
+    "allocated_output_bytes": 5951488
+  },
+  "native_readback": {
+    "rows": 1000000,
+    "unique_orders": 1000000,
+    "min_id": 0,
+    "max_id": 999999,
+    "amount_cents": 599500000
+  },
+  "workers": 2,
+  "worker_cores": 1,
+  "roles": {
+    "spark-order-recovery-worker-2": {
+      "samples": 9,
+      "mean_cpu_percent": 48.0,
+      "peak_cpu_percent": 97.47,
+      "mean_memory_mib": 310.44444444444446,
+      "peak_memory_mib": 558.4,
+      "last_lifetime_block_io": "0B / 5.37MB"
+    },
+    "spark-order-recovery-worker-1": {
+      "samples": 9,
+      "mean_cpu_percent": 58.925555555555555,
+      "peak_cpu_percent": 100.74,
+      "mean_memory_mib": 320.85555555555555,
+      "peak_memory_mib": 500.6,
+      "last_lifetime_block_io": "53.2kB / 5.35MB"
+    },
+    "spark-order-recovery-master-1": {
+      "samples": 9,
+      "mean_cpu_percent": 0.6877777777777777,
+      "peak_cpu_percent": 2.05,
+      "mean_memory_mib": 178.5,
+      "peak_memory_mib": 180.8,
+      "last_lifetime_block_io": "4.56MB / 410kB"
+    },
+    "spark-order-recovery-orders-run-8d14a4ec4205": {
+      "samples": 3,
+      "mean_cpu_percent": 64.20333333333333,
+      "peak_cpu_percent": 98.88,
+      "mean_memory_mib": 410.73333333333335,
+      "peak_memory_mib": 497.7,
+      "last_lifetime_block_io": "119kB / 918kB"
+    },
+    "spark-order-recovery-orders-run-fc25c080c668": {
+      "samples": 2,
+      "mean_cpu_percent": 82.61,
+      "peak_cpu_percent": 98.76,
+      "mean_memory_mib": 360.95,
+      "peak_memory_mib": 414.5,
+      "last_lifetime_block_io": "0B / 147kB"
+    },
+    "spark-order-recovery-orders-run-0389ae0548e4": {
+      "samples": 2,
+      "mean_cpu_percent": 84.92,
+      "peak_cpu_percent": 100.06,
+      "mean_memory_mib": 339.9,
+      "peak_memory_mib": 408.2,
+      "last_lifetime_block_io": "0B / 147kB"
+    }
+  },
+  "gaps": [
+    "Rounded Docker lifetime block IO; IOPS/device latency unavailable",
+    "Short-lived verifier may be undersampled",
+    "No worker/driver crash or HDFS durability claim",
+    "Builds and downloads overlapped this functional run; no performance ranking"
+  ],
+  "source_sha256": {
+    "docker-compose.yml": "9ee6985003949ccd302d7e2a639a9498dfc5e2603d8c4c2a0a34b40d283fe01b",
+    "orders-workload/orders.py": "ac01df2b9d8c52070097158d215fa2c2c5ece2d5353ae1bdf3ead0855edf5211",
+    "scripts/verify_parquet.py": "e35035de9b9cc238842276779a147b934d9e398d15f6196fc8e8c644977870b3"
+  }
+}

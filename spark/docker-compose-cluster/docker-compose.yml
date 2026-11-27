@@ -1,0 +1,51 @@
+name: spark-order-recovery
+x-spark: &spark
+  build:
+    context: .
+    dockerfile: docker/Dockerfile.spark
+  image: examples/spark-order-recovery:4.3.0
+  cpus: 1
+  mem_limit: 2g
+  networks: [lab]
+  volumes:
+    - output:/data
+services:
+  master:
+    <<: *spark
+    command: ["/opt/spark/bin/spark-class", "org.apache.spark.deploy.master.Master", "--host", "master"]
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import socket; socket.create_connection(('master',7077),2).close()"]
+      interval: 3s
+      retries: 60
+      timeout: 3s
+  worker:
+    <<: *spark
+    command: ["/opt/spark/bin/spark-class", "org.apache.spark.deploy.worker.Worker", "--cores", "1", "--memory", "1g", "spark://master:7077"]
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8081/json/',timeout=2).close()"]
+      interval: 3s
+      retries: 60
+      timeout: 3s
+    deploy:
+      replicas: 2
+    depends_on:
+      master: {condition: service_healthy}
+  orders:
+    <<: *spark
+    profiles: [tools]
+    command: ["/opt/spark/bin/spark-submit", "--master", "spark://master:7077", "--driver-memory", "1g", "--executor-memory", "1g", "--total-executor-cores", "2", "--conf", "spark.driver.host=orders", "--conf", "spark.sql.shuffle.partitions=8", "/opt/spark/orders-workload/orders.py", "write"]
+  parquet-verifier:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.verifier
+    image: examples/spark-parquet-verifier:1
+    profiles: [tools]
+    cpus: 1
+    mem_limit: 512m
+    volumes: [output:/data:ro]
+    networks: [lab]
+volumes:
+  output:
+networks:
+  lab:
+    internal: true

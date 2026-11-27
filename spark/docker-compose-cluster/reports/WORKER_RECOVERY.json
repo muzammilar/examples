@@ -1,0 +1,128 @@
+{
+  "date": "2026-11-26",
+  "type": "functional-recovery-diagnostics-not-performance-comparison",
+  "engine": "Spark 4.3.0",
+  "workload": {
+    "orders": 1000000,
+    "customers": 10000,
+    "input_partitions": 16
+  },
+  "native_recovery": {
+    "victim": "38034e4c0a70493376dc054cd9b05c645700ea497e41f380583e62e82b281c41",
+    "elapsed_s": 15.279379334067926,
+    "executor_removals": 1,
+    "failed_task_attempts": 1,
+    "native_removals": [
+      {
+        "Event": "SparkListenerExecutorRemoved",
+        "Timestamp": 1795728125938,
+        "Executor ID": "1",
+        "Removed Reason": "worker lost: 172.19.0.3:35039 got disassociated"
+      }
+    ],
+    "application_exit": 0,
+    "independent_readback": "Required separately by Make verify",
+    "evidence": "results/worker-recovery-1795728117460050000"
+  },
+  "independent_arrow_readback": {
+    "orders": 1000000,
+    "amount_cents": 599500000,
+    "missing": 0,
+    "wrong": 0,
+    "parquet_files": 16,
+    "codecs": [
+      "SNAPPY"
+    ],
+    "column_compressed_bytes": 6528906,
+    "column_uncompressed_bytes": 12925420,
+    "column_compression_ratio": 1.979722177038542,
+    "parquet_file_bytes": 6554890,
+    "allocated_output_bytes": 6688768
+  },
+  "resources": [
+    {
+      "container": "spark-order-recovery-worker-1",
+      "sample_count": 8,
+      "sampled_cpu_pct_min": 0.05,
+      "sampled_cpu_pct_mean": 42.07875,
+      "sampled_cpu_pct_max": 99.78,
+      "sampled_cgroup_memory_peak_bytes": 505683968,
+      "observed_positive_io_deltas_lower_bound": {
+        "rbytes": 40960,
+        "wbytes": 1196032,
+        "rios": 2,
+        "wios": 11
+      }
+    },
+    {
+      "container": "spark-order-recovery-worker-2",
+      "sample_count": 8,
+      "sampled_cpu_pct_min": 0.06,
+      "sampled_cpu_pct_mean": 35.45625,
+      "sampled_cpu_pct_max": 98.61,
+      "sampled_cgroup_memory_peak_bytes": 601411584,
+      "observed_positive_io_deltas_lower_bound": {
+        "rbytes": 6983680,
+        "wbytes": 8732672,
+        "rios": 546,
+        "wios": 45
+      }
+    },
+    {
+      "container": "spark-order-recovery-master-1",
+      "sample_count": 8,
+      "sampled_cpu_pct_min": 0.05,
+      "sampled_cpu_pct_mean": 3.00625,
+      "sampled_cpu_pct_max": 7.45,
+      "sampled_cgroup_memory_peak_bytes": 300302336,
+      "observed_positive_io_deltas_lower_bound": {
+        "rbytes": 0,
+        "wbytes": 49152,
+        "rios": 0,
+        "wios": 3
+      }
+    },
+    {
+      "container": "spark-order-recovery-run-1795728117538027000",
+      "sample_count": 4,
+      "sampled_cpu_pct_min": 0.46,
+      "sampled_cpu_pct_mean": 58.89,
+      "sampled_cpu_pct_max": 99.9,
+      "sampled_cgroup_memory_peak_bytes": 633729024,
+      "observed_positive_io_deltas_lower_bound": {
+        "rbytes": 35536896,
+        "wbytes": 1081344,
+        "rios": 2055,
+        "wios": 4
+      }
+    },
+    {
+      "container": "spark-order-recovery-orders-run-bc9f32aebe2d",
+      "sample_count": 2,
+      "sampled_cpu_pct_min": 42.38,
+      "sampled_cpu_pct_mean": 71.14,
+      "sampled_cpu_pct_max": 99.9,
+      "sampled_cgroup_memory_peak_bytes": 447479808,
+      "observed_positive_io_deltas_lower_bound": {
+        "rbytes": 0,
+        "wbytes": 770048,
+        "rios": 0,
+        "wios": 1
+      }
+    }
+  ],
+  "resource_window": {
+    "first": "2026-11-26T21:21:59.049546+00:00",
+    "last": "2026-11-26T21:22:24.821513+00:00",
+    "samples": 9
+  },
+  "limits": [
+    "First/last actor samples miss startup/exit work; per-actor I/O deltas are observed lower bounds.",
+    "Restart resets counters; positive sampled deltas cannot account for all pre-crash activity.",
+    "CPU percentages are Docker samples, 100 percent is one host core; roles capped to one core.",
+    "Device latency/queue depth and full network byte deltas are not reported.",
+    "No independent physical failure domains or replicated storage.",
+    "Two controller attempts stopped before publication because HTTP 200 startup text was not JSON; original logs retained."
+  ],
+  "raw_evidence": "results/worker-recovery-1795728117460050000"
+}
