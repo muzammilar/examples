@@ -1,0 +1,2 @@
+FROM apache/doris:fe-4.0.8@sha256:390413325a93d9121768bda153ccaa3c7a8da4aa0fd2a466406cddc14a6399b2
+RUN sed -i 's/-Xmx8192m/-Xmx1024m/g; s/-Xms8192m/-Xms1024m/g' /opt/apache-doris/fe/conf/fe.conf

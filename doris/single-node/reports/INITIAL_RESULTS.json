@@ -1,0 +1,92 @@
+{
+  "date": "2026-11-26",
+  "engine_native_version": "doris-4.0.8-rc02-bc8ea1bac6d",
+  "release_image": "apache/doris 4.0.8 Stable",
+  "scope": "One bulk million-row insert, complete independent Go row scan, retained backend crash and native core-setting change; RF1.",
+  "correctness": {
+    "amount_cents": 599500000,
+    "fetch_verify_ms": 315.765,
+    "missing": 0,
+    "orders": 1000000,
+    "wrong": 0
+  },
+  "after_crash": {
+    "amount_cents": 599500000,
+    "fetch_verify_ms": 413.675,
+    "missing": 0,
+    "orders": 1000000,
+    "wrong": 0
+  },
+  "killed_exit_code": 137,
+  "effective_backend_cores": 2,
+  "backend_memory_limit_bytes": 2147483648,
+  "backend_container_limit_bytes": 4294967296,
+  "backend_storage_directory_bytes": 9576104,
+  "native_table_size_display": "3.960 MB",
+  "tablets": 8,
+  "copies_per_tablet": 1,
+  "compression_ratio": null,
+  "compression_gap": "Native segment compressed/uncompressed byte accounting not captured; table footprint includes encoding and index overhead.",
+  "native_cgroups": {
+    "fe": {
+      "cpu.stat": {
+        "value": "usage_usec 136028075\nuser_usec 91194835\nsystem_usec 44833239\nnice_usec 0\nnr_periods 7382\nnr_throttled 161\nthrottled_usec 22038920\nnr_bursts 0\nburst_usec 0",
+        "status": 0,
+        "error": ""
+      },
+      "memory.current": {
+        "value": "1014697984",
+        "status": 0,
+        "error": ""
+      },
+      "memory.peak": {
+        "value": "1018355712",
+        "status": 0,
+        "error": ""
+      },
+      "io.stat": {
+        "value": "254:0 rbytes=0 wbytes=4796416 rios=0 wios=706 dbytes=0 dios=0",
+        "status": 0,
+        "error": ""
+      }
+    },
+    "be": {
+      "cpu.stat": {
+        "value": "usage_usec 11676965\nuser_usec 8676181\nsystem_usec 3000784\nnice_usec 0\nnr_periods 1209\nnr_throttled 6\nthrottled_usec 435806\nnr_bursts 0\nburst_usec 0",
+        "status": 0,
+        "error": ""
+      },
+      "memory.current": {
+        "value": "1359753216",
+        "status": 0,
+        "error": ""
+      },
+      "memory.peak": {
+        "value": "1520664576",
+        "status": 0,
+        "error": ""
+      },
+      "io.stat": {
+        "value": "254:0 rbytes=0 wbytes=909312 rios=0 wios=84 dbytes=0 dios=0",
+        "status": 0,
+        "error": ""
+      }
+    }
+  },
+  "counter_scope": "Final container lifetime; backend counters reset on replacement, cached reads may produce zero device bytes.",
+  "initial_failures": [
+    "Backend accepted connections before reporting usable storage capacity; schema creation rejected.",
+    "Post-restart E-240 FE address unavailable until heartbeat. Bounded readiness retry added for this specific startup error."
+  ],
+  "gaps": [
+    "No live reader/writer or per-operation external ACK history",
+    "No HA, disk replacement, independent backup/restore or capacity benchmark",
+    "Short-lived Go process resource samples incomplete",
+    "Initial native worker sizing saw 11 host cores despite two-CPU quota; explicit num_cores=2 subsequently verified"
+  ],
+  "source_sha256": {
+    "docker-compose.yml": "6f14119e25f44f3d339fc3554e3346abcbbb6ddb6b4e46453ce9d7caec93d59c",
+    "orders-workload/main.go": "afc832f2e944ed3d2ace20ea3f3dcfd682d9b53d08dc4e20550d7bb98e49313b",
+    "docker/Dockerfile.be": "e9bdc5017d78aa8fcae40f28158d509d9a3d218189a192b7ea164f559f126b91"
+  }
+}

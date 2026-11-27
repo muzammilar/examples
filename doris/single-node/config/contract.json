@@ -1,0 +1,17 @@
+{
+  "engine": "Doris 4.0.8",
+  "required_operations": [
+    "idempotent schema setup",
+    "single bulk insert",
+    "ordered full-row query",
+    "retained BE restart"
+  ],
+  "consistency": "Read committed completed fixture from a new connection; concurrent mutation/isolation claims are pending.",
+  "atomicity": "One native INSERT statement; ambiguous acknowledgement/transaction boundaries not yet fault-tested.",
+  "idempotency": "Unique Key order_id with sequence column; concurrent retry and conflicting revisions pending.",
+  "delete_ttl": "DROP for teardown; row delete/TTL pending.",
+  "durability": "RF1, one FE and BE with retained Docker volumes. No independent backup or permanent disk-loss tolerance.",
+  "retry": "No mutation retry. Readiness retries only the known transient unavailable-FE startup error within a 90-second budget.",
+  "payload": "1,000,000 fixed integer orders; eight tablets.",
+  "client": "Go MySQL driver v1.9.3, one connection, 5-second connect and 120-second read/write timeout; verification context 5 minutes."
+}
