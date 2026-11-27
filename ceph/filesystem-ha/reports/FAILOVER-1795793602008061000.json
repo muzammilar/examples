@@ -1,0 +1,278 @@
+{
+  "classification": "correctness/recovery diagnostic; no comparative performance qualification",
+  "case": "results/mds-failover-1795793602008061000",
+  "result": {
+    "histories": [
+      {
+        "attempts": 224,
+        "acks": 224,
+        "ambiguous_or_incomplete": 0,
+        "acknowledged_bytes": 58720256
+      },
+      {
+        "attempts": 128,
+        "acks": 128,
+        "ambiguous_or_incomplete": 0,
+        "acknowledged_bytes": 33554432
+      },
+      {
+        "attempts": 220,
+        "acks": 220,
+        "ambiguous_or_incomplete": 0,
+        "acknowledged_bytes": 57671680
+      }
+    ],
+    "total_acks": 572,
+    "acknowledged_bytes": 149946368,
+    "osds_up_in": 9,
+    "all_pgs_active_clean": true,
+    "pgs_on_three_hosts": 17,
+    "monitor_quorum": 3,
+    "mds_failover": "passed",
+    "old": "fs1",
+    "new": "fs0",
+    "observed_failover_s": 28.337444291999418,
+    "restored_standby": true,
+    "input_reloaded": false
+  },
+  "writer": {
+    "operations": 224,
+    "successes": 224,
+    "errors_or_ambiguous": 0,
+    "max_success_completion_gap_ms": 20327,
+    "phases": {
+      "startup": {
+        "operations": 37,
+        "latency_ms_nearest_rank": {
+          "p50": 69.235521,
+          "p95": 117.227809,
+          "p99": 165.934997,
+          "max": 165.934997
+        }
+      },
+      "after": {
+        "operations": 39,
+        "latency_ms_nearest_rank": {
+          "p50": 63.565549,
+          "p95": 81.02981,
+          "p99": 89.143761,
+          "max": 89.143761
+        }
+      },
+      "baseline": {
+        "operations": 44,
+        "latency_ms_nearest_rank": {
+          "p50": 62.612747,
+          "p95": 102.750803,
+          "p99": 341.759279,
+          "max": 341.759279
+        }
+      },
+      "injection": {
+        "operations": 104,
+        "latency_ms_nearest_rank": {
+          "p50": 65.338672,
+          "p95": 111.899432,
+          "p99": 130.098302,
+          "max": 20214.552983
+        }
+      }
+    },
+    "native_unit": {
+      "MainPID": "0",
+      "ExecMainCode": "1",
+      "ExecMainStatus": "0",
+      "MemoryPeak": "40026112",
+      "CPUUsageNSec": "6931278000",
+      "IOReadBytes": "0",
+      "IOWriteBytes": "1851392",
+      "ActiveState": "active",
+      "SubState": "exited"
+    }
+  },
+  "reader": {
+    "operations": 842,
+    "successes": 842,
+    "errors_or_ambiguous": 0,
+    "max_success_completion_gap_ms": 7134,
+    "phases": {
+      "startup": {
+        "operations": 34,
+        "latency_ms_nearest_rank": {
+          "p50": 20.231876,
+          "p95": 67.947909,
+          "p99": 69.00912,
+          "max": 69.00912
+        }
+      },
+      "after": {
+        "operations": 450,
+        "latency_ms_nearest_rank": {
+          "p50": 2.931436,
+          "p95": 4.548547,
+          "p99": 8.040449,
+          "max": 22.379598
+        }
+      },
+      "baseline": {
+        "operations": 66,
+        "latency_ms_nearest_rank": {
+          "p50": 18.321672,
+          "p95": 41.204664,
+          "p99": 108.406121,
+          "max": 108.406121
+        }
+      },
+      "injection": {
+        "operations": 292,
+        "latency_ms_nearest_rank": {
+          "p50": 12.659467,
+          "p95": 29.374241,
+          "p99": 58.9498,
+          "max": 7029.910291
+        }
+      }
+    },
+    "native_unit": {
+      "MainPID": "0",
+      "ExecMainCode": "1",
+      "ExecMainStatus": "0",
+      "MemoryPeak": "45228032",
+      "CPUUsageNSec": "9447525000",
+      "IOReadBytes": "0",
+      "IOWriteBytes": "114688",
+      "ActiveState": "active",
+      "SubState": "exited"
+    }
+  },
+  "environment": {
+    "NCPU": 11,
+    "MemTotal": 26216296448,
+    "KernelVersion": "6.12.76-linuxkit",
+    "OperatingSystem": "Docker Desktop",
+    "Driver": "overlayfs",
+    "ServerVersion": "29.5.3",
+    "docker_api": "1.54"
+  },
+  "docker_observation": {
+    "path": "results/resources-1795793565146436000.jsonl",
+    "counter_deltas": {
+      "cpu_core_s": 476.1793620000004,
+      "network_rx_bytes": 710318480,
+      "network_tx_bytes": 710318480,
+      "disk_read_bytes": 539514368,
+      "disk_write_bytes": 368824832
+    },
+    "sampled_aggregate_memory_peak_bytes": 11844878336,
+    "guest_vm_actor": [
+      {
+        "name": "/ceph-filesystem-ha-guests-1",
+        "samples": 227,
+        "peak_memory_bytes": 11835035648,
+        "configuration": {
+          "image_id": "sha256:804e213cd1ef415ea5fb3f31b02f4432f19c44adcf1dd99c24ef531626885949",
+          "image_reference": "ceph-filesystem-ha-guests:21.2.0",
+          "memory_limit_bytes": 17179869184,
+          "nano_cpus": 8000000000,
+          "started_at": "2026-11-27T15:02:28.741394464Z"
+        },
+        "counter_deltas": {
+          "cpu_core_s": 475.66862500000025,
+          "network_rx_bytes": 710318480,
+          "network_tx_bytes": 710318480,
+          "disk_read_bytes": 539514368,
+          "disk_write_bytes": 368824832
+        },
+        "cpu_utilization_pct_one_core_min": 104.72492280892607,
+        "cpu_utilization_pct_one_core_max": 409.06096870516626,
+        "observed_s": 229.24789214134216,
+        "sampled_mean_memory_bytes": 11618794130.60793,
+        "cpu_utilization_pct_one_core_average": 207.4909481421657
+      }
+    ]
+  },
+  "storage": {
+    "guest_scsi_lifetime": {
+      "read_ios": 26524,
+      "write_ios": 61300,
+      "read_bytes": 1625131008,
+      "write_bytes": 4628620800,
+      "device_io_ms": 47951
+    },
+    "native_snapshot": "results/native-resources-1795793795473772000.json",
+    "ceph_raw_used_bytes": 889614336,
+    "file_data": {
+      "stored": 149946368,
+      "stored_data": 149946368,
+      "stored_omap": 0,
+      "objects": 572,
+      "kb_used": 439296,
+      "bytes_used": 449839104,
+      "data_bytes_used": 449839104,
+      "omap_bytes_used": 0,
+      "percent_used": 0.00411550747230649,
+      "max_avail": 36284530688,
+      "quota_objects": 0,
+      "quota_bytes": 0,
+      "dirty": 0,
+      "rd": 4239,
+      "rd_bytes": 1048576000,
+      "wr": 572,
+      "wr_bytes": 149946368,
+      "compress_bytes_used": 0,
+      "compress_under_bytes": 0,
+      "stored_raw": 449839104,
+      "avail_raw": 108853594786
+    },
+    "metadata": {
+      "stored": 5908769,
+      "stored_data": 5800538,
+      "stored_omap": 108231,
+      "objects": 23,
+      "kb_used": 17394,
+      "bytes_used": 17810517,
+      "data_bytes_used": 17485824,
+      "omap_bytes_used": 324693,
+      "percent_used": 0.00016359223809558898,
+      "max_avail": 36284530688,
+      "quota_objects": 0,
+      "quota_bytes": 0,
+      "dirty": 0,
+      "rd": 160,
+      "rd_bytes": 6692864,
+      "wr": 1594,
+      "wr_bytes": 6601728,
+      "compress_bytes_used": 0,
+      "compress_under_bytes": 0,
+      "stored_raw": 17726308,
+      "avail_raw": 108853594786
+    },
+    "qcow2_apparent_bytes": 8793162304,
+    "qcow2_allocated_bytes": 8792608768,
+    "codec": "none",
+    "compression_ratio": null,
+    "compression_note": "Both CephFS pool compression counters are reported; no compressed counterpart or compression CPU comparison was run."
+  },
+  "limits": [
+    "Sample-window deltas exclude startup and exit outside observation. Decreasing counters are treated as restarts and the new counter is accumulated; reset intervals have no CPU utilization estimate.",
+    "Short-lived actors may be missed; use native pre-exit cgroup counters as well.",
+    "CPU utilization is interval-average percent of one core; short spikes may be missed.",
+    "Docker disk bytes are not device I/O latency; absent counters are unavailable, not zero.",
+    "Docker CPU includes QEMU TCG emulation and guests; native unit CPU is inside guest kernels. These scopes cannot be added.",
+    "Native storage counters are cumulative at the identified snapshot, not fault-only deltas.",
+    "Guest SCSI counters include all owned whole SCSI disks, including unused spares and provisioning; OS root disks and device-mapper duplicates are excluded. Per-daemon io.stat is unavailable because IOAccounting was not enabled for those native daemon units.",
+    "Historical immutable files are read during the fault; new live ACKs are reconciled by fresh clients afterwards.",
+    "Sampling misses very short controls, builder work and sub-second peaks; physical disk latency is unavailable.",
+    "Native PG placement proves the declared three-host layout, not independent raw replica hashes or a completed deep scrub.",
+    "Completion gaps include the intentional 100 ms think time and controller polling. Percentiles are diagnostic samples, not steady-state benchmark estimates."
+  ],
+  "evidence_sha256": {
+    "results/mds-failover-1795793602008061000/result.json": "b31d3c292e89d1c64750e30f63b7c1d49968e45fa1eb17490bf4fba55d6a1b39",
+    "results/mds-failover-1795793602008061000/killed.json": "4674deaec0977a2f1806744edc44a909c9986ac16f6f12393435c90a3476cfd3",
+    "results/mds-failover-1795793602008061000/writer.log": "c934556abdd7dcfff2481bdbc918e7773ab4b6d4f327ae86c6de92d5ee15e656",
+    "results/mds-failover-1795793602008061000/reader.log": "4e45348b7fc7d680386a97eba048bfb423f5c0b3f126fe0bdb3fb7cfd89a3c90",
+    "results/resources-1795793565146436000.jsonl": "9c76e529119756f1453a07382094920877bfc4737a5d8aaa146835bb7e89b8fd",
+    "results/native-resources-1795793795473772000.json": "2d1daf2413d8d15624afb943cfb13a91a2095fabe83ff47ddc7aa5b1e7b25702"
+  },
+  "application_source_sha256": "bd22664a62e2660e0d66651639a9416ccdd507870884deb3168f046d7d4d25cd"
+}

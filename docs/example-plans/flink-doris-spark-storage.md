@@ -26,10 +26,11 @@ interfaces instead of introducing custom Java test utilities.
 
 ## Storage work
 
-- [ ] Extend existing Garage and SeaweedFS S3 labs with interrupted multipart completion and fresh full-body reads. Reuse their native repair observations before adding a new fault.
+- [x] Extend existing Garage and SeaweedFS S3 labs with interrupted multipart completion and fresh full-body reads. Serving-role loss during an incomplete request, retained-part resume, discarded responses and logical abort passed; internal commit interruption and physical reclamation remain unrun.
 - [ ] Add a SeaweedFS filesystem workload with concurrent mounted clients, file-close visibility, rename, reader reconnect and metadata outage. Qualify the actual mount primitive independently from the existing S3 API.
-- [ ] Extend Ceph beyond its existing RGW example with a dedicated CephFS project. Exercise metadata-server failover, client reconnect and exact file manifests alongside OSD recovery. Keep the guest lab's CPU/emulation limits visible.
-- [ ] Qualify HDFS replication and failover as part of the Hadoop examples. Record client-visible file publication and failed in-flight writes through NameNode leadership changes.
+- [x] Add a dedicated native-client [CephFS project](../../ceph/filesystem-ha/). Active-MDS crash, standby promotion, exact ACK manifests and diagnosed retained-setup recovery ran; keep CPU/emulation limits visible.
+- [ ] Extend CephFS to whole-guest/OSD loss and independent restore; RGW recovery does not establish the filesystem interface's behavior.
+- [x] Qualify HDFS replication and initial live failover in the Hadoop metadata-HA example. Record client-visible publication and retain the failed native JSch fencing case; partitions/quorum loss/independent restore remain follow-ups.
 - [ ] Investigate JuiceFS Community over a lab-owned supported S3 backend and an explicitly durable metadata service. Test mount ownership, metadata loss and object-store outage separately. Add it only after the current four-system baseline is runnable.
 
 Garage is an object store. Ceph RGW, CephFS and SeaweedFS S3/mount interfaces need
@@ -106,5 +107,15 @@ its own gateway/controller and native audits: 1,431 objects, 487,206,912 bytes
 read directly across three zone copies, and matching current etcd revision 1,534.
 All 21 unrelated roles remained unchanged; owned cleanup passed. Native cgroup
 I/O counts are recorded for SeaweedFS roles, with the distroless etcd shell gap
-explicit. Next: CephFS deployment/client and metadata-server recovery. SeaweedFS
-mounted-client semantics and physical abort reclamation remain further work.
+explicit.
+
+CephFS 21.2.0 then passed two active-MDS SIGKILL/promotions (24.857 / 28.337 s),
+standby restoration and fresh-client reconciliation of 572 acknowledged files /
+149,946,368 bytes. All 17 PGs spanned three logical guest hosts. The first repeated
+setup exposed an empty-keyring controller defect; in-place credential-file recovery
+and the fixed repeat passed without reseeding. A redundant image-removal cleanup
+error was preserved, fixed and explicitly retried. CPU/memory/disk bytes, native
+whole-device I/O counts and storage/compression gaps are documented in the
+[CephFS README](../../ceph/filesystem-ha/). Owned infrastructure was removed;
+raw witnesses remain ignored. Next: SeaweedFS mounted-client semantics, then the
+pipeline gates above. Physical abort reclamation remains further work.

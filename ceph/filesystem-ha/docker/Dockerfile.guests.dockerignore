@@ -1,0 +1,8 @@
+**
+!docker/
+!docker/Dockerfile.guests
+!.build/
+!.build/runtime/
+!.build/runtime/*.py
+!native/
+!native/*.py

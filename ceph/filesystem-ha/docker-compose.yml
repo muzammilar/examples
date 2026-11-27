@@ -1,0 +1,25 @@
+name: ceph-filesystem-ha
+services:
+  guests:
+    image: ceph-filesystem-ha-guests:21.2.0
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.guests
+    cpus: 8
+    mem_limit: 16g
+    stop_grace_period: 45s
+    volumes: [state:/state]
+  control:
+    image: ceph-filesystem-ha-guests:21.2.0
+    profiles: [tools]
+    network_mode: service:guests
+    entrypoint: [python3]
+    cpus: 1
+    mem_limit: 512m
+    volumes:
+      - state:/state
+      - ./native:/opt/lab/native:ro
+      - ./.build/files-workload:/opt/workload:ro
+      - ./results:/results
+volumes:
+  state:

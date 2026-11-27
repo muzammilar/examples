@@ -15,6 +15,18 @@ execution evidence.
 
 ## Fresh qualification in this follow-up
 
+- [CephFS](ceph/filesystem-ha/) (additional 2026-11-27 batch example, outside the
+  original cohort count): Umbrella 21.2.0 native C++ clients, three guests, nine
+  OSDs and active/standby MDS. Two real active-MDS SIGKILLs promoted the standby
+  in **24.857 / 28.337 s**; **572 ACK files / 149,946,368 bytes** survived fresh
+  full-body readback with zero loss/wrong bodies. The final audit verified all
+  **17 PGs** on three guest hosts and full MON quorum. Failed no-op-authorize
+  bootstrap and redundant image-removal cases remain documented with successful
+  in-place recovery/retry. CPU, memory, disk bytes and native SCSI I/O counts are
+  reported; codec comparison and per-daemon I/O accounting remain gaps. Scoped
+  teardown passed. No CephFS disk loss, deep-scrub, mounted FUSE/kernel semantics,
+  partition, MDS scaling or independent-restore qualification is claimed.
+
 - [DuckDB/ZFS](duckdb/zfs-recovery/reports/FULL_SUITE_RESULTS.json): fresh five-command
   lifecycle passed on 2026-11-22. Continuous guest-crash recovery verifies
   **2,000,000 seed + 323,000 acknowledged rows** and 180 independent read results,
