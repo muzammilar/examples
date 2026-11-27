@@ -1,0 +1,56 @@
+{
+  "status": "baseline_and_bounded_process_failover_passed; deeper production cases unrun",
+  "hadoop": "3.5.0",
+  "baseline": {
+    "verdict": "passed",
+    "logical_bytes": 67108864,
+    "blocks": 4,
+    "physical_copies_per_block": 3,
+    "sha256": "a997fe6fdfc358af98f345eb7f74350111c2ab239d4257cfd988dff9f696da69",
+    "publication_ms": 374.142375,
+    "timing_kind": "diagnostic"
+  },
+  "native_jsch_failover": {
+    "verdict": "failed",
+    "deadline_s": 60,
+    "old_active": "nn1",
+    "old_pid": 38,
+    "old_pid_killed": true,
+    "new_active_observed": false,
+    "post_fault_reconciliation": "passed; every ACK and all three physical copies matched after manual recovery",
+    "fencer_thread_wait_observed_s": 200.12
+  },
+  "openssh_variant": {
+    "retained_trial_s": 29.317325292,
+    "fresh_trial_s": 29.616048666,
+    "fresh_live_acks": 19,
+    "fresh_live_successful_reads": 48,
+    "fresh_published_files": 20,
+    "fresh_logical_bytes": 87031808,
+    "acknowledged_missing": 0,
+    "wrong_bodies": 0,
+    "physical_copies_verified": 3,
+    "negative_controls_passed": [
+      "unowned target",
+      "wrong port"
+    ]
+  },
+  "manual_recovery": "passed after Docker restart: both ZKFCs stopped, both NameNodes observed standby, confirmed manual promotion of nn2",
+  "cleanup": "verified witness archives; three owned infrastructure teardown runs passed; final own containers/volumes/network absent",
+  "lifecycle": {
+    "repeated_up_and_retained_verify": "passed",
+    "fresh_format_index_archival": "passed after preserved omitted-step failure",
+    "final_five_commands": "passed",
+    "final_fixture": "results/baseline-1795786571326235000"
+  },
+  "unrun": [
+    "JournalNode/ZooKeeper quorum loss",
+    "fencing transport loss",
+    "network partitions",
+    "permanent disk loss",
+    "independent restore",
+    "upgrades",
+    "pressure",
+    "fair comparative benchmark"
+  ]
+}

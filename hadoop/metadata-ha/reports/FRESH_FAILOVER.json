@@ -1,0 +1,79 @@
+{
+  "evidence": "results/failover-1795786427178295000",
+  "timing_kind": "diagnostic",
+  "verdict": {
+    "failover": "passed",
+    "old_active": "nn1",
+    "new_active": "nn2",
+    "observed_failover_and_fencing_s": 29.616048665999998,
+    "input_reloaded": false,
+    "roles_after_rejoin": {
+      "nn1": "standby",
+      "nn2": "active"
+    },
+    "acks_after": 19
+  },
+  "workload": {
+    "writer": {
+      "outcomes": {
+        "ack": 19,
+        "ambiguous": 0,
+        "ok": 0,
+        "fail": 0
+      },
+      "latency_ms": {
+        "samples": 19,
+        "min": 21.797542,
+        "max": 31060.899889,
+        "p50": 27.312583,
+        "p95": 31060.899889,
+        "p99": 31060.899889
+      },
+      "fatal_events": [],
+      "exit_resources": [
+        {
+          "cpu.stat": "usage_usec 1484719\nuser_usec 1390246\nsystem_usec 94473\nnice_usec 0\nnr_periods 129\nnr_throttled 11\nthrottled_usec 1232622\nnr_bursts 0\nburst_usec 0\n",
+          "event": "resources",
+          "io.stat": "254:0 rbytes=0 wbytes=245760 rios=0 wios=43 dbytes=0 dios=0\n",
+          "memory.peak": "117768192\n",
+          "utc_ms": 1795786467745
+        }
+      ]
+    },
+    "reader": {
+      "outcomes": {
+        "ack": 0,
+        "ambiguous": 0,
+        "ok": 48,
+        "fail": 0
+      },
+      "latency_ms": {
+        "samples": 48,
+        "min": 2.545875,
+        "max": 30437.248806,
+        "p50": 3.487417,
+        "p95": 8.713292,
+        "p99": 30437.248806
+      },
+      "fatal_events": [],
+      "exit_resources": [
+        {
+          "cpu.stat": "usage_usec 1425734\nuser_usec 1326982\nsystem_usec 98752\nnice_usec 0\nnr_periods 125\nnr_throttled 11\nthrottled_usec 970204\nnr_bursts 0\nburst_usec 0\n",
+          "event": "resources",
+          "io.stat": "254:0 rbytes=0 wbytes=98304 rios=0 wios=4 dbytes=0 dios=0\n",
+          "memory.peak": "112549888\n",
+          "utc_ms": 1795786467952
+        }
+      ]
+    }
+  },
+  "storage": {
+    "published_files": 20,
+    "blocks": 23,
+    "logical_body_bytes": 87031808,
+    "all_three_physical_hashes_match": true,
+    "body_compression_ratio": 1.0,
+    "replication_factor": 3,
+    "checksum_metadata_included": false
+  }
+}

@@ -1,0 +1,182 @@
+{
+  "evidence": "results/retained-storage-resources.json",
+  "scope": "After retained-history verification, before teardown; process counters include earlier phases in the current process lifetime",
+  "roles": {
+    "nn1": {
+      "storage": {
+        "/data/name": {
+          "apparent_bytes": 3148238,
+          "allocated_bytes": 3174400,
+          "files": 10
+        },
+        "/data/data": {
+          "apparent_bytes": 0,
+          "allocated_bytes": 0,
+          "files": 0
+        },
+        "/data/journal": {
+          "apparent_bytes": 0,
+          "allocated_bytes": 0,
+          "files": 0
+        }
+      },
+      "cpu": "usage_usec 18046911\nuser_usec 16634145\nsystem_usec 1412765\nnice_usec 0\nnr_periods 1669\nnr_throttled 106\nthrottled_usec 11025184\nnr_bursts 0\nburst_usec 0\n",
+      "memory_peak_bytes": "248901632\n",
+      "io": "254:0 rbytes=7172096 wbytes=4165632 rios=294 wios=379 dbytes=0 dios=0\n"
+    },
+    "nn2": {
+      "storage": {
+        "/data/name": {
+          "apparent_bytes": 1050002,
+          "allocated_bytes": 1077248,
+          "files": 8
+        },
+        "/data/data": {
+          "apparent_bytes": 0,
+          "allocated_bytes": 0,
+          "files": 0
+        },
+        "/data/journal": {
+          "apparent_bytes": 0,
+          "allocated_bytes": 0,
+          "files": 0
+        }
+      },
+      "cpu": "usage_usec 11899080\nuser_usec 10687667\nsystem_usec 1211413\nnice_usec 0\nnr_periods 2265\nnr_throttled 34\nthrottled_usec 3580053\nnr_bursts 0\nburst_usec 0\n",
+      "memory_peak_bytes": "258756608\n",
+      "io": "254:0 rbytes=20398080 wbytes=4988928 rios=728 wios=348 dbytes=0 dios=0\n"
+    },
+    "jn1": {
+      "storage": {
+        "/data/name": {
+          "apparent_bytes": 0,
+          "allocated_bytes": 0,
+          "files": 0
+        },
+        "/data/data": {
+          "apparent_bytes": 0,
+          "allocated_bytes": 0,
+          "files": 0
+        },
+        "/data/journal": {
+          "apparent_bytes": 4197050,
+          "allocated_bytes": 4231168,
+          "files": 13
+        }
+      },
+      "cpu": "usage_usec 4689273\nuser_usec 4097362\nsystem_usec 591910\nnice_usec 0\nnr_periods 827\nnr_throttled 16\nthrottled_usec 1421787\nnr_bursts 0\nburst_usec 0\n",
+      "memory_peak_bytes": "174161920\n",
+      "io": "254:0 rbytes=22507520 wbytes=6975488 rios=1001 wios=506 dbytes=0 dios=0\n"
+    },
+    "jn2": {
+      "storage": {
+        "/data/name": {
+          "apparent_bytes": 0,
+          "allocated_bytes": 0,
+          "files": 0
+        },
+        "/data/data": {
+          "apparent_bytes": 0,
+          "allocated_bytes": 0,
+          "files": 0
+        },
+        "/data/journal": {
+          "apparent_bytes": 4197050,
+          "allocated_bytes": 4231168,
+          "files": 13
+        }
+      },
+      "cpu": "usage_usec 4708193\nuser_usec 4075483\nsystem_usec 632709\nnice_usec 0\nnr_periods 835\nnr_throttled 16\nthrottled_usec 1466715\nnr_bursts 0\nburst_usec 0\n",
+      "memory_peak_bytes": "187297792\n",
+      "io": "254:0 rbytes=32665600 wbytes=6942720 rios=1678 wios=498 dbytes=0 dios=0\n254:16 rbytes=135168 wbytes=0 rios=4 wios=0 dbytes=0 dios=0\n"
+    },
+    "jn3": {
+      "storage": {
+        "/data/name": {
+          "apparent_bytes": 0,
+          "allocated_bytes": 0,
+          "files": 0
+        },
+        "/data/data": {
+          "apparent_bytes": 0,
+          "allocated_bytes": 0,
+          "files": 0
+        },
+        "/data/journal": {
+          "apparent_bytes": 4197050,
+          "allocated_bytes": 4231168,
+          "files": 13
+        }
+      },
+      "cpu": "usage_usec 4686767\nuser_usec 4100660\nsystem_usec 586106\nnice_usec 0\nnr_periods 779\nnr_throttled 17\nthrottled_usec 1511312\nnr_bursts 0\nburst_usec 0\n",
+      "memory_peak_bytes": "183840768\n",
+      "io": "254:0 rbytes=31105024 wbytes=7004160 rios=1427 wios=514 dbytes=0 dios=0\n"
+    },
+    "dn1": {
+      "storage": {
+        "/data/name": {
+          "apparent_bytes": 0,
+          "allocated_bytes": 0,
+          "files": 0
+        },
+        "/data/data": {
+          "apparent_bytes": 102507297,
+          "allocated_bytes": 102674432,
+          "files": 78
+        },
+        "/data/journal": {
+          "apparent_bytes": 0,
+          "allocated_bytes": 0,
+          "files": 0
+        }
+      },
+      "cpu": "usage_usec 4508426\nuser_usec 4059152\nsystem_usec 449274\nnice_usec 0\nnr_periods 1112\nnr_throttled 21\nthrottled_usec 1534186\nnr_bursts 0\nburst_usec 0\n",
+      "memory_peak_bytes": "283344896\n",
+      "io": "254:0 rbytes=84312064 wbytes=28692480 rios=845 wios=229 dbytes=0 dios=0\n"
+    },
+    "dn2": {
+      "storage": {
+        "/data/name": {
+          "apparent_bytes": 0,
+          "allocated_bytes": 0,
+          "files": 0
+        },
+        "/data/data": {
+          "apparent_bytes": 102507297,
+          "allocated_bytes": 102674432,
+          "files": 78
+        },
+        "/data/journal": {
+          "apparent_bytes": 0,
+          "allocated_bytes": 0,
+          "files": 0
+        }
+      },
+      "cpu": "usage_usec 4453487\nuser_usec 4006474\nsystem_usec 447012\nnice_usec 0\nnr_periods 1127\nnr_throttled 23\nthrottled_usec 2199842\nnr_bursts 0\nburst_usec 0\n",
+      "memory_peak_bytes": "279044096\n",
+      "io": "254:0 rbytes=75943936 wbytes=28684288 rios=216 wios=232 dbytes=0 dios=0\n"
+    },
+    "dn3": {
+      "storage": {
+        "/data/name": {
+          "apparent_bytes": 0,
+          "allocated_bytes": 0,
+          "files": 0
+        },
+        "/data/data": {
+          "apparent_bytes": 102507297,
+          "allocated_bytes": 102674432,
+          "files": 78
+        },
+        "/data/journal": {
+          "apparent_bytes": 0,
+          "allocated_bytes": 0,
+          "files": 0
+        }
+      },
+      "cpu": "usage_usec 4444544\nuser_usec 4033424\nsystem_usec 411120\nnice_usec 0\nnr_periods 1139\nnr_throttled 23\nthrottled_usec 2245872\nnr_bursts 0\nburst_usec 0\n",
+      "memory_peak_bytes": "282923008\n",
+      "io": "254:0 rbytes=75558912 wbytes=28659712 rios=227 wios=226 dbytes=0 dios=0\n"
+    }
+  }
+}

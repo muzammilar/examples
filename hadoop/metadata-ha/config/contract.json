@@ -1,0 +1,71 @@
+{
+  "operations": [
+    "stage file",
+    "hsync",
+    "close",
+    "atomic rename publication",
+    "full witnessed read"
+  ],
+  "versions": {
+    "hadoop": "3.5.0",
+    "zookeeper_server": "3.9.7",
+    "bundled_zookeeper_client": "3.8.6",
+    "bundled_fencer_jsch": "0.1.55"
+  },
+  "topology": {
+    "namenodes": 2,
+    "journalnodes": 3,
+    "zookeeper_voters": 3,
+    "zkfc": 2,
+    "datanodes": 3,
+    "physical_hosts": 1
+  },
+  "durability": {
+    "data_replication_target": 3,
+    "minimum_completed_block_copies": 2,
+    "sync_on_close": true,
+    "explicit_hsync_before_close": true,
+    "journal_write_quorum": 2
+  },
+  "publication": "A unique staging file is hsynced/closed, then renamed into its unique final path. Only a successful rename followed by a fsynced external witness record is an ACK.",
+  "consistency": "Final files are immutable and only witnessed closed publications are read; no multi-file transaction claim",
+  "retry": "No application mutation replay; native Hadoop HA retries are configured. All failed mutation outcomes remain ambiguous until final/staging state is reconciled.",
+  "fencing": "Default ZKFC-only OpenSSH variant uses native shell hook, generated ECDSA keys and strict host pins; bounded remote fuser kill plus explicit listener refusal. Original native JSch sshfence is retained as failed variant.",
+  "workload": {
+    "seed_bytes": 67108864,
+    "block_bytes": 16777216,
+    "live_payload_bytes": 1048576,
+    "write_pacing_ms": 200,
+    "read_pacing_ms": 100,
+    "seed": 42193
+  },
+  "fault_expectation": {
+    "active_process_pause_proven": true,
+    "standby_active_within_s": 60,
+    "acknowledged_missing": 0,
+    "wrong_successful_bodies": 0,
+    "post_rejoin_new_acks": 5,
+    "exact_paused_pid_and_listener_refusal_required": true
+  },
+  "client": {
+    "api": "native libhdfs in C++17",
+    "jvm_heap": "64m..256m",
+    "connect_timeout_ms": 5000,
+    "rpc_timeout_ms": 10000,
+    "socket_timeout_ms": 10000,
+    "app_read_retry_budget_s": 60,
+    "native_calls_may_exceed_deadline": true,
+    "external_case_timeout_required": true
+  },
+  "unrun": [
+    "loss of journal/ZooKeeper quorum",
+    "data disk loss",
+    "whole host outage",
+    "independent restore",
+    "upgrades",
+    "balancer/maintenance pressure",
+    "physical power loss",
+    "security qualification",
+    "cold-cache or comparative performance"
+  ]
+}

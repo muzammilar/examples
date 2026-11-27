@@ -1,0 +1,176 @@
+name: hadoop-metadata-ha
+x-hadoop: &hadoop
+  image: examples/hadoop-metadata-ha:3.5.0
+  cpus: 1
+  mem_limit: 1g
+  networks: [lab]
+  init: true
+x-zookeeper: &zookeeper
+  image: zookeeper:3.9.7@sha256:23f7fe549a6be53e39f9bf90cfa82542b4c7df8e8a19374ce4f3625cd11fa86b
+  cpus: 0.5
+  mem_limit: 512m
+  networks: [lab]
+  environment: &zooenv
+    JVMFLAGS: -Xms256m -Xmx256m
+    ZOO_SERVERS: server.1=zk1:2888:3888;2181 server.2=zk2:2888:3888;2181 server.3=zk3:2888:3888;2181
+    ZOO_4LW_COMMANDS_WHITELIST: ruok,mntr,srvr
+  healthcheck:
+    test: [CMD, zkServer.sh, status]
+    interval: 3s
+    timeout: 5s
+    retries: 60
+services:
+  zk1:
+    <<: *zookeeper
+    hostname: zk1
+    environment: {<<: *zooenv, ZOO_MY_ID: "1"}
+    volumes: [zk1-data:/data, zk1-journal:/datalog, zk1-logs:/logs]
+  zk2:
+    <<: *zookeeper
+    hostname: zk2
+    environment: {<<: *zooenv, ZOO_MY_ID: "2"}
+    volumes: [zk2-data:/data, zk2-journal:/datalog, zk2-logs:/logs]
+  zk3:
+    <<: *zookeeper
+    hostname: zk3
+    environment: {<<: *zooenv, ZOO_MY_ID: "3"}
+    volumes: [zk3-data:/data, zk3-journal:/datalog, zk3-logs:/logs]
+  jn1:
+    <<: *hadoop
+    hostname: jn1
+    command: [journalnode]
+    volumes: [jn1:/data/journal]
+    healthcheck: &journalcheck
+      test: [CMD, python3, -c, "import socket; socket.create_connection(('127.0.0.1',8485),2).close()"]
+      interval: 3s
+      timeout: 3s
+      retries: 60
+  jn2:
+    <<: *hadoop
+    hostname: jn2
+    command: [journalnode]
+    volumes: [jn2:/data/journal]
+    healthcheck: *journalcheck
+  jn3:
+    <<: *hadoop
+    hostname: jn3
+    command: [journalnode]
+    volumes: [jn3:/data/journal]
+    healthcheck: *journalcheck
+  nn1:
+    <<: *hadoop
+    hostname: nn1
+    command: [namenode]
+    environment: {HDFS_NAMENODE_ID: nn1}
+    volumes: [nn1:/data/name, nn1-control:/control, fencing:/lab-ssh:ro]
+    healthcheck: &nncheck
+      test: [CMD, python3, -c, "import os,urllib.request; urllib.request.urlopen('http://'+os.environ['HDFS_NAMENODE_ID']+':9870/jmx?qry=Hadoop:service=NameNode,name=NameNodeStatus',timeout=2).read()"]
+      interval: 3s
+      timeout: 3s
+      retries: 60
+  nn2:
+    <<: *hadoop
+    hostname: nn2
+    command: [namenode]
+    environment: {HDFS_NAMENODE_ID: nn2}
+    volumes: [nn2:/data/name, nn2-control:/control, fencing:/lab-ssh:ro]
+    healthcheck: *nncheck
+  zkfc1:
+    image: ${FENCER_IMAGE:-examples/hadoop-ha-openssh:3.5.0}
+    cpus: 0.5
+    mem_limit: 512m
+    network_mode: service:nn1
+    init: true
+    environment: {HDFS_NAMENODE_ID: nn1, HADOOP_HEAPSIZE_MAX: "256"}
+    command: [zkfc]
+    volumes: [fencing:/lab-ssh:ro]
+    depends_on: [nn1]
+  zkfc2:
+    image: ${FENCER_IMAGE:-examples/hadoop-ha-openssh:3.5.0}
+    cpus: 0.5
+    mem_limit: 512m
+    network_mode: service:nn2
+    init: true
+    environment: {HDFS_NAMENODE_ID: nn2, HADOOP_HEAPSIZE_MAX: "256"}
+    command: [zkfc]
+    volumes: [fencing:/lab-ssh:ro]
+    depends_on: [nn2]
+  dn1:
+    <<: *hadoop
+    hostname: dn1
+    command: [datanode]
+    volumes: [dn1:/data/data]
+  dn2:
+    <<: *hadoop
+    hostname: dn2
+    command: [datanode]
+    volumes: [dn2:/data/data]
+  dn3:
+    <<: *hadoop
+    hostname: dn3
+    command: [datanode]
+    volumes: [dn3:/data/data]
+  keys:
+    <<: *hadoop
+    profiles: [tools]
+    command: [python3, /opt/hadoop/lab-scripts/keys.py]
+    volumes: [fencing:/lab-ssh]
+  tools:
+    <<: *hadoop
+    profiles: [tools]
+    user: hadoop
+    command: [python3, -c, "import time; time.sleep(86400)"]
+    volumes: [witness:/witness:ro]
+  witness-control:
+    <<: *hadoop
+    profiles: [tools]
+    user: hadoop
+    cpus: 0.25
+    mem_limit: 128m
+    command: [python3, -c, "import time; time.sleep(86400)"]
+    volumes: [witness:/witness]
+  files-writer:
+    image: examples/hadoop-ha-files:3.5.0
+    profiles: [tools]
+    cpus: 1
+    mem_limit: 1g
+    networks: [lab]
+    init: true
+    environment: {LIBHDFS_OPTS: -Xms64m -Xmx256m}
+    command: [writer]
+    volumes: [witness:/witness]
+  files-reader:
+    image: examples/hadoop-ha-files:3.5.0
+    profiles: [tools]
+    cpus: 1
+    mem_limit: 1g
+    networks: [lab]
+    init: true
+    environment: {LIBHDFS_OPTS: -Xms64m -Xmx256m}
+    command: [reader]
+    volumes: [witness:/witness:ro]
+volumes:
+  zk1-data:
+  zk1-journal:
+  zk1-logs:
+  zk2-data:
+  zk2-journal:
+  zk2-logs:
+  zk3-data:
+  zk3-journal:
+  zk3-logs:
+  jn1:
+  jn2:
+  jn3:
+  nn1:
+  nn2:
+  nn1-control:
+  nn2-control:
+  fencing:
+  dn1:
+  dn2:
+  dn3:
+  witness:
+networks:
+  lab:
+    internal: true

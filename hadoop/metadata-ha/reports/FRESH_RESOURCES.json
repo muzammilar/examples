@@ -1,0 +1,451 @@
+{
+  "evidence": "results/resources-1795786423396384000.jsonl",
+  "environment": {
+    "type": "environment",
+    "run_id": 1795786423396384000,
+    "command": [
+      "make",
+      "test-production"
+    ],
+    "environment": {
+      "NCPU": 11,
+      "MemTotal": 26216296448,
+      "KernelVersion": "6.12.76-linuxkit",
+      "OperatingSystem": "Docker Desktop",
+      "Driver": "overlayfs",
+      "ServerVersion": "29.5.3",
+      "docker_api": "1.54"
+    },
+    "cotenancy": "Only this HDFS HA example; no other heavy lab."
+  },
+  "sampled_aggregate_memory_peak_bytes": 2527899648,
+  "actors": [
+    {
+      "name": "/hadoop-metadata-ha-zkfc2-1",
+      "samples": 52,
+      "peak_memory_bytes": 95313920,
+      "configuration": {
+        "image_id": "sha256:f2e3f18f7a10e134ac4890035d7255d93b33280050ee7adac2ee8334c4e2822b",
+        "image_reference": "examples/hadoop-ha-openssh:3.5.0",
+        "memory_limit_bytes": 536870912,
+        "nano_cpus": 500000000,
+        "started_at": "2026-11-27T13:32:20.199597339Z"
+      },
+      "cpu_utilization_pct_one_core_min": 0.08570865593616904,
+      "cpu_utilization_pct_one_core_max": 20.783300458975447,
+      "counter_deltas": {
+        "cpu_core_s": 0.39777799999999996,
+        "disk_read_bytes": 0,
+        "disk_write_bytes": 253952
+      }
+    },
+    {
+      "name": "/hadoop-metadata-ha-nn2-1",
+      "samples": 52,
+      "peak_memory_bytes": 223010816,
+      "configuration": {
+        "image_id": "sha256:1890cf73a8b317c30ec2ae6d34f91d39b7709dedf8d629b38985b586e695e851",
+        "image_reference": "examples/hadoop-metadata-ha:3.5.0",
+        "memory_limit_bytes": 1073741824,
+        "nano_cpus": 1000000000,
+        "started_at": "2026-11-27T13:32:20.113617923Z"
+      },
+      "cpu_utilization_pct_one_core_min": 0.30938748004819777,
+      "cpu_utilization_pct_one_core_max": 27.01384854639077,
+      "counter_deltas": {
+        "cpu_core_s": 1.8295370000000002,
+        "disk_read_bytes": 0,
+        "disk_write_bytes": 1634304
+      }
+    },
+    {
+      "name": "/hadoop-metadata-ha-dn3-1",
+      "samples": 52,
+      "peak_memory_bytes": 263036928,
+      "configuration": {
+        "image_id": "sha256:1890cf73a8b317c30ec2ae6d34f91d39b7709dedf8d629b38985b586e695e851",
+        "image_reference": "examples/hadoop-metadata-ha:3.5.0",
+        "memory_limit_bytes": 1073741824,
+        "nano_cpus": 1000000000,
+        "started_at": "2026-11-27T13:32:20.111592714Z"
+      },
+      "cpu_utilization_pct_one_core_min": 0.08830071797718261,
+      "cpu_utilization_pct_one_core_max": 14.212322874182862,
+      "counter_deltas": {
+        "cpu_core_s": 0.8263379999999998,
+        "disk_read_bytes": 0,
+        "disk_write_bytes": 20418560
+      }
+    },
+    {
+      "name": "/hadoop-metadata-ha-dn2-1",
+      "samples": 52,
+      "peak_memory_bytes": 258113536,
+      "configuration": {
+        "image_id": "sha256:1890cf73a8b317c30ec2ae6d34f91d39b7709dedf8d629b38985b586e695e851",
+        "image_reference": "examples/hadoop-metadata-ha:3.5.0",
+        "memory_limit_bytes": 1073741824,
+        "nano_cpus": 1000000000,
+        "started_at": "2026-11-27T13:32:20.112971756Z"
+      },
+      "cpu_utilization_pct_one_core_min": 0.0963802558913371,
+      "cpu_utilization_pct_one_core_max": 10.019846969652225,
+      "counter_deltas": {
+        "cpu_core_s": 0.7915550000000002,
+        "disk_read_bytes": 0,
+        "disk_write_bytes": 20418560
+      }
+    },
+    {
+      "name": "/hadoop-metadata-ha-dn1-1",
+      "samples": 52,
+      "peak_memory_bytes": 254980096,
+      "configuration": {
+        "image_id": "sha256:1890cf73a8b317c30ec2ae6d34f91d39b7709dedf8d629b38985b586e695e851",
+        "image_reference": "examples/hadoop-metadata-ha:3.5.0",
+        "memory_limit_bytes": 1073741824,
+        "nano_cpus": 1000000000,
+        "started_at": "2026-11-27T13:32:20.112978131Z"
+      },
+      "cpu_utilization_pct_one_core_min": 0.09360344105486489,
+      "cpu_utilization_pct_one_core_max": 10.953529893645868,
+      "counter_deltas": {
+        "cpu_core_s": 0.690715,
+        "disk_read_bytes": 0,
+        "disk_write_bytes": 20738048
+      }
+    },
+    {
+      "name": "/hadoop-metadata-ha-zkfc1-1",
+      "samples": 52,
+      "peak_memory_bytes": 93413376,
+      "configuration": {
+        "image_id": "sha256:f2e3f18f7a10e134ac4890035d7255d93b33280050ee7adac2ee8334c4e2822b",
+        "image_reference": "examples/hadoop-ha-openssh:3.5.0",
+        "memory_limit_bytes": 536870912,
+        "nano_cpus": 500000000,
+        "started_at": "2026-11-27T13:32:15.874101671Z"
+      },
+      "cpu_utilization_pct_one_core_min": 0.06200429145111606,
+      "cpu_utilization_pct_one_core_max": 3.6433757775029947,
+      "counter_deltas": {
+        "cpu_core_s": 0.20198000000000005,
+        "disk_read_bytes": 0,
+        "disk_write_bytes": 258048
+      }
+    },
+    {
+      "name": "/hadoop-metadata-ha-witness-control-1",
+      "samples": 52,
+      "peak_memory_bytes": 3559424,
+      "configuration": {
+        "image_id": "sha256:1890cf73a8b317c30ec2ae6d34f91d39b7709dedf8d629b38985b586e695e851",
+        "image_reference": "examples/hadoop-metadata-ha:3.5.0",
+        "memory_limit_bytes": 134217728,
+        "nano_cpus": 250000000,
+        "started_at": "2026-11-27T13:32:12.12073471Z"
+      },
+      "cpu_utilization_pct_one_core_min": 0.0006591070530208513,
+      "cpu_utilization_pct_one_core_max": 2.7803923698259085,
+      "counter_deltas": {
+        "cpu_core_s": 0.06421299999999999,
+        "disk_read_bytes": 0,
+        "disk_write_bytes": 16384
+      }
+    },
+    {
+      "name": "/hadoop-metadata-ha-nn1-1",
+      "samples": 52,
+      "peak_memory_bytes": 235073536,
+      "configuration": {
+        "image_id": "sha256:1890cf73a8b317c30ec2ae6d34f91d39b7709dedf8d629b38985b586e695e851",
+        "image_reference": "examples/hadoop-metadata-ha:3.5.0",
+        "memory_limit_bytes": 1073741824,
+        "nano_cpus": 1000000000,
+        "started_at": "2026-11-27T13:32:12.12112196Z"
+      },
+      "cpu_utilization_pct_one_core_min": 0.0009278994312749823,
+      "cpu_utilization_pct_one_core_max": 102.75816318187945,
+      "counter_deltas": {
+        "cpu_core_s": 4.405247,
+        "disk_read_bytes": 0,
+        "disk_write_bytes": 638976
+      }
+    },
+    {
+      "name": "/hadoop-metadata-ha-tools-1",
+      "samples": 52,
+      "peak_memory_bytes": 118304768,
+      "configuration": {
+        "image_id": "sha256:1890cf73a8b317c30ec2ae6d34f91d39b7709dedf8d629b38985b586e695e851",
+        "image_reference": "examples/hadoop-metadata-ha:3.5.0",
+        "memory_limit_bytes": 1073741824,
+        "nano_cpus": 1000000000,
+        "started_at": "2026-11-27T13:32:12.120738377Z"
+      },
+      "cpu_utilization_pct_one_core_min": 0.0010379081908807835,
+      "cpu_utilization_pct_one_core_max": 93.4358662585205,
+      "counter_deltas": {
+        "cpu_core_s": 5.429035,
+        "disk_read_bytes": 0,
+        "disk_write_bytes": 98304
+      }
+    },
+    {
+      "name": "/hadoop-metadata-ha-zk2-1",
+      "samples": 52,
+      "peak_memory_bytes": 172314624,
+      "configuration": {
+        "image_id": "sha256:23f7fe549a6be53e39f9bf90cfa82542b4c7df8e8a19374ce4f3625cd11fa86b",
+        "image_reference": "zookeeper:3.9.7@sha256:23f7fe549a6be53e39f9bf90cfa82542b4c7df8e8a19374ce4f3625cd11fa86b",
+        "memory_limit_bytes": 536870912,
+        "nano_cpus": 500000000,
+        "started_at": "2026-11-27T13:32:02.928215804Z"
+      },
+      "cpu_utilization_pct_one_core_min": 0.07486669376990922,
+      "cpu_utilization_pct_one_core_max": 25.62845717868404,
+      "counter_deltas": {
+        "cpu_core_s": 4.059899,
+        "disk_read_bytes": 0,
+        "disk_write_bytes": 733184
+      }
+    },
+    {
+      "name": "/hadoop-metadata-ha-zk1-1",
+      "samples": 52,
+      "peak_memory_bytes": 173166592,
+      "configuration": {
+        "image_id": "sha256:23f7fe549a6be53e39f9bf90cfa82542b4c7df8e8a19374ce4f3625cd11fa86b",
+        "image_reference": "zookeeper:3.9.7@sha256:23f7fe549a6be53e39f9bf90cfa82542b4c7df8e8a19374ce4f3625cd11fa86b",
+        "memory_limit_bytes": 536870912,
+        "nano_cpus": 500000000,
+        "started_at": "2026-11-27T13:32:02.926390929Z"
+      },
+      "cpu_utilization_pct_one_core_min": 0.08074580234168324,
+      "cpu_utilization_pct_one_core_max": 26.325991068575416,
+      "counter_deltas": {
+        "cpu_core_s": 4.2075499999999995,
+        "disk_read_bytes": 0,
+        "disk_write_bytes": 778240
+      }
+    },
+    {
+      "name": "/hadoop-metadata-ha-zk3-1",
+      "samples": 52,
+      "peak_memory_bytes": 183377920,
+      "configuration": {
+        "image_id": "sha256:23f7fe549a6be53e39f9bf90cfa82542b4c7df8e8a19374ce4f3625cd11fa86b",
+        "image_reference": "zookeeper:3.9.7@sha256:23f7fe549a6be53e39f9bf90cfa82542b4c7df8e8a19374ce4f3625cd11fa86b",
+        "memory_limit_bytes": 536870912,
+        "nano_cpus": 500000000,
+        "started_at": "2026-11-27T13:32:02.928218429Z"
+      },
+      "cpu_utilization_pct_one_core_min": 0.08754871971470249,
+      "cpu_utilization_pct_one_core_max": 26.78581001150256,
+      "counter_deltas": {
+        "cpu_core_s": 4.157477999999999,
+        "disk_read_bytes": 0,
+        "disk_write_bytes": 757760
+      }
+    },
+    {
+      "name": "/hadoop-metadata-ha-jn2-1",
+      "samples": 52,
+      "peak_memory_bytes": 133791744,
+      "configuration": {
+        "image_id": "sha256:1890cf73a8b317c30ec2ae6d34f91d39b7709dedf8d629b38985b586e695e851",
+        "image_reference": "examples/hadoop-metadata-ha:3.5.0",
+        "memory_limit_bytes": 1073741824,
+        "nano_cpus": 1000000000,
+        "started_at": "2026-11-27T13:32:02.925134012Z"
+      },
+      "cpu_utilization_pct_one_core_min": 0.053165015274664655,
+      "cpu_utilization_pct_one_core_max": 6.493957352458801,
+      "counter_deltas": {
+        "cpu_core_s": 0.5885860000000003,
+        "disk_read_bytes": 0,
+        "disk_write_bytes": 1748992
+      }
+    },
+    {
+      "name": "/hadoop-metadata-ha-jn1-1",
+      "samples": 52,
+      "peak_memory_bytes": 150278144,
+      "configuration": {
+        "image_id": "sha256:1890cf73a8b317c30ec2ae6d34f91d39b7709dedf8d629b38985b586e695e851",
+        "image_reference": "examples/hadoop-metadata-ha:3.5.0",
+        "memory_limit_bytes": 1073741824,
+        "nano_cpus": 1000000000,
+        "started_at": "2026-11-27T13:32:02.923114304Z"
+      },
+      "cpu_utilization_pct_one_core_min": 0.054847657068705834,
+      "cpu_utilization_pct_one_core_max": 8.998538944564904,
+      "counter_deltas": {
+        "cpu_core_s": 0.6425369999999999,
+        "disk_read_bytes": 0,
+        "disk_write_bytes": 1744896
+      }
+    },
+    {
+      "name": "/hadoop-metadata-ha-jn3-1",
+      "samples": 52,
+      "peak_memory_bytes": 144519168,
+      "configuration": {
+        "image_id": "sha256:1890cf73a8b317c30ec2ae6d34f91d39b7709dedf8d629b38985b586e695e851",
+        "image_reference": "examples/hadoop-metadata-ha:3.5.0",
+        "memory_limit_bytes": 1073741824,
+        "nano_cpus": 1000000000,
+        "started_at": "2026-11-27T13:32:02.924578262Z"
+      },
+      "cpu_utilization_pct_one_core_min": 0.05467705264673094,
+      "cpu_utilization_pct_one_core_max": 13.33181664658255,
+      "counter_deltas": {
+        "cpu_core_s": 0.647656,
+        "disk_read_bytes": 0,
+        "disk_write_bytes": 1769472
+      }
+    },
+    {
+      "name": "/hadoop-metadata-ha-files-writer-run-dd188719da28",
+      "samples": 1,
+      "peak_memory_bytes": 89948160,
+      "configuration": {
+        "image_id": "sha256:5c1ae3b1b47e5dfdeba66712e0570e50987ccf47cc714809bcec3f8f3c47bfd3",
+        "image_reference": "examples/hadoop-ha-files:3.5.0",
+        "memory_limit_bytes": 1073741824,
+        "nano_cpus": 1000000000,
+        "started_at": "2026-11-27T13:33:43.782967003Z"
+      },
+      "counter_deltas": {
+        "cpu_core_s": 0.0,
+        "disk_read_bytes": 0,
+        "disk_write_bytes": 0
+      }
+    },
+    {
+      "name": "/hadoop-metadata-ha-files-writer-run-6aa2b403780e",
+      "samples": 2,
+      "peak_memory_bytes": 4067328,
+      "configuration": {
+        "image_id": "sha256:5c1ae3b1b47e5dfdeba66712e0570e50987ccf47cc714809bcec3f8f3c47bfd3",
+        "image_reference": "examples/hadoop-ha-files:3.5.0",
+        "memory_limit_bytes": 1073741824,
+        "nano_cpus": 1000000000,
+        "started_at": "2026-11-27T13:33:47.502203505Z"
+      },
+      "counter_deltas": {
+        "cpu_core_s": -0.122561
+      }
+    },
+    {
+      "name": "/hdfs-ha-reader-ffe8416709e8",
+      "samples": 34,
+      "peak_memory_bytes": 110804992,
+      "configuration": {
+        "image_id": "sha256:5c1ae3b1b47e5dfdeba66712e0570e50987ccf47cc714809bcec3f8f3c47bfd3",
+        "image_reference": "examples/hadoop-ha-files:3.5.0",
+        "memory_limit_bytes": 1073741824,
+        "nano_cpus": 1000000000,
+        "started_at": "2026-11-27T13:33:51.336062923Z"
+      },
+      "cpu_utilization_pct_one_core_min": 0.054598614124698935,
+      "cpu_utilization_pct_one_core_max": 49.299075473788484,
+      "counter_deltas": {
+        "cpu_core_s": 0.7655939999999999,
+        "disk_read_bytes": 0,
+        "disk_write_bytes": 49152
+      }
+    },
+    {
+      "name": "/hdfs-ha-writer-ffe8416709e8",
+      "samples": 34,
+      "peak_memory_bytes": 116502528,
+      "configuration": {
+        "image_id": "sha256:5c1ae3b1b47e5dfdeba66712e0570e50987ccf47cc714809bcec3f8f3c47bfd3",
+        "image_reference": "examples/hadoop-ha-files:3.5.0",
+        "memory_limit_bytes": 1073741824,
+        "nano_cpus": 1000000000,
+        "started_at": "2026-11-27T13:33:51.126589965Z"
+      },
+      "cpu_utilization_pct_one_core_min": 0.05320082180209311,
+      "cpu_utilization_pct_one_core_max": 35.90322542807407,
+      "counter_deltas": {
+        "cpu_core_s": 0.6405150000000001,
+        "disk_read_bytes": 0,
+        "disk_write_bytes": 204800
+      }
+    },
+    {
+      "name": "/hadoop-metadata-ha-files-writer-run-3b15cf307e58",
+      "samples": 2,
+      "peak_memory_bytes": 38211584,
+      "configuration": {
+        "image_id": "sha256:5c1ae3b1b47e5dfdeba66712e0570e50987ccf47cc714809bcec3f8f3c47bfd3",
+        "image_reference": "examples/hadoop-ha-files:3.5.0",
+        "memory_limit_bytes": 1073741824,
+        "nano_cpus": 1000000000,
+        "started_at": "2026-11-27T13:34:28.180563135Z"
+      },
+      "counter_deltas": {
+        "cpu_core_s": -0.212353
+      }
+    },
+    {
+      "name": "/hadoop-metadata-ha-files-writer-run-61cc70b21444",
+      "samples": 1,
+      "peak_memory_bytes": 92024832,
+      "configuration": {
+        "image_id": "sha256:5c1ae3b1b47e5dfdeba66712e0570e50987ccf47cc714809bcec3f8f3c47bfd3",
+        "image_reference": "examples/hadoop-ha-files:3.5.0",
+        "memory_limit_bytes": 1073741824,
+        "nano_cpus": 1000000000,
+        "started_at": "2026-11-27T13:34:29.75062576Z"
+      },
+      "counter_deltas": {
+        "cpu_core_s": 0.0,
+        "disk_read_bytes": 0,
+        "disk_write_bytes": 0
+      }
+    },
+    {
+      "name": "/hadoop-metadata-ha-files-writer-run-e94b6bc0cf6b",
+      "samples": 1,
+      "peak_memory_bytes": 99307520,
+      "configuration": {
+        "image_id": "sha256:5c1ae3b1b47e5dfdeba66712e0570e50987ccf47cc714809bcec3f8f3c47bfd3",
+        "image_reference": "examples/hadoop-ha-files:3.5.0",
+        "memory_limit_bytes": 1073741824,
+        "nano_cpus": 1000000000,
+        "started_at": "2026-11-27T13:34:33.795137762Z"
+      },
+      "counter_deltas": {
+        "cpu_core_s": 0.0,
+        "disk_read_bytes": 0,
+        "disk_write_bytes": 0
+      }
+    },
+    {
+      "name": "/hadoop-metadata-ha-files-writer-run-9517c8627163",
+      "samples": 1,
+      "peak_memory_bytes": 83046400,
+      "configuration": {
+        "image_id": "sha256:5c1ae3b1b47e5dfdeba66712e0570e50987ccf47cc714809bcec3f8f3c47bfd3",
+        "image_reference": "examples/hadoop-ha-files:3.5.0",
+        "memory_limit_bytes": 1073741824,
+        "nano_cpus": 1000000000,
+        "started_at": "2026-11-27T13:34:35.340701888Z"
+      },
+      "counter_deltas": {
+        "cpu_core_s": 0.0,
+        "disk_read_bytes": 0,
+        "disk_write_bytes": 0
+      }
+    }
+  ],
+  "limits": [
+    "Sample-window deltas exclude startup and exit outside observation.",
+    "Short-lived actors may be missed; use native pre-exit cgroup counters as well.",
+    "CPU utilization is interval-average percent of one core; short spikes may be missed.",
+    "Docker disk bytes are not device I/O latency; absent counters are unavailable, not zero."
+  ]
+}
