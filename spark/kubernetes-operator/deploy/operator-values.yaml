@@ -1,0 +1,15 @@
+image:
+  tag: 1.1.0
+  digest: sha256:b1aef33bfdc5cc2ddaaf59d19bc87b8a0737c7ef48807836b2bb59808faad509
+operatorRbac:
+  clusterRole: {create: false}
+  clusterRoleBinding: {create: false}
+  role: {create: true}
+  roleBinding: {create: true}
+workloadResources:
+  namespaces:
+    create: false
+    overrideWatchedNamespaces: true
+    data: [spark-lab]
+  role: {create: true}
+  clusterRole: {create: false}

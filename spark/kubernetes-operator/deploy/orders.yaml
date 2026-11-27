@@ -1,0 +1,50 @@
+apiVersion: spark.apache.org/v1
+kind: SparkApplication
+metadata:
+  name: orders-write
+spec:
+  pyFiles: local:///opt/spark/orders-workload/orders.py
+  driverArgs: [write]
+  runtimeVersions:
+    sparkVersion: 4.3.0
+  applicationTolerations:
+    restartConfig:
+      restartPolicy: Never
+    resourceRetainPolicy: Always
+  sparkConf:
+    spark.kubernetes.namespace: spark-lab
+    spark.kubernetes.authenticate.driver.serviceAccountName: spark
+    spark.kubernetes.container.image: examples/spark-hdfs-orders:4.3.0
+    spark.kubernetes.container.image.pullPolicy: Never
+    spark.driver.memory: 1g
+    spark.driver.memoryOverhead: 512m
+    spark.kubernetes.driver.request.cores: "1"
+    spark.kubernetes.driver.limit.cores: "1"
+    spark.executor.instances: "2"
+    spark.executor.cores: "1"
+    spark.executor.memory: 1g
+    spark.executor.memoryOverhead: 512m
+    spark.kubernetes.executor.request.cores: "1"
+    spark.kubernetes.executor.limit.cores: "1"
+    spark.kubernetes.executor.deleteOnTermination: "true"
+    spark.dynamicAllocation.enabled: "false"
+    spark.sql.shuffle.partitions: "8"
+    spark.hadoop.fs.defaultFS: hdfs://namenode:9000
+    spark.hadoop.dfs.replication: "3"
+    spark.kubernetes.driverEnv.OUTPUT_PATH: hdfs://namenode:9000/lab/orders
+    spark.kubernetes.driverEnv.EVENT_LOG_DIR: hdfs://namenode:9000/lab/events
+    spark.kubernetes.driverEnv.AWS_EC2_METADATA_DISABLED: "true"
+    spark.executorEnv.AWS_EC2_METADATA_DISABLED: "true"
+  executorSpec:
+    podTemplateSpec:
+      metadata:
+        labels:
+          lab.example/role: spark-executor
+      spec:
+        affinity:
+          podAntiAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              - labelSelector:
+                  matchLabels:
+                    lab.example/role: spark-executor
+                topologyKey: kubernetes.io/hostname

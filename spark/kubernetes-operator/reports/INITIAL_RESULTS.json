@@ -1,0 +1,998 @@
+{
+  "environment": {
+    "cpus": 11,
+    "memory_bytes": 26216296448,
+    "architecture": "aarch64",
+    "kernel": "6.12.76-linuxkit",
+    "docker_server": "29.5.3",
+    "kubernetes": {
+      "clientVersion": {
+        "major": "1",
+        "minor": "37",
+        "gitVersion": "v1.37.3",
+        "gitCommit": "f81a9c5f95912fd97b7c8aa4966301aeae84a253",
+        "gitTreeState": "clean",
+        "buildDate": "2026-11-25T10:43:39Z",
+        "goVersion": "go1.26.11",
+        "compiler": "gc",
+        "platform": "darwin/arm64"
+      },
+      "kustomizeVersion": "v5.8.1",
+      "serverVersion": {
+        "major": "1",
+        "minor": "37",
+        "emulationMajor": "1",
+        "emulationMinor": "37",
+        "minCompatibilityMajor": "1",
+        "minCompatibilityMinor": "36",
+        "gitVersion": "v1.37.0",
+        "gitCommit": "f54c212e3a2f75d674b717a9b29052b20b60aefc",
+        "gitTreeState": "clean",
+        "buildDate": "2026-08-26T10:44:25Z",
+        "goVersion": "go1.26.6",
+        "compiler": "gc",
+        "platform": "linux/arm64"
+      }
+    },
+    "disk_class": "Docker Desktop VM overlay; underlying device not measured",
+    "co_tenancy": "Only this example lab was running; kind workers share one VM",
+    "effective_role_limits": {
+      "datanode-0": [
+        {
+          "limits": {
+            "cpu": "1",
+            "memory": "1Gi"
+          },
+          "requests": {
+            "cpu": "500m",
+            "memory": "1Gi"
+          }
+        }
+      ],
+      "datanode-1": [
+        {
+          "limits": {
+            "cpu": "1",
+            "memory": "1Gi"
+          },
+          "requests": {
+            "cpu": "500m",
+            "memory": "1Gi"
+          }
+        }
+      ],
+      "datanode-2": [
+        {
+          "limits": {
+            "cpu": "1",
+            "memory": "1Gi"
+          },
+          "requests": {
+            "cpu": "500m",
+            "memory": "1Gi"
+          }
+        }
+      ],
+      "hdfs-tools": [
+        {
+          "limits": {
+            "cpu": "1",
+            "memory": "1Gi"
+          },
+          "requests": {
+            "cpu": "100m",
+            "memory": "128Mi"
+          }
+        }
+      ],
+      "namenode-0": [
+        {
+          "limits": {
+            "cpu": "1",
+            "memory": "1Gi"
+          },
+          "requests": {
+            "cpu": "500m",
+            "memory": "1Gi"
+          }
+        }
+      ],
+      "orders-live-reader-4xvjt": [
+        {
+          "limits": {
+            "cpu": "1",
+            "memory": "1Gi"
+          },
+          "requests": {
+            "cpu": "250m",
+            "memory": "256Mi"
+          }
+        }
+      ],
+      "orders-read-1795737986844491000-0-driver": [
+        {
+          "limits": {
+            "cpu": "1",
+            "memory": "1536Mi"
+          },
+          "requests": {
+            "cpu": "1",
+            "memory": "1536Mi"
+          }
+        }
+      ],
+      "orders-read-1795738043619741000-0-driver": [
+        {
+          "limits": {
+            "cpu": "1",
+            "memory": "1536Mi"
+          },
+          "requests": {
+            "cpu": "1",
+            "memory": "1536Mi"
+          }
+        }
+      ],
+      "orders-read-1795738103293785000-0-driver": [
+        {
+          "limits": {
+            "cpu": "1",
+            "memory": "1536Mi"
+          },
+          "requests": {
+            "cpu": "1",
+            "memory": "1536Mi"
+          }
+        }
+      ],
+      "orders-write-0-driver": [
+        {
+          "limits": {
+            "cpu": "1",
+            "memory": "1536Mi"
+          },
+          "requests": {
+            "cpu": "1",
+            "memory": "1536Mi"
+          }
+        }
+      ],
+      "parquet-verifier-8957w-lb2xl": [
+        {
+          "limits": {
+            "cpu": "1",
+            "memory": "1Gi"
+          },
+          "requests": {
+            "cpu": "250m",
+            "memory": "256Mi"
+          }
+        }
+      ],
+      "parquet-verifier-pp6ln-hbcbw": [
+        {
+          "limits": {
+            "cpu": "1",
+            "memory": "1Gi"
+          },
+          "requests": {
+            "cpu": "250m",
+            "memory": "256Mi"
+          }
+        }
+      ],
+      "parquet-verifier-rvc6l-f2z7c": [
+        {
+          "limits": {
+            "cpu": "1",
+            "memory": "1Gi"
+          },
+          "requests": {
+            "cpu": "250m",
+            "memory": "256Mi"
+          }
+        }
+      ],
+      "spark-kubernetes-operator-6565cb7bf5-cfzll": [
+        {
+          "limits": {
+            "cpu": "1",
+            "ephemeral-storage": "2Gi",
+            "memory": "2Gi"
+          },
+          "requests": {
+            "cpu": "1",
+            "ephemeral-storage": "2Gi",
+            "memory": "2Gi"
+          }
+        }
+      ]
+    }
+  },
+  "tested_at_utc": "2026-11-27T00:09:11.021971+00:00",
+  "qualification": "Initial functional/recovery diagnostics only; no performance comparison",
+  "versions": {
+    "spark": "4.3.0",
+    "operator": "1.1.0",
+    "operator_chart": "1.9.0",
+    "hadoop": "3.5.0",
+    "pyarrow": "26.0.1"
+  },
+  "executor_recovery": {
+    "application": "orders-write",
+    "native_success": true,
+    "driver_exit_codes": [
+      0
+    ],
+    "fault": {
+      "pod": "verified-orders-c1cf3ba21a51abd7-exec-1",
+      "uid": "fa665594-de69-4412-8151-524436732acc",
+      "executor_id": "1",
+      "elapsed_s": 15.484200041973963
+    },
+    "elapsed_s": 87.8297366250772,
+    "source_sha256": "5037c8c8bc8d4a4072d467496657aa6d79f7713a901d313a5fb3e612b8b94506",
+    "native_matching_removals": 1,
+    "native_matching_failed_tasks": 1
+  },
+  "fresh_oracle": {
+    "verifier_source_sha256": "679aeb238efa1f93a8b97d8e1f20f2130fca679ab878d113162f460cf454593b",
+    "read_hash_verify_ms": 176.25391699993997,
+    "process_cpu_user_s": 0.199837,
+    "process_cpu_system_s": 0.031703999999999996,
+    "process_peak_rss_bytes_linux": 98398208,
+    "container_counters_before_exit": {
+      "cpu.stat": "usage_usec 1601135\nuser_usec 1458987\nsystem_usec 142147\nnice_usec 0\nnr_periods 19\nnr_throttled 15\nthrottled_usec 1132643\nnr_bursts 0\nburst_usec 0\n",
+      "memory.peak": "117362688\n",
+      "io.stat": "254:0 rbytes=0 wbytes=32768 rios=0 wios=1 dbytes=0 dios=0\n"
+    },
+    "orders": 1000000,
+    "amount_cents": 599500000,
+    "missing": 0,
+    "wrong": 0,
+    "file_manifest": [
+      {
+        "file": "part-00000-391ea06f-5ce0-49c0-8154-823e36672c9d-c000.snappy.parquet",
+        "bytes": 409711,
+        "sha256": "0d90b1f46976f780d8de773d4fc3d80644c17e82378fcdf4339a48415366e5a3"
+      },
+      {
+        "file": "part-00001-391ea06f-5ce0-49c0-8154-823e36672c9d-c000.snappy.parquet",
+        "bytes": 409664,
+        "sha256": "def1f6f7da7c8ac358acd097b9d585a44019fc6c57c4202696f5bd54574b023f"
+      },
+      {
+        "file": "part-00002-391ea06f-5ce0-49c0-8154-823e36672c9d-c000.snappy.parquet",
+        "bytes": 409665,
+        "sha256": "a66258486cfc83823387e67fd72bd404c689e6268815a213a88ec0ab75a43730"
+      },
+      {
+        "file": "part-00003-391ea06f-5ce0-49c0-8154-823e36672c9d-c000.snappy.parquet",
+        "bytes": 409689,
+        "sha256": "ab83da91ca9514d0238f615703a9dda23ebd540efd31233c8190f0ce8364dd76"
+      },
+      {
+        "file": "part-00004-391ea06f-5ce0-49c0-8154-823e36672c9d-c000.snappy.parquet",
+        "bytes": 409700,
+        "sha256": "d8515fc399d5d0d4206469fdf9bb6ccef43d936dcd416c92b338579f77ec2898"
+      },
+      {
+        "file": "part-00005-391ea06f-5ce0-49c0-8154-823e36672c9d-c000.snappy.parquet",
+        "bytes": 409659,
+        "sha256": "c5cc7029dbb3b07e3472a3d9835e165ee82d36c1858aff1a467945e5a08ece97"
+      },
+      {
+        "file": "part-00006-391ea06f-5ce0-49c0-8154-823e36672c9d-c000.snappy.parquet",
+        "bytes": 409662,
+        "sha256": "8e69591c7a4a70ffdc7d36a967d5cc6b30943ebfc8e178f10586227e8e5eb4d3"
+      },
+      {
+        "file": "part-00007-391ea06f-5ce0-49c0-8154-823e36672c9d-c000.snappy.parquet",
+        "bytes": 409687,
+        "sha256": "e181e6018054f9b1b095a1539ab1d727f1b5c7003d57d557294f90e631bee518"
+      },
+      {
+        "file": "part-00008-391ea06f-5ce0-49c0-8154-823e36672c9d-c000.snappy.parquet",
+        "bytes": 409705,
+        "sha256": "d5b4bb3aff343bc0454c7adbc04397b40f904fe48ae4420506d40ec8f03bf8ce"
+      },
+      {
+        "file": "part-00009-391ea06f-5ce0-49c0-8154-823e36672c9d-c000.snappy.parquet",
+        "bytes": 409661,
+        "sha256": "9dc88abd7271916ad463a407c594f7e5c23ee41c0c735a884456645ac21c3b9f"
+      },
+      {
+        "file": "part-00010-391ea06f-5ce0-49c0-8154-823e36672c9d-c000.snappy.parquet",
+        "bytes": 409684,
+        "sha256": "75a43bae17b157840424ddf2c802787636d7a41bc213aa8e4651154a4cde2dab"
+      },
+      {
+        "file": "part-00011-391ea06f-5ce0-49c0-8154-823e36672c9d-c000.snappy.parquet",
+        "bytes": 409681,
+        "sha256": "8899cc81aa28ef50d68b8800b61d90aa5fa14b4dab2c9b6d92ff78ae0e5b2ea0"
+      },
+      {
+        "file": "part-00012-391ea06f-5ce0-49c0-8154-823e36672c9d-c000.snappy.parquet",
+        "bytes": 409712,
+        "sha256": "6f642904a254fdaf30c3d1cb79cdd42c1ced00736dac6f6523c3cf570eaf96f9"
+      },
+      {
+        "file": "part-00013-391ea06f-5ce0-49c0-8154-823e36672c9d-c000.snappy.parquet",
+        "bytes": 409651,
+        "sha256": "2c4ab0cd8b0c5160c2f8fb734d028d009dc0a41a651a16998d933a7229d58d75"
+      },
+      {
+        "file": "part-00014-391ea06f-5ce0-49c0-8154-823e36672c9d-c000.snappy.parquet",
+        "bytes": 409676,
+        "sha256": "3813f591280407fd81207f71f9e6bc29718e49d04a4f6f0ee7b6c03250954a21"
+      },
+      {
+        "file": "part-00015-391ea06f-5ce0-49c0-8154-823e36672c9d-c000.snappy.parquet",
+        "bytes": 409683,
+        "sha256": "2b2c6452faa92c755b8a7d60ce049d7bf54c9b76d75b5ba1e1228414ee76564c"
+      }
+    ],
+    "parquet_files": 16,
+    "codecs": [
+      "SNAPPY"
+    ],
+    "column_compressed_bytes": 6528906,
+    "column_uncompressed_bytes": 12925420,
+    "column_compression_ratio": 1.979722177038542,
+    "parquet_file_bytes": 6554890,
+    "allocated_output_bytes": 6619136
+  },
+  "empty_disk_replacement": {
+    "passed": true,
+    "elapsed_s": 110.72402679198422,
+    "old_pvc_uid": "40575cc2-e404-478a-bd08-fd4870520b74",
+    "new_pvc_uid": "96d7f5a2-037d-4fbc-b1d1-2b90a1e6aa24",
+    "old_datanode_uuid": "0f4c5361-a3be-49be-9222-992081a93953",
+    "new_datanode_uuid": "d9897625-4b78-4a54-bf54-25f7d9debf98",
+    "namenode_identity_unchanged": true,
+    "input_reloaded": false
+  },
+  "final_three_copy_audit": {
+    "copies": 3,
+    "parquet_files": 16,
+    "blocks": 16,
+    "file_bytes_per_copy": 6554890,
+    "all_replica_file_hashes_match_oracle": true,
+    "physical": {
+      "datanode-0": {
+        "uid": "1780b2cb-86b5-42fe-8ca7-2503e0ddab06",
+        "worker": "spark-kubernetes-operator-worker2",
+        "files": {
+          "part-00000-391ea06f-5ce0-49c0-8154-823e36672c9d-c000.snappy.parquet": {
+            "sha256": "0d90b1f46976f780d8de773d4fc3d80644c17e82378fcdf4339a48415366e5a3",
+            "missing": []
+          },
+          "part-00001-391ea06f-5ce0-49c0-8154-823e36672c9d-c000.snappy.parquet": {
+            "sha256": "def1f6f7da7c8ac358acd097b9d585a44019fc6c57c4202696f5bd54574b023f",
+            "missing": []
+          },
+          "part-00002-391ea06f-5ce0-49c0-8154-823e36672c9d-c000.snappy.parquet": {
+            "sha256": "a66258486cfc83823387e67fd72bd404c689e6268815a213a88ec0ab75a43730",
+            "missing": []
+          },
+          "part-00003-391ea06f-5ce0-49c0-8154-823e36672c9d-c000.snappy.parquet": {
+            "sha256": "ab83da91ca9514d0238f615703a9dda23ebd540efd31233c8190f0ce8364dd76",
+            "missing": []
+          },
+          "part-00004-391ea06f-5ce0-49c0-8154-823e36672c9d-c000.snappy.parquet": {
+            "sha256": "d8515fc399d5d0d4206469fdf9bb6ccef43d936dcd416c92b338579f77ec2898",
+            "missing": []
+          },
+          "part-00005-391ea06f-5ce0-49c0-8154-823e36672c9d-c000.snappy.parquet": {
+            "sha256": "c5cc7029dbb3b07e3472a3d9835e165ee82d36c1858aff1a467945e5a08ece97",
+            "missing": []
+          },
+          "part-00006-391ea06f-5ce0-49c0-8154-823e36672c9d-c000.snappy.parquet": {
+            "sha256": "8e69591c7a4a70ffdc7d36a967d5cc6b30943ebfc8e178f10586227e8e5eb4d3",
+            "missing": []
+          },
+          "part-00007-391ea06f-5ce0-49c0-8154-823e36672c9d-c000.snappy.parquet": {
+            "sha256": "e181e6018054f9b1b095a1539ab1d727f1b5c7003d57d557294f90e631bee518",
+            "missing": []
+          },
+          "part-00008-391ea06f-5ce0-49c0-8154-823e36672c9d-c000.snappy.parquet": {
+            "sha256": "d5b4bb3aff343bc0454c7adbc04397b40f904fe48ae4420506d40ec8f03bf8ce",
+            "missing": []
+          },
+          "part-00009-391ea06f-5ce0-49c0-8154-823e36672c9d-c000.snappy.parquet": {
+            "sha256": "9dc88abd7271916ad463a407c594f7e5c23ee41c0c735a884456645ac21c3b9f",
+            "missing": []
+          },
+          "part-00010-391ea06f-5ce0-49c0-8154-823e36672c9d-c000.snappy.parquet": {
+            "sha256": "75a43bae17b157840424ddf2c802787636d7a41bc213aa8e4651154a4cde2dab",
+            "missing": []
+          },
+          "part-00011-391ea06f-5ce0-49c0-8154-823e36672c9d-c000.snappy.parquet": {
+            "sha256": "8899cc81aa28ef50d68b8800b61d90aa5fa14b4dab2c9b6d92ff78ae0e5b2ea0",
+            "missing": []
+          },
+          "part-00012-391ea06f-5ce0-49c0-8154-823e36672c9d-c000.snappy.parquet": {
+            "sha256": "6f642904a254fdaf30c3d1cb79cdd42c1ced00736dac6f6523c3cf570eaf96f9",
+            "missing": []
+          },
+          "part-00013-391ea06f-5ce0-49c0-8154-823e36672c9d-c000.snappy.parquet": {
+            "sha256": "2c4ab0cd8b0c5160c2f8fb734d028d009dc0a41a651a16998d933a7229d58d75",
+            "missing": []
+          },
+          "part-00014-391ea06f-5ce0-49c0-8154-823e36672c9d-c000.snappy.parquet": {
+            "sha256": "3813f591280407fd81207f71f9e6bc29718e49d04a4f6f0ee7b6c03250954a21",
+            "missing": []
+          },
+          "part-00015-391ea06f-5ce0-49c0-8154-823e36672c9d-c000.snappy.parquet": {
+            "sha256": "2b2c6452faa92c755b8a7d60ce049d7bf54c9b76d75b5ba1e1228414ee76564c",
+            "missing": []
+          }
+        }
+      },
+      "datanode-1": {
+        "uid": "52019a85-e140-4811-87ad-98278c14cea0",
+        "worker": "spark-kubernetes-operator-worker",
+        "files": {
+          "part-00000-391ea06f-5ce0-49c0-8154-823e36672c9d-c000.snappy.parquet": {
+            "sha256": "0d90b1f46976f780d8de773d4fc3d80644c17e82378fcdf4339a48415366e5a3",
+            "missing": []
+          },
+          "part-00001-391ea06f-5ce0-49c0-8154-823e36672c9d-c000.snappy.parquet": {
+            "sha256": "def1f6f7da7c8ac358acd097b9d585a44019fc6c57c4202696f5bd54574b023f",
+            "missing": []
+          },
+          "part-00002-391ea06f-5ce0-49c0-8154-823e36672c9d-c000.snappy.parquet": {
+            "sha256": "a66258486cfc83823387e67fd72bd404c689e6268815a213a88ec0ab75a43730",
+            "missing": []
+          },
+          "part-00003-391ea06f-5ce0-49c0-8154-823e36672c9d-c000.snappy.parquet": {
+            "sha256": "ab83da91ca9514d0238f615703a9dda23ebd540efd31233c8190f0ce8364dd76",
+            "missing": []
+          },
+          "part-00004-391ea06f-5ce0-49c0-8154-823e36672c9d-c000.snappy.parquet": {
+            "sha256": "d8515fc399d5d0d4206469fdf9bb6ccef43d936dcd416c92b338579f77ec2898",
+            "missing": []
+          },
+          "part-00005-391ea06f-5ce0-49c0-8154-823e36672c9d-c000.snappy.parquet": {
+            "sha256": "c5cc7029dbb3b07e3472a3d9835e165ee82d36c1858aff1a467945e5a08ece97",
+            "missing": []
+          },
+          "part-00006-391ea06f-5ce0-49c0-8154-823e36672c9d-c000.snappy.parquet": {
+            "sha256": "8e69591c7a4a70ffdc7d36a967d5cc6b30943ebfc8e178f10586227e8e5eb4d3",
+            "missing": []
+          },
+          "part-00007-391ea06f-5ce0-49c0-8154-823e36672c9d-c000.snappy.parquet": {
+            "sha256": "e181e6018054f9b1b095a1539ab1d727f1b5c7003d57d557294f90e631bee518",
+            "missing": []
+          },
+          "part-00008-391ea06f-5ce0-49c0-8154-823e36672c9d-c000.snappy.parquet": {
+            "sha256": "d5b4bb3aff343bc0454c7adbc04397b40f904fe48ae4420506d40ec8f03bf8ce",
+            "missing": []
+          },
+          "part-00009-391ea06f-5ce0-49c0-8154-823e36672c9d-c000.snappy.parquet": {
+            "sha256": "9dc88abd7271916ad463a407c594f7e5c23ee41c0c735a884456645ac21c3b9f",
+            "missing": []
+          },
+          "part-00010-391ea06f-5ce0-49c0-8154-823e36672c9d-c000.snappy.parquet": {
+            "sha256": "75a43bae17b157840424ddf2c802787636d7a41bc213aa8e4651154a4cde2dab",
+            "missing": []
+          },
+          "part-00011-391ea06f-5ce0-49c0-8154-823e36672c9d-c000.snappy.parquet": {
+            "sha256": "8899cc81aa28ef50d68b8800b61d90aa5fa14b4dab2c9b6d92ff78ae0e5b2ea0",
+            "missing": []
+          },
+          "part-00012-391ea06f-5ce0-49c0-8154-823e36672c9d-c000.snappy.parquet": {
+            "sha256": "6f642904a254fdaf30c3d1cb79cdd42c1ced00736dac6f6523c3cf570eaf96f9",
+            "missing": []
+          },
+          "part-00013-391ea06f-5ce0-49c0-8154-823e36672c9d-c000.snappy.parquet": {
+            "sha256": "2c4ab0cd8b0c5160c2f8fb734d028d009dc0a41a651a16998d933a7229d58d75",
+            "missing": []
+          },
+          "part-00014-391ea06f-5ce0-49c0-8154-823e36672c9d-c000.snappy.parquet": {
+            "sha256": "3813f591280407fd81207f71f9e6bc29718e49d04a4f6f0ee7b6c03250954a21",
+            "missing": []
+          },
+          "part-00015-391ea06f-5ce0-49c0-8154-823e36672c9d-c000.snappy.parquet": {
+            "sha256": "2b2c6452faa92c755b8a7d60ce049d7bf54c9b76d75b5ba1e1228414ee76564c",
+            "missing": []
+          }
+        }
+      },
+      "datanode-2": {
+        "uid": "77d3bc2c-d64d-4320-aed4-fc076300bb30",
+        "worker": "spark-kubernetes-operator-worker3",
+        "files": {
+          "part-00000-391ea06f-5ce0-49c0-8154-823e36672c9d-c000.snappy.parquet": {
+            "sha256": "0d90b1f46976f780d8de773d4fc3d80644c17e82378fcdf4339a48415366e5a3",
+            "missing": []
+          },
+          "part-00001-391ea06f-5ce0-49c0-8154-823e36672c9d-c000.snappy.parquet": {
+            "sha256": "def1f6f7da7c8ac358acd097b9d585a44019fc6c57c4202696f5bd54574b023f",
+            "missing": []
+          },
+          "part-00002-391ea06f-5ce0-49c0-8154-823e36672c9d-c000.snappy.parquet": {
+            "sha256": "a66258486cfc83823387e67fd72bd404c689e6268815a213a88ec0ab75a43730",
+            "missing": []
+          },
+          "part-00003-391ea06f-5ce0-49c0-8154-823e36672c9d-c000.snappy.parquet": {
+            "sha256": "ab83da91ca9514d0238f615703a9dda23ebd540efd31233c8190f0ce8364dd76",
+            "missing": []
+          },
+          "part-00004-391ea06f-5ce0-49c0-8154-823e36672c9d-c000.snappy.parquet": {
+            "sha256": "d8515fc399d5d0d4206469fdf9bb6ccef43d936dcd416c92b338579f77ec2898",
+            "missing": []
+          },
+          "part-00005-391ea06f-5ce0-49c0-8154-823e36672c9d-c000.snappy.parquet": {
+            "sha256": "c5cc7029dbb3b07e3472a3d9835e165ee82d36c1858aff1a467945e5a08ece97",
+            "missing": []
+          },
+          "part-00006-391ea06f-5ce0-49c0-8154-823e36672c9d-c000.snappy.parquet": {
+            "sha256": "8e69591c7a4a70ffdc7d36a967d5cc6b30943ebfc8e178f10586227e8e5eb4d3",
+            "missing": []
+          },
+          "part-00007-391ea06f-5ce0-49c0-8154-823e36672c9d-c000.snappy.parquet": {
+            "sha256": "e181e6018054f9b1b095a1539ab1d727f1b5c7003d57d557294f90e631bee518",
+            "missing": []
+          },
+          "part-00008-391ea06f-5ce0-49c0-8154-823e36672c9d-c000.snappy.parquet": {
+            "sha256": "d5b4bb3aff343bc0454c7adbc04397b40f904fe48ae4420506d40ec8f03bf8ce",
+            "missing": []
+          },
+          "part-00009-391ea06f-5ce0-49c0-8154-823e36672c9d-c000.snappy.parquet": {
+            "sha256": "9dc88abd7271916ad463a407c594f7e5c23ee41c0c735a884456645ac21c3b9f",
+            "missing": []
+          },
+          "part-00010-391ea06f-5ce0-49c0-8154-823e36672c9d-c000.snappy.parquet": {
+            "sha256": "75a43bae17b157840424ddf2c802787636d7a41bc213aa8e4651154a4cde2dab",
+            "missing": []
+          },
+          "part-00011-391ea06f-5ce0-49c0-8154-823e36672c9d-c000.snappy.parquet": {
+            "sha256": "8899cc81aa28ef50d68b8800b61d90aa5fa14b4dab2c9b6d92ff78ae0e5b2ea0",
+            "missing": []
+          },
+          "part-00012-391ea06f-5ce0-49c0-8154-823e36672c9d-c000.snappy.parquet": {
+            "sha256": "6f642904a254fdaf30c3d1cb79cdd42c1ced00736dac6f6523c3cf570eaf96f9",
+            "missing": []
+          },
+          "part-00013-391ea06f-5ce0-49c0-8154-823e36672c9d-c000.snappy.parquet": {
+            "sha256": "2c4ab0cd8b0c5160c2f8fb734d028d009dc0a41a651a16998d933a7229d58d75",
+            "missing": []
+          },
+          "part-00014-391ea06f-5ce0-49c0-8154-823e36672c9d-c000.snappy.parquet": {
+            "sha256": "3813f591280407fd81207f71f9e6bc29718e49d04a4f6f0ee7b6c03250954a21",
+            "missing": []
+          },
+          "part-00015-391ea06f-5ce0-49c0-8154-823e36672c9d-c000.snappy.parquet": {
+            "sha256": "2b2c6452faa92c755b8a7d60ce049d7bf54c9b76d75b5ba1e1228414ee76564c",
+            "missing": []
+          }
+        }
+      }
+    }
+  },
+  "effective_hdfs_config": {
+    "dfs.replication": "3",
+    "dfs.namenode.replication.min": "2",
+    "dfs.datanode.synconclose": "true",
+    "dfs.heartbeat.interval": "1",
+    "dfs.namenode.heartbeat.recheck-interval": "1000"
+  },
+  "resources": [
+    {
+      "pod": "datanode-0",
+      "worker": "spark-kubernetes-operator-worker2",
+      "pod_uid": "1780b2cb-86b5-42fe-8ca7-2503e0ddab06",
+      "samples": 113,
+      "observed_seconds": 247.70516109466553,
+      "sampled_cpu_mean_pct_one_core": 1.697180220800226,
+      "sampled_cpu_peak_pct_one_core": 6.79573681074829,
+      "charged_memory_mean_bytes": 195332295,
+      "cpu_core_seconds_observed_lower_bound": 4.204003,
+      "io_counter_observed_deltas": {
+        "rbytes": 0,
+        "wbytes": 9027584,
+        "rios": 0,
+        "wios": 113
+      },
+      "observed_native_memory_peak_bytes": 211513344
+    },
+    {
+      "pod": "datanode-1",
+      "worker": "spark-kubernetes-operator-worker",
+      "pod_uid": "52019a85-e140-4811-87ad-98278c14cea0",
+      "samples": 113,
+      "observed_seconds": 247.70516109466553,
+      "sampled_cpu_mean_pct_one_core": 1.6091243244127296,
+      "sampled_cpu_peak_pct_one_core": 7.649083145605613,
+      "charged_memory_mean_bytes": 196665706,
+      "cpu_core_seconds_observed_lower_bound": 3.985884,
+      "io_counter_observed_deltas": {
+        "rbytes": 0,
+        "wbytes": 9064448,
+        "rios": 0,
+        "wios": 113
+      },
+      "observed_native_memory_peak_bytes": 210677760
+    },
+    {
+      "pod": "datanode-2",
+      "worker": "spark-kubernetes-operator-worker3",
+      "pod_uid": "d7aeef00-86c5-45ef-b4d5-6297e44fde29",
+      "samples": 72,
+      "observed_seconds": 132.47762799263,
+      "sampled_cpu_mean_pct_one_core": 1.7277558744691108,
+      "sampled_cpu_peak_pct_one_core": 7.0196383178518245,
+      "charged_memory_mean_bytes": 191139726,
+      "cpu_core_seconds_observed_lower_bound": 2.28889,
+      "io_counter_observed_deltas": {
+        "rbytes": 0,
+        "wbytes": 7921664,
+        "rios": 0,
+        "wios": 74
+      },
+      "observed_native_memory_peak_bytes": 204042240
+    },
+    {
+      "pod": "hdfs-tools",
+      "worker": "spark-kubernetes-operator-worker2",
+      "pod_uid": "7bfcda62-bae5-47bd-bbaa-584034dbc6cd",
+      "samples": 113,
+      "observed_seconds": 247.70516109466553,
+      "sampled_cpu_mean_pct_one_core": 4.895883859022738,
+      "sampled_cpu_peak_pct_one_core": 20.995941234211912,
+      "charged_memory_mean_bytes": 5099157,
+      "cpu_core_seconds_observed_lower_bound": 12.127357,
+      "io_counter_observed_deltas": {
+        "rbytes": 0,
+        "wbytes": 294912,
+        "rios": 0,
+        "wios": 9
+      },
+      "observed_native_memory_peak_bytes": 116465664
+    },
+    {
+      "pod": "namenode-0",
+      "worker": "spark-kubernetes-operator-worker",
+      "pod_uid": "04de820a-360d-4511-992a-8dc90b985703",
+      "samples": 113,
+      "observed_seconds": 247.70516109466553,
+      "sampled_cpu_mean_pct_one_core": 3.4169812863791305,
+      "sampled_cpu_peak_pct_one_core": 90.84711617740837,
+      "charged_memory_mean_bytes": 226239768,
+      "cpu_core_seconds_observed_lower_bound": 8.464039,
+      "io_counter_observed_deltas": {
+        "rbytes": 36864,
+        "wbytes": 1253376,
+        "rios": 9,
+        "wios": 335
+      },
+      "observed_native_memory_peak_bytes": 299503616
+    },
+    {
+      "pod": "orders-live-reader-4xvjt",
+      "worker": "spark-kubernetes-operator-worker2",
+      "pod_uid": "7f45dc7e-bf6f-4b0d-827f-587647b4e95a",
+      "samples": 51,
+      "observed_seconds": 87.15781712532043,
+      "sampled_cpu_mean_pct_one_core": 63.26048404897715,
+      "sampled_cpu_peak_pct_one_core": 89.65187743108898,
+      "charged_memory_mean_bytes": 90378802,
+      "cpu_core_seconds_observed_lower_bound": 55.136457,
+      "io_counter_observed_deltas": {
+        "rbytes": 0,
+        "wbytes": 2908160,
+        "rios": 0,
+        "wios": 64
+      },
+      "observed_native_memory_peak_bytes": 179777536
+    },
+    {
+      "pod": "spark-kubernetes-operator-6565cb7bf5-cfzll",
+      "worker": "spark-kubernetes-operator-worker3",
+      "pod_uid": "251266cb-ec34-42de-9a8a-16b67b9889fe",
+      "samples": 113,
+      "observed_seconds": 247.70516109466553,
+      "sampled_cpu_mean_pct_one_core": 1.5311889276907282,
+      "sampled_cpu_peak_pct_one_core": 35.36575000281659,
+      "charged_memory_mean_bytes": 1890485383,
+      "cpu_core_seconds_observed_lower_bound": 3.792834,
+      "io_counter_observed_deltas": {
+        "rbytes": 0,
+        "wbytes": 348160,
+        "rios": 0,
+        "wios": 34
+      },
+      "observed_native_memory_peak_bytes": 1905364992
+    },
+    {
+      "pod": "orders-write-0-driver",
+      "worker": "spark-kubernetes-operator-worker2",
+      "pod_uid": "6f0cffea-4ba1-460d-ae81-6f393a171c23",
+      "samples": 40,
+      "observed_seconds": 69.78014206886292,
+      "sampled_cpu_mean_pct_one_core": 17.962683405875516,
+      "sampled_cpu_peak_pct_one_core": 100.40064776175527,
+      "charged_memory_mean_bytes": 522237030,
+      "cpu_core_seconds_observed_lower_bound": 12.534386,
+      "io_counter_observed_deltas": {
+        "rbytes": 0,
+        "wbytes": 1134592,
+        "rios": 0,
+        "wios": 15
+      },
+      "observed_native_memory_peak_bytes": 600604672
+    },
+    {
+      "pod": "verified-orders-c1cf3ba21a51abd7-exec-1",
+      "worker": "spark-kubernetes-operator-worker",
+      "pod_uid": "fa665594-de69-4412-8151-524436732acc",
+      "samples": 4,
+      "observed_seconds": 7.595333099365234,
+      "sampled_cpu_mean_pct_one_core": 38.92970803672998,
+      "sampled_cpu_peak_pct_one_core": 80.14360749327383,
+      "charged_memory_mean_bytes": 309818368,
+      "cpu_core_seconds_observed_lower_bound": 2.956841,
+      "io_counter_observed_deltas": {
+        "rbytes": 0,
+        "wbytes": 4096,
+        "rios": 0,
+        "wios": 1
+      },
+      "observed_native_memory_peak_bytes": 454504448
+    },
+    {
+      "pod": "verified-orders-c1cf3ba21a51abd7-exec-2",
+      "worker": "spark-kubernetes-operator-worker3",
+      "pod_uid": "6d90c902-7978-4f79-b7d4-6f8ee6495d00",
+      "samples": 37,
+      "observed_seconds": 64.29744100570679,
+      "sampled_cpu_mean_pct_one_core": 10.51859746548813,
+      "sampled_cpu_peak_pct_one_core": 85.74852710210398,
+      "charged_memory_mean_bytes": 538021888,
+      "cpu_core_seconds_observed_lower_bound": 6.763189,
+      "io_counter_observed_deltas": {
+        "rbytes": 0,
+        "wbytes": 1351680,
+        "rios": 0,
+        "wios": 17
+      },
+      "observed_native_memory_peak_bytes": 621170688
+    },
+    {
+      "pod": "verified-orders-c1cf3ba21a51abd7-exec-3",
+      "worker": "spark-kubernetes-operator-worker",
+      "pod_uid": "d8a7e632-68aa-4a88-85c7-21f7c9349825",
+      "samples": 19,
+      "observed_seconds": 31.307613134384155,
+      "sampled_cpu_mean_pct_one_core": 6.965117368226015,
+      "sampled_cpu_peak_pct_one_core": 84.32625720137523,
+      "charged_memory_mean_bytes": 269848576,
+      "cpu_core_seconds_observed_lower_bound": 2.180612,
+      "io_counter_observed_deltas": {
+        "rbytes": 0,
+        "wbytes": 53248,
+        "rios": 0,
+        "wios": 4
+      },
+      "observed_native_memory_peak_bytes": 385695744
+    },
+    {
+      "pod": "orders-read-1795737986844491000-0-driver",
+      "worker": "spark-kubernetes-operator-worker2",
+      "pod_uid": "089fb972-f890-440a-8b36-fb01b812c0c5",
+      "samples": 10,
+      "observed_seconds": 14.681817054748535,
+      "sampled_cpu_mean_pct_one_core": 59.87698911666196,
+      "sampled_cpu_peak_pct_one_core": 100.19879497955846,
+      "charged_memory_mean_bytes": 392423424,
+      "cpu_core_seconds_observed_lower_bound": 8.79103,
+      "io_counter_observed_deltas": {
+        "rbytes": 0,
+        "wbytes": 1105920,
+        "rios": 0,
+        "wios": 11
+      },
+      "observed_native_memory_peak_bytes": 545574912
+    },
+    {
+      "pod": "verified-orders-b9e6f7a21a533314-exec-1",
+      "worker": "spark-kubernetes-operator-worker",
+      "pod_uid": "b0a92ead-aed9-4b3a-9615-af9853d3e7c6",
+      "samples": 6,
+      "observed_seconds": 8.282724142074585,
+      "sampled_cpu_mean_pct_one_core": 43.26413554927895,
+      "sampled_cpu_peak_pct_one_core": 67.08222714885544,
+      "charged_memory_mean_bytes": 358093482,
+      "cpu_core_seconds_observed_lower_bound": 3.583449,
+      "io_counter_observed_deltas": {
+        "rbytes": 0,
+        "wbytes": 774144,
+        "rios": 0,
+        "wios": 2
+      },
+      "observed_native_memory_peak_bytes": 603758592
+    },
+    {
+      "pod": "verified-orders-b9e6f7a21a533314-exec-2",
+      "worker": "spark-kubernetes-operator-worker2",
+      "pod_uid": "56029398-cc0d-409f-86d2-0148f9b0c706",
+      "samples": 6,
+      "observed_seconds": 8.282724142074585,
+      "sampled_cpu_mean_pct_one_core": 40.60131597184512,
+      "sampled_cpu_peak_pct_one_core": 99.73048508667483,
+      "charged_memory_mean_bytes": 330835968,
+      "cpu_core_seconds_observed_lower_bound": 3.362895,
+      "io_counter_observed_deltas": {
+        "rbytes": 0,
+        "wbytes": 4096,
+        "rios": 0,
+        "wios": 1
+      },
+      "observed_native_memory_peak_bytes": 573267968
+    },
+    {
+      "pod": "orders-read-1795738043619741000-0-driver",
+      "worker": "spark-kubernetes-operator-worker2",
+      "pod_uid": "168f0097-996b-44d6-994a-b0f733774655",
+      "samples": 10,
+      "observed_seconds": 14.614283800125122,
+      "sampled_cpu_mean_pct_one_core": 63.634414981871224,
+      "sampled_cpu_peak_pct_one_core": 100.30426700256265,
+      "charged_memory_mean_bytes": 388790681,
+      "cpu_core_seconds_observed_lower_bound": 9.299714,
+      "io_counter_observed_deltas": {
+        "rbytes": 0,
+        "wbytes": 1114112,
+        "rios": 0,
+        "wios": 13
+      },
+      "observed_native_memory_peak_bytes": 547319808
+    },
+    {
+      "pod": "verified-orders-32b796a21a54111c-exec-1",
+      "worker": "spark-kubernetes-operator-worker3",
+      "pod_uid": "8985889b-9b88-4230-8737-b1427a61943c",
+      "samples": 6,
+      "observed_seconds": 8.383750915527344,
+      "sampled_cpu_mean_pct_one_core": 36.46085184065522,
+      "sampled_cpu_peak_pct_one_core": 77.34857414239468,
+      "charged_memory_mean_bytes": 292827818,
+      "cpu_core_seconds_observed_lower_bound": 3.056787,
+      "io_counter_observed_deltas": {
+        "rbytes": 0,
+        "wbytes": 118784,
+        "rios": 0,
+        "wios": 2
+      },
+      "observed_native_memory_peak_bytes": 419344384
+    },
+    {
+      "pod": "verified-orders-32b796a21a54111c-exec-2",
+      "worker": "spark-kubernetes-operator-worker",
+      "pod_uid": "38916a15-1b3c-4730-8ac8-fc7d5a4afa27",
+      "samples": 6,
+      "observed_seconds": 8.383750915527344,
+      "sampled_cpu_mean_pct_one_core": 40.949332042316,
+      "sampled_cpu_peak_pct_one_core": 56.3519519830111,
+      "charged_memory_mean_bytes": 320356352,
+      "cpu_core_seconds_observed_lower_bound": 3.43309,
+      "io_counter_observed_deltas": {
+        "rbytes": 0,
+        "wbytes": 888832,
+        "rios": 0,
+        "wios": 3
+      },
+      "observed_native_memory_peak_bytes": 486178816
+    },
+    {
+      "pod": "datanode-2",
+      "worker": "spark-kubernetes-operator-worker3",
+      "pod_uid": "77d3bc2c-d64d-4320-aed4-fc076300bb30",
+      "samples": 20,
+      "observed_seconds": 30.324038982391357,
+      "sampled_cpu_mean_pct_one_core": 2.6193872144183645,
+      "sampled_cpu_peak_pct_one_core": 4.896605109624904,
+      "charged_memory_mean_bytes": 190856601,
+      "cpu_core_seconds_observed_lower_bound": 0.794304,
+      "io_counter_observed_deltas": {
+        "rbytes": 0,
+        "wbytes": 512000,
+        "rios": 0,
+        "wios": 15
+      },
+      "observed_native_memory_peak_bytes": 200044544
+    },
+    {
+      "pod": "orders-read-1795738103293785000-0-driver",
+      "worker": "spark-kubernetes-operator-worker2",
+      "pod_uid": "f15211b8-2df8-490e-9ee8-f8bf846735cc",
+      "samples": 10,
+      "observed_seconds": 14.731401920318604,
+      "sampled_cpu_mean_pct_one_core": 59.530634269805695,
+      "sampled_cpu_peak_pct_one_core": 100.55078647101445,
+      "charged_memory_mean_bytes": 394353049,
+      "cpu_core_seconds_observed_lower_bound": 8.769697,
+      "io_counter_observed_deltas": {
+        "rbytes": 0,
+        "wbytes": 1118208,
+        "rios": 0,
+        "wios": 14
+      },
+      "observed_native_memory_peak_bytes": 549249024
+    },
+    {
+      "pod": "verified-orders-4e4b8ca21a54f9e9-exec-1",
+      "worker": "spark-kubernetes-operator-worker",
+      "pod_uid": "ba1b375b-b600-4ea7-87bb-95e71f933c92",
+      "samples": 6,
+      "observed_seconds": 8.358595132827759,
+      "sampled_cpu_mean_pct_one_core": 42.112328017605094,
+      "sampled_cpu_peak_pct_one_core": 89.12526173310255,
+      "charged_memory_mean_bytes": 333505877,
+      "cpu_core_seconds_observed_lower_bound": 3.519999,
+      "io_counter_observed_deltas": {
+        "rbytes": 0,
+        "wbytes": 774144,
+        "rios": 0,
+        "wios": 2
+      },
+      "observed_native_memory_peak_bytes": 584454144
+    },
+    {
+      "pod": "verified-orders-4e4b8ca21a54f9e9-exec-2",
+      "worker": "spark-kubernetes-operator-worker2",
+      "pod_uid": "212a760e-25e7-4d50-9032-52c41df264c8",
+      "samples": 6,
+      "observed_seconds": 8.358595132827759,
+      "sampled_cpu_mean_pct_one_core": 41.447862289604096,
+      "sampled_cpu_peak_pct_one_core": 60.9346035067891,
+      "charged_memory_mean_bytes": 351863466,
+      "cpu_core_seconds_observed_lower_bound": 3.464459,
+      "io_counter_observed_deltas": {
+        "rbytes": 0,
+        "wbytes": 4096,
+        "rios": 0,
+        "wios": 1
+      },
+      "observed_native_memory_peak_bytes": 589529088
+    }
+  ],
+  "final_native_storage_directories": {
+    "datanode-0": {
+      "logical_du_bytes": 8343585,
+      "allocated_du_bytes": 8491008
+    },
+    "datanode-1": {
+      "logical_du_bytes": 8343585,
+      "allocated_du_bytes": 8491008
+    },
+    "datanode-2": {
+      "logical_du_bytes": 8343585,
+      "allocated_du_bytes": 8491008
+    },
+    "namenode-0": {
+      "logical_du_bytes": 1049268,
+      "allocated_du_bytes": 1077248
+    }
+  },
+  "observed_setup_failures": [
+    "Image-import preflight underestimated compressed-content plus overlay snapshot demand; corrected conservative bound. Removed authorized unused build cache and own host-built images after worker import.",
+    "DataNode EPERM changing PVC-root permissions; corrected mount parent so non-root process owns its native data subdirectory. Retained NameNode and PVC state."
+  ],
+  "limitations": [
+    "All workers share one Docker VM; one NameNode; no metadata HA/restore qualification.",
+    "Finite bulk publication, not an external per-record ACK journal; no continuous writes during disk replacement.",
+    "Physical replica hashes cover published Parquet files, not all Spark event logs or metadata.",
+    "Sampled CPU/IO omit unobserved start/exit intervals. Native peaks include charged cache. Device service latency, network byte accounting and portable host cache control unmeasured.",
+    "HDFS replicated physical bytes and Parquet column compression are distinct layers. File hashes are not a physical power-loss test.",
+    "Source event-proof controller ran separately on this first trial; integrated target requires a fresh repeat to qualify exact final orchestration.",
+    "Further failure, lifecycle and matched level-3 benchmark coverage remains pending."
+  ],
+  "teardown": {
+    "make_down": "passed",
+    "make_kind_down": "passed",
+    "private_kubeconfig_removed": true,
+    "owned_kind_node_containers_removed": true
+  }
+}

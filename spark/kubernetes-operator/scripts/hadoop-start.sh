@@ -1,0 +1,1 @@
+../../../hadoop/single-node/scripts/start.sh

@@ -1,0 +1,18 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: orders-live-reader
+spec:
+  backoffLimit: 0
+  activeDeadlineSeconds: 360
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: live-reader
+          image: examples/spark-hdfs-verifier:26.0.1
+          imagePullPolicy: Never
+          command: [/opt/venv/bin/python, /app/live_reader.py]
+          resources:
+            requests: {cpu: 250m, memory: 256Mi}
+            limits: {cpu: "1", memory: 1Gi}

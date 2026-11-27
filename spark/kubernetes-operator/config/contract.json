@@ -1,0 +1,11 @@
+{
+  "workload": {"orders": 1000000, "customers": 10000, "amount_cents": 599500000, "source_partitions": 16},
+  "operations": ["finite joined Parquet publication", "fresh full-body Spark read", "independent Arrow read", "visible closed-part read"],
+  "publication": "Spark file commit protocol; _SUCCESS marks completed dataset; readers before completion make only per-file claims",
+  "consistency": "HDFS namespace and immutable completed files; no multi-writer or transaction isolation claim",
+  "retry": "Native task retries; whole-application restart Never; errorifexists prevents blind replay over existing output",
+  "storage": {"target_copies": 3, "minimum_block_completion_copies": 2, "sync_on_close": true, "namenodes": 1, "independent_metadata_backup": false},
+  "client": {"spark_driver_memory": "1g + 512m overhead", "executors": 2, "executor_cores": 1, "executor_memory": "1g + 512m overhead", "shuffle_partitions": 8},
+  "faults": {"executor": "force delete one observed active executor Pod", "disk": "fence one DataNode, prove two surviving full copies, replace only its PVC and verify restored three-copy hashes"},
+  "limitations": ["All kind workers share one Docker VM", "Single NameNode metadata failure point", "No external source acknowledgement history", "No HA, independent restore or physical power-loss qualification", "Accelerated lab-only HDFS failure detection", "No competitive performance result"]
+}
