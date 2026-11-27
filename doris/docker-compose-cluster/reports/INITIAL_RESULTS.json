@@ -1,0 +1,425 @@
+{
+  "date": "2026-11-26",
+  "classification": "functional-recovery-diagnostics",
+  "engine_versions": [
+    "doris-4.0.8-rc02-bc8ea1bac6d"
+  ],
+  "topology": {
+    "voting_frontends": 3,
+    "leaders": 1,
+    "backends": 3,
+    "tablets": 8,
+    "replica_records": 24,
+    "copies_per_tablet": 3,
+    "versions_agree": true
+  },
+  "revision_1_all_replica_reads": [
+    {
+      "amount_cents": 599500000,
+      "expected_revision": 1,
+      "fetch_verify_ms": 256.132,
+      "fixed_replica_index": 0,
+      "missing": 0,
+      "orders": 1000000,
+      "query_and_fetch_verify_ms": 329.666,
+      "wrong": 0
+    },
+    {
+      "amount_cents": 599500000,
+      "expected_revision": 1,
+      "fetch_verify_ms": 279.621,
+      "fixed_replica_index": 1,
+      "missing": 0,
+      "orders": 1000000,
+      "query_and_fetch_verify_ms": 354.031,
+      "wrong": 0
+    },
+    {
+      "amount_cents": 599500000,
+      "expected_revision": 1,
+      "fetch_verify_ms": 251.236,
+      "fixed_replica_index": 2,
+      "missing": 0,
+      "orders": 1000000,
+      "query_and_fetch_verify_ms": 330.533,
+      "wrong": 0
+    }
+  ],
+  "revision_2_all_replica_reads": [
+    {
+      "amount_cents": 1599500000,
+      "expected_revision": 2,
+      "fetch_verify_ms": 192.449,
+      "fixed_replica_index": 0,
+      "missing": 0,
+      "orders": 1000000,
+      "query_and_fetch_verify_ms": 268.15,
+      "wrong": 0
+    },
+    {
+      "amount_cents": 1599500000,
+      "expected_revision": 2,
+      "fetch_verify_ms": 266.357,
+      "fixed_replica_index": 1,
+      "missing": 0,
+      "orders": 1000000,
+      "query_and_fetch_verify_ms": 341.989,
+      "wrong": 0
+    },
+    {
+      "amount_cents": 1599500000,
+      "expected_revision": 2,
+      "fetch_verify_ms": 198.58,
+      "fixed_replica_index": 2,
+      "missing": 0,
+      "orders": 1000000,
+      "query_and_fetch_verify_ms": 259.833,
+      "wrong": 0
+    }
+  ],
+  "strict_immediate_outage_query": {
+    "status": "FAILED",
+    "error": "RpcException: send fragments failed; UNAVAILABLE, dead backend 172.30.42.21",
+    "first_error_duration_s_in_followup": 40.7507284169551,
+    "evidence": "results/failed-immediate-backend-read/"
+  },
+  "bounded_recovery": {
+    "errors_before_recovery": 1,
+    "fresh_read_recovery_s": 42.57430783286691,
+    "successful_read": {
+      "amount_cents": 599500000,
+      "expected_revision": 1,
+      "fetch_verify_ms": 453.505,
+      "fixed_replica_index": -1,
+      "missing": 0,
+      "orders": 1000000,
+      "query_and_fetch_verify_ms": 516.853,
+      "wrong": 0
+    },
+    "backend_still_down": true,
+    "phase_budget_s": 90,
+    "evidence": "results/backend-recovery-1795728817709019000"
+  },
+  "restored_replica_verification": {
+    "complete": true,
+    "elapsed_s": 58.059088667156175,
+    "all_replica_readbacks": "passed",
+    "native_topology": "passed"
+  },
+  "storage": {
+    "fe1": {
+      "allocated_role_storage_bytes": 311296,
+      "lifetime_block_counters_since_current_container_start": {
+        "rbytes": 185417728,
+        "wbytes": 7548928,
+        "rios": 9968,
+        "wios": 726
+      }
+    },
+    "fe2": {
+      "allocated_role_storage_bytes": 303104,
+      "lifetime_block_counters_since_current_container_start": {
+        "rbytes": 909312,
+        "wbytes": 3194880,
+        "rios": 53,
+        "wios": 549
+      }
+    },
+    "fe3": {
+      "allocated_role_storage_bytes": 303104,
+      "lifetime_block_counters_since_current_container_start": {
+        "rbytes": 3551232,
+        "wbytes": 3006464,
+        "rios": 225,
+        "wios": 509
+      }
+    },
+    "be1": {
+      "allocated_role_storage_bytes": 95498240,
+      "lifetime_block_counters_since_current_container_start": {
+        "rbytes": 0,
+        "wbytes": 5390336,
+        "rios": 0,
+        "wios": 104
+      }
+    },
+    "be2": {
+      "allocated_role_storage_bytes": 95170560,
+      "lifetime_block_counters_since_current_container_start": {
+        "rbytes": 229646336,
+        "wbytes": 11440128,
+        "rios": 2525,
+        "wios": 483
+      }
+    },
+    "be3": {
+      "allocated_role_storage_bytes": 95371264,
+      "lifetime_block_counters_since_current_container_start": {
+        "rbytes": 109633536,
+        "wbytes": 11833344,
+        "rios": 1807,
+        "wios": 470
+      }
+    }
+  },
+  "native_effective_backend_config": {
+    "be1_effective_config": [
+      [
+        "mem_limit",
+        "std::string",
+        "2G",
+        "false"
+      ],
+      [
+        "num_cores",
+        "int32_t",
+        "1",
+        "false"
+      ]
+    ],
+    "be2_effective_config": [
+      [
+        "mem_limit",
+        "std::string",
+        "2G",
+        "false"
+      ],
+      [
+        "num_cores",
+        "int32_t",
+        "1",
+        "false"
+      ]
+    ],
+    "be3_effective_config": [
+      [
+        "mem_limit",
+        "std::string",
+        "2G",
+        "false"
+      ],
+      [
+        "num_cores",
+        "int32_t",
+        "1",
+        "false"
+      ]
+    ]
+  },
+  "native_table_size_display_after_revision2": "10.490 MB across 24 replica records; asynchronous metadata observation",
+  "native_compression_ratio": null,
+  "resource_phases": [
+    {
+      "command": [
+        "make",
+        "test"
+      ],
+      "history": "results/resources-1795728570566293000.jsonl",
+      "environment": {
+        "NCPU": 11,
+        "MemTotal": 26216296448,
+        "KernelVersion": "6.12.76-linuxkit",
+        "OperatingSystem": "Docker Desktop",
+        "Driver": "overlayfs",
+        "ServerVersion": "29.5.3",
+        "docker_api": "1.54"
+      },
+      "samples": 8,
+      "observation_s": 7.245661624940112,
+      "average_cpu_pct_of_one_core_lower_bound": 83.10780038737693,
+      "sampled_actors": [
+        "/doris-replicated-orders-be1-1",
+        "/doris-replicated-orders-be2-1",
+        "/doris-replicated-orders-be3-1",
+        "/doris-replicated-orders-fe1-1",
+        "/doris-replicated-orders-fe2-1",
+        "/doris-replicated-orders-fe3-1",
+        "/doris-replicated-orders-orders-run-1920fd7b9153",
+        "/doris-replicated-orders-orders-run-4fe8f543ec60",
+        "/doris-replicated-orders-orders-run-570004ef6f85",
+        "/doris-replicated-orders-orders-run-807570fb7181"
+      ],
+      "sampled_total_memory_peak_bytes_including_page_cache": 7689068544,
+      "observed_deltas_lower_bound": {
+        "cpu_core_seconds": 6.02171,
+        "block_read_bytes": 2002944,
+        "block_write_bytes": 12410880,
+        "network_receive_bytes": 120102040,
+        "network_transmit_bytes": 195049467
+      },
+      "observed_block_read_bytes_per_s_lower_bound": 276433.55481930263,
+      "observed_block_write_bytes_per_s_lower_bound": 1712870.4930521208
+    },
+    {
+      "command": [
+        "make",
+        "topology"
+      ],
+      "history": "results/resources-1795728599951669000.jsonl",
+      "environment": {
+        "NCPU": 11,
+        "MemTotal": 26216296448,
+        "KernelVersion": "6.12.76-linuxkit",
+        "OperatingSystem": "Docker Desktop",
+        "Driver": "overlayfs",
+        "ServerVersion": "29.5.3",
+        "docker_api": "1.54"
+      },
+      "samples": 1,
+      "observation_s": 0,
+      "average_cpu_pct_of_one_core_lower_bound": null,
+      "sampled_actors": [
+        "/doris-replicated-orders-be1-1",
+        "/doris-replicated-orders-be2-1",
+        "/doris-replicated-orders-be3-1",
+        "/doris-replicated-orders-fe1-1",
+        "/doris-replicated-orders-fe2-1",
+        "/doris-replicated-orders-fe3-1"
+      ],
+      "sampled_total_memory_peak_bytes_including_page_cache": 7221460992,
+      "observed_deltas_lower_bound": {
+        "cpu_core_seconds": 0.0,
+        "block_read_bytes": 0,
+        "block_write_bytes": 0,
+        "network_receive_bytes": 0,
+        "network_transmit_bytes": 0
+      },
+      "observed_block_read_bytes_per_s_lower_bound": null,
+      "observed_block_write_bytes_per_s_lower_bound": null
+    },
+    {
+      "command": [
+        "make",
+        "backend-restart"
+      ],
+      "history": "results/resources-1795728624852561000.jsonl",
+      "environment": {
+        "NCPU": 11,
+        "MemTotal": 26216296448,
+        "KernelVersion": "6.12.76-linuxkit",
+        "OperatingSystem": "Docker Desktop",
+        "Driver": "overlayfs",
+        "ServerVersion": "29.5.3",
+        "docker_api": "1.54"
+      },
+      "samples": 46,
+      "observation_s": 46.80486850021407,
+      "average_cpu_pct_of_one_core_lower_bound": 46.970205674008994,
+      "sampled_actors": [
+        "/doris-replicated-orders-be1-1",
+        "/doris-replicated-orders-be2-1",
+        "/doris-replicated-orders-be3-1",
+        "/doris-replicated-orders-fe1-1",
+        "/doris-replicated-orders-fe2-1",
+        "/doris-replicated-orders-fe3-1",
+        "/doris-replicated-orders-orders-run-3c2c696abf67",
+        "/doris-replicated-orders-orders-run-636515582377"
+      ],
+      "sampled_total_memory_peak_bytes_including_page_cache": 7393325056,
+      "observed_deltas_lower_bound": {
+        "cpu_core_seconds": 21.984343,
+        "block_read_bytes": 954368,
+        "block_write_bytes": 1298432,
+        "network_receive_bytes": 32393631,
+        "network_transmit_bytes": 54195898
+      },
+      "observed_block_read_bytes_per_s_lower_bound": 20390.35746880979,
+      "observed_block_write_bytes_per_s_lower_bound": 27741.38762923907
+    },
+    {
+      "command": [
+        "make",
+        "backend-recovery"
+      ],
+      "history": "results/resources-1795728817653000000.jsonl",
+      "environment": {
+        "NCPU": 11,
+        "MemTotal": 26216296448,
+        "KernelVersion": "6.12.76-linuxkit",
+        "OperatingSystem": "Docker Desktop",
+        "Driver": "overlayfs",
+        "ServerVersion": "29.5.3",
+        "docker_api": "1.54"
+      },
+      "samples": 56,
+      "observation_s": 57.20106320804916,
+      "average_cpu_pct_of_one_core_lower_bound": 50.5721683787328,
+      "sampled_actors": [
+        "/doris-replicated-orders-be1-1",
+        "/doris-replicated-orders-be2-1",
+        "/doris-replicated-orders-be3-1",
+        "/doris-replicated-orders-fe1-1",
+        "/doris-replicated-orders-fe2-1",
+        "/doris-replicated-orders-fe3-1",
+        "/doris-replicated-orders-orders-run-c105ad40942c",
+        "/doris-replicated-orders-read-1795728818759990000"
+      ],
+      "sampled_total_memory_peak_bytes_including_page_cache": 7912034304,
+      "observed_deltas_lower_bound": {
+        "cpu_core_seconds": 28.927818,
+        "block_read_bytes": 0,
+        "block_write_bytes": 3108864,
+        "network_receive_bytes": 106649796,
+        "network_transmit_bytes": 190325990
+      },
+      "observed_block_read_bytes_per_s_lower_bound": 0.0,
+      "observed_block_write_bytes_per_s_lower_bound": 54349.75900172656
+    },
+    {
+      "command": [
+        "make",
+        "mutate"
+      ],
+      "history": "results/resources-1795728887214321000.jsonl",
+      "environment": {
+        "NCPU": 11,
+        "MemTotal": 26216296448,
+        "KernelVersion": "6.12.76-linuxkit",
+        "OperatingSystem": "Docker Desktop",
+        "Driver": "overlayfs",
+        "ServerVersion": "29.5.3",
+        "docker_api": "1.54"
+      },
+      "samples": 28,
+      "observation_s": 27.824817166896537,
+      "average_cpu_pct_of_one_core_lower_bound": 127.8901197681042,
+      "sampled_actors": [
+        "/doris-replicated-orders-be1-1",
+        "/doris-replicated-orders-be2-1",
+        "/doris-replicated-orders-be3-1",
+        "/doris-replicated-orders-fe1-1",
+        "/doris-replicated-orders-fe2-1",
+        "/doris-replicated-orders-fe3-1",
+        "/doris-replicated-orders-orders-run-05487bc2c9ad",
+        "/doris-replicated-orders-orders-run-7e84bca3f720"
+      ],
+      "sampled_total_memory_peak_bytes_including_page_cache": 8196640768,
+      "observed_deltas_lower_bound": {
+        "cpu_core_seconds": 35.585192,
+        "block_read_bytes": 0,
+        "block_write_bytes": 15548416,
+        "network_receive_bytes": 112754523,
+        "network_transmit_bytes": 203867420
+      },
+      "observed_block_read_bytes_per_s_lower_bound": 0.0,
+      "observed_block_write_bytes_per_s_lower_bound": 558796.6996059226
+    }
+  ],
+  "source_sha256": {
+    "docker-compose.yml": "d8f5d0955accc37e6c06259ad10ef30467b5862f0174c09fbe64dde03c84f875",
+    "orders-workload/main.go": "8e00463c5c7aa9340b3152f5cb4721eea14eb70ea0d06d5e0291d70b5e40748b",
+    "docker/Dockerfile.fe": "e54cb0621189defc8c5352856ccbb732006ee4a91912a7063f90ec466ad236a3",
+    "docker/Dockerfile.be": "8ce3bd6c00293301f38b0dc14e5911576c4048a46807be7f5b1a7d4f1fda4d5d"
+  },
+  "limitations": [
+    "No performance comparison or capacity qualification. Level-3 competitive trials are pending.",
+    "Raw counters miss work before/after actor samples; short-lived Go actors may not have two samples. All deltas are observed lower bounds.",
+    "A restarted backend resets counters. Final lifetime I/O-operation counts are not phase-specific IOPS.",
+    "Docker raw stats expose byte counters but not I/O-operation counts or device latency on this host; final native cgroup snapshots supply lifetime operation counts only.",
+    "Storage is one point after an update; includes internal tables, obsolete versions and temporary/native files. Not settled compaction space or a codec compression ratio.",
+    "Network aggregation counts inter-role traffic at send and receive endpoints; do not interpret both as external ingress.",
+    "Quiesced committed-data recovery only; no live producer or durable per-record ACK journal.",
+    "Single physical host; permanent disk loss, partitions, quorum loss, FE leadership failover, independent restore and operator coverage remain pending.",
+    "Initial topology controller used LastFailedVersion instead of released LstFailedVersion. It failed after three body checks passed; preserved data was rechecked after correction."
+  ]
+}

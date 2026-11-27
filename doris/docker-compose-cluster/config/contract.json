@@ -1,0 +1,29 @@
+{
+  "engine": "Doris 4.0.8",
+  "required_operations": [
+    "Unique Key bulk insert and sequence revision",
+    "Exact ordered body scan",
+    "Three native fixed-replica read selections",
+    "Three voting FEs and RF3 tablet topology",
+    "Backend outage and retained restart"
+  ],
+  "consistency": "Completed fixture readback; no serializable multi-statement guarantee claimed. Fixed-replica reads disable caches, missing-version skips and fixed-replica fallback.",
+  "atomicity": "One bulk INSERT at a time. Lost mutation acknowledgements remain ambiguous until reconciled.",
+  "idempotency": "Unique Key(order_id), sequence revision. Conflicting concurrent writers and replay histories remain pending.",
+  "delete_ttl": "Only explicit database teardown is covered; deletes/retention pending.",
+  "durability": "Three tablet replicas on three BE containers and three FE voters, all on one physical host. No independent backup, disk failure or host-loss qualification.",
+  "retry": "No application mutation retry. FE has native query retries; the first immediate outage query still failed after about 41 seconds. Preserve that failed result.",
+  "reference_client": {
+    "driver": "go-sql-driver/mysql v1.9.3",
+    "connect_timeout_s": 5,
+    "read_write_timeout_s": 120,
+    "operation_context_s": 300,
+    "pool_connections": 2,
+    "verification": "Dedicated connection for session settings and row stream"
+  },
+  "fault_expectations": {
+    "backend-restart": "Strict immediate read must succeed; initial attempt FAILED. Fault cleanup restores retained BE without resetting data.",
+    "backend-recovery": "Follow-up characterization: hold one BE down; allow transport errors, require a new exact-body read within 90 seconds, then retained restart and complete three-replica verification. This does not turn the strict failed attempt into a pass."
+  },
+  "payload": "1,000,000 fixed four-integer rows, 10,000 customers, 8 tablets and 3 copies per tablet."
+}

@@ -1,0 +1,80 @@
+name: doris-replicated-orders
+x-fe: &fe
+  build: {context: ., dockerfile: docker/Dockerfile.fe}
+  image: examples/doris-replicated-fe:4.0.8
+  cpus: 0.5
+  mem_limit: 2g
+  healthcheck:
+    test: ["CMD-SHELL", "mysql -h127.0.0.1 -P9030 -uroot -e 'SHOW FRONTENDS'"]
+    interval: 5s
+    timeout: 5s
+    retries: 60
+x-fe-env: &fe-env
+  FE_SERVERS: fe1:172.30.42.11:9010,fe2:172.30.42.12:9010,fe3:172.30.42.13:9010
+x-be: &be
+  build: {context: ., dockerfile: docker/Dockerfile.be}
+  image: examples/doris-replicated-be:4.0.8
+  cpus: 1
+  mem_limit: 4g
+  depends_on:
+    fe1: {condition: service_healthy}
+    fe2: {condition: service_healthy}
+    fe3: {condition: service_healthy}
+  healthcheck:
+    test: ["CMD-SHELL", "bash -c 'echo > /dev/tcp/127.0.0.1/9060'"]
+    interval: 5s
+    timeout: 5s
+    retries: 60
+services:
+  fe1:
+    <<: *fe
+    environment: {<<: *fe-env, FE_ID: "1"}
+    volumes: [fe1-meta:/opt/apache-doris/fe/doris-meta]
+    networks: {lab: {ipv4_address: 172.30.42.11}}
+  fe2:
+    <<: *fe
+    environment: {<<: *fe-env, FE_ID: "2"}
+    depends_on: {fe1: {condition: service_healthy}}
+    volumes: [fe2-meta:/opt/apache-doris/fe/doris-meta]
+    networks: {lab: {ipv4_address: 172.30.42.12}}
+  fe3:
+    <<: *fe
+    environment: {<<: *fe-env, FE_ID: "3"}
+    depends_on: {fe1: {condition: service_healthy}}
+    volumes: [fe3-meta:/opt/apache-doris/fe/doris-meta]
+    networks: {lab: {ipv4_address: 172.30.42.13}}
+  be1:
+    <<: *be
+    environment: {<<: *fe-env, BE_ADDR: "172.30.42.21:9050"}
+    volumes: [be1-data:/opt/apache-doris/be/storage]
+    networks: {lab: {ipv4_address: 172.30.42.21}}
+  be2:
+    <<: *be
+    environment: {<<: *fe-env, BE_ADDR: "172.30.42.22:9050"}
+    volumes: [be2-data:/opt/apache-doris/be/storage]
+    networks: {lab: {ipv4_address: 172.30.42.22}}
+  be3:
+    <<: *be
+    environment: {<<: *fe-env, BE_ADDR: "172.30.42.23:9050"}
+    volumes: [be3-data:/opt/apache-doris/be/storage]
+    networks: {lab: {ipv4_address: 172.30.42.23}}
+  orders:
+    build: orders-workload
+    image: examples/doris-replicated-orders:1
+    profiles: [tools]
+    cpus: 1
+    mem_limit: 256m
+    networks: [lab]
+    command: [verify]
+volumes:
+  fe1-meta:
+  fe2-meta:
+  fe3-meta:
+  be1-data:
+  be2-data:
+  be3-data:
+networks:
+  lab:
+    internal: true
+    ipam:
+      config: [{subnet: 172.30.42.0/24}]
