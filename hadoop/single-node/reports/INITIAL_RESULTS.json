@@ -1,0 +1,72 @@
+{
+  "date": "2026-11-26",
+  "engine": "Hadoop 3.5.0 native aarch64",
+  "correctness": {
+    "bytes": 67108864,
+    "sha256": "657bedfeae9a069554e7aee77d25268c194dee39bbb080f3260e58aaf383bd46",
+    "wrong": 0
+  },
+  "after_datanode_crash": {
+    "bytes": 67108864,
+    "sha256": "657bedfeae9a069554e7aee77d25268c194dee39bbb080f3260e58aaf383bd46",
+    "wrong": 0
+  },
+  "killed_exit_code": 137,
+  "copies": 1,
+  "data_directory_bytes": 67633709,
+  "name_directory_bytes": 1049269,
+  "physical_block_sha256": "657bedfeae9a069554e7aee77d25268c194dee39bbb080f3260e58aaf383bd46",
+  "payload_codec": "none; opaque uncompressed binary input",
+  "native_cgroups": {
+    "namenode": {
+      "cpu.stat": {
+        "value": "usage_usec 11378127\nuser_usec 10222072\nsystem_usec 1156055\nnice_usec 0\nnr_periods 1863\nnr_throttled 69\nthrottled_usec 7691502\nnr_bursts 0\nburst_usec 0",
+        "status": 0,
+        "error": ""
+      },
+      "memory.current": {
+        "value": "209391616",
+        "status": 0,
+        "error": ""
+      },
+      "memory.peak": {
+        "value": "322707456",
+        "status": 0,
+        "error": ""
+      },
+      "io.stat": {
+        "value": "254:0 rbytes=0 wbytes=1691648 rios=0 wios=65 dbytes=0 dios=0",
+        "status": 0,
+        "error": ""
+      }
+    },
+    "datanode": {
+      "cpu.stat": {
+        "value": "usage_usec 2645221\nuser_usec 2382492\nsystem_usec 262728\nnice_usec 0\nnr_periods 562\nnr_throttled 18\nthrottled_usec 1866231\nnr_bursts 0\nburst_usec 0",
+        "status": 0,
+        "error": ""
+      },
+      "memory.current": {
+        "value": "152686592",
+        "status": 0,
+        "error": ""
+      },
+      "memory.peak": {
+        "value": "156688384",
+        "status": 0,
+        "error": ""
+      },
+      "io.stat": {
+        "value": "254:0 rbytes=0 wbytes=319488 rios=0 wios=33 dbytes=0 dios=0",
+        "status": 0,
+        "error": ""
+      }
+    }
+  },
+  "counter_scope": "Final container lifetime; DataNode counters start after crash replacement and exclude initial upload. Reads may hit shared VM page cache.",
+  "gaps": [
+    "No live readers/writers during crash",
+    "No NameNode HA, permanent disk loss, independent restore or YARN",
+    "No sustained performance comparison, device latency or complete all-actor I/O timeline"
+  ]
+}

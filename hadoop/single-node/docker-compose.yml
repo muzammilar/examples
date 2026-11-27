@@ -1,0 +1,35 @@
+name: hadoop-single-node
+x-hadoop: &hadoop
+  build:
+    context: .
+    dockerfile: docker/Dockerfile.hadoop
+  image: examples/hadoop-single-node:3.5.0
+  cpus: 1
+  mem_limit: 1g
+  networks: [lab]
+services:
+  namenode:
+    <<: *hadoop
+    command: [namenode]
+    volumes: [name:/data/name]
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import socket; socket.create_connection(('namenode',9000),2).close()"]
+      interval: 3s
+      timeout: 3s
+      retries: 60
+  datanode:
+    <<: *hadoop
+    command: [datanode]
+    volumes: [data:/data/data]
+    depends_on:
+      namenode: {condition: service_healthy}
+  files:
+    <<: *hadoop
+    profiles: [tools]
+    command: [python3, /opt/hadoop/lab-scripts/files.py]
+volumes:
+  name:
+  data:
+networks:
+  lab:
+    internal: true

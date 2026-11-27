@@ -1,0 +1,17 @@
+{
+  "engine": "Hadoop 3.5.0",
+  "required_operations": [
+    "closed-file upload",
+    "full-body read",
+    "native fsck",
+    "retained DataNode restart"
+  ],
+  "consistency": "Verify bytes after successful file close and retained process restart; in-flight hflush/publication semantics pending.",
+  "atomicity": "No transaction or multi-file atomicity claimed.",
+  "idempotency": "No transparent mutation retry; repeated PUT to existing path is rejected.",
+  "delete_ttl": "Explicit lab-directory deletion, no TTL.",
+  "durability": "RF1, one NameNode and DataNode; retained Docker volumes on one host. No metadata HA or disk-loss guarantee.",
+  "retry": "Native HDFS CLI behavior; harness does not reseed during restart verification.",
+  "payload": "One 64 MiB deterministic incompressible binary file, RNG seed 42193.",
+  "client": "Native HDFS CLI, independent SHA-256 of streamed body and physical block."
+}
