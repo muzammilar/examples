@@ -2,6 +2,7 @@
 
 import json
 import hashlib
+import importlib.util
 import os
 from pathlib import Path
 import subprocess
@@ -58,6 +59,13 @@ def audit(directory):
         for role in ("writer", "reader"):
             output = execute(role, "verify", run)
             (directory / (role + "-" + run + ".log")).write_text(output)
+    if (ROOT / "results/native-http/fixture.json").exists():
+        spec = importlib.util.spec_from_file_location(
+            "native_http_project", ROOT / "projects/native-http/http_project.py"
+        )
+        project = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(project)
+        project.audit(directory)
     native = json.loads(
         command("exec", "-T", "files-reader", "python3", "/opt/lab/native_audit.py")
     )
@@ -133,11 +141,14 @@ def main():
         output = command(
             "--profile",
             "application",
+            "--profile",
+            "native-http",
             "rm",
             "--force",
             "--stop",
             "files-writer",
             "files-reader",
+            "http-workload",
         )
         save(
             results
@@ -163,6 +174,8 @@ def main():
         output = command(
             "--profile",
             "application",
+            "--profile",
+            "native-http",
             "down",
             "--volumes",
             "--remove-orphans",
@@ -185,10 +198,27 @@ def main():
             )
             if remaining.strip():
                 raise RuntimeError("Owned " + resource + " resources remain")
-        image = "seaweedfs-filesystem-workload:4.55"
-        listing = ["docker", "image", "ls", "--filter", "reference=" + image, "--quiet"]
-        if subprocess.check_output(listing, text=True).strip():
-            subprocess.run(["docker", "image", "rm", image], check=True)
+        for image in (
+            "seaweedfs-filesystem-workload:4.55",
+            "seaweedfs-filesystem-http:4.55",
+        ):
+            listing = [
+                "docker",
+                "image",
+                "ls",
+                "--filter",
+                "reference=" + image,
+                "--quiet",
+            ]
+            if subprocess.check_output(listing, text=True).strip():
+                subprocess.run(["docker", "image", "rm", image], check=True)
+        http_fixture = ROOT / "results/native-http/fixture.json"
+        if http_fixture.exists():
+            if json.loads(http_fixture.read_text())["parent_fixture"] != fixture["id"]:
+                raise RuntimeError("HTTP fixture differs during retirement")
+            http_fixture.rename(
+                http_fixture.parent / ("retired-fixture-" + fixture["id"] + ".json")
+            )
         (results / "fixture.json").rename(
             results / ("retired-fixture-" + fixture["id"] + ".json")
         )

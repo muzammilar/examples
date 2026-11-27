@@ -25,8 +25,18 @@ execution evidence.
   lock-probe and stop-on-RPC-error failures remain preserved. CPU/memory/native
   I/O and owned-volume allocation are reported with compression/measurement gaps.
   Scoped teardown passed. FUSE metadata-quorum loss, physical disk replacement,
-  lock-owner crash, upgrades and independent restore remain unrun; kernel/native
-  API performance comparisons are deferred.
+  lock-owner crash, upgrades and independent restore remain unrun. The separate
+  [native HTTP/FUSE follow-up](seaweedfs/filesystem-cluster/projects/native-http/)
+  passed HTTP correctness, live ten-second two-filer loss/recovery and three
+  matched 256-file diagnostic pairs: HTTP/FUSE publication medians **131.062 /
+  4.323 timed ops/s**. Different publication semantics prevent isolating FUSE
+  overhead. The first 1,000-file FUSE attempt stays failed (180-second timeout,
+  **802 ACKs + one observed unacknowledged publication**). Recurring one-second
+  stalls remain unresolved. Final audit verified **2,621 ACKs + one observed body**,
+  **7,866 native-copy reads**, zero wrong bodies; 30 ambiguous HTTP paths absent.
+  CPU, memory, disk bytes/I/O, allocation and compression gaps are documented.
+  Scoped teardown passed. S3/gRPC, metadata-quorum/disk loss and independent
+  restore remain unrun for this HTTP interface.
 
 - [CephFS](ceph/filesystem-ha/) (additional 2026-11-27 batch example, outside the
   original cohort count): Umbrella 21.2.0 native C++ clients, three guests, nine
@@ -37,8 +47,15 @@ execution evidence.
   bootstrap and redundant image-removal cases remain documented with successful
   in-place recovery/retry. CPU, memory, disk bytes and native SCSI I/O counts are
   reported; codec comparison and per-daemon I/O accounting remain gaps. Scoped
-  teardown passed. No CephFS disk loss, deep-scrub, mounted FUSE/kernel semantics,
-  partition, MDS scaling or independent-restore qualification is claimed.
+  teardown passed. The [kernel-client follow-up](ceph/filesystem-ha/projects/kernel-client/)
+  subsequently passed secure Linux 7.0 mounts, remount recovery and three paired
+  1,000-file trials against the native library. Each path retained **3,128 ACKs /
+  819,986,432 bytes**, zero wrong/missing bodies. The initial Linux 6.8 aes256k
+  mount failure and two approximately five-second kernel-read stalls remain
+  documented. Different rename layouts prevent isolating client overhead; CPU,
+  memory, disk bytes/I/O, allocation and compression gaps are reported. No kernel
+  live-write MDS failover, CephFS disk loss, deep-scrub, FUSE, partition, MDS
+  scaling or independent-restore qualification is claimed.
 
 - [DuckDB/ZFS](duckdb/zfs-recovery/reports/FULL_SUITE_RESULTS.json): fresh five-command
   lifecycle passed on 2026-11-22. Continuous guest-crash recovery verifies

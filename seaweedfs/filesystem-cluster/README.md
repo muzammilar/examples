@@ -20,8 +20,11 @@ container, host filesystem mount or external credentials are used. The upstream
 SeaweedFS entrypoint also needs its user-switch/ownership capabilities. All runtime
 services use an internal network without published host ports.
 
-The cluster's combined limits are **6.75 CPUs / 5 GiB**, including both workload
-services. The tested Docker VM had 11 CPUs / 26,216,296,448 bytes RAM. Sparse/cache
+The base cluster’s combined limits are **6.75 CPUs / 5 GiB**, including both
+FUSE services. The optional [native HTTP project](projects/native-http/) adds
+1 CPU / 512 MiB, for **7.75 CPUs / 5.5 GiB** combined limits. Each volume server
+allows 32 × 64-MiB volumes; reserve additional disk for three replicated copies,
+metadata and caches before running the paired trials (`COMPARE_FILES=256` by default). The tested Docker VM had 11 CPUs / 26,216,296,448 bytes RAM. Sparse/cache
 growth still needs headroom: the bounded corpus allows at most 256 MiB per run.
 The observed settled volumes occupied 511,696,896 bytes, excluding images.
 
@@ -48,11 +51,16 @@ limited to 512 files / 180 seconds and stops cooperatively after recovery.
 | `make test-production` | Serial verify → locks → filer failure → verify |
 | `python3 scripts/observe.py test-production` | Add sampled Docker CPU, memory, disk and network measurements |
 | `make resources` | Read only owned-volume sizes and native cgroup lifetime counters |
-| `make unit-test` | Five offline oracle controls, including corrupt-replica and missing-ACK rejection |
+| `make unit-test` | Seven offline oracle controls, including corrupt-replica, missing-ACK and HTTP fixture-ownership rejection |
+| `make api-up` / `make api-test` | Build/start the local HTTP application and verify its baseline |
+| `make api-filer-failure` | Live HTTP writer/reader during proven simultaneous filer loss |
+| `make api-compare` | Three bounded paired native-HTTP/FUSE trials, no S3 gateway |
 
 `files-workload/` contains the C++ source, CMake/Ninja build, Dockerfile and mount
 entrypoint. `config/` holds the etcd-backed filer setup and declared contract;
 `scripts/` contains lifecycle, independent payload/replica checks and reporting.
+`projects/native-http/` keeps the API workload, tests, comparison and its reports
+together; it shares this lab’s explicitly owned backend and cleanup.
 `reports/` holds curated evidence. Raw histories, failed trials and resource
 samples stay under ignored `results/`; build/research caches stay in `.build/`.
 The example uses no sibling Makefile, generated state or machine-local source.
@@ -158,8 +166,8 @@ WAL, metadata and cache allocation must not be called a compression ratio.
   The interactive `make cli` command is unrun.
 - [ ] Matched native-resource CephFS/HDFS shared-file comparisons after equivalent
   correctness gates. Ceph's emulated timings cannot be ranked against this run.
-- [ ] **Future production-path comparison, not today's tests:** compare SeaweedFS
-  S3 and native filer HTTP/gRPC against FUSE for the same logical blob workload.
+- [ ] Extend the [native HTTP/FUSE comparison](projects/native-http/) to
+  S3/gRPC and additional payload/workload shapes.
   Separately compare CephFS kernel versus FUSE/native-library clients for POSIX
   workloads. Measure large sequential I/O and small-file/metadata operations,
   CPU, memory, latency and recovery at matched budgets. Account for filesystem

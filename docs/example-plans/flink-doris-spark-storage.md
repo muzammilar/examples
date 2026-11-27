@@ -130,8 +130,19 @@ compression and measurement gaps explicit. Scoped teardown passed. Next: the
 pipeline gates above; filesystem quorum/disk/restore cases and physical multipart
 abort reclamation remain further work.
 
-Future production-client work (explicitly deferred, not today's execution):
-compare native SeaweedFS S3/filer APIs with FUSE where applications can use object
-semantics, and CephFS kernel/FUSE/library clients where POSIX access is needed.
+Production-client follow-up (approved level 3):
+[CephFS kernel/library](../../ceph/filesystem-ha/projects/kernel-client/) secure
+mounts, retained remount and three paired trials passed, **3,128 ACK files per
+path**, with resource/storage measurements and preserved Linux 6.8 key-compatibility
+failure. Two kernel trials showed five-second reads. Different rename layouts
+prevent an isolated client-overhead ranking. Kernel writes during MDS failure
+remain unrun. The [native SeaweedFS HTTP/FUSE project](../../seaweedfs/filesystem-cluster/projects/native-http/)
+passed native HTTP correctness, live two-filer recovery and three paired
+256-file trials. HTTP/FUSE publication medians were **131.062 / 4.323 timed ops/s**,
+with differing semantics and resource scopes explicit. The failed 1,000-file FUSE
+trial, one unacknowledged-but-published body and recurring one-second stalls remain
+preserved. Final readback checked 2,621 ACKs plus that body and all three copies;
+scoped cleanup passed.
+S3/gRPC and Ceph FUSE comparisons remain further work.
 Separate metadata-heavy/small-file and sequential/bulk workloads, cache states,
 durability and fault behavior before making performance recommendations.

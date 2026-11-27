@@ -24,7 +24,9 @@ class ReplicaOracle(unittest.TestCase):
         self.root = Path(self.directory.name)
         self.run = "a" * 32
         (self.root / "journals").mkdir()
-        (self.root / "fixture.json").write_text(json.dumps({"runs": [self.run]}))
+        (self.root / "fixture.json").write_text(
+            json.dumps({"id": "fixture-a", "runs": [self.run]})
+        )
         self.body = hashlib.shake_256(f"95513:{self.run}:0".encode()).digest(13)
         self.row = {
             "run": self.run,
@@ -74,6 +76,25 @@ class ReplicaOracle(unittest.TestCase):
             ),
             (1, 3, 39),
         )
+
+    def test_http_namespace_is_verified_with_same_oracle(self):
+        root = self.root / "native-http"
+        (root / "journals").mkdir(parents=True)
+        (root / "fixture.json").write_text(
+            json.dumps({"parent_fixture": "fixture-a", "runs": [self.run]})
+        )
+        (root / "journals" / self.journal.name).write_bytes(self.journal.read_bytes())
+        result = self.run_audit()
+        self.assertEqual((result["acks"], result["direct_replica_reads"]), (2, 6))
+
+    def test_foreign_http_fixture_is_rejected(self):
+        root = self.root / "native-http"
+        root.mkdir()
+        (root / "fixture.json").write_text(
+            json.dumps({"parent_fixture": "other", "runs": []})
+        )
+        with self.assertRaisesRegex(RuntimeError, "another lab fixture"):
+            self.run_audit()
 
     def test_one_same_length_corrupt_replica_fails(self):
         self.corrupt = True

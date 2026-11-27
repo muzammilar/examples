@@ -59,6 +59,16 @@ def main():
     case, resources, native, locks = [
         Path(p).resolve().relative_to(c.ROOT) for p in sys.argv[1:5]
     ]
+    source_ids = {
+        r["sha256"]
+        for name in ("writer.log", "reader.log")
+        for r in rows(case / name)
+        if r.get("event") == "source"
+    }
+    if len(source_ids) != 1:
+        raise RuntimeError(
+            "No unique application source in the original executed evidence"
+        )
     seed = next(
         r["run"] for r in rows(case / "reader.log") if r.get("event") == "verified"
     )
@@ -137,9 +147,7 @@ def main():
                 locks / "contender.log",
             ]
         },
-        "application_source_sha256": hashlib.sha256(
-            (c.ROOT / "files-workload/main.cpp").read_bytes()
-        ).hexdigest(),
+        "application_source_sha256": next(iter(source_ids)),
     }
     for actor in metrics["actors"]:
         report["roles"][

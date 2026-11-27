@@ -29,6 +29,17 @@ x-mount: &mount
     timeout: 2s
     retries: 45
 services:
+  http-workload:
+    image: seaweedfs-filesystem-http:4.55
+    build:
+      context: .
+      dockerfile: projects/native-http/workload/Dockerfile
+    profiles: [native-http]
+    networks: [lab]
+    cap_drop: [ALL]
+    cpus: 1
+    mem_limit: 512m
+    volumes: [./results:/results]
   master0:
     <<: *store
     hostname: master0
@@ -113,7 +124,7 @@ services:
   volume0:
     <<: *store
     hostname: volume0
-    command: [volume, -ip=volume0, -ip.bind=0.0.0.0, -port=8080, -dir=/data, '-master=master0:9333,master1:9333,master2:9333', -max=8, -dataCenter=zone0, -rack=rack0, -minFreeSpace=1GiB]
+    command: [volume, -ip=volume0, -ip.bind=0.0.0.0, -port=8080, -dir=/data, '-master=master0:9333,master1:9333,master2:9333', -max=32, -dataCenter=zone0, -rack=rack0, -minFreeSpace=1GiB]
     volumes: [volume0:/data]
     depends_on:
       master0: {condition: service_healthy}
@@ -127,7 +138,7 @@ services:
   volume1:
     <<: *store
     hostname: volume1
-    command: [volume, -ip=volume1, -ip.bind=0.0.0.0, -port=8080, -dir=/data, '-master=master0:9333,master1:9333,master2:9333', -max=8, -dataCenter=zone1, -rack=rack1, -minFreeSpace=1GiB]
+    command: [volume, -ip=volume1, -ip.bind=0.0.0.0, -port=8080, -dir=/data, '-master=master0:9333,master1:9333,master2:9333', -max=32, -dataCenter=zone1, -rack=rack1, -minFreeSpace=1GiB]
     volumes: [volume1:/data]
     depends_on:
       master0: {condition: service_healthy}
@@ -141,7 +152,7 @@ services:
   volume2:
     <<: *store
     hostname: volume2
-    command: [volume, -ip=volume2, -ip.bind=0.0.0.0, -port=8080, -dir=/data, '-master=master0:9333,master1:9333,master2:9333', -max=8, -dataCenter=zone2, -rack=rack2, -minFreeSpace=1GiB]
+    command: [volume, -ip=volume2, -ip.bind=0.0.0.0, -port=8080, -dir=/data, '-master=master0:9333,master1:9333,master2:9333', -max=32, -dataCenter=zone2, -rack=rack2, -minFreeSpace=1GiB]
     volumes: [volume2:/data]
     depends_on:
       master0: {condition: service_healthy}

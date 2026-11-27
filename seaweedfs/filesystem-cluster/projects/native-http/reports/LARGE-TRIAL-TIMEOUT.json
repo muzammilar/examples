@@ -1,0 +1,623 @@
+{
+  "passed": false,
+  "requested_files": 1000,
+  "payload_bytes": 262144,
+  "reason": "FUSE seed exceeded 180s controller supervisor",
+  "run": "0d14ecb629e14f21b512a666bccca620",
+  "attempts": 803,
+  "acknowledged": 802,
+  "unfinished_attempts": 1,
+  "latency_ms": {
+    "p50": 15.1223125,
+    "p95": 1031.516792,
+    "p99": 1039.254168,
+    "max": 1049.937792,
+    "over_1000_ms": 165
+  },
+  "reconciliation": {
+    "files": 1086,
+    "logical_bytes": 284688384,
+    "direct_replica_reads": 3258,
+    "physical_body_bytes": 854065152,
+    "acks": 1085,
+    "ambiguous_present": 1,
+    "ambiguous_absent": 30
+  },
+  "journal_sha256": "00c86a4f434fd672cd55e660d7c1410240f085f0ef81be4b74a9c986bbac6470",
+  "evidence": "results/native-http/comparison-1795799549634842000",
+  "failure_log": "results/api-comparison.log",
+  "unstarted_http": {
+    "run": "0d14ecb629e14f21b512a666bccca620",
+    "http_journal_absent": true,
+    "http_namespace_status": {
+      "http://filer0:8888": 404,
+      "http://filer1:8888": 404
+    },
+    "original_fixture_sha256": "0c101a76553b17eb4e8c073da3c2f93aba58b0b11d000f5ae1be3908745e1061",
+    "reason": "FUSE seed hit external 180s supervisor before HTTP branch began. Remove only unstarted HTTP reservation; preserve all FUSE attempts and ACKs."
+  },
+  "input_reloaded": false,
+  "limits": [
+    "No completed matched HTTP trial; no performance winner.",
+    "Native reconciliation covers all active histories, including the earlier live HTTP failure test.",
+    "A timeout does not prove the in-flight publication failed.",
+    "Native cgroup snapshot window includes independent reconciliation after the failed trial; Docker sampling ends with the timeout. Neither is an isolated per-op cost.",
+    "Compression comparison unrun; high-entropy data with no configured workload codec. Allocated/logical ratios include replication and metadata."
+  ],
+  "docker_resources": {
+    "evidence": "results/resources-1795799549587819000.jsonl",
+    "environment": {
+      "type": "environment",
+      "run_id": 1795799549587819000,
+      "command": [
+        "make",
+        "api-compare"
+      ],
+      "environment": {
+        "NCPU": 11,
+        "MemTotal": 26216296448,
+        "KernelVersion": "6.12.76-linuxkit",
+        "OperatingSystem": "Docker Desktop",
+        "Driver": "overlayfs",
+        "ServerVersion": "29.5.3",
+        "docker_api": "1.54"
+      },
+      "cotenancy": "Only this SeaweedFS filesystem example; no other heavy lab."
+    },
+    "sampled_aggregate_memory_peak_bytes": 2685165568,
+    "actors": [
+      {
+        "name": "/seaweedfs-filesystem-cluster-http-workload-1",
+        "samples": 172,
+        "peak_memory_bytes": 1376256,
+        "configuration": {
+          "image_id": "sha256:a193f1bb0e7d39110fe0a0794c48adf3f4059d197cee42d32f1c48f828288be0",
+          "image_reference": "seaweedfs-filesystem-http:4.55",
+          "memory_limit_bytes": 536870912,
+          "nano_cpus": 1000000000,
+          "started_at": "2026-11-27T17:11:45.574013262Z"
+        },
+        "counter_deltas": {
+          "cpu_core_s": 0.221503,
+          "network_rx_bytes": 81513076,
+          "network_tx_bytes": 155254,
+          "disk_read_bytes": 0,
+          "disk_write_bytes": 0
+        },
+        "cpu_utilization_pct_one_core_min": 0.0,
+        "cpu_utilization_pct_one_core_max": 18.400451994441113,
+        "observed_s": 182.82451009750366,
+        "sampled_mean_memory_bytes": 1280047.6279069767,
+        "cpu_utilization_pct_one_core_average": 0.12115607468706927
+      },
+      {
+        "name": "/seaweedfs-filesystem-cluster-files-writer-1",
+        "samples": 172,
+        "peak_memory_bytes": 533483520,
+        "configuration": {
+          "image_id": "sha256:a58bae58384e834220db16f3ef461bc6effdf7dd697c04a8fca691384d068fd5",
+          "image_reference": "seaweedfs-filesystem-workload:4.55",
+          "memory_limit_bytes": 536870912,
+          "nano_cpus": 1000000000,
+          "started_at": "2026-11-27T17:11:19.831413958Z"
+        },
+        "counter_deltas": {
+          "cpu_core_s": 5.333785999999999,
+          "network_rx_bytes": 14792250,
+          "network_tx_bytes": 214464285,
+          "disk_read_bytes": 4096,
+          "disk_write_bytes": 232091648
+        },
+        "cpu_utilization_pct_one_core_min": 0.6115601970101485,
+        "cpu_utilization_pct_one_core_max": 8.106511939188099,
+        "observed_s": 182.82375597953796,
+        "sampled_mean_memory_bytes": 385538476.6511628,
+        "cpu_utilization_pct_one_core_average": 2.9174468992951703
+      },
+      {
+        "name": "/seaweedfs-filesystem-cluster-files-reader-1",
+        "samples": 172,
+        "peak_memory_bytes": 176984064,
+        "configuration": {
+          "image_id": "sha256:a58bae58384e834220db16f3ef461bc6effdf7dd697c04a8fca691384d068fd5",
+          "image_reference": "seaweedfs-filesystem-workload:4.55",
+          "memory_limit_bytes": 536870912,
+          "nano_cpus": 1000000000,
+          "started_at": "2026-11-27T17:11:19.831426375Z"
+        },
+        "counter_deltas": {
+          "cpu_core_s": 2.121082,
+          "network_rx_bytes": 225524412,
+          "network_tx_bytes": 1298878,
+          "disk_read_bytes": 0,
+          "disk_write_bytes": 135168
+        },
+        "cpu_utilization_pct_one_core_min": 0.22895863719911197,
+        "cpu_utilization_pct_one_core_max": 51.76911017167404,
+        "observed_s": 182.82325100898743,
+        "sampled_mean_memory_bytes": 175582755.72093022,
+        "cpu_utilization_pct_one_core_average": 1.1601817538490928
+      },
+      {
+        "name": "/seaweedfs-filesystem-cluster-filer0-1",
+        "samples": 172,
+        "peak_memory_bytes": 198201344,
+        "configuration": {
+          "image_id": "sha256:7ca46aeae2f223b37e5d91593c17ab37738eec6df6ab69b48a0487f7643342b9",
+          "image_reference": "chrislusf/seaweedfs:4.55@sha256:7ca46aeae2f223b37e5d91593c17ab37738eec6df6ab69b48a0487f7643342b9",
+          "memory_limit_bytes": 536870912,
+          "nano_cpus": 500000000,
+          "started_at": "2026-11-27T17:12:03.569021548Z"
+        },
+        "counter_deltas": {
+          "cpu_core_s": 3.3328740000000003,
+          "network_rx_bytes": 46071571,
+          "network_tx_bytes": 46872572,
+          "disk_read_bytes": 0,
+          "disk_write_bytes": 0
+        },
+        "cpu_utilization_pct_one_core_min": 0.725558614640318,
+        "cpu_utilization_pct_one_core_max": 10.393791376039943,
+        "observed_s": 182.82229089736938,
+        "sampled_mean_memory_bytes": 166744159.25581396,
+        "cpu_utilization_pct_one_core_average": 1.8230129289162937
+      },
+      {
+        "name": "/seaweedfs-filesystem-cluster-volume0-1",
+        "samples": 172,
+        "peak_memory_bytes": 379076608,
+        "configuration": {
+          "image_id": "sha256:7ca46aeae2f223b37e5d91593c17ab37738eec6df6ab69b48a0487f7643342b9",
+          "image_reference": "chrislusf/seaweedfs:4.55@sha256:7ca46aeae2f223b37e5d91593c17ab37738eec6df6ab69b48a0487f7643342b9",
+          "memory_limit_bytes": 536870912,
+          "nano_cpus": 500000000,
+          "started_at": "2026-11-27T17:11:12.705152594Z"
+        },
+        "counter_deltas": {
+          "cpu_core_s": 1.683431,
+          "network_rx_bytes": 212360852,
+          "network_tx_bytes": 185481381,
+          "disk_read_bytes": 0,
+          "disk_write_bytes": 188055552
+        },
+        "cpu_utilization_pct_one_core_min": 0.18730119350485663,
+        "cpu_utilization_pct_one_core_max": 10.113188028101405,
+        "observed_s": 182.82232904434204,
+        "sampled_mean_memory_bytes": 269149779.3488372,
+        "cpu_utilization_pct_one_core_average": 0.9208016377428917
+      },
+      {
+        "name": "/seaweedfs-filesystem-cluster-volume2-1",
+        "samples": 172,
+        "peak_memory_bytes": 378634240,
+        "configuration": {
+          "image_id": "sha256:7ca46aeae2f223b37e5d91593c17ab37738eec6df6ab69b48a0487f7643342b9",
+          "image_reference": "chrislusf/seaweedfs:4.55@sha256:7ca46aeae2f223b37e5d91593c17ab37738eec6df6ab69b48a0487f7643342b9",
+          "memory_limit_bytes": 536870912,
+          "nano_cpus": 500000000,
+          "started_at": "2026-11-27T17:11:12.704688927Z"
+        },
+        "counter_deltas": {
+          "cpu_core_s": 1.793237,
+          "network_rx_bytes": 212602338,
+          "network_tx_bytes": 274758338,
+          "disk_read_bytes": 77824,
+          "disk_write_bytes": 181846016
+        },
+        "cpu_utilization_pct_one_core_min": 0.22235390328924193,
+        "cpu_utilization_pct_one_core_max": 10.116428994812377,
+        "observed_s": 182.82357501983643,
+        "sampled_mean_memory_bytes": 268365514.41860464,
+        "cpu_utilization_pct_one_core_average": 0.9808565442424114
+      },
+      {
+        "name": "/seaweedfs-filesystem-cluster-filer1-1",
+        "samples": 172,
+        "peak_memory_bytes": 208183296,
+        "configuration": {
+          "image_id": "sha256:7ca46aeae2f223b37e5d91593c17ab37738eec6df6ab69b48a0487f7643342b9",
+          "image_reference": "chrislusf/seaweedfs:4.55@sha256:7ca46aeae2f223b37e5d91593c17ab37738eec6df6ab69b48a0487f7643342b9",
+          "memory_limit_bytes": 536870912,
+          "nano_cpus": 500000000,
+          "started_at": "2026-11-27T17:12:03.567639715Z"
+        },
+        "counter_deltas": {
+          "cpu_core_s": 5.2848630000000005,
+          "network_rx_bytes": 64650578,
+          "network_tx_bytes": 62987426,
+          "disk_read_bytes": 0,
+          "disk_write_bytes": 0
+        },
+        "cpu_utilization_pct_one_core_min": 0.9737575985793141,
+        "cpu_utilization_pct_one_core_max": 8.727530186183053,
+        "observed_s": 182.82335901260376,
+        "sampled_mean_memory_bytes": 167608724.8372093,
+        "cpu_utilization_pct_one_core_average": 2.89069352436286
+      },
+      {
+        "name": "/seaweedfs-filesystem-cluster-volume1-1",
+        "samples": 172,
+        "peak_memory_bytes": 382550016,
+        "configuration": {
+          "image_id": "sha256:7ca46aeae2f223b37e5d91593c17ab37738eec6df6ab69b48a0487f7643342b9",
+          "image_reference": "chrislusf/seaweedfs:4.55@sha256:7ca46aeae2f223b37e5d91593c17ab37738eec6df6ab69b48a0487f7643342b9",
+          "memory_limit_bytes": 536870912,
+          "nano_cpus": 500000000,
+          "started_at": "2026-11-27T17:11:12.703050261Z"
+        },
+        "counter_deltas": {
+          "cpu_core_s": 1.7650899999999998,
+          "network_rx_bytes": 212599824,
+          "network_tx_bytes": 270279011,
+          "disk_read_bytes": 0,
+          "disk_write_bytes": 188055552
+        },
+        "cpu_utilization_pct_one_core_min": 0.2040001489521119,
+        "cpu_utilization_pct_one_core_max": 9.735160493389547,
+        "observed_s": 182.822096824646,
+        "sampled_mean_memory_bytes": 270844142.1395349,
+        "cpu_utilization_pct_one_core_average": 0.9654686335279197
+      },
+      {
+        "name": "/seaweedfs-filesystem-cluster-master2-1",
+        "samples": 172,
+        "peak_memory_bytes": 91807744,
+        "configuration": {
+          "image_id": "sha256:7ca46aeae2f223b37e5d91593c17ab37738eec6df6ab69b48a0487f7643342b9",
+          "image_reference": "chrislusf/seaweedfs:4.55@sha256:7ca46aeae2f223b37e5d91593c17ab37738eec6df6ab69b48a0487f7643342b9",
+          "memory_limit_bytes": 268435456,
+          "nano_cpus": 250000000,
+          "started_at": "2026-11-27T17:11:10.101371718Z"
+        },
+        "counter_deltas": {
+          "cpu_core_s": 1.320662,
+          "network_rx_bytes": 209932,
+          "network_tx_bytes": 134222,
+          "disk_read_bytes": 0,
+          "disk_write_bytes": 49152
+        },
+        "cpu_utilization_pct_one_core_min": 0.16906392043873733,
+        "cpu_utilization_pct_one_core_max": 2.1776022801394315,
+        "observed_s": 182.821063041687,
+        "sampled_mean_memory_bytes": 91518642.60465117,
+        "cpu_utilization_pct_one_core_average": 0.7223795650388827
+      },
+      {
+        "name": "/seaweedfs-filesystem-cluster-master0-1",
+        "samples": 172,
+        "peak_memory_bytes": 123228160,
+        "configuration": {
+          "image_id": "sha256:7ca46aeae2f223b37e5d91593c17ab37738eec6df6ab69b48a0487f7643342b9",
+          "image_reference": "chrislusf/seaweedfs:4.55@sha256:7ca46aeae2f223b37e5d91593c17ab37738eec6df6ab69b48a0487f7643342b9",
+          "memory_limit_bytes": 268435456,
+          "nano_cpus": 250000000,
+          "started_at": "2026-11-27T17:11:10.102003051Z"
+        },
+        "counter_deltas": {
+          "cpu_core_s": 1.735069,
+          "network_rx_bytes": 763083,
+          "network_tx_bytes": 1030078,
+          "disk_read_bytes": 0,
+          "disk_write_bytes": 49152
+        },
+        "cpu_utilization_pct_one_core_min": 0.40707645780476204,
+        "cpu_utilization_pct_one_core_max": 1.9055606589382565,
+        "observed_s": 182.81987810134888,
+        "sampled_mean_memory_bytes": 123060771.72093023,
+        "cpu_utilization_pct_one_core_average": 0.9490592697136244
+      },
+      {
+        "name": "/seaweedfs-filesystem-cluster-master1-1",
+        "samples": 172,
+        "peak_memory_bytes": 91443200,
+        "configuration": {
+          "image_id": "sha256:7ca46aeae2f223b37e5d91593c17ab37738eec6df6ab69b48a0487f7643342b9",
+          "image_reference": "chrislusf/seaweedfs:4.55@sha256:7ca46aeae2f223b37e5d91593c17ab37738eec6df6ab69b48a0487f7643342b9",
+          "memory_limit_bytes": 268435456,
+          "nano_cpus": 250000000,
+          "started_at": "2026-11-27T17:11:10.098197635Z"
+        },
+        "counter_deltas": {
+          "cpu_core_s": 1.3067209999999998,
+          "network_rx_bytes": 211051,
+          "network_tx_bytes": 134339,
+          "disk_read_bytes": 0,
+          "disk_write_bytes": 49152
+        },
+        "cpu_utilization_pct_one_core_min": 0.1763707968467003,
+        "cpu_utilization_pct_one_core_max": 1.9013681554803181,
+        "observed_s": 182.81834411621094,
+        "sampled_mean_memory_bytes": 91170863.62790698,
+        "cpu_utilization_pct_one_core_average": 0.7147647060895405
+      },
+      {
+        "name": "/seaweedfs-filesystem-cluster-etcd0-1",
+        "samples": 172,
+        "peak_memory_bytes": 47910912,
+        "configuration": {
+          "image_id": "sha256:47d217be8ec4ca943954b5f4bf8029ee9bc0ffb05fbe2a44d579a1f640e03ed4",
+          "image_reference": "gcr.io/etcd-development/etcd:v3.7.4@sha256:47d217be8ec4ca943954b5f4bf8029ee9bc0ffb05fbe2a44d579a1f640e03ed4",
+          "memory_limit_bytes": 268435456,
+          "nano_cpus": 500000000,
+          "started_at": "2026-11-27T17:11:10.09617301Z"
+        },
+        "counter_deltas": {
+          "cpu_core_s": 4.684393,
+          "network_rx_bytes": 7846187,
+          "network_tx_bytes": 12436991,
+          "disk_read_bytes": 0,
+          "disk_write_bytes": 25042944
+        },
+        "cpu_utilization_pct_one_core_min": 1.0647643062885312,
+        "cpu_utilization_pct_one_core_max": 7.6070218712974365,
+        "observed_s": 182.81714391708374,
+        "sampled_mean_memory_bytes": 44359418.04651163,
+        "cpu_utilization_pct_one_core_average": 2.562337918441935
+      },
+      {
+        "name": "/seaweedfs-filesystem-cluster-etcd1-1",
+        "samples": 172,
+        "peak_memory_bytes": 41459712,
+        "configuration": {
+          "image_id": "sha256:47d217be8ec4ca943954b5f4bf8029ee9bc0ffb05fbe2a44d579a1f640e03ed4",
+          "image_reference": "gcr.io/etcd-development/etcd:v3.7.4@sha256:47d217be8ec4ca943954b5f4bf8029ee9bc0ffb05fbe2a44d579a1f640e03ed4",
+          "memory_limit_bytes": 268435456,
+          "nano_cpus": 500000000,
+          "started_at": "2026-11-27T17:11:10.101645135Z"
+        },
+        "counter_deltas": {
+          "cpu_core_s": 4.691384,
+          "network_rx_bytes": 7831753,
+          "network_tx_bytes": 11633729,
+          "disk_read_bytes": 0,
+          "disk_write_bytes": 24944640
+        },
+        "cpu_utilization_pct_one_core_min": 0.940023057320025,
+        "cpu_utilization_pct_one_core_max": 7.742322485889914,
+        "observed_s": 182.8158459663391,
+        "sampled_mean_memory_bytes": 39320409.302325584,
+        "cpu_utilization_pct_one_core_average": 2.566180177217132
+      },
+      {
+        "name": "/seaweedfs-filesystem-cluster-etcd2-1",
+        "samples": 172,
+        "peak_memory_bytes": 46690304,
+        "configuration": {
+          "image_id": "sha256:47d217be8ec4ca943954b5f4bf8029ee9bc0ffb05fbe2a44d579a1f640e03ed4",
+          "image_reference": "gcr.io/etcd-development/etcd:v3.7.4@sha256:47d217be8ec4ca943954b5f4bf8029ee9bc0ffb05fbe2a44d579a1f640e03ed4",
+          "memory_limit_bytes": 268435456,
+          "nano_cpus": 500000000,
+          "started_at": "2026-11-27T17:11:10.094394676Z"
+        },
+        "counter_deltas": {
+          "cpu_core_s": 6.049762,
+          "network_rx_bytes": 12635460,
+          "network_tx_bytes": 17945317,
+          "disk_read_bytes": 0,
+          "disk_write_bytes": 25038848
+        },
+        "cpu_utilization_pct_one_core_min": 1.6059080139734467,
+        "cpu_utilization_pct_one_core_max": 10.097585159245048,
+        "observed_s": 182.8143389225006,
+        "sampled_mean_memory_bytes": 43425268.093023255,
+        "cpu_utilization_pct_one_core_average": 3.3092382335308175
+      }
+    ],
+    "limits": [
+      "Sample-window deltas exclude startup and exit outside observation. Decreasing counters are treated as restarts and the new counter is accumulated; reset intervals have no CPU utilization estimate.",
+      "Short-lived actors may be missed; use native pre-exit cgroup counters as well.",
+      "CPU utilization is interval-average percent of one core; short spikes may be missed.",
+      "Docker disk bytes are not device I/O latency; absent counters are unavailable, not zero."
+    ]
+  },
+  "storage_after_reconciliation": {
+    "etcd1": {
+      "files": 3,
+      "apparent_bytes": 144801792,
+      "allocated_bytes": 129134592
+    },
+    "volume0": {
+      "files": 29,
+      "apparent_bytes": 284988228,
+      "allocated_bytes": 285085696
+    },
+    "master0": {
+      "files": 4,
+      "apparent_bytes": 1759,
+      "allocated_bytes": 16384
+    },
+    "master1": {
+      "files": 3,
+      "apparent_bytes": 1377,
+      "allocated_bytes": 12288
+    },
+    "volume2": {
+      "files": 29,
+      "apparent_bytes": 284988228,
+      "allocated_bytes": 285085696
+    },
+    "etcd2": {
+      "files": 3,
+      "apparent_bytes": 144801792,
+      "allocated_bytes": 129150976
+    },
+    "volume1": {
+      "files": 29,
+      "apparent_bytes": 284988228,
+      "allocated_bytes": 285085696
+    },
+    "etcd0": {
+      "files": 3,
+      "apparent_bytes": 144801792,
+      "allocated_bytes": 129146880
+    },
+    "master2": {
+      "files": 3,
+      "apparent_bytes": 1377,
+      "allocated_bytes": 12288
+    }
+  },
+  "native_cgroups": {
+    "master0": {
+      "cpu_core_s_delta": 2.1786909999999997,
+      "memory_peak_bytes": 156323840,
+      "block_io_delta": {
+        "rbytes": 0,
+        "wbytes": 49152,
+        "rios": 0,
+        "wios": 18,
+        "dbytes": 0,
+        "dios": 0
+      },
+      "collector_error": null
+    },
+    "master1": {
+      "cpu_core_s_delta": 1.667682,
+      "memory_peak_bytes": 95195136,
+      "block_io_delta": {
+        "rbytes": 0,
+        "wbytes": 49152,
+        "rios": 0,
+        "wios": 721,
+        "dbytes": 0,
+        "dios": 0
+      },
+      "collector_error": null
+    },
+    "master2": {
+      "cpu_core_s_delta": 1.67932,
+      "memory_peak_bytes": 94478336,
+      "block_io_delta": {
+        "rbytes": 0,
+        "wbytes": 49152,
+        "rios": 0,
+        "wios": 720,
+        "dbytes": 0,
+        "dios": 0
+      },
+      "collector_error": null
+    },
+    "etcd0": {
+      "cpu_core_s_delta": null,
+      "memory_peak_bytes": null,
+      "block_io_delta": null,
+      "collector_error": null
+    },
+    "etcd1": {
+      "cpu_core_s_delta": null,
+      "memory_peak_bytes": null,
+      "block_io_delta": null,
+      "collector_error": null
+    },
+    "etcd2": {
+      "cpu_core_s_delta": null,
+      "memory_peak_bytes": null,
+      "block_io_delta": null,
+      "collector_error": null
+    },
+    "volume0": {
+      "cpu_core_s_delta": 2.5336420000000004,
+      "memory_peak_bytes": 389574656,
+      "block_io_delta": {
+        "rbytes": 0,
+        "wbytes": 211025920,
+        "rios": 0,
+        "wios": 335,
+        "dbytes": 0,
+        "dios": 0
+      },
+      "collector_error": null
+    },
+    "volume1": {
+      "cpu_core_s_delta": 2.6089979999999997,
+      "memory_peak_bytes": 393154560,
+      "block_io_delta": {
+        "rbytes": 0,
+        "wbytes": 211025920,
+        "rios": 0,
+        "wios": 334,
+        "dbytes": 0,
+        "dios": 0
+      },
+      "collector_error": null
+    },
+    "volume2": {
+      "cpu_core_s_delta": 2.650957,
+      "memory_peak_bytes": 386433024,
+      "block_io_delta": {
+        "rbytes": 77824,
+        "wbytes": 211034112,
+        "rios": 1,
+        "wios": 335,
+        "dbytes": 0,
+        "dios": 0
+      },
+      "collector_error": null
+    },
+    "filer0": {
+      "cpu_core_s_delta": 4.523474,
+      "memory_peak_bytes": 202579968,
+      "block_io_delta": {
+        "rbytes": 0,
+        "wbytes": 0,
+        "rios": 0,
+        "wios": 0,
+        "dbytes": 0,
+        "dios": 0
+      },
+      "collector_error": null
+    },
+    "filer1": {
+      "cpu_core_s_delta": 5.832565,
+      "memory_peak_bytes": 210051072,
+      "block_io_delta": {
+        "rbytes": 0,
+        "wbytes": 0,
+        "rios": 0,
+        "wios": 0,
+        "dbytes": 0,
+        "dios": 0
+      },
+      "collector_error": null
+    },
+    "files-writer": {
+      "cpu_core_s_delta": 6.8587620000000005,
+      "memory_peak_bytes": 537133056,
+      "block_io_delta": {
+        "rbytes": 143360,
+        "wbytes": 450740224,
+        "rios": 5,
+        "wios": 3321,
+        "dbytes": 0,
+        "dios": 0
+      },
+      "collector_error": null
+    },
+    "files-reader": {
+      "cpu_core_s_delta": 5.584937999999999,
+      "memory_peak_bytes": 535728128,
+      "block_io_delta": {
+        "rbytes": 0,
+        "wbytes": 216985600,
+        "rios": 0,
+        "wios": 1663,
+        "dbytes": 0,
+        "dios": 0
+      },
+      "collector_error": null
+    },
+    "http-workload": {
+      "cpu_core_s_delta": 0.4601050000000002,
+      "memory_peak_bytes": 8015872,
+      "block_io_delta": {
+        "rbytes": 0,
+        "wbytes": 0,
+        "rios": 0,
+        "wios": 0,
+        "dbytes": 0,
+        "dios": 0
+      },
+      "collector_error": null
+    }
+  }
+}

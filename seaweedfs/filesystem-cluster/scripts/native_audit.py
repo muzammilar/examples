@@ -30,8 +30,24 @@ def main():
         "ambiguous_present": 0,
         "ambiguous_absent": 0,
     }
-    for run in fixture["runs"]:
-        path = Path("/results/journals") / (run + ".jsonl")
+    corpora = [
+        (run, Path("/results/journals") / (run + ".jsonl"), "")
+        for run in fixture["runs"]
+    ]
+    http_path = Path("/results/native-http/fixture.json")
+    if http_path.exists():
+        http = json.loads(http_path.read_text())
+        if http["parent_fixture"] != fixture["id"]:
+            raise RuntimeError("HTTP corpus belongs to another lab fixture")
+        corpora.extend(
+            (
+                run,
+                Path("/results/native-http/journals") / (run + ".jsonl"),
+                "native-http/",
+            )
+            for run in http["runs"]
+        )
+    for run, path, prefix in corpora:
         raw = path.read_bytes()
         if not raw or not raw.endswith(b"\n"):
             raise RuntimeError("Incomplete external journal")
@@ -71,18 +87,18 @@ def main():
         counts["acks"] += len(acks)
         for seq, row in attempts.items():
             observation = Path("/results/observed-publications") / (
-                run + "-" + str(seq) + ".json"
+                prefix.replace("/", "-") + run + "-" + str(seq) + ".json"
             )
             try:
                 metadata = json.loads(
-                    get(f"http://filer0:8888/{run}/{seq}?metadata=true")
+                    get(f"http://filer0:8888/{prefix}{run}/{seq}?metadata=true")
                 )
             except HTTPError as error:
                 if error.code != 404 or seq in acks or observation.exists():
                     raise
                 try:
                     metadata = json.loads(
-                        get(f"http://filer1:8888/{run}/{seq}?metadata=true")
+                        get(f"http://filer1:8888/{prefix}{run}/{seq}?metadata=true")
                     )
                 except HTTPError as second:
                     if second.code != 404:

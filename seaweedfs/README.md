@@ -20,3 +20,8 @@ beside the measured results.
 |---|---|
 | [s3-cluster](s3-cluster/README.md#future-work--todo) | Exercise supported volume-server growth/drain and verify actual object placement, retained acknowledgements and native repair. |
 | [filesystem-cluster](filesystem-cluster/README.md#limits-and-next-tests) | FUSE lock-owner crash, one-filer routing, metadata quorum/partitions, filesystem-interface disk loss, compaction and independent restore. |
+
+The filesystem lab includes a [native HTTP versus FUSE project](filesystem-cluster/projects/native-http/)
+with paired blob trials, live two-filer failure/recovery, resource measurements
+and a preserved larger-run timeout/ambiguous-write finding. It uses the native
+filer API, with no S3 gateway or cloud credentials.

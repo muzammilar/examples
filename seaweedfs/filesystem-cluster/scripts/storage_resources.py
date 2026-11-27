@@ -58,7 +58,10 @@ print(json.dumps(result))"""
         )
     )
     counters = {}
-    for role in [*c.STORAGE, "files-writer", "files-reader"]:
+    roles = [*c.STORAGE, "files-writer", "files-reader"]
+    if (c.ROOT / "results/native-http/fixture.json").exists():
+        roles.append("http-workload")
+    for role in roles:
         command = "for f in cpu.stat memory.peak io.stat; do echo METRIC:$f; cat /sys/fs/cgroup/$f; done; if test -d /tmp/weed-cache; then echo METRIC:cache_bytes; du -sb /tmp/weed-cache; fi"
         result = subprocess.run(
             [*c.COMPOSE, "exec", "-T", role, "sh", "-c", command],

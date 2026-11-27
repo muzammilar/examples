@@ -5,6 +5,9 @@ COMPOSE := docker compose --project-name seaweedfs-filesystem-cluster
 export COMPOSE_PROJECT_NAME := seaweedfs-filesystem-cluster
 FILES ?= 128
 PAYLOAD_BYTES ?= 262144
+COMPARE_FILES ?= 256
+NATIVE_HTTP ?= 0
+export COMPARE_FILES
 export FILES PAYLOAD_BYTES
 .NOTPARALLEL:
 .PHONY: build docker-up up test verify status down docker-down
@@ -14,8 +17,10 @@ docker-up: build
 	$(PYTHON) scripts/control.py docker-up
 up: build
 	$(PYTHON) scripts/control.py up
+	@if [ "$(NATIVE_HTTP)" = 1 ]; then $(MAKE) api-up; fi
 test:
 	$(PYTHON) scripts/control.py test
+	@if [ "$(NATIVE_HTTP)" = 1 ]; then $(MAKE) api-test; fi
 verify:
 	$(PYTHON) scripts/control.py verify
 status:
@@ -47,3 +52,23 @@ cli:
 .PHONY: unit-test
 unit-test:
 	$(PYTHON) -m unittest discover -s tests -v
+
+.PHONY: api-up api-test api-verify
+api-up:
+	$(PYTHON) projects/native-http/http_project.py up
+api-test:
+	$(PYTHON) projects/native-http/http_project.py test
+api-verify:
+	$(PYTHON) projects/native-http/http_project.py verify
+
+.PHONY: api-compare
+api-compare:
+	$(PYTHON) projects/native-http/compare.py
+
+.PHONY: api-filer-failure api-test-production
+api-filer-failure:
+	$(PYTHON) projects/native-http/filer_failure.py
+api-test-production:
+	$(MAKE) api-verify
+	$(MAKE) api-filer-failure
+	$(MAKE) api-verify
