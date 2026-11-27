@@ -80,14 +80,58 @@ diagnostics, **not** full-lifecycle totals or a repeated comparative benchmark.
 Docker exposed I/O byte counters but no operation counts or device latency. Reads
 were warm/shared-cache, not verified cold. Compression is disabled (native body
 ratio 1.0); replication, deduplication, metadata, GC and allocation are separate costs.
-No 2.5.0-versus-2.6.0 performance winner is established. The live-crash trial did
-not inject a fault inside multipart completion; [that follow-up remains unrun](docs/MULTIPART_RECOVERY_PLAN.md).
+No 2.5.0-versus-2.6.0 performance winner is established. The original live-crash trial did
+not inject a fault inside multipart completion; the separate bounded follow-up
+below records those tests without changing the original trial's scope.
 
 To observe another case, use `RESULTS_DIR=... python3 scripts/observe.py failover`
 (or `verify`) with the same local fixture. `scripts/storage_usage.py` runs inside
 the read-only audit container; `scripts/resource_report.py` summarizes raw Docker
 counters and accounts for counter resets across container restart. No host cloud
 credentials or host filesystem storage paths are used.
+
+## Multipart publication boundaries — 2026-11-27
+
+After the five-command setup and API test, `make multipart-failure` runs a healthy
+raw-HTTP control, serving-node loss with an incomplete completion body, deliberate
+response disposal and abort visibility. It creates its own case directory within
+the existing fixture; no new cluster or sibling example state is required.
+[Workload/build ownership](multipart-workload/) · [test design](docs/MULTIPART_RECOVERY_PLAN.md)
+· [recovery results](reports/MULTIPART_RECOVERY.json) · [resource diagnostics](reports/MULTIPART_RESOURCES.json).
+
+- Each multipart object used four **8 MiB** parts. The controller verified the
+  connected owned peer, application source hash, **197/395 request bytes sent**
+  and the target's SIGKILL exit **137**. All four part ETags/sizes survived;
+  a fresh client completed the **same upload ID** and verified all **32 MiB**.
+- Discarding the completion response after headers produced **one ambiguous
+  publication**, fully readable by a fresh client without replay. It remains
+  separate from the **two multipart client ACKs**. Abort removed its upload from
+  listings and kept its final key absent; physical reclamation is unrun.
+- Independent background traffic recorded **379 PUT ACKs**, **zero ambiguous
+  ordinary PUTs**, and **715 successful GETs / zero errors or wrong bodies**.
+  The longest successful-GET completion gap was **1.071 s**.
+- Final readback verified **1,395 objects / 161,222,656 bytes**. The native audit
+  checked **4,626 required copies of 1,542 blocks** over **256 partitions**, with
+  no missing, misplaced or corrupt required copies. This includes the independently
+  observed publication whose completion response was discarded.
+- Observed diagnostics: **869,531,648 bytes** aggregate charged-memory peak,
+  **22.703 CPU core-seconds** and **1,208,143,872 disk-write bytes**. CPU utilization,
+  disk reads, logical/allocated storage and collection gaps remain in the reports.
+  No cold-cache, throughput-ranking or device I/O latency/count claim is made.
+
+This tests an incomplete request and an application-discarded response, **not** an
+internal metadata-commit crash or a proven network loss before server publication.
+Regular writes/reads continued through native repair; the fixed ACK prefix regained
+all copies before new progress was required. A separate reader remained live during
+final tail reconciliation. Four protocol controls reject false ACKs and unowned
+endpoints; a history control proves a discarded response cannot become an ACK.
+
+Cleanup also exposed a negative result: the first `make down` saw a nonempty
+listing immediately after batch deletion and failed. A later fresh client found
+**zero objects and zero pending uploads**; an explicit second `make down` and owned
+Docker teardown succeeded. The failed check remains preserved. Its cause and
+visibility bound have not been isolated; do not claim a consistency violation or
+hide it with an automatic retry.
 
 ## Live production tests
 

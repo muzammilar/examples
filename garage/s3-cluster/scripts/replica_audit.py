@@ -44,6 +44,23 @@ def expected_blocks():
     entries, required = w.Store.__new__(w.Store).expected(
         fault=(w.ROOT / "churn.jsonl").exists()
     )
+    # A discarded response is not an ACK. Still require native copies for bodies
+    # independently read back after that ambiguous completion.
+    import json
+
+    observations = [
+        w.ROOT / "multipart-published.json",
+        *w.ROOT.glob("fault-multipart-*/multipart-published.json"),
+    ]
+    for path in observations:
+        if not path.exists():
+            continue
+        for value in json.loads(path.read_text()):
+            if value != entries.get(value["key"]):
+                raise RuntimeError(
+                    "Multipart readback observation differs from witnessed attempt"
+                )
+            required.add(value["key"])
     blocks = set()
     for key in required:
         value = entries[key]
@@ -53,7 +70,12 @@ def expected_blocks():
             raise RuntimeError(
                 "body generator differs from the external witness: " + key
             )
-        part_size = 8 * 1024 * 1024 if key == "cases/multipart" else max(len(data), 1)
+        part_size = value.get(
+            "multipart_part_size",
+            8 * 1024 * 1024 if key == "cases/multipart" else max(len(data), 1),
+        )
+        if not isinstance(part_size, int) or part_size < 1:
+            raise RuntimeError("Invalid multipart boundary in witness")
         for offset in range(0, len(data), part_size):
             part = data[offset : offset + part_size]
             for start in range(0, len(part), 1000000):

@@ -73,6 +73,8 @@ def summarize(root):
                     "live_prefix_recovery",
                 ]
             }
+            if (case / "multipart-summary.json").exists():
+                value["multipart"] = read(case / "multipart-summary.json")
             value["automatic_metadata_sweeps"] = len(
                 records(case / "live-repair-prefix/metadata-sweeps.jsonl")
             )

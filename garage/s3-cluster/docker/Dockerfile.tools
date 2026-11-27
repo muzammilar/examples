@@ -4,5 +4,5 @@ WORKDIR /app
 COPY requirements.txt audit-requirements.txt /tmp/
 RUN pip install --no-cache-dir -r /tmp/requirements.txt -r /tmp/audit-requirements.txt
 COPY *.py /app/
-RUN python -m unittest -v test_workload test_traffic test_placement test_reader
+RUN python -m unittest -v test_workload test_traffic test_placement test_reader test_multipart
 ENTRYPOINT ["python", "/app/workload.py"]

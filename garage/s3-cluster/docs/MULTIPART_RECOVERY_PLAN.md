@@ -36,6 +36,14 @@ Retain failures without reseeding. Extend the local native auditor with explicit
 multipart part boundaries in its witness; do not assume all multipart payloads
 have the original fixture's one hardcoded key.
 
-These new multipart fault cases are **not implemented or run yet**. The healthy
-API suite already exercises completion, list-parts and abort. A generic native
-process crash does not establish interruption at a multipart commit boundary.
+All three bounded cases above ran on Garage 2.6.0. See
+[the source and ownership](../multipart-workload/) and
+[the complete measured result](../reports/MULTIPART_RECOVERY.json).
+The healthy raw-transport control passed before injection; four negative controls
+and a separate history test protect the ACK distinction. Physical abort reclamation
+and an internal metadata-commit interruption remain unrun.
+
+The first cleanup failed its immediate post-delete empty-bucket assertion. A later
+fresh client observed zero objects and zero pending uploads; a separately invoked
+`make down` succeeded. Both attempts remain recorded. This transient listing result
+has not been isolated enough to attribute it to a component or consistency model.

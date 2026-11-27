@@ -1,0 +1,346 @@
+{
+  "fixture": "73a3442a-0509-4094-8b94-6b301cd875dd",
+  "cases": [
+    {
+      "case": "fault-multipart-45c739f6e28d4330b3d913592d481046",
+      "passed": true,
+      "external_assist": false,
+      "target": "garage0",
+      "mode": "multipart",
+      "writer": {
+        "ack": 379,
+        "ambiguous": 0
+      },
+      "reader": {
+        "get": 715,
+        "get_error": 0,
+        "wrong": 0
+      },
+      "longest_read_completion_gap_seconds": 1.070591688156128,
+      "phases": {
+        "baseline": {
+          "seconds": 2.1616878509521484,
+          "ack": {
+            "count": 21,
+            "p50_ms": 43.66033300000538,
+            "p99_ms": 86.13912500000254,
+            "max_ms": 86.13912500000254,
+            "ops_per_second": 9.71463108827217
+          },
+          "ambiguous": {
+            "count": 0,
+            "ops_per_second": 0.0
+          },
+          "get": {
+            "count": 24,
+            "p50_ms": 6.49683400000356,
+            "p99_ms": 191.06970800000056,
+            "max_ms": 191.06970800000056,
+            "ops_per_second": 11.10243552945391
+          },
+          "get_error": {
+            "count": 0,
+            "ops_per_second": 0.0
+          }
+        },
+        "injection": {
+          "seconds": 0.21085524559020996,
+          "ack": {
+            "count": 2,
+            "p50_ms": 44.40545900000359,
+            "p99_ms": 86.8851249999949,
+            "max_ms": 86.8851249999949,
+            "ops_per_second": 9.485180197446605
+          },
+          "ambiguous": {
+            "count": 0,
+            "ops_per_second": 0.0
+          },
+          "get": {
+            "count": 3,
+            "p50_ms": 2.6423749999935353,
+            "p99_ms": 6.390749999994227,
+            "max_ms": 6.390749999994227,
+            "ops_per_second": 14.227770296169906
+          },
+          "get_error": {
+            "count": 0,
+            "ops_per_second": 0.0
+          }
+        },
+        "repair": {
+          "seconds": 28.770245790481567,
+          "ack": {
+            "count": 348,
+            "p50_ms": 12.387666999998714,
+            "p99_ms": 93.71887500000753,
+            "max_ms": 129.4047909999989,
+            "ops_per_second": 12.095829925621747
+          },
+          "ambiguous": {
+            "count": 0,
+            "ops_per_second": 0.0
+          },
+          "get": {
+            "count": 444,
+            "p50_ms": 2.8837499999951888,
+            "p99_ms": 83.8726670000085,
+            "max_ms": 1019.3517080000021,
+            "ops_per_second": 15.43261059475878
+          },
+          "get_error": {
+            "count": 0,
+            "ops_per_second": 0.0
+          }
+        },
+        "after": {
+          "seconds": 0.7164690494537354,
+          "ack": {
+            "count": 8,
+            "p50_ms": 6.078916999996409,
+            "p99_ms": 45.808875000005855,
+            "max_ms": 45.808875000005855,
+            "ops_per_second": 11.165869629817951
+          },
+          "ambiguous": {
+            "count": 0,
+            "ops_per_second": 0.0
+          },
+          "get": {
+            "count": 13,
+            "p50_ms": 2.4251250000020264,
+            "p99_ms": 4.185583000008819,
+            "max_ms": 4.185583000008819,
+            "ops_per_second": 18.14453814845417
+          },
+          "get_error": {
+            "count": 0,
+            "ops_per_second": 0.0
+          }
+        },
+        "reconcile": {
+          "seconds": 13.804338216781616,
+          "ack": {
+            "count": 0,
+            "ops_per_second": 0.0
+          },
+          "ambiguous": {
+            "count": 0,
+            "ops_per_second": 0.0
+          },
+          "get": {
+            "count": 231,
+            "p50_ms": 2.7121660000091197,
+            "p99_ms": 47.11550000001807,
+            "max_ms": 50.82854200000497,
+            "ops_per_second": 16.733869916283172
+          },
+          "get_error": {
+            "count": 0,
+            "ops_per_second": 0.0
+          }
+        }
+      },
+      "live_prefix": {
+        "ack_objects": 124,
+        "captured_at": 1795789710.582293
+      },
+      "live_prefix_recovery": {
+        "baseline_blocks": 1287,
+        "physical_blocks": 1572,
+        "verified_copies": 4708,
+        "required_native_copies_verified": 3861,
+        "missing_native_replicas": 0,
+        "misplaced_live_blocks": 0,
+        "corrupt_blocks": 0,
+        "native_partitions": 256,
+        "required_partitions_covered": 255,
+        "layout_version": 1,
+        "ring_sha256": "97116d9b819001da40135813e4f06717772d7dfc600ae49a2ed3a5ba1300d12f",
+        "wait_seconds": 11.821224170999997,
+        "docker_data_free_bytes": 39036526592
+      },
+      "multipart": {
+        "raw_transport_control": "passed",
+        "interrupted_request": {
+          "passed": true,
+          "parts_retained": 4,
+          "resumed_same_upload_id": true
+        },
+        "lost_response": {
+          "passed": true,
+          "published_without_application_ack": true,
+          "mutation_replayed": false
+        },
+        "abort": {
+          "passed": true,
+          "final_key_absent": true,
+          "upload_unlisted": true,
+          "physical_reclamation": "unrun"
+        },
+        "object_bytes": 33554432,
+        "completed_objects": 3
+      },
+      "automatic_metadata_sweeps": 0,
+      "native_final": {
+        "baseline_blocks": 1542,
+        "physical_blocks": 1584,
+        "verified_copies": 4752,
+        "required_native_copies_verified": 4626,
+        "missing_native_replicas": 0,
+        "misplaced_live_blocks": 0,
+        "corrupt_blocks": 0,
+        "native_partitions": 256,
+        "required_partitions_covered": 256,
+        "layout_version": 1,
+        "ring_sha256": "97116d9b819001da40135813e4f06717772d7dfc600ae49a2ed3a5ba1300d12f",
+        "wait_seconds": 0.6415238749999901,
+        "docker_data_free_bytes": 39034142720
+      }
+    }
+  ],
+  "cumulative_ack_objects": 381,
+  "cumulative_attempted_objects": 382,
+  "optional_attempts_present": 1,
+  "reconciliation": {
+    "objects_verified": 1395,
+    "bytes_verified": 161222656,
+    "missing_acknowledged_keys": 0,
+    "corrupt_objects": 0,
+    "stale_versions": 0,
+    "extra_or_duplicate_keys": 0
+  },
+  "native_final": {
+    "baseline_blocks": 1542,
+    "physical_blocks": 1584,
+    "verified_copies": 4752,
+    "required_native_copies_verified": 4626,
+    "missing_native_replicas": 0,
+    "misplaced_live_blocks": 0,
+    "corrupt_blocks": 0,
+    "native_partitions": 256,
+    "required_partitions_covered": 256,
+    "layout_version": 1,
+    "ring_sha256": "97116d9b819001da40135813e4f06717772d7dfc600ae49a2ed3a5ba1300d12f",
+    "wait_seconds": 0.5975362499999903,
+    "docker_data_free_bytes": 39033720832
+  },
+  "scope": "Incomplete completion-request serving-process crash; deliberately discarded completion response; abort visibility; live traffic and native exact-owner repair.",
+  "version": "2.6.0",
+  "image": "dxflrs/garage:v2.6.0@sha256:4b5a318fc9fe2fbec5d3af590eeafe05d83492e6411266fa0b9e215c20264013",
+  "evidence": "results/multipart-boundaries",
+  "storage_usage_snapshot": {
+    "/disks/0": {
+      "files": 507,
+      "apparent_bytes": 74093696,
+      "allocated_bytes": 74334208
+    },
+    "/disks/1": {
+      "files": 528,
+      "apparent_bytes": 56368576,
+      "allocated_bytes": 56549376
+    },
+    "/disks/2": {
+      "files": 552,
+      "apparent_bytes": 66412160,
+      "allocated_bytes": 66625536
+    },
+    "/disks/3": {
+      "files": 531,
+      "apparent_bytes": 65273344,
+      "allocated_bytes": 65482752
+    },
+    "/disks/4": {
+      "files": 529,
+      "apparent_bytes": 61670528,
+      "allocated_bytes": 61870080
+    },
+    "/disks/5": {
+      "files": 527,
+      "apparent_bytes": 69930560,
+      "allocated_bytes": 70156288
+    },
+    "/disks/6": {
+      "files": 529,
+      "apparent_bytes": 57181376,
+      "allocated_bytes": 57364480
+    },
+    "/disks/7": {
+      "files": 534,
+      "apparent_bytes": 59650240,
+      "allocated_bytes": 59838464
+    },
+    "/disks/8": {
+      "files": 524,
+      "apparent_bytes": 80042816,
+      "allocated_bytes": 80306176
+    },
+    "/metadata/0": {
+      "files": 10,
+      "apparent_bytes": 5576062,
+      "allocated_bytes": 5599232
+    },
+    "/metadata/1": {
+      "files": 10,
+      "apparent_bytes": 7341534,
+      "allocated_bytes": 7368704
+    },
+    "/metadata/2": {
+      "files": 10,
+      "apparent_bytes": 5612902,
+      "allocated_bytes": 5636096
+    },
+    "/metadata/3": {
+      "files": 10,
+      "apparent_bytes": 7402998,
+      "allocated_bytes": 7430144
+    },
+    "/metadata/4": {
+      "files": 10,
+      "apparent_bytes": 5547366,
+      "allocated_bytes": 5570560
+    },
+    "/metadata/5": {
+      "files": 10,
+      "apparent_bytes": 5588350,
+      "allocated_bytes": 5611520
+    },
+    "/metadata/6": {
+      "files": 10,
+      "apparent_bytes": 5539126,
+      "allocated_bytes": 5562368
+    },
+    "/metadata/7": {
+      "files": 10,
+      "apparent_bytes": 5563750,
+      "allocated_bytes": 5586944
+    },
+    "/metadata/8": {
+      "files": 10,
+      "apparent_bytes": 7349654,
+      "allocated_bytes": 7372800
+    }
+  },
+  "limitations": [
+    "Incomplete HTTP request-body crash is not an internal metadata-commit crash.",
+    "Discarding the response after headers is not a proven network loss before server publication.",
+    "Aborted-block physical reclamation remains unrun.",
+    "No performance ranking, independent-host durability or device I/O latency/count claim."
+  ],
+  "cleanup": {
+    "initial_verdict": "failed immediate empty-bucket check after acknowledged batch deletions",
+    "later_fresh_observation": {
+      "objects": 0,
+      "pending_uploads": 0
+    },
+    "explicit_second_make_down": "passed",
+    "owned_docker_teardown": "passed",
+    "attribution": "unresolved; transient post-delete listing visibility observed, exact scope/bound not isolated",
+    "evidence": [
+      "results/multipart-boundaries/down.log",
+      "results/multipart-boundaries/cleanup-leftovers.jsonl",
+      "results/multipart-boundaries/down-retry.log",
+      "results/multipart-boundaries/docker-down.log"
+    ]
+  }
+}

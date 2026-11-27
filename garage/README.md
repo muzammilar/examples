@@ -11,7 +11,7 @@ GitHub mirror: https://github.com/deuxfleurs-org/garage
 |---|---|---|---|
 | [S3](s3-cluster/#benchmark) | 2026-11-16 | Nine nodes, three copies, data fsync, native ARM64; final peer/recovery configuration | 1 MiB / 16 clients: PUT 155.14 MiB/s, warm GET 458.55 MiB/s; 41,536 requests, zero failures |
 
-Current stable requalification: [Garage 2.6.0](s3-cluster/#fresh-260-qualification--2026-11-27) passed the API/full-copy baseline and one live owner crash. Historical performance numbers above remain 2.5.0 results; interrupted multipart completion is next, not yet executed.
+Current stable requalification: [Garage 2.6.0](s3-cluster/#fresh-260-qualification--2026-11-27) passed the API/full-copy baseline and one live owner crash. Historical performance numbers above remain 2.5.0 results; the separate multipart request/response/abort tests also passed. An initial post-delete listing check failed before later empty readback and explicit cleanup retry; attribution remains unresolved.
 
 ## Known issues
 

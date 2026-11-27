@@ -107,6 +107,10 @@ services:
       BENCH_LARGE_REQUESTS: ${BENCH_LARGE_REQUESTS:-128}
     volumes:
       - ./${RESULTS_DIR:-results/recovery}:/results
+  multipart-workload:
+    extends: tools
+    profiles: [tools]
+    entrypoint: [python, /app/multipart_workload.py]
   audit:
     extends: tools
     profiles: [tools]

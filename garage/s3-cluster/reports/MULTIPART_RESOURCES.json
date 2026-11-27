@@ -1,0 +1,385 @@
+{
+  "evidence": "results/multipart-boundaries/resources-1795789693416612000.jsonl",
+  "environment": {
+    "type": "environment",
+    "run_id": 1795789693416612000,
+    "command": [
+      "make",
+      "multipart-failure"
+    ],
+    "environment": {
+      "NCPU": 11,
+      "MemTotal": 26216296448,
+      "KernelVersion": "6.12.76-linuxkit",
+      "OperatingSystem": "Docker Desktop",
+      "Driver": "overlayfs",
+      "ServerVersion": "29.5.3",
+      "docker_api": "1.54"
+    },
+    "cotenancy": "Only this Garage example; no other heavy lab."
+  },
+  "sampled_aggregate_memory_peak_bytes": 869531648,
+  "actors": [
+    {
+      "name": "/garage-s3-cluster-s3-1",
+      "samples": 50,
+      "peak_memory_bytes": 27746304,
+      "configuration": {
+        "image_id": "sha256:8c6b55d891584afded3ab1b91063a703ecc8ff2481302b691773648ffa806226",
+        "image_reference": "haproxy:3.2.8-alpine",
+        "memory_limit_bytes": 134217728,
+        "nano_cpus": 500000000,
+        "started_at": "2026-11-27T14:26:42.991711917Z"
+      },
+      "counter_deltas": {
+        "cpu_core_s": 0.817222,
+        "disk_read_bytes": 0,
+        "disk_write_bytes": 0
+      },
+      "cpu_utilization_pct_one_core_min": 0.20552915688204199,
+      "cpu_utilization_pct_one_core_max": 16.458715869268413
+    },
+    {
+      "name": "/garage-s3-cluster-garage3-1",
+      "samples": 50,
+      "peak_memory_bytes": 89882624,
+      "configuration": {
+        "image_id": "sha256:4b5a318fc9fe2fbec5d3af590eeafe05d83492e6411266fa0b9e215c20264013",
+        "image_reference": "dxflrs/garage:v2.6.0@sha256:4b5a318fc9fe2fbec5d3af590eeafe05d83492e6411266fa0b9e215c20264013",
+        "memory_limit_bytes": 805306368,
+        "nano_cpus": 1000000000,
+        "started_at": "2026-11-27T14:27:13.698009584Z"
+      },
+      "counter_deltas": {
+        "cpu_core_s": 2.4217669999999996,
+        "disk_read_bytes": 86016,
+        "disk_write_bytes": 234987520
+      },
+      "cpu_utilization_pct_one_core_min": 0.01776825150178346,
+      "cpu_utilization_pct_one_core_max": 16.805434392097848
+    },
+    {
+      "name": "/garage-s3-cluster-garage6-1",
+      "samples": 50,
+      "peak_memory_bytes": 77910016,
+      "configuration": {
+        "image_id": "sha256:4b5a318fc9fe2fbec5d3af590eeafe05d83492e6411266fa0b9e215c20264013",
+        "image_reference": "dxflrs/garage:v2.6.0@sha256:4b5a318fc9fe2fbec5d3af590eeafe05d83492e6411266fa0b9e215c20264013",
+        "memory_limit_bytes": 805306368,
+        "nano_cpus": 1000000000,
+        "started_at": "2026-11-27T14:27:30.798749176Z"
+      },
+      "counter_deltas": {
+        "cpu_core_s": 1.4734399999999999,
+        "disk_read_bytes": 0,
+        "disk_write_bytes": 81203200
+      },
+      "cpu_utilization_pct_one_core_min": 0.023066488792880206,
+      "cpu_utilization_pct_one_core_max": 20.420441817240935
+    },
+    {
+      "name": "/garage-s3-cluster-garage7-1",
+      "samples": 50,
+      "peak_memory_bytes": 82173952,
+      "configuration": {
+        "image_id": "sha256:4b5a318fc9fe2fbec5d3af590eeafe05d83492e6411266fa0b9e215c20264013",
+        "image_reference": "dxflrs/garage:v2.6.0@sha256:4b5a318fc9fe2fbec5d3af590eeafe05d83492e6411266fa0b9e215c20264013",
+        "memory_limit_bytes": 805306368,
+        "nano_cpus": 1000000000,
+        "started_at": "2026-11-27T14:27:36.799379345Z"
+      },
+      "counter_deltas": {
+        "cpu_core_s": 1.4213550000000001,
+        "disk_read_bytes": 0,
+        "disk_write_bytes": 86667264
+      },
+      "cpu_utilization_pct_one_core_min": 0.3758434521649553,
+      "cpu_utilization_pct_one_core_max": 19.64941796727709
+    },
+    {
+      "name": "/garage-s3-cluster-garage2-1",
+      "samples": 50,
+      "peak_memory_bytes": 89018368,
+      "configuration": {
+        "image_id": "sha256:4b5a318fc9fe2fbec5d3af590eeafe05d83492e6411266fa0b9e215c20264013",
+        "image_reference": "dxflrs/garage:v2.6.0@sha256:4b5a318fc9fe2fbec5d3af590eeafe05d83492e6411266fa0b9e215c20264013",
+        "memory_limit_bytes": 805306368,
+        "nano_cpus": 1000000000,
+        "started_at": "2026-11-27T14:27:07.718830596Z"
+      },
+      "counter_deltas": {
+        "cpu_core_s": 1.694429,
+        "disk_read_bytes": 0,
+        "disk_write_bytes": 93188096
+      },
+      "cpu_utilization_pct_one_core_min": 0.03341706864266821,
+      "cpu_utilization_pct_one_core_max": 27.569265074917862
+    },
+    {
+      "name": "/garage-s3-cluster-garage1-1",
+      "samples": 50,
+      "peak_memory_bytes": 80510976,
+      "configuration": {
+        "image_id": "sha256:4b5a318fc9fe2fbec5d3af590eeafe05d83492e6411266fa0b9e215c20264013",
+        "image_reference": "dxflrs/garage:v2.6.0@sha256:4b5a318fc9fe2fbec5d3af590eeafe05d83492e6411266fa0b9e215c20264013",
+        "memory_limit_bytes": 805306368,
+        "nano_cpus": 1000000000,
+        "started_at": "2026-11-27T14:27:01.696555135Z"
+      },
+      "counter_deltas": {
+        "cpu_core_s": 2.679372,
+        "disk_read_bytes": 0,
+        "disk_write_bytes": 225730560
+      },
+      "cpu_utilization_pct_one_core_min": 0.029571876074452545,
+      "cpu_utilization_pct_one_core_max": 30.561906205307984
+    },
+    {
+      "name": "/garage-s3-cluster-garage4-1",
+      "samples": 50,
+      "peak_memory_bytes": 82743296,
+      "configuration": {
+        "image_id": "sha256:4b5a318fc9fe2fbec5d3af590eeafe05d83492e6411266fa0b9e215c20264013",
+        "image_reference": "dxflrs/garage:v2.6.0@sha256:4b5a318fc9fe2fbec5d3af590eeafe05d83492e6411266fa0b9e215c20264013",
+        "memory_limit_bytes": 805306368,
+        "nano_cpus": 1000000000,
+        "started_at": "2026-11-27T14:27:19.727428962Z"
+      },
+      "counter_deltas": {
+        "cpu_core_s": 1.4126619999999999,
+        "disk_read_bytes": 0,
+        "disk_write_bytes": 88158208
+      },
+      "cpu_utilization_pct_one_core_min": 0.025872681838252986,
+      "cpu_utilization_pct_one_core_max": 14.679154735256132
+    },
+    {
+      "name": "/garage-s3-cluster-garage0-1",
+      "samples": 50,
+      "peak_memory_bytes": 65662976,
+      "configuration": {
+        "image_id": "sha256:4b5a318fc9fe2fbec5d3af590eeafe05d83492e6411266fa0b9e215c20264013",
+        "image_reference": "dxflrs/garage:v2.6.0@sha256:4b5a318fc9fe2fbec5d3af590eeafe05d83492e6411266fa0b9e215c20264013",
+        "memory_limit_bytes": 805306368,
+        "nano_cpus": 1000000000,
+        "started_at": "2026-11-27T14:26:56.317617174Z"
+      },
+      "counter_deltas": {
+        "cpu_core_s": 2.6426450000000004,
+        "disk_read_bytes": 0,
+        "disk_write_bytes": 53923840
+      },
+      "cpu_utilization_pct_one_core_min": 0.037245235136892776,
+      "cpu_utilization_pct_one_core_max": 51.31432761890449,
+      "counter_resets": 3
+    },
+    {
+      "name": "/garage-s3-cluster-garage5-1",
+      "samples": 50,
+      "peak_memory_bytes": 91688960,
+      "configuration": {
+        "image_id": "sha256:4b5a318fc9fe2fbec5d3af590eeafe05d83492e6411266fa0b9e215c20264013",
+        "image_reference": "dxflrs/garage:v2.6.0@sha256:4b5a318fc9fe2fbec5d3af590eeafe05d83492e6411266fa0b9e215c20264013",
+        "memory_limit_bytes": 805306368,
+        "nano_cpus": 1000000000,
+        "started_at": "2026-11-27T14:27:25.423705298Z"
+      },
+      "counter_deltas": {
+        "cpu_core_s": 1.4084269999999999,
+        "disk_read_bytes": 0,
+        "disk_write_bytes": 95457280
+      },
+      "cpu_utilization_pct_one_core_min": 0.026666644289410804,
+      "cpu_utilization_pct_one_core_max": 16.0911303714657
+    },
+    {
+      "name": "/garage-s3-cluster-garage8-1",
+      "samples": 50,
+      "peak_memory_bytes": 104443904,
+      "configuration": {
+        "image_id": "sha256:4b5a318fc9fe2fbec5d3af590eeafe05d83492e6411266fa0b9e215c20264013",
+        "image_reference": "dxflrs/garage:v2.6.0@sha256:4b5a318fc9fe2fbec5d3af590eeafe05d83492e6411266fa0b9e215c20264013",
+        "memory_limit_bytes": 805306368,
+        "nano_cpus": 1000000000,
+        "started_at": "2026-11-27T14:27:42.448805292Z"
+      },
+      "counter_deltas": {
+        "cpu_core_s": 2.519521,
+        "disk_read_bytes": 131072,
+        "disk_write_bytes": 248827904
+      },
+      "cpu_utilization_pct_one_core_min": 0.1738735186549399,
+      "cpu_utilization_pct_one_core_max": 23.025416444130933
+    },
+    {
+      "name": "/garage-s3-cluster-tools-run-d5cfcd38ea6e",
+      "samples": 1,
+      "peak_memory_bytes": 57065472,
+      "configuration": {
+        "image_id": "sha256:6a79dfd447bef6cc79f47d686fab6ab9b9519ec590ef647b6b0dc065e2a6e32d",
+        "image_reference": "garage-s3-cluster-tools:dev",
+        "memory_limit_bytes": 2147483648,
+        "nano_cpus": 2000000000,
+        "started_at": "2026-11-27T14:28:14.759319502Z"
+      },
+      "counter_deltas": {}
+    },
+    {
+      "name": "/garage-s3-cluster-audit-c12253a8423c",
+      "samples": 1,
+      "peak_memory_bytes": 33103872,
+      "configuration": {
+        "image_id": "sha256:6a79dfd447bef6cc79f47d686fab6ab9b9519ec590ef647b6b0dc065e2a6e32d",
+        "image_reference": "garage-s3-cluster-tools:dev",
+        "memory_limit_bytes": 2147483648,
+        "nano_cpus": 2000000000,
+        "started_at": "2026-11-27T14:28:17.43480192Z"
+      },
+      "counter_deltas": {}
+    },
+    {
+      "name": "/garage-s3-cluster-audit-1cbc822ec12c",
+      "samples": 1,
+      "peak_memory_bytes": 0,
+      "configuration": {
+        "image_id": "sha256:6a79dfd447bef6cc79f47d686fab6ab9b9519ec590ef647b6b0dc065e2a6e32d",
+        "image_reference": "garage-s3-cluster-tools:dev",
+        "memory_limit_bytes": 2147483648,
+        "nano_cpus": 2000000000,
+        "started_at": "2026-11-27T14:28:18.238298212Z"
+      },
+      "counter_deltas": {}
+    },
+    {
+      "name": "/garage-s3-cluster-multipart-090efcec6495",
+      "samples": 11,
+      "peak_memory_bytes": 92712960,
+      "configuration": {
+        "image_id": "sha256:6a79dfd447bef6cc79f47d686fab6ab9b9519ec590ef647b6b0dc065e2a6e32d",
+        "image_reference": "garage-s3-cluster-tools:dev",
+        "memory_limit_bytes": 2147483648,
+        "nano_cpus": 2000000000,
+        "started_at": "2026-11-27T14:28:19.414738629Z"
+      },
+      "counter_deltas": {
+        "cpu_core_s": 0.519622
+      },
+      "cpu_utilization_pct_one_core_min": 0.10935237200305147,
+      "cpu_utilization_pct_one_core_max": 15.792938717818641
+    },
+    {
+      "name": "/garage-s3-cluster-writer-e4a82b5f6cfe",
+      "samples": 30,
+      "peak_memory_bytes": 42242048,
+      "configuration": {
+        "image_id": "sha256:6a79dfd447bef6cc79f47d686fab6ab9b9519ec590ef647b6b0dc065e2a6e32d",
+        "image_reference": "garage-s3-cluster-tools:dev",
+        "memory_limit_bytes": 2147483648,
+        "nano_cpus": 2000000000,
+        "started_at": "2026-11-27T14:28:19.415095295Z"
+      },
+      "counter_deltas": {
+        "cpu_core_s": 0.718932
+      },
+      "cpu_utilization_pct_one_core_min": 1.5622745561002072,
+      "cpu_utilization_pct_one_core_max": 3.3472553146905994
+    },
+    {
+      "name": "/garage-s3-cluster-reader-7707de22fedb",
+      "samples": 44,
+      "peak_memory_bytes": 43683840,
+      "configuration": {
+        "image_id": "sha256:6a79dfd447bef6cc79f47d686fab6ab9b9519ec590ef647b6b0dc065e2a6e32d",
+        "image_reference": "garage-s3-cluster-tools:dev",
+        "memory_limit_bytes": 2147483648,
+        "nano_cpus": 2000000000,
+        "started_at": "2026-11-27T14:28:19.404414795Z"
+      },
+      "counter_deltas": {
+        "cpu_core_s": 1.2417420000000001
+      },
+      "cpu_utilization_pct_one_core_min": 0.9429908189914218,
+      "cpu_utilization_pct_one_core_max": 5.8132224443195835
+    },
+    {
+      "name": "/garage-s3-cluster-audit-e4aa80bb5ffa",
+      "samples": 1,
+      "peak_memory_bytes": 0,
+      "configuration": {
+        "image_id": "sha256:6a79dfd447bef6cc79f47d686fab6ab9b9519ec590ef647b6b0dc065e2a6e32d",
+        "image_reference": "garage-s3-cluster-tools:dev",
+        "memory_limit_bytes": 2147483648,
+        "nano_cpus": 2000000000,
+        "started_at": "2026-11-27T14:28:30.749552884Z"
+      },
+      "counter_deltas": {}
+    },
+    {
+      "name": "/garage-s3-cluster-audit-c6f78eeac1c3",
+      "samples": 12,
+      "peak_memory_bytes": 29020160,
+      "configuration": {
+        "image_id": "sha256:6a79dfd447bef6cc79f47d686fab6ab9b9519ec590ef647b6b0dc065e2a6e32d",
+        "image_reference": "garage-s3-cluster-tools:dev",
+        "memory_limit_bytes": 2147483648,
+        "nano_cpus": 2000000000,
+        "started_at": "2026-11-27T14:28:38.141821554Z"
+      },
+      "counter_deltas": {
+        "cpu_core_s": 0.866126
+      },
+      "cpu_utilization_pct_one_core_min": 0.0,
+      "cpu_utilization_pct_one_core_max": 56.532001986694944,
+      "counter_resets": 1
+    },
+    {
+      "name": "/garage-s3-cluster-tools-run-8c50e11af344",
+      "samples": 2,
+      "peak_memory_bytes": 64487424,
+      "configuration": {
+        "image_id": "sha256:6a79dfd447bef6cc79f47d686fab6ab9b9519ec590ef647b6b0dc065e2a6e32d",
+        "image_reference": "garage-s3-cluster-tools:dev",
+        "memory_limit_bytes": 2147483648,
+        "nano_cpus": 2000000000,
+        "started_at": "2026-11-27T14:28:59.174768258Z"
+      },
+      "counter_deltas": {
+        "cpu_core_s": 0.8657600000000001
+      },
+      "cpu_utilization_pct_one_core_min": 82.76168126663919,
+      "cpu_utilization_pct_one_core_max": 82.76168126663919
+    },
+    {
+      "name": "/garage-s3-cluster-audit-d543dc2ba7a4",
+      "samples": 1,
+      "peak_memory_bytes": 25698304,
+      "configuration": {
+        "image_id": "sha256:6a79dfd447bef6cc79f47d686fab6ab9b9519ec590ef647b6b0dc065e2a6e32d",
+        "image_reference": "garage-s3-cluster-tools:dev",
+        "memory_limit_bytes": 2147483648,
+        "nano_cpus": 2000000000,
+        "started_at": "2026-11-27T14:29:02.600688468Z"
+      },
+      "counter_deltas": {}
+    },
+    {
+      "name": "/garage-s3-cluster-audit-2a7d2117cb2d",
+      "samples": 1,
+      "peak_memory_bytes": 27701248,
+      "configuration": {
+        "image_id": "sha256:6a79dfd447bef6cc79f47d686fab6ab9b9519ec590ef647b6b0dc065e2a6e32d",
+        "image_reference": "garage-s3-cluster-tools:dev",
+        "memory_limit_bytes": 2147483648,
+        "nano_cpus": 2000000000,
+        "started_at": "2026-11-27T14:29:03.413023594Z"
+      },
+      "counter_deltas": {}
+    }
+  ],
+  "limits": [
+    "Sample-window deltas exclude startup and exit outside observation. Decreasing counters are treated as restarts and the new counter is accumulated; reset intervals have no CPU utilization estimate.",
+    "Short-lived actors may be missed; use native pre-exit cgroup counters as well.",
+    "CPU utilization is interval-average percent of one core; short spikes may be missed.",
+    "Docker disk bytes are not device I/O latency; absent counters are unavailable, not zero."
+  ]
+}

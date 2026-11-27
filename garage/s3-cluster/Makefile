@@ -62,8 +62,8 @@ gateway-failure:
 	FAULT_TARGET=s3 python3 scripts/control.py process
 unit-test:
 	$(RUN) unit
-	$(COMPOSE) run --rm --entrypoint python tools -m unittest -v test_traffic test_placement test_reader
-	python3 -m unittest -v test_control test_teardown test_config test_resource_report
+	$(COMPOSE) run --rm --entrypoint python tools -m unittest -v test_traffic test_placement test_reader test_multipart
+	python3 -m unittest -v test_control test_teardown test_config test_resource_report test_multipart_history
 test-production:
 	$(MAKE) test
 	$(MAKE) failover
@@ -82,3 +82,7 @@ report:
 .PHONY: recover-bootstrap
 recover-bootstrap:
 	python3 scripts/control.py recover-bootstrap
+
+.PHONY: multipart-failure
+multipart-failure:
+	python3 scripts/multipart_control.py

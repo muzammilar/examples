@@ -94,5 +94,11 @@ readback verified 1,876 objects / 76,419,072 bytes and all 5,754 required native
 copies. CPU, memory, storage and I/O-byte diagnostics are recorded; I/O counts
 and initial-setup sampling remain gaps. Owned cleanup passed. This is not a
 new competitive benchmark or proof of multipart commit-boundary recovery.
-The [three bounded multipart follow-ups](../../garage/s3-cluster/docs/MULTIPART_RECOVERY_PLAN.md)
-remain to implement before the SeaweedFS multipart and CephFS work.
+The [three bounded Garage multipart cases](../../garage/s3-cluster/docs/MULTIPART_RECOVERY_PLAN.md)
+subsequently passed: four retained parts resumed after serving-node SIGKILL,
+a discarded completion response remained non-ACK despite correct publication,
+and abort disappeared logically. Final readback checked 1,395 objects and 4,626
+required native copies. An immediate post-delete listing check failed; later
+empty readback and explicit cleanup retry passed, with attribution unresolved.
+Physical abort reclamation and internal commit interruption remain unrun.
+Next: the corresponding SeaweedFS paths, then CephFS.

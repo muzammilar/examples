@@ -21,6 +21,7 @@ for name in [
     "traffic.py",
     "storage_usage.py",
     "test_traffic.py",
+    "test_multipart.py",
     "test_reader.py",
     "witness.py",
     "placement.py",
@@ -33,5 +34,6 @@ for name in [
     if name.endswith(".py"):
         source_path = root / ("tests" if name.startswith("test_") else "scripts") / name
     shutil.copy2(source_path, target / name)
+shutil.copy2(root / "multipart-workload/main.py", target / "multipart_workload.py")
 shutil.copy2(root / "docker/Dockerfile.tools", target / "Dockerfile")
 print("Prepared", target)
