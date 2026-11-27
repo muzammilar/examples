@@ -1,7 +1,7 @@
 name: ${COMPOSE_PROJECT_NAME:-seaweedfs-s3-cluster}
 services:
   master0:
-    image: chrislusf/seaweedfs:4.53
+    image: ${SEAWEED_IMAGE:-chrislusf/seaweedfs:4.55@sha256:7ca46aeae2f223b37e5d91593c17ab37738eec6df6ab69b48a0487f7643342b9}
     hostname: master0
     command:
     - master
@@ -28,7 +28,7 @@ services:
     volumes:
     - master0:/data
   master1:
-    image: chrislusf/seaweedfs:4.53
+    image: ${SEAWEED_IMAGE:-chrislusf/seaweedfs:4.55@sha256:7ca46aeae2f223b37e5d91593c17ab37738eec6df6ab69b48a0487f7643342b9}
     hostname: master1
     command:
     - master
@@ -55,7 +55,7 @@ services:
     volumes:
     - master1:/data
   master2:
-    image: chrislusf/seaweedfs:4.53
+    image: ${SEAWEED_IMAGE:-chrislusf/seaweedfs:4.55@sha256:7ca46aeae2f223b37e5d91593c17ab37738eec6df6ab69b48a0487f7643342b9}
     hostname: master2
     command:
     - master
@@ -82,7 +82,7 @@ services:
     volumes:
     - master2:/data
   etcd0:
-    image: gcr.io/etcd-development/etcd:v3.6.16
+    image: ${ETCD_IMAGE:-gcr.io/etcd-development/etcd:v3.7.4@sha256:47d217be8ec4ca943954b5f4bf8029ee9bc0ffb05fbe2a44d579a1f640e03ed4}
     hostname: etcd0
     entrypoint:
     - /usr/local/bin/etcd
@@ -110,7 +110,7 @@ services:
       timeout: 5s
       retries: 60
   etcd1:
-    image: gcr.io/etcd-development/etcd:v3.6.16
+    image: ${ETCD_IMAGE:-gcr.io/etcd-development/etcd:v3.7.4@sha256:47d217be8ec4ca943954b5f4bf8029ee9bc0ffb05fbe2a44d579a1f640e03ed4}
     hostname: etcd1
     entrypoint:
     - /usr/local/bin/etcd
@@ -138,7 +138,7 @@ services:
       timeout: 5s
       retries: 60
   etcd2:
-    image: gcr.io/etcd-development/etcd:v3.6.16
+    image: ${ETCD_IMAGE:-gcr.io/etcd-development/etcd:v3.7.4@sha256:47d217be8ec4ca943954b5f4bf8029ee9bc0ffb05fbe2a44d579a1f640e03ed4}
     hostname: etcd2
     entrypoint:
     - /usr/local/bin/etcd
@@ -166,7 +166,7 @@ services:
       timeout: 5s
       retries: 60
   volume0:
-    image: chrislusf/seaweedfs:4.53
+    image: ${SEAWEED_IMAGE:-chrislusf/seaweedfs:4.55@sha256:7ca46aeae2f223b37e5d91593c17ab37738eec6df6ab69b48a0487f7643342b9}
     hostname: volume0
     command:
     - volume
@@ -203,7 +203,7 @@ services:
       master2:
         condition: service_healthy
   volume1:
-    image: chrislusf/seaweedfs:4.53
+    image: ${SEAWEED_IMAGE:-chrislusf/seaweedfs:4.55@sha256:7ca46aeae2f223b37e5d91593c17ab37738eec6df6ab69b48a0487f7643342b9}
     hostname: volume1
     command:
     - volume
@@ -240,7 +240,7 @@ services:
       master2:
         condition: service_healthy
   volume2:
-    image: chrislusf/seaweedfs:4.53
+    image: ${SEAWEED_IMAGE:-chrislusf/seaweedfs:4.55@sha256:7ca46aeae2f223b37e5d91593c17ab37738eec6df6ab69b48a0487f7643342b9}
     hostname: volume2
     command:
     - volume
@@ -277,7 +277,7 @@ services:
       master2:
         condition: service_healthy
   volume3:
-    image: chrislusf/seaweedfs:4.53
+    image: ${SEAWEED_IMAGE:-chrislusf/seaweedfs:4.55@sha256:7ca46aeae2f223b37e5d91593c17ab37738eec6df6ab69b48a0487f7643342b9}
     hostname: volume3
     command:
     - volume
@@ -314,7 +314,7 @@ services:
       master2:
         condition: service_healthy
   volume4:
-    image: chrislusf/seaweedfs:4.53
+    image: ${SEAWEED_IMAGE:-chrislusf/seaweedfs:4.55@sha256:7ca46aeae2f223b37e5d91593c17ab37738eec6df6ab69b48a0487f7643342b9}
     hostname: volume4
     command:
     - volume
@@ -351,7 +351,7 @@ services:
       master2:
         condition: service_healthy
   volume5:
-    image: chrislusf/seaweedfs:4.53
+    image: ${SEAWEED_IMAGE:-chrislusf/seaweedfs:4.55@sha256:7ca46aeae2f223b37e5d91593c17ab37738eec6df6ab69b48a0487f7643342b9}
     hostname: volume5
     command:
     - volume
@@ -388,7 +388,7 @@ services:
       master2:
         condition: service_healthy
   volume6:
-    image: chrislusf/seaweedfs:4.53
+    image: ${SEAWEED_IMAGE:-chrislusf/seaweedfs:4.55@sha256:7ca46aeae2f223b37e5d91593c17ab37738eec6df6ab69b48a0487f7643342b9}
     hostname: volume6
     command:
     - volume
@@ -425,7 +425,7 @@ services:
       master2:
         condition: service_healthy
   volume7:
-    image: chrislusf/seaweedfs:4.53
+    image: ${SEAWEED_IMAGE:-chrislusf/seaweedfs:4.55@sha256:7ca46aeae2f223b37e5d91593c17ab37738eec6df6ab69b48a0487f7643342b9}
     hostname: volume7
     command:
     - volume
@@ -462,7 +462,7 @@ services:
       master2:
         condition: service_healthy
   volume8:
-    image: chrislusf/seaweedfs:4.53
+    image: ${SEAWEED_IMAGE:-chrislusf/seaweedfs:4.55@sha256:7ca46aeae2f223b37e5d91593c17ab37738eec6df6ab69b48a0487f7643342b9}
     hostname: volume8
     command:
     - volume
@@ -499,7 +499,7 @@ services:
       master2:
         condition: service_healthy
   filer0:
-    image: chrislusf/seaweedfs:4.53
+    image: ${SEAWEED_IMAGE:-chrislusf/seaweedfs:4.55@sha256:7ca46aeae2f223b37e5d91593c17ab37738eec6df6ab69b48a0487f7643342b9}
     hostname: filer0
     command:
     - filer
@@ -532,7 +532,7 @@ services:
       etcd2:
         condition: service_healthy
   filer1:
-    image: chrislusf/seaweedfs:4.53
+    image: ${SEAWEED_IMAGE:-chrislusf/seaweedfs:4.55@sha256:7ca46aeae2f223b37e5d91593c17ab37738eec6df6ab69b48a0487f7643342b9}
     hostname: filer1
     command:
     - filer
@@ -565,7 +565,7 @@ services:
       etcd2:
         condition: service_healthy
   filer2:
-    image: chrislusf/seaweedfs:4.53
+    image: ${SEAWEED_IMAGE:-chrislusf/seaweedfs:4.55@sha256:7ca46aeae2f223b37e5d91593c17ab37738eec6df6ab69b48a0487f7643342b9}
     hostname: filer2
     command:
     - filer
@@ -598,7 +598,7 @@ services:
       etcd2:
         condition: service_healthy
   s3api0:
-    image: chrislusf/seaweedfs:4.53
+    image: ${SEAWEED_IMAGE:-chrislusf/seaweedfs:4.55@sha256:7ca46aeae2f223b37e5d91593c17ab37738eec6df6ab69b48a0487f7643342b9}
     hostname: s3api0
     command:
     - s3
@@ -633,7 +633,7 @@ services:
       filer2:
         condition: service_healthy
   s3api1:
-    image: chrislusf/seaweedfs:4.53
+    image: ${SEAWEED_IMAGE:-chrislusf/seaweedfs:4.55@sha256:7ca46aeae2f223b37e5d91593c17ab37738eec6df6ab69b48a0487f7643342b9}
     hostname: s3api1
     command:
     - s3
@@ -668,7 +668,7 @@ services:
       filer2:
         condition: service_healthy
   s3api2:
-    image: chrislusf/seaweedfs:4.53
+    image: ${SEAWEED_IMAGE:-chrislusf/seaweedfs:4.55@sha256:7ca46aeae2f223b37e5d91593c17ab37738eec6df6ab69b48a0487f7643342b9}
     hostname: s3api2
     command:
     - s3
@@ -747,6 +747,12 @@ services:
       BENCH_LARGE_REQUESTS: ${BENCH_LARGE_REQUESTS:-128}
     volumes:
     - ./${RESULTS_DIR:-results/recovery}:/results
+  multipart-workload:
+    extends: tools
+    profiles: [tools]
+    entrypoint: [python, /app/multipart_workload.py]
+    environment:
+      MULTIPART_ENDPOINT: http://s3api0:8333
 volumes:
   master0: {}
   master1: {}

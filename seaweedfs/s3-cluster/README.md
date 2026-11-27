@@ -1,6 +1,9 @@
 # SeaweedFS: S3 cluster and disk recovery
 
 S3 over a separated master, volume and filer architecture with HA metadata.
+The current pins are **SeaweedFS 4.55** and **etcd 3.7.4**. Historical benchmark
+and recovery tables below remain their original 4.53 results; the fresh protocol
+trial does not update those performance numbers.
 
 ## Quick start
 
@@ -10,10 +13,62 @@ S3 over a separated master, volume and filer architecture with HA metadata.
 4. `make down` — delete the workload bucket and objects; keep infrastructure running.
 5. `make docker-down` — remove owned containers, volumes, network and client image.
 
-Requires Docker Compose and Python 3. Use a Docker VM with at least 20 GiB RAM
+Requires Docker Compose and Python 3.11+. Use a Docker VM with at least 20 GiB RAM
 and 12 GiB free disk for this example alone. Fixture credentials are scoped to a
 local private Docker network; production TLS, secret management and redundant
 gateways are deployment work. No host block devices or privileged containers.
+
+## Fresh multipart recovery — 2026-11-27
+
+`make multipart-failure` uses the existing cluster with a locally built
+[multipart workload](multipart-workload/). Native binaries reported SeaweedFS
+`4.55 a98c9e271 linux arm64` and etcd `3.7.4` on ARM64, both digest pinned.
+A fresh protocol fixture used **1,000 small objects + eight 1 MiB objects**;
+the API suite verified **1,013 objects / 48,140,288 bytes** before faults.
+This smaller fixture is a correctness/recovery run, not a replacement benchmark.
+
+| Case | Measured outcome |
+|---|---|
+| Interrupted completion request | Four acknowledged 8 MiB parts survived exact `s3api0` exit 137; completion resumed with the same upload ID and a fresh full 32 MiB read |
+| Completion response disposal | One fully published object read back without a client completion ACK; no mutation replay; distinct from two multipart client ACKs |
+| Abort | Upload disappeared from listings; final key absent; physical reclamation unrun |
+| Background traffic | 415 PUT ACKs, zero ambiguous ordinary PUTs; 830 successful GETs, zero errors/wrong bodies; longest completion gap 4.093 s |
+| Final S3 reconciliation | 1,431 objects / 162,402,304 bytes; no missing ACKs, wrong bodies, stale metadata or unknown keys |
+| Native bytes and metadata | 4,374 direct replica-chunk reads, 487,206,912 physical-zone body bytes; wrong-owner negative control passed; all three etcd members matched at current revision 1,534 |
+| Placement/isolation | Three zone copies per required chunk; all 21 unrelated role identities unchanged |
+| Observed resource window | 2,961,342,464 bytes aggregate charged-memory peak; 26.382 CPU core-seconds; per-role CPU utilization and disk bytes retained |
+| Native volume lifetime snapshot | 650,047,488 write bytes / 10,044 write I/Os; zero physical read I/O observed (cache residency is not cold-read performance) |
+| Data-directory usage | 623,869,035 apparent / 624,418,816 allocated bytes over nine volume servers; includes replication, dead/aborted data and metadata |
+| Cleanup | Explicit `make down` and owned Docker teardown passed |
+
+[Recovery results](reports/MULTIPART_RECOVERY.json) ·
+[window resource metrics](reports/MULTIPART_RESOURCES.json) ·
+[native lifetime/storage counters](reports/MULTIPART_NATIVE_RESOURCES.json).
+Native I/O lifetime totals include setup/API work; they are not fault-window deltas.
+The distroless etcd image has no shell: Docker samples cover its CPU/memory/disk
+bytes, but the native shell-based I/O-count collector cannot read its cgroups.
+HAProxy has no `/data` directory; that storage field is unavailable, not zero.
+Short-lived actors and peaks between samples can be missed. Docker build resource
+usage is outside per-container trial totals. Configured CPU ceilings oversubscribe
+this VM; this was the only active lab and no comparative performance ranking is made.
+
+The corpus is deterministic incompressible bytes. Native data-file amplification
+was about **3.84×** the final live logical body size, including replication and
+unreclaimed data. Codec compression savings were not isolated; this ratio must
+not be presented as a compression codec ratio. Compressible input, physical abort
+reclamation, verified cold reads and device I/O latency remain measurement gaps.
+
+The protocol checks an **incomplete HTTP request body** and an application-discarded
+response, not interruption inside the filer commit transaction. Version 4.55's
+completion code can recognize a committed object after a finalize error; the client
+must reconcile an uncertain result before retrying. Six SDK/HTTP negative controls
+run without external endpoints. The separate history check in the source-owning
+protocol suite keeps publication without a client ACK distinct from acknowledgements.
+No data-disk, metadata-quorum, upgrade or independent-host failure coverage is implied.
+
+[4.55 release](https://github.com/seaweedfs/seaweedfs/releases/tag/4.55) ·
+[completion handler](https://github.com/seaweedfs/seaweedfs/blob/4.55/weed/s3api/s3api_object_handlers_multipart.go) ·
+[filer completion/commit path](https://github.com/seaweedfs/seaweedfs/blob/4.55/weed/s3api/filer_multipart.go)
 
 ## Workload and test contract
 

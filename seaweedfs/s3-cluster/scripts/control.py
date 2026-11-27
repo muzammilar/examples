@@ -167,7 +167,9 @@ def history():
     for case in sorted(BASE.glob("fault-*")):
         if not case.is_dir():
             continue
-        for value in attempted_objects(records(case / "churn.jsonl")):
+        for value in attempted_objects(
+            records(case / "churn.jsonl")
+        ) + attempted_objects(records(case / "multipart.jsonl")):
             key = value["object"]["key"]
             if key in seen:
                 raise RuntimeError("repeated object across histories: " + key)

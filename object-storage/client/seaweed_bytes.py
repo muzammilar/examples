@@ -1,6 +1,6 @@
 """Verify every native volume replica against external full-object SHA-256.
 
-Pinned SeaweedFS 4.53 filer metadata supplies chunk IDs and offsets. Native
+Pinned SeaweedFS 4.53/4.55 filer metadata supplies chunk IDs and offsets. Native
 ?proxied=true forbids a volume server from forwarding to a different replica.
 No placement, needle format, cookie, checksum, or manifest codec is implemented.
 """
@@ -29,6 +29,28 @@ for node in range(9):
 store = w.Store.__new__(w.Store)
 expected, required = store.expected(fault=(w.ROOT / "churn.jsonl").exists())
 # Root runs following all cases contain historical ACKs but no current journal.
+# Independently observed publication is durable evidence without a client ACK.
+observations = [
+    w.ROOT / "multipart-published.json",
+    *w.ROOT.glob("fault-multipart-*/multipart-published.json"),
+]
+confirmed = {}
+for path in observations:
+    if path.exists():
+        for value in json.loads(path.read_text()):
+            if value != expected.get(value["key"]):
+                raise RuntimeError(
+                    "Multipart observation differs from witnessed attempt"
+                )
+            confirmed[value["key"]] = value
+if confirmed:
+    reader = w.Store()
+    try:
+        for key, value in confirmed.items():
+            reader.get(value)
+            required.add(key)
+    finally:
+        reader.s3.close()
 start = time.monotonic()
 
 

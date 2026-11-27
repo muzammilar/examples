@@ -1,0 +1,577 @@
+{
+  "scope": "Process/container lifetime counters and non-atomic current /data usage; not fault-window deltas. Missing shell/files are measurement gaps, not zeros.",
+  "roles": {
+    "etcd0": {
+      "container_id": "314b387aa7bb342e35105d13826e317b4e54daa804940cd77023595442175cde",
+      "started_at": "2026-11-27T14:38:49.814545712Z",
+      "cpu_stat": null,
+      "memory_peak_bytes": null,
+      "io_stat": null,
+      "data_allocated_kib": null,
+      "data_apparent_bytes": null,
+      "measurement_error": null,
+      "collector_returncode": 127
+    },
+    "etcd1": {
+      "container_id": "961818ba2562ed17af1598113a1c6b88244ed59fde94f0ff704dd4de363af52f",
+      "started_at": "2026-11-27T14:38:49.811244629Z",
+      "cpu_stat": null,
+      "memory_peak_bytes": null,
+      "io_stat": null,
+      "data_allocated_kib": null,
+      "data_apparent_bytes": null,
+      "measurement_error": null,
+      "collector_returncode": 127
+    },
+    "etcd2": {
+      "container_id": "a4e75fa6813dc6e37e6bbdc5d5f35147a9352a179c6c69ca829dbbe0962a1849",
+      "started_at": "2026-11-27T14:38:49.814719629Z",
+      "cpu_stat": null,
+      "memory_peak_bytes": null,
+      "io_stat": null,
+      "data_allocated_kib": null,
+      "data_apparent_bytes": null,
+      "measurement_error": null,
+      "collector_returncode": 127
+    },
+    "filer0": {
+      "container_id": "34a6b14b8a354ab5350351175a252fe3083e8ef48a30b92093b33c09ef581345",
+      "started_at": "2026-11-27T14:38:55.465465923Z",
+      "cpu_stat": {
+        "usage_usec": 8687384,
+        "user_usec": 4872524,
+        "system_usec": 3814859,
+        "nice_usec": 0,
+        "nr_periods": 3960,
+        "nr_throttled": 0,
+        "throttled_usec": 0,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      },
+      "memory_peak_bytes": 188342272,
+      "io_stat": null,
+      "data_allocated_kib": 8,
+      "data_apparent_bytes": 8192,
+      "measurement_error": null,
+      "collector_returncode": 0
+    },
+    "filer1": {
+      "container_id": "f8bea624bbd447f167bc07621aabd522ba92fd345211bd18340d6f68afd2eafe",
+      "started_at": "2026-11-27T14:38:55.467476257Z",
+      "cpu_stat": {
+        "usage_usec": 6377418,
+        "user_usec": 3588761,
+        "system_usec": 2788657,
+        "nice_usec": 0,
+        "nr_periods": 3833,
+        "nr_throttled": 0,
+        "throttled_usec": 0,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      },
+      "memory_peak_bytes": 148598784,
+      "io_stat": null,
+      "data_allocated_kib": 8,
+      "data_apparent_bytes": 8192,
+      "measurement_error": null,
+      "collector_returncode": 0
+    },
+    "filer2": {
+      "container_id": "7b9807c6edd3449e2e24d1f98e76d018a3ae49dc77bcd439db8d9fb21a2bef31",
+      "started_at": "2026-11-27T14:38:55.466464007Z",
+      "cpu_stat": {
+        "usage_usec": 5408790,
+        "user_usec": 3056733,
+        "system_usec": 2352057,
+        "nice_usec": 0,
+        "nr_periods": 3540,
+        "nr_throttled": 0,
+        "throttled_usec": 0,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      },
+      "memory_peak_bytes": 108388352,
+      "io_stat": [
+        {
+          "device": "254:0",
+          "rbytes": 4096,
+          "wbytes": 0,
+          "rios": 1,
+          "wios": 0,
+          "dbytes": 0,
+          "dios": 0
+        }
+      ],
+      "data_allocated_kib": 8,
+      "data_apparent_bytes": 8192,
+      "measurement_error": null,
+      "collector_returncode": 0
+    },
+    "master0": {
+      "container_id": "283bd3b832d79a99049c395d2287f1e4e930361a53d2944f07555f123945ba27",
+      "started_at": "2026-11-27T14:38:49.813507879Z",
+      "cpu_stat": {
+        "usage_usec": 4584926,
+        "user_usec": 2949706,
+        "system_usec": 1635220,
+        "nice_usec": 0,
+        "nr_periods": 3179,
+        "nr_throttled": 2,
+        "throttled_usec": 114647,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      },
+      "memory_peak_bytes": 111996928,
+      "io_stat": [
+        {
+          "device": "254:0",
+          "rbytes": 1695744,
+          "wbytes": 176128,
+          "rios": 61,
+          "wios": 62,
+          "dbytes": 0,
+          "dios": 0
+        }
+      ],
+      "data_allocated_kib": 32,
+      "data_apparent_bytes": 18920,
+      "measurement_error": null,
+      "collector_returncode": 0
+    },
+    "master1": {
+      "container_id": "884dfbed05d4b3a70995a64e29a7954a0e7aba038b9a1b3e89b9b8dcc966ccb8",
+      "started_at": "2026-11-27T14:38:49.812098754Z",
+      "cpu_stat": {
+        "usage_usec": 2974259,
+        "user_usec": 1952682,
+        "system_usec": 1021577,
+        "nice_usec": 0,
+        "nr_periods": 2746,
+        "nr_throttled": 1,
+        "throttled_usec": 110103,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      },
+      "memory_peak_bytes": 71331840,
+      "io_stat": [
+        {
+          "device": "254:0",
+          "rbytes": 12288,
+          "wbytes": 167936,
+          "rios": 3,
+          "wios": 1449,
+          "dbytes": 0,
+          "dios": 0
+        }
+      ],
+      "data_allocated_kib": 28,
+      "data_apparent_bytes": 18538,
+      "measurement_error": null,
+      "collector_returncode": 0
+    },
+    "master2": {
+      "container_id": "944bcdffdc32909d07092d8723ca6697dd559862b8fe164da929edbbc15d33d2",
+      "started_at": "2026-11-27T14:38:49.812586462Z",
+      "cpu_stat": {
+        "usage_usec": 2979071,
+        "user_usec": 1970389,
+        "system_usec": 1008682,
+        "nice_usec": 0,
+        "nr_periods": 2799,
+        "nr_throttled": 2,
+        "throttled_usec": 105022,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      },
+      "memory_peak_bytes": 72695808,
+      "io_stat": [
+        {
+          "device": "254:0",
+          "rbytes": 0,
+          "wbytes": 167936,
+          "rios": 0,
+          "wios": 1450,
+          "dbytes": 0,
+          "dios": 0
+        }
+      ],
+      "data_allocated_kib": 28,
+      "data_apparent_bytes": 18538,
+      "measurement_error": null,
+      "collector_returncode": 0
+    },
+    "s3": {
+      "container_id": "a94a9932f0b0150e55809b6440843bd63ec381b4b677f88ec168557444a417e7",
+      "started_at": "2026-11-27T14:39:06.695739845Z",
+      "cpu_stat": {
+        "usage_usec": 3406421,
+        "user_usec": 1683159,
+        "system_usec": 1723262,
+        "nice_usec": 0,
+        "nr_periods": 1832,
+        "nr_throttled": 0,
+        "throttled_usec": 0,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      },
+      "memory_peak_bytes": 33742848,
+      "io_stat": [
+        {
+          "device": "254:0",
+          "rbytes": 4096,
+          "wbytes": 0,
+          "rios": 1,
+          "wios": 0,
+          "dbytes": 0,
+          "dios": 0
+        }
+      ],
+      "data_allocated_kib": null,
+      "data_apparent_bytes": null,
+      "measurement_error": "du: /data: No such file or directory\ndu: /data: No such file or directory\n",
+      "collector_returncode": 1
+    },
+    "s3api0": {
+      "container_id": "495b29b043ebcc0fa601ab8b0a68f333a8d55422087fce8c7668898a207e29e6",
+      "started_at": "2026-11-27T14:41:29.857829342Z",
+      "cpu_stat": {
+        "usage_usec": 2441427,
+        "user_usec": 1744998,
+        "system_usec": 696428,
+        "nice_usec": 0,
+        "nr_periods": 1397,
+        "nr_throttled": 0,
+        "throttled_usec": 0,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      },
+      "memory_peak_bytes": 195928064,
+      "io_stat": null,
+      "data_allocated_kib": 8,
+      "data_apparent_bytes": 8192,
+      "measurement_error": null,
+      "collector_returncode": 0
+    },
+    "s3api1": {
+      "container_id": "bd7e23c0516e730c360db1eaf3b02c85abe315e48f74be776f73823dbe9877b0",
+      "started_at": "2026-11-27T14:39:01.089410801Z",
+      "cpu_stat": {
+        "usage_usec": 3496729,
+        "user_usec": 2406029,
+        "system_usec": 1090700,
+        "nice_usec": 0,
+        "nr_periods": 1970,
+        "nr_throttled": 0,
+        "throttled_usec": 0,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      },
+      "memory_peak_bytes": 156655616,
+      "io_stat": null,
+      "data_allocated_kib": 8,
+      "data_apparent_bytes": 8192,
+      "measurement_error": null,
+      "collector_returncode": 0
+    },
+    "s3api2": {
+      "container_id": "ef16ebc7fbec68887d5c304c90d57d8301d3b3cd1b977e96c273c3834dcb0543",
+      "started_at": "2026-11-27T14:39:01.091747093Z",
+      "cpu_stat": {
+        "usage_usec": 3623940,
+        "user_usec": 2484806,
+        "system_usec": 1139133,
+        "nice_usec": 0,
+        "nr_periods": 1983,
+        "nr_throttled": 0,
+        "throttled_usec": 0,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      },
+      "memory_peak_bytes": 200310784,
+      "io_stat": null,
+      "data_allocated_kib": 8,
+      "data_apparent_bytes": 8192,
+      "measurement_error": null,
+      "collector_returncode": 0
+    },
+    "volume0": {
+      "container_id": "406aa85305063c2e55b4c4afcb70df54bdb9c0e6430f528788753ab7daa33e60",
+      "started_at": "2026-11-27T14:38:55.462027673Z",
+      "cpu_stat": {
+        "usage_usec": 3405214,
+        "user_usec": 2160412,
+        "system_usec": 1244802,
+        "nice_usec": 0,
+        "nr_periods": 1866,
+        "nr_throttled": 0,
+        "throttled_usec": 0,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      },
+      "memory_peak_bytes": 289378304,
+      "io_stat": [
+        {
+          "device": "254:0",
+          "rbytes": 0,
+          "wbytes": 144207872,
+          "rios": 0,
+          "wios": 2086,
+          "dbytes": 0,
+          "dios": 0
+        }
+      ],
+      "data_allocated_kib": 135624,
+      "data_apparent_bytes": 138813721,
+      "measurement_error": null,
+      "collector_returncode": 0
+    },
+    "volume1": {
+      "container_id": "c877b63624c8c757dd538ac0b80b80dbb7865ee55d7f177a63b31450971e8d8e",
+      "started_at": "2026-11-27T14:38:55.46763959Z",
+      "cpu_stat": {
+        "usage_usec": 1762654,
+        "user_usec": 1214366,
+        "system_usec": 548287,
+        "nice_usec": 0,
+        "nr_periods": 1675,
+        "nr_throttled": 0,
+        "throttled_usec": 0,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      },
+      "memory_peak_bytes": 76636160,
+      "io_stat": [
+        {
+          "device": "254:0",
+          "rbytes": 0,
+          "wbytes": 249856,
+          "rios": 0,
+          "wios": 25,
+          "dbytes": 0,
+          "dios": 0
+        }
+      ],
+      "data_allocated_kib": 212,
+      "data_apparent_bytes": 160940,
+      "measurement_error": null,
+      "collector_returncode": 0
+    },
+    "volume2": {
+      "container_id": "772228722f81a2dbdf44f79fb6968f22f9c4aa6ffe638783650da585adc1f0b5",
+      "started_at": "2026-11-27T14:38:55.466119673Z",
+      "cpu_stat": {
+        "usage_usec": 2683778,
+        "user_usec": 1747419,
+        "system_usec": 936358,
+        "nice_usec": 0,
+        "nr_periods": 1828,
+        "nr_throttled": 0,
+        "throttled_usec": 0,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      },
+      "memory_peak_bytes": 196632576,
+      "io_stat": [
+        {
+          "device": "254:0",
+          "rbytes": 0,
+          "wbytes": 72216576,
+          "rios": 0,
+          "wios": 1226,
+          "dbytes": 0,
+          "dios": 0
+        }
+      ],
+      "data_allocated_kib": 67424,
+      "data_apparent_bytes": 68981684,
+      "measurement_error": null,
+      "collector_returncode": 0
+    },
+    "volume3": {
+      "container_id": "1b5f259ba5a64fffb4ace2588858a1ea178db249516dcaac5ca4b8c7247b06e2",
+      "started_at": "2026-11-27T14:38:55.452630423Z",
+      "cpu_stat": {
+        "usage_usec": 2752412,
+        "user_usec": 1777436,
+        "system_usec": 974976,
+        "nice_usec": 0,
+        "nr_periods": 1839,
+        "nr_throttled": 0,
+        "throttled_usec": 0,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      },
+      "memory_peak_bytes": 193773568,
+      "io_stat": [
+        {
+          "device": "254:0",
+          "rbytes": 0,
+          "wbytes": 74432512,
+          "rios": 0,
+          "wios": 1375,
+          "dbytes": 0,
+          "dios": 0
+        }
+      ],
+      "data_allocated_kib": 69272,
+      "data_apparent_bytes": 70870284,
+      "measurement_error": null,
+      "collector_returncode": 0
+    },
+    "volume4": {
+      "container_id": "2d50fa724d7f640120e597070fd29ce044c2ade66d2d7a12de116bfb7af1568a",
+      "started_at": "2026-11-27T14:38:55.463750465Z",
+      "cpu_stat": {
+        "usage_usec": 1831360,
+        "user_usec": 1219568,
+        "system_usec": 611792,
+        "nice_usec": 0,
+        "nr_periods": 1673,
+        "nr_throttled": 0,
+        "throttled_usec": 0,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      },
+      "memory_peak_bytes": 76496896,
+      "io_stat": [
+        {
+          "device": "254:0",
+          "rbytes": 0,
+          "wbytes": 2363392,
+          "rios": 0,
+          "wios": 188,
+          "dbytes": 0,
+          "dios": 0
+        }
+      ],
+      "data_allocated_kib": 1848,
+      "data_apparent_bytes": 1849078,
+      "measurement_error": null,
+      "collector_returncode": 0
+    },
+    "volume5": {
+      "container_id": "32486099a1c0a483a7c6f253506ad74c3e56652c4402e9a830931f64717668d3",
+      "started_at": "2026-11-27T14:38:55.449706882Z",
+      "cpu_stat": {
+        "usage_usec": 3594956,
+        "user_usec": 2290580,
+        "system_usec": 1304376,
+        "nice_usec": 0,
+        "nr_periods": 2138,
+        "nr_throttled": 0,
+        "throttled_usec": 0,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      },
+      "memory_peak_bytes": 297848832,
+      "io_stat": [
+        {
+          "device": "254:0",
+          "rbytes": 0,
+          "wbytes": 139890688,
+          "rios": 0,
+          "wios": 1793,
+          "dbytes": 0,
+          "dios": 0
+        }
+      ],
+      "data_allocated_kib": 132140,
+      "data_apparent_bytes": 135236983,
+      "measurement_error": null,
+      "collector_returncode": 0
+    },
+    "volume6": {
+      "container_id": "59d7be52c104c0c411f0cf00d131b6f791a99a6ad9b067840cd943035080a2a8",
+      "started_at": "2026-11-27T14:38:55.448090298Z",
+      "cpu_stat": {
+        "usage_usec": 3410835,
+        "user_usec": 2283559,
+        "system_usec": 1127276,
+        "nice_usec": 0,
+        "nr_periods": 1863,
+        "nr_throttled": 0,
+        "throttled_usec": 0,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      },
+      "memory_peak_bytes": 278614016,
+      "io_stat": [
+        {
+          "device": "254:0",
+          "rbytes": 0,
+          "wbytes": 142491648,
+          "rios": 0,
+          "wios": 1986,
+          "dbytes": 0,
+          "dios": 0
+        }
+      ],
+      "data_allocated_kib": 134200,
+      "data_apparent_bytes": 137339767,
+      "measurement_error": null,
+      "collector_returncode": 0
+    },
+    "volume7": {
+      "container_id": "4b4fd0ac8e4b05976f532c3b1d08aa5b6d8daf28c235076aba5d0ce7d466dbf8",
+      "started_at": "2026-11-27T14:38:55.46632984Z",
+      "cpu_stat": {
+        "usage_usec": 1929054,
+        "user_usec": 1291664,
+        "system_usec": 637390,
+        "nice_usec": 0,
+        "nr_periods": 1802,
+        "nr_throttled": 0,
+        "throttled_usec": 0,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      },
+      "memory_peak_bytes": 80150528,
+      "io_stat": [
+        {
+          "device": "254:0",
+          "rbytes": 0,
+          "wbytes": 2400256,
+          "rios": 0,
+          "wios": 197,
+          "dbytes": 0,
+          "dios": 0
+        }
+      ],
+      "data_allocated_kib": 1872,
+      "data_apparent_bytes": 1849711,
+      "measurement_error": null,
+      "collector_returncode": 0
+    },
+    "volume8": {
+      "container_id": "0513cefc3d3fe10f58b32d1af0fb69c35a1257fb5b9e77a5cbbb402c7674025b",
+      "started_at": "2026-11-27T14:38:55.443532173Z",
+      "cpu_stat": {
+        "usage_usec": 2697569,
+        "user_usec": 1773706,
+        "system_usec": 923862,
+        "nice_usec": 0,
+        "nr_periods": 1855,
+        "nr_throttled": 0,
+        "throttled_usec": 0,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      },
+      "memory_peak_bytes": 185094144,
+      "io_stat": [
+        {
+          "device": "254:0",
+          "rbytes": 0,
+          "wbytes": 71794688,
+          "rios": 0,
+          "wios": 1168,
+          "dbytes": 0,
+          "dios": 0
+        }
+      ],
+      "data_allocated_kib": 67192,
+      "data_apparent_bytes": 68766867,
+      "measurement_error": null,
+      "collector_returncode": 0
+    }
+  }
+}

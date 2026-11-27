@@ -74,6 +74,7 @@ def summarize(root):
                 "objects_verified": reconciliation["objects_verified"],
                 "direct_replica_chunk_reads": physical["direct_replica_chunk_reads"],
                 "phases": result["phases"],
+                **({"multipart": result["multipart"]} if "multipart" in result else {}),
             }
         )
     history = read(root / "fault-history.json")
@@ -82,6 +83,11 @@ def summarize(root):
         p = root / (name + ".json")
         if p.exists():
             required.update(v["key"] for v in read(p))
+    confirmed = set()
+    for p in root.glob("fault-multipart-*/multipart-published.json"):
+        confirmed.update(v["key"] for v in read(p))
+    client_required = set(required)
+    required.update(confirmed)
     final = read(root / "reconciliation.json")
     physical = read(root / "replica-byte-audit.json")
     if final["objects_verified"] < len(required) or physical["objects"] != len(
@@ -107,7 +113,8 @@ def summarize(root):
         "cases": cases,
         "cumulative_ack_objects": sum(v["acked"] for v in history),
         "cumulative_attempts": len(history),
-        "optional_attempts_present": final["objects_verified"] - len(required),
+        "optional_attempts_present": final["objects_verified"] - len(client_required),
+        "observed_publications_without_client_ack": len(confirmed - client_required),
         "final_reconciliation": final,
         "final_replica_bytes": physical,
         "scope": "one host; independent paced SDK reader/writer; saved failures remain failures",

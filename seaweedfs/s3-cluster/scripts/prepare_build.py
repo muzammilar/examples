@@ -18,6 +18,11 @@ for path in source.iterdir():
     except OSError:
         shutil.copy2(path, target / path.name)
 for name in ["traffic.py", "test_traffic.py", "witness.py"]:
-    shutil.copy2(root / ("tests" if name.startswith("test_") else "scripts") / name, target / name)
+    shutil.copy2(
+        root / ("tests" if name.startswith("test_") else "scripts") / name,
+        target / name,
+    )
+shutil.copy2(root / "multipart-workload/main.py", target / "multipart_workload.py")
 shutil.copy2(root / "docker/Dockerfile.tools", target / "Dockerfile")
+shutil.copy2(root / "tests/test_multipart.py", target / "test_multipart.py")
 print("Prepared", target)

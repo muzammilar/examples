@@ -101,4 +101,10 @@ and abort disappeared logically. Final readback checked 1,395 objects and 4,626
 required native copies. An immediate post-delete listing check failed; later
 empty readback and explicit cleanup retry passed, with attribution unresolved.
 Physical abort reclamation and internal commit interruption remain unrun.
-Next: the corresponding SeaweedFS paths, then CephFS.
+SeaweedFS 4.55 + etcd 3.7.4 subsequently passed the same protocol paths with
+its own gateway/controller and native audits: 1,431 objects, 487,206,912 bytes
+read directly across three zone copies, and matching current etcd revision 1,534.
+All 21 unrelated roles remained unchanged; owned cleanup passed. Native cgroup
+I/O counts are recorded for SeaweedFS roles, with the distroless etcd shell gap
+explicit. Next: CephFS deployment/client and metadata-server recovery. SeaweedFS
+mounted-client semantics and physical abort reclamation remain further work.

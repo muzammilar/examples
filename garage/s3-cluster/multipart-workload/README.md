@@ -5,7 +5,8 @@ The parent owns its nine nodes, lifecycle, credentials, writer/reader and result
 Its five-command Quick start remains in [the parent README](../README.md).
 Run `make multipart-failure` there after `make test` against the same fixture.
 
-`main.py` uses the existing pinned Boto3 oracle, preserving its explicit local
+`main.py` links to the tracked `object-storage/multipart-workload/main.py` source,
+shared with the SeaweedFS protocol case. It uses the existing pinned Boto3 oracle, preserving its explicit local
 credentials, one SDK attempt, deadlines and exact-byte verification. This is a
 focused extension of the existing Python SDK workload exception. It is not a new
 repository-wide harness. `Dockerfile` links to the parent SDK image definition;
@@ -15,7 +16,8 @@ Compose service uses that local image. Materialized files remain ignored.
 
 The SDK signs requests. Python's standard HTTP client only controls incomplete
 body transmission and response disposal. A healthy raw-transport control must
-pass before any fault. Only the fixed owned `garage0:3900` endpoint is permitted.
+pass before any fault. This lab permits only its fixed owned `garage0:3900` endpoint. The shared module
+also supports the explicitly selected SeaweedFS `s3api0:8333` route; other URLs fail closed.
 Four unit controls reject an HTTP-200 error body, require completion XML, prove
 response disposal never creates an ACK and reject an unexpected host before I/O.
 

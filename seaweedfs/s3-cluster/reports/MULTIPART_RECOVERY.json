@@ -1,0 +1,233 @@
+{
+  "fixture": "75bb112a-8024-4308-b88d-93a4deb097ac",
+  "passed_cases": 1,
+  "failed_cases_preserved": [],
+  "cases": [
+    {
+      "case": "fault-multipart-cfec4eec24de4fb18900288a23a72d27",
+      "mode": "multipart",
+      "target": "s3api0",
+      "ack_objects": 415,
+      "ambiguous_puts": 0,
+      "successful_gets": 830,
+      "get_errors": 0,
+      "wrong_reads": 0,
+      "outage_ack_objects": 0,
+      "outage_gets": 3,
+      "first_ack_after_proven_exit_seconds": 4.0586724281311035,
+      "longest_read_completion_gap_seconds": 4.093299627304077,
+      "restart_to_ready_seconds": 5.809649041999364,
+      "exit_to_native_replica_barrier_seconds": 28.43329906463623,
+      "survivors_unchanged": 21,
+      "objects_verified": 1431,
+      "direct_replica_chunk_reads": 4374,
+      "phases": {
+        "baseline": {
+          "seconds": 1.1711969375610352,
+          "ack": {
+            "count": 12,
+            "p50_ms": 8.866458999932547,
+            "p99_ms": 15.489624999986518,
+            "max_ms": 15.489624999986518,
+            "ops_per_second": 10.24592843026849
+          },
+          "ambiguous": {
+            "count": 0,
+            "ops_per_second": 0.0
+          },
+          "get": {
+            "count": 13,
+            "p50_ms": 3.0961249999563734,
+            "p99_ms": 30.003708000094775,
+            "max_ms": 30.003708000094775,
+            "ops_per_second": 11.099755799457531
+          },
+          "get_error": {
+            "count": 0,
+            "ops_per_second": 0.0
+          }
+        },
+        "injection": {
+          "seconds": 0.19943594932556152,
+          "ack": {
+            "count": 1,
+            "p50_ms": 8.399459000088427,
+            "p99_ms": 8.399459000088427,
+            "max_ms": 8.399459000088427,
+            "ops_per_second": 5.014141148482657
+          },
+          "ambiguous": {
+            "count": 0,
+            "ops_per_second": 0.0
+          },
+          "get": {
+            "count": 3,
+            "p50_ms": 4.747542000018257,
+            "p99_ms": 15.438124999946012,
+            "max_ms": 15.438124999946012,
+            "ops_per_second": 15.042423445447971
+          },
+          "get_error": {
+            "count": 0,
+            "ops_per_second": 0.0
+          }
+        },
+        "outage": {
+          "seconds": 3.0060949325561523,
+          "ack": {
+            "count": 0,
+            "ops_per_second": 0.0
+          },
+          "ambiguous": {
+            "count": 0,
+            "ops_per_second": 0.0
+          },
+          "get": {
+            "count": 1,
+            "p50_ms": 3.37487499996314,
+            "p99_ms": 3.37487499996314,
+            "max_ms": 3.37487499996314,
+            "ops_per_second": 0.3326574916746481
+          },
+          "get_error": {
+            "count": 0,
+            "ops_per_second": 0.0
+          }
+        },
+        "repair": {
+          "seconds": 25.297348022460938,
+          "ack": {
+            "count": 393,
+            "p50_ms": 9.627625000007356,
+            "p99_ms": 25.457959000050323,
+            "max_ms": 4033.058043999972,
+            "ops_per_second": 15.53522525962264
+          },
+          "ambiguous": {
+            "count": 0,
+            "ops_per_second": 0.0
+          },
+          "get": {
+            "count": 443,
+            "p50_ms": 2.7755410000054326,
+            "p99_ms": 5.208707999940998,
+            "max_ms": 4041.596709999908,
+            "ops_per_second": 17.511717022933407
+          },
+          "get_error": {
+            "count": 0,
+            "ops_per_second": 0.0
+          }
+        },
+        "after": {
+          "seconds": 0.7599339485168457,
+          "ack": {
+            "count": 9,
+            "p50_ms": 8.651417000010042,
+            "p99_ms": 14.549874999943313,
+            "max_ms": 14.549874999943313,
+            "ops_per_second": 11.843134548160661
+          },
+          "ambiguous": {
+            "count": 0,
+            "ops_per_second": 0.0
+          },
+          "get": {
+            "count": 14,
+            "p50_ms": 2.422958000011022,
+            "p99_ms": 3.3030829999916023,
+            "max_ms": 3.3030829999916023,
+            "ops_per_second": 18.42265374158325
+          },
+          "get_error": {
+            "count": 0,
+            "ops_per_second": 0.0
+          }
+        },
+        "reconcile": {
+          "seconds": 20.260602235794067,
+          "ack": {
+            "count": 0,
+            "ops_per_second": 0.0
+          },
+          "ambiguous": {
+            "count": 0,
+            "ops_per_second": 0.0
+          },
+          "get": {
+            "count": 356,
+            "p50_ms": 3.2107920000044032,
+            "p99_ms": 10.578584000086266,
+            "max_ms": 12.774666999916917,
+            "ops_per_second": 17.571047289554937
+          },
+          "get_error": {
+            "count": 0,
+            "ops_per_second": 0.0
+          }
+        }
+      },
+      "multipart": {
+        "raw_transport_control": "passed",
+        "interrupted_request": {
+          "passed": true,
+          "parts_retained": 4,
+          "resumed_same_upload_id": true
+        },
+        "lost_response": {
+          "passed": true,
+          "published_without_application_ack": true,
+          "mutation_replayed": false
+        },
+        "abort": {
+          "passed": true,
+          "final_key_absent": true,
+          "upload_unlisted": true,
+          "physical_reclamation": "unrun"
+        },
+        "object_bytes": 33554432,
+        "completed_objects": 3
+      }
+    }
+  ],
+  "cumulative_ack_objects": 417,
+  "cumulative_attempts": 418,
+  "optional_attempts_present": 1,
+  "observed_publications_without_client_ack": 1,
+  "final_reconciliation": {
+    "objects_verified": 1431,
+    "bytes_verified": 162402304,
+    "missing_acknowledged_keys": 0,
+    "corrupt_objects": 0,
+    "stale_versions": 0,
+    "extra_or_duplicate_keys": 0
+  },
+  "final_replica_bytes": {
+    "objects": 1431,
+    "logical_bytes": 162402304,
+    "physical_zone_body_bytes_verified": 487206912,
+    "inline_objects_verified_from_metadata": 1,
+    "direct_replica_chunk_reads": 4374,
+    "mismatched_objects": 0,
+    "non_owner_negative_control": true,
+    "seconds": 1.7543367920000037
+  },
+  "scope": "one host; independent paced SDK reader/writer; saved failures remain failures",
+  "versions": {
+    "seaweedfs": "4.55",
+    "etcd": "3.7.4"
+  },
+  "evidence": "results/multipart-455",
+  "limitations": [
+    "S3 gateway loss is not data-node or metadata quorum loss.",
+    "Incomplete HTTP request-body crash is not interruption inside the filer commit transaction.",
+    "Response disposal after headers is not a proven loss before publication.",
+    "Abort physical reclamation, fresh-version disk loss and deep configuration/upgrade matrices remain unrun.",
+    "Diagnostic warm-cache trial; no normalized performance winner."
+  ],
+  "native_version_outputs": {
+    "native-version": "version 30GB 4.55 a98c9e271 linux arm64",
+    "etcd-version": "etcd Version: 3.7.4\nGit SHA: 2e8a5c9\nGo Version: go1.26.11\nGo OS/Arch: linux/arm64"
+  },
+  "cleanup": "make down and owned docker-down passed"
+}

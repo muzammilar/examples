@@ -1,6 +1,9 @@
 export PYTHONPATH := $(CURDIR)/scripts:$(CURDIR)/tests:$(CURDIR)/s3-workload
 SHELL := /bin/sh
 COMPOSE_PROJECT_NAME ?= seaweedfs-s3-cluster
+SEAWEED_IMAGE ?= chrislusf/seaweedfs:4.55@sha256:7ca46aeae2f223b37e5d91593c17ab37738eec6df6ab69b48a0487f7643342b9
+ETCD_IMAGE ?= gcr.io/etcd-development/etcd:v3.7.4@sha256:47d217be8ec4ca943954b5f4bf8029ee9bc0ffb05fbe2a44d579a1f640e03ed4
+export SEAWEED_IMAGE ETCD_IMAGE
 RESULTS_DIR ?= results/recovery
 OBJECTS ?= 10000
 LARGE_OBJECTS ?= 128
@@ -80,3 +83,7 @@ cold-reopen:
 .PHONY: report
 report:
 	python3 scripts/report.py
+
+.PHONY: multipart-failure
+multipart-failure:
+	python3 scripts/multipart_control.py

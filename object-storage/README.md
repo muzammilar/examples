@@ -15,8 +15,8 @@ owned state, resource caps, failure tests and measured README.
 
 | Store | Selected release | Scope and important boundary |
 |---|---|---|
-| SeaweedFS | 4.53 | Separate master, replicated volume, filer/HA metadata and S3 roles; explicit fsync storage rules and native repair |
-| Garage | 2.5.0 | Consistent mode, three copies across three logical zones; explicit data fsync and metadata durability policy; bucket versioning is unsupported |
+| SeaweedFS | 4.53 historical; 4.55 protocol follow-up | Separate master, replicated volume, filer/HA metadata and S3 roles; explicit fsync storage rules and native repair |
+| Garage | 2.5.0 historical; 2.6.0 follow-up | Consistent mode, three copies across three logical zones; explicit data fsync and metadata durability policy; bucket versioning is unsupported |
 | RustFS | 1.0.5 | Stable upstream GA line; fresh four-node/one-drive deployments with EC2+2 only; shorter operational history is disclosed rather than equated with the others |
 | Ceph RGW | Tentacle 20.2.5 | Maintained stable branch; BlueStore OSDs, MON quorum, CRUSH failure domains, native replacement/backfill and separate RGW pools |
 
@@ -153,3 +153,16 @@ checksums/scrubbing, disk replacement, replication RPO and recovery cost.
 [Apache Ozone and the existing S3 clusters](../docs/example-plans/storage-and-lakehouse.md#object-and-filesystem-storage) have proposed multipart recovery tests. Use the same object bodies and compare metadata availability, successful readback and restored storage redundancy independently.
 
 The [self-hosted Tigris comparison](../tigris/) is blocked until a supported local server distribution and its deployment terms are available. The four measured stores above provide reference results for their own configurations.
+
+## Multipart publication boundaries
+
+The [tracked protocol source](multipart-workload/) is symlinked and materialized
+inside the independently owned Garage and SeaweedFS labs. Both exercised four
+8 MiB parts, an incomplete completion request interrupted by serving-process loss,
+response disposal without a client ACK, and abort visibility. Both preserved parts,
+completed with the same upload ID, reconciled the response-disposal object without
+replaying it and verified native copies. This is protocol/correctness evidence,
+not a matched throughput winner; the serving roles and native storage mechanisms
+differ. Garage's first post-delete cleanup check failed before later empty
+readback and explicit retry. SeaweedFS cleanup passed. Physical abort reclamation
+and an internal metadata-commit crash remain unrun for both.
