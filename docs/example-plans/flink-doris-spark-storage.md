@@ -192,3 +192,15 @@ subsequently localized the long publications to rename: 28/128 calls exceeded
 768 native copies passed exact readback; resource/compressibility measurements
 and scoped cleanup are preserved. DLM retry is a source-informed candidate, not
 a proven internal cause. Other storage follow-ups remain open.
+
+The [CephFS kernel-client MDS follow-up](../../ceph/filesystem-ha/projects/kernel-client/)
+passed in a fresh lab: native promotion observed at 30.592 s, 512 live ACK files,
+157 correct historical cycles, and all 768 library/old-kernel/live-kernel ACKs
+retained. Maximum publication latency was 22,253.562 ms despite p99 153.228 ms.
+Both kernel namespaces matched exactly; all nine OSDs/17 PGs/three MONs recovered.
+CPU, memory, native virtual-disk IOPS/latency, storage and disabled-compression
+measurements are preserved. Whole-guest/disk/partition/independent-restore cases
+remain open; this MDS result does not substitute for them.
+
+The current Ceph recovery fixture’s full teardown also passed after fresh body
+and namespace reconciliation; only curated outcomes are committed.

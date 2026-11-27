@@ -94,6 +94,13 @@ def audit(directory, fixture=None):
             for r in rows
         ):
             raise RuntimeError("No exact kernel-client readback")
+        namespace = json.loads(command("namespace", node, fixture["run"]).stdout)
+        save(directory / ("guest-" + str(node) + "-namespace.json"), namespace)
+        expected_names = sorted(str(sequence) for sequence in range(fixture["files"]))
+        if namespace["names"] != expected_names or not namespace["all_regular_files"]:
+            raise RuntimeError(
+                "Kernel publication namespace differs; retain unexpected staging entries"
+            )
     result = {
         "acks": len(acks),
         "bytes": len(acks) * fixture["payload_bytes"],

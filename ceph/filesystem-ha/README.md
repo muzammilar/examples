@@ -42,6 +42,7 @@ fixture. Cleanup refuses when acknowledged bodies cannot be reconciled.
 | `make unit-test` | Offline corrupted/truncated/misordered witness and fixture-ownership controls |
 | `make kernel-up` / `make kernel-test` | Prepare secure guest kernel mounts; verify matched bodies |
 | `make kernel-reopen` | Unmount/remount and reread retained ACKs without reseeding |
+| `make kernel-mds-failure` | Live kernel writer/reader during a proven active-MDS crash; separate from the library result |
 | `make kernel-compare` | Three paired, 1,000-file access-path diagnostic trials |
 
 - `files-workload/`: C++ application, CMake/Ninja and Docker build. Native

@@ -107,16 +107,90 @@ in process RSS. Whole-stack resource measurements include all paired work and
 verification and cannot be assigned to a single path. Virtual-device I/O is not
 physical device latency or power-loss evidence.
 
+## Live kernel MDS test
+
+`make kernel-mds-failure` is a separate operational test after the two baselines.
+`make kernel-test-production` runs kernel verification, this fault and verification
+serially. The parent `make test-production KERNEL_CLIENT=1` includes that sequence.
+The case is bounded to 256 MiB total (payloads at most 512 KiB).
+Its [declared contract](contract.json) requires 512 live publications and exact
+historical reads while the discovered active MDS is runtime-masked and SIGKILLed.
+The producer stays running; the controller requires a different active MDS name
+and GID within 90 seconds, restores standby, then checks every live body through
+both mounts and all retained library ACKs. The zero-error case fails on ambiguity,
+wrong/missing bodies or an external actor deadline. A failed trial remains tracked
+for diagnosis and later cleanup reconciliation. Do not delete it or lower the
+expected count to manufacture a pass. The bounded case passed on 2026-11-27; its measurements follow.
+
+`kernel_actors.py` manages only example-owned guest units. `mds_failure.py` keeps
+baseline, fault, live readback and library readback in separate evidence paths.
+The existing parent lifecycle still owns all infrastructure and teardown.
+`recovery_report.py CASE BEFORE AFTER OBSERVER NAMESPACE_VERIFY` curates the
+recorded paths; raw data and inspection output remain ignored.
+
+## Kernel MDS recovery — 2026-11-27
+
+[Curated recovery and all-role measurements](reports/KERNEL-MDS-RECOVERY-2026-11-27.json).
+Both baselines passed before injection: 128 library ACKs and 128 kernel ACKs.
+The controller runtime-masked active `fs0`, proved its native PID died by SIGKILL,
+observed `fs1` become active, then restored the standby. The writer was never
+paused and the input was never reloaded.
+
+| Observation | Measured outcome |
+|---|---|
+| Native promotion observed by controller | 30.592 seconds, including polling/control overhead; not an exact election instant |
+| Live publications | 512 ACK files / 134,217,728 bytes; zero ambiguity, missing ACKs or wrong bodies |
+| Historical reader | 157 successful cycles / 20,096 exact body reads; zero errors |
+| Publication latency under the fault | Mean 129.959 ms; p50 81.076 ms; p95 121.681 ms; p99 153.228 ms; maximum **22,253.562 ms** |
+| Largest writer ACK-completion gap | 22,365 ms, including the 100-ms think time |
+| Preserved corpus | 128 library + 128 old kernel + 512 live kernel files = 768 ACKs / 201,326,592 bytes |
+| Independent namespace follow-up | Both kernel mounts had exactly 128 old / 512 new regular files, with no leftover staging entries |
+| Recovered native topology | Nine OSDs up/in; 17 PGs active+clean across three guest hosts; three MONs; one active MDS and a standby |
+
+The single failover stall sits beyond p99 for a 512-operation sample. The maximum
+and ACK gap expose it; the p99 alone would hide the outage. Historical reads use
+a small likely resident corpus; fresh processes are not physically cold reads.
+This is one recovery diagnostic, not a new capacity or client-speed comparison.
+
+| Resource scope | Observed value |
+|---|---|
+| Sampled full case, all owned containers | 640.865 host core-seconds; 13,458,661,376-byte aggregate memory peak |
+| Sampled Docker block activity | 282,311,680 read bytes / 669,638,656 write bytes |
+| Native whole-OSD virtual-disk window | 435,359,744 read bytes / 3,583 reads; 481,488,896 write bytes / 15,285 writes |
+| POSIX writer process | 7,220-KiB peak RSS; 4.871 guest user+system CPU seconds |
+| POSIX reader process | 7,820-KiB peak RSS; 103.269 guest user+system CPU seconds, including repeated hash verification |
+| Native data-pool storage | 201,326,592 logical bytes / 603,979,776 allocated bytes, exactly RF3, not a compression ratio |
+| All raw Ceph used / sparse guest disks allocated | 1,033,117,696 / 10,671,075,328 bytes; guest disks include operating systems |
+| Compression | Effective `compression_mode=none`; native compressed/under-compression counters zero; no codec-ratio comparison |
+
+The report includes per-daemon CPU/memory, per-device IOPS, byte rates, mean block
+request completion times and outstanding I/O, with per-guest monotonic windows
+and boot-ID checks. Those are **virtual-device** observations, not physical host
+storage latency. Native disk windows include idle time, verification and admin
+work outside the narrower Docker fault window. Guest CPU and Docker host CPU are
+different, overlapping domains; never add them. Restarted MDS counter deltas stay
+unavailable instead of subtracting across process lifetimes. POSIX RSS excludes
+kernel/backend memory. Docker outer-interface counters do not qualify complete
+private-guest replication traffic.
+
+Guest preparation is substantial: this fresh lab installed Ceph and rebooted both
+clients into the pinned secure-capable kernel before seeding. That is preparation,
+not a live-workload rolling upgrade. Thin virtual disk capacity is not reserved
+physical Docker storage; the existing host-space guard remains necessary.
+Both teardown commands passed for this fixture after all ACK and namespace
+checks: mounts, CephFS/pools, owned guests/disks and the owned build tag were
+removed. Original witnesses and resource evidence remain ignored locally.
+
 ## Limits and next tests
 
-Kernel-client remount recovery passed. Kernel writes during MDS crash, whole-guest
-loss, disk loss, partitions, independent restore, physical cold reads and a
+Kernel-client remount and live MDS recovery passed. Whole-guest loss, permanent
+disk loss, partitions, independent restore, physical cold reads and a
 matched rename-layout comparison remain **unrun**. The parent’s prior SDK MDS
 failover result does not qualify the kernel writer for those failures. Kernel
 package upgrades were preparation; no live-write rolling-kernel-upgrade claim.
 FUSE is also unrun in this CephFS lab.
 
-Both lifecycle teardown steps passed after full reconciliation: guest kernel
+The earlier paired comparison’s lifecycle teardown steps passed after full reconciliation: guest kernel
 mounts were removed, CephFS and its pools deleted, owned Docker containers/disks
 and build tag removed. Original witnesses/logs remain ignored locally.
 
@@ -141,3 +215,10 @@ and kernel/background work must remain visible in the resource report.
 - [Secure-key compatibility and migration](https://docs.ceph.com/en/latest/rados/configuration/auth-config-ref/).
 - [Linux 6.8 key parser](https://github.com/torvalds/linux/blob/v6.8/net/ceph/crypto.c)
   and [Ceph 21.2 cipher selection](https://github.com/ceph/ceph/blob/v21.2.0/src/auth/Crypto.cc).
+
+- [Pinned monitor beacon/standby logic](https://github.com/ceph/ceph/blob/v21.2.0/src/mon/MDSMonitor.cc).
+- [MDS recovery states](https://docs.ceph.com/en/umbrella/cephfs/mds-states/).
+- [Virtual-device counter interpretation](https://docs.kernel.org/admin-guide/iostats.html).
+- [Stable 21.2.0 release provenance](https://lists.ceph.io/hyperkitty/list/ceph-users%40ceph.io/thread/HJ5PMOPU3PRX4P63IPDV66RTWSE5VIG5/):
+  release SHA `b060042deb05d33e6cc358970cfb8221240bcf3e` matches the daemon output,
+  even though the packaged version string also prints `(dev - None)`.

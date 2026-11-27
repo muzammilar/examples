@@ -6,12 +6,14 @@ import shlex
 from guest import ssh
 
 GUEST = r"""
-import json, pathlib, subprocess
+import json, pathlib, subprocess, time
 def call(*args):
     return subprocess.check_output(args, text=True).strip()
 units = call('systemctl', 'list-units', '--type=service', '--all', '--no-legend', '--plain').splitlines()
 result = {'kernel': call('uname', '-r'), 'memory': pathlib.Path('/proc/meminfo').read_text(),
-          'diskstats': pathlib.Path('/proc/diskstats').read_text(), 'units': {}}
+          'diskstats': pathlib.Path('/proc/diskstats').read_text(), 'units': {},
+          'sample_monotonic_ns': time.monotonic_ns(),
+          'boot_id': pathlib.Path('/proc/sys/kernel/random/boot_id').read_text().strip()}
 for line in units:
     name = line.split()[0]
     if not name.startswith(('ceph-mon@','ceph-mgr@','ceph-mds@','ceph-osd@','cephfs-')):
@@ -37,6 +39,8 @@ def main():
         "df": "ceph df detail -f json",
         "status": "ceph status -f json",
         "osd_perf": "ceph osd perf -f json",
+        "data_pool_config": "ceph osd pool get labfs_data all -f json",
+        "metadata_pool_config": "ceph osd pool get labfs_meta all -f json",
         "filesystem": "ceph fs status -f json",
         "effective_mds_cache": "ceph config get mds mds_cache_memory_limit -f json",
     }.items():

@@ -44,6 +44,7 @@ failover:
 test-production:
 	$(MAKE) verify
 	$(MAKE) failover
+	@if [ "$(KERNEL_CLIENT)" = 1 ]; then $(MAKE) kernel-test-production; fi
 	$(MAKE) verify
 
 .PHONY: resources down docker-down
@@ -84,3 +85,13 @@ kernel-compare:
 .PHONY: kernel-reopen
 kernel-reopen:
 	$(PYTHON) projects/kernel-client/control.py reopen
+
+.PHONY: kernel-mds-failure
+kernel-mds-failure:
+	$(PYTHON) projects/kernel-client/mds_failure.py
+
+.PHONY: kernel-test-production
+kernel-test-production:
+	$(MAKE) kernel-verify
+	$(MAKE) kernel-mds-failure
+	$(MAKE) kernel-verify

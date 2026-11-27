@@ -224,6 +224,17 @@ def main():
                 }
             )
         )
+    elif mode == "namespace":
+        program = (
+            "import json,os; entries=list(os.scandir('/mnt/lab/"
+            + run
+            + "')); print(json.dumps({'run':'"
+            + run
+            + "','node':"
+            + str(node)
+            + ",'names':sorted(entry.name for entry in entries),'all_regular_files':all(entry.is_file(follow_symlinks=False) for entry in entries)}))"
+        )
+        print(ssh(node, "python3 -c " + shlex.quote(program), True))
     elif mode == "verify":
         path = Path("/results") / sys.argv[4]
         if (

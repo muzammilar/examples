@@ -1,0 +1,24 @@
+{
+  "backend": "CephFS kernel client, Linux 7.0.0-44-generic against Ceph 21.2.0",
+  "publication": "Exclusive staged create, write, file fsync, close, same-directory rename, directory fsync, syncfs, then fsynced witness outside the Ceph pools",
+  "replication": "Native RF3/min_size2 across three guest hosts; nine OSDs",
+  "kernel_mds_failure": {
+    "fault": "Runtime-mask and SIGKILL the discovered active MDS; await another name/GID, then restore standby",
+    "live_writer": "512 immutable files, 256 KiB by default, 100 ms think time; never paused at injection",
+    "live_reader": "Exact byte/hash historical baseline reads through the independent read-only mount",
+    "promotion_deadline_s": 90,
+    "actor_external_timeout_s": 180,
+    "expected_ack_files": 512,
+    "allowed_mutation_or_read_errors": 0,
+    "postcondition": "Fresh exact readback on both kernel mounts, preserved library ACKs, all PGs active+clean across three guest hosts and full MON quorum",
+    "failure_policy": "Any missing ACK, ambiguity, body mismatch or deadline violation preserves a failed case and its fixture; never reset or reseed it",
+    "payload_max_bytes": 524288
+  },
+  "unclaimed": [
+    "physical power-loss durability",
+    "independent physical hosts",
+    "linearizability proof",
+    "permanent disk-loss qualification",
+    "independent backup/restore"
+  ]
+}
