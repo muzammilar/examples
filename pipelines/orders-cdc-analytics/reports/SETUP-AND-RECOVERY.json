@@ -1,0 +1,89 @@
+{
+  "date": "2026-11-27",
+  "scope": "Bounded level-3 local CDC pipeline qualification",
+  "fixture": "b5c37d62bd2641249a2e29c6d29e1a22",
+  "original_job": "0553623f0ebab1038112187153ca6d0b",
+  "replay_job": "f502b781a3a182a44c994a7a4c9d4d65",
+  "failures": [
+    {
+      "case": "Native BE memory 1536M",
+      "outcome": "Port health passed; 4 KiB query allocations refused; setup failed",
+      "evidence": "results/up-1795815024502043000"
+    },
+    {
+      "case": "Native BE memory 2G, container 2560MiB",
+      "outcome": "One million source orders committed; stream loads refused; Flink exhausted 20 restarts and terminally failed",
+      "source_ack_batches": 41,
+      "source_orders": 1000000,
+      "customers": 10000,
+      "completed_checkpoints": 19,
+      "checkpoint_retained_after_terminal_failure": false,
+      "evidence": "results/test-1795816135057296000"
+    },
+    {
+      "case": "Native BE 2304M, container 2816MiB, original allocator",
+      "outcome": "Kafka replay reached one million rows per sink, but exact readback still refused allocations; this replay verification failed",
+      "native_profile": {
+        "backend": "be2",
+        "rss_gib": 2.25,
+        "jemalloc_cache_mib": 972.15,
+        "tcache_bytes": 1020651168
+      },
+      "evidence": "results/replay-1795816954160921000"
+    },
+    {
+      "case": "Unreadable SQL connector JARs",
+      "outcome": "Docker remote ADD created 0600 root files; non-root native factory discovery failed; SQL CLI process exit 0 did not imply a submitted job",
+      "fix": "ADD --chmod=0644 and non-root readability build gate; semantic submission/error checks"
+    },
+    {
+      "case": "Missing Flink 2.3 conflict policy",
+      "outcome": "Planner rejected incompatible inferred upsert key",
+      "fix": "ON CONFLICT DO DEDUPLICATE; no disabled contract check"
+    },
+    {
+      "case": "Debezium accepted PUT then temporary status 404",
+      "outcome": "Original setup failed; status later RUNNING",
+      "fix": "Retry only explicit allowed 404; preserve errors on other HTTP failures"
+    },
+    {
+      "case": "Connect environment settings ignored",
+      "outcome": "31 internal partitions had RF1 while requested environment values were 3",
+      "fix": "CONNECT_* prefix; in-place reassignments to three brokers, minISR2; worker restart and exact retained-data verification",
+      "evidence": "results/connect-replication-1795817283790522000"
+    }
+  ],
+  "recovery": {
+    "input_reseeded": false,
+    "sink_tables_cleared": false,
+    "method": "Replay complete source Kafka history from offset zero under new native sink label namespaces; roll retained BEs with allocator overrides",
+    "checkpoint_restore_claimed": false,
+    "allocator": "percpu_arena:disabled,narenas:2,tcache_max:4096",
+    "native_be_limit_mib": 2304,
+    "container_be_limit_mib": 2816,
+    "exact_fields_per_row": 8,
+    "rows_verified_per_sink": 1000000,
+    "sinks": 2,
+    "verified_ack_batches": 41,
+    "unacknowledged_committed_batches": 0,
+    "unacknowledged_absent_batches": 0,
+    "exact_check_ms": {
+      "checkpointed": 1599.972959,
+      "asynchronous": 1419.917292
+    },
+    "evidence": "results/verify-1795817226325130000"
+  },
+  "limitations": [
+    "Initial baseline and replay readback failures remain failed; recovered success does not erase them.",
+    "The two native profiles are not an isolated allocator performance benchmark.",
+    "All roles share one Docker VM; no physical power-loss or independent-host durability proof.",
+    "Full snapshot equality does not prove end-to-end exactly-once.",
+    "The source recipe uses deterministic modulo formulas; the printed seed field is unused for source generation."
+  ],
+  "provenance": {
+    "docker-compose.yml": "49a86926151c1a37c50f11b54daedfe89e46b64dc2567b46f6489465d12b81f4",
+    "docker/Dockerfile.be": "352084cc6b653f29cb0f9b8d37d14c4ebf45d23b557dca126db4a06328443056",
+    "sql/pipeline.sql": "83b6b6f48136a723b8a6f74ac3b1145f06c637b9a4f916ad4209570d101ab0a0",
+    "config/debezium.json": "2be7e129b0b2c1ad2f40a111a26602725c9fa17f2a528d93652ec6d10740b29f"
+  }
+}

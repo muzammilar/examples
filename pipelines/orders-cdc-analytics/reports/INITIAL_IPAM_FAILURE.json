@@ -1,0 +1,19 @@
+{
+  "verdict": "failed-before-workload",
+  "case": "dynamic allocation collided with static Doris FE IPs",
+  "observed": {
+    "orders-cdc-analytics-taskmanager-1": "172.30.67.12/24",
+    "orders-cdc-analytics-taskmanager-2": "172.30.67.13/24"
+  },
+  "source_orders": 0,
+  "source_customers": 0,
+  "fixture_created": false,
+  "recovery": "Recreate only owned containers/network; keep every named volume; restrict dynamic IPs to 172.30.67.128/25",
+  "volume_set_unchanged": true,
+  "retry_status": {
+    "passed": true,
+    "mode": "docker-up"
+  },
+  "raw_evidence": "results/network-allocation-recovery",
+  "original_compose_sha256": "cfe63e6848556bd6bd9748200daebd39898eccb904ec07be227baae420658872"
+}

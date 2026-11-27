@@ -1,0 +1,13 @@
+{
+  "performance_depth": 3,
+  "source": "PostgreSQL commit with synchronous_commit=on; external batch intent/ACK journal and transactional receipts",
+  "replication": "Kafka RF3/minISR2; Doris RF3 across three BEs; PostgreSQL and shared Flink checkpoint volume are single local storage domains",
+  "cdc": "Debezium at-least-once; Flink PK changelog normalization enabled; regular current-table join, no state TTL",
+  "sinks": {"checkpointed": "Doris connector checkpoint/2PC", "asynchronous": "batch sink, at-least-once with unique-key/sequence idempotency"},
+  "correctness": "Exact ordered full-body comparison with a quiescent PostgreSQL snapshot; every retained batch receipt reconciled",
+  "deletes": "Physical source deletes and cancellation-filter retractions must disappear from both sinks",
+  "versions": "version=order_revision*1000000+customer_revision; revisions positive/monotonic, customer revision below 1000000",
+  "retry": "No blind retry of an ambiguous source commit. Reconcile transaction receipt and external intent first",
+  "isolation": "All services private local Docker network; no cloud endpoints/configuration/credentials",
+  "limits": "No global exactly-once/linearizability proof; no independent-host or power-loss durability claim; no saturation/long soak"
+}

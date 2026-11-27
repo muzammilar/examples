@@ -35,6 +35,10 @@ To add or test a system, follow [`FORMAT.md`](FORMAT.md): folder layout, Make ta
 
 To pick the next example, use the [design backlog and suggested first assignments](TODO.md#example-designs-to-assign). It covers both missing systems and unanswered questions in existing labs. Each assignment identifies a workload, a failure to trigger and an independent check of the outcome.
 
+[Cross-system pipelines](pipelines/) have their own project directories and local
+lifecycles. The [current batch](docs/example-plans/flink-doris-spark-storage.md)
+tracks CDC/streaming analytics, Spark/HDFS and lakehouse integrations.
+
 | System | Folder | Category | Website | GitHub |
 |--------|--------|----------|---------|--------|
 | Aerospike | [`aerospike/`](aerospike) | Key-value | [aerospike.com](https://aerospike.com/) | [aerospike/aerospike-server](https://github.com/aerospike/aerospike-server) |

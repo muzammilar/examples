@@ -1,0 +1,6 @@
+FROM flink:2.3.0-scala_2.12-java17@sha256:4a3d00effd7e78f253e30e558700dd2c0474ffbc1840472fc198d87857b177f4
+ADD --chmod=0644 --checksum=sha256:08630bfc4bf1e82cf8d65fbdb04a97967216fc44acd4215708f9a5256fd2928a https://repo.maven.apache.org/maven2/org/apache/flink/flink-sql-connector-kafka/5.1.0-2.3/flink-sql-connector-kafka-5.1.0-2.3.jar /opt/flink/lib/
+ADD --chmod=0644 --checksum=sha256:f8331465f0f091c709b96f7f7040d3b665a45c2a86dc5bba40b26edb857997e2 https://repo.maven.apache.org/maven2/org/apache/doris/flink-doris-connector-2.3/26.3.0/flink-doris-connector-2.3-26.3.0.jar /opt/flink/lib/
+
+USER flink
+RUN test -r /opt/flink/lib/flink-sql-connector-kafka-5.1.0-2.3.jar && test -r /opt/flink/lib/flink-doris-connector-2.3-26.3.0.jar

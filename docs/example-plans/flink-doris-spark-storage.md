@@ -68,7 +68,7 @@ after measuring.
 
 ## First-pass execution checkpoint — 2026-11-26
 
-| Example | Verified evidence | Next gate |
+| Example | Verified level-3 evidence | Optional deeper follow-up (not a level-3 blocker) |
 |---|---|---|
 | Flink Compose | 1M exact output rows; checkpoint restore after worker SIGKILL; failed initial restart policy retained | Independent live source/witness and richer keyed-state workload |
 | Flink local | One JVM/container emits 1M exact rows; independent readback and complete lifecycle passed | Publication/process-loss boundaries |
@@ -146,3 +146,42 @@ scoped cleanup passed.
 S3/gRPC and Ceph FUSE comparisons remain further work.
 Separate metadata-heavy/small-file and sequential/bulk workloads, cache states,
 durability and fault behavior before making performance recommendations.
+
+## Active cross-system and storage scope
+
+Flink and Doris deployment examples are complete for the agreed level-3 scope.
+The optional deeper cases above do not reopen that completed work. Current work
+implements the five cross-system paths listed above, each in a focused project
+with an owned local lifecycle, plus bounded storage recovery follow-ups. Keep
+performance at level 3; no exhaustive matrices or long soaks.
+
+Planned paths (bounded storage follow-ups may be interleaved after a completed pipeline):
+
+1. PostgreSQL/Debezium/Kafka/Flink/Doris: exact CDC join and deletion/correction
+   semantics, checkpoint-versus-async sink behavior, one live worker failure.
+2. HDFS/Spark/Doris: deterministic partition publication, idempotent reload and
+   one executor/DataNode failure, with preserved batch receipts.
+3. Kafka/Flink/Iceberg/SeaweedFS/Spark: snapshot readback, one interrupted commit
+   and bounded maintenance/recovery. Keep its catalog/store owned and local.
+4. Live CDC plus historical Spark correction: version-guarded publication and
+   exact final watermark reconciliation; then matched ClickHouse control.
+5. Storage: bounded CephFS mounted-client MDS/node/disk recovery and fresh restore;
+   diagnose the SeaweedFS publication stalls; multipart commit/reclamation cases;
+   JuiceFS metadata/object-store outage and recovery. These are focused scenarios,
+   not a new exhaustive qualification of every storage topology.
+
+No real AWS configuration, credentials or resources. Run heavy labs serially
+within verified total CPU/memory/disk budgets. Each completed project gets its
+own curated good/bad results, limitations, scoped cleanup and commit to main.
+
+### Cross-system progress — 2026-11-27
+
+[Order CDC analytics](../../pipelines/orders-cdc-analytics/) completed its million-order
+retained recovery, customer corrections, live worker loss, deletions, three fixed-replica
+full reads and 420 point-predicate checks. All 244 source transaction ACKs reconciled;
+998,000 active joined rows remained per sink. Native memory refusals, terminal job
+failure, removed checkpoints and initial RF1 Connect topics remain failed findings,
+with in-place/log-based recovery documented. Three short hot-query trials are diagnostics,
+not a competitive winner. The final configuration passed a separate 10,000-order
+fresh lifecycle, including exact native checkpoint settings and owned teardown.
+Next: bounded FUSE stage diagnosis and the remaining pipeline/storage paths above.
