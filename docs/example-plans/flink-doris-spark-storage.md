@@ -76,7 +76,8 @@ after measuring.
 | Spark Compose | 1M exact joined rows; active-task worker SIGKILL, native failed-task event and two fresh full-body readbacks | Completed-shuffle owner loss, driver/publication recovery, required deployment shapes |
 | Spark operator/HDFS RF3 | 1M exact joined rows after active executor loss; native failed task; two-copy reads, empty PVC replacement and all three physical replica hashes passed | Continuous ACK witnesses, metadata HA/restore, driver/publication loss and final orchestration repeat |
 | Doris RF1 | 1M exact rows across retained BE crash, native tablet/core readback | Independent restore and live ACK witnesses |
-| Doris RF3 | Three voters/24 current tablet replicas; 1M upserts and three fixed-replica reads. Immediate outage read failed; fresh read recovered at 42.57 s | Live writer/reader witnesses, permanent disk/FE failure and operator |
+| Doris RF3 | Three voters/24 current tablet replicas; 1M upserts and three fixed-replica reads. Immediate outage read failed; fresh read recovered at 42.57 s | Live writer/reader witnesses, permanent disk/FE failure; operator baseline now separate |
+| Doris operator | Three voters/24 current replicas, 1M revision upserts, retained BE SIGKILL and controller restart passed. Native capacity readiness fixed after preserved setup failure | Live witnesses, FE/node/disk loss, safe scaling, partitions, upgrades and restore |
 | HDFS RF1 | 64 MiB exact body/block hashes, fsck and retained DataNode crash | Replication and metadata HA |
 
 These are correctness/recovery diagnostics. No level-3 competitive benchmark has

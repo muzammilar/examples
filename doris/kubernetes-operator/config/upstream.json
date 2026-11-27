@@ -1,0 +1,8 @@
+{
+  "operator_version": "26.0.1",
+  "source_url": "https://github.com/apache/doris-operator/archive/refs/tags/26.0.1.tar.gz",
+  "source_sha256": "ac45c518932ae91855999a7f90617a1bef00df249d7753831734cdceea95287e",
+  "operator_image": "apache/doris:operator-26.0.1@sha256:3a44226565923f33ac11334410b4ad4b7a082a8a0895b32f1548c7dff913c9a2",
+  "fe_image": "apache/doris:fe-4.0.8@sha256:390413325a93d9121768bda153ccaa3c7a8da4aa0fd2a466406cddc14a6399b2",
+  "be_image": "apache/doris:be-4.0.8@sha256:d911ae3826491598be4e383cba83011a266091b8fdc6c34c036280220cc4fea9"
+}

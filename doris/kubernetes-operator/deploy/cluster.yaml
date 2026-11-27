@@ -1,0 +1,53 @@
+apiVersion: doris.selectdb.com/v1
+kind: DorisCluster
+metadata:
+  name: orders
+  namespace: doris-lab
+spec:
+  enableRestartWhenConfigChange: true
+  feSpec:
+    replicas: 3
+    electionNumber: 3
+    image: apache/doris:fe-4.0.8@sha256:390413325a93d9121768bda153ccaa3c7a8da4aa0fd2a466406cddc14a6399b2
+    requests: {cpu: 500m, memory: 2Gi}
+    limits: {cpu: "1", memory: 2Gi}
+    envVars:
+      - {name: AWS_EC2_METADATA_DISABLED, value: "true"}
+    configMapInfo: {configMapName: orders-fe-config}
+    podLabels: {lab.example/role: frontend}
+    affinity:
+      podAntiAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchLabels: {lab.example/role: frontend}
+            topologyKey: kubernetes.io/hostname
+    persistentVolumes:
+      - name: metadata
+        mountPath: /opt/apache-doris/fe/doris-meta
+        persistentVolumeClaimSpec:
+          accessModes: [ReadWriteOnce]
+          resources:
+            requests: {storage: 2Gi}
+  beSpec:
+    replicas: 3
+    image: apache/doris:be-4.0.8@sha256:d911ae3826491598be4e383cba83011a266091b8fdc6c34c036280220cc4fea9
+    requests: {cpu: "1", memory: 3Gi}
+    limits: {cpu: "1", memory: 3Gi}
+    skipDefaultSystemInit: true
+    envVars:
+      - {name: AWS_EC2_METADATA_DISABLED, value: "true"}
+    configMapInfo: {configMapName: orders-be-config}
+    podLabels: {lab.example/role: backend}
+    affinity:
+      podAntiAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchLabels: {lab.example/role: backend}
+            topologyKey: kubernetes.io/hostname
+    persistentVolumes:
+      - name: storage
+        mountPath: /opt/apache-doris/be/storage
+        persistentVolumeClaimSpec:
+          accessModes: [ReadWriteOnce]
+          resources:
+            requests: {storage: 4Gi}

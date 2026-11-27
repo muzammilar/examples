@@ -1,0 +1,15 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: doris-lab
+resources:
+  - operator.yaml
+  - doris.selectdb.com.yaml
+images:
+  - name: apache/doris
+    newTag: operator-26.0.1
+    digest: sha256:3a44226565923f33ac11334410b4ad4b7a082a8a0895b32f1548c7dff913c9a2
+patches:
+  - target:
+      kind: Deployment
+      name: doris-operator
+    path: operator-patch.json

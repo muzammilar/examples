@@ -1,0 +1,58 @@
+{
+  "versions": {
+    "doris": "4.0.8",
+    "operator": "26.0.1",
+    "kubernetes": "1.37.0",
+    "kubectl": "1.37.3"
+  },
+  "operations": [
+    "idempotent schema setup",
+    "finite bulk insert",
+    "sequence-controlled revision upsert",
+    "full ordered body read",
+    "drop"
+  ],
+  "workload": {
+    "orders": 1000000,
+    "customers": 10000,
+    "tablets": 8,
+    "replicas_per_tablet": 3
+  },
+  "topology": {
+    "voting_frontends": 3,
+    "backends": 3,
+    "physical_kind_workers": 3,
+    "physical_hosts": 1
+  },
+  "consistency": "Native Doris UNIQUE KEY merge-on-write and revision sequence column; no transactional or linearizability claim",
+  "oracle": "Exact bodies and IDs on each fixed replica index; result caches and fallback disabled; native membership/tablet agreement required",
+  "client": {
+    "mysql_driver": "1.9.3",
+    "pool_size": 2,
+    "connect_timeout_s": 5,
+    "read_write_timeout_s": 120,
+    "overall_context_s": 300,
+    "mutation_retries": "none"
+  },
+  "acknowledgement": "A bulk SQL mutation returns one ACK; no per-row external commit history",
+  "storage": "Separate retained FE metadata and BE storage PVCs; kind local-path volumes share one Docker VM; no independent backup",
+  "initial_faults": [
+    "containerd SIGKILL of one data-owning BE, prove exit 137/restart with unchanged Pod/PVC identity",
+    "operator rollout, require unchanged database Pod identities and restart counts"
+  ],
+  "unrun": [
+    "live writer/witness failures",
+    "scale-out/in",
+    "drain/PDB",
+    "node loss/restart",
+    "partitions/quorum loss",
+    "permanent disk loss",
+    "upgrades",
+    "pressure",
+    "independent restore",
+    "physical power loss",
+    "matched performance comparison",
+    "repeated setup after acknowledged writes",
+    "SQL drop operation; tested teardown deletes the owned cluster/namespace"
+  ]
+}

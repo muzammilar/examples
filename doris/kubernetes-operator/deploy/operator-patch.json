@@ -1,0 +1,9 @@
+[
+  {"op":"replace","path":"/spec/template/spec/containers/0/args","value":["--leader-elect","-namespace=doris-lab"]},
+  {"op":"replace","path":"/spec/template/spec/containers/0/imagePullPolicy","value":"IfNotPresent"},
+  {"op":"replace","path":"/spec/template/spec/containers/0/resources","value":{"requests":{"cpu":"250m","memory":"256Mi"},"limits":{"cpu":"1","memory":"512Mi"}}},
+  {"op":"remove","path":"/spec/template/spec/containers/0/volumeMounts"},
+  {"op":"remove","path":"/spec/template/spec/volumes"},
+  {"op":"replace","path":"/spec/template/spec/containers/0/env/1/value","value":"false"},
+  {"op":"replace","path":"/spec/template/spec/containers/0/env/2/value","value":"doris-lab"}
+]
