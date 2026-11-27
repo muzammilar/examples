@@ -1,0 +1,1 @@
+../../docker-compose-cluster/scripts/verify.py

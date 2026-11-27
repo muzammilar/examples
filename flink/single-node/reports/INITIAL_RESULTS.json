@@ -1,0 +1,58 @@
+{
+  "date": "2026-11-26",
+  "classification": "functional-local-mode-diagnostics",
+  "engine": "Flink 2.3.0",
+  "oracle": {
+    "orders": 1000000,
+    "customers": 10000,
+    "amount_cents": 599500000,
+    "missing": 0,
+    "wrong": 0,
+    "csv_bytes": 15877890,
+    "allocated_output_bytes": 15884288,
+    "output_codec": "uncompressed CSV",
+    "gzip_reference_bytes": 4869875,
+    "gzip_reference_ratio": 3.260430709207115
+  },
+  "source_materialization": {
+    "sql/orders.sql": {
+      "source": "flink/docker-compose-cluster/sql/orders.sql",
+      "method": "hardlink",
+      "sha256": "12f5ca0ab6e336873f723591b2cb863b3dbc03e0380f38b5d4c217898b09e9a3"
+    },
+    "verify.py": {
+      "source": "flink/docker-compose-cluster/scripts/verify.py",
+      "method": "hardlink",
+      "sha256": "b3b95fc7ab82f2394191b8c6576baf78b7f55261374fa46515df8ebd8d2d3620"
+    }
+  },
+  "resources": [
+    {
+      "actor": "flink-local-orders-local-sql-run-eccdee671e96",
+      "samples": 45,
+      "cpu_sample_mean_pct_of_one_core": 12.517333333333333,
+      "cpu_sample_peak_pct_of_one_core": 100.6,
+      "sampled_cgroup_memory_peak_bytes": 505688064,
+      "observed_positive_io_deltas_lower_bound": {
+        "rbytes": 0,
+        "wbytes": 35663872,
+        "rios": 0,
+        "wios": 45
+      }
+    }
+  ],
+  "limits": {
+    "sql_cpu": 1,
+    "sql_memory_bytes": 2147483648,
+    "verifier_cpu": 1,
+    "verifier_memory_bytes": 268435456
+  },
+  "limitations": [
+    "Functional run overlapped the separately isolated operator lab; no performance ranking.",
+    "Datagen rate is intentionally bounded; runtime is not a capacity measurement.",
+    "First/last samples omit actor startup/exit; short verifier was not sampled.",
+    "Device latency/queue depth and complete network accounting remain pending.",
+    "One container/JVM and one local volume; no replicated storage, failover or physical power-loss durability.",
+    "SQL-client exit status is supplemented by exact independent body verification; no post-exit native REST history is available."
+  ]
+}

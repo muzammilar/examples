@@ -1,0 +1,25 @@
+name: flink-local-orders
+services:
+  local-sql:
+    build: {context: .build, dockerfile: ../docker/Dockerfile.flink}
+    image: examples/flink-local-orders:2.3.0
+    profiles: [tools]
+    cpus: 1
+    mem_limit: 2g
+    entrypoint: [/opt/flink/bin/sql-client.sh]
+    command: [-Dexecution.target=local, -Dtaskmanager.numberOfTaskSlots=2, -Dtaskmanager.memory.process.size=1024m, -f, /opt/flink/lab-sql/orders.sql]
+    volumes: [output:/data]
+    networks: [lab]
+  orders-verifier:
+    build: {context: .build, dockerfile: ../docker/Dockerfile.verifier}
+    image: examples/flink-local-verifier:1
+    profiles: [tools]
+    cpus: 1
+    mem_limit: 256m
+    volumes: [output:/data]
+    networks: [lab]
+volumes:
+  output:
+networks:
+  lab:
+    internal: true

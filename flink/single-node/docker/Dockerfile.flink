@@ -1,0 +1,3 @@
+FROM flink:2.3.0-scala_2.12-java17@sha256:4a3d00effd7e78f253e30e558700dd2c0474ffbc1840472fc198d87857b177f4
+COPY sql /opt/flink/lab-sql
+COPY source-inventory.json /opt/flink/lab-source-inventory.json
