@@ -4,6 +4,7 @@
 #include <array>
 #include <cerrno>
 #include <chrono>
+#include <cstdlib>
 #include <fcntl.h>
 #include <filesystem>
 #include <fstream>
@@ -73,7 +74,8 @@ void write_all(int fd, const char *data, std::size_t size) {
 void sync(int fd) { check(::fsync(fd) == 0, "fsync"); }
 std::vector<char> payload(const std::string &run, std::size_t seq,
                           std::size_t size) {
-  auto seed = "95513:" + run + ":" + std::to_string(seq);
+  auto seed =
+      std::string(PAYLOAD_SEED_PREFIX) + ":" + run + ":" + std::to_string(seq);
   std::vector<char> data(size);
   std::unique_ptr<EVP_MD_CTX, decltype(&EVP_MD_CTX_free)> ctx(EVP_MD_CTX_new(),
                                                               EVP_MD_CTX_free);
@@ -95,8 +97,12 @@ std::string sha256(const std::vector<char> &data) {
     out << std::hex << std::setw(2) << std::setfill('0') << unsigned(digest[i]);
   return out.str();
 }
+fs::path witness_root() {
+  const char *configured = std::getenv("WITNESS_ROOT");
+  return configured ? fs::path(configured) : fs::path("/results");
+}
 fs::path journal(const std::string &run) {
-  return fs::path("/results/journals") / (run + ".jsonl");
+  return witness_root() / "journals" / (run + ".jsonl");
 }
 std::map<std::size_t, json> records(const std::string &run,
                                     const std::string &event) {
@@ -131,6 +137,7 @@ void verify(const std::string &run) {
         row.at("sha256") != sha256(payload(run, seq, size)))
       throw std::runtime_error("Witness differs from deterministic oracle");
     const auto path = fs::path("/mnt/lab") / run / std::to_string(seq);
+    const auto started = Clock::now();
     File file(path, O_RDONLY);
     std::vector<char> data(size);
     std::size_t done = 0;
@@ -149,6 +156,13 @@ void verify(const std::string &run) {
     if (n != 0 || sha256(data) != row.at("sha256"))
       throw std::runtime_error("Wrong successful body");
     file.close();
+    emit({{"event", "body_read"},
+          {"run", run},
+          {"sequence", seq},
+          {"bytes", size},
+          {"duration_ms",
+           std::chrono::duration<double, std::milli>(Clock::now() - started)
+               .count()}});
   }
   emit({{"event", "verified"},
         {"run", run},
@@ -161,13 +175,13 @@ void seed(const std::string &run, std::size_t count, std::size_t size,
   if (!count || count > 1024 || !size || size > 1048576 ||
       count * size > 268435456)
     throw std::invalid_argument("Seed exceeds bounds");
-  fs::create_directories("/results/journals");
+  fs::create_directories(witness_root() / "journals");
   File witness(journal(run), O_WRONLY | O_CREAT | O_EXCL | O_APPEND);
   const auto directory = fs::path("/mnt/lab") / run;
   if (!fs::create_directory(directory))
     throw std::runtime_error("Run already exists");
   for (std::size_t seq = 0; seq < count; ++seq) {
-    if (live && fs::exists(fs::path("/results") / ("stop-writer-" + run)))
+    if (live && fs::exists(witness_root() / ("stop-writer-" + run)))
       break;
     auto data = payload(run, seq, size);
     json row{{"run", run},         {"sequence", seq},
@@ -186,6 +200,8 @@ void seed(const std::string &run, std::size_t count, std::size_t size,
       fs::rename(temporary, directory / std::to_string(seq));
       File parent(directory, O_RDONLY | O_DIRECTORY);
       sync(parent.get());
+      if (SYNC_PUBLICATION_WITH_SYNCFS)
+        check(::syncfs(parent.get()) == 0, "syncfs publication");
       parent.close();
       row["event"] = "ack";
     } catch (const std::exception &e) {
@@ -247,10 +263,13 @@ int main(int argc, char **argv) {
       throw std::invalid_argument("Invalid run identity");
     struct statfs filesystem{};
     check(::statfs("/mnt/lab", &filesystem) == 0, "statfs");
-    if (filesystem.f_type != 0x65735546)
-      throw std::runtime_error("Expected an actual FUSE mount");
+    if (filesystem.f_type != EXPECTED_FILESYSTEM_MAGIC)
+      throw std::runtime_error("Unexpected filesystem type");
     emit({{"event", "mount_verified"}, {"f_type", filesystem.f_type}});
     emit({{"event", "source"}, {"sha256", WORKLOAD_SOURCE_SHA256}});
+    emit({{"event", "publication_contract"},
+          {"syncfs", bool(SYNC_PUBLICATION_WITH_SYNCFS)},
+          {"payload_seed_prefix", PAYLOAD_SEED_PREFIX}});
     if ((mode == "seed" || mode == "writer") && argc == 5)
       seed(run, std::stoull(argv[3]), std::stoull(argv[4]), mode == "writer");
     else if (mode == "verify" && argc == 3)
@@ -262,7 +281,7 @@ int main(int argc, char **argv) {
         throw std::invalid_argument("Invalid reader identity");
       const auto end = Clock::now() + std::chrono::seconds(180);
       while (Clock::now() < end &&
-             !fs::exists(fs::path("/results") / ("stop-reader-" + actor))) {
+             !fs::exists(witness_root() / ("stop-reader-" + actor))) {
         const auto start = Clock::now();
         try {
           verify(run);
