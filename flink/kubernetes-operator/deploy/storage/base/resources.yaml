@@ -1,0 +1,73 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: seaweed-config
+data:
+  s3.json: |
+    {"identities":[{"name":"flink-lab","credentials":[{"accessKey":"flink-local","secretKey":"flink-local-secret"}],"actions":["Admin","Read","Write","List","Tagging"]}]}
+  filer.toml: |
+    [leveldb2]
+    enabled = true
+    dir = "/data/filer"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: seaweed-data
+spec:
+  accessModes: [ReadWriteOnce]
+  resources:
+    requests:
+      storage: 4Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: seaweed
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels: {app: seaweed}
+  template:
+    metadata:
+      labels: {app: seaweed}
+    spec:
+      containers:
+        - name: seaweed
+          image: chrislusf/seaweedfs:4.55@sha256:7ca46aeae2f223b37e5d91593c17ab37738eec6df6ab69b48a0487f7643342b9
+          args: [server, -dir=/data, -ip=seaweed, -ip.bind=0.0.0.0, -volume.max=32, -master.volumeSizeLimitMB=64, -filer, -s3, -s3.config=/etc/seaweedfs/s3.json]
+          resources:
+            requests: {cpu: 250m, memory: 256Mi}
+            limits: {cpu: "1", memory: 768Mi}
+          readinessProbe:
+            tcpSocket: {port: 8333}
+            periodSeconds: 3
+          livenessProbe:
+            tcpSocket: {port: 9333}
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          volumeMounts:
+            - {name: data, mountPath: /data}
+            - {name: config, mountPath: /etc/seaweedfs, readOnly: true}
+      volumes:
+        - name: data
+          persistentVolumeClaim: {claimName: seaweed-data}
+        - name: config
+          configMap: {name: seaweed-config}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: seaweed
+spec:
+  selector: {app: seaweed}
+  ports:
+    - {name: s3, port: 8333}
+    - {name: master, port: 9333}
+    - {name: master-grpc, port: 19333}
+    - {name: filer, port: 8888}
+    - {name: filer-grpc, port: 18888}
+    - {name: volume, port: 8080}
+    - {name: volume-grpc, port: 18080}

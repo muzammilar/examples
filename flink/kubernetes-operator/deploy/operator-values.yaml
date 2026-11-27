@@ -1,0 +1,10 @@
+watchNamespaces: [flink-lab]
+image:
+  tag: "1.16.1"
+  digest: sha256:94b91ea6e9d83996f12d7360ca74e49264057cf3ce697636d81677611651d142
+webhook:
+  create: false
+operatorPod:
+  resources:
+    requests: {cpu: 250m, memory: 512Mi}
+    limits: {cpu: "1", memory: 1Gi}

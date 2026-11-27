@@ -1,0 +1,50 @@
+apiVersion: flink.apache.org/v1beta1
+kind: FlinkDeployment
+metadata:
+  name: orders
+spec:
+  image: flink-operator-orders:lab
+  imagePullPolicy: Never
+  flinkVersion: v2_3
+  serviceAccount: flink
+  flinkConfiguration:
+    taskmanager.numberOfTaskSlots: "1"
+    s3.endpoint: http://seaweed:8333
+    s3.path.style.access: "true"
+    s3.access-key: flink-local
+    s3.secret-key: flink-local-secret
+    s3.aws.credentials.provider: org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider
+    state.checkpoints.dir: s3://flink-lab/checkpoints
+    state.savepoints.dir: s3://flink-lab/savepoints
+    restart-strategy.type: fixed-delay
+    restart-strategy.fixed-delay.attempts: "10"
+    restart-strategy.fixed-delay.delay: 10s
+  podTemplate:
+    spec:
+      containers:
+        - name: flink-main-container
+          env:
+            - {name: AWS_EC2_METADATA_DISABLED, value: "true"}
+            - {name: AWS_REGION, value: us-east-1}
+  jobManager:
+    resources:
+      requests: {memory: 1600Mi, cpu: "1"}
+      limits: {memory: 1600Mi, cpu: "1"}
+  taskManager:
+    podTemplate:
+      spec:
+        affinity:
+          podAntiAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              - labelSelector:
+                  matchLabels: {app: orders, component: taskmanager}
+                topologyKey: kubernetes.io/hostname
+    resources:
+      requests: {memory: 1600Mi, cpu: "1"}
+      limits: {memory: 1600Mi, cpu: "1"}
+  job:
+    jarURI: local:///opt/flink/lib/flink-table-runtime-2.3.0.jar
+    entryClass: org.apache.flink.table.runtime.application.SqlDriver
+    args: [--scriptUri, file:///opt/flink/lab-sql/orders.sql]
+    parallelism: 2
+    upgradeMode: savepoint

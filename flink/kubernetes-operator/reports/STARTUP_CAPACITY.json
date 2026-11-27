@@ -1,0 +1,29 @@
+{
+  "date": "2026-11-26",
+  "status": "blocked-environment-capacity",
+  "engine": "2.3.0",
+  "operator": "1.16.1",
+  "seaweedfs": "4.55",
+  "kind_nodes": 3,
+  "docker_vm_capacity_gib": 79,
+  "minimum_observed_available_mib": 99,
+  "after_owned_teardown_available_bytes": 9950892032,
+  "observed": [
+    "Operator ready",
+    "SeaweedFS and verifier ready",
+    "FlinkDeployment submitted; manager Pod running"
+  ],
+  "not_verified": [
+    "Native SQL completion",
+    "Output correctness",
+    "TaskManager recovery",
+    "Comparative performance"
+  ],
+  "cleanup": "Owned kind cluster, private kubeconfig and built images removed; no unrelated Docker resources removed",
+  "raw_evidence": [
+    "results/up.log",
+    "results/capacity-blocked-startup.json",
+    "results/capacity-blocked-disk.txt",
+    "results/capacity-teardown.log"
+  ]
+}

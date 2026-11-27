@@ -1,0 +1,444 @@
+{
+  "date": "2026-11-26",
+  "classification": "functional-and-recovery-diagnostics",
+  "engine": "Flink 2.3.0",
+  "operator": "1.16.1",
+  "seaweedfs": "4.55",
+  "docker_environment": {
+    "NCPU": 11,
+    "MemTotal": 26216296448,
+    "KernelVersion": "6.12.76-linuxkit",
+    "OperatingSystem": "Docker Desktop",
+    "Driver": "overlayfs",
+    "ServerVersion": "29.5.3",
+    "Architecture": "aarch64"
+  },
+  "current_client_server_versions": {
+    "clientVersion": {
+      "major": "1",
+      "minor": "37",
+      "gitVersion": "v1.37.3",
+      "gitCommit": "f81a9c5f95912fd97b7c8aa4966301aeae84a253",
+      "gitTreeState": "clean",
+      "buildDate": "2026-11-25T10:43:39Z",
+      "goVersion": "go1.26.11",
+      "compiler": "gc",
+      "platform": "darwin/arm64"
+    },
+    "kustomizeVersion": "v5.8.1",
+    "serverVersion": {
+      "major": "1",
+      "minor": "37",
+      "emulationMajor": "1",
+      "emulationMinor": "37",
+      "minCompatibilityMajor": "1",
+      "minCompatibilityMinor": "36",
+      "gitVersion": "v1.37.0",
+      "gitCommit": "f54c212e3a2f75d674b717a9b29052b20b60aefc",
+      "gitTreeState": "clean",
+      "buildDate": "2026-08-26T10:44:25Z",
+      "goVersion": "go1.26.6",
+      "compiler": "gc",
+      "platform": "linux/arm64"
+    }
+  },
+  "clean_corrected_capacity": {
+    "native_result": {
+      "mode": "test",
+      "native_checkpoint_restores": 0,
+      "native_state": "FINISHED",
+      "fault": null,
+      "elapsed_s": 94.67367883399129,
+      "history": "test-1795729901184999000.jsonl"
+    },
+    "readback": {
+      "orders": 1000000,
+      "customers": 10000,
+      "amount_cents": 599500000,
+      "missing": 0,
+      "wrong": 0,
+      "duplicate": 0,
+      "csv_bytes": 15877890,
+      "gzip_reference_bytes": 4871256,
+      "gzip_reference_ratio": 3.2595063778212436
+    },
+    "native_final_checkpoints": {
+      "restored": 0,
+      "total": 52,
+      "in_progress": 0,
+      "completed": 51,
+      "failed": 1
+    },
+    "failed_checkpoint_cause": "Checkpoint triggered before all required tasks were running; native startup attempt rejected.",
+    "storage_allocated_bytes": 374108160,
+    "observations": {
+      "history": "test-1795729901184999000.jsonl",
+      "last_observed_checkpoint_counts": {
+        "restored": 0,
+        "total": 52,
+        "in_progress": 0,
+        "completed": 51,
+        "failed": 1
+      },
+      "observed_taskmanager_workers": [
+        "flink-kubernetes-operator-worker",
+        "flink-kubernetes-operator-worker2"
+      ],
+      "container_image_ids": [
+        "docker.io/chrislusf/seaweedfs@sha256:7ca46aeae2f223b37e5d91593c17ab37738eec6df6ab69b48a0487f7643342b9",
+        "docker.io/library/import-2026-11-26@sha256:a9e92f511b4e3e8fff4fd05eeada649b43fd31494795d1b053716a0b34d7eb7b",
+        "ghcr.io/apache/flink-kubernetes-operator@sha256:94b91ea6e9d83996f12d7360ca74e49264057cf3ce697636d81677611651d142",
+        "sha256:50b0e80f2dab16ee1aaa4c2f5b7656b200421bea5a06c1a370d6aee3b7d44fb9"
+      ],
+      "resources": [
+        {
+          "pod": "flink-kubernetes-operator-5fbbdcb59c-2vljm",
+          "samples": 18,
+          "observation_s": 94.17119350004941,
+          "average_cpu_pct_of_one_core_lower_bound": 1.2994961139569268,
+          "sampled_memory_current_peak_bytes": 596418560,
+          "native_cgroup_lifetime_memory_peak_bytes": 603291648,
+          "observed_positive_deltas_lower_bound": {
+            "rbytes": 0,
+            "wbytes": 86016,
+            "rios": 0,
+            "wios": 7,
+            "cpu_usec": 1223751
+          },
+          "read_bytes_per_s_lower_bound": 0.0,
+          "write_bytes_per_s_lower_bound": 913.400338288745,
+          "read_iops_lower_bound": 0.0,
+          "write_iops_lower_bound": 0.07433270982167521
+        },
+        {
+          "pod": "object-verifier",
+          "samples": 18,
+          "observation_s": 94.17119350004941,
+          "average_cpu_pct_of_one_core_lower_bound": 0.8486661050967573,
+          "sampled_memory_current_peak_bytes": 7884800,
+          "native_cgroup_lifetime_memory_peak_bytes": 46305280,
+          "observed_positive_deltas_lower_bound": {
+            "rbytes": 0,
+            "wbytes": 0,
+            "rios": 0,
+            "wios": 0,
+            "cpu_usec": 799199
+          },
+          "read_bytes_per_s_lower_bound": 0.0,
+          "write_bytes_per_s_lower_bound": 0.0,
+          "read_iops_lower_bound": 0.0,
+          "write_iops_lower_bound": 0.0
+        },
+        {
+          "pod": "orders-76f9d88b45-vhpwc",
+          "samples": 18,
+          "observation_s": 94.17119350004941,
+          "average_cpu_pct_of_one_core_lower_bound": 7.443468368059201,
+          "sampled_memory_current_peak_bytes": 1129107456,
+          "native_cgroup_lifetime_memory_peak_bytes": 1135833088,
+          "observed_positive_deltas_lower_bound": {
+            "rbytes": 0,
+            "wbytes": 4456448,
+            "rios": 0,
+            "wios": 21,
+            "cpu_usec": 7009603
+          },
+          "read_bytes_per_s_lower_bound": 0.0,
+          "write_bytes_per_s_lower_bound": 47322.836574197834,
+          "read_iops_lower_bound": 0.0,
+          "write_iops_lower_bound": 0.22299812946502565
+        },
+        {
+          "pod": "orders-taskmanager-1-1",
+          "samples": 18,
+          "observation_s": 94.17119350004941,
+          "average_cpu_pct_of_one_core_lower_bound": 5.681499619092321,
+          "sampled_memory_current_peak_bytes": 905252864,
+          "native_cgroup_lifetime_memory_peak_bytes": 911372288,
+          "observed_positive_deltas_lower_bound": {
+            "rbytes": 0,
+            "wbytes": 75116544,
+            "rios": 0,
+            "wios": 110,
+            "cpu_usec": 5350336
+          },
+          "read_bytes_per_s_lower_bound": 0.0,
+          "write_bytes_per_s_lower_bound": 797659.4668512997,
+          "read_iops_lower_bound": 0.0,
+          "write_iops_lower_bound": 1.1680854400548961
+        },
+        {
+          "pod": "orders-taskmanager-1-2",
+          "samples": 18,
+          "observation_s": 94.17119350004941,
+          "average_cpu_pct_of_one_core_lower_bound": 5.449293790672098,
+          "sampled_memory_current_peak_bytes": 893321216,
+          "native_cgroup_lifetime_memory_peak_bytes": 899309568,
+          "observed_positive_deltas_lower_bound": {
+            "rbytes": 0,
+            "wbytes": 75296768,
+            "rios": 0,
+            "wios": 113,
+            "cpu_usec": 5131665
+          },
+          "read_bytes_per_s_lower_bound": 0.0,
+          "write_bytes_per_s_lower_bound": 799573.2580362858,
+          "read_iops_lower_bound": 0.0,
+          "write_iops_lower_bound": 1.1999423156927571
+        },
+        {
+          "pod": "seaweed-7c98c49577-2m58t",
+          "samples": 18,
+          "observation_s": 94.17119350004941,
+          "average_cpu_pct_of_one_core_lower_bound": 4.673317642509958,
+          "sampled_memory_current_peak_bytes": 802869248,
+          "native_cgroup_lifetime_memory_peak_bytes": 805306368,
+          "observed_positive_deltas_lower_bound": {
+            "rbytes": 16384,
+            "wbytes": 310263808,
+            "rios": 4,
+            "wios": 697,
+            "cpu_usec": 4400919
+          },
+          "read_bytes_per_s_lower_bound": 173.9810168169038,
+          "write_bytes_per_s_lower_bound": 3294678.5154617075,
+          "read_iops_lower_bound": 0.042475834183814405,
+          "write_iops_lower_bound": 7.401414106529661
+        }
+      ]
+    }
+  },
+  "combined_worker_and_storage_recovery": {
+    "native_result": {
+      "mode": "task-recovery",
+      "native_checkpoint_restores": 1,
+      "native_state": "FINISHED",
+      "fault": {
+        "pod": "orders-taskmanager-1-1",
+        "uid": "e80a99ea-ce01-4e02-83be-15c2ee55b7c6",
+        "elapsed_s": 11.506952082971111
+      },
+      "elapsed_s": 327.07535920804366,
+      "history": "task-recovery-1795729305359257000.jsonl"
+    },
+    "readback": {
+      "orders": 1000000,
+      "customers": 10000,
+      "amount_cents": 599500000,
+      "missing": 0,
+      "wrong": 0,
+      "duplicate": 0,
+      "csv_bytes": 15877890,
+      "gzip_reference_bytes": 4871066,
+      "gzip_reference_ratio": 3.2596335175914266
+    },
+    "capacity_failure": "Four 64 MiB SeaweedFS volume slots exhausted; master reported no writable/free volumes while TCP readiness remained true.",
+    "recovery": "Increase volume.max from 4 to 32, restart only SeaweedFS on the same retained PVC. No Flink reset or input reload.",
+    "longest_completed_checkpoint_ms": 237834,
+    "storage_allocated_bytes_after_recovery": 280948736,
+    "observations": {
+      "history": "task-recovery-1795729305359257000.jsonl",
+      "last_observed_checkpoint_counts": {
+        "restored": 1,
+        "total": 29,
+        "in_progress": 0,
+        "completed": 27,
+        "failed": 2
+      },
+      "observed_taskmanager_workers": [
+        "flink-kubernetes-operator-worker",
+        "flink-kubernetes-operator-worker2"
+      ],
+      "container_image_ids": [
+        "docker.io/chrislusf/seaweedfs@sha256:7ca46aeae2f223b37e5d91593c17ab37738eec6df6ab69b48a0487f7643342b9",
+        "docker.io/library/import-2026-11-26@sha256:b9e996b58fc7174e467be6570be3cffe3ae45ef0470f2a61b067692ddae56097",
+        "ghcr.io/apache/flink-kubernetes-operator@sha256:94b91ea6e9d83996f12d7360ca74e49264057cf3ce697636d81677611651d142",
+        "sha256:cd64685fc53344d939887031904e6815a9c01ba62919aa754c5749959e3060b7"
+      ],
+      "resources": [
+        {
+          "pod": "flink-kubernetes-operator-5fbbdcb59c-4grtg",
+          "samples": 60,
+          "observation_s": 326.6664488329552,
+          "average_cpu_pct_of_one_core_lower_bound": 1.1717769038342203,
+          "sampled_memory_current_peak_bytes": 635801600,
+          "native_cgroup_lifetime_memory_peak_bytes": 640483328,
+          "observed_positive_deltas_lower_bound": {
+            "rbytes": 0,
+            "wbytes": 262144,
+            "rios": 0,
+            "wios": 25,
+            "cpu_usec": 3827802
+          },
+          "read_bytes_per_s_lower_bound": 0.0,
+          "write_bytes_per_s_lower_bound": 802.4821677785785,
+          "read_iops_lower_bound": 0.0,
+          "write_iops_lower_bound": 0.07653066327844416
+        },
+        {
+          "pod": "object-verifier",
+          "samples": 60,
+          "observation_s": 326.6664488329552,
+          "average_cpu_pct_of_one_core_lower_bound": 0.7866874633685201,
+          "sampled_memory_current_peak_bytes": 8794112,
+          "native_cgroup_lifetime_memory_peak_bytes": 47022080,
+          "observed_positive_deltas_lower_bound": {
+            "rbytes": 0,
+            "wbytes": 0,
+            "rios": 0,
+            "wios": 0,
+            "cpu_usec": 2569844
+          },
+          "read_bytes_per_s_lower_bound": 0.0,
+          "write_bytes_per_s_lower_bound": 0.0,
+          "read_iops_lower_bound": 0.0,
+          "write_iops_lower_bound": 0.0
+        },
+        {
+          "pod": "orders-76f9d88b45-pcq4s",
+          "samples": 60,
+          "observation_s": 326.6664488329552,
+          "average_cpu_pct_of_one_core_lower_bound": 5.244884824018554,
+          "sampled_memory_current_peak_bytes": 1150545920,
+          "native_cgroup_lifetime_memory_peak_bytes": 1158156288,
+          "observed_positive_deltas_lower_bound": {
+            "rbytes": 0,
+            "wbytes": 11075584,
+            "rios": 0,
+            "wios": 54,
+            "cpu_usec": 17133279
+          },
+          "read_bytes_per_s_lower_bound": 0.0,
+          "write_bytes_per_s_lower_bound": 33904.87158864494,
+          "read_iops_lower_bound": 0.0,
+          "write_iops_lower_bound": 0.16530623268143937
+        },
+        {
+          "pod": "seaweed-54d7545fd-hm82k",
+          "samples": 51,
+          "observation_s": 276.70744979195297,
+          "average_cpu_pct_of_one_core_lower_bound": 3.159338502296526,
+          "sampled_memory_current_peak_bytes": 740294656,
+          "native_cgroup_lifetime_memory_peak_bytes": 748736512,
+          "observed_positive_deltas_lower_bound": {
+            "rbytes": 0,
+            "wbytes": 270733312,
+            "rios": 0,
+            "wios": 682,
+            "cpu_usec": 8742125
+          },
+          "read_bytes_per_s_lower_bound": 0.0,
+          "write_bytes_per_s_lower_bound": 978409.9134430796,
+          "read_iops_lower_bound": 0.0,
+          "write_iops_lower_bound": 2.4646969227347255
+        },
+        {
+          "pod": "orders-taskmanager-1-1",
+          "samples": 2,
+          "observation_s": 5.526501500047743,
+          "average_cpu_pct_of_one_core_lower_bound": 45.64625559186417,
+          "sampled_memory_current_peak_bytes": 805724160,
+          "native_cgroup_lifetime_memory_peak_bytes": 811151360,
+          "observed_positive_deltas_lower_bound": {
+            "rbytes": 0,
+            "wbytes": 11685888,
+            "rios": 0,
+            "wios": 13,
+            "cpu_usec": 2522641
+          },
+          "read_bytes_per_s_lower_bound": 0.0,
+          "write_bytes_per_s_lower_bound": 2114518.1992439604,
+          "read_iops_lower_bound": 0.0,
+          "write_iops_lower_bound": 2.352301903815224
+        },
+        {
+          "pod": "orders-taskmanager-1-2",
+          "samples": 59,
+          "observation_s": 321.31025008298457,
+          "average_cpu_pct_of_one_core_lower_bound": 3.9445672824712616,
+          "sampled_memory_current_peak_bytes": 883527680,
+          "native_cgroup_lifetime_memory_peak_bytes": 889864192,
+          "observed_positive_deltas_lower_bound": {
+            "rbytes": 0,
+            "wbytes": 88645632,
+            "rios": 0,
+            "wios": 155,
+            "cpu_usec": 12674299
+          },
+          "read_bytes_per_s_lower_bound": 0.0,
+          "write_bytes_per_s_lower_bound": 275887.9680218902,
+          "read_iops_lower_bound": 0.0,
+          "write_iops_lower_bound": 0.48239979882362377
+        },
+        {
+          "pod": "orders-taskmanager-1-4",
+          "samples": 55,
+          "observation_s": 299.142705374863,
+          "average_cpu_pct_of_one_core_lower_bound": 3.317861950724341,
+          "sampled_memory_current_peak_bytes": 891424768,
+          "native_cgroup_lifetime_memory_peak_bytes": 898961408,
+          "observed_positive_deltas_lower_bound": {
+            "rbytes": 0,
+            "wbytes": 78843904,
+            "rios": 0,
+            "wios": 137,
+            "cpu_usec": 9925142
+          },
+          "read_bytes_per_s_lower_bound": 0.0,
+          "write_bytes_per_s_lower_bound": 263566.1929352373,
+          "read_iops_lower_bound": 0.0,
+          "write_iops_lower_bound": 0.4579753994947728
+        },
+        {
+          "pod": "seaweed-7c98c49577-xflbb",
+          "samples": 9,
+          "observation_s": 44.408395249862224,
+          "average_cpu_pct_of_one_core_lower_bound": 1.5471961914726735,
+          "sampled_memory_current_peak_bytes": 243724288,
+          "native_cgroup_lifetime_memory_peak_bytes": 249794560,
+          "observed_positive_deltas_lower_bound": {
+            "rbytes": 0,
+            "wbytes": 9297920,
+            "rios": 0,
+            "wios": 60,
+            "cpu_usec": 687085
+          },
+          "read_bytes_per_s_lower_bound": 0.0,
+          "write_bytes_per_s_lower_bound": 209373.0238997737,
+          "read_iops_lower_bound": 0.0,
+          "write_iops_lower_bound": 1.3510958831638067
+        }
+      ]
+    }
+  },
+  "repeated_setup": {
+    "uid": "5dd8da8e-1739-4cb7-904d-9b74d1069c06",
+    "generation": 1,
+    "job_id": "6b39b0e19330f680de516e722661331b",
+    "same_job_and_resource_uid": true
+  },
+  "deployed_source_matches": {
+    "sql_sha256": "369c2e941b73ea9c56ddf6cc877801eded8ac8dc91534aaba8827c51524d7e21",
+    "verifier_sha256": "c5587aa86d869e9d136ba5e4b095f426dc64034df77c78241cfa580b85074025"
+  },
+  "source_sha256": {
+    "sql/orders.sql": "369c2e941b73ea9c56ddf6cc877801eded8ac8dc91534aaba8827c51524d7e21",
+    "scripts/objects.py": "c5587aa86d869e9d136ba5e4b095f426dc64034df77c78241cfa580b85074025",
+    "scripts/job.py": "5dac42f7dbcbd4b9c69ef5b02232807d1fb77a870425d3d31d2d9ad7508006c9",
+    "deploy/orders.yaml": "9c8f8bea2c62ceb4d75b1a46a16fca7781909749258aec9c492d0352e8f7ba0a",
+    "deploy/storage/base/resources.yaml": "ed9cfe5cbdf8a9e52199494e0606189525abdaeb6de23d099b8e624ccb88656c",
+    "config/kubectl.json": "54d99a07fa127ba67567b2d925fe0ada4ee32e34ed5519cea2c0eb426c27f669"
+  },
+  "limitations": [
+    "No comparative performance benchmark or production-readiness qualification.",
+    "Initial controls used host kubectl 1.34.1 against server 1.37.0, outside supported skew. Example-local 1.37.3 was then used for repeated setup, completion/readback and teardown.",
+    "Combined run is worker Pod loss plus storage-capacity intervention; 327 seconds is not an isolated worker-failover RTO.",
+    "Clean corrected-capacity run injected no fault; one startup checkpoint failed before tasks were ready.",
+    "Initial Docker capacity attempt reached 99 MiB free; own cluster teardown and separately authorized unused-build-cache cleanup preceded successful retries.",
+    "Resource deltas miss work outside sample windows; peak cgroup counters include container lifetime, not only the observation phase.",
+    "Detailed network accounting, device latency/queue depth, controller/control-plane overhead and short-lived oracle CPU remain incomplete.",
+    "CSV reference gzip is not native object-store compression. Allocated storage includes obsolete checkpoint chunks and metadata; compaction was not tested.",
+    "One VM/failure domain, one non-HA S3 dependency; no external live ACK witness, scale/savepoint round trip, manager HA, independent restore or node/disk-loss qualification.",
+    "Admission webhook disabled in initial profile. TCP Pod readiness does not detect exhausted writable volume slots; up additionally requires an exact S3 write/read/delete probe."
+  ]
+}

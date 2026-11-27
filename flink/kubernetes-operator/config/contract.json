@@ -1,0 +1,16 @@
+{
+  "required_operations": ["Bounded streaming SQL", "Checkpointed file publication", "Worker Pod loss", "Retained S3 capacity recovery", "Exact independent final readback", "Repeated setup without reseed"],
+  "consistency": "Checkpoint-published file parts; verify complete bounded output after native FINISHED. No atomic multi-file table snapshot or external-producer exactly-once claim.",
+  "atomicity": "Native sink/checkpoint protocol only; no transaction spanning unrelated systems.",
+  "idempotency": "Up preserves an existing job and data. A new input run requires a fresh owned lifecycle or separately owned paths; failed data is not automatically reset.",
+  "delete_ttl": "Lifecycle removes owned resources; retention and physical reclamation are not qualified.",
+  "durability": "One kind cluster/VM and one SeaweedFS PVC. Retained process/Pod recovery is tested, not independent disks, backup, power loss or host failure.",
+  "retry": "Native Flink fixed-delay task restart: 10 attempts, 10 seconds. S3 SDK uses explicit local endpoint/static lab credentials and bounded per-request connect/read timeouts. No host AWS discovery.",
+  "payload": "1,000,000 deterministic orders, 10,000 customers, expected 599,500,000 cents; three integer CSV fields.",
+  "fault_expectations": {
+    "worker": "Observe a completed checkpoint, delete one owned TaskManager Pod, require a native checkpoint restoration and exact eventual final result.",
+    "storage_pressure": "Four 64 MiB volume slots reject writes and can stall checkpoints while TCP readiness remains true. Preserve the stall and recover on the retained PVC; never claim its combined duration as worker-only RTO."
+  },
+  "client": {"s3_library": "boto3 1.44.12", "connect_timeout_s": 3, "read_timeout_s": 10, "sdk_max_attempts_setting": 2, "control_deadline_s": 900},
+  "not_qualified": ["External ACK histories and live independent readers", "Scale out/in and savepoints", "Manager HA", "Node/disk failure", "Independent restore", "Admission webhook lifecycle", "Comparative performance"]
+}

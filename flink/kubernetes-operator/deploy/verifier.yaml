@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: object-verifier
+spec:
+  restartPolicy: Never
+  containers:
+    - name: verifier
+      image: flink-operator-objects:lab
+      imagePullPolicy: Never
+      command: [python, -c, 'import time; time.sleep(86400)']
+      resources:
+        requests: {cpu: 100m, memory: 64Mi}
+        limits: {cpu: "1", memory: 256Mi}
+      env:
+        - {name: AWS_EC2_METADATA_DISABLED, value: "true"}
+        - {name: AWS_CONFIG_FILE, value: /nonexistent}
+        - {name: AWS_SHARED_CREDENTIALS_FILE, value: /nonexistent}
