@@ -1,0 +1,39 @@
+{
+  "started_at": "2026-11-26T20:45:49.917534+00:00",
+  "job_id": "8857471247b528af3bbf59dda79040a0",
+  "verdict": "passed",
+  "correctness": {
+    "orders": 1000000,
+    "customers": 10000,
+    "amount_cents": 599500000,
+    "missing": 0,
+    "wrong": 0,
+    "csv_bytes": 15877890,
+    "allocated_output_bytes": 16252928,
+    "output_codec": "uncompressed CSV",
+    "gzip_reference_bytes": 4872244,
+    "gzip_reference_ratio": 3.2588454108620177
+  },
+  "before_counts": {
+    "restored": 0,
+    "total": 3,
+    "in_progress": 0,
+    "completed": 2,
+    "failed": 1
+  },
+  "after_counts": {
+    "restored": 2,
+    "total": 54,
+    "in_progress": 0,
+    "completed": 51,
+    "failed": 3
+  },
+  "killed_exit_code": 137,
+  "job_state": "FINISHED",
+  "scope": "One owned worker crash with checkpoint recovery; final output verified; no per-record external ACK witness or live independent reader yet.",
+  "prior_failed_trial": {
+    "output_rows": 27848,
+    "cause": "Three one-second retries exhausted while the worker RPC endpoint was unavailable. SQL client exited zero despite a native failed job.",
+    "verdict": "failed"
+  }
+}

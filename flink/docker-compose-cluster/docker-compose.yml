@@ -1,0 +1,57 @@
+name: flink-state-recovery
+x-flink: &flink
+  build:
+    context: .
+    dockerfile: docker/Dockerfile.flink
+  image: examples/flink-state-recovery:2.3.0
+  cpus: 1
+  mem_limit: 1600m
+  environment:
+    FLINK_PROPERTIES: |
+      jobmanager.rpc.address: jobmanager
+      jobmanager.memory.process.size: 1024m
+      taskmanager.memory.process.size: 1024m
+      taskmanager.numberOfTaskSlots: 1
+      parallelism.default: 2
+      rest.address: jobmanager
+      rest.bind-address: 0.0.0.0
+  volumes:
+    - output:/data
+  networks: [lab]
+services:
+  jobmanager:
+    <<: *flink
+    command: jobmanager
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c 'echo > /dev/tcp/localhost/8081'"]
+      interval: 3s
+      timeout: 2s
+      retries: 60
+  taskmanager:
+    <<: *flink
+    command: taskmanager
+    deploy:
+      replicas: 2
+    depends_on:
+      jobmanager: {condition: service_healthy}
+  sql:
+    <<: *flink
+    profiles: [tools]
+    entrypoint: /opt/flink/bin/sql-client.sh
+    command: ["-Drest.address=jobmanager", "-Djobmanager.rpc.address=jobmanager", "-f", "/opt/flink/lab-sql/orders.sql"]
+  verifier:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.verifier
+    image: examples/flink-order-verifier:1
+    cpus: 1
+    mem_limit: 256m
+    profiles: [tools]
+    volumes:
+      - output:/data:ro
+    networks: [lab]
+volumes:
+  output:
+networks:
+  lab:
+    internal: true

@@ -1,0 +1,17 @@
+{
+  "engine": "Flink 2.3.0",
+  "required_operations": [
+    "bounded datagen source",
+    "filesystem CSV sink",
+    "exact final readback",
+    "checkpoint worker recovery"
+  ],
+  "consistency": "Checkpointed streaming computation; verify the complete bounded result after native FINISHED. No multi-file reader snapshot claim.",
+  "atomicity": "Checkpoint-coordinated sink recovery; no cross-system transaction claimed.",
+  "idempotency": "No external producer dedup contract. A new run requires a fresh owned output path.",
+  "delete_ttl": "Only example teardown; TTL not tested.",
+  "durability": "One host, shared Docker volume; not independent backup or power-loss evidence.",
+  "retry": "Native task restart 10 attempts with 10-second delay; controller does not reload or delete failed output.",
+  "payload": "1,000,000 fixed three-integer rows, 10,000 customer IDs.",
+  "client": "Native SQL client; independent Python exact-body CSV oracle."
+}

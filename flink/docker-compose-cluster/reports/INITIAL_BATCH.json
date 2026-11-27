@@ -1,0 +1,50 @@
+{
+  "scope": "One functional batch with independent exact readback. No capacity comparison.",
+  "date": "2026-11-26",
+  "engine": "Flink 2.3.0",
+  "correctness": {
+    "orders": 1000000,
+    "customers": 10000,
+    "amount_cents": 599500000,
+    "missing": 0,
+    "wrong": 0,
+    "csv_bytes": 15877890,
+    "allocated_output_bytes": 15884288,
+    "output_codec": "uncompressed CSV",
+    "gzip_reference_bytes": 4869875,
+    "gzip_reference_ratio": 3.260430709207115
+  },
+  "roles": {
+    "flink-state-recovery-taskmanager-1": {
+      "samples": 35,
+      "mean_cpu_percent": 3.116,
+      "max_cpu_percent": 37.07,
+      "mean_memory_mib": 550.6514285714286,
+      "peak_memory_mib": 557.0,
+      "last_lifetime_block_io": "0B / 40.7MB"
+    },
+    "flink-state-recovery-jobmanager-1": {
+      "samples": 35,
+      "mean_cpu_percent": 2.7088571428571426,
+      "max_cpu_percent": 18.45,
+      "mean_memory_mib": 544.5657142857143,
+      "peak_memory_mib": 580.3,
+      "last_lifetime_block_io": "135kB / 24.9MB"
+    },
+    "flink-state-recovery-sql-run-737cc07443fc": {
+      "samples": 34,
+      "mean_cpu_percent": 8.48764705882353,
+      "max_cpu_percent": 57.6,
+      "mean_memory_mib": 218.25882352941176,
+      "peak_memory_mib": 226.6,
+      "last_lifetime_block_io": "0B / 46.4MB"
+    }
+  },
+  "measurement_gaps": [
+    "docker stats counters are rounded lifetime container observations",
+    "IOPS and device latency unavailable in this first capture",
+    "startup/build overhead and short-lived verifier may be under-sampled",
+    "No durable history or live independent reader yet"
+  ],
+  "first_attempt": "Failed endpoint configuration. Saved separately in ignored results/failed-sql-client-logs."
+}
