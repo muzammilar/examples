@@ -1,6 +1,6 @@
 name: ${COMPOSE_PROJECT_NAME:-garage-s3-cluster}
 x-garage: &garage
-  image: dxflrs/garage:v2.5.0
+  image: ${GARAGE_IMAGE:-dxflrs/garage:v2.6.0@sha256:4b5a318fc9fe2fbec5d3af590eeafe05d83492e6411266fa0b9e215c20264013}
   command: [/garage, server]
   cpus: 1
   mem_limit: 768m

@@ -1,0 +1,349 @@
+{
+  "fixture": "ae42a87a-be87-4e1c-bea6-d9bc0083dcd1",
+  "cases": [
+    {
+      "case": "fault-process-garage0-20261127T054336-665a8e18",
+      "passed": true,
+      "external_assist": false,
+      "target": "garage0",
+      "mode": "process",
+      "writer": {
+        "ack": 863,
+        "ambiguous": 1
+      },
+      "reader": {
+        "get": 867,
+        "get_error": 0,
+        "wrong": 0
+      },
+      "longest_read_completion_gap_seconds": 5.145750045776367,
+      "phases": {
+        "baseline": {
+          "seconds": 5.768373250961304,
+          "ack": {
+            "count": 62,
+            "p50_ms": 44.60425000002033,
+            "p99_ms": 88.92841700003373,
+            "max_ms": 88.92841700003373,
+            "ops_per_second": 10.748264251046455
+          },
+          "ambiguous": {
+            "count": 0,
+            "ops_per_second": 0.0
+          },
+          "get": {
+            "count": 83,
+            "p50_ms": 3.1801249999716674,
+            "p99_ms": 142.71091699993121,
+            "max_ms": 142.71091699993121,
+            "ops_per_second": 14.388805368336383
+          },
+          "get_error": {
+            "count": 0,
+            "ops_per_second": 0.0
+          }
+        },
+        "injection": {
+          "seconds": 0.22044610977172852,
+          "ack": {
+            "count": 1,
+            "p50_ms": 10.586666999870431,
+            "p99_ms": 10.586666999870431,
+            "max_ms": 10.586666999870431,
+            "ops_per_second": 4.536256053851428
+          },
+          "ambiguous": {
+            "count": 0,
+            "ops_per_second": 0.0
+          },
+          "get": {
+            "count": 2,
+            "p50_ms": 3.692374999900494,
+            "p99_ms": 5.220582999982071,
+            "max_ms": 5.220582999982071,
+            "ops_per_second": 9.072512107702856
+          },
+          "get_error": {
+            "count": 0,
+            "ops_per_second": 0.0
+          }
+        },
+        "outage": {
+          "seconds": 30.00810170173645,
+          "ack": {
+            "count": 197,
+            "p50_ms": 45.68041700008507,
+            "p99_ms": 128.36041700006717,
+            "max_ms": 129.38666700006252,
+            "ops_per_second": 6.564893772957334
+          },
+          "ambiguous": {
+            "count": 1,
+            "p50_ms": 12018.478422000044,
+            "p99_ms": 12018.478422000044,
+            "max_ms": 12018.478422000044,
+            "ops_per_second": 0.03332433387287987
+          },
+          "get": {
+            "count": 63,
+            "p50_ms": 3.940750000083426,
+            "p99_ms": 5094.245918999832,
+            "max_ms": 5094.245918999832,
+            "ops_per_second": 2.0994330339914318
+          },
+          "get_error": {
+            "count": 0,
+            "ops_per_second": 0.0
+          }
+        },
+        "repair": {
+          "seconds": 50.338748931884766,
+          "ack": {
+            "count": 594,
+            "p50_ms": 43.77645900012794,
+            "p99_ms": 94.7392509999645,
+            "max_ms": 129.03591600002073,
+            "ops_per_second": 11.80005488026259
+          },
+          "ambiguous": {
+            "count": 0,
+            "ops_per_second": 0.0
+          },
+          "get": {
+            "count": 496,
+            "p50_ms": 3.025792000016736,
+            "p99_ms": 2505.4062509998403,
+            "max_ms": 5006.993961000035,
+            "ops_per_second": 9.853244479141825
+          },
+          "get_error": {
+            "count": 0,
+            "ops_per_second": 0.0
+          }
+        },
+        "after": {
+          "seconds": 0.852269172668457,
+          "ack": {
+            "count": 9,
+            "p50_ms": 5.451291000099445,
+            "p99_ms": 45.689541000001554,
+            "max_ms": 45.689541000001554,
+            "ops_per_second": 10.560044043152443
+          },
+          "ambiguous": {
+            "count": 0,
+            "ops_per_second": 0.0
+          },
+          "get": {
+            "count": 16,
+            "p50_ms": 1.9691249999596039,
+            "p99_ms": 2.966332999903898,
+            "max_ms": 2.966332999903898,
+            "ops_per_second": 18.77341163227101
+          },
+          "get_error": {
+            "count": 0,
+            "ops_per_second": 0.0
+          }
+        },
+        "reconcile": {
+          "seconds": 12.974431991577148,
+          "ack": {
+            "count": 0,
+            "ops_per_second": 0.0
+          },
+          "ambiguous": {
+            "count": 0,
+            "ops_per_second": 0.0
+          },
+          "get": {
+            "count": 207,
+            "p50_ms": 2.780999999913547,
+            "p99_ms": 55.9297920001427,
+            "max_ms": 86.82883300002686,
+            "ops_per_second": 15.954455665911388
+          },
+          "get_error": {
+            "count": 0,
+            "ops_per_second": 0.0
+          }
+        }
+      },
+      "live_prefix": {
+        "ack_objects": 339,
+        "captured_at": 1795787059.584618
+      },
+      "live_prefix_recovery": {
+        "baseline_blocks": 1394,
+        "physical_blocks": 1911,
+        "verified_copies": 5728,
+        "required_native_copies_verified": 4182,
+        "missing_native_replicas": 0,
+        "misplaced_live_blocks": 0,
+        "corrupt_blocks": 0,
+        "native_partitions": 256,
+        "required_partitions_covered": 255,
+        "layout_version": 1,
+        "ring_sha256": "1b71c2283f784ff8ea1fad552aad14ab72a1c1cecc48e05ecca2f607bde160b2",
+        "wait_seconds": 11.114475631000005,
+        "docker_data_free_bytes": 39392976896
+      },
+      "automatic_metadata_sweeps": 0,
+      "native_final": {
+        "baseline_blocks": 1918,
+        "physical_blocks": 1924,
+        "verified_copies": 5772,
+        "required_native_copies_verified": 5754,
+        "missing_native_replicas": 0,
+        "misplaced_live_blocks": 0,
+        "corrupt_blocks": 0,
+        "native_partitions": 256,
+        "required_partitions_covered": 256,
+        "layout_version": 1,
+        "ring_sha256": "1b71c2283f784ff8ea1fad552aad14ab72a1c1cecc48e05ecca2f607bde160b2",
+        "wait_seconds": 0.3761355839999396,
+        "docker_data_free_bytes": 39390269440
+      }
+    }
+  ],
+  "cumulative_ack_objects": 863,
+  "cumulative_attempted_objects": 864,
+  "optional_attempts_present": 0,
+  "reconciliation": {
+    "objects_verified": 1876,
+    "bytes_verified": 76419072,
+    "missing_acknowledged_keys": 0,
+    "corrupt_objects": 0,
+    "stale_versions": 0,
+    "extra_or_duplicate_keys": 0
+  },
+  "native_final": {
+    "baseline_blocks": 1918,
+    "physical_blocks": 1924,
+    "verified_copies": 5772,
+    "required_native_copies_verified": 5754,
+    "missing_native_replicas": 0,
+    "misplaced_live_blocks": 0,
+    "corrupt_blocks": 0,
+    "native_partitions": 256,
+    "required_partitions_covered": 256,
+    "layout_version": 1,
+    "ring_sha256": "1b71c2283f784ff8ea1fad552aad14ab72a1c1cecc48e05ecca2f607bde160b2",
+    "wait_seconds": 0.37469562499995845,
+    "docker_data_free_bytes": 39389609984
+  },
+  "scope": "API baseline and single-owner process loss; no multipart-specific fault qualification or performance ranking",
+  "version": "2.6.0",
+  "image": "dxflrs/garage:v2.6.0@sha256:4b5a318fc9fe2fbec5d3af590eeafe05d83492e6411266fa0b9e215c20264013",
+  "evidence": "results/multipart-v260",
+  "input": {
+    "small_objects": 1000,
+    "one_mib_objects": 8,
+    "multipart_api_fixture_bytes": 33554432
+  },
+  "storage_usage_snapshot": {
+    "/disks/0": {
+      "files": 598,
+      "apparent_bytes": 25611712,
+      "allocated_bytes": 25669632
+    },
+    "/disks/1": {
+      "files": 658,
+      "apparent_bytes": 24836480,
+      "allocated_bytes": 24891392
+    },
+    "/disks/2": {
+      "files": 671,
+      "apparent_bytes": 28068224,
+      "allocated_bytes": 28131328
+    },
+    "/disks/3": {
+      "files": 621,
+      "apparent_bytes": 23952320,
+      "allocated_bytes": 24006656
+    },
+    "/disks/4": {
+      "files": 632,
+      "apparent_bytes": 30794816,
+      "allocated_bytes": 30871552
+    },
+    "/disks/5": {
+      "files": 674,
+      "apparent_bytes": 23769280,
+      "allocated_bytes": 23814144
+    },
+    "/disks/6": {
+      "files": 640,
+      "apparent_bytes": 27617024,
+      "allocated_bytes": 27680768
+    },
+    "/disks/7": {
+      "files": 644,
+      "apparent_bytes": 22424512,
+      "allocated_bytes": 22470656
+    },
+    "/disks/8": {
+      "files": 643,
+      "apparent_bytes": 28474880,
+      "allocated_bytes": 28540928
+    },
+    "/metadata/0": {
+      "files": 10,
+      "apparent_bytes": 5727686,
+      "allocated_bytes": 5750784
+    },
+    "/metadata/1": {
+      "files": 10,
+      "apparent_bytes": 5748046,
+      "allocated_bytes": 5771264
+    },
+    "/metadata/2": {
+      "files": 10,
+      "apparent_bytes": 8111582,
+      "allocated_bytes": 8134656
+    },
+    "/metadata/3": {
+      "files": 10,
+      "apparent_bytes": 5723542,
+      "allocated_bytes": 5746688
+    },
+    "/metadata/4": {
+      "files": 10,
+      "apparent_bytes": 8054238,
+      "allocated_bytes": 8081408
+    },
+    "/metadata/5": {
+      "files": 10,
+      "apparent_bytes": 5772622,
+      "allocated_bytes": 5795840
+    },
+    "/metadata/6": {
+      "files": 10,
+      "apparent_bytes": 5752142,
+      "allocated_bytes": 5775360
+    },
+    "/metadata/7": {
+      "files": 10,
+      "apparent_bytes": 5785102,
+      "allocated_bytes": 5808128
+    },
+    "/metadata/8": {
+      "files": 10,
+      "apparent_bytes": 8009230,
+      "allocated_bytes": 8036352
+    }
+  },
+  "compression": "compression_level=none; native body compression ratio 1.0; replication, deduplication, metadata and allocation are separate",
+  "source_sha256": {
+    "src/model/s3/object_table.rs": "9fd2c2ce126c4e3aeb98172c7c103454406a01176e12d3f16dc1da6ae2d57a83",
+    "src/model/s3/mpu_table.rs": "b726eb66839b1be542fe2ea995e8e3b533bfaf98a884d5d109ee8f19be2c4e6d",
+    "src/api/s3/multipart.rs": "15746d064aa33c1f1f8f70b44236f46716621bcaca5fcaf064eaefbb1c069784",
+    "src/rpc/layout/version.rs": "49cc5c8992aba1d10943ad2ff8c3babda8ca26d503d6fc0c9c76540f53acdfa0",
+    "src/rpc/layout/history.rs": "3eb22dac7f9c9edcaa267075f743b81d9f98876cd573d69b15628aeff930e19f"
+  },
+  "measurement_limits": [
+    "Initial setup/seed started before the resource observer; no full lifecycle resource claim.",
+    "Docker disk byte counters were available; absent I/O counts/device latency remain unavailable.",
+    "CPU resets during native container restart are accumulated; CPU utilization is omitted across that reset interval."
+  ]
+}

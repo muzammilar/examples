@@ -19,6 +19,7 @@ for path in source.iterdir():
         shutil.copy2(path, target / path.name)
 for name in [
     "traffic.py",
+    "storage_usage.py",
     "test_traffic.py",
     "test_reader.py",
     "witness.py",

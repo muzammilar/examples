@@ -85,3 +85,14 @@ These are correctness/recovery diagnostics. No level-3 competitive benchmark has
 run yet. Curated per-example reports separate missing resource evidence from
 executed checks. Storage interfaces and complex pipelines remain unimplemented
 in this batch. Existing S3 evaluations are historical evidence, not reruns.
+
+## Storage follow-up — 2026-11-27
+
+Garage 2.6.0 has been pinned and requalified in a fresh nine-node lab: 1,013
+API objects, then 863 live ACKs across a 30-second native-owner crash. Final
+readback verified 1,876 objects / 76,419,072 bytes and all 5,754 required native
+copies. CPU, memory, storage and I/O-byte diagnostics are recorded; I/O counts
+and initial-setup sampling remain gaps. Owned cleanup passed. This is not a
+new competitive benchmark or proof of multipart commit-boundary recovery.
+The [three bounded multipart follow-ups](../../garage/s3-cluster/docs/MULTIPART_RECOVERY_PLAN.md)
+remain to implement before the SeaweedFS multipart and CephFS work.

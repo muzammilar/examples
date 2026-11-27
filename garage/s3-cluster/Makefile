@@ -1,6 +1,8 @@
 export PYTHONPATH := $(CURDIR)/scripts:$(CURDIR)/tests:$(CURDIR)/s3-workload
 SHELL := /bin/sh
 COMPOSE_PROJECT_NAME ?= garage-s3-cluster
+GARAGE_IMAGE ?= dxflrs/garage:v2.6.0@sha256:4b5a318fc9fe2fbec5d3af590eeafe05d83492e6411266fa0b9e215c20264013
+export GARAGE_IMAGE
 RESULTS_DIR ?= results/recovery
 OBJECTS ?= 10000
 LARGE_OBJECTS ?= 128
@@ -61,7 +63,7 @@ gateway-failure:
 unit-test:
 	$(RUN) unit
 	$(COMPOSE) run --rm --entrypoint python tools -m unittest -v test_traffic test_placement test_reader
-	python3 -m unittest -v test_control test_teardown test_config
+	python3 -m unittest -v test_control test_teardown test_config test_resource_report
 test-production:
 	$(MAKE) test
 	$(MAKE) failover

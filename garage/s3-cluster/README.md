@@ -1,6 +1,10 @@
 # Garage: replicated S3 and permanent disk loss
 
-Nine Garage 2.5.0 storage nodes distribute three copies across three logical
+The current image pin is Garage **2.6.0**. The historical benchmarks and recovery
+results below were measured on **2.5.0** and remain labeled as such; they do not
+become 2.6.0 performance claims. See the [current multipart recovery follow-up](docs/MULTIPART_RECOVERY_PLAN.md).
+
+Nine Garage storage nodes distribute three copies across three logical
 zones. Separate metadata/data volumes make permanent data-disk replacement
 observable. SQLite metadata, consistent quorum mode and data fsync are explicit.
 
@@ -20,7 +24,7 @@ production secrets. No host ports or host devices are needed.
 
 | Component | Count | Limits / behavior |
 |---|---:|---|
-| Garage `dxflrs/garage:v2.5.0` | 9 | 1 CPU, 768 MiB each; three nodes per logical zone |
+| Garage `dxflrs/garage:v2.6.0` (digest pinned) | 9 | 1 CPU, 768 MiB each; three nodes per logical zone |
 | HAProxy `3.2.8-alpine` | 1 | 0.5 CPU, 128 MiB; nine S3 frontends |
 | Docker-built Boto3 client | 1 | 2 CPUs, 2 GiB; SDK 1.44.3, SigV4/path addressing |
 | Metadata/data disks | 18 | Separate named volumes; shared physical Docker filesystem |
@@ -45,6 +49,45 @@ Unicode keys, copy, four overwrite versions with immediate reads, delete,
 multipart abort, pagination, and invalid Content-MD5 rejection. Eleven shared negative
 client controls reject corrupted/truncated/stale data, unavailable responses,
 missing acknowledgements and malformed pagination.
+
+## Fresh 2.6.0 qualification — 2026-11-27
+
+The digest-pinned ARM64 binary reported `garage v2.6.0`. A new, smaller
+correctness/recovery fixture used 1,000 small objects and eight 1 MiB objects;
+this does not replace the historical 10,000-object performance profile.
+
+| Case | Measured outcome |
+|---|---|
+| Complete API suite | 1,013 objects / 48,140,288 bytes; healthy 32 MiB multipart completion and abort included; zero wrong/missing data |
+| Native owner crash | 30.008 s outage of `garage0`, proved exit 137; 197 PUT ACKs, one ambiguous PUT and 63 successful GETs during outage |
+| Entire live case | 863 ACKs / one ambiguous attempt; 867 successful GETs / zero GET errors; longest completion gap 5.146 s |
+| Final reconciliation | 1,876 objects / 76,419,072 bytes; every ACK present/correct; the non-ACK object absent |
+| Exact physical owners | 5,754 required copies of 1,918 blocks verified over all 256 partitions; zero missing, misplaced or corrupt required copies |
+| Resource diagnostics | Sampled aggregate charged-memory peak 530,042,880 bytes; 29.869 CPU core-seconds, 372,736 disk-read bytes and 1,538,437,120 disk-write bytes across observed intervals |
+| Storage snapshot | Native data directories: 235,549,248 apparent / 236,077,056 allocated bytes; metadata reported separately |
+| Lifecycle | Five commands passed; owned cluster containers, volumes, network and tools tag removed; witnesses retained |
+
+[Recovery/phase results](reports/GARAGE_2_6_RECOVERY.json) and
+[resource samples summary](reports/GARAGE_2_6_RESOURCES.json) retain the native
+copy barrier, CPU utilization, image/limits and measurement gaps. Native repair
+was explicitly invoked; this does not prove completely automatic all-copy repair.
+The original `G010lh` decoder passed on all nine 2.6.0 metadata disks, with native
+partition/ring lookup reviewed against pinned source. Unknown/transitional layouts
+still fail closed.
+
+Initial setup and seed started before resource sampling; these are observed-window
+diagnostics, **not** full-lifecycle totals or a repeated comparative benchmark.
+Docker exposed I/O byte counters but no operation counts or device latency. Reads
+were warm/shared-cache, not verified cold. Compression is disabled (native body
+ratio 1.0); replication, deduplication, metadata, GC and allocation are separate costs.
+No 2.5.0-versus-2.6.0 performance winner is established. The live-crash trial did
+not inject a fault inside multipart completion; [that follow-up remains unrun](docs/MULTIPART_RECOVERY_PLAN.md).
+
+To observe another case, use `RESULTS_DIR=... python3 scripts/observe.py failover`
+(or `verify`) with the same local fixture. `scripts/storage_usage.py` runs inside
+the read-only audit container; `scripts/resource_report.py` summarizes raw Docker
+counters and accounts for counter resets across container restart. No host cloud
+credentials or host filesystem storage paths are used.
 
 ## Live production tests
 
@@ -134,7 +177,7 @@ are still three zone copies; that case has a negative unit control. The suite
 also verifies complete S3 bodies against the external SHA-256 witness. Native
 metadata worker/queue checks are not independent byte-for-byte verification of
 every SQLite metadata row. The auditor is deliberately scoped to uncompressed,
-single-data-directory Garage 2.5.0, with the fixed nine-node layout used here.
+single-data-directory Garage 2.5.0 and the fresh 2.6.0 baseline, with the fixed nine-node layout used here.
 
 ### Lifecycle and remaining boundaries
 

@@ -1,4 +1,4 @@
-"""Read-only lookup of Garage 2.5.0's persisted, natively computed replica ring.
+"""Read-only lookup of Garage 2.5/2.6's persisted, natively computed replica ring.
 
 This reads G010lh MessagePack, then uses the same partition/table lookup as
 LayoutVersion::{partition_of,nodes_of}. No placement assignment is recomputed.
