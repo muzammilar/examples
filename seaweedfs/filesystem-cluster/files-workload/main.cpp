@@ -191,18 +191,36 @@ void seed(const std::string &run, std::size_t count, std::size_t size,
     write_all(witness.get(), line.data(), line.size());
     sync(witness.get());
     const auto start = Clock::now();
+    auto stage_started = start;
+    auto completed_stage = [&](const char *name) {
+      const auto finished = Clock::now();
+      row["stages_ms"][name] =
+          std::chrono::duration<double, std::milli>(finished - stage_started)
+              .count();
+      stage_started = Clock::now();
+    };
     try {
       auto temporary = directory / ("." + std::to_string(seq) + ".tmp");
       File out(temporary, O_WRONLY | O_CREAT | O_EXCL);
+      completed_stage("file_open");
       write_all(out.get(), data.data(), data.size());
+      completed_stage("file_write");
       sync(out.get());
+      completed_stage("file_fsync");
       out.close();
+      completed_stage("file_close");
       fs::rename(temporary, directory / std::to_string(seq));
+      completed_stage("rename");
       File parent(directory, O_RDONLY | O_DIRECTORY);
+      completed_stage("directory_open");
       sync(parent.get());
-      if (SYNC_PUBLICATION_WITH_SYNCFS)
+      completed_stage("directory_fsync");
+      if (SYNC_PUBLICATION_WITH_SYNCFS) {
         check(::syncfs(parent.get()) == 0, "syncfs publication");
+        completed_stage("syncfs");
+      }
       parent.close();
+      completed_stage("directory_close");
       row["event"] = "ack";
     } catch (const std::exception &e) {
       row["event"] = "ambiguous";

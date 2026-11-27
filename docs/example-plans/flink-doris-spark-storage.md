@@ -185,3 +185,10 @@ with in-place/log-based recovery documented. Three short hot-query trials are di
 not a competitive winner. The final configuration passed a separate 10,000-order
 fresh lifecycle, including exact native checkpoint settings and owned teardown.
 Next: bounded FUSE stage diagnosis and the remaining pipeline/storage paths above.
+
+The [bounded FUSE publication probe](../../seaweedfs/filesystem-cluster/projects/fuse-publication-stalls/)
+subsequently localized the long publications to rename: 28/128 calls exceeded
+500 ms; p95 1,019.055 ms. File fsync peaked at 15.334 ms. All 256 ACK files and
+768 native copies passed exact readback; resource/compressibility measurements
+and scoped cleanup are preserved. DLM retry is a source-informed candidate, not
+a proven internal cause. Other storage follow-ups remain open.

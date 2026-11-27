@@ -54,6 +54,7 @@ limited to 512 files / 180 seconds and stops cooperatively after recovery.
 | `make unit-test` | Seven offline oracle controls, including corrupt-replica, missing-ACK and HTTP fixture-ownership rejection |
 | `make api-up` / `make api-test` | Build/start the local HTTP application and verify its baseline |
 | `make api-filer-failure` | Live HTTP writer/reader during proven simultaneous filer loss |
+| `make publication-stalls` | [Bounded syscall-stage diagnosis](projects/fuse-publication-stalls/) of the preserved FUSE publication stalls |
 | `make api-compare` | Three bounded paired native-HTTP/FUSE trials, no S3 gateway |
 
 `files-workload/` contains the C++ source, CMake/Ninja build, Dockerfile and mount
@@ -61,6 +62,8 @@ entrypoint. `config/` holds the etcd-backed filer setup and declared contract;
 `scripts/` contains lifecycle, independent payload/replica checks and reporting.
 `projects/native-http/` keeps the API workload, tests, comparison and its reports
 together; it shares this lab’s explicitly owned backend and cleanup.
+`projects/fuse-publication-stalls/` keeps the bounded publication-stage diagnostic
+and its reports beside the original comparison.
 `reports/` holds curated evidence. Raw histories, failed trials and resource
 samples stay under ignored `results/`; build/research caches stay in `.build/`.
 The example uses no sibling Makefile, generated state or machine-local source.

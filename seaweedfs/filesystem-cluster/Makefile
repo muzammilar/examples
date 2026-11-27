@@ -72,3 +72,7 @@ api-test-production:
 	$(MAKE) api-verify
 	$(MAKE) api-filer-failure
 	$(MAKE) api-verify
+
+.PHONY: publication-stalls
+publication-stalls:
+	$(PYTHON) projects/fuse-publication-stalls/diagnose.py
