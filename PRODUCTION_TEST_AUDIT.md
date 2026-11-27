@@ -15,6 +15,19 @@ execution evidence.
 
 ## Fresh qualification in this follow-up
 
+- [SeaweedFS filesystem](seaweedfs/filesystem-cluster/) (additional 2026-11-27
+  batch example): two independent FUSE mounts, C++ publication/readback and
+  distributed flock exclusion passed. The final ten-second loss of both filers
+  recorded **15 ACKs / one ambiguous create** and **19 complete historical-read
+  cycles / one EIO cycle**, then both actors recovered. All retained histories
+  verified **161 ACK files / 42,205,184 bytes** and **483 direct native-copy reads**;
+  two ambiguous paths were confirmed absent without replay. Initial capability,
+  lock-probe and stop-on-RPC-error failures remain preserved. CPU/memory/native
+  I/O and owned-volume allocation are reported with compression/measurement gaps.
+  Scoped teardown passed. FUSE metadata-quorum loss, physical disk replacement,
+  lock-owner crash, upgrades and independent restore remain unrun; kernel/native
+  API performance comparisons are deferred.
+
 - [CephFS](ceph/filesystem-ha/) (additional 2026-11-27 batch example, outside the
   original cohort count): Umbrella 21.2.0 native C++ clients, three guests, nine
   OSDs and active/standby MDS. Two real active-MDS SIGKILLs promoted the standby

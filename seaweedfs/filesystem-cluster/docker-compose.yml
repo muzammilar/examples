@@ -1,0 +1,211 @@
+name: seaweedfs-filesystem-cluster
+x-seaweed: &seaweed chrislusf/seaweedfs:4.55@sha256:7ca46aeae2f223b37e5d91593c17ab37738eec6df6ab69b48a0487f7643342b9
+x-etcd: &etcd gcr.io/etcd-development/etcd:v3.7.4@sha256:47d217be8ec4ca943954b5f4bf8029ee9bc0ffb05fbe2a44d579a1f640e03ed4
+x-store: &store
+  image: *seaweed
+  networks: [lab]
+  cap_drop: [ALL]
+  cap_add: [SETUID, SETGID, CHOWN, DAC_OVERRIDE]
+  cpus: 0.5
+  mem_limit: 512m
+x-mount: &mount
+  image: seaweedfs-filesystem-workload:4.55
+  build:
+    context: .
+    dockerfile: files-workload/Dockerfile
+  profiles: [application]
+  networks: [lab]
+  cap_drop: [ALL]
+  cap_add: [SYS_ADMIN]
+  security_opt: [apparmor:unconfined]
+  devices: [/dev/fuse:/dev/fuse]
+  cpus: 1
+  mem_limit: 512m
+  stop_grace_period: 30s
+  volumes: [./results:/results]
+  healthcheck:
+    test: [CMD, mountpoint, -q, /mnt/lab]
+    interval: 2s
+    timeout: 2s
+    retries: 45
+services:
+  master0:
+    <<: *store
+    hostname: master0
+    command: [master, -ip=master0, -ip.bind=0.0.0.0, -mdir=/data, '-peers=master0:9333,master1:9333,master2:9333', -defaultReplication=200, -volumeSizeLimitMB=64]
+    cpus: 0.25
+    mem_limit: 256m
+    volumes: [master0:/data]
+    healthcheck:
+      test: [CMD, wget, -q, -O, /dev/null, http://127.0.0.1:9333/cluster/status]
+      interval: 2s
+      timeout: 2s
+      retries: 60
+  master1:
+    <<: *store
+    hostname: master1
+    command: [master, -ip=master1, -ip.bind=0.0.0.0, -mdir=/data, '-peers=master0:9333,master1:9333,master2:9333', -defaultReplication=200, -volumeSizeLimitMB=64]
+    cpus: 0.25
+    mem_limit: 256m
+    volumes: [master1:/data]
+    healthcheck:
+      test: [CMD, wget, -q, -O, /dev/null, http://127.0.0.1:9333/cluster/status]
+      interval: 2s
+      timeout: 2s
+      retries: 60
+  master2:
+    <<: *store
+    hostname: master2
+    command: [master, -ip=master2, -ip.bind=0.0.0.0, -mdir=/data, '-peers=master0:9333,master1:9333,master2:9333', -defaultReplication=200, -volumeSizeLimitMB=64]
+    cpus: 0.25
+    mem_limit: 256m
+    volumes: [master2:/data]
+    healthcheck:
+      test: [CMD, wget, -q, -O, /dev/null, http://127.0.0.1:9333/cluster/status]
+      interval: 2s
+      timeout: 2s
+      retries: 60
+  etcd0:
+    image: *etcd
+    hostname: etcd0
+    entrypoint: [/usr/local/bin/etcd]
+    networks: [lab]
+    cap_drop: [ALL]
+    cpus: 0.5
+    mem_limit: 256m
+    command: [--name=etcd0, --data-dir=/data, --listen-client-urls=http://0.0.0.0:2379, --advertise-client-urls=http://etcd0:2379, --listen-peer-urls=http://0.0.0.0:2380, --initial-advertise-peer-urls=http://etcd0:2380, '--initial-cluster=etcd0=http://etcd0:2380,etcd1=http://etcd1:2380,etcd2=http://etcd2:2380', --initial-cluster-token=seaweedfs-filesystem-cluster, --auto-compaction-retention=1]
+    volumes: [etcd0:/data]
+    healthcheck:
+      test: [CMD, /usr/local/bin/etcdctl, endpoint, health]
+      interval: 2s
+      timeout: 2s
+      retries: 60
+  etcd1:
+    image: *etcd
+    hostname: etcd1
+    entrypoint: [/usr/local/bin/etcd]
+    networks: [lab]
+    cap_drop: [ALL]
+    cpus: 0.5
+    mem_limit: 256m
+    command: [--name=etcd1, --data-dir=/data, --listen-client-urls=http://0.0.0.0:2379, --advertise-client-urls=http://etcd1:2379, --listen-peer-urls=http://0.0.0.0:2380, --initial-advertise-peer-urls=http://etcd1:2380, '--initial-cluster=etcd0=http://etcd0:2380,etcd1=http://etcd1:2380,etcd2=http://etcd2:2380', --initial-cluster-token=seaweedfs-filesystem-cluster, --auto-compaction-retention=1]
+    volumes: [etcd1:/data]
+    healthcheck:
+      test: [CMD, /usr/local/bin/etcdctl, endpoint, health]
+      interval: 2s
+      timeout: 2s
+      retries: 60
+  etcd2:
+    image: *etcd
+    hostname: etcd2
+    entrypoint: [/usr/local/bin/etcd]
+    networks: [lab]
+    cap_drop: [ALL]
+    cpus: 0.5
+    mem_limit: 256m
+    command: [--name=etcd2, --data-dir=/data, --listen-client-urls=http://0.0.0.0:2379, --advertise-client-urls=http://etcd2:2379, --listen-peer-urls=http://0.0.0.0:2380, --initial-advertise-peer-urls=http://etcd2:2380, '--initial-cluster=etcd0=http://etcd0:2380,etcd1=http://etcd1:2380,etcd2=http://etcd2:2380', --initial-cluster-token=seaweedfs-filesystem-cluster, --auto-compaction-retention=1]
+    volumes: [etcd2:/data]
+    healthcheck:
+      test: [CMD, /usr/local/bin/etcdctl, endpoint, health]
+      interval: 2s
+      timeout: 2s
+      retries: 60
+  volume0:
+    <<: *store
+    hostname: volume0
+    command: [volume, -ip=volume0, -ip.bind=0.0.0.0, -port=8080, -dir=/data, '-master=master0:9333,master1:9333,master2:9333', -max=8, -dataCenter=zone0, -rack=rack0, -minFreeSpace=1GiB]
+    volumes: [volume0:/data]
+    depends_on:
+      master0: {condition: service_healthy}
+      master1: {condition: service_healthy}
+      master2: {condition: service_healthy}
+    healthcheck:
+      test: [CMD, wget, -q, -O, /dev/null, http://127.0.0.1:8080/healthz]
+      interval: 2s
+      timeout: 2s
+      retries: 60
+  volume1:
+    <<: *store
+    hostname: volume1
+    command: [volume, -ip=volume1, -ip.bind=0.0.0.0, -port=8080, -dir=/data, '-master=master0:9333,master1:9333,master2:9333', -max=8, -dataCenter=zone1, -rack=rack1, -minFreeSpace=1GiB]
+    volumes: [volume1:/data]
+    depends_on:
+      master0: {condition: service_healthy}
+      master1: {condition: service_healthy}
+      master2: {condition: service_healthy}
+    healthcheck:
+      test: [CMD, wget, -q, -O, /dev/null, http://127.0.0.1:8080/healthz]
+      interval: 2s
+      timeout: 2s
+      retries: 60
+  volume2:
+    <<: *store
+    hostname: volume2
+    command: [volume, -ip=volume2, -ip.bind=0.0.0.0, -port=8080, -dir=/data, '-master=master0:9333,master1:9333,master2:9333', -max=8, -dataCenter=zone2, -rack=rack2, -minFreeSpace=1GiB]
+    volumes: [volume2:/data]
+    depends_on:
+      master0: {condition: service_healthy}
+      master1: {condition: service_healthy}
+      master2: {condition: service_healthy}
+    healthcheck:
+      test: [CMD, wget, -q, -O, /dev/null, http://127.0.0.1:8080/healthz]
+      interval: 2s
+      timeout: 2s
+      retries: 60
+  filer0:
+    <<: *store
+    hostname: filer0
+    command: [filer, -ip=filer0, -ip.bind=0.0.0.0, '-master=master0:9333,master1:9333,master2:9333', -defaultReplicaPlacement=200, -maxMB=2]
+    volumes: [./config/filer.toml:/etc/seaweedfs/filer.toml:ro]
+    depends_on:
+      etcd0: {condition: service_healthy}
+      etcd1: {condition: service_healthy}
+      etcd2: {condition: service_healthy}
+    healthcheck:
+      test: [CMD, wget, -q, -O, /dev/null, http://127.0.0.1:8888/healthz]
+      interval: 2s
+      timeout: 2s
+      retries: 60
+  filer1:
+    <<: *store
+    hostname: filer1
+    command: [filer, -ip=filer1, -ip.bind=0.0.0.0, '-master=master0:9333,master1:9333,master2:9333', -defaultReplicaPlacement=200, -maxMB=2]
+    volumes: [./config/filer.toml:/etc/seaweedfs/filer.toml:ro]
+    depends_on:
+      etcd0: {condition: service_healthy}
+      etcd1: {condition: service_healthy}
+      etcd2: {condition: service_healthy}
+    healthcheck:
+      test: [CMD, wget, -q, -O, /dev/null, http://127.0.0.1:8888/healthz]
+      interval: 2s
+      timeout: 2s
+      retries: 60
+  files-writer:
+    <<: *mount
+    hostname: files-writer
+    environment:
+      FILERS: filer0:8888,filer1:8888
+    depends_on:
+      filer0: {condition: service_healthy}
+      filer1: {condition: service_healthy}
+  files-reader:
+    <<: *mount
+    hostname: files-reader
+    environment:
+      FILERS: filer0:8888,filer1:8888
+    depends_on:
+      filer0: {condition: service_healthy}
+      filer1: {condition: service_healthy}
+networks:
+  lab:
+    internal: true
+volumes:
+  master0:
+  master1:
+  master2:
+  etcd0:
+  etcd1:
+  etcd2:
+  volume0:
+  volume1:
+  volume2:

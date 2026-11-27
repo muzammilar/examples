@@ -1,0 +1,18 @@
+{
+  "backend": "SeaweedFS 4.55 FUSE, etcd 3.7.4",
+  "operations": ["exclusive staging create", "write", "fsync", "close", "rename", "directory fsync", "exact read and EOF", "cross-mount flock"],
+  "atomicity_claim": "Single immutable same-filesystem rename publication; no multi-file transaction claim",
+  "consistency_claim": "All acknowledged bodies survive the bounded filer-process outage and reconcile through both mounts and three native volume endpoints",
+  "replication": "200: one volume copy per each of three logical zones",
+  "writeback_cache": false,
+  "distributed_locks": true,
+  "metadata_cache_ttl_s": 1,
+  "payload_default_bytes": 262144,
+  "payload_max_bytes": 1048576,
+  "run_max_bytes": 268435456,
+  "external_supervisor_s": 180,
+  "retries": "No application mutation replay; unique next operation after ambiguous error. Native mount retries follow pinned upstream implementation. Read transport errors are observed and retried; wrong bodies and unexpected missing ACKs fail.",
+  "delete_ttl": "unqualified",
+  "fault_expectation": "Both filer processes exit 137; availability errors/stalls allowed during ten-second hold, then at least five new ACKs and three full historical read cycles, all old ACKs intact and all three copies verified",
+  "unclaimed": ["physical host independence", "power-loss durability", "complete POSIX consistency", "lock-owner crash recovery", "independent backup", "compression benefit"]
+}

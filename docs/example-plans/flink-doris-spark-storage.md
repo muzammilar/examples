@@ -27,7 +27,7 @@ interfaces instead of introducing custom Java test utilities.
 ## Storage work
 
 - [x] Extend existing Garage and SeaweedFS S3 labs with interrupted multipart completion and fresh full-body reads. Serving-role loss during an incomplete request, retained-part resume, discarded responses and logical abort passed; internal commit interruption and physical reclamation remain unrun.
-- [ ] Add a SeaweedFS filesystem workload with concurrent mounted clients, file-close visibility, rename, reader reconnect and metadata outage. Qualify the actual mount primitive independently from the existing S3 API.
+- [x] Add a separate SeaweedFS filesystem workload with two independent mounts, file publication/rename/readback, cross-mount flock and live filer-outage recovery. The bounded initial contract passed; contended mutation, lock-owner crash, metadata quorum and filesystem disk loss remain follow-ups.
 - [x] Add a dedicated native-client [CephFS project](../../ceph/filesystem-ha/). Active-MDS crash, standby promotion, exact ACK manifests and diagnosed retained-setup recovery ran; keep CPU/emulation limits visible.
 - [ ] Extend CephFS to whole-guest/OSD loss and independent restore; RGW recovery does not establish the filesystem interface's behavior.
 - [x] Qualify HDFS replication and initial live failover in the Hadoop metadata-HA example. Record client-visible publication and retain the failed native JSch fencing case; partitions/quorum loss/independent restore remain follow-ups.
@@ -117,5 +117,21 @@ and the fixed repeat passed without reseeding. A redundant image-removal cleanup
 error was preserved, fixed and explicitly retried. CPU/memory/disk bytes, native
 whole-device I/O counts and storage/compression gaps are documented in the
 [CephFS README](../../ceph/filesystem-ha/). Owned infrastructure was removed;
-raw witnesses remain ignored. Next: SeaweedFS mounted-client semantics, then the
-pipeline gates above. Physical abort reclamation remains further work.
+raw witnesses remain ignored.
+
+The separate [SeaweedFS filesystem cluster](../../seaweedfs/filesystem-cluster/)
+then verified two independent FUSE mounts, distributed flock and a ten-second
+SIGKILL of both filer processes under live traffic. Final readback checked all
+161 ACKed files / 42,205,184 bytes and 483 direct replica reads. Two ambiguous
+creates were confirmed absent without replay. EIO reads/EAGAIN creates remained
+visible; both actors resumed. Initial capability/probe/error-policy failures stay
+documented. CPU, memory, native I/O and allocated storage are recorded, with
+compression and measurement gaps explicit. Scoped teardown passed. Next: the
+pipeline gates above; filesystem quorum/disk/restore cases and physical multipart
+abort reclamation remain further work.
+
+Future production-client work (explicitly deferred, not today's execution):
+compare native SeaweedFS S3/filer APIs with FUSE where applications can use object
+semantics, and CephFS kernel/FUSE/library clients where POSIX access is needed.
+Separate metadata-heavy/small-file and sequential/bulk workloads, cache states,
+durability and fault behavior before making performance recommendations.
