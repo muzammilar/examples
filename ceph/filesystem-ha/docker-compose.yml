@@ -21,5 +21,7 @@ services:
       - ./native:/opt/lab/native:ro
       - ./.build/files-workload:/opt/workload:ro
       - ./results:/results
+      - ./projects/kernel-client:/opt/lab/kernel-client:ro
+      - ./.build/kernel-workload-artifact:/opt/kernel-workload:ro
 volumes:
   state:

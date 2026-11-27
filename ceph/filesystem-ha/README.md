@@ -39,7 +39,10 @@ fixture. Cleanup refuses when acknowledged bodies cannot be reconciled.
 | `make resources` | Save guest daemon/cgroup counters, Ceph storage statistics and sparse-disk usage |
 | `python3 scripts/observe.py test-production` | Also sample owned Docker CPU/memory/disk/network during the serial test |
 | `make recover-keyrings` | Narrow recovery for the diagnosed empty-keyring bootstrap bug, followed by old-ACK reconciliation |
-| `make unit-test` | Offline corrupted/truncated/misordered witness controls |
+| `make unit-test` | Offline corrupted/truncated/misordered witness and fixture-ownership controls |
+| `make kernel-up` / `make kernel-test` | Prepare secure guest kernel mounts; verify matched bodies |
+| `make kernel-reopen` | Unmount/remount and reread retained ACKs without reseeding |
+| `make kernel-compare` | Three paired, 1,000-file access-path diagnostic trials |
 
 - `files-workload/`: C++ application, CMake/Ninja and Docker build. Native
   `libcephfs`, OpenSSL and nlohmann/json handle storage, hashing and JSON.
@@ -52,12 +55,16 @@ fixture. Cleanup refuses when acknowledged bodies cannot be reconciled.
 - `vm-runtime/`: symlinks to tracked boot/capacity source. `prepare_build.py`
   copies them as regular files into ignored `.build/runtime/` before building.
   No sibling Makefile or generated state is used.
+- `projects/kernel-client/`: kernel mounts, local Docker build, comparison, recovery
+  and results; the parent owns its guest lifecycle.
 - `reports/`: compact curated measurements; ignored `results/` contains immutable
   original journals, exports, actor logs, FSMap observations and raw samples.
 
 The workload is managed through the Compose control service but executes inside
 the guests, where it can reach the private Ceph network. It uses the native C API;
-**kernel and FUSE mounts are untested**. There is no separately managed host client.
+the [kernel-client project](projects/kernel-client/) adds guest-only kernel mounts
+and a bounded library-versus-kernel comparison. FUSE remains untested. There is no
+separately managed host client.
 
 ## Contract and topology
 

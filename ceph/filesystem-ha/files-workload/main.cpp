@@ -19,6 +19,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <sys/resource.h>
 #include <system_error>
 #include <thread>
 #include <unistd.h>
@@ -70,6 +71,13 @@ public:
     try {
       checked(ceph_conf_read_file(handle, "/etc/ceph/ceph.conf"),
               "read owned config");
+      checked(ceph_conf_set(handle, "ms_client_mode", "secure"),
+              "require encrypted client transport");
+      std::array<char, 128> mode{};
+      checked(ceph_conf_get(handle, "ms_client_mode", mode.data(), mode.size()),
+              "read client transport mode");
+      emit(
+          {{"event", "client_configuration"}, {"ms_client_mode", mode.data()}});
       checked(
           ceph_conf_set(handle, "keyring",
                         ("/etc/ceph/ceph.client." + id + ".keyring").c_str()),
@@ -177,6 +185,7 @@ struct Mismatch : std::runtime_error {
   using std::runtime_error::runtime_error;
 };
 void verify_body(ceph_mount_info *connection, const json &expected) {
+  const auto started = Clock::now();
   File file(connection, expected.at("path").get<std::string>(), O_RDONLY);
   const auto count = expected.at("bytes").get<std::size_t>();
   std::vector<char> data(count);
@@ -198,19 +207,29 @@ void verify_body(ceph_mount_info *connection, const json &expected) {
     throw Mismatch("Wrong successful body/length: " +
                    expected.at("path").get<std::string>());
   file.close();
+  emit({{"event", "body_read"},
+        {"path", expected.at("path")},
+        {"bytes", count},
+        {"duration_ms",
+         std::chrono::duration<double, std::milli>(Clock::now() - started)
+             .count()}});
 }
-json expected(const std::string &run, std::size_t sequence, std::size_t size) {
+json expected(const std::string &run, std::size_t sequence,
+              const std::vector<char> &data) {
   return {{"run", run},
           {"sequence", sequence},
           {"path", "/objects/" + run + "/" + std::to_string(sequence)},
-          {"bytes", size},
-          {"sha256", sha256(payload(run, sequence, size))}};
+          {"bytes", data.size()},
+          {"sha256", sha256(data)}};
+}
+json expected(const std::string &run, std::size_t sequence, std::size_t size) {
+  return expected(run, sequence, payload(run, sequence, size));
 }
 void publish(ceph_mount_info *connection, Journal &journal,
              const fs::path &directory, const std::string &run,
              std::size_t sequence, std::size_t size) {
   const auto data = payload(run, sequence, size);
-  auto record = expected(run, sequence, size);
+  auto record = expected(run, sequence, data);
   record["event"] = "attempt";
   record["utc_start_ms"] = epoch_ms();
   record["phase_start"] = contents(directory / "phase");
@@ -268,6 +287,13 @@ std::map<std::size_t, json> acknowledged(const fs::path &file,
   return result;
 }
 void resources() {
+  rusage usage{};
+  if (getrusage(RUSAGE_SELF, &usage) == 0)
+    emit({{"event", "process_resources"},
+          {"peak_rss_kib", usage.ru_maxrss},
+          {"user_cpu_s", usage.ru_utime.tv_sec + usage.ru_utime.tv_usec / 1e6},
+          {"system_cpu_s",
+           usage.ru_stime.tv_sec + usage.ru_stime.tv_usec / 1e6}});
   emit({{"event", "resources"},
         {"proc_status", contents("/proc/self/status")},
         {"proc_io", contents("/proc/self/io")}});
@@ -335,6 +361,10 @@ int main(int argc, char **argv) {
       }
       std::size_t ambiguous_present = 0;
       for (const auto &[sequence, item] : attempts) {
+        const auto bytes = item.at("bytes").get<std::size_t>();
+        if (!bytes || bytes > 16777216 ||
+            expected(run, sequence, bytes).at("sha256") != item.at("sha256"))
+          throw Mismatch("Witness differs from deterministic payload corpus");
         if (acks.count(sequence)) {
           if (acks.at(sequence).at("path") != item.at("path") ||
               acks.at(sequence).at("sha256") != item.at("sha256") ||

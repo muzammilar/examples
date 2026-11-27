@@ -3,6 +3,7 @@ SHELL := /bin/bash
 COMPOSE := docker compose --project-name ceph-filesystem-ha
 export COMPOSE_PROJECT_NAME := ceph-filesystem-ha
 PYTHON ?= python3
+KERNEL_CLIENT ?= 0
 .NOTPARALLEL:
 .PHONY: build-guests docker-up status
 build-guests:
@@ -25,6 +26,7 @@ up: build-workload
 	$(PYTHON) scripts/guard.py
 	$(COMPOSE) run --rm control /opt/lab/native/bootstrap.py
 	$(COMPOSE) run --rm control /opt/lab/native/workload.py install
+	@if [ "$(KERNEL_CLIENT)" = 1 ]; then $(MAKE) kernel-up; fi
 
 FILES ?= 128
 PAYLOAD_BYTES ?= 262144
@@ -32,6 +34,7 @@ export FILES PAYLOAD_BYTES
 .PHONY: test verify
 test:
 	$(PYTHON) scripts/test.py baseline
+	@if [ "$(KERNEL_CLIENT)" = 1 ]; then $(MAKE) kernel-test; fi
 verify:
 	$(PYTHON) scripts/test.py verify
 
@@ -62,3 +65,22 @@ recover-keyrings:
 .PHONY: cli
 cli:
 	$(COMPOSE) exec guests ssh -F /dev/null -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i /state/id_ed25519 -p 2221 -t root@127.0.0.1
+
+.PHONY: build-kernel kernel-up kernel-test kernel-verify
+build-kernel:
+	$(PYTHON) projects/kernel-client/prepare.py
+	docker build -f projects/kernel-client/Dockerfile --target artifact --output type=local,dest=.build/kernel-workload-artifact .
+kernel-up: build-kernel
+	$(PYTHON) projects/kernel-client/control.py up
+kernel-test:
+	$(PYTHON) projects/kernel-client/control.py test
+kernel-verify:
+	$(PYTHON) projects/kernel-client/control.py verify
+
+.PHONY: kernel-compare
+kernel-compare:
+	$(PYTHON) projects/kernel-client/compare.py
+
+.PHONY: kernel-reopen
+kernel-reopen:
+	$(PYTHON) projects/kernel-client/control.py reopen

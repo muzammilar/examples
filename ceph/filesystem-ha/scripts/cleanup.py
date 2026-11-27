@@ -17,6 +17,18 @@ def main():
             raise RuntimeError("Deployment already removed; use make docker-down")
         directory = lab.ROOT / "results" / ("teardown-" + str(time.time_ns()))
         directory.mkdir()
+        kernel_environment = lab.ROOT / "results/kernel-client/environment.json"
+        if kernel_environment.exists():
+            if json.loads(kernel_environment.read_text())["fsid"] != data["fsid"]:
+                raise RuntimeError("Kernel environment belongs to another cluster")
+            subprocess.run(
+                [
+                    sys.executable,
+                    str(lab.ROOT / "projects/kernel-client/control.py"),
+                    "down",
+                ],
+                check=True,
+            )
         # Any failed reconciliation preserves the running infrastructure for diagnosis.
         verified = checks.audit(directory)
         removed = json.loads(lab.native("remove_filesystem.py", data["fsid"]).stdout)
@@ -68,6 +80,12 @@ def main():
         if subprocess.check_output(listing, text=True).strip():
             raise RuntimeError("Owned build tag remains")
         index = lab.ROOT / "results/fixture.json"
+        for name in ("fixture", "environment"):
+            path = lab.ROOT / "results/kernel-client" / (name + ".json")
+            if path.exists():
+                path.rename(
+                    path.parent / ("retired-" + name + "-" + data["id"] + ".json")
+                )
         index.rename(lab.ROOT / "results" / ("retired-fixture-" + data["id"] + ".json"))
         checks.save(
             lab.ROOT / "results" / ("destroyed-" + data["id"] + ".json"),

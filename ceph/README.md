@@ -22,3 +22,7 @@ beside the measured results.
 |---|---|
 | [s3-cluster](s3-cluster/README.md#future-work--todo) | Isolate individual MON, MGR, OSD and RGW daemon failures instead of inferring them from whole-guest outages. |
 | [filesystem-ha](filesystem-ha/README.md#deployment-limits-and-next-tests) | Filesystem-interface disk/guest loss, partitions, mounted-client semantics, MDS scaling and independent restore. |
+
+The CephFS lab also contains a [kernel-client access-path comparison](filesystem-ha/projects/kernel-client/)
+with guest-only secure mounts and remount recovery. These clients share the
+parent lab’s lifecycle; no host kernel mount or cloud storage is used.

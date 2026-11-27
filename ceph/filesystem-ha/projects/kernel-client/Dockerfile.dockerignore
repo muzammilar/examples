@@ -1,0 +1,5 @@
+**
+!.build/
+!.build/kernel-workload/
+!.build/kernel-workload/main.cpp
+!.build/kernel-workload/CMakeLists.txt
