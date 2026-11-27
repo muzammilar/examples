@@ -1,0 +1,11 @@
+{
+  "operations": ["finite joined Parquet write", "fresh Spark read", "independent Arrow exact read"],
+  "workload": {"orders": 1000000, "customers": 10000, "amount_cents": 599500000, "source_partitions": 16},
+  "execution": "local[1]: one JVM scheduler/executor and one Python driver process, not a standalone cluster",
+  "publication": "Spark file commit protocol and _SUCCESS; no transaction or concurrent-writer guarantee",
+  "retry": "errorifexists rejects overwriting an existing output; no blind writer replay after ambiguity",
+  "durability": "One example-owned local Docker volume; no replicated storage or independent backup",
+  "reference_client": {"cpu_limit": 1, "memory_limit": "2GiB", "driver_heap": "1g", "shuffle_partitions": 8, "application_restart": "none"},
+  "failure_case": "SIGKILL read-only application after observing an active native task, then fresh readers verify original published data",
+  "unrun": ["interrupted writer publication", "disk-full", "corrupt Parquet", "independent restore", "physical power loss", "matched competitive benchmark"]
+}

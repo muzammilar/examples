@@ -1,0 +1,365 @@
+{
+  "tested_at_utc": "2026-11-27T01:26:20.988887+00:00",
+  "qualification": "Initial finite correctness and reader-process recovery diagnostics; no competitive performance claim",
+  "versions": {
+    "spark": "4.3.0",
+    "arrow": "26.0.1"
+  },
+  "environment": {
+    "NCPU": 11,
+    "MemTotal": 26216296448,
+    "KernelVersion": "6.12.76-linuxkit",
+    "OperatingSystem": "Docker Desktop",
+    "Driver": "overlayfs",
+    "ServerVersion": "29.5.3",
+    "docker_api": "1.54"
+  },
+  "baseline": {
+    "mode": "write",
+    "phases": {
+      "write": {
+        "elapsed_s": 11.426024292130023
+      },
+      "verify": {
+        "elapsed_s": 9.402765166945755
+      },
+      "arrow": {
+        "elapsed_s": 0.5344861669000238
+      }
+    },
+    "orders_source_sha256": "5037c8c8bc8d4a4072d467496657aa6d79f7713a901d313a5fb3e612b8b94506",
+    "oracle_source_sha256": "679aeb238efa1f93a8b97d8e1f20f2130fca679ab878d113162f460cf454593b",
+    "orders": 1000000,
+    "amount_cents": 599500000,
+    "missing": 0,
+    "wrong": 0
+  },
+  "reader_crash": {
+    "observed_active_tasks": [
+      {
+        "id": "driver",
+        "hostPort": "58ad223387bc:39941",
+        "isActive": true,
+        "rddBlocks": 0,
+        "memoryUsed": 180907,
+        "diskUsed": 0,
+        "totalCores": 1,
+        "maxTasks": 1,
+        "activeTasks": 1,
+        "failedTasks": 0,
+        "completedTasks": 3,
+        "totalTasks": 4,
+        "totalDuration": 8600,
+        "totalGCTime": 0,
+        "totalInputBytes": 70548,
+        "totalShuffleRead": 56,
+        "totalShuffleWrite": 56,
+        "isBlacklisted": false,
+        "maxMemory": 434031820,
+        "addTime": "2026-11-27T01:25:48.547GMT",
+        "executorLogs": {},
+        "memoryMetrics": {
+          "usedOnHeapStorageMemory": 180907,
+          "usedOffHeapStorageMemory": 0,
+          "totalOnHeapStorageMemory": 434031820,
+          "totalOffHeapStorageMemory": 0
+        },
+        "blacklistedInStages": [],
+        "peakMemoryMetrics": {
+          "JVMHeapMemory": 0,
+          "JVMOffHeapMemory": 0,
+          "OnHeapExecutionMemory": 0,
+          "OffHeapExecutionMemory": 0,
+          "OnHeapStorageMemory": 0,
+          "OffHeapStorageMemory": 0,
+          "OnHeapUnifiedMemory": 0,
+          "OffHeapUnifiedMemory": 0,
+          "DirectPoolMemory": 0,
+          "MappedPoolMemory": 0,
+          "ProcessTreeJVMVMemory": 0,
+          "ProcessTreeJVMRSSMemory": 0,
+          "ProcessTreePythonVMemory": 0,
+          "ProcessTreePythonRSSMemory": 0,
+          "ProcessTreeOtherVMemory": 0,
+          "ProcessTreeOtherRSSMemory": 0,
+          "MinorGCCount": 0,
+          "MinorGCTime": 0,
+          "MajorGCCount": 0,
+          "MajorGCTime": 0,
+          "TotalGCTime": 0,
+          "ConcurrentGCCount": 0,
+          "ConcurrentGCTime": 0
+        },
+        "attributes": {},
+        "resources": {},
+        "resourceProfileId": 0,
+        "isExcluded": false,
+        "excludedInStages": []
+      }
+    ],
+    "exit_code": 137,
+    "elapsed_s": 10.631286040879786,
+    "mode": "Read-only process crash; fresh verification is required separately",
+    "container_id": "58ad223387bcd9e72abf9074728a200efd9598a95b66c80f64010049c2962c78"
+  },
+  "recovered": {
+    "mode": "verify",
+    "phases": {
+      "verify": {
+        "elapsed_s": 9.365275709191337
+      },
+      "arrow": {
+        "elapsed_s": 0.5005421249661595
+      }
+    },
+    "orders_source_sha256": "5037c8c8bc8d4a4072d467496657aa6d79f7713a901d313a5fb3e612b8b94506",
+    "oracle_source_sha256": "679aeb238efa1f93a8b97d8e1f20f2130fca679ab878d113162f460cf454593b",
+    "orders": 1000000,
+    "amount_cents": 599500000,
+    "missing": 0,
+    "wrong": 0
+  },
+  "published_file_manifest_unchanged": true,
+  "arrow_oracle": {
+    "verifier_source_sha256": "679aeb238efa1f93a8b97d8e1f20f2130fca679ab878d113162f460cf454593b",
+    "read_hash_verify_ms": 199.10683399996287,
+    "process_cpu_user_s": 0.225464,
+    "process_cpu_system_s": 0.017187,
+    "process_peak_rss_bytes_linux": 102617088,
+    "container_counters_before_exit": {
+      "cpu.stat": "usage_usec 243439\nuser_usec 226196\nsystem_usec 17243\nnice_usec 0\nnr_periods 3\nnr_throttled 1\nthrottled_usec 3279\nnr_bursts 0\nburst_usec 0\n",
+      "memory.peak": "68284416\n",
+      "io.stat": ""
+    },
+    "orders": 1000000,
+    "amount_cents": 599500000,
+    "missing": 0,
+    "wrong": 0,
+    "file_manifest": [
+      {
+        "file": "part-00000-0e1bccd8-eaa5-4d7d-967c-edb0afb4881c-c000.snappy.parquet",
+        "bytes": 409711,
+        "sha256": "5e97ce3be0368fd74fe2b1c333bab0917bf5c70498f6c91b6613c68869a828d6"
+      },
+      {
+        "file": "part-00001-0e1bccd8-eaa5-4d7d-967c-edb0afb4881c-c000.snappy.parquet",
+        "bytes": 409664,
+        "sha256": "9215043f37a26245b70dd1144c19ab488e09d3ad2997eb6000cd9a363ed68175"
+      },
+      {
+        "file": "part-00002-0e1bccd8-eaa5-4d7d-967c-edb0afb4881c-c000.snappy.parquet",
+        "bytes": 409665,
+        "sha256": "d251ae8652ac5fe99d465b5256bd4b175fb480972a6f35cc629992905a5df997"
+      },
+      {
+        "file": "part-00003-0e1bccd8-eaa5-4d7d-967c-edb0afb4881c-c000.snappy.parquet",
+        "bytes": 409689,
+        "sha256": "7e67ee788a5736656bc0632846dd91e2ed3c06eecad48feb707a8e0bc7c95cb2"
+      },
+      {
+        "file": "part-00004-0e1bccd8-eaa5-4d7d-967c-edb0afb4881c-c000.snappy.parquet",
+        "bytes": 409700,
+        "sha256": "f5a82cd06f677e5ff601b0255a3b7bfde3825a1042a7fb5b16f3ccd7e3276e9a"
+      },
+      {
+        "file": "part-00005-0e1bccd8-eaa5-4d7d-967c-edb0afb4881c-c000.snappy.parquet",
+        "bytes": 409659,
+        "sha256": "5f32ee93ca9b54cf8266c63ca541cd8c893b9c5aaffac52b6fbee9c1ef30f438"
+      },
+      {
+        "file": "part-00006-0e1bccd8-eaa5-4d7d-967c-edb0afb4881c-c000.snappy.parquet",
+        "bytes": 409662,
+        "sha256": "fb026d43eee57c2f645cdcdf06da8e16941b43a19f13a8d6e01f371b44043d2d"
+      },
+      {
+        "file": "part-00007-0e1bccd8-eaa5-4d7d-967c-edb0afb4881c-c000.snappy.parquet",
+        "bytes": 409687,
+        "sha256": "2a782c2c00bc116bc7c26444ded6cd85a328ce2bb0ee32b2daea4f9915d4aa78"
+      },
+      {
+        "file": "part-00008-0e1bccd8-eaa5-4d7d-967c-edb0afb4881c-c000.snappy.parquet",
+        "bytes": 409705,
+        "sha256": "8b8963c3c33c2038a9c00081916cb18b7e7fb3e95ce960d04dbeb029ad50dc3a"
+      },
+      {
+        "file": "part-00009-0e1bccd8-eaa5-4d7d-967c-edb0afb4881c-c000.snappy.parquet",
+        "bytes": 409661,
+        "sha256": "a4386c77b253f24901841d6c10d676d8aa593f2f5825a8b46418be1f6f262dac"
+      },
+      {
+        "file": "part-00010-0e1bccd8-eaa5-4d7d-967c-edb0afb4881c-c000.snappy.parquet",
+        "bytes": 409684,
+        "sha256": "2b9a73569d1a24ebc9bc613c80881fba2b44d55a63c4330418ad3651c375275d"
+      },
+      {
+        "file": "part-00011-0e1bccd8-eaa5-4d7d-967c-edb0afb4881c-c000.snappy.parquet",
+        "bytes": 409681,
+        "sha256": "6cd8063e6e58a4dae2c5a62b559379d432c848534bf99263fe5e685b2c8a1d6b"
+      },
+      {
+        "file": "part-00012-0e1bccd8-eaa5-4d7d-967c-edb0afb4881c-c000.snappy.parquet",
+        "bytes": 409712,
+        "sha256": "3246b16a3bd1b17a8264a7c187b9301c3c4dcdd32e4aed626e4ae51e4e75f6ff"
+      },
+      {
+        "file": "part-00013-0e1bccd8-eaa5-4d7d-967c-edb0afb4881c-c000.snappy.parquet",
+        "bytes": 409651,
+        "sha256": "b5b65c56ae31dac2a7280643c3e8a2b4861bf0f19d013c039575d42f13795af3"
+      },
+      {
+        "file": "part-00014-0e1bccd8-eaa5-4d7d-967c-edb0afb4881c-c000.snappy.parquet",
+        "bytes": 409676,
+        "sha256": "ba4705a519b790b206ba59aa543da0d3e7894b5104fd7e5768631232b7d06a29"
+      },
+      {
+        "file": "part-00015-0e1bccd8-eaa5-4d7d-967c-edb0afb4881c-c000.snappy.parquet",
+        "bytes": 409683,
+        "sha256": "529efaddacead3b1b2fc2489a2d7b02e4dea70cf2f4abb2ce7f475865410f89b"
+      }
+    ],
+    "parquet_files": 16,
+    "codecs": [
+      "SNAPPY"
+    ],
+    "column_compressed_bytes": 6528906,
+    "column_uncompressed_bytes": 12925420,
+    "column_compression_ratio": 1.979722177038542,
+    "parquet_file_bytes": 6554890,
+    "allocated_output_bytes": 6688768
+  },
+  "writer_pre_exit_cgroup_counters": {
+    "cpu.stat": "usage_usec 10821981\nuser_usec 10472950\nsystem_usec 349031\nnice_usec 0\nnr_periods 111\nnr_throttled 106\nthrottled_usec 10272334\nnr_bursts 0\nburst_usec 0\n",
+    "memory.peak": "757497856\n",
+    "io.stat": "254:0 rbytes=7446528 wbytes=147456 rios=199 wios=2 dbytes=0 dios=0\n"
+  },
+  "sampled_actors": [
+    {
+      "names": [
+        "/spark-local-read-crash"
+      ],
+      "configuration": {
+        "image_id": "sha256:c0d7e9b9a5e5a5b7d1a3e47692f620c2b3dce73d7460e6c5f441c426ccbcfe74",
+        "image_reference": "examples/spark-local-orders:4.3.0",
+        "memory_limit_bytes": 2147483648,
+        "nano_cpus": 1000000000,
+        "started_at": "2026-11-27T01:25:46.022173597Z"
+      },
+      "id": "58ad223387bcd9e72abf9074728a200efd9598a95b66c80f64010049c2962c78",
+      "samples": 10,
+      "sampled_cpu_mean_pct_one_core": 99.61846379392938,
+      "sampled_cpu_peak_pct_one_core": 103.46091438328509,
+      "sampled_memory_max_bytes": 483340288,
+      "observed_io_byte_deltas_lower_bound": {
+        "read": 53248,
+        "write": 114688
+      }
+    },
+    {
+      "names": [
+        "/spark-local-orders-orders-run-4b88635f9800"
+      ],
+      "configuration": {
+        "image_id": "sha256:c0d7e9b9a5e5a5b7d1a3e47692f620c2b3dce73d7460e6c5f441c426ccbcfe74",
+        "image_reference": "examples/spark-local-orders:4.3.0",
+        "memory_limit_bytes": 2147483648,
+        "nano_cpus": 1000000000,
+        "started_at": "2026-11-27T01:25:56.733705838Z"
+      },
+      "id": "20188be2d00e6969b43ec72e725f88d205aefe4b694896d1ed6bffb8dce0a150",
+      "samples": 9,
+      "sampled_cpu_mean_pct_one_core": 100.49091523861534,
+      "sampled_cpu_peak_pct_one_core": 103.27216231926779,
+      "sampled_memory_max_bytes": 647536640,
+      "observed_io_byte_deltas_lower_bound": {
+        "read": 0,
+        "write": 114688
+      }
+    },
+    {
+      "names": [
+        "/spark-local-orders-orders-run-c5cd0f02ea25"
+      ],
+      "configuration": {
+        "image_id": "sha256:c0d7e9b9a5e5a5b7d1a3e47692f620c2b3dce73d7460e6c5f441c426ccbcfe74",
+        "image_reference": "examples/spark-local-orders:4.3.0",
+        "memory_limit_bytes": 2147483648,
+        "nano_cpus": 1000000000,
+        "started_at": "2026-11-27T01:25:00.385178756Z"
+      },
+      "id": "f924e5d926a0115d1f5fa419958ed16cdce1d3dcf9270b9c872ed0046ece5ff8",
+      "samples": 11,
+      "sampled_cpu_mean_pct_one_core": 98.01064898879376,
+      "sampled_cpu_peak_pct_one_core": 104.26380415392607,
+      "sampled_memory_max_bytes": 731095040,
+      "observed_io_byte_deltas_lower_bound": {
+        "read": 3575808,
+        "write": 114688
+      }
+    },
+    {
+      "names": [
+        "/spark-local-orders-orders-run-c8d90e7d8586"
+      ],
+      "configuration": {
+        "image_id": "sha256:c0d7e9b9a5e5a5b7d1a3e47692f620c2b3dce73d7460e6c5f441c426ccbcfe74",
+        "image_reference": "examples/spark-local-orders:4.3.0",
+        "memory_limit_bytes": 2147483648,
+        "nano_cpus": 1000000000,
+        "started_at": "2026-11-27T01:25:11.818572845Z"
+      },
+      "id": "8ad045dfd6ee0fc9f3fc4fe1c083ca0b158dd06c876b27ac65b3688f3b6d86ab",
+      "samples": 9,
+      "sampled_cpu_mean_pct_one_core": 98.6209014883332,
+      "sampled_cpu_peak_pct_one_core": 102.90899956306464,
+      "sampled_memory_max_bytes": 669048832,
+      "observed_io_byte_deltas_lower_bound": {
+        "read": 0,
+        "write": 114688
+      }
+    },
+    {
+      "names": [
+        "/spark-local-orders-parquet-verifier-run-9db07a95490c"
+      ],
+      "configuration": {
+        "image_id": "sha256:7f9fd8bca50b890ebec53ccdca39854e3306815f3dbca541b68fcbc6fef3b9ef",
+        "image_reference": "examples/spark-local-verifier:26.0.1",
+        "memory_limit_bytes": 536870912,
+        "nano_cpus": 1000000000,
+        "started_at": "2026-11-27T01:25:21.227389335Z"
+      },
+      "id": "a2bfd1875c70a83d651337048967a66ea7505a355cd951c59b2c39700465a728",
+      "samples": 1,
+      "sampled_cpu_mean_pct_one_core": null,
+      "sampled_cpu_peak_pct_one_core": null,
+      "sampled_memory_max_bytes": null,
+      "observed_io_byte_deltas_lower_bound": null
+    }
+  ],
+  "sources": {
+    "orders.py": {
+      "source": "spark/docker-compose-cluster/orders-workload/orders.py",
+      "method": "hardlink",
+      "sha256": "5037c8c8bc8d4a4072d467496657aa6d79f7713a901d313a5fb3e612b8b94506"
+    },
+    "verify.py": {
+      "source": "spark/docker-compose-cluster/scripts/verify_parquet.py",
+      "method": "hardlink",
+      "sha256": "679aeb238efa1f93a8b97d8e1f20f2130fca679ab878d113162f460cf454593b"
+    }
+  },
+  "limitations": [
+    "Single Docker volume/host, no replicated durability or independent backup.",
+    "Local scheduling/execution shares one JVM; Python is an additional driver process.",
+    "Reader SIGKILL does not qualify interrupted writer publication or native recovery of a killed driver.",
+    "Startup/exit intervals can be missed by samples; native pre-exit counters cover the normal writer and Arrow reader, not the killed actor final interval.",
+    "Byte I/O uses Docker/cgroup counters; device service latency, full network accounting and host-independent cold reads unavailable.",
+    "One trial per path, elapsed application times include startup and verification; no sustained capacity or comparative winner.",
+    "No physical power-loss or fsync durability proof."
+  ],
+  "teardown": {
+    "make_down": "passed",
+    "make_docker_down": "passed",
+    "owned_container_volume_network_and_built_images_removed": true
+  }
+}

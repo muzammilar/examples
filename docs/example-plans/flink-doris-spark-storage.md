@@ -72,6 +72,7 @@ after measuring.
 | Flink Compose | 1M exact output rows; checkpoint restore after worker SIGKILL; failed initial restart policy retained | Independent live source/witness and richer keyed-state workload |
 | Flink local | One JVM/container emits 1M exact rows; independent readback and complete lifecycle passed | Publication/process-loss boundaries |
 | Flink operator | Clean 1M output, retained repeated setup and combined worker/S3-capacity recovery passed. Undersized store stalled a checkpoint for 237.834 s; initial disk block preserved | Scale/savepoint round trip, manager HA, semantic readiness and external ACK witnesses |
+| Spark local | One-JVM million-order join; fresh Spark/Arrow reads; active read-process SIGKILL and unchanged file hashes passed | Interrupted writer publication, bounded storage pressure and independent restore |
 | Spark Compose | 1M exact joined rows; active-task worker SIGKILL, native failed-task event and two fresh full-body readbacks | Completed-shuffle owner loss, driver/publication recovery, required deployment shapes |
 | Spark operator/HDFS RF3 | 1M exact joined rows after active executor loss; native failed task; two-copy reads, empty PVC replacement and all three physical replica hashes passed | Continuous ACK witnesses, metadata HA/restore, driver/publication loss and final orchestration repeat |
 | Doris RF1 | 1M exact rows across retained BE crash, native tablet/core readback | Independent restore and live ACK witnesses |

@@ -1,0 +1,29 @@
+name: spark-local-orders
+services:
+  orders:
+    build: {context: .build, dockerfile: ../orders-workload/Dockerfile}
+    image: examples/spark-local-orders:4.3.0
+    profiles: [tools]
+    cpus: 1
+    mem_limit: 2g
+    environment:
+      AWS_EC2_METADATA_DISABLED: "true"
+      OUTPUT_PATH: file:///data/orders
+      EVENT_LOG_DIR: file:///data/events
+    entrypoint: [/opt/spark/bin/spark-submit]
+    command: [--master, "local[1]", --driver-memory, 1g, --conf, spark.sql.shuffle.partitions=8, /opt/spark/orders-workload/orders.py, write]
+    volumes: [output:/data]
+    networks: [lab]
+  parquet-verifier:
+    build: {context: .build, dockerfile: ../docker/Dockerfile.verifier}
+    image: examples/spark-local-verifier:26.0.1
+    profiles: [tools]
+    cpus: 1
+    mem_limit: 512m
+    volumes: [output:/data:ro]
+    networks: [lab]
+volumes:
+  output:
+networks:
+  lab:
+    internal: true
