@@ -160,6 +160,12 @@ failed state only after fencing its owner, and retain storage if export fails.
 
 ## kind (Kubernetes)
 
+Check kubectl/server version skew and Helm/operator compatibility before setup.
+Use a checksum-pinned, example-local kubectl when the host client is outside the
+[supported one-minor skew](https://kubernetes.io/releases/version-skew-policy/#kubectl).
+Do not replace the user's global tooling. Record actual client/server versions
+and distinguish earlier runs with unsupported tooling from later verification.
+
 Each system/example gets its own kind cluster, context and kubeconfig. Do not
 share clusters across different examples. `kind-up` creates them; `kind-down`
 deletes the owned cluster and context/config. A rerun may reuse only that same

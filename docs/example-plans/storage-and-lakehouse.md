@@ -2,6 +2,14 @@
 
 Each unchecked item is a proposed example. Use an example-owned local object store and credentials. Record its allocation, durability and outages separately from the client, catalog and table format. The [existing S3 results](../../object-storage/) and [Iceberg results](../../iceberg/) give the starting configurations.
 
+## Columnar compression and file performance
+
+- [ ] **CSV vs Parquet vs Arrow IPC/Feather V2 vs Vortex.** Use identical typed rows,
+  fresh full-body readback and matched budgets to measure encode/decode, projection
+  and selective reads. Include native codecs, physical bytes/I/O, CPU/memory,
+  cold/warm distinctions and interrupted/corrupt-file recovery. Keep Arrow memory
+  layout separate from persisted IPC. [Focused design](columnar-formats.md)
+
 ## Tables and catalogs
 
 - [ ] **Apache Hudi — corrections during compaction (new).** Feed identical order updates, deletes and late arrivals to copy-on-write and merge-on-read tables. Interrupt a merge-on-read compaction while ingest continues, then compare both snapshots to a source ledger at the same source offset, recording each table’s own completed instant. Measure the separate freshness of the read-optimized view. [Table types](https://hudi.apache.org/docs/table_types/) · [Compaction](https://hudi.apache.org/docs/compaction/)

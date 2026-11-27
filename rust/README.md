@@ -25,3 +25,7 @@ snapshot space pinning, format migration, pressure and isolated repeated
 comparisons with SQLite/RocksDB. These libraries do not supply native clustering
 or replicated HA in this example. See the [candidate research](EMBEDDED_DATABASE_SURVEY.md)
 for pinned source findings; Turso remains a separate future SQL example.
+
+Planned: [CSV/Parquet/Arrow IPC/Vortex comparison](../docs/example-plans/columnar-formats.md),
+covering typed correctness, compression, scan/decode costs, resources and interrupted
+file publication. The project is not implemented or benchmarked yet.

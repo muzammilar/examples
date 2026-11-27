@@ -28,3 +28,5 @@ Each assignment should produce its own five-command lifecycle, local Docker-buil
 - Tigris stays blocked on a supported self-hosted storage server. Hosted observability checks require a separate authorized run. All current implementation assignments use isolated local infrastructure.
 
 New candidates include Accumulo, SolrCloud, ZooKeeper, Fluss, standalone Flink state recovery, Hudi, Ozone, SlateDB and BookKeeper. Their briefs identify specific questions that the existing examples leave open.
+
+The [columnar-format comparison](columnar-formats.md) includes CSV, Parquet, persisted Arrow IPC and Vortex; its runs remain pending.

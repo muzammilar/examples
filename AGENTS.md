@@ -782,6 +782,23 @@ verdict/provenance rather than the archive, and never relabel the failure.
 
 ## Technology research
 
+### Repository-only space cleanup
+
+When space is low, inspect and reclaim generated files inside this repository
+first. Keep automatic cleanup scoped to this repository. Remove only confirmed
+untracked, ignored, reproducible caches, temporary files and build outputs.
+Check Git tracking and active use before removal. Report the paths and measured
+space recovered. The example's documented lifecycle may remove its own Docker
+resources. Unrelated Docker images/volumes, global caches, other repositories
+and host temporary directories require separate authorization for cleanup.
+
+Preserve curated reports, acknowledged-operation histories, failed-run evidence
+and the only usable recovery copy. Saved evidence is immutable. Exact duplicate
+exports may share hard links after byte verification, with a local receipt of
+paths and hashes; future tools must create new files instead of editing evidence
+in place. Archive or retire larger evidence only through a verified preservation
+procedure. A large ignored file alone is insufficient reason to delete it.
+
 Before adding or materially changing an example for a technology, and before describing what it is good or bad at, read the relevant official manpages and inspect the corresponding source code. Use the documentation and source for the version actually used by the example when possible. Follow the execution path relevant to the example (configuration, query or API behavior, storage, replication, scheduling, or failure handling) rather than relying only on a project overview or benchmark headline. Use this research to choose representative workloads and explain tradeoffs; distinguish behavior confirmed in source from behavior measured by this repository's example, and cite useful upstream references in the README.
 
 ### Stable release selection

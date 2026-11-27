@@ -37,8 +37,6 @@ PgDog discovers roles and routes queries; Patroni owns promotion. Replica reads 
 
 Older [Helm](../k8s/hello-postgres/) and [Vagrant](../vagrant/multi-vm-postgres/) deployments remain independent examples.
 
-Older [Helm](../k8s/hello-postgres/) and [Vagrant](../vagrant/multi-vm-postgres/) deployments remain independent examples.
-
 ## Vector retrieval
 
 [pgvector inventory-aware product search](pgvector-product-search/) provides

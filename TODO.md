@@ -3,6 +3,10 @@
 Candidate databases and systems to add as examples. Branch names follow the existing
 `<system>-single-node`, `<system>-docker-compose-cluster` and `<system>-kubernetes-{operator,helm}` convention.
 
+## Current priority batch
+
+Flink, Doris and Spark/Hadoop deployment examples, followed by local cross-system pipelines and storage work on Garage, SeaweedFS, CephFS and HDFS. See the [implementation sequence](docs/example-plans/flink-doris-spark-storage.md). MinIO is excluded from this batch. Earlier candidates remain available after this priority.
+
 ## Example designs to assign
 
 Start with the [handoff guide](docs/example-plans/README.md), then choose one unchecked workload below. Each design describes the deployment, the event to trigger and how a second observer can tell whether recovery worked. The [system directory index](README.md#systems) lists existing code. The [production-test audit](PRODUCTION_TEST_AUDIT.md) records what actually ran. A design is ready to assign once its local release, license and topology prerequisites are confirmed.
@@ -266,7 +270,7 @@ The [durable-execution designs](docs/example-plans/streaming-and-observability.m
 Use the same orders and customer keys for the [PostgreSQL designs](docs/example-plans/relational-and-analytical.md#postgresql-and-its-extensions). Check shard placement on sharding systems and compute/storage behavior on Neon.
 
 - [ ] `postgres-single-node`: plain PostgreSQL on the current stable major, with asynchronous I/O, `pg_stat_statements` and `pgbench`. Pin the release at implementation. [Release policy and current versions](https://www.postgresql.org/support/versioning/)
-- [ ] `postgres-docker-compose-cluster`: streaming replication with Patroni + etcd; `failover`, sync vs async commit.
+- [ ] Extend the existing [Patroni HA group](postgres/pgdog-docker-compose-cluster/) with DCS/quorum loss, peer partitions, stale-primary fencing and independent backup/restore. Primary failover, replica crashes and synchronous-standby stalls already have measured results.
 - [ ] `postgres-kubernetes-operator`: CloudNativePG on kind; replicas, switchover and a point-in-time restore to a second cluster via the supported Barman Cloud plugin and an isolated local object store.
 - [x] `citus-docker-compose-cluster`: 3 replicated worker groups plus replicated coordinator; colocated distributed tables, worker/coordinator failover, replica stalls and active-write rebalancing 3 → 5 → 3.
 - [x] `pgdog-docker-compose-cluster`: separate pooling configuration example, 3 PostgreSQL copies, pool-size reload/comparison, replica routing and primary failover. Customer sharding is a separate example; online resharding remains future work.
@@ -354,6 +358,8 @@ Extend the [existing MySQL labs](mysql/) with the same order corpus. The [MySQL 
 - [ ] `monetdb-single-node`: a MonetDB column-store server running the same analytical queries as DuckDB, with a hot-backup/fresh-restore case.
 
 ## Lakehouse and object storage
+
+- [ ] `rust/columnar-formats`: compare **CSV, Parquet, Arrow IPC/Feather V2 and Vortex** on the same deterministic rows, typed full-body oracle and resource budgets. Measure compression, encode/decode/query latency, CPU/memory, disk space/read-write bytes/IOPS, verified cold versus warm reads and interrupted/corrupt-file recovery. Planned, unrun; [design and compatibility requirements](docs/example-plans/columnar-formats.md).
 
 Pick a [table, catalog or storage design](docs/example-plans/storage-and-lakehouse.md) with a concrete commit/restore boundary. The checked entries below keep their original experimental scope.
 

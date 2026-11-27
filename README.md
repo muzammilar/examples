@@ -46,11 +46,14 @@ To pick the next example, use the [design backlog and suggested first assignment
 | ClickHouse | [`clickhouse/`](clickhouse) | OLAP / analytics | [clickhouse.com](https://clickhouse.com/) | [ClickHouse/ClickHouse](https://github.com/ClickHouse/ClickHouse) |
 | CockroachDB | [`cockroachdb/`](cockroachdb) | Distributed SQL | [cockroachlabs.com](https://www.cockroachlabs.com/) | [cockroachdb/cockroach](https://github.com/cockroachdb/cockroach) |
 | Dragonfly | [`dragonfly/`](dragonfly) | Cache / in-memory | [dragonflydb.io](https://www.dragonflydb.io/) | [dragonflydb/dragonfly](https://github.com/dragonflydb/dragonfly) |
+| Apache Doris | [`doris/`](doris) | Mutable analytical SQL | [Doris](https://doris.apache.org/) | [apache/doris](https://github.com/apache/doris) |
 | DuckDB | [`duckdb/`](duckdb) | Embedded analytics | [duckdb.org](https://duckdb.org/) | [duckdb/duckdb](https://github.com/duckdb/duckdb) |
 | Elasticsearch | [`elasticsearch/`](elasticsearch) | Search | [elastic.co](https://www.elastic.co/elasticsearch) | [elastic/elasticsearch](https://github.com/elastic/elasticsearch) |
+| Apache Flink | [`flink/`](flink) | Stateful stream / batch processing | [Flink](https://flink.apache.org/) | [apache/flink](https://github.com/apache/flink) |
 | FoundationDB | [`foundationdb/`](foundationdb) | Key-value | [foundationdb.org](https://www.foundationdb.org/) | [apple/foundationdb](https://github.com/apple/foundationdb) |
 | Garage | [`garage/`](garage) | S3 object storage | [garagehq.deuxfleurs.fr](https://garagehq.deuxfleurs.fr/) | [deuxfleurs-org/garage](https://github.com/deuxfleurs-org/garage) |
 | GreptimeDB | [`greptimedb/`](greptimedb) | Metrics / logs / observability | [greptime.com](https://greptime.com/) | [GreptimeTeam/greptimedb](https://github.com/GreptimeTeam/greptimedb) |
+| Apache Hadoop | [`hadoop/`](hadoop) | HDFS storage / YARN scheduling | [Hadoop](https://hadoop.apache.org/) | [apache/hadoop](https://github.com/apache/hadoop) |
 | Iceberg | [`iceberg/`](iceberg) | Lakehouse tables | [iceberg.apache.org](https://iceberg.apache.org/) | [apache/iceberg](https://github.com/apache/iceberg) |
 | InfluxDB | [`influxdb/`](influxdb) | Time-series | [influxdata.com](https://www.influxdata.com/products/influxdb/) | [influxdata/influxdb](https://github.com/influxdata/influxdb) |
 | Kafka | [`kafka/`](kafka) | Streaming | [kafka.apache.org](https://kafka.apache.org/) | [apache/kafka](https://github.com/apache/kafka) |
@@ -77,6 +80,7 @@ To pick the next example, use the [design backlog and suggested first assignment
 | SeaweedFS | [`seaweedfs/`](seaweedfs) | Distributed filesystem / S3 | [seaweedfs.com](https://seaweedfs.com/) | [seaweedfs/seaweedfs](https://github.com/seaweedfs/seaweedfs) |
 | SingleStore | [`singlestore/`](singlestore) | Distributed SQL | [singlestore.com](https://www.singlestore.com/) | — |
 | Skytable | [`skytable/`](skytable) | Key-value | [skytable.io](https://skytable.io/) | [skytable/skytable](https://github.com/skytable/skytable) |
+| Apache Spark | [`spark/`](spark) | Distributed SQL / batch processing | [Spark](https://spark.apache.org/) | [apache/spark](https://github.com/apache/spark) |
 | StarRocks | [`starrocks/`](starrocks) | Mutable analytics | [starrocks.io](https://www.starrocks.io/) | [StarRocks/starrocks](https://github.com/StarRocks/starrocks) |
 | Tarantool | [`tarantool/`](tarantool) | In-memory DB + Lua | [tarantool.io](https://www.tarantool.io/) | [tarantool/tarantool](https://github.com/tarantool/tarantool) |
 | TiDB | [`tidb/`](tidb) | Distributed SQL | [pingcap.com](https://www.pingcap.com/tidb/) | [pingcap/tidb](https://github.com/pingcap/tidb) |
