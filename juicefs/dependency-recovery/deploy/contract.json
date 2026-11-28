@@ -1,0 +1,33 @@
+{
+  "operations": ["exclusive create", "write", "file fsync and close", "same-directory rename", "directory fsync", "complete read", "cross-mount flock"],
+  "consistency": "close-to-open; explicit zero metadata/open-cache TTL for these tests",
+  "atomicity": "native rename only; the complete publication chain is not one transaction",
+  "idempotency": "unique run/sequence and O_EXCL; never replay an ambiguous publication",
+  "durability": {
+    "metadata": "PostgreSQL 19.0 with fsync, synchronous_commit and full_page_writes on",
+    "objects": "SeaweedFS replication 200, three simulated zone owners; full native bodies checked",
+    "writeback": false,
+    "ack": "file fsync, close, rename, directory fsync and external witness fsync complete",
+    "limit": "one Docker VM; no physical power-loss or permanent metadata disk-loss proof"
+  },
+  "default_corpus": {"baseline_files":128,"files_per_live_case":512,"bytes_per_file":262144,"seed_prefix":"96517","distribution":"deterministic SHAKE256, incompressible"},
+  "limits": {"max_files_per_run":1024,"max_file_bytes":1048576,"max_run_bytes":268435456,"max_fixture_bytes":536870912},
+  "reference_client": {
+    "juicefs":"1.4.2",
+    "get_timeout_s":5,"put_timeout_s":5,"io_retries":2,
+    "max_uploads":4,"max_downloads":4,"buffer_mib":32,"disk_cache_mib":0,
+    "prefetch":0,"max_readahead_mib":0,"open_cache_s":0,
+    "postgres_max_open_connections":8,"postgres_max_idle_connections":4,"connect_timeout_s":5,
+    "metadata_retry":"native pinned SQL transaction retries, up to 50 with quadratic backoff; not a measured universal cancellation bound",
+    "outer_worker_deadline_s":180
+  },
+  "faults": {
+    "metadata":"SIGKILL the sole metadata process for 15s; restart the same retained container/disk",
+    "objects":"SIGKILL the sole S3 gateway for 20s; retained volume/metadata services stay alive",
+    "expected":"blocked/error operations permitted during dependency loss; no wrong successful historical reads, no lost ACK bodies, post-recovery progress and complete reconciliation",
+    "cold_probe":"third distinct FUSE superblock has not read baseline data before S3 loss; premature complete read fails fault/cache qualification"
+  },
+  "compression":"none; actual native object bodies must equal logical ACK payload bytes",
+  "retention":"trash-days=1; expiration, delete/compaction, physical reclamation and independent restore unrun",
+  "unrun":["automatic metadata failover","permanent disk loss","partitions","independent restore","CSI deployment","cache/performance matrix","power-loss durability"]
+}

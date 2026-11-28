@@ -189,6 +189,7 @@ The first five priority systems now have local examples. Each README describes t
 - [ ] MongoDB replica set
 - [ ] Temporal
 - [ ] Restate
+- [x] [JuiceFS metadata/S3 dependency recovery](juicefs/dependency-recovery/): live C++ publication, cross-mount locks, exact ACK/native RF3 checks and explicit ambiguous errors; rejected probes retained. Metadata HA, CSI and independent restore remain future work.
 - [x] SeaweedFS — [replicated S3 and disk recovery](seaweedfs/s3-cluster/)
 
 ## Time-series

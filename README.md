@@ -60,6 +60,7 @@ tracks CDC/streaming analytics, Spark/HDFS and lakehouse integrations.
 | Apache Hadoop | [`hadoop/`](hadoop) | HDFS storage / YARN scheduling | [Hadoop](https://hadoop.apache.org/) | [apache/hadoop](https://github.com/apache/hadoop) |
 | Iceberg | [`iceberg/`](iceberg) | Lakehouse tables | [iceberg.apache.org](https://iceberg.apache.org/) | [apache/iceberg](https://github.com/apache/iceberg) |
 | InfluxDB | [`influxdb/`](influxdb) | Time-series | [influxdata.com](https://www.influxdata.com/products/influxdb/) | [influxdata/influxdb](https://github.com/influxdata/influxdb) |
+| JuiceFS | [`juicefs/`](juicefs) | POSIX filesystem / object storage | [juicefs.com](https://juicefs.com/) | [juicedata/juicefs](https://github.com/juicedata/juicefs) |
 | Kafka | [`kafka/`](kafka) | Streaming | [kafka.apache.org](https://kafka.apache.org/) | [apache/kafka](https://github.com/apache/kafka) |
 | kdb+ | [`kdb/`](kdb) | Time-series | [kx.com](https://kx.com/) | — |
 | Kubernetes | [`k8s/`](k8s) | Container orchestration | [kubernetes.io](https://kubernetes.io/) | [kubernetes/kubernetes](https://github.com/kubernetes/kubernetes) |

@@ -31,7 +31,7 @@ interfaces instead of introducing custom Java test utilities.
 - [x] Add a dedicated native-client [CephFS project](../../ceph/filesystem-ha/). Active-MDS crash, standby promotion, exact ACK manifests and diagnosed retained-setup recovery ran; keep CPU/emulation limits visible.
 - [ ] Extend CephFS to whole-guest/OSD loss and independent restore; RGW recovery does not establish the filesystem interface's behavior.
 - [x] Qualify HDFS replication and initial live failover in the Hadoop metadata-HA example. Record client-visible publication and retain the failed native JSch fencing case; partitions/quorum loss/independent restore remain follow-ups.
-- [ ] Investigate JuiceFS Community over a lab-owned supported S3 backend and an explicitly durable metadata service. Test mount ownership, metadata loss and object-store outage separately. Add it only after the current four-system baseline is runnable.
+- [x] [JuiceFS dependency recovery](../../juicefs/dependency-recovery/): PostgreSQL retained-process outage and fresh-client S3 outage passed exact ACK/native RF3 checks. Failed/rejected probes and a cached-endpoint observation remain documented. Metadata HA, permanent loss, CSI and independent restore remain unrun.
 
 Garage is an object store. Ceph RGW, CephFS and SeaweedFS S3/mount interfaces need
 their own contracts and observed guarantees. Each pipeline includes its own
@@ -253,3 +253,18 @@ evidence, not sustained capacity or an independent-host durability claim.
 Next: interleave a bounded storage recovery follow-up, then version-guarded live
 CDC plus Spark historical correction and the matched ClickHouse control. Do not
 reopen completed Flink/Doris deployment examples for optional deeper matrices.
+
+### JuiceFS storage follow-up
+
+[JuiceFS dependency recovery](../../juicefs/dependency-recovery/) completed bounded
+metadata and object-gateway outages in separate retained fixtures. The qualified
+S3 case retained 639 ACK files / 167,510,016 bytes, with one explicit ambiguous
+fsync and zero missing/corrupt ACK bodies across 1,917 native copies. Metadata
+recovery retained 640 ACKs. Historical/client-cold reads, latency maxima, CPU,
+memory, block bytes, storage and disabled compression are recorded. Failed Docker
+identity and warm-cache probes remain failed/rejected; a confounded IP-movement
+case exposed old-endpoint retries consistent with the native one-minute DNS cache.
+Both fixtures are verified and removed. Ceph whole-guest/disk/restore work still
+requires the existing 25-GiB free-Docker-space gate; do not weaken it to fit the VM.
+Next cross-system work is live CDC plus Spark historical correction, then the
+matched ClickHouse control; completed Flink/Doris deployment examples stay closed.

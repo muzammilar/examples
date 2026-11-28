@@ -1,0 +1,469 @@
+---
+name: juicefs-dependency-recovery
+services:
+  master1:
+    image: chrislusf/seaweedfs:4.55@sha256:7ca46aeae2f223b37e5d91593c17ab37738eec6df6ab69b48a0487f7643342b9
+    cpus: 0.125
+    mem_limit: 192m
+    networks:
+    - lab
+    hostname: master1
+    command:
+    - master
+    - "-ip=master1"
+    - "-ip.bind=0.0.0.0"
+    - "-mdir=/data"
+    - "-peers=master1:9333,master2:9333,master3:9333"
+    - "-volumeSizeLimitMB=64"
+    - "-defaultReplication=200"
+    healthcheck:
+      test:
+      - CMD
+      - wget
+      - "-q"
+      - "-O"
+      - "/dev/null"
+      - http://127.0.0.1:9333/healthz
+      interval: 3s
+      timeout: 3s
+      retries: 60
+    volumes:
+    - master1:/data
+  etcd1:
+    image: gcr.io/etcd-development/etcd:v3.7.4@sha256:47d217be8ec4ca943954b5f4bf8029ee9bc0ffb05fbe2a44d579a1f640e03ed4
+    cpus: 0.25
+    mem_limit: 384m
+    networks:
+    - lab
+    hostname: etcd1
+    entrypoint:
+    - "/usr/local/bin/etcd"
+    command:
+    - "--name=etcd1"
+    - "--data-dir=/data"
+    - "--listen-client-urls=http://0.0.0.0:2379"
+    - "--advertise-client-urls=http://etcd1:2379"
+    - "--listen-peer-urls=http://0.0.0.0:2380"
+    - "--initial-advertise-peer-urls=http://etcd1:2380"
+    - "--initial-cluster=etcd1=http://etcd1:2380,etcd2=http://etcd2:2380,etcd3=http://etcd3:2380"
+    - "--initial-cluster-token=juicefs-dependency-recovery"
+    - "--auto-compaction-retention=1"
+    healthcheck:
+      test:
+      - CMD
+      - "/usr/local/bin/etcdctl"
+      - endpoint
+      - health
+      interval: 3s
+      timeout: 3s
+      retries: 60
+    volumes:
+    - etcd1:/data
+  volume1:
+    image: chrislusf/seaweedfs:4.55@sha256:7ca46aeae2f223b37e5d91593c17ab37738eec6df6ab69b48a0487f7643342b9
+    cpus: 0.25
+    mem_limit: 256m
+    networks:
+    - lab
+    hostname: volume1
+    command:
+    - volume
+    - "-ip=volume1"
+    - "-ip.bind=0.0.0.0"
+    - "-port=8080"
+    - "-dir=/data"
+    - "-master=master1:9333,master2:9333,master3:9333"
+    - "-max=16"
+    - "-dataCenter=zone1"
+    - "-rack=rack1"
+    - "-minFreeSpace=1GiB"
+    healthcheck:
+      test:
+      - CMD
+      - wget
+      - "-q"
+      - "-O"
+      - "/dev/null"
+      - http://127.0.0.1:8080/healthz
+      interval: 3s
+      timeout: 3s
+      retries: 60
+    depends_on:
+      master1:
+        condition: service_healthy
+      master2:
+        condition: service_healthy
+      master3:
+        condition: service_healthy
+    volumes:
+    - volume1:/data
+  master2:
+    image: chrislusf/seaweedfs:4.55@sha256:7ca46aeae2f223b37e5d91593c17ab37738eec6df6ab69b48a0487f7643342b9
+    cpus: 0.125
+    mem_limit: 192m
+    networks:
+    - lab
+    hostname: master2
+    command:
+    - master
+    - "-ip=master2"
+    - "-ip.bind=0.0.0.0"
+    - "-mdir=/data"
+    - "-peers=master1:9333,master2:9333,master3:9333"
+    - "-volumeSizeLimitMB=64"
+    - "-defaultReplication=200"
+    healthcheck:
+      test:
+      - CMD
+      - wget
+      - "-q"
+      - "-O"
+      - "/dev/null"
+      - http://127.0.0.1:9333/healthz
+      interval: 3s
+      timeout: 3s
+      retries: 60
+    volumes:
+    - master2:/data
+  etcd2:
+    image: gcr.io/etcd-development/etcd:v3.7.4@sha256:47d217be8ec4ca943954b5f4bf8029ee9bc0ffb05fbe2a44d579a1f640e03ed4
+    cpus: 0.25
+    mem_limit: 384m
+    networks:
+    - lab
+    hostname: etcd2
+    entrypoint:
+    - "/usr/local/bin/etcd"
+    command:
+    - "--name=etcd2"
+    - "--data-dir=/data"
+    - "--listen-client-urls=http://0.0.0.0:2379"
+    - "--advertise-client-urls=http://etcd2:2379"
+    - "--listen-peer-urls=http://0.0.0.0:2380"
+    - "--initial-advertise-peer-urls=http://etcd2:2380"
+    - "--initial-cluster=etcd1=http://etcd1:2380,etcd2=http://etcd2:2380,etcd3=http://etcd3:2380"
+    - "--initial-cluster-token=juicefs-dependency-recovery"
+    - "--auto-compaction-retention=1"
+    healthcheck:
+      test:
+      - CMD
+      - "/usr/local/bin/etcdctl"
+      - endpoint
+      - health
+      interval: 3s
+      timeout: 3s
+      retries: 60
+    volumes:
+    - etcd2:/data
+  volume2:
+    image: chrislusf/seaweedfs:4.55@sha256:7ca46aeae2f223b37e5d91593c17ab37738eec6df6ab69b48a0487f7643342b9
+    cpus: 0.25
+    mem_limit: 256m
+    networks:
+    - lab
+    hostname: volume2
+    command:
+    - volume
+    - "-ip=volume2"
+    - "-ip.bind=0.0.0.0"
+    - "-port=8080"
+    - "-dir=/data"
+    - "-master=master1:9333,master2:9333,master3:9333"
+    - "-max=16"
+    - "-dataCenter=zone2"
+    - "-rack=rack2"
+    - "-minFreeSpace=1GiB"
+    healthcheck:
+      test:
+      - CMD
+      - wget
+      - "-q"
+      - "-O"
+      - "/dev/null"
+      - http://127.0.0.1:8080/healthz
+      interval: 3s
+      timeout: 3s
+      retries: 60
+    depends_on:
+      master1:
+        condition: service_healthy
+      master2:
+        condition: service_healthy
+      master3:
+        condition: service_healthy
+    volumes:
+    - volume2:/data
+  master3:
+    image: chrislusf/seaweedfs:4.55@sha256:7ca46aeae2f223b37e5d91593c17ab37738eec6df6ab69b48a0487f7643342b9
+    cpus: 0.125
+    mem_limit: 192m
+    networks:
+    - lab
+    hostname: master3
+    command:
+    - master
+    - "-ip=master3"
+    - "-ip.bind=0.0.0.0"
+    - "-mdir=/data"
+    - "-peers=master1:9333,master2:9333,master3:9333"
+    - "-volumeSizeLimitMB=64"
+    - "-defaultReplication=200"
+    healthcheck:
+      test:
+      - CMD
+      - wget
+      - "-q"
+      - "-O"
+      - "/dev/null"
+      - http://127.0.0.1:9333/healthz
+      interval: 3s
+      timeout: 3s
+      retries: 60
+    volumes:
+    - master3:/data
+  etcd3:
+    image: gcr.io/etcd-development/etcd:v3.7.4@sha256:47d217be8ec4ca943954b5f4bf8029ee9bc0ffb05fbe2a44d579a1f640e03ed4
+    cpus: 0.25
+    mem_limit: 384m
+    networks:
+    - lab
+    hostname: etcd3
+    entrypoint:
+    - "/usr/local/bin/etcd"
+    command:
+    - "--name=etcd3"
+    - "--data-dir=/data"
+    - "--listen-client-urls=http://0.0.0.0:2379"
+    - "--advertise-client-urls=http://etcd3:2379"
+    - "--listen-peer-urls=http://0.0.0.0:2380"
+    - "--initial-advertise-peer-urls=http://etcd3:2380"
+    - "--initial-cluster=etcd1=http://etcd1:2380,etcd2=http://etcd2:2380,etcd3=http://etcd3:2380"
+    - "--initial-cluster-token=juicefs-dependency-recovery"
+    - "--auto-compaction-retention=1"
+    healthcheck:
+      test:
+      - CMD
+      - "/usr/local/bin/etcdctl"
+      - endpoint
+      - health
+      interval: 3s
+      timeout: 3s
+      retries: 60
+    volumes:
+    - etcd3:/data
+  volume3:
+    image: chrislusf/seaweedfs:4.55@sha256:7ca46aeae2f223b37e5d91593c17ab37738eec6df6ab69b48a0487f7643342b9
+    cpus: 0.25
+    mem_limit: 256m
+    networks:
+    - lab
+    hostname: volume3
+    command:
+    - volume
+    - "-ip=volume3"
+    - "-ip.bind=0.0.0.0"
+    - "-port=8080"
+    - "-dir=/data"
+    - "-master=master1:9333,master2:9333,master3:9333"
+    - "-max=16"
+    - "-dataCenter=zone3"
+    - "-rack=rack3"
+    - "-minFreeSpace=1GiB"
+    healthcheck:
+      test:
+      - CMD
+      - wget
+      - "-q"
+      - "-O"
+      - "/dev/null"
+      - http://127.0.0.1:8080/healthz
+      interval: 3s
+      timeout: 3s
+      retries: 60
+    depends_on:
+      master1:
+        condition: service_healthy
+      master2:
+        condition: service_healthy
+      master3:
+        condition: service_healthy
+    volumes:
+    - volume3:/data
+  filer1:
+    image: chrislusf/seaweedfs:4.55@sha256:7ca46aeae2f223b37e5d91593c17ab37738eec6df6ab69b48a0487f7643342b9
+    cpus: 0.25
+    mem_limit: 384m
+    networks:
+    - lab
+    hostname: filer1
+    command:
+    - filer
+    - "-ip=filer1"
+    - "-ip.bind=0.0.0.0"
+    - "-master=master1:9333,master2:9333,master3:9333"
+    - "-defaultReplicaPlacement=200"
+    - "-maxMB=2"
+    volumes:
+    - "./deploy/seaweed/filer.toml:/etc/seaweedfs/filer.toml:ro"
+    healthcheck:
+      test:
+      - CMD
+      - wget
+      - "-q"
+      - "-O"
+      - "/dev/null"
+      - http://127.0.0.1:8888/healthz
+      interval: 3s
+      timeout: 3s
+      retries: 60
+    depends_on:
+      etcd1:
+        condition: service_healthy
+      etcd2:
+        condition: service_healthy
+      etcd3:
+        condition: service_healthy
+  filer2:
+    image: chrislusf/seaweedfs:4.55@sha256:7ca46aeae2f223b37e5d91593c17ab37738eec6df6ab69b48a0487f7643342b9
+    cpus: 0.25
+    mem_limit: 384m
+    networks:
+    - lab
+    hostname: filer2
+    command:
+    - filer
+    - "-ip=filer2"
+    - "-ip.bind=0.0.0.0"
+    - "-master=master1:9333,master2:9333,master3:9333"
+    - "-defaultReplicaPlacement=200"
+    - "-maxMB=2"
+    volumes:
+    - "./deploy/seaweed/filer.toml:/etc/seaweedfs/filer.toml:ro"
+    healthcheck:
+      test:
+      - CMD
+      - wget
+      - "-q"
+      - "-O"
+      - "/dev/null"
+      - http://127.0.0.1:8888/healthz
+      interval: 3s
+      timeout: 3s
+      retries: 60
+    depends_on:
+      etcd1:
+        condition: service_healthy
+      etcd2:
+        condition: service_healthy
+      etcd3:
+        condition: service_healthy
+  s3:
+    image: chrislusf/seaweedfs:4.55@sha256:7ca46aeae2f223b37e5d91593c17ab37738eec6df6ab69b48a0487f7643342b9
+    cpus: 0.125
+    mem_limit: 256m
+    networks:
+    - lab
+    command:
+    - s3
+    - "-ip.bind=0.0.0.0"
+    - "-port=8333"
+    - "-filer=filer1:8888,filer2:8888"
+    - "-config=/etc/seaweedfs/s3.json"
+    - "-cacheCapacityMB=0"
+    - "-port.iceberg=0"
+    - "-port.lance=0"
+    volumes:
+    - "./deploy/seaweed/s3.json:/etc/seaweedfs/s3.json:ro"
+    healthcheck:
+      test:
+      - CMD
+      - wget
+      - "-q"
+      - "-O"
+      - "/dev/null"
+      - http://127.0.0.1:8333/status
+      interval: 3s
+      timeout: 3s
+      retries: 60
+    depends_on:
+      filer1:
+        condition: service_healthy
+      filer2:
+        condition: service_healthy
+  metadata:
+    image: postgres:19.0@sha256:4ea94de574c17f0372722806c949757050fbb1cd7648410fe45d6bba275cc00e
+    cpus: 0.5
+    mem_limit: 768m
+    networks: [lab]
+    environment:
+      POSTGRES_USER: juicefs
+      POSTGRES_PASSWORD: local-metadata-only
+      POSTGRES_DB: juicefs
+    volumes: [metadata:/var/lib/postgresql]
+    healthcheck:
+      test: [CMD, pg_isready, -U, juicefs, -d, juicefs]
+      interval: 3s
+      timeout: 3s
+      retries: 60
+  files-writer: &mount
+    image: examples/juicefs-dependency-recovery:1.4.2
+    build: {context: .build/docker}
+    cpus: 0.5
+    mem_limit: 768m
+    networks: [lab]
+    cap_add: [SYS_ADMIN]
+    devices: [/dev/fuse:/dev/fuse]
+    security_opt: [apparmor:unconfined]
+    environment: &environment
+      META_URL: 'postgres://juicefs@metadata:5432/juicefs?sslmode=disable&connect_timeout=5&max_open_conns=8&max_idle_conns=4'
+      META_PASSWORD: local-metadata-only
+      AWS_REGION: us-east-1
+      AWS_DEFAULT_REGION: us-east-1
+      AWS_EC2_METADATA_DISABLED: 'true'
+      AWS_CONFIG_FILE: /dev/null
+      AWS_SHARED_CREDENTIALS_FILE: /dev/null
+      JFS_S3_VHOST_STYLE: 'false'
+      ACCESS_KEY: juicefs-lab
+      SECRET_KEY: juicefs-local-only-secret
+      S3_BUCKET_URL: http://s3:8333/juicefs
+      WITNESS_ROOT: /results
+      READ_ONLY: 'false'
+    volumes: ['./results:/results']
+    stop_grace_period: 30s
+  files-reader:
+    <<: *mount
+    environment:
+      <<: *environment
+      READ_ONLY: 'false'
+  cold-reader:
+    <<: *mount
+    profiles: [tools]
+    environment:
+      <<: *environment
+      READ_ONLY: 'true'
+  control:
+    <<: *mount
+    profiles: [tools]
+    cpus: 0.5
+    mem_limit: 512m
+    cap_add: []
+    devices: []
+    security_opt: []
+    entrypoint: [/usr/bin/python3]
+    volumes:
+      - './results:/results'
+      - './scripts:/opt/lab:ro'
+    command: [/opt/lab/control.py, help]
+volumes:
+  master1: {}
+  master2: {}
+  master3: {}
+  etcd1: {}
+  etcd2: {}
+  etcd3: {}
+  volume1: {}
+  volume2: {}
+  volume3: {}
+  metadata: {}
+networks:
+  lab: {internal: true}
