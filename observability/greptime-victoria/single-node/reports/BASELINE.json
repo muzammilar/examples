@@ -1,0 +1,3182 @@
+{
+  "scope": "Pass 1 driver/healthy ingestion and lifecycle controls only; no performance/recovery winner",
+  "hardware": {
+    "NCPU": 11,
+    "MemTotal": 26216296448,
+    "KernelVersion": "6.12.76-linuxkit",
+    "OperatingSystem": "Docker Desktop",
+    "ServerVersion": "29.5.3",
+    "Architecture": "aarch64"
+  },
+  "hardware_augmentation": {
+    "host_cpu_model": "Apple M4 Pro",
+    "disk_class": "Docker Desktop virtual disk; host device class unverified",
+    "captured_at_unix_s": 1795855698.28827,
+    "scope": "Metadata read after controls on the same local host"
+  },
+  "backend_budget": {
+    "cpu": 4,
+    "memory_bytes": 4294967296,
+    "greptime": {
+      "cpu": 4,
+      "memory_bytes": 4294967296
+    },
+    "victoria_each_of_two": {
+      "cpu": 2,
+      "memory_bytes": 2147483648
+    }
+  },
+  "cases": [
+    {
+      "case": {
+        "kind": "driver-control",
+        "run": "054239221cb14b9f80b4efee1a828141"
+      },
+      "fixture": {
+        "run": "054239221cb14b9f80b4efee1a828141",
+        "start_ms": 1795846656000,
+        "series": 100,
+        "points": 100,
+        "logs": 10000
+      },
+      "status": {
+        "passed": false,
+        "run": "054239221cb14b9f80b4efee1a828141",
+        "scope": "Healthy common OTLP input/readback only; no recovery/performance qualification"
+      },
+      "signals": {
+        "greptime:metrics": {
+          "configuration": {
+            "backend": "greptime",
+            "batch": 1000,
+            "connect_timeout_s": 5,
+            "fixture": {
+              "run": "054239221cb14b9f80b4efee1a828141",
+              "start_ms": 1795846656000,
+              "series": 100,
+              "points": 100,
+              "logs": 10000
+            },
+            "gzip": true,
+            "http_timeout_s": 30,
+            "max_connections_per_host": 4,
+            "protocol": "otlp-http-protobuf",
+            "retry_attempts": 0,
+            "signal": "metrics",
+            "started_at": "2026-11-28T08:17:37.699628094Z",
+            "workers": 1
+          },
+          "request_responses": 10,
+          "accepted_records": 10000,
+          "unaccepted_responses": 0,
+          "http_latency": {
+            "samples": 10,
+            "unit": "ms",
+            "mean": 3.8673417,
+            "p50": 2.423291,
+            "p95": 15.900417,
+            "p99": 15.900417,
+            "p999": 15.900417,
+            "max": 15.900417,
+            "qualification": "One finite-corpus diagnostic; not sustained/repeated performance qualification"
+          },
+          "request_construction_encoding_latency": {
+            "samples": 10,
+            "unit": "ms",
+            "mean": 0.8366082,
+            "p50": 0.777208,
+            "p95": 1.065417,
+            "p99": 1.065417,
+            "p999": 1.065417,
+            "max": 1.065417,
+            "qualification": "One finite-corpus diagnostic; not sustained/repeated performance qualification"
+          },
+          "raw_encoded_bytes": 1013950,
+          "wire_bytes": 71655,
+          "wire_compression_ratio": 14.15044309538762,
+          "last_exact_readback": {
+            "backend": "greptime",
+            "duplicates": 0,
+            "duration_s": 0.022222583,
+            "event": "exact-readback",
+            "expected_records": 10000,
+            "missing": 0,
+            "signal": "metrics",
+            "wrong": 0
+          },
+          "admission": [
+            {
+              "elapsed_s": 0.051979666,
+              "event": "admission-complete",
+              "meaning": "API acceptance, not verified visibility or crash durability",
+              "records": 10000
+            }
+          ],
+          "evidence": "results/cases/054239221cb14b9f80b4efee1a828141/greptime/metrics"
+        },
+        "greptime:logs": {
+          "configuration": {
+            "backend": "greptime",
+            "batch": 1000,
+            "connect_timeout_s": 5,
+            "fixture": {
+              "run": "054239221cb14b9f80b4efee1a828141",
+              "start_ms": 1795846656000,
+              "series": 100,
+              "points": 100,
+              "logs": 10000
+            },
+            "gzip": true,
+            "http_timeout_s": 30,
+            "max_connections_per_host": 4,
+            "protocol": "otlp-http-protobuf",
+            "retry_attempts": 0,
+            "signal": "logs",
+            "started_at": "2026-11-28T08:17:38.233542636Z",
+            "workers": 1
+          },
+          "request_responses": 10,
+          "accepted_records": 10000,
+          "unaccepted_responses": 0,
+          "http_latency": {
+            "samples": 10,
+            "unit": "ms",
+            "mean": 5.2765375,
+            "p50": 4.718083,
+            "p95": 8.243542,
+            "p99": 8.243542,
+            "p999": 8.243542,
+            "max": 8.243542,
+            "qualification": "One finite-corpus diagnostic; not sustained/repeated performance qualification"
+          },
+          "request_construction_encoding_latency": {
+            "samples": 10,
+            "unit": "ms",
+            "mean": 2.0733289,
+            "p50": 1.868833,
+            "p95": 2.922541,
+            "p99": 2.922541,
+            "p999": 2.922541,
+            "max": 2.922541,
+            "qualification": "One finite-corpus diagnostic; not sustained/repeated performance qualification"
+          },
+          "raw_encoded_bytes": 4831705,
+          "wire_bytes": 427746,
+          "wire_compression_ratio": 11.2957339168572,
+          "last_exact_readback": {
+            "backend": "greptime",
+            "duplicates": 0,
+            "duration_s": 0.047770958,
+            "event": "exact-readback",
+            "expected_records": 10000,
+            "missing": 0,
+            "signal": "logs",
+            "wrong": 0
+          },
+          "admission": [
+            {
+              "elapsed_s": 0.087755958,
+              "event": "admission-complete",
+              "meaning": "API acceptance, not verified visibility or crash durability",
+              "records": 10000
+            }
+          ],
+          "evidence": "results/cases/054239221cb14b9f80b4efee1a828141/greptime/logs"
+        },
+        "victoria:metrics": {
+          "configuration": {
+            "backend": "victoria",
+            "batch": 1000,
+            "connect_timeout_s": 5,
+            "fixture": {
+              "run": "054239221cb14b9f80b4efee1a828141",
+              "start_ms": 1795846656000,
+              "series": 100,
+              "points": 100,
+              "logs": 10000
+            },
+            "gzip": true,
+            "http_timeout_s": 30,
+            "max_connections_per_host": 4,
+            "protocol": "otlp-http-protobuf",
+            "retry_attempts": 0,
+            "signal": "metrics",
+            "started_at": "2026-11-28T08:17:39.566561095Z",
+            "workers": 1
+          },
+          "request_responses": 10,
+          "accepted_records": 10000,
+          "unaccepted_responses": 0,
+          "http_latency": {
+            "samples": 10,
+            "unit": "ms",
+            "mean": 1.1407665,
+            "p50": 0.470792,
+            "p95": 6.418541,
+            "p99": 6.418541,
+            "p999": 6.418541,
+            "max": 6.418541,
+            "qualification": "One finite-corpus diagnostic; not sustained/repeated performance qualification"
+          },
+          "request_construction_encoding_latency": {
+            "samples": 10,
+            "unit": "ms",
+            "mean": 0.8042541,
+            "p50": 0.813917,
+            "p95": 0.944708,
+            "p99": 0.944708,
+            "p999": 0.944708,
+            "max": 0.944708,
+            "qualification": "One finite-corpus diagnostic; not sustained/repeated performance qualification"
+          },
+          "raw_encoded_bytes": 1013950,
+          "wire_bytes": 71655,
+          "wire_compression_ratio": 14.15044309538762,
+          "last_exact_readback": {
+            "state": "not passed in this attempt"
+          },
+          "admission": [
+            {
+              "elapsed_s": 0.024288833,
+              "event": "admission-complete",
+              "meaning": "API acceptance, not verified visibility or crash durability",
+              "records": 10000
+            }
+          ],
+          "evidence": "results/cases/054239221cb14b9f80b4efee1a828141/victoria/metrics"
+        }
+      },
+      "executed_workload_source": {
+        "transport.go": "70725e64d2e379e40a1594b1de09068034a6e71567a5623849f4bae7b483ffc0",
+        "corpus.go": "535b5f5726b472a8601ef1b965234c6d1f87a5ce5ab094c5c66177286044157c",
+        "transport_test.go": "ac067bb9d8d14875ab17ece97115ba7fb75ba07dc24147dc27c45fb23a117ad2",
+        "main.go": "d2a51c82e214b52817c252ed045c8c2234942e3daf9bbb01053bd27d7fd62bff",
+        "corpus_test.go": "602160ca6dba760731e4f00123e5e020b1c8e537c182c6f7fe9cfc0ad66cec88",
+        "readback.go": "5ac4eb74604d835117212380a119193cbd085c183da156706adb1e847c63db9d",
+        "go.mod": "b5b15e71e5c049dd9609246f019fd94a1498708c33d6ed0f3d8c5350af87e62e",
+        "go.sum": "bccad6b8ddfdd1e646f115c6ca046c0cd99e29be3affe0aafb4c04c8d6df4758"
+      },
+      "data_snapshots": {}
+    },
+    {
+      "case": {
+        "kind": "driver-control",
+        "run": "6f74694b4af74972ab21b0254b786887"
+      },
+      "fixture": {
+        "run": "6f74694b4af74972ab21b0254b786887",
+        "start_ms": 1795846874000,
+        "series": 100,
+        "points": 100,
+        "logs": 10000
+      },
+      "status": {
+        "passed": true,
+        "run": "6f74694b4af74972ab21b0254b786887",
+        "scope": "Healthy common OTLP input/readback only; no recovery/performance qualification"
+      },
+      "signals": {
+        "greptime:metrics": {
+          "configuration": {
+            "backend": "greptime",
+            "batch": 1000,
+            "connect_timeout_s": 5,
+            "fixture": {
+              "run": "6f74694b4af74972ab21b0254b786887",
+              "start_ms": 1795846874000,
+              "series": 100,
+              "points": 100,
+              "logs": 10000
+            },
+            "gzip": true,
+            "http_timeout_s": 30,
+            "max_connections_per_host": 4,
+            "protocol": "otlp-http-protobuf",
+            "retry_attempts": 0,
+            "signal": "metrics",
+            "started_at": "2026-11-28T08:21:15.717717375Z",
+            "workers": 1
+          },
+          "request_responses": 10,
+          "accepted_records": 10000,
+          "unaccepted_responses": 0,
+          "http_latency": {
+            "samples": 10,
+            "unit": "ms",
+            "mean": 2.7443501,
+            "p50": 2.468458,
+            "p95": 5.092708,
+            "p99": 5.092708,
+            "p999": 5.092708,
+            "max": 5.092708,
+            "qualification": "One finite-corpus diagnostic; not sustained/repeated performance qualification"
+          },
+          "request_construction_encoding_latency": {
+            "samples": 10,
+            "unit": "ms",
+            "mean": 0.8414457000000001,
+            "p50": 0.782375,
+            "p95": 1.100625,
+            "p99": 1.100625,
+            "p999": 1.100625,
+            "max": 1.100625,
+            "qualification": "One finite-corpus diagnostic; not sustained/repeated performance qualification"
+          },
+          "raw_encoded_bytes": 1013950,
+          "wire_bytes": 71868,
+          "wire_compression_ratio": 14.108504480436356,
+          "last_exact_readback": {
+            "backend": "greptime",
+            "duplicates": 0,
+            "duration_s": 0.022154666,
+            "event": "exact-readback",
+            "expected_records": 10000,
+            "missing": 0,
+            "signal": "metrics",
+            "wrong": 0
+          },
+          "admission": [
+            {
+              "elapsed_s": 0.040806,
+              "event": "admission-complete",
+              "meaning": "API acceptance, not verified visibility or crash durability",
+              "records": 10000
+            }
+          ],
+          "evidence": "results/cases/6f74694b4af74972ab21b0254b786887/greptime/metrics"
+        },
+        "greptime:logs": {
+          "configuration": {
+            "backend": "greptime",
+            "batch": 1000,
+            "connect_timeout_s": 5,
+            "fixture": {
+              "run": "6f74694b4af74972ab21b0254b786887",
+              "start_ms": 1795846874000,
+              "series": 100,
+              "points": 100,
+              "logs": 10000
+            },
+            "gzip": true,
+            "http_timeout_s": 30,
+            "max_connections_per_host": 4,
+            "protocol": "otlp-http-protobuf",
+            "retry_attempts": 0,
+            "signal": "logs",
+            "started_at": "2026-11-28T08:21:16.264017334Z",
+            "workers": 1
+          },
+          "request_responses": 10,
+          "accepted_records": 10000,
+          "unaccepted_responses": 0,
+          "http_latency": {
+            "samples": 10,
+            "unit": "ms",
+            "mean": 5.0604128,
+            "p50": 4.735876,
+            "p95": 6.279459,
+            "p99": 6.279459,
+            "p999": 6.279459,
+            "max": 6.279459,
+            "qualification": "One finite-corpus diagnostic; not sustained/repeated performance qualification"
+          },
+          "request_construction_encoding_latency": {
+            "samples": 10,
+            "unit": "ms",
+            "mean": 2.0026416,
+            "p50": 1.918417,
+            "p95": 2.440166,
+            "p99": 2.440166,
+            "p999": 2.440166,
+            "max": 2.440166,
+            "qualification": "One finite-corpus diagnostic; not sustained/repeated performance qualification"
+          },
+          "raw_encoded_bytes": 4831705,
+          "wire_bytes": 427449,
+          "wire_compression_ratio": 11.30358241568,
+          "last_exact_readback": {
+            "backend": "greptime",
+            "duplicates": 0,
+            "duration_s": 0.047345375,
+            "event": "exact-readback",
+            "expected_records": 10000,
+            "missing": 0,
+            "signal": "logs",
+            "wrong": 0
+          },
+          "admission": [
+            {
+              "elapsed_s": 0.084670833,
+              "event": "admission-complete",
+              "meaning": "API acceptance, not verified visibility or crash durability",
+              "records": 10000
+            }
+          ],
+          "evidence": "results/cases/6f74694b4af74972ab21b0254b786887/greptime/logs"
+        },
+        "victoria:metrics": {
+          "configuration": {
+            "backend": "victoria",
+            "batch": 1000,
+            "connect_timeout_s": 5,
+            "fixture": {
+              "run": "6f74694b4af74972ab21b0254b786887",
+              "start_ms": 1795846874000,
+              "series": 100,
+              "points": 100,
+              "logs": 10000
+            },
+            "gzip": true,
+            "http_timeout_s": 30,
+            "max_connections_per_host": 4,
+            "protocol": "otlp-http-protobuf",
+            "retry_attempts": 0,
+            "signal": "metrics",
+            "started_at": "2026-11-28T08:21:17.546804459Z",
+            "workers": 1
+          },
+          "request_responses": 10,
+          "accepted_records": 10000,
+          "unaccepted_responses": 0,
+          "http_latency": {
+            "samples": 10,
+            "unit": "ms",
+            "mean": 1.5038001,
+            "p50": 0.500708,
+            "p95": 9.440167,
+            "p99": 9.440167,
+            "p999": 9.440167,
+            "max": 9.440167,
+            "qualification": "One finite-corpus diagnostic; not sustained/repeated performance qualification"
+          },
+          "request_construction_encoding_latency": {
+            "samples": 10,
+            "unit": "ms",
+            "mean": 0.8552375,
+            "p50": 0.787625,
+            "p95": 1.187,
+            "p99": 1.187,
+            "p999": 1.187,
+            "max": 1.187,
+            "qualification": "One finite-corpus diagnostic; not sustained/repeated performance qualification"
+          },
+          "raw_encoded_bytes": 1013950,
+          "wire_bytes": 71868,
+          "wire_compression_ratio": 14.108504480436356,
+          "last_exact_readback": {
+            "backend": "victoria",
+            "duplicates": 0,
+            "duration_s": 0.010257458,
+            "event": "exact-readback",
+            "expected_records": 10000,
+            "missing": 0,
+            "signal": "metrics",
+            "wrong": 0
+          },
+          "admission": [
+            {
+              "elapsed_s": 0.029410083,
+              "event": "admission-complete",
+              "meaning": "API acceptance, not verified visibility or crash durability",
+              "records": 10000
+            }
+          ],
+          "evidence": "results/cases/6f74694b4af74972ab21b0254b786887/victoria/metrics"
+        },
+        "victoria:logs": {
+          "configuration": {
+            "backend": "victoria",
+            "batch": 1000,
+            "connect_timeout_s": 5,
+            "fixture": {
+              "run": "6f74694b4af74972ab21b0254b786887",
+              "start_ms": 1795846874000,
+              "series": 100,
+              "points": 100,
+              "logs": 10000
+            },
+            "gzip": true,
+            "http_timeout_s": 30,
+            "max_connections_per_host": 4,
+            "protocol": "otlp-http-protobuf",
+            "retry_attempts": 0,
+            "signal": "logs",
+            "started_at": "2026-11-28T08:21:28.32206084Z",
+            "workers": 1
+          },
+          "request_responses": 10,
+          "accepted_records": 10000,
+          "unaccepted_responses": 0,
+          "http_latency": {
+            "samples": 10,
+            "unit": "ms",
+            "mean": 3.2340623,
+            "p50": 1.883041,
+            "p95": 8.281083,
+            "p99": 8.281083,
+            "p999": 8.281083,
+            "max": 8.281083,
+            "qualification": "One finite-corpus diagnostic; not sustained/repeated performance qualification"
+          },
+          "request_construction_encoding_latency": {
+            "samples": 10,
+            "unit": "ms",
+            "mean": 1.9792417,
+            "p50": 1.933875,
+            "p95": 2.536459,
+            "p99": 2.536459,
+            "p999": 2.536459,
+            "max": 2.536459,
+            "qualification": "One finite-corpus diagnostic; not sustained/repeated performance qualification"
+          },
+          "raw_encoded_bytes": 4831705,
+          "wire_bytes": 427449,
+          "wire_compression_ratio": 11.30358241568,
+          "last_exact_readback": {
+            "backend": "victoria",
+            "duplicates": 0,
+            "duration_s": 0.060385542,
+            "event": "exact-readback",
+            "expected_records": 10000,
+            "missing": 0,
+            "signal": "logs",
+            "wrong": 0
+          },
+          "admission": [
+            {
+              "elapsed_s": 0.065956459,
+              "event": "admission-complete",
+              "meaning": "API acceptance, not verified visibility or crash durability",
+              "records": 10000
+            }
+          ],
+          "evidence": "results/cases/6f74694b4af74972ab21b0254b786887/victoria/logs"
+        }
+      },
+      "executed_workload_source": {
+        "transport.go": "70725e64d2e379e40a1594b1de09068034a6e71567a5623849f4bae7b483ffc0",
+        "resources.go": "7f3e431817250a74f6f2eb80b9e02a6ddd5475838140a3a7cb2e2bf0a2a6d232",
+        "corpus.go": "535b5f5726b472a8601ef1b965234c6d1f87a5ce5ab094c5c66177286044157c",
+        "transport_test.go": "ac067bb9d8d14875ab17ece97115ba7fb75ba07dc24147dc27c45fb23a117ad2",
+        "main.go": "324f793664023116b1ae3fab759cf3c43082a54b97d1598e23c6d68fb9276fb9",
+        "corpus_test.go": "602160ca6dba760731e4f00123e5e020b1c8e537c182c6f7fe9cfc0ad66cec88",
+        "readback.go": "6a4477ab0005d066e8f3a3a3acac1490a0e564ecc5fc2cfef85d6894b0755c97",
+        "go.mod": "b5b15e71e5c049dd9609246f019fd94a1498708c33d6ed0f3d8c5350af87e62e",
+        "go.sum": "bccad6b8ddfdd1e646f115c6ca046c0cd99e29be3affe0aafb4c04c8d6df4758"
+      },
+      "data_snapshots": {}
+    },
+    {
+      "case": {
+        "kind": "healthy-common-otlp",
+        "run": "7e83fdcd0e074a50ab43f75745cdc2ba"
+      },
+      "fixture": {
+        "run": "7e83fdcd0e074a50ab43f75745cdc2ba",
+        "start_ms": 1795846995000,
+        "series": 10000,
+        "points": 100,
+        "logs": 1000000
+      },
+      "status": {
+        "passed": true,
+        "run": "7e83fdcd0e074a50ab43f75745cdc2ba",
+        "scope": "Healthy common OTLP input/readback only; no recovery/performance qualification"
+      },
+      "signals": {
+        "greptime:metrics": {
+          "configuration": {
+            "backend": "greptime",
+            "batch": 1000,
+            "connect_timeout_s": 5,
+            "fixture": {
+              "run": "7e83fdcd0e074a50ab43f75745cdc2ba",
+              "start_ms": 1795846995000,
+              "series": 10000,
+              "points": 100,
+              "logs": 1000000
+            },
+            "gzip": true,
+            "http_timeout_s": 30,
+            "max_connections_per_host": 4,
+            "protocol": "otlp-http-protobuf",
+            "retry_attempts": 0,
+            "signal": "metrics",
+            "started_at": "2026-11-28T08:23:16.944188501Z",
+            "workers": 1
+          },
+          "request_responses": 1000,
+          "accepted_records": 1000000,
+          "unaccepted_responses": 0,
+          "http_latency": {
+            "samples": 1000,
+            "unit": "ms",
+            "mean": 2.2202964940000003,
+            "p50": 2.097834,
+            "p95": 2.669458,
+            "p99": 3.470625,
+            "p999": 10.025208,
+            "max": 11.815709,
+            "qualification": "One finite-corpus diagnostic; not sustained/repeated performance qualification"
+          },
+          "request_construction_encoding_latency": {
+            "samples": 1000,
+            "unit": "ms",
+            "mean": 0.7666436710000001,
+            "p50": 0.754125,
+            "p95": 0.868417,
+            "p99": 1.0495,
+            "p999": 1.441125,
+            "max": 1.478209,
+            "qualification": "One finite-corpus diagnostic; not sustained/repeated performance qualification"
+          },
+          "raw_encoded_bytes": 103428100,
+          "wire_bytes": 7889759,
+          "wire_compression_ratio": 13.109158340577958,
+          "last_exact_readback": {
+            "backend": "greptime",
+            "duplicates": 0,
+            "duration_s": 1.149955084,
+            "event": "exact-readback",
+            "expected_records": 1000000,
+            "missing": 0,
+            "signal": "metrics",
+            "wrong": 0
+          },
+          "admission": [
+            {
+              "elapsed_s": 3.372610918,
+              "event": "admission-complete",
+              "meaning": "API acceptance, not verified visibility or crash durability",
+              "records": 1000000
+            }
+          ],
+          "evidence": "results/cases/7e83fdcd0e074a50ab43f75745cdc2ba/greptime/metrics"
+        },
+        "greptime:logs": {
+          "configuration": {
+            "backend": "greptime",
+            "batch": 1000,
+            "connect_timeout_s": 5,
+            "fixture": {
+              "run": "7e83fdcd0e074a50ab43f75745cdc2ba",
+              "start_ms": 1795846995000,
+              "series": 10000,
+              "points": 100,
+              "logs": 1000000
+            },
+            "gzip": true,
+            "http_timeout_s": 30,
+            "max_connections_per_host": 4,
+            "protocol": "otlp-http-protobuf",
+            "retry_attempts": 0,
+            "signal": "logs",
+            "started_at": "2026-11-28T08:23:21.958855212Z",
+            "workers": 1
+          },
+          "request_responses": 1000,
+          "accepted_records": 1000000,
+          "unaccepted_responses": 0,
+          "http_latency": {
+            "samples": 1000,
+            "unit": "ms",
+            "mean": 3.995480561,
+            "p50": 3.8735,
+            "p95": 4.602208,
+            "p99": 5.169541,
+            "p999": 15.294375,
+            "max": 20.004875,
+            "qualification": "One finite-corpus diagnostic; not sustained/repeated performance qualification"
+          },
+          "request_construction_encoding_latency": {
+            "samples": 1000,
+            "unit": "ms",
+            "mean": 1.764075101,
+            "p50": 1.732375,
+            "p95": 1.930792,
+            "p99": 2.898041,
+            "p999": 3.006042,
+            "max": 3.031916,
+            "qualification": "One finite-corpus diagnostic; not sustained/repeated performance qualification"
+          },
+          "raw_encoded_bytes": 485267034,
+          "wire_bytes": 42904311,
+          "wire_compression_ratio": 11.310449292613043,
+          "last_exact_readback": {
+            "backend": "greptime",
+            "duplicates": 0,
+            "duration_s": 4.740987919,
+            "event": "exact-readback",
+            "expected_records": 1000000,
+            "missing": 0,
+            "signal": "logs",
+            "wrong": 0
+          },
+          "admission": [
+            {
+              "elapsed_s": 6.989642795,
+              "event": "admission-complete",
+              "meaning": "API acceptance, not verified visibility or crash durability",
+              "records": 1000000
+            }
+          ],
+          "evidence": "results/cases/7e83fdcd0e074a50ab43f75745cdc2ba/greptime/logs"
+        },
+        "victoria:metrics": {
+          "configuration": {
+            "backend": "victoria",
+            "batch": 1000,
+            "connect_timeout_s": 5,
+            "fixture": {
+              "run": "7e83fdcd0e074a50ab43f75745cdc2ba",
+              "start_ms": 1795846995000,
+              "series": 10000,
+              "points": 100,
+              "logs": 1000000
+            },
+            "gzip": true,
+            "http_timeout_s": 30,
+            "max_connections_per_host": 4,
+            "protocol": "otlp-http-protobuf",
+            "retry_attempts": 0,
+            "signal": "metrics",
+            "started_at": "2026-11-28T08:23:35.56902801Z",
+            "workers": 1
+          },
+          "request_responses": 1000,
+          "accepted_records": 1000000,
+          "unaccepted_responses": 0,
+          "http_latency": {
+            "samples": 1000,
+            "unit": "ms",
+            "mean": 0.548159818,
+            "p50": 0.479792,
+            "p95": 0.608208,
+            "p99": 2.628458,
+            "p999": 10.211792,
+            "max": 11.118375,
+            "qualification": "One finite-corpus diagnostic; not sustained/repeated performance qualification"
+          },
+          "request_construction_encoding_latency": {
+            "samples": 1000,
+            "unit": "ms",
+            "mean": 0.756524369,
+            "p50": 0.742958,
+            "p95": 0.85875,
+            "p99": 0.9935,
+            "p999": 1.095792,
+            "max": 1.114959,
+            "qualification": "One finite-corpus diagnostic; not sustained/repeated performance qualification"
+          },
+          "raw_encoded_bytes": 103428100,
+          "wire_bytes": 7889759,
+          "wire_compression_ratio": 13.109158340577958,
+          "last_exact_readback": {
+            "backend": "victoria",
+            "duplicates": 0,
+            "duration_s": 0.757256126,
+            "event": "exact-readback",
+            "expected_records": 1000000,
+            "missing": 0,
+            "signal": "metrics",
+            "wrong": 0
+          },
+          "admission": [
+            {
+              "elapsed_s": 1.723803251,
+              "event": "admission-complete",
+              "meaning": "API acceptance, not verified visibility or crash durability",
+              "records": 1000000
+            }
+          ],
+          "evidence": "results/cases/7e83fdcd0e074a50ab43f75745cdc2ba/victoria/metrics"
+        },
+        "victoria:logs": {
+          "configuration": {
+            "backend": "victoria",
+            "batch": 1000,
+            "connect_timeout_s": 5,
+            "fixture": {
+              "run": "7e83fdcd0e074a50ab43f75745cdc2ba",
+              "start_ms": 1795846995000,
+              "series": 10000,
+              "points": 100,
+              "logs": 1000000
+            },
+            "gzip": true,
+            "http_timeout_s": 30,
+            "max_connections_per_host": 4,
+            "protocol": "otlp-http-protobuf",
+            "retry_attempts": 0,
+            "signal": "logs",
+            "started_at": "2026-11-28T08:23:43.36134393Z",
+            "workers": 1
+          },
+          "request_responses": 1000,
+          "accepted_records": 1000000,
+          "unaccepted_responses": 0,
+          "http_latency": {
+            "samples": 1000,
+            "unit": "ms",
+            "mean": 2.133794148,
+            "p50": 0.916208,
+            "p95": 5.827042,
+            "p99": 6.1425,
+            "p999": 6.988125,
+            "max": 7.955916,
+            "qualification": "One finite-corpus diagnostic; not sustained/repeated performance qualification"
+          },
+          "request_construction_encoding_latency": {
+            "samples": 1000,
+            "unit": "ms",
+            "mean": 1.7610264629999999,
+            "p50": 1.722125,
+            "p95": 1.930042,
+            "p99": 2.892333,
+            "p999": 3.028917,
+            "max": 3.224667,
+            "qualification": "One finite-corpus diagnostic; not sustained/repeated performance qualification"
+          },
+          "raw_encoded_bytes": 485267034,
+          "wire_bytes": 42904311,
+          "wire_compression_ratio": 11.310449292613043,
+          "last_exact_readback": {
+            "backend": "victoria",
+            "duplicates": 0,
+            "duration_s": 6.041036878,
+            "event": "exact-readback",
+            "expected_records": 1000000,
+            "missing": 0,
+            "signal": "logs",
+            "wrong": 0
+          },
+          "admission": [
+            {
+              "elapsed_s": 5.047112418,
+              "event": "admission-complete",
+              "meaning": "API acceptance, not verified visibility or crash durability",
+              "records": 1000000
+            }
+          ],
+          "evidence": "results/cases/7e83fdcd0e074a50ab43f75745cdc2ba/victoria/logs"
+        }
+      },
+      "executed_workload_source": {
+        "transport.go": "70725e64d2e379e40a1594b1de09068034a6e71567a5623849f4bae7b483ffc0",
+        "disk.go": "fa9e4bd01dbb1c000a8c8a3abafe2c5ab51e12fb5229df8c3062bb0b4f0dd878",
+        "resources.go": "7f3e431817250a74f6f2eb80b9e02a6ddd5475838140a3a7cb2e2bf0a2a6d232",
+        "corpus.go": "535b5f5726b472a8601ef1b965234c6d1f87a5ce5ab094c5c66177286044157c",
+        "transport_test.go": "ac067bb9d8d14875ab17ece97115ba7fb75ba07dc24147dc27c45fb23a117ad2",
+        "main.go": "ad63cb692ac80fa07b10847601b4ca1840c0bd907cd35ac24d495f545be2e215",
+        "corpus_test.go": "602160ca6dba760731e4f00123e5e020b1c8e537c182c6f7fe9cfc0ad66cec88",
+        "readback.go": "6a4477ab0005d066e8f3a3a3acac1490a0e564ecc5fc2cfef85d6894b0755c97",
+        "go.mod": "b5b15e71e5c049dd9609246f019fd94a1498708c33d6ed0f3d8c5350af87e62e",
+        "go.sum": "bccad6b8ddfdd1e646f115c6ca046c0cd99e29be3affe0aafb4c04c8d6df4758"
+      },
+      "data_snapshots": {
+        "greptime-disk-after-readback.json": {
+          "volumes": {
+            "obs-greptime-victoria-single_greptime": {
+              "role": "greptime",
+              "allocated_bytes": 130490368,
+              "event": "data-volume-snapshot",
+              "logical_regular_file_bytes": 130335865,
+              "regular_files": 22,
+              "scope": "read-only mounted owned data volume; inode-deduplicated; not a transient peak or native codec ratio"
+            }
+          },
+          "allocated_data_bytes": 130490368,
+          "logical_file_bytes": 130335865
+        },
+        "greptime-disk-before-ingest.json": {
+          "volumes": {
+            "obs-greptime-victoria-single_greptime": {
+              "role": "greptime",
+              "allocated_bytes": 4206592,
+              "event": "data-volume-snapshot",
+              "logical_regular_file_bytes": 4086273,
+              "regular_files": 13,
+              "scope": "read-only mounted owned data volume; inode-deduplicated; not a transient peak or native codec ratio"
+            }
+          },
+          "allocated_data_bytes": 4206592,
+          "logical_file_bytes": 4086273
+        },
+        "victoria-disk-after-readback.json": {
+          "volumes": {
+            "obs-greptime-victoria-single_vmetrics": {
+              "role": "vmetrics",
+              "allocated_bytes": 2203648,
+              "event": "data-volume-snapshot",
+              "logical_regular_file_bytes": 1914448,
+              "regular_files": 57,
+              "scope": "read-only mounted owned data volume; inode-deduplicated; not a transient peak or native codec ratio"
+            },
+            "obs-greptime-victoria-single_vlogs": {
+              "role": "vlogs",
+              "allocated_bytes": 31293440,
+              "event": "data-volume-snapshot",
+              "logical_regular_file_bytes": 31005792,
+              "regular_files": 85,
+              "scope": "read-only mounted owned data volume; inode-deduplicated; not a transient peak or native codec ratio"
+            }
+          },
+          "allocated_data_bytes": 33497088,
+          "logical_file_bytes": 32920240
+        },
+        "victoria-disk-before-ingest.json": {
+          "volumes": {
+            "obs-greptime-victoria-single_vmetrics": {
+              "role": "vmetrics",
+              "allocated_bytes": 847872,
+              "event": "data-volume-snapshot",
+              "logical_regular_file_bytes": 615702,
+              "regular_files": 42,
+              "scope": "read-only mounted owned data volume; inode-deduplicated; not a transient peak or native codec ratio"
+            },
+            "obs-greptime-victoria-single_vlogs": {
+              "role": "vlogs",
+              "allocated_bytes": 430080,
+              "event": "data-volume-snapshot",
+              "logical_regular_file_bytes": 342301,
+              "regular_files": 20,
+              "scope": "read-only mounted owned data volume; inode-deduplicated; not a transient peak or native codec ratio"
+            }
+          },
+          "allocated_data_bytes": 1277952,
+          "logical_file_bytes": 958003
+        }
+      }
+    },
+    {
+      "case": {
+        "kind": "driver-control",
+        "run": "12c380ae0fe24095979a328259ed2133",
+        "protocol": "native"
+      },
+      "fixture": {
+        "run": "12c380ae0fe24095979a328259ed2133",
+        "start_ms": 1795847277000,
+        "series": 100,
+        "points": 100,
+        "logs": 10000
+      },
+      "status": {
+        "passed": true,
+        "run": "12c380ae0fe24095979a328259ed2133",
+        "scope": "Healthy common OTLP input/readback only; no recovery/performance qualification"
+      },
+      "signals": {
+        "greptime:metrics": {
+          "configuration": {
+            "backend": "greptime",
+            "batch": 1000,
+            "connect_timeout_s": 5,
+            "fixture": {
+              "run": "12c380ae0fe24095979a328259ed2133",
+              "start_ms": 1795847277000,
+              "series": 100,
+              "points": 100,
+              "logs": 10000
+            },
+            "http_timeout_s": 30,
+            "max_connections_per_host": 4,
+            "protocol": "native",
+            "requested_otlp_gzip": true,
+            "retry_attempts": 0,
+            "signal": "metrics",
+            "started_at": "2026-11-28T08:28:01.174340424Z",
+            "workers": 1
+          },
+          "request_responses": 10,
+          "accepted_records": 10000,
+          "unaccepted_responses": 0,
+          "http_latency": {
+            "samples": 10,
+            "unit": "ms",
+            "mean": 1.9492749,
+            "p50": 1.410333,
+            "p95": 6.38775,
+            "p99": 6.38775,
+            "p999": 6.38775,
+            "max": 6.38775,
+            "qualification": "One finite-corpus diagnostic; not sustained/repeated performance qualification"
+          },
+          "request_construction_encoding_latency": {
+            "samples": 10,
+            "unit": "ms",
+            "mean": 0.0974333,
+            "p50": 0.082541,
+            "p95": 0.15125,
+            "p99": 0.15125,
+            "p999": 0.15125,
+            "max": 0.15125,
+            "qualification": "One finite-corpus diagnostic; not sustained/repeated performance qualification"
+          },
+          "raw_encoded_bytes": 284301,
+          "wire_bytes": 70461,
+          "wire_compression_ratio": 4.034870353812748,
+          "last_exact_readback": {
+            "backend": "greptime",
+            "duplicates": 0,
+            "duration_s": 0.016405625,
+            "event": "exact-readback",
+            "expected_records": 10000,
+            "missing": 0,
+            "signal": "metrics",
+            "wrong": 0
+          },
+          "admission": [
+            {
+              "elapsed_s": 0.022726834,
+              "event": "admission-complete",
+              "meaning": "API acceptance, not verified visibility or crash durability",
+              "records": 10000
+            }
+          ],
+          "evidence": "results/cases/12c380ae0fe24095979a328259ed2133/greptime/metrics"
+        },
+        "greptime:logs": {
+          "configuration": {
+            "backend": "greptime",
+            "batch": 1000,
+            "connect_timeout_s": 5,
+            "fixture": {
+              "run": "12c380ae0fe24095979a328259ed2133",
+              "start_ms": 1795847277000,
+              "series": 100,
+              "points": 100,
+              "logs": 10000
+            },
+            "http_timeout_s": 30,
+            "max_connections_per_host": 4,
+            "protocol": "native",
+            "requested_otlp_gzip": true,
+            "retry_attempts": 0,
+            "signal": "logs",
+            "started_at": "2026-11-28T08:28:01.694331049Z",
+            "workers": 1
+          },
+          "request_responses": 10,
+          "accepted_records": 10000,
+          "unaccepted_responses": 0,
+          "http_latency": {
+            "samples": 10,
+            "unit": "ms",
+            "mean": 3.7383167,
+            "p50": 3.2105,
+            "p95": 8.174334,
+            "p99": 8.174334,
+            "p999": 8.174334,
+            "max": 8.174334,
+            "qualification": "One finite-corpus diagnostic; not sustained/repeated performance qualification"
+          },
+          "request_construction_encoding_latency": {
+            "samples": 10,
+            "unit": "ms",
+            "mean": 2.9384208999999997,
+            "p50": 2.71725,
+            "p95": 4.62225,
+            "p99": 4.62225,
+            "p999": 4.62225,
+            "max": 4.62225,
+            "qualification": "One finite-corpus diagnostic; not sustained/repeated performance qualification"
+          },
+          "raw_encoded_bytes": 5099308,
+          "wire_bytes": 5099308,
+          "wire_compression_ratio": 1.0,
+          "last_exact_readback": {
+            "backend": "greptime",
+            "duplicates": 0,
+            "duration_s": 0.048042709,
+            "event": "exact-readback",
+            "expected_records": 10000,
+            "missing": 0,
+            "signal": "logs",
+            "wrong": 0
+          },
+          "admission": [
+            {
+              "elapsed_s": 0.070787458,
+              "event": "admission-complete",
+              "meaning": "API acceptance, not verified visibility or crash durability",
+              "records": 10000
+            }
+          ],
+          "evidence": "results/cases/12c380ae0fe24095979a328259ed2133/greptime/logs"
+        },
+        "victoria:metrics": {
+          "configuration": {
+            "backend": "victoria",
+            "batch": 1000,
+            "connect_timeout_s": 5,
+            "fixture": {
+              "run": "12c380ae0fe24095979a328259ed2133",
+              "start_ms": 1795847277000,
+              "series": 100,
+              "points": 100,
+              "logs": 10000
+            },
+            "http_timeout_s": 30,
+            "max_connections_per_host": 4,
+            "protocol": "native",
+            "requested_otlp_gzip": true,
+            "retry_attempts": 0,
+            "signal": "metrics",
+            "started_at": "2026-11-28T08:28:03.617091342Z",
+            "workers": 1
+          },
+          "request_responses": 10,
+          "accepted_records": 10000,
+          "unaccepted_responses": 0,
+          "http_latency": {
+            "samples": 10,
+            "unit": "ms",
+            "mean": 0.7253333000000001,
+            "p50": 0.212375,
+            "p95": 4.79025,
+            "p99": 4.79025,
+            "p999": 4.79025,
+            "max": 4.79025,
+            "qualification": "One finite-corpus diagnostic; not sustained/repeated performance qualification"
+          },
+          "request_construction_encoding_latency": {
+            "samples": 10,
+            "unit": "ms",
+            "mean": 0.0844083,
+            "p50": 0.074166,
+            "p95": 0.133334,
+            "p99": 0.133334,
+            "p999": 0.133334,
+            "max": 0.133334,
+            "qualification": "One finite-corpus diagnostic; not sustained/repeated performance qualification"
+          },
+          "raw_encoded_bytes": 284301,
+          "wire_bytes": 70461,
+          "wire_compression_ratio": 4.034870353812748,
+          "last_exact_readback": {
+            "backend": "victoria",
+            "duplicates": 0,
+            "duration_s": 0.009793709,
+            "event": "exact-readback",
+            "expected_records": 10000,
+            "missing": 0,
+            "signal": "metrics",
+            "wrong": 0
+          },
+          "admission": [
+            {
+              "elapsed_s": 0.01017475,
+              "event": "admission-complete",
+              "meaning": "API acceptance, not verified visibility or crash durability",
+              "records": 10000
+            }
+          ],
+          "evidence": "results/cases/12c380ae0fe24095979a328259ed2133/victoria/metrics"
+        },
+        "victoria:logs": {
+          "configuration": {
+            "backend": "victoria",
+            "batch": 1000,
+            "connect_timeout_s": 5,
+            "fixture": {
+              "run": "12c380ae0fe24095979a328259ed2133",
+              "start_ms": 1795847277000,
+              "series": 100,
+              "points": 100,
+              "logs": 10000
+            },
+            "http_timeout_s": 30,
+            "max_connections_per_host": 4,
+            "protocol": "native",
+            "requested_otlp_gzip": true,
+            "retry_attempts": 0,
+            "signal": "logs",
+            "started_at": "2026-11-28T08:28:14.367836333Z",
+            "workers": 1
+          },
+          "request_responses": 10,
+          "accepted_records": 10000,
+          "unaccepted_responses": 0,
+          "http_latency": {
+            "samples": 10,
+            "unit": "ms",
+            "mean": 3.1077332,
+            "p50": 1.902375,
+            "p95": 7.416083,
+            "p99": 7.416083,
+            "p999": 7.416083,
+            "max": 7.416083,
+            "qualification": "One finite-corpus diagnostic; not sustained/repeated performance qualification"
+          },
+          "request_construction_encoding_latency": {
+            "samples": 10,
+            "unit": "ms",
+            "mean": 2.3413125999999997,
+            "p50": 2.09675,
+            "p95": 3.338584,
+            "p99": 3.338584,
+            "p999": 3.338584,
+            "max": 3.338584,
+            "qualification": "One finite-corpus diagnostic; not sustained/repeated performance qualification"
+          },
+          "raw_encoded_bytes": 5099298,
+          "wire_bytes": 5099298,
+          "wire_compression_ratio": 1.0,
+          "last_exact_readback": {
+            "backend": "victoria",
+            "duplicates": 0,
+            "duration_s": 0.053076625,
+            "event": "exact-readback",
+            "expected_records": 10000,
+            "missing": 0,
+            "signal": "logs",
+            "wrong": 0
+          },
+          "admission": [
+            {
+              "elapsed_s": 0.05878175,
+              "event": "admission-complete",
+              "meaning": "API acceptance, not verified visibility or crash durability",
+              "records": 10000
+            }
+          ],
+          "evidence": "results/cases/12c380ae0fe24095979a328259ed2133/victoria/logs"
+        }
+      },
+      "executed_workload_source": {
+        "transport.go": "31b08697341d14bf5944bb67c19ca4f6b3db22619521fb0f0ddb809a1a3b8382",
+        "disk.go": "fa9e4bd01dbb1c000a8c8a3abafe2c5ab51e12fb5229df8c3062bb0b4f0dd878",
+        "native.go": "0be19f97e443ed25d2954d036e96c5752b12dc9027f98f744077c96dccae1368",
+        "resources.go": "7f3e431817250a74f6f2eb80b9e02a6ddd5475838140a3a7cb2e2bf0a2a6d232",
+        "corpus.go": "535b5f5726b472a8601ef1b965234c6d1f87a5ce5ab094c5c66177286044157c",
+        "transport_test.go": "ac067bb9d8d14875ab17ece97115ba7fb75ba07dc24147dc27c45fb23a117ad2",
+        "main.go": "82945143bdd2574ab6b0fddfc52321a35aeaa88499da4df0d6aa609447009562",
+        "corpus_test.go": "602160ca6dba760731e4f00123e5e020b1c8e537c182c6f7fe9cfc0ad66cec88",
+        "readback.go": "9bbcf96555f92c135d8192222e52b028d09df5b3de7141dc5a4b7b99750b93ae",
+        "native-logs.yaml": "780da24596137b36cf75b72e3e3506f8507d283c26181ba16da417ff43b53e4a",
+        "go.mod": "4913e1d078c958a3abe1f16be7334c91c915355551c751af707171e5193d1586",
+        "go.sum": "6a6a442007faa79bf3318622d2696e640dbeee90dcfb410385f2f1e559df8474"
+      },
+      "data_snapshots": {
+        "greptime-disk-after-readback.json": {
+          "volumes": {
+            "obs-greptime-victoria-single_greptime": {
+              "role": "greptime",
+              "allocated_bytes": 133132288,
+              "event": "data-volume-snapshot",
+              "logical_regular_file_bytes": 132944273,
+              "regular_files": 24,
+              "scope": "read-only mounted owned data volume; inode-deduplicated; not a transient peak or native codec ratio"
+            }
+          },
+          "allocated_data_bytes": 133132288,
+          "logical_file_bytes": 132944273
+        },
+        "greptime-disk-before-ingest.json": {
+          "volumes": {
+            "obs-greptime-victoria-single_greptime": {
+              "role": "greptime",
+              "allocated_bytes": 130990080,
+              "event": "data-volume-snapshot",
+              "logical_regular_file_bytes": 130833387,
+              "regular_files": 22,
+              "scope": "read-only mounted owned data volume; inode-deduplicated; not a transient peak or native codec ratio"
+            }
+          },
+          "allocated_data_bytes": 130990080,
+          "logical_file_bytes": 130833387
+        },
+        "victoria-disk-after-readback.json": {
+          "volumes": {
+            "obs-greptime-victoria-single_vmetrics": {
+              "role": "vmetrics",
+              "allocated_bytes": 5414912,
+              "event": "data-volume-snapshot",
+              "logical_regular_file_bytes": 5079230,
+              "regular_files": 67,
+              "scope": "read-only mounted owned data volume; inode-deduplicated; not a transient peak or native codec ratio"
+            },
+            "obs-greptime-victoria-single_vlogs": {
+              "role": "vlogs",
+              "allocated_bytes": 31293440,
+              "event": "data-volume-snapshot",
+              "logical_regular_file_bytes": 31005792,
+              "regular_files": 85,
+              "scope": "read-only mounted owned data volume; inode-deduplicated; not a transient peak or native codec ratio"
+            }
+          },
+          "allocated_data_bytes": 36708352,
+          "logical_file_bytes": 36085022
+        },
+        "victoria-disk-before-ingest.json": {
+          "volumes": {
+            "obs-greptime-victoria-single_vmetrics": {
+              "role": "vmetrics",
+              "allocated_bytes": 5361664,
+              "event": "data-volume-snapshot",
+              "logical_regular_file_bytes": 5071416,
+              "regular_files": 57,
+              "scope": "read-only mounted owned data volume; inode-deduplicated; not a transient peak or native codec ratio"
+            },
+            "obs-greptime-victoria-single_vlogs": {
+              "role": "vlogs",
+              "allocated_bytes": 31293440,
+              "event": "data-volume-snapshot",
+              "logical_regular_file_bytes": 31005792,
+              "regular_files": 85,
+              "scope": "read-only mounted owned data volume; inode-deduplicated; not a transient peak or native codec ratio"
+            }
+          },
+          "allocated_data_bytes": 36655104,
+          "logical_file_bytes": 36077208
+        }
+      }
+    },
+    {
+      "case": {
+        "kind": "healthy-native",
+        "run": "85a28369c1fd4e63a267b66947a07a47",
+        "protocol": "native"
+      },
+      "fixture": {
+        "run": "85a28369c1fd4e63a267b66947a07a47",
+        "start_ms": 1795846995000,
+        "series": 10000,
+        "points": 100,
+        "logs": 1000000,
+        "payload_seed": "7e83fdcd0e074a50ab43f75745cdc2ba"
+      },
+      "status": {
+        "passed": true,
+        "run": "85a28369c1fd4e63a267b66947a07a47",
+        "scope": "Healthy native input/readback only; no recovery/performance qualification"
+      },
+      "signals": {
+        "greptime:metrics": {
+          "configuration": {
+            "backend": "greptime",
+            "batch": 1000,
+            "connect_timeout_s": 5,
+            "fixture": {
+              "run": "85a28369c1fd4e63a267b66947a07a47",
+              "payload_seed": "7e83fdcd0e074a50ab43f75745cdc2ba",
+              "start_ms": 1795846995000,
+              "series": 10000,
+              "points": 100,
+              "logs": 1000000
+            },
+            "http_timeout_s": 30,
+            "max_connections_per_host": 4,
+            "protocol": "native",
+            "requested_otlp_gzip": true,
+            "retry_attempts": 0,
+            "signal": "metrics",
+            "started_at": "2026-11-28T08:31:02.778949592Z",
+            "workers": 1
+          },
+          "request_responses": 1000,
+          "accepted_records": 1000000,
+          "unaccepted_responses": 0,
+          "http_latency": {
+            "samples": 1000,
+            "unit": "ms",
+            "mean": 1.459844379,
+            "p50": 1.372542,
+            "p95": 1.818542,
+            "p99": 2.127375,
+            "p999": 4.061,
+            "max": 13.123583,
+            "qualification": "One finite-corpus diagnostic; not sustained/repeated performance qualification"
+          },
+          "request_construction_encoding_latency": {
+            "samples": 1000,
+            "unit": "ms",
+            "mean": 0.248681125,
+            "p50": 0.227,
+            "p95": 0.390792,
+            "p99": 0.426125,
+            "p999": 0.506209,
+            "max": 0.525292,
+            "qualification": "One finite-corpus diagnostic; not sustained/repeated performance qualification"
+          },
+          "raw_encoded_bytes": 123343091,
+          "wire_bytes": 15765806,
+          "wire_compression_ratio": 7.823456092254339,
+          "last_exact_readback": {
+            "backend": "greptime",
+            "duplicates": 0,
+            "duration_s": 1.082976959,
+            "event": "exact-readback",
+            "expected_records": 1000000,
+            "missing": 0,
+            "signal": "metrics",
+            "wrong": 0
+          },
+          "admission": [
+            {
+              "elapsed_s": 1.9192549589999999,
+              "event": "admission-complete",
+              "meaning": "API acceptance, not verified visibility or crash durability",
+              "records": 1000000
+            }
+          ],
+          "evidence": "results/cases/85a28369c1fd4e63a267b66947a07a47/greptime/metrics"
+        },
+        "greptime:logs": {
+          "configuration": {
+            "backend": "greptime",
+            "batch": 1000,
+            "connect_timeout_s": 5,
+            "fixture": {
+              "run": "85a28369c1fd4e63a267b66947a07a47",
+              "payload_seed": "7e83fdcd0e074a50ab43f75745cdc2ba",
+              "start_ms": 1795846995000,
+              "series": 10000,
+              "points": 100,
+              "logs": 1000000
+            },
+            "http_timeout_s": 30,
+            "max_connections_per_host": 4,
+            "protocol": "native",
+            "requested_otlp_gzip": true,
+            "retry_attempts": 0,
+            "signal": "logs",
+            "started_at": "2026-11-28T08:31:06.266685468Z",
+            "workers": 1
+          },
+          "request_responses": 1000,
+          "accepted_records": 1000000,
+          "unaccepted_responses": 0,
+          "http_latency": {
+            "samples": 1000,
+            "unit": "ms",
+            "mean": 2.7741335840000003,
+            "p50": 2.618708,
+            "p95": 4.004958,
+            "p99": 4.865708,
+            "p999": 11.874459,
+            "max": 16.752708,
+            "qualification": "One finite-corpus diagnostic; not sustained/repeated performance qualification"
+          },
+          "request_construction_encoding_latency": {
+            "samples": 1000,
+            "unit": "ms",
+            "mean": 2.448755788,
+            "p50": 2.366375,
+            "p95": 3.164917,
+            "p99": 3.948625,
+            "p999": 5.050583,
+            "max": 5.072125,
+            "qualification": "One finite-corpus diagnostic; not sustained/repeated performance qualification"
+          },
+          "raw_encoded_bytes": 512027562,
+          "wire_bytes": 512027562,
+          "wire_compression_ratio": 1.0,
+          "last_exact_readback": {
+            "backend": "greptime",
+            "duplicates": 0,
+            "duration_s": 4.9778946269999995,
+            "event": "exact-readback",
+            "expected_records": 1000000,
+            "missing": 0,
+            "signal": "logs",
+            "wrong": 0
+          },
+          "admission": [
+            {
+              "elapsed_s": 5.622190669,
+              "event": "admission-complete",
+              "meaning": "API acceptance, not verified visibility or crash durability",
+              "records": 1000000
+            }
+          ],
+          "evidence": "results/cases/85a28369c1fd4e63a267b66947a07a47/greptime/logs"
+        },
+        "victoria:metrics": {
+          "configuration": {
+            "backend": "victoria",
+            "batch": 1000,
+            "connect_timeout_s": 5,
+            "fixture": {
+              "run": "85a28369c1fd4e63a267b66947a07a47",
+              "payload_seed": "7e83fdcd0e074a50ab43f75745cdc2ba",
+              "start_ms": 1795846995000,
+              "series": 10000,
+              "points": 100,
+              "logs": 1000000
+            },
+            "http_timeout_s": 30,
+            "max_connections_per_host": 4,
+            "protocol": "native",
+            "requested_otlp_gzip": true,
+            "retry_attempts": 0,
+            "signal": "metrics",
+            "started_at": "2026-11-28T08:31:18.82857746Z",
+            "workers": 1
+          },
+          "request_responses": 1000,
+          "accepted_records": 1000000,
+          "unaccepted_responses": 0,
+          "http_latency": {
+            "samples": 1000,
+            "unit": "ms",
+            "mean": 0.40297621,
+            "p50": 0.361667,
+            "p95": 0.483916,
+            "p99": 1.468167,
+            "p999": 2.582375,
+            "max": 6.636708,
+            "qualification": "One finite-corpus diagnostic; not sustained/repeated performance qualification"
+          },
+          "request_construction_encoding_latency": {
+            "samples": 1000,
+            "unit": "ms",
+            "mean": 0.289105459,
+            "p50": 0.229708,
+            "p95": 0.473167,
+            "p99": 0.579916,
+            "p999": 1.904791,
+            "max": 2.50725,
+            "qualification": "One finite-corpus diagnostic; not sustained/repeated performance qualification"
+          },
+          "raw_encoded_bytes": 123343091,
+          "wire_bytes": 15765806,
+          "wire_compression_ratio": 7.823456092254339,
+          "last_exact_readback": {
+            "backend": "victoria",
+            "duplicates": 0,
+            "duration_s": 0.681605125,
+            "event": "exact-readback",
+            "expected_records": 1000000,
+            "missing": 0,
+            "signal": "metrics",
+            "wrong": 0
+          },
+          "admission": [
+            {
+              "elapsed_s": 0.911052625,
+              "event": "admission-complete",
+              "meaning": "API acceptance, not verified visibility or crash durability",
+              "records": 1000000
+            }
+          ],
+          "evidence": "results/cases/85a28369c1fd4e63a267b66947a07a47/victoria/metrics"
+        },
+        "victoria:logs": {
+          "configuration": {
+            "backend": "victoria",
+            "batch": 1000,
+            "connect_timeout_s": 5,
+            "fixture": {
+              "run": "85a28369c1fd4e63a267b66947a07a47",
+              "payload_seed": "7e83fdcd0e074a50ab43f75745cdc2ba",
+              "start_ms": 1795846995000,
+              "series": 10000,
+              "points": 100,
+              "logs": 1000000
+            },
+            "http_timeout_s": 30,
+            "max_connections_per_host": 4,
+            "protocol": "native",
+            "requested_otlp_gzip": true,
+            "retry_attempts": 0,
+            "signal": "logs",
+            "started_at": "2026-11-28T08:31:29.90692484Z",
+            "workers": 1
+          },
+          "request_responses": 1000,
+          "accepted_records": 1000000,
+          "unaccepted_responses": 0,
+          "http_latency": {
+            "samples": 1000,
+            "unit": "ms",
+            "mean": 2.1277777070000004,
+            "p50": 1.025625,
+            "p95": 6.539792,
+            "p99": 6.849542,
+            "p999": 8.1605,
+            "max": 9.318875,
+            "qualification": "One finite-corpus diagnostic; not sustained/repeated performance qualification"
+          },
+          "request_construction_encoding_latency": {
+            "samples": 1000,
+            "unit": "ms",
+            "mean": 1.935816367,
+            "p50": 1.889041,
+            "p95": 2.340333,
+            "p99": 2.991041,
+            "p999": 3.302166,
+            "max": 3.522083,
+            "qualification": "One finite-corpus diagnostic; not sustained/repeated performance qualification"
+          },
+          "raw_encoded_bytes": 512026562,
+          "wire_bytes": 512026562,
+          "wire_compression_ratio": 1.0,
+          "last_exact_readback": {
+            "backend": "victoria",
+            "duplicates": 0,
+            "duration_s": 4.873208543,
+            "event": "exact-readback",
+            "expected_records": 1000000,
+            "missing": 0,
+            "signal": "logs",
+            "wrong": 0
+          },
+          "admission": [
+            {
+              "elapsed_s": 4.468849418,
+              "event": "admission-complete",
+              "meaning": "API acceptance, not verified visibility or crash durability",
+              "records": 1000000
+            }
+          ],
+          "evidence": "results/cases/85a28369c1fd4e63a267b66947a07a47/victoria/logs"
+        }
+      },
+      "executed_workload_source": {
+        "transport.go": "033cb682f8e929fd667a8a2c7ae90ef0611da9ebe37da8a2298b540761a9ca94",
+        "disk.go": "fa9e4bd01dbb1c000a8c8a3abafe2c5ab51e12fb5229df8c3062bb0b4f0dd878",
+        "native.go": "0be19f97e443ed25d2954d036e96c5752b12dc9027f98f744077c96dccae1368",
+        "resources.go": "7f3e431817250a74f6f2eb80b9e02a6ddd5475838140a3a7cb2e2bf0a2a6d232",
+        "corpus.go": "125227b73051db177d5b7996d7eb96cdefca81d3da90743b9fe00ec6cc82005c",
+        "transport_test.go": "ac067bb9d8d14875ab17ece97115ba7fb75ba07dc24147dc27c45fb23a117ad2",
+        "main.go": "ab4d290edabbf836346c9f6f7fb7ea3ef44ab292876336ec0aad13918efcbe1f",
+        "corpus_test.go": "637fa67ecfd127407be9622ba4c81c20d534a99c69cfc983d9b4c1f3b37c959b",
+        "readback.go": "9bbcf96555f92c135d8192222e52b028d09df5b3de7141dc5a4b7b99750b93ae",
+        "native-logs.yaml": "780da24596137b36cf75b72e3e3506f8507d283c26181ba16da417ff43b53e4a",
+        "go.mod": "4913e1d078c958a3abe1f16be7334c91c915355551c751af707171e5193d1586",
+        "go.sum": "6a6a442007faa79bf3318622d2696e640dbeee90dcfb410385f2f1e559df8474"
+      },
+      "data_snapshots": {
+        "greptime-disk-after-readback.json": {
+          "volumes": {
+            "obs-greptime-victoria-single_greptime": {
+              "role": "greptime",
+              "allocated_bytes": 247607296,
+              "event": "data-volume-snapshot",
+              "logical_regular_file_bytes": 247394473,
+              "regular_files": 32,
+              "scope": "read-only mounted owned data volume; inode-deduplicated; not a transient peak or native codec ratio"
+            }
+          },
+          "allocated_data_bytes": 247607296,
+          "logical_file_bytes": 247394473
+        },
+        "greptime-disk-before-ingest.json": {
+          "volumes": {
+            "obs-greptime-victoria-single_greptime": {
+              "role": "greptime",
+              "allocated_bytes": 131993600,
+              "event": "data-volume-snapshot",
+              "logical_regular_file_bytes": 131802666,
+              "regular_files": 24,
+              "scope": "read-only mounted owned data volume; inode-deduplicated; not a transient peak or native codec ratio"
+            }
+          },
+          "allocated_data_bytes": 131993600,
+          "logical_file_bytes": 131802666
+        },
+        "victoria-disk-after-readback.json": {
+          "volumes": {
+            "obs-greptime-victoria-single_vmetrics": {
+              "role": "vmetrics",
+              "allocated_bytes": 6316032,
+              "event": "data-volume-snapshot",
+              "logical_regular_file_bytes": 5935024,
+              "regular_files": 77,
+              "scope": "read-only mounted owned data volume; inode-deduplicated; not a transient peak or native codec ratio"
+            },
+            "obs-greptime-victoria-single_vlogs": {
+              "role": "vlogs",
+              "allocated_bytes": 59129856,
+              "event": "data-volume-snapshot",
+              "logical_regular_file_bytes": 58670818,
+              "regular_files": 135,
+              "scope": "read-only mounted owned data volume; inode-deduplicated; not a transient peak or native codec ratio"
+            }
+          },
+          "allocated_data_bytes": 65445888,
+          "logical_file_bytes": 64605842
+        },
+        "victoria-disk-before-ingest.json": {
+          "volumes": {
+            "obs-greptime-victoria-single_vmetrics": {
+              "role": "vmetrics",
+              "allocated_bytes": 5419008,
+              "event": "data-volume-snapshot",
+              "logical_regular_file_bytes": 5078945,
+              "regular_files": 67,
+              "scope": "read-only mounted owned data volume; inode-deduplicated; not a transient peak or native codec ratio"
+            },
+            "obs-greptime-victoria-single_vlogs": {
+              "role": "vlogs",
+              "allocated_bytes": 31682560,
+              "event": "data-volume-snapshot",
+              "logical_regular_file_bytes": 31340539,
+              "regular_files": 100,
+              "scope": "read-only mounted owned data volume; inode-deduplicated; not a transient peak or native codec ratio"
+            }
+          },
+          "allocated_data_bytes": 37101568,
+          "logical_file_bytes": 36419484
+        }
+      }
+    },
+    {
+      "case": {
+        "kind": "driver-control",
+        "run": "8b4310f932124397b31c6e5d6e278222",
+        "protocol": "otlp"
+      },
+      "fixture": {
+        "run": "8b4310f932124397b31c6e5d6e278222",
+        "start_ms": 1795848147000,
+        "series": 100,
+        "points": 100,
+        "logs": 10000
+      },
+      "status": {
+        "passed": true,
+        "run": "8b4310f932124397b31c6e5d6e278222",
+        "scope": "Healthy otlp input/readback only; no recovery/performance qualification"
+      },
+      "signals": {
+        "greptime:metrics": {
+          "configuration": {
+            "backend": "greptime",
+            "batch": 1000,
+            "connect_timeout_s": 5,
+            "fixture": {
+              "run": "8b4310f932124397b31c6e5d6e278222",
+              "start_ms": 1795848147000,
+              "series": 100,
+              "points": 100,
+              "logs": 10000
+            },
+            "http_timeout_s": 30,
+            "max_connections_per_host": 4,
+            "protocol": "otlp",
+            "requested_otlp_gzip": true,
+            "retry_attempts": 0,
+            "signal": "metrics",
+            "started_at": "2026-11-28T08:42:29.064743381Z",
+            "workers": 1
+          },
+          "request_responses": 10,
+          "accepted_records": 10000,
+          "unaccepted_responses": 0,
+          "http_latency": {
+            "samples": 10,
+            "unit": "ms",
+            "mean": 3.7490251,
+            "p50": 2.52025,
+            "p95": 13.920125,
+            "p99": 13.920125,
+            "p999": 13.920125,
+            "max": 13.920125,
+            "qualification": "One finite-corpus diagnostic; not sustained/repeated performance qualification"
+          },
+          "request_construction_encoding_latency": {
+            "samples": 10,
+            "unit": "ms",
+            "mean": 1.1164292,
+            "p50": 1.046417,
+            "p95": 1.726583,
+            "p99": 1.726583,
+            "p999": 1.726583,
+            "max": 1.726583,
+            "qualification": "One finite-corpus diagnostic; not sustained/repeated performance qualification"
+          },
+          "raw_encoded_bytes": 1013950,
+          "wire_bytes": 71643,
+          "wire_compression_ratio": 14.152813254609661,
+          "last_exact_readback": {
+            "backend": "greptime",
+            "duplicates": 0,
+            "duration_s": 0.020225666,
+            "event": "exact-readback",
+            "expected_records": 10000,
+            "missing": 0,
+            "signal": "metrics",
+            "wrong": 0
+          },
+          "admission": [
+            {
+              "elapsed_s": 0.051463541,
+              "event": "admission-complete",
+              "meaning": "API acceptance, not verified visibility or crash durability",
+              "records": 10000
+            }
+          ],
+          "evidence": "results/cases/8b4310f932124397b31c6e5d6e278222/greptime/metrics"
+        },
+        "greptime:logs": {
+          "configuration": {
+            "backend": "greptime",
+            "batch": 1000,
+            "connect_timeout_s": 5,
+            "fixture": {
+              "run": "8b4310f932124397b31c6e5d6e278222",
+              "start_ms": 1795848147000,
+              "series": 100,
+              "points": 100,
+              "logs": 10000
+            },
+            "http_timeout_s": 30,
+            "max_connections_per_host": 4,
+            "protocol": "otlp",
+            "requested_otlp_gzip": true,
+            "retry_attempts": 0,
+            "signal": "logs",
+            "started_at": "2026-11-28T08:42:29.606459173Z",
+            "workers": 1
+          },
+          "request_responses": 10,
+          "accepted_records": 10000,
+          "unaccepted_responses": 0,
+          "http_latency": {
+            "samples": 10,
+            "unit": "ms",
+            "mean": 5.2345416,
+            "p50": 4.863916,
+            "p95": 8.029458,
+            "p99": 8.029458,
+            "p999": 8.029458,
+            "max": 8.029458,
+            "qualification": "One finite-corpus diagnostic; not sustained/repeated performance qualification"
+          },
+          "request_construction_encoding_latency": {
+            "samples": 10,
+            "unit": "ms",
+            "mean": 3.1521957,
+            "p50": 2.999583,
+            "p95": 3.66225,
+            "p99": 3.66225,
+            "p999": 3.66225,
+            "max": 3.66225,
+            "qualification": "One finite-corpus diagnostic; not sustained/repeated performance qualification"
+          },
+          "raw_encoded_bytes": 4831705,
+          "wire_bytes": 427722,
+          "wire_compression_ratio": 11.296367734182484,
+          "last_exact_readback": {
+            "backend": "greptime",
+            "duplicates": 0,
+            "duration_s": 0.049605833,
+            "event": "exact-readback",
+            "expected_records": 10000,
+            "missing": 0,
+            "signal": "logs",
+            "wrong": 0
+          },
+          "admission": [
+            {
+              "elapsed_s": 0.088428625,
+              "event": "admission-complete",
+              "meaning": "API acceptance, not verified visibility or crash durability",
+              "records": 10000
+            }
+          ],
+          "evidence": "results/cases/8b4310f932124397b31c6e5d6e278222/greptime/logs"
+        },
+        "victoria:metrics": {
+          "configuration": {
+            "backend": "victoria",
+            "batch": 1000,
+            "connect_timeout_s": 5,
+            "fixture": {
+              "run": "8b4310f932124397b31c6e5d6e278222",
+              "start_ms": 1795848147000,
+              "series": 100,
+              "points": 100,
+              "logs": 10000
+            },
+            "http_timeout_s": 30,
+            "max_connections_per_host": 4,
+            "protocol": "otlp",
+            "requested_otlp_gzip": true,
+            "retry_attempts": 0,
+            "signal": "metrics",
+            "started_at": "2026-11-28T08:42:31.657720091Z",
+            "workers": 1
+          },
+          "request_responses": 10,
+          "accepted_records": 10000,
+          "unaccepted_responses": 0,
+          "http_latency": {
+            "samples": 10,
+            "unit": "ms",
+            "mean": 1.0288793,
+            "p50": 0.581625,
+            "p95": 5.050542,
+            "p99": 5.050542,
+            "p999": 5.050542,
+            "max": 5.050542,
+            "qualification": "One finite-corpus diagnostic; not sustained/repeated performance qualification"
+          },
+          "request_construction_encoding_latency": {
+            "samples": 10,
+            "unit": "ms",
+            "mean": 1.1578082,
+            "p50": 1.107541,
+            "p95": 1.499417,
+            "p99": 1.499417,
+            "p999": 1.499417,
+            "max": 1.499417,
+            "qualification": "One finite-corpus diagnostic; not sustained/repeated performance qualification"
+          },
+          "raw_encoded_bytes": 1013950,
+          "wire_bytes": 71643,
+          "wire_compression_ratio": 14.152813254609661,
+          "last_exact_readback": {
+            "backend": "victoria",
+            "duplicates": 0,
+            "duration_s": 0.009583584,
+            "event": "exact-readback",
+            "expected_records": 10000,
+            "missing": 0,
+            "signal": "metrics",
+            "wrong": 0
+          },
+          "admission": [
+            {
+              "elapsed_s": 0.024441583,
+              "event": "admission-complete",
+              "meaning": "API acceptance, not verified visibility or crash durability",
+              "records": 10000
+            }
+          ],
+          "evidence": "results/cases/8b4310f932124397b31c6e5d6e278222/victoria/metrics"
+        },
+        "victoria:logs": {
+          "configuration": {
+            "backend": "victoria",
+            "batch": 1000,
+            "connect_timeout_s": 5,
+            "fixture": {
+              "run": "8b4310f932124397b31c6e5d6e278222",
+              "start_ms": 1795848147000,
+              "series": 100,
+              "points": 100,
+              "logs": 10000
+            },
+            "http_timeout_s": 30,
+            "max_connections_per_host": 4,
+            "protocol": "otlp",
+            "requested_otlp_gzip": true,
+            "retry_attempts": 0,
+            "signal": "logs",
+            "started_at": "2026-11-28T08:42:42.465598971Z",
+            "workers": 1
+          },
+          "request_responses": 10,
+          "accepted_records": 10000,
+          "unaccepted_responses": 0,
+          "http_latency": {
+            "samples": 10,
+            "unit": "ms",
+            "mean": 3.4013584000000003,
+            "p50": 1.291208,
+            "p95": 8.519791,
+            "p99": 8.519791,
+            "p999": 8.519791,
+            "max": 8.519791,
+            "qualification": "One finite-corpus diagnostic; not sustained/repeated performance qualification"
+          },
+          "request_construction_encoding_latency": {
+            "samples": 10,
+            "unit": "ms",
+            "mean": 3.0981542,
+            "p50": 2.93875,
+            "p95": 4.292917,
+            "p99": 4.292917,
+            "p999": 4.292917,
+            "max": 4.292917,
+            "qualification": "One finite-corpus diagnostic; not sustained/repeated performance qualification"
+          },
+          "raw_encoded_bytes": 4831705,
+          "wire_bytes": 427722,
+          "wire_compression_ratio": 11.296367734182484,
+          "last_exact_readback": {
+            "backend": "victoria",
+            "duplicates": 0,
+            "duration_s": 0.058990833,
+            "event": "exact-readback",
+            "expected_records": 10000,
+            "missing": 0,
+            "signal": "logs",
+            "wrong": 0
+          },
+          "admission": [
+            {
+              "elapsed_s": 0.068900542,
+              "event": "admission-complete",
+              "meaning": "API acceptance, not verified visibility or crash durability",
+              "records": 10000
+            }
+          ],
+          "evidence": "results/cases/8b4310f932124397b31c6e5d6e278222/victoria/logs"
+        }
+      },
+      "executed_workload_source": {
+        "transport.go": "033cb682f8e929fd667a8a2c7ae90ef0611da9ebe37da8a2298b540761a9ca94",
+        "disk.go": "337a52ae7e8c323306d795a6dd4b164761656a91fe11df9e561f1bcef67848a1",
+        "native.go": "0be19f97e443ed25d2954d036e96c5752b12dc9027f98f744077c96dccae1368",
+        "resources.go": "7f3e431817250a74f6f2eb80b9e02a6ddd5475838140a3a7cb2e2bf0a2a6d232",
+        "corpus.go": "125227b73051db177d5b7996d7eb96cdefca81d3da90743b9fe00ec6cc82005c",
+        "transport_test.go": "ac067bb9d8d14875ab17ece97115ba7fb75ba07dc24147dc27c45fb23a117ad2",
+        "main.go": "cfe061069638063cee1ef7bc5df9a9d2c6c9e1f331e0037d318948fe2935433c",
+        "corpus_test.go": "637fa67ecfd127407be9622ba4c81c20d534a99c69cfc983d9b4c1f3b37c959b",
+        "readback.go": "9bbcf96555f92c135d8192222e52b028d09df5b3de7141dc5a4b7b99750b93ae",
+        "native-logs.yaml": "780da24596137b36cf75b72e3e3506f8507d283c26181ba16da417ff43b53e4a",
+        "go.mod": "4913e1d078c958a3abe1f16be7334c91c915355551c751af707171e5193d1586",
+        "go.sum": "6a6a442007faa79bf3318622d2696e640dbeee90dcfb410385f2f1e559df8474"
+      },
+      "data_snapshots": {
+        "greptime-disk-after-readback.json": {
+          "volumes": {
+            "obs-greptime-victoria-single_greptime": {
+              "role": "greptime",
+              "allocated_bytes": 4362240,
+              "event": "data-volume-snapshot",
+              "filesystem": {
+                "filesystem_available_bytes": 15415836672,
+                "filesystem_total_bytes": 83954712576,
+                "filesystem_type": "0xef53"
+              },
+              "logical_regular_file_bytes": 4243754,
+              "regular_files": 13,
+              "scope": "read-only mounted owned data volume; inode-deduplicated; not a transient peak or native codec ratio"
+            }
+          },
+          "allocated_data_bytes": 4362240,
+          "logical_file_bytes": 4243754
+        },
+        "greptime-disk-before-ingest.json": {
+          "volumes": {
+            "obs-greptime-victoria-single_greptime": {
+              "role": "greptime",
+              "allocated_bytes": 2174976,
+              "event": "data-volume-snapshot",
+              "filesystem": {
+                "filesystem_available_bytes": 15418044416,
+                "filesystem_total_bytes": 83954712576,
+                "filesystem_type": "0xef53"
+              },
+              "logical_regular_file_bytes": 2115921,
+              "regular_files": 9,
+              "scope": "read-only mounted owned data volume; inode-deduplicated; not a transient peak or native codec ratio"
+            }
+          },
+          "allocated_data_bytes": 2174976,
+          "logical_file_bytes": 2115921
+        },
+        "victoria-disk-after-readback.json": {
+          "volumes": {
+            "obs-greptime-victoria-single_vmetrics": {
+              "role": "vmetrics",
+              "allocated_bytes": 122880,
+              "event": "data-volume-snapshot",
+              "filesystem": {
+                "filesystem_available_bytes": 15415455744,
+                "filesystem_total_bytes": 83954712576,
+                "filesystem_type": "0xef53"
+              },
+              "logical_regular_file_bytes": 9666,
+              "regular_files": 15,
+              "scope": "read-only mounted owned data volume; inode-deduplicated; not a transient peak or native codec ratio"
+            },
+            "obs-greptime-victoria-single_vlogs": {
+              "role": "vlogs",
+              "allocated_bytes": 28672,
+              "event": "data-volume-snapshot",
+              "filesystem": {
+                "filesystem_available_bytes": 15415455744,
+                "filesystem_total_bytes": 83954712576,
+                "filesystem_type": "0xef53"
+              },
+              "logical_regular_file_bytes": 6,
+              "regular_files": 3,
+              "scope": "read-only mounted owned data volume; inode-deduplicated; not a transient peak or native codec ratio"
+            }
+          },
+          "allocated_data_bytes": 151552,
+          "logical_file_bytes": 9672
+        },
+        "victoria-disk-before-ingest.json": {
+          "volumes": {
+            "obs-greptime-victoria-single_vmetrics": {
+              "role": "vmetrics",
+              "allocated_bytes": 69632,
+              "event": "data-volume-snapshot",
+              "filesystem": {
+                "filesystem_available_bytes": 15415533568,
+                "filesystem_total_bytes": 83954712576,
+                "filesystem_type": "0xef53"
+              },
+              "logical_regular_file_bytes": 31,
+              "regular_files": 5,
+              "scope": "read-only mounted owned data volume; inode-deduplicated; not a transient peak or native codec ratio"
+            },
+            "obs-greptime-victoria-single_vlogs": {
+              "role": "vlogs",
+              "allocated_bytes": 8192,
+              "event": "data-volume-snapshot",
+              "filesystem": {
+                "filesystem_available_bytes": 15415529472,
+                "filesystem_total_bytes": 83954712576,
+                "filesystem_type": "0xef53"
+              },
+              "logical_regular_file_bytes": 0,
+              "regular_files": 1,
+              "scope": "read-only mounted owned data volume; inode-deduplicated; not a transient peak or native codec ratio"
+            }
+          },
+          "allocated_data_bytes": 77824,
+          "logical_file_bytes": 31
+        }
+      }
+    }
+  ],
+  "resource_windows": [
+    {
+      "protocol": "otlp",
+      "scope": "Entire Make invocation including retained-data preflight, backend transitions, ingestion and full readback; not isolated per-backend performance cost",
+      "summary": {
+        "evidence": "/Users/muzammil/github.com/muzammilar/examples/observability/greptime-victoria/single-node/results/resources-1795854190604851000.jsonl",
+        "environment": {
+          "type": "environment",
+          "run_id": 1795854190604851000,
+          "fixture": "incident-corpus-v1",
+          "command": [
+            "make",
+            "common-case",
+            "PYTHON=/Users/muzammil/.local/bin/python3.13"
+          ],
+          "environment": {
+            "NCPU": 11,
+            "MemTotal": 26216296448,
+            "KernelVersion": "6.12.76-linuxkit",
+            "OperatingSystem": "Docker Desktop",
+            "Driver": "overlayfs",
+            "ServerVersion": "29.5.3",
+            "docker_api": "1.54"
+          },
+          "cotenancy": "Only this metrics/log comparison; backends run serially; no other heavy lab."
+        },
+        "sampled_aggregate_memory_peak_bytes": 1130475520,
+        "sampled_aggregate_memory_mean_bytes": 424248971.6363636,
+        "actors": [
+          {
+            "name": "/obs-greptime-victoria-single-vlogs-1",
+            "samples": 24,
+            "peak_memory_bytes": 179130368,
+            "configuration": {
+              "image_id": "sha256:7bec543b83cbff641e4b568c6f28d8e9cd779e4eab3add9f8806c32af23ea1e1",
+              "image_reference": "victoriametrics/victoria-logs:v1.55.0@sha256:7bec543b83cbff641e4b568c6f28d8e9cd779e4eab3add9f8806c32af23ea1e1",
+              "memory_limit_bytes": 2147483648,
+              "nano_cpus": 2000000000,
+              "started_at": "2026-11-28T08:21:16.925597251Z"
+            },
+            "counter_deltas": {
+              "cpu_core_s": 5.7965409999999995,
+              "network_rx_bytes": 43615352,
+              "network_tx_bytes": 48822777,
+              "disk_read_bytes": 16384,
+              "disk_write_bytes": 29499392
+            },
+            "counter_resets": 10,
+            "cpu_utilization_pct_one_core_min": 0.01700133634867502,
+            "cpu_utilization_pct_one_core_max": 76.45347653454765,
+            "observed_s": 43.76309108734131,
+            "sampled_mean_memory_bytes": 74206720.0,
+            "cpu_utilization_pct_one_core_average": 13.245273256478626,
+            "container_lifetime_counters_at_last_sample": {
+              "cpu_core_s": 5.75214,
+              "network_rx_bytes": 43610027,
+              "network_tx_bytes": 48348854,
+              "disk_read_bytes": 16384,
+              "disk_write_bytes": 29499392
+            }
+          },
+          {
+            "name": "/obs-greptime-victoria-single-vmetrics-1",
+            "samples": 24,
+            "peak_memory_bytes": 110030848,
+            "configuration": {
+              "image_id": "sha256:322a7a92fdcc269280e9c38af94c83bc76827a31b792acbc60e44394e7f29c20",
+              "image_reference": "victoriametrics/victoria-metrics:v1.157.0@sha256:322a7a92fdcc269280e9c38af94c83bc76827a31b792acbc60e44394e7f29c20",
+              "memory_limit_bytes": 2147483648,
+              "nano_cpus": 2000000000,
+              "started_at": "2026-11-28T08:21:16.926712584Z"
+            },
+            "counter_deltas": {
+              "cpu_core_s": 1.238559,
+              "network_rx_bytes": 8424127,
+              "network_tx_bytes": 10075514,
+              "disk_read_bytes": 8192,
+              "disk_write_bytes": 1355776
+            },
+            "counter_resets": 10,
+            "cpu_utilization_pct_one_core_min": 0.019949015053301336,
+            "cpu_utilization_pct_one_core_max": 34.549258934526634,
+            "observed_s": 43.76210808753967,
+            "sampled_mean_memory_bytes": 87903744.0,
+            "cpu_utilization_pct_one_core_average": 2.830208721943752,
+            "container_lifetime_counters_at_last_sample": {
+              "cpu_core_s": 1.166475,
+              "network_rx_bytes": 8420337,
+              "network_tx_bytes": 10040522,
+              "disk_read_bytes": 16384,
+              "disk_write_bytes": 1355776
+            }
+          },
+          {
+            "name": "/obs-greptime-victoria-single-greptime-1",
+            "samples": 20,
+            "peak_memory_bytes": 1116516352,
+            "configuration": {
+              "image_id": "sha256:a10181273b9400a30fbad6f5043b3d08e388c7d4ee30a7570e5f0241496e9ee1",
+              "image_reference": "greptime/greptimedb:v1.3.1@sha256:a10181273b9400a30fbad6f5043b3d08e388c7d4ee30a7570e5f0241496e9ee1",
+              "memory_limit_bytes": 4294967296,
+              "nano_cpus": 4000000000,
+              "started_at": "2026-11-28T08:23:11.173883346Z"
+            },
+            "counter_deltas": {
+              "cpu_core_s": 10.877669,
+              "network_rx_bytes": 51861340,
+              "network_tx_bytes": 442570079,
+              "disk_read_bytes": 0,
+              "disk_write_bytes": 127946752
+            },
+            "counter_resets": 1,
+            "cpu_utilization_pct_one_core_min": 0.19782913587319603,
+            "cpu_utilization_pct_one_core_max": 135.390298831235,
+            "observed_s": 22.31238102912903,
+            "sampled_mean_memory_bytes": 708900864.0,
+            "cpu_utilization_pct_one_core_average": 48.75171764859652,
+            "container_lifetime_counters_at_last_sample": {
+              "cpu_core_s": 10.877669,
+              "network_rx_bytes": 51862230,
+              "network_tx_bytes": 442570653,
+              "disk_read_bytes": 0,
+              "disk_write_bytes": 134676480
+            }
+          },
+          {
+            "name": "/obs-greptime-victoria-single-telemetry-workload-run-4b773088b1aa",
+            "samples": 1,
+            "peak_memory_bytes": 0,
+            "configuration": {
+              "image_id": "sha256:a1048a3118f316a3416964be7cf8e667bd3335046e0e8457c235596b8ec25a4f",
+              "image_reference": "obs-greptime-victoria-single-workload:local",
+              "memory_limit_bytes": 536870912,
+              "nano_cpus": 1000000000,
+              "started_at": "2026-11-28T08:23:12.50612543Z"
+            },
+            "observed_s": 0.0,
+            "sampled_mean_memory_bytes": 0.0,
+            "container_lifetime_counters_at_last_sample": {
+              "cpu_core_s": 0.0,
+              "network_rx_bytes": 0,
+              "network_tx_bytes": 0
+            },
+            "counter_deltas": {}
+          },
+          {
+            "name": "/obs-greptime-victoria-single-telemetry-workload-run-99c58f5a2216",
+            "samples": 3,
+            "peak_memory_bytes": 11542528,
+            "configuration": {
+              "image_id": "sha256:a1048a3118f316a3416964be7cf8e667bd3335046e0e8457c235596b8ec25a4f",
+              "image_reference": "obs-greptime-victoria-single-workload:local",
+              "memory_limit_bytes": 536870912,
+              "nano_cpus": 1000000000,
+              "started_at": "2026-11-28T08:23:16.894956751Z"
+            },
+            "counter_deltas": {
+              "cpu_core_s": 0.765108,
+              "network_rx_bytes": 218886,
+              "network_tx_bytes": 5098888
+            },
+            "cpu_utilization_pct_one_core_min": 37.576240010528856,
+            "cpu_utilization_pct_one_core_max": 38.00808381541965,
+            "observed_s": 2.02449893951416,
+            "sampled_mean_memory_bytes": 11287210.666666666,
+            "cpu_utilization_pct_one_core_average": 37.79246237509074,
+            "container_lifetime_counters_at_last_sample": {
+              "cpu_core_s": 1.072457,
+              "network_rx_bytes": 309234,
+              "network_tx_bytes": 6998215
+            }
+          },
+          {
+            "name": "/obs-greptime-victoria-single-telemetry-workload-run-4916fe57e87b",
+            "samples": 2,
+            "peak_memory_bytes": 5357568,
+            "configuration": {
+              "image_id": "sha256:a1048a3118f316a3416964be7cf8e667bd3335046e0e8457c235596b8ec25a4f",
+              "image_reference": "obs-greptime-victoria-single-workload:local",
+              "memory_limit_bytes": 536870912,
+              "nano_cpus": 1000000000,
+              "started_at": "2026-11-28T08:23:20.507306336Z"
+            },
+            "counter_deltas": {
+              "cpu_core_s": 0.0,
+              "network_rx_bytes": 0,
+              "network_tx_bytes": 0
+            },
+            "counter_resets": 3,
+            "observed_s": -63931451000.75578,
+            "sampled_mean_memory_bytes": 2678784.0,
+            "container_lifetime_counters_at_last_sample": {
+              "cpu_core_s": 0.0,
+              "network_rx_bytes": 0,
+              "network_tx_bytes": 0
+            }
+          },
+          {
+            "name": "/obs-greptime-victoria-single-telemetry-workload-run-8f3d6533d153",
+            "samples": 7,
+            "peak_memory_bytes": 14639104,
+            "configuration": {
+              "image_id": "sha256:a1048a3118f316a3416964be7cf8e667bd3335046e0e8457c235596b8ec25a4f",
+              "image_reference": "obs-greptime-victoria-single-workload:local",
+              "memory_limit_bytes": 536870912,
+              "nano_cpus": 1000000000,
+              "started_at": "2026-11-28T08:23:21.90726392Z"
+            },
+            "counter_deltas": {
+              "cpu_core_s": 3.0000050000000003,
+              "network_rx_bytes": 388166,
+              "network_tx_bytes": 37770370
+            },
+            "cpu_utilization_pct_one_core_min": 48.34952526381392,
+            "cpu_utilization_pct_one_core_max": 50.306870198424974,
+            "observed_s": 6.079317808151245,
+            "sampled_mean_memory_bytes": 13802349.714285715,
+            "cpu_utilization_pct_one_core_average": 49.34772444331741,
+            "container_lifetime_counters_at_last_sample": {
+              "cpu_core_s": 3.421145,
+              "network_rx_bytes": 442852,
+              "network_tx_bytes": 42889330
+            }
+          },
+          {
+            "name": "/obs-greptime-victoria-single-telemetry-workload-run-4683b6157e62",
+            "samples": 5,
+            "peak_memory_bytes": 37130240,
+            "configuration": {
+              "image_id": "sha256:a1048a3118f316a3416964be7cf8e667bd3335046e0e8457c235596b8ec25a4f",
+              "image_reference": "obs-greptime-victoria-single-workload:local",
+              "memory_limit_bytes": 536870912,
+              "nano_cpus": 1000000000,
+              "started_at": "2026-11-28T08:23:29.169455632Z"
+            },
+            "counter_deltas": {
+              "cpu_core_s": 3.772373,
+              "network_rx_bytes": 377696675,
+              "network_tx_bytes": 94806
+            },
+            "cpu_utilization_pct_one_core_min": 91.62492032688992,
+            "cpu_utilization_pct_one_core_max": 96.78306563479455,
+            "observed_s": 4.055908918380737,
+            "sampled_mean_memory_bytes": 31403212.8,
+            "cpu_utilization_pct_one_core_average": 93.0093124849082,
+            "container_lifetime_counters_at_last_sample": {
+              "cpu_core_s": 4.379595,
+              "network_rx_bytes": 439071986,
+              "network_tx_bytes": 112832
+            }
+          },
+          {
+            "name": "/obs-greptime-victoria-single-telemetry-workload-run-0b1a36514bd4",
+            "samples": 2,
+            "peak_memory_bytes": 11554816,
+            "configuration": {
+              "image_id": "sha256:a1048a3118f316a3416964be7cf8e667bd3335046e0e8457c235596b8ec25a4f",
+              "image_reference": "obs-greptime-victoria-single-workload:local",
+              "memory_limit_bytes": 536870912,
+              "nano_cpus": 1000000000,
+              "started_at": "2026-11-28T08:23:35.512924718Z"
+            },
+            "counter_deltas": {
+              "cpu_core_s": 0.771139,
+              "network_rx_bytes": 159883,
+              "network_tx_bytes": 5029980
+            },
+            "cpu_utilization_pct_one_core_min": 75.71997003069401,
+            "cpu_utilization_pct_one_core_max": 75.71997003069401,
+            "observed_s": 1.018409013748169,
+            "sampled_mean_memory_bytes": 11208704.0,
+            "cpu_utilization_pct_one_core_average": 75.71997003069401,
+            "container_lifetime_counters_at_last_sample": {
+              "cpu_core_s": 1.060805,
+              "network_rx_bytes": 217048,
+              "network_tx_bytes": 6755420
+            }
+          },
+          {
+            "name": "/obs-greptime-victoria-single-telemetry-workload-run-f5f14b6f0664",
+            "samples": 1,
+            "peak_memory_bytes": 129208320,
+            "configuration": {
+              "image_id": "sha256:a1048a3118f316a3416964be7cf8e667bd3335046e0e8457c235596b8ec25a4f",
+              "image_reference": "obs-greptime-victoria-single-workload:local",
+              "memory_limit_bytes": 536870912,
+              "nano_cpus": 1000000000,
+              "started_at": "2026-11-28T08:23:38.747294136Z"
+            },
+            "observed_s": 0.0,
+            "sampled_mean_memory_bytes": 129208320.0,
+            "container_lifetime_counters_at_last_sample": {
+              "cpu_core_s": 0.200582,
+              "network_rx_bytes": 2872019,
+              "network_tx_bytes": 24254
+            },
+            "counter_deltas": {}
+          },
+          {
+            "name": "/obs-greptime-victoria-single-telemetry-workload-run-283087cf165e",
+            "samples": 1,
+            "peak_memory_bytes": 897024,
+            "configuration": {
+              "image_id": "sha256:a1048a3118f316a3416964be7cf8e667bd3335046e0e8457c235596b8ec25a4f",
+              "image_reference": "obs-greptime-victoria-single-workload:local",
+              "memory_limit_bytes": 536870912,
+              "nano_cpus": 1000000000,
+              "started_at": "2026-11-28T08:23:40.546893095Z"
+            },
+            "observed_s": 0.0,
+            "sampled_mean_memory_bytes": 897024.0,
+            "container_lifetime_counters_at_last_sample": {
+              "cpu_core_s": 0.471912,
+              "network_rx_bytes": 2879295,
+              "network_tx_bytes": 23594
+            },
+            "counter_deltas": {}
+          },
+          {
+            "name": "/obs-greptime-victoria-single-telemetry-workload-run-7c1393f38ffb",
+            "samples": 1,
+            "peak_memory_bytes": 0,
+            "configuration": {
+              "image_id": "sha256:a1048a3118f316a3416964be7cf8e667bd3335046e0e8457c235596b8ec25a4f",
+              "image_reference": "obs-greptime-victoria-single-workload:local",
+              "memory_limit_bytes": 536870912,
+              "nano_cpus": 1000000000,
+              "started_at": "2026-11-28T08:23:42.308755055Z"
+            },
+            "observed_s": 0.0,
+            "sampled_mean_memory_bytes": 0.0,
+            "container_lifetime_counters_at_last_sample": {
+              "cpu_core_s": 0.0,
+              "network_rx_bytes": 0,
+              "network_tx_bytes": 0
+            },
+            "counter_deltas": {}
+          },
+          {
+            "name": "/obs-greptime-victoria-single-telemetry-workload-run-8d79cbb18a86",
+            "samples": 5,
+            "peak_memory_bytes": 16183296,
+            "configuration": {
+              "image_id": "sha256:a1048a3118f316a3416964be7cf8e667bd3335046e0e8457c235596b8ec25a4f",
+              "image_reference": "obs-greptime-victoria-single-workload:local",
+              "memory_limit_bytes": 536870912,
+              "nano_cpus": 1000000000,
+              "started_at": "2026-11-28T08:23:43.308178138Z"
+            },
+            "counter_deltas": {
+              "cpu_core_s": 2.653638,
+              "network_rx_bytes": 285256,
+              "network_tx_bytes": 35087761
+            },
+            "cpu_utilization_pct_one_core_min": 64.18819521824857,
+            "cpu_utilization_pct_one_core_max": 66.31492535845287,
+            "observed_s": 4.060131072998047,
+            "sampled_mean_memory_bytes": 14722662.4,
+            "cpu_utilization_pct_one_core_average": 65.35843184098299,
+            "container_lifetime_counters_at_last_sample": {
+              "cpu_core_s": 3.210869,
+              "network_rx_bytes": 343348,
+              "network_tx_bytes": 42205930
+            }
+          },
+          {
+            "name": "/obs-greptime-victoria-single-telemetry-workload-run-41ca00635828",
+            "samples": 6,
+            "peak_memory_bytes": 13541376,
+            "configuration": {
+              "image_id": "sha256:a1048a3118f316a3416964be7cf8e667bd3335046e0e8457c235596b8ec25a4f",
+              "image_reference": "obs-greptime-victoria-single-workload:local",
+              "memory_limit_bytes": 536870912,
+              "nano_cpus": 1000000000,
+              "started_at": "2026-11-28T08:23:48.610281585Z"
+            },
+            "counter_deltas": {
+              "cpu_core_s": 5.092528000000001,
+              "network_rx_bytes": 42888812,
+              "network_tx_bytes": 164124
+            },
+            "cpu_utilization_pct_one_core_min": 99.69232317321729,
+            "cpu_utilization_pct_one_core_max": 100.23611857852515,
+            "observed_s": 5.091571092605591,
+            "sampled_mean_memory_bytes": 13216426.666666666,
+            "cpu_utilization_pct_one_core_average": 100.01879395135617,
+            "container_lifetime_counters_at_last_sample": {
+              "cpu_core_s": 5.717345,
+              "network_rx_bytes": 47996386,
+              "network_tx_bytes": 186183
+            }
+          }
+        ],
+        "limits": [
+          "Sample-window deltas exclude startup and exit outside observation. Decreasing counters are treated as restarts and the new counter is accumulated; reset intervals have no CPU utilization estimate.",
+          "Short-lived actors may be missed; use native pre-exit cgroup counters as well.",
+          "CPU utilization is interval-average percent of one core; short spikes may be missed.",
+          "Docker disk bytes are not device I/O latency; absent counters are unavailable, not zero."
+        ]
+      }
+    },
+    {
+      "protocol": "native",
+      "scope": "Entire Make invocation including retained-data preflight, backend transitions, ingestion and full readback; not isolated per-backend performance cost",
+      "summary": {
+        "evidence": "/Users/muzammil/github.com/muzammilar/examples/observability/greptime-victoria/single-node/results/resources-1795854627915784000.jsonl",
+        "environment": {
+          "type": "environment",
+          "run_id": 1795854627915784000,
+          "fixture": "incident-corpus-v1",
+          "command": [
+            "make",
+            "native-full-case",
+            "PYTHON=/Users/muzammil/.local/bin/python3.13"
+          ],
+          "environment": {
+            "NCPU": 11,
+            "MemTotal": 26216296448,
+            "KernelVersion": "6.12.76-linuxkit",
+            "OperatingSystem": "Docker Desktop",
+            "Driver": "overlayfs",
+            "ServerVersion": "29.5.3",
+            "docker_api": "1.54"
+          },
+          "cotenancy": "Only this metrics/log comparison; backends run serially; no other heavy lab."
+        },
+        "sampled_aggregate_memory_peak_bytes": 1061224448,
+        "sampled_aggregate_memory_mean_bytes": 414535910.7605634,
+        "actors": [
+          {
+            "name": "/obs-greptime-victoria-single-vlogs-1",
+            "samples": 32,
+            "peak_memory_bytes": 185008128,
+            "configuration": {
+              "image_id": "sha256:7bec543b83cbff641e4b568c6f28d8e9cd779e4eab3add9f8806c32af23ea1e1",
+              "image_reference": "victoriametrics/victoria-logs:v1.55.0@sha256:7bec543b83cbff641e4b568c6f28d8e9cd779e4eab3add9f8806c32af23ea1e1",
+              "memory_limit_bytes": 2147483648,
+              "nano_cpus": 2000000000,
+              "started_at": "2026-11-28T08:28:02.5228443Z"
+            },
+            "counter_deltas": {
+              "cpu_core_s": 7.109503000000001,
+              "network_rx_bytes": 513869253,
+              "network_tx_bytes": 88649993,
+              "disk_read_bytes": 16384,
+              "disk_write_bytes": 27447296
+            },
+            "counter_resets": 10,
+            "cpu_utilization_pct_one_core_min": 0.02502488071904934,
+            "cpu_utilization_pct_one_core_max": 84.50869519626202,
+            "observed_s": 71.3069429397583,
+            "sampled_mean_memory_bytes": 65447552.0,
+            "cpu_utilization_pct_one_core_average": 9.970281583949362,
+            "container_lifetime_counters_at_last_sample": {
+              "cpu_core_s": 5.159049,
+              "network_rx_bytes": 513678860,
+              "network_tx_bytes": 40885155,
+              "disk_read_bytes": 98304,
+              "disk_write_bytes": 27447296
+            }
+          },
+          {
+            "name": "/obs-greptime-victoria-single-vmetrics-1",
+            "samples": 32,
+            "peak_memory_bytes": 180879360,
+            "configuration": {
+              "image_id": "sha256:322a7a92fdcc269280e9c38af94c83bc76827a31b792acbc60e44394e7f29c20",
+              "image_reference": "victoriametrics/victoria-metrics:v1.157.0@sha256:322a7a92fdcc269280e9c38af94c83bc76827a31b792acbc60e44394e7f29c20",
+              "memory_limit_bytes": 2147483648,
+              "nano_cpus": 2000000000,
+              "started_at": "2026-11-28T08:28:02.522562258Z"
+            },
+            "counter_deltas": {
+              "cpu_core_s": 1.1391329999999997,
+              "network_rx_bytes": 16309492,
+              "network_tx_bytes": 8326299,
+              "disk_read_bytes": 8192,
+              "disk_write_bytes": 897024
+            },
+            "counter_resets": 8,
+            "cpu_utilization_pct_one_core_min": 0.02315586905529567,
+            "cpu_utilization_pct_one_core_max": 34.762812618307485,
+            "observed_s": 71.30570816993713,
+            "sampled_mean_memory_bytes": 127820288.0,
+            "cpu_utilization_pct_one_core_average": 1.5975340954264083,
+            "container_lifetime_counters_at_last_sample": {
+              "cpu_core_s": 0.859321,
+              "network_rx_bytes": 16276806,
+              "network_tx_bytes": 4300083,
+              "disk_read_bytes": 36864,
+              "disk_write_bytes": 897024
+            }
+          },
+          {
+            "name": "/obs-greptime-victoria-single-greptime-1",
+            "samples": 36,
+            "peak_memory_bytes": 1045581824,
+            "configuration": {
+              "image_id": "sha256:a10181273b9400a30fbad6f5043b3d08e388c7d4ee30a7570e5f0241496e9ee1",
+              "image_reference": "greptime/greptimedb:v1.3.1@sha256:a10181273b9400a30fbad6f5043b3d08e388c7d4ee30a7570e5f0241496e9ee1",
+              "memory_limit_bytes": 4294967296,
+              "nano_cpus": 4000000000,
+              "started_at": "2026-11-28T08:30:28.470640256Z"
+            },
+            "counter_deltas": {
+              "cpu_core_s": 9.603016999999998,
+              "network_rx_bytes": 529988402,
+              "network_tx_bytes": 856873323,
+              "disk_read_bytes": 0,
+              "disk_write_bytes": 123981824
+            },
+            "cpu_utilization_pct_one_core_min": 0.0,
+            "cpu_utilization_pct_one_core_max": 85.21934124667163,
+            "counter_resets": 11,
+            "observed_s": 47.89952492713928,
+            "sampled_mean_memory_bytes": 610233912.8888888,
+            "cpu_utilization_pct_one_core_average": 20.048251030897063,
+            "container_lifetime_counters_at_last_sample": {
+              "cpu_core_s": 6.938678,
+              "network_rx_bytes": 529858462,
+              "network_tx_bytes": 410774537,
+              "disk_read_bytes": 0,
+              "disk_write_bytes": 123981824
+            }
+          },
+          {
+            "name": "/obs-greptime-victoria-single-telemetry-workload-run-cdcf8cf40b02",
+            "samples": 1,
+            "peak_memory_bytes": 0,
+            "configuration": {
+              "image_id": "sha256:bb4a43ffa3304f8b1661bdc26da5cf7624d52d2a27e7808f509d87168b102180",
+              "image_reference": "obs-greptime-victoria-single-workload:local",
+              "memory_limit_bytes": 536870912,
+              "nano_cpus": 1000000000,
+              "started_at": "2026-11-28T08:30:30.918168049Z"
+            },
+            "observed_s": 0.0,
+            "sampled_mean_memory_bytes": 0.0,
+            "container_lifetime_counters_at_last_sample": {
+              "cpu_core_s": 0.0,
+              "network_rx_bytes": 0,
+              "network_tx_bytes": 0
+            },
+            "counter_deltas": {}
+          },
+          {
+            "name": "/obs-greptime-victoria-single-telemetry-workload-run-6eb4612d09fb",
+            "samples": 1,
+            "peak_memory_bytes": 19550208,
+            "configuration": {
+              "image_id": "sha256:bb4a43ffa3304f8b1661bdc26da5cf7624d52d2a27e7808f509d87168b102180",
+              "image_reference": "obs-greptime-victoria-single-workload:local",
+              "memory_limit_bytes": 536870912,
+              "nano_cpus": 1000000000,
+              "started_at": "2026-11-28T08:30:36.042634593Z"
+            },
+            "observed_s": 0.0,
+            "sampled_mean_memory_bytes": 19550208.0,
+            "container_lifetime_counters_at_last_sample": {
+              "cpu_core_s": 0.015266,
+              "network_rx_bytes": 4311072,
+              "network_tx_bytes": 2521
+            },
+            "counter_deltas": {}
+          },
+          {
+            "name": "/obs-greptime-victoria-single-telemetry-workload-run-43c5ad361827",
+            "samples": 1,
+            "peak_memory_bytes": 0,
+            "configuration": {
+              "image_id": "sha256:bb4a43ffa3304f8b1661bdc26da5cf7624d52d2a27e7808f509d87168b102180",
+              "image_reference": "obs-greptime-victoria-single-workload:local",
+              "memory_limit_bytes": 536870912,
+              "nano_cpus": 1000000000,
+              "started_at": "2026-11-28T08:30:37.034832802Z"
+            },
+            "observed_s": 0.0,
+            "sampled_mean_memory_bytes": 0.0,
+            "container_lifetime_counters_at_last_sample": {
+              "cpu_core_s": 0.0,
+              "network_rx_bytes": 0,
+              "network_tx_bytes": 0
+            },
+            "counter_deltas": {}
+          },
+          {
+            "name": "/obs-greptime-victoria-single-telemetry-workload-run-aa12c1bb2057",
+            "samples": 1,
+            "peak_memory_bytes": 264376320,
+            "configuration": {
+              "image_id": "sha256:bb4a43ffa3304f8b1661bdc26da5cf7624d52d2a27e7808f509d87168b102180",
+              "image_reference": "obs-greptime-victoria-single-workload:local",
+              "memory_limit_bytes": 536870912,
+              "nano_cpus": 1000000000,
+              "started_at": "2026-11-28T08:30:45.307670333Z"
+            },
+            "observed_s": 0.0,
+            "sampled_mean_memory_bytes": 264376320.0,
+            "container_lifetime_counters_at_last_sample": {
+              "cpu_core_s": 0.697455,
+              "network_rx_bytes": 2686537,
+              "network_tx_bytes": 6184
+            },
+            "counter_deltas": {}
+          },
+          {
+            "name": "/obs-greptime-victoria-single-telemetry-workload-run-62a0744a6408",
+            "samples": 5,
+            "peak_memory_bytes": 35221504,
+            "configuration": {
+              "image_id": "sha256:bb4a43ffa3304f8b1661bdc26da5cf7624d52d2a27e7808f509d87168b102180",
+              "image_reference": "obs-greptime-victoria-single-workload:local",
+              "memory_limit_bytes": 536870912,
+              "nano_cpus": 1000000000,
+              "started_at": "2026-11-28T08:30:46.568937209Z"
+            },
+            "counter_deltas": {
+              "cpu_core_s": 2.8004640000000003,
+              "network_rx_bytes": 281076633,
+              "network_tx_bytes": 70518
+            },
+            "cpu_utilization_pct_one_core_min": 90.94551745322237,
+            "cpu_utilization_pct_one_core_max": 92.99945277231907,
+            "counter_resets": 3,
+            "observed_s": -63931451447.34027,
+            "sampled_mean_memory_bytes": 24265523.2,
+            "container_lifetime_counters_at_last_sample": {
+              "cpu_core_s": 0.0,
+              "network_rx_bytes": 0,
+              "network_tx_bytes": 0
+            }
+          },
+          {
+            "name": "/obs-greptime-victoria-single-telemetry-workload-run-dc830ff994d9",
+            "samples": 1,
+            "peak_memory_bytes": 59625472,
+            "configuration": {
+              "image_id": "sha256:bb4a43ffa3304f8b1661bdc26da5cf7624d52d2a27e7808f509d87168b102180",
+              "image_reference": "obs-greptime-victoria-single-workload:local",
+              "memory_limit_bytes": 536870912,
+              "nano_cpus": 1000000000,
+              "started_at": "2026-11-28T08:30:52.279921962Z"
+            },
+            "observed_s": 0.0,
+            "sampled_mean_memory_bytes": 59625472.0,
+            "container_lifetime_counters_at_last_sample": {
+              "cpu_core_s": 0.083495,
+              "network_rx_bytes": 4025730,
+              "network_tx_bytes": 30458
+            },
+            "counter_deltas": {}
+          },
+          {
+            "name": "/obs-greptime-victoria-single-telemetry-workload-run-76c2ab743e6e",
+            "samples": 6,
+            "peak_memory_bytes": 14749696,
+            "configuration": {
+              "image_id": "sha256:bb4a43ffa3304f8b1661bdc26da5cf7624d52d2a27e7808f509d87168b102180",
+              "image_reference": "obs-greptime-victoria-single-workload:local",
+              "memory_limit_bytes": 536870912,
+              "nano_cpus": 1000000000,
+              "started_at": "2026-11-28T08:30:53.255155254Z"
+            },
+            "counter_deltas": {
+              "cpu_core_s": 5.094242,
+              "network_rx_bytes": 45748308,
+              "network_tx_bytes": 176334
+            },
+            "cpu_utilization_pct_one_core_min": 99.59888387525783,
+            "cpu_utilization_pct_one_core_max": 100.79053040281323,
+            "observed_s": 5.0895140171051025,
+            "sampled_mean_memory_bytes": 13382997.333333334,
+            "cpu_utilization_pct_one_core_average": 100.09289654923845,
+            "container_lifetime_counters_at_last_sample": {
+              "cpu_core_s": 5.290919,
+              "network_rx_bytes": 47292003,
+              "network_tx_bytes": 184264
+            }
+          },
+          {
+            "name": "/obs-greptime-victoria-single-telemetry-workload-run-a18aab994acc",
+            "samples": 2,
+            "peak_memory_bytes": 10960896,
+            "configuration": {
+              "image_id": "sha256:bb4a43ffa3304f8b1661bdc26da5cf7624d52d2a27e7808f509d87168b102180",
+              "image_reference": "obs-greptime-victoria-single-workload:local",
+              "memory_limit_bytes": 536870912,
+              "nano_cpus": 1000000000,
+              "started_at": "2026-11-28T08:31:02.721630425Z"
+            },
+            "counter_deltas": {
+              "cpu_core_s": 0.26474200000000003,
+              "network_rx_bytes": 200470,
+              "network_tx_bytes": 8765657
+            },
+            "cpu_utilization_pct_one_core_min": 26.094470231943866,
+            "cpu_utilization_pct_one_core_max": 26.094470231943866,
+            "observed_s": 1.014552116394043,
+            "sampled_mean_memory_bytes": 10614784.0,
+            "cpu_utilization_pct_one_core_average": 26.094470231943866,
+            "container_lifetime_counters_at_last_sample": {
+              "cpu_core_s": 0.502661,
+              "network_rx_bytes": 368866,
+              "network_tx_bytes": 16133450
+            }
+          },
+          {
+            "name": "/obs-greptime-victoria-single-telemetry-workload-run-ba8c318d10a7",
+            "samples": 1,
+            "peak_memory_bytes": 266887168,
+            "configuration": {
+              "image_id": "sha256:bb4a43ffa3304f8b1661bdc26da5cf7624d52d2a27e7808f509d87168b102180",
+              "image_reference": "obs-greptime-victoria-single-workload:local",
+              "memory_limit_bytes": 536870912,
+              "nano_cpus": 1000000000,
+              "started_at": "2026-11-28T08:31:04.894850634Z"
+            },
+            "observed_s": 0.0,
+            "sampled_mean_memory_bytes": 266887168.0,
+            "container_lifetime_counters_at_last_sample": {
+              "cpu_core_s": 0.429719,
+              "network_rx_bytes": 2682221,
+              "network_tx_bytes": 6185
+            },
+            "counter_deltas": {}
+          },
+          {
+            "name": "/obs-greptime-victoria-single-telemetry-workload-run-2e786a4af523",
+            "samples": 6,
+            "peak_memory_bytes": 17625088,
+            "configuration": {
+              "image_id": "sha256:bb4a43ffa3304f8b1661bdc26da5cf7624d52d2a27e7808f509d87168b102180",
+              "image_reference": "obs-greptime-victoria-single-workload:local",
+              "memory_limit_bytes": 536870912,
+              "nano_cpus": 1000000000,
+              "started_at": "2026-11-28T08:31:06.212844302Z"
+            },
+            "counter_deltas": {
+              "cpu_core_s": 3.282945,
+              "network_rx_bytes": 577683,
+              "network_tx_bytes": 463233798
+            },
+            "cpu_utilization_pct_one_core_min": 63.5126267489768,
+            "cpu_utilization_pct_one_core_max": 65.56118817179036,
+            "observed_s": 5.058849811553955,
+            "sampled_mean_memory_bytes": 16171690.666666666,
+            "cpu_utilization_pct_one_core_average": 64.895087268692,
+            "container_lifetime_counters_at_last_sample": {
+              "cpu_core_s": 3.582903,
+              "network_rx_bytes": 630381,
+              "network_tx_bytes": 501667771
+            }
+          },
+          {
+            "name": "/obs-greptime-victoria-single-telemetry-workload-run-419d7691f589",
+            "samples": 5,
+            "peak_memory_bytes": 33673216,
+            "configuration": {
+              "image_id": "sha256:bb4a43ffa3304f8b1661bdc26da5cf7624d52d2a27e7808f509d87168b102180",
+              "image_reference": "obs-greptime-victoria-single-workload:local",
+              "memory_limit_bytes": 536870912,
+              "nano_cpus": 1000000000,
+              "started_at": "2026-11-28T08:31:12.080052804Z"
+            },
+            "counter_deltas": {
+              "cpu_core_s": 3.6371049999999996,
+              "network_rx_bytes": 350871673,
+              "network_tx_bytes": 87867
+            },
+            "cpu_utilization_pct_one_core_min": 81.48673195015277,
+            "cpu_utilization_pct_one_core_max": 92.59967502977463,
+            "observed_s": 4.057792901992798,
+            "sampled_mean_memory_bytes": 29963059.2,
+            "cpu_utilization_pct_one_core_average": 89.63259308314635,
+            "container_lifetime_counters_at_last_sample": {
+              "cpu_core_s": 4.235141,
+              "network_rx_bytes": 407077384,
+              "network_tx_bytes": 106204
+            }
+          },
+          {
+            "name": "/obs-greptime-victoria-single-telemetry-workload-run-9bab9d2a8c80",
+            "samples": 1,
+            "peak_memory_bytes": 9535488,
+            "configuration": {
+              "image_id": "sha256:bb4a43ffa3304f8b1661bdc26da5cf7624d52d2a27e7808f509d87168b102180",
+              "image_reference": "obs-greptime-victoria-single-workload:local",
+              "memory_limit_bytes": 536870912,
+              "nano_cpus": 1000000000,
+              "started_at": "2026-11-28T08:31:18.770243877Z"
+            },
+            "observed_s": 0.0,
+            "sampled_mean_memory_bytes": 9535488.0,
+            "container_lifetime_counters_at_last_sample": {
+              "cpu_core_s": 0.020896,
+              "network_rx_bytes": 5146,
+              "network_tx_bytes": 245062
+            },
+            "counter_deltas": {}
+          },
+          {
+            "name": "/obs-greptime-victoria-single-telemetry-workload-run-eda624131b5f",
+            "samples": 1,
+            "peak_memory_bytes": 53567488,
+            "configuration": {
+              "image_id": "sha256:bb4a43ffa3304f8b1661bdc26da5cf7624d52d2a27e7808f509d87168b102180",
+              "image_reference": "obs-greptime-victoria-single-workload:local",
+              "memory_limit_bytes": 536870912,
+              "nano_cpus": 1000000000,
+              "started_at": "2026-11-28T08:31:28.94368234Z"
+            },
+            "observed_s": 0.0,
+            "sampled_mean_memory_bytes": 53567488.0,
+            "container_lifetime_counters_at_last_sample": {
+              "cpu_core_s": 0.053118,
+              "network_rx_bytes": 2504628,
+              "network_tx_bytes": 17061
+            },
+            "counter_deltas": {}
+          },
+          {
+            "name": "/obs-greptime-victoria-single-telemetry-workload-run-07633530ac61",
+            "samples": 5,
+            "peak_memory_bytes": 15233024,
+            "configuration": {
+              "image_id": "sha256:bb4a43ffa3304f8b1661bdc26da5cf7624d52d2a27e7808f509d87168b102180",
+              "image_reference": "obs-greptime-victoria-single-workload:local",
+              "memory_limit_bytes": 536870912,
+              "nano_cpus": 1000000000,
+              "started_at": "2026-11-28T08:31:29.855345049Z"
+            },
+            "counter_deltas": {
+              "cpu_core_s": 2.400454,
+              "network_rx_bytes": 442719,
+              "network_tx_bytes": 469883343
+            },
+            "cpu_utilization_pct_one_core_min": 57.606641975540796,
+            "cpu_utilization_pct_one_core_max": 59.98857170022463,
+            "observed_s": 4.066103935241699,
+            "sampled_mean_memory_bytes": 14166425.6,
+            "cpu_utilization_pct_one_core_average": 59.03572653898014,
+            "container_lifetime_counters_at_last_sample": {
+              "cpu_core_s": 2.513114,
+              "network_rx_bytes": 462497,
+              "network_tx_bytes": 487301145
+            }
+          },
+          {
+            "name": "/obs-greptime-victoria-single-telemetry-workload-run-17612f0e3728",
+            "samples": 5,
+            "peak_memory_bytes": 13340672,
+            "configuration": {
+              "image_id": "sha256:bb4a43ffa3304f8b1661bdc26da5cf7624d52d2a27e7808f509d87168b102180",
+              "image_reference": "obs-greptime-victoria-single-workload:local",
+              "memory_limit_bytes": 536870912,
+              "nano_cpus": 1000000000,
+              "started_at": "2026-11-28T08:31:34.575344842Z"
+            },
+            "counter_deltas": {
+              "cpu_core_s": 4.061752,
+              "network_rx_bytes": 35678157,
+              "network_tx_bytes": 158328
+            },
+            "cpu_utilization_pct_one_core_min": 99.47211586926929,
+            "cpu_utilization_pct_one_core_max": 100.32119648344367,
+            "observed_s": 4.065566062927246,
+            "sampled_mean_memory_bytes": 12996608.0,
+            "cpu_utilization_pct_one_core_average": 99.90618617756516,
+            "container_lifetime_counters_at_last_sample": {
+              "cpu_core_s": 4.604915,
+              "network_rx_bytes": 40398993,
+              "network_tx_bytes": 180849
+            }
+          }
+        ],
+        "limits": [
+          "Sample-window deltas exclude startup and exit outside observation. Decreasing counters are treated as restarts and the new counter is accumulated; reset intervals have no CPU utilization estimate.",
+          "Short-lived actors may be missed; use native pre-exit cgroup counters as well.",
+          "CPU utilization is interval-average percent of one core; short spikes may be missed.",
+          "Docker disk bytes are not device I/O latency; absent counters are unavailable, not zero."
+        ]
+      }
+    }
+  ],
+  "verified_teardowns": [
+    {
+      "verified": true,
+      "witnesses": {
+        "results/cases/054239221cb14b9f80b4efee1a828141/case.json": "5df79fcc64f40858a19bfd1cc0b5480242132078acdd40a2bf272354af2f3703",
+        "results/cases/054239221cb14b9f80b4efee1a828141/fixture.json": "3071c498338d39035fc5c306944c4daff6bd60790dbf389cc264a7417db3612e",
+        "results/cases/054239221cb14b9f80b4efee1a828141/greptime/logs/configuration.json": "f74add6dc3c500908d355b32de549f3bafe094eeb1fde7994095b1832ff4d993",
+        "results/cases/054239221cb14b9f80b4efee1a828141/greptime/logs/requests.jsonl": "0af5341d1bc4999e6ae5bef253f73a7207beef64324afee6d1d1c0bc1bd001fd",
+        "results/cases/054239221cb14b9f80b4efee1a828141/greptime/metrics/configuration.json": "3359a3afde280df34056b6ef37fb127b4c1880c9bc0252e06f93dceabaae0b8d",
+        "results/cases/054239221cb14b9f80b4efee1a828141/greptime/metrics/requests.jsonl": "7c58b3adbfb57ce2f7e69003d4ad3a1f0661d163cd723523c71e7fbba1a968c0",
+        "results/cases/054239221cb14b9f80b4efee1a828141/victoria/metrics/configuration.json": "8edb994b2c508c6d24545a000f41dbcdf536fbca9afe75517d990fe8be21e082",
+        "results/cases/054239221cb14b9f80b4efee1a828141/victoria/metrics/requests.jsonl": "2adc59507ac8d1dcea89025f9c8a4c948c8ca83e2be6ddc390e2c4f64c0f06b1",
+        "results/cases/12c380ae0fe24095979a328259ed2133/case.json": "f186955926c26249338e85dd7b9c9e4cc5c94909f51fc8eec938774e7cda1932",
+        "results/cases/12c380ae0fe24095979a328259ed2133/fixture.json": "8cfc43a328d4f33119c1f963a98d2af5fa47db91a14b33600e1deb926af4a708",
+        "results/cases/12c380ae0fe24095979a328259ed2133/greptime/logs/configuration.json": "5031d67fba3b7967a66eb28651d6543de06139c5e2fcdaa618028b77f3f25479",
+        "results/cases/12c380ae0fe24095979a328259ed2133/greptime/logs/requests.jsonl": "9dbfa3217053964415f20e064556c4dc2db809909df4c755eec7dd6de916b573",
+        "results/cases/12c380ae0fe24095979a328259ed2133/greptime/metrics/configuration.json": "7ee98526771541da1b411149de0c1f5da9b6c1becfd59ce17eb2e2e327ab84bb",
+        "results/cases/12c380ae0fe24095979a328259ed2133/greptime/metrics/requests.jsonl": "d9369b47c626046999b4c6091eb4c5157fb3ea507164fea6aad844d2481bfdeb",
+        "results/cases/12c380ae0fe24095979a328259ed2133/victoria/logs/configuration.json": "085976eee2df350d5c4dcfc0b78938d8651349f99a034024e8c76eb6599e88f4",
+        "results/cases/12c380ae0fe24095979a328259ed2133/victoria/logs/requests.jsonl": "3d482f5bbd569059114bb97a90074b29214b67958ea000b16ac1e28784b3f1f7",
+        "results/cases/12c380ae0fe24095979a328259ed2133/victoria/metrics/configuration.json": "de981d43d2d0bf21f0fc327eaaf2695b73649553f3b6d908a8670b150ff80c0e",
+        "results/cases/12c380ae0fe24095979a328259ed2133/victoria/metrics/requests.jsonl": "ab80bae9c0d29987eee23543079812fbc65028e5b411952efc7d3f589d8103c9",
+        "results/cases/6f74694b4af74972ab21b0254b786887/case.json": "14e5113ea8c0761ecc92a58228a3e73b43ccceb3b51fae9455ec152ffb72a3ca",
+        "results/cases/6f74694b4af74972ab21b0254b786887/fixture.json": "2bf445e492ba739322f376daf7d6e422c617d4b6438d10d94e088615f0afe077",
+        "results/cases/6f74694b4af74972ab21b0254b786887/greptime/logs/configuration.json": "0d91bd100c1cc9cbb8317f4c9cb1ecc5b96282c2d2806f0df33f94606415df0c",
+        "results/cases/6f74694b4af74972ab21b0254b786887/greptime/logs/requests.jsonl": "eddf33d4825d3797a1fe8dea49c7971f822349b085aa8bb5af70e21ca3072233",
+        "results/cases/6f74694b4af74972ab21b0254b786887/greptime/metrics/configuration.json": "f5d506fd88eaf624c996f4b5c705d24d0b64c603e7219addf2cdba1c750562a5",
+        "results/cases/6f74694b4af74972ab21b0254b786887/greptime/metrics/requests.jsonl": "156758f15c4037d7be1f8106c63d5db29470ef7626bae1dfcf29e4369cd3b45d",
+        "results/cases/6f74694b4af74972ab21b0254b786887/victoria/logs/configuration.json": "76e8bfde007c217c454002d5848666810d54531d4e04b1da05c90294d9e36886",
+        "results/cases/6f74694b4af74972ab21b0254b786887/victoria/logs/requests.jsonl": "cfdb6e8a765475d8df9df9e9dc1c05d70246055136fe2dc3360ed1da9693ef8f",
+        "results/cases/6f74694b4af74972ab21b0254b786887/victoria/metrics/configuration.json": "8774cf55a30586bce92f9db10b9e5d2a80e8269ad2534253d4c9712921ce98e3",
+        "results/cases/6f74694b4af74972ab21b0254b786887/victoria/metrics/requests.jsonl": "52174aa5ca0c58ce18aa55df94eb52baef7387acc20a9c835bb90760e280e8f3",
+        "results/cases/7e83fdcd0e074a50ab43f75745cdc2ba/case.json": "79b575920e0cc20054abef0560e4cb91a5b33911c44ddf34eff6a33f0045339d",
+        "results/cases/7e83fdcd0e074a50ab43f75745cdc2ba/fixture.json": "44302c895bf5306c4df16f3716b73f3ff2943cc2bee4b7e755d89183975916c4",
+        "results/cases/7e83fdcd0e074a50ab43f75745cdc2ba/greptime/logs/configuration.json": "e01760da7086ba9006daea90b8a6a1abdaf7c60a7501c6a8a0b2001c43722031",
+        "results/cases/7e83fdcd0e074a50ab43f75745cdc2ba/greptime/logs/requests.jsonl": "611766015161d895378269bd2fa33383cec2e6bab1ae25b9c91759dd151a3282",
+        "results/cases/7e83fdcd0e074a50ab43f75745cdc2ba/greptime/metrics/configuration.json": "a967c0670f7224a34dfc8d6974c0aba3b920a58589d77f085240e1720712ac56",
+        "results/cases/7e83fdcd0e074a50ab43f75745cdc2ba/greptime/metrics/requests.jsonl": "059a4eba4fa2bd28e297c65d11a329d1e2c16aaafea342b01def0f50be7c5635",
+        "results/cases/7e83fdcd0e074a50ab43f75745cdc2ba/victoria/logs/configuration.json": "e8d530810cd4c0dcf8f02524c6b4e09a3d6064d85875c3198c7814ea145e0b5f",
+        "results/cases/7e83fdcd0e074a50ab43f75745cdc2ba/victoria/logs/requests.jsonl": "3103ec9863b3a9d3db4446f6691fd3a97787b532942487bdad91b284caafd783",
+        "results/cases/7e83fdcd0e074a50ab43f75745cdc2ba/victoria/metrics/configuration.json": "dcb34f6720f61be06467c33d6bbf6fd8ee5c548fa956412d50fb731180b5aab8",
+        "results/cases/7e83fdcd0e074a50ab43f75745cdc2ba/victoria/metrics/requests.jsonl": "d22fc08d456b1e1b8867c41ed097e2e56d4f5d2ae2b5a9c9b119c82db415ee49",
+        "results/cases/85a28369c1fd4e63a267b66947a07a47/case.json": "4e47ff83de7d8a3891666013ab43b5c2d67a03b105c5cd13b39788202b6a0132",
+        "results/cases/85a28369c1fd4e63a267b66947a07a47/fixture.json": "edbf749af4e18702496d6f4a3e087b38d95bbae1964612dced79000b7ca7f29d",
+        "results/cases/85a28369c1fd4e63a267b66947a07a47/greptime/logs/configuration.json": "47291e32e1dba3ecbdc5ddb115a22e66e51a1a5f2a55d82ff610d9d384680862",
+        "results/cases/85a28369c1fd4e63a267b66947a07a47/greptime/logs/requests.jsonl": "fc320affc53c40428140b8e138e8ab206fa3d8fd41b92fe89e87d08d114a6d3b",
+        "results/cases/85a28369c1fd4e63a267b66947a07a47/greptime/metrics/configuration.json": "0bd60dc4567480fb87e0eb897e9c6275ad943e68f2db05b496ef7c0f157257bf",
+        "results/cases/85a28369c1fd4e63a267b66947a07a47/greptime/metrics/requests.jsonl": "771bf7b3e0f4c16cdf1073a4abbaae075aa3e39ab13fdf923e418d3b91383dbb",
+        "results/cases/85a28369c1fd4e63a267b66947a07a47/victoria/logs/configuration.json": "5f59f8e3e246051bbbfe9444a84444a2fe9fc701bafc6b8a1fc7559e9df08959",
+        "results/cases/85a28369c1fd4e63a267b66947a07a47/victoria/logs/requests.jsonl": "4dace2a4051c8c5f1542dc62a15d5da71c9e83b90d3fcb06a090e35f9f5ec248",
+        "results/cases/85a28369c1fd4e63a267b66947a07a47/victoria/metrics/configuration.json": "777451447c9e409bc9e0802bbf8ad0ed0a3093d8d02a7319414deaead51b1c2e",
+        "results/cases/85a28369c1fd4e63a267b66947a07a47/victoria/metrics/requests.jsonl": "f6b90f0317b519602a019eb9211b9cd7288b3e096ed0a78203b7c3fb3eb57024",
+        "results/cases/8b4310f932124397b31c6e5d6e278222/case.json": "60bb172e4fd1b5d063dadcc6c42dba6545d08a8309b697436086e2dbd2c4941c",
+        "results/cases/8b4310f932124397b31c6e5d6e278222/fixture.json": "a4d91658715431a032f80833b5deb22c6b64599edc54278aa405ddceb2636f4b",
+        "results/cases/8b4310f932124397b31c6e5d6e278222/greptime/logs/configuration.json": "b69da86301817735dae0cccc201a5134e57c7617265703bf3354a040f4623f99",
+        "results/cases/8b4310f932124397b31c6e5d6e278222/greptime/logs/requests.jsonl": "a2f6a55c4b2fb8c226a7725d0233ed773b72905b038098f87cdc90b7060f8913",
+        "results/cases/8b4310f932124397b31c6e5d6e278222/greptime/metrics/configuration.json": "1283372ae7b737a07533824da1a5ff752a23a53bc05b2259cfb2986dd93c20a2",
+        "results/cases/8b4310f932124397b31c6e5d6e278222/greptime/metrics/requests.jsonl": "bffe7b8a90d2f18678ff46ce14cbc503326e5e3c6223c36bf83d91ec1262a4a1",
+        "results/cases/8b4310f932124397b31c6e5d6e278222/victoria/logs/configuration.json": "039df5cecec3c221daf261c8e1e2bf5bf0542b38364d5bb3ce955b5688b062f5",
+        "results/cases/8b4310f932124397b31c6e5d6e278222/victoria/logs/requests.jsonl": "3130a24a0f18a7f1bbc4248b6ab11fb94669db7d9a89923f6ba1899e03e9ec53",
+        "results/cases/8b4310f932124397b31c6e5d6e278222/victoria/metrics/configuration.json": "d512bd6da76f6022506413b6d9022d2704c8d278275f2253950481e4ee5e12d9",
+        "results/cases/8b4310f932124397b31c6e5d6e278222/victoria/metrics/requests.jsonl": "aa76e586530c75d709257c4b299a3bb8212a5451c5afec564b250ae11b8de9eb"
+      },
+      "cases": [
+        "8b4310f932124397b31c6e5d6e278222"
+      ],
+      "scope": "Acknowledged input/readback verified before stopping backend containers; owned volumes retained until docker-down",
+      "owned_resources_absent": true,
+      "removed_workload_image_id": "sha256:6fd03fbbad6517f8b4fa4e985eefdc8c8b4f584f3aa47a42b60eb442828f26e3"
+    },
+    {
+      "verified": true,
+      "witnesses": {
+        "results/cases/054239221cb14b9f80b4efee1a828141/case.json": "5df79fcc64f40858a19bfd1cc0b5480242132078acdd40a2bf272354af2f3703",
+        "results/cases/054239221cb14b9f80b4efee1a828141/fixture.json": "3071c498338d39035fc5c306944c4daff6bd60790dbf389cc264a7417db3612e",
+        "results/cases/054239221cb14b9f80b4efee1a828141/greptime/logs/configuration.json": "f74add6dc3c500908d355b32de549f3bafe094eeb1fde7994095b1832ff4d993",
+        "results/cases/054239221cb14b9f80b4efee1a828141/greptime/logs/requests.jsonl": "0af5341d1bc4999e6ae5bef253f73a7207beef64324afee6d1d1c0bc1bd001fd",
+        "results/cases/054239221cb14b9f80b4efee1a828141/greptime/metrics/configuration.json": "3359a3afde280df34056b6ef37fb127b4c1880c9bc0252e06f93dceabaae0b8d",
+        "results/cases/054239221cb14b9f80b4efee1a828141/greptime/metrics/requests.jsonl": "7c58b3adbfb57ce2f7e69003d4ad3a1f0661d163cd723523c71e7fbba1a968c0",
+        "results/cases/054239221cb14b9f80b4efee1a828141/victoria/metrics/configuration.json": "8edb994b2c508c6d24545a000f41dbcdf536fbca9afe75517d990fe8be21e082",
+        "results/cases/054239221cb14b9f80b4efee1a828141/victoria/metrics/requests.jsonl": "2adc59507ac8d1dcea89025f9c8a4c948c8ca83e2be6ddc390e2c4f64c0f06b1",
+        "results/cases/12c380ae0fe24095979a328259ed2133/case.json": "f186955926c26249338e85dd7b9c9e4cc5c94909f51fc8eec938774e7cda1932",
+        "results/cases/12c380ae0fe24095979a328259ed2133/fixture.json": "8cfc43a328d4f33119c1f963a98d2af5fa47db91a14b33600e1deb926af4a708",
+        "results/cases/12c380ae0fe24095979a328259ed2133/greptime/logs/configuration.json": "5031d67fba3b7967a66eb28651d6543de06139c5e2fcdaa618028b77f3f25479",
+        "results/cases/12c380ae0fe24095979a328259ed2133/greptime/logs/requests.jsonl": "9dbfa3217053964415f20e064556c4dc2db809909df4c755eec7dd6de916b573",
+        "results/cases/12c380ae0fe24095979a328259ed2133/greptime/metrics/configuration.json": "7ee98526771541da1b411149de0c1f5da9b6c1becfd59ce17eb2e2e327ab84bb",
+        "results/cases/12c380ae0fe24095979a328259ed2133/greptime/metrics/requests.jsonl": "d9369b47c626046999b4c6091eb4c5157fb3ea507164fea6aad844d2481bfdeb",
+        "results/cases/12c380ae0fe24095979a328259ed2133/victoria/logs/configuration.json": "085976eee2df350d5c4dcfc0b78938d8651349f99a034024e8c76eb6599e88f4",
+        "results/cases/12c380ae0fe24095979a328259ed2133/victoria/logs/requests.jsonl": "3d482f5bbd569059114bb97a90074b29214b67958ea000b16ac1e28784b3f1f7",
+        "results/cases/12c380ae0fe24095979a328259ed2133/victoria/metrics/configuration.json": "de981d43d2d0bf21f0fc327eaaf2695b73649553f3b6d908a8670b150ff80c0e",
+        "results/cases/12c380ae0fe24095979a328259ed2133/victoria/metrics/requests.jsonl": "ab80bae9c0d29987eee23543079812fbc65028e5b411952efc7d3f589d8103c9",
+        "results/cases/6f74694b4af74972ab21b0254b786887/case.json": "14e5113ea8c0761ecc92a58228a3e73b43ccceb3b51fae9455ec152ffb72a3ca",
+        "results/cases/6f74694b4af74972ab21b0254b786887/fixture.json": "2bf445e492ba739322f376daf7d6e422c617d4b6438d10d94e088615f0afe077",
+        "results/cases/6f74694b4af74972ab21b0254b786887/greptime/logs/configuration.json": "0d91bd100c1cc9cbb8317f4c9cb1ecc5b96282c2d2806f0df33f94606415df0c",
+        "results/cases/6f74694b4af74972ab21b0254b786887/greptime/logs/requests.jsonl": "eddf33d4825d3797a1fe8dea49c7971f822349b085aa8bb5af70e21ca3072233",
+        "results/cases/6f74694b4af74972ab21b0254b786887/greptime/metrics/configuration.json": "f5d506fd88eaf624c996f4b5c705d24d0b64c603e7219addf2cdba1c750562a5",
+        "results/cases/6f74694b4af74972ab21b0254b786887/greptime/metrics/requests.jsonl": "156758f15c4037d7be1f8106c63d5db29470ef7626bae1dfcf29e4369cd3b45d",
+        "results/cases/6f74694b4af74972ab21b0254b786887/victoria/logs/configuration.json": "76e8bfde007c217c454002d5848666810d54531d4e04b1da05c90294d9e36886",
+        "results/cases/6f74694b4af74972ab21b0254b786887/victoria/logs/requests.jsonl": "cfdb6e8a765475d8df9df9e9dc1c05d70246055136fe2dc3360ed1da9693ef8f",
+        "results/cases/6f74694b4af74972ab21b0254b786887/victoria/metrics/configuration.json": "8774cf55a30586bce92f9db10b9e5d2a80e8269ad2534253d4c9712921ce98e3",
+        "results/cases/6f74694b4af74972ab21b0254b786887/victoria/metrics/requests.jsonl": "52174aa5ca0c58ce18aa55df94eb52baef7387acc20a9c835bb90760e280e8f3",
+        "results/cases/7e83fdcd0e074a50ab43f75745cdc2ba/case.json": "79b575920e0cc20054abef0560e4cb91a5b33911c44ddf34eff6a33f0045339d",
+        "results/cases/7e83fdcd0e074a50ab43f75745cdc2ba/fixture.json": "44302c895bf5306c4df16f3716b73f3ff2943cc2bee4b7e755d89183975916c4",
+        "results/cases/7e83fdcd0e074a50ab43f75745cdc2ba/greptime/logs/configuration.json": "e01760da7086ba9006daea90b8a6a1abdaf7c60a7501c6a8a0b2001c43722031",
+        "results/cases/7e83fdcd0e074a50ab43f75745cdc2ba/greptime/logs/requests.jsonl": "611766015161d895378269bd2fa33383cec2e6bab1ae25b9c91759dd151a3282",
+        "results/cases/7e83fdcd0e074a50ab43f75745cdc2ba/greptime/metrics/configuration.json": "a967c0670f7224a34dfc8d6974c0aba3b920a58589d77f085240e1720712ac56",
+        "results/cases/7e83fdcd0e074a50ab43f75745cdc2ba/greptime/metrics/requests.jsonl": "059a4eba4fa2bd28e297c65d11a329d1e2c16aaafea342b01def0f50be7c5635",
+        "results/cases/7e83fdcd0e074a50ab43f75745cdc2ba/victoria/logs/configuration.json": "e8d530810cd4c0dcf8f02524c6b4e09a3d6064d85875c3198c7814ea145e0b5f",
+        "results/cases/7e83fdcd0e074a50ab43f75745cdc2ba/victoria/logs/requests.jsonl": "3103ec9863b3a9d3db4446f6691fd3a97787b532942487bdad91b284caafd783",
+        "results/cases/7e83fdcd0e074a50ab43f75745cdc2ba/victoria/metrics/configuration.json": "dcb34f6720f61be06467c33d6bbf6fd8ee5c548fa956412d50fb731180b5aab8",
+        "results/cases/7e83fdcd0e074a50ab43f75745cdc2ba/victoria/metrics/requests.jsonl": "d22fc08d456b1e1b8867c41ed097e2e56d4f5d2ae2b5a9c9b119c82db415ee49",
+        "results/cases/85a28369c1fd4e63a267b66947a07a47/case.json": "4e47ff83de7d8a3891666013ab43b5c2d67a03b105c5cd13b39788202b6a0132",
+        "results/cases/85a28369c1fd4e63a267b66947a07a47/fixture.json": "edbf749af4e18702496d6f4a3e087b38d95bbae1964612dced79000b7ca7f29d",
+        "results/cases/85a28369c1fd4e63a267b66947a07a47/greptime/logs/configuration.json": "47291e32e1dba3ecbdc5ddb115a22e66e51a1a5f2a55d82ff610d9d384680862",
+        "results/cases/85a28369c1fd4e63a267b66947a07a47/greptime/logs/requests.jsonl": "fc320affc53c40428140b8e138e8ab206fa3d8fd41b92fe89e87d08d114a6d3b",
+        "results/cases/85a28369c1fd4e63a267b66947a07a47/greptime/metrics/configuration.json": "0bd60dc4567480fb87e0eb897e9c6275ad943e68f2db05b496ef7c0f157257bf",
+        "results/cases/85a28369c1fd4e63a267b66947a07a47/greptime/metrics/requests.jsonl": "771bf7b3e0f4c16cdf1073a4abbaae075aa3e39ab13fdf923e418d3b91383dbb",
+        "results/cases/85a28369c1fd4e63a267b66947a07a47/victoria/logs/configuration.json": "5f59f8e3e246051bbbfe9444a84444a2fe9fc701bafc6b8a1fc7559e9df08959",
+        "results/cases/85a28369c1fd4e63a267b66947a07a47/victoria/logs/requests.jsonl": "4dace2a4051c8c5f1542dc62a15d5da71c9e83b90d3fcb06a090e35f9f5ec248",
+        "results/cases/85a28369c1fd4e63a267b66947a07a47/victoria/metrics/configuration.json": "777451447c9e409bc9e0802bbf8ad0ed0a3093d8d02a7319414deaead51b1c2e",
+        "results/cases/85a28369c1fd4e63a267b66947a07a47/victoria/metrics/requests.jsonl": "f6b90f0317b519602a019eb9211b9cd7288b3e096ed0a78203b7c3fb3eb57024"
+      },
+      "cases": [
+        "054239221cb14b9f80b4efee1a828141",
+        "12c380ae0fe24095979a328259ed2133",
+        "6f74694b4af74972ab21b0254b786887",
+        "7e83fdcd0e074a50ab43f75745cdc2ba",
+        "85a28369c1fd4e63a267b66947a07a47"
+      ],
+      "scope": "Acknowledged input/readback verified before stopping backend containers; owned volumes retained until docker-down",
+      "owned_resources_absent": true,
+      "removed_workload_image_id": "sha256:bb4a43ffa3304f8b1661bdc26da5cf7624d52d2a27e7808f509d87168b102180"
+    }
+  ],
+  "findings": [
+    "VictoriaMetrics adds scope.name and maps omitted scope.version to unknown. Initial strict metadata expectations failed; corrected independent readback verified already accepted data before another corpus was emitted.",
+    "The first native driver status description inherited an OTLP template. Its case/configuration protocol is native; classify by the executed configuration and source manifest, not that descriptive template.",
+    "Native JSON logs use different framing: a JSON array through the checked-in Greptime pipeline and NDJSON through VictoriaLogs. Bodies/timestamps are the same logical input; Remote Write uses official Prometheus protobufs and Snappy.",
+    "Synchronous Greptime WAL and periodically flushed Victoria buffers are different acknowledgement/durability contracts. Healthy visibility and graceful-stop preservation do not qualify abrupt-crash durability."
+  ],
+  "measurement_limits": [
+    "These finite-corpus runs were not the repeated five-minute performance cells. No throughput, resource-efficiency, codec or durability winner is qualified.",
+    "Dataset construction/encoding scope changed while building the controls; old OTLP encoding time excludes corpus-object construction. Source manifests preserve that difference. API round trips and whole-loop diagnostics remain separate.",
+    "All batch-1000 latency samples are request latencies, not measured single-record-operation latencies. Batch-size screens, cold/warm analytical queries and repeated trials remain pending.",
+    "Disk snapshots include cumulative owned generation state, WAL/indexes/metadata and prior controls; differing prior attempts and compaction state prevent normalized cross-backend storage conclusions. Images/overlay/engine logs and raw host evidence are excluded.",
+    "Wire compression is measured from raw encoded/wire request bytes. Native on-disk codec uncompressed/compressed byte ratios are not collected; do not equate volume allocation or protocol ratios with a native codec ratio.",
+    "Docker samples may miss short-lived tools; native pre-exit cgroup records are retained in tool logs. Missing disk IOPS/device latency/queue depth are unavailable, not zero. Host controller/observer overhead is outside container CPU counters.",
+    "First-generation setup predates its resource observer. Early inherited phase labels were later made explicit/atomic. Aggregate test-window counters are diagnostic, not accurate startup/phase performance attribution."
+  ],
+  "next": [
+    "live generator/reader during abrupt process loss with ACK/ambiguity/loss reconciliation",
+    "matched sustained and repeated batch/native comparisons after recovery gates",
+    "engine-cold/warm query oracles and timing",
+    "comparable cluster contract/topology profile",
+    "three-signal and shared incident-stack comparisons"
+  ]
+}

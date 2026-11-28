@@ -1,0 +1,9 @@
+[storage]
+type = "File"
+data_home = "/data"
+[wal]
+provider = "raft_engine"
+dir = "/data/wal"
+sync_write = true
+[http]
+addr = "0.0.0.0:4000"

@@ -1,0 +1,50 @@
+name: obs-greptime-victoria-single
+services:
+  greptime:
+    profiles: [greptime]
+    image: greptime/greptimedb:v1.3.1@sha256:a10181273b9400a30fbad6f5043b3d08e388c7d4ee30a7570e5f0241496e9ee1
+    command: [standalone, start, -c, /config/greptime.toml]
+    cpus: 4
+    mem_limit: 4g
+    volumes:
+      - ./config/greptime.toml:/config/greptime.toml:ro
+      - greptime:/data
+    networks: [lab]
+  vmetrics:
+    profiles: [victoria]
+    image: victoriametrics/victoria-metrics:v1.157.0@sha256:322a7a92fdcc269280e9c38af94c83bc76827a31b792acbc60e44394e7f29c20
+    command: [-storageDataPath=/data, -retentionPeriod=7d, -dedup.minScrapeInterval=1ms]
+    cpus: 2
+    mem_limit: 2g
+    volumes: [vmetrics:/data]
+    networks: [lab]
+  vlogs:
+    profiles: [victoria]
+    image: victoriametrics/victoria-logs:v1.55.0@sha256:7bec543b83cbff641e4b568c6f28d8e9cd779e4eab3add9f8806c32af23ea1e1
+    command: [-storageDataPath=/data, -retentionPeriod=7d]
+    cpus: 2
+    mem_limit: 2g
+    volumes: [vlogs:/data]
+    networks: [lab]
+  telemetry-workload:
+    profiles: [tools]
+    image: obs-greptime-victoria-single-workload:local
+    build:
+      context: ./.build/telemetry-workload
+    user: '${LAB_UID:?run through Make}:0'
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    cpus: 1
+    mem_limit: 512m
+    volumes: [./results:/results]
+    networks: [lab]
+networks:
+  lab:
+    internal: true
+    ipam:
+      config: [{subnet: 172.30.73.0/24}]
+volumes:
+  greptime: {}
+  vmetrics: {}
+  vlogs: {}

@@ -1,0 +1,10 @@
+version: 2
+transform:
+  - fields: [run,tenant]
+    type: string
+    index: tag
+  - fields: [body]
+    type: string
+  - fields: ["epoch_ms,timestamp"]
+    type: epoch, ms
+    index: timestamp

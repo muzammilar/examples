@@ -71,11 +71,27 @@ controller mistakes are documented separately from backend behavior. Corrected
 cases ran independently after the initial `make test` failures; no reseeding hid
 those attempts. Nine offline controller controls and three Go checks passed.
 
-The three observability comparisons remain unrun. The
-matched metrics/log project is being
-implemented, with pinned OTLP-handler research and equal total budgets; its source
-is not yet a qualified experiment. Comparative trials wait for the CDC lab to be
-fully stopped (now verified).
+The [matched metrics/log lab](../../observability/greptime-victoria/single-node/)
+completed its first healthy controls: both engines matched one million metric
+points and one million log bodies through OTLP/gzip and native Remote Write/JSON.
+Six Go checks and three destructive-cleanup guards passed; two generations were
+independently verified before destruction. Failed scope-metadata expectations
+and measurement gaps remain documented. This is a driver/healthy baseline, not a
+qualified performance or abrupt-recovery comparison. Live fault/ACK reconciliation,
+batch screens, cold/warm queries and repeated sustained trials remain next.
+The three-signal and broader incident-stack deployments remain unrun.
+
+Current upstream deployment research found that SigNoz now uses Foundry (pinned
+research release 0.5.0); its old repository-bundled Compose deployment is deprecated.
+The supported topology includes PostgreSQL metadata as well as ClickHouse, Keeper,
+collector and SigNoz, all of which must count against its budget. ClickStack 2.47.0
+ships a combined app/API, MongoDB, ClickHouse and collector; inspect its older
+MongoDB pin/support before choosing the lab dependency. OpenObserve's local
+single-node storage is separate from its NATS/PostgreSQL/object-store HA topology.
+No upstream installer was executed and no real AWS configuration was inspected.
+Sources: [SigNoz supported Docker workflow](https://signoz.io/docs/install/docker/),
+[ClickStack 2.47 compose source](https://github.com/ClickHouse/ClickStack/blob/%40hyperdx/app%402.47.0/docker-compose.yml),
+[OpenObserve deployment modes](https://openobserve.ai/docs/architecture/).
 
 ## Next pipeline design
 

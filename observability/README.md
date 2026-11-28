@@ -1,9 +1,11 @@
 # Observability
 
 Future reproducible comparisons of telemetry backends, complete observability
-stacks and infrastructure monitoring. This directory is a plan, not a runnable
-example or a set of benchmark results. GreptimeDB versus Victoria is an accepted
-planned comparison; the broader stack matrix remains future work.
+stacks and infrastructure monitoring. The
+[GreptimeDB/Victoria lab](greptime-victoria/single-node/) now has passing healthy
+OTLP/native million-record controls and verified lifecycle evidence. Its recovery
+and repeated performance comparison remain unfinished; it establishes no winner.
+The three-signal and incident-stack comparisons are being prepared.
 
 The [per-system example plans](../docs/example-plans/streaming-and-observability.md#observability) specify the incident, failure and data checks for each component.
 
