@@ -1,0 +1,261 @@
+{
+  "verdict": "failed-retained-restart-prerequisite",
+  "collector_fault_injected": false,
+  "case": "9bae05ff7ecb4206a821c9cfd82f925d",
+  "initial_healthy_source_commit": "9378311",
+  "reports": [
+    {
+      "path": "results/audits/2cf55f0ce16c4bf090ed3d80786badf5/9bae05ff7ecb4206a821c9cfd82f925d/grafana/readback-1.json",
+      "sha256": "e3a2ce1dbaaf43e2401a65b89b0273e1410dcc2a4da7219342236e3b205835ee",
+      "signals": {
+        "logs": {
+          "complete": true,
+          "counts": {
+            "acknowledged_records": 1000000,
+            "acknowledged_present": 955726,
+            "ambiguous_records": 0,
+            "ambiguous_present": 0,
+            "ambiguous_absent_at_cut": 0,
+            "unexpected_ids": [],
+            "duplicate_copies_returned_by_query": 0,
+            "missing_acknowledged_count": 44274,
+            "missing_id_first_16": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12,
+              13,
+              14,
+              15
+            ],
+            "missing_id_last_16": [
+              999984,
+              999985,
+              999986,
+              999987,
+              999988,
+              999989,
+              999990,
+              999991,
+              999992,
+              999993,
+              999994,
+              999995,
+              999996,
+              999997,
+              999998,
+              999999
+            ]
+          },
+          "exact_attribute_type_fidelity": true,
+          "elapsed_s": 35.256127724
+        },
+        "metrics": {
+          "complete": true,
+          "counts": {
+            "acknowledged_records": 1000000,
+            "acknowledged_present": 1000000,
+            "ambiguous_records": 0,
+            "ambiguous_present": 0,
+            "ambiguous_absent_at_cut": 0,
+            "unexpected_ids": [],
+            "duplicate_copies_returned_by_query": 0,
+            "missing_acknowledged_count": 0,
+            "missing_id_first_16": [],
+            "missing_id_last_16": []
+          },
+          "exact_attribute_type_fidelity": true,
+          "elapsed_s": 0.778360459
+        },
+        "traces": {
+          "complete": true,
+          "counts": {
+            "acknowledged_records": 30000,
+            "acknowledged_present": 30000,
+            "ambiguous_records": 0,
+            "ambiguous_present": 0,
+            "ambiguous_absent_at_cut": 0,
+            "unexpected_ids": [],
+            "duplicate_copies_returned_by_query": 0,
+            "missing_acknowledged_count": 0,
+            "missing_id_first_16": [],
+            "missing_id_last_16": []
+          },
+          "exact_attribute_type_fidelity": true,
+          "elapsed_s": 81.475606829
+        }
+      }
+    },
+    {
+      "path": "results/audits/2cf55f0ce16c4bf090ed3d80786badf5/9bae05ff7ecb4206a821c9cfd82f925d/grafana/readback-2.json",
+      "sha256": "e780914f2126235a27c08bba7c17a63203afbcff95cf0917f8aa906d0a698997",
+      "signals": {
+        "logs": {
+          "complete": true,
+          "counts": {
+            "acknowledged_records": 1000000,
+            "acknowledged_present": 955726,
+            "ambiguous_records": 0,
+            "ambiguous_present": 0,
+            "ambiguous_absent_at_cut": 0,
+            "unexpected_ids": [],
+            "duplicate_copies_returned_by_query": 0,
+            "missing_acknowledged_count": 44274,
+            "missing_id_first_16": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12,
+              13,
+              14,
+              15
+            ],
+            "missing_id_last_16": [
+              999984,
+              999985,
+              999986,
+              999987,
+              999988,
+              999989,
+              999990,
+              999991,
+              999992,
+              999993,
+              999994,
+              999995,
+              999996,
+              999997,
+              999998,
+              999999
+            ]
+          },
+          "exact_attribute_type_fidelity": true,
+          "elapsed_s": 36.733064767
+        },
+        "metrics": {
+          "complete": true,
+          "counts": {
+            "acknowledged_records": 1000000,
+            "acknowledged_present": 1000000,
+            "ambiguous_records": 0,
+            "ambiguous_present": 0,
+            "ambiguous_absent_at_cut": 0,
+            "unexpected_ids": [],
+            "duplicate_copies_returned_by_query": 0,
+            "missing_acknowledged_count": 0,
+            "missing_id_first_16": [],
+            "missing_id_last_16": []
+          },
+          "exact_attribute_type_fidelity": true,
+          "elapsed_s": 0.779739959
+        },
+        "traces": {
+          "complete": true,
+          "counts": {
+            "acknowledged_records": 30000,
+            "acknowledged_present": 30000,
+            "ambiguous_records": 0,
+            "ambiguous_present": 0,
+            "ambiguous_absent_at_cut": 0,
+            "unexpected_ids": [],
+            "duplicate_copies_returned_by_query": 0,
+            "missing_acknowledged_count": 0,
+            "missing_id_first_16": [],
+            "missing_id_last_16": []
+          },
+          "exact_attribute_type_fidelity": true,
+          "elapsed_s": 70.052740406
+        }
+      }
+    }
+  ],
+  "bounded_probes": [
+    {
+      "path": "results/log-restart-probes/c5ffc4f3755a40118355c4c264bf0dfb/0-false.json",
+      "result": {
+        "backend": "grafana",
+        "log_ids": [],
+        "loki_cache_control_no_cache": false,
+        "meaning": "Bounded native exact-log probe; no source replay or reset",
+        "request": 0
+      }
+    },
+    {
+      "path": "results/log-restart-probes/c5ffc4f3755a40118355c4c264bf0dfb/0-true.json",
+      "result": {
+        "backend": "grafana",
+        "log_ids": [],
+        "loki_cache_control_no_cache": true,
+        "meaning": "Bounded native exact-log probe; no source replay or reset",
+        "request": 0
+      }
+    },
+    {
+      "path": "results/log-restart-probes/c5ffc4f3755a40118355c4c264bf0dfb/9999-false.json",
+      "result": {
+        "backend": "grafana",
+        "log_ids": [],
+        "loki_cache_control_no_cache": false,
+        "meaning": "Bounded native exact-log probe; no source replay or reset",
+        "request": 9999
+      }
+    },
+    {
+      "path": "results/log-restart-probes/c5ffc4f3755a40118355c4c264bf0dfb/9999-true.json",
+      "result": {
+        "backend": "grafana",
+        "log_ids": [],
+        "loki_cache_control_no_cache": true,
+        "meaning": "Bounded native exact-log probe; no source replay or reset",
+        "request": 9999
+      }
+    },
+    {
+      "path": "results/log-restart-probes/7b58b1d828e745978257a19f925b175b/0.json",
+      "result": {
+        "backend": "grafana",
+        "body_filter": true,
+        "log_ids": [],
+        "loki_cache_control_no_cache": true,
+        "meaning": "Bounded native exact-log probe; no source replay or reset",
+        "request": 0
+      }
+    },
+    {
+      "path": "results/log-restart-probes/7b58b1d828e745978257a19f925b175b/9999.json",
+      "result": {
+        "backend": "grafana",
+        "body_filter": true,
+        "log_ids": [],
+        "loki_cache_control_no_cache": true,
+        "meaning": "Bounded native exact-log probe; no source replay or reset",
+        "request": 9999
+      }
+    }
+  ],
+  "limitations": [
+    "Previously complete log readback now omits 44,274 acknowledged IDs; missing native query results do not isolate physical loss from index/read-path failure.",
+    "No source replay, data reset or volume removal.",
+    "Default and no-cache metadata probes and no-cache unique-body probes were empty for request 0 and 9999.",
+    "The original stop exit codes were not captured; do not claim a proven clean shutdown or a proven power-loss crash.",
+    "Grafana collector injection remains unrun; performance qualification is blocked."
+  ]
+}

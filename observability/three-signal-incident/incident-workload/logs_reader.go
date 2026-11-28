@@ -38,6 +38,8 @@ func greptimeRows(ctx context.Context, query string) ([][]json.RawMessage, error
 	return result.Output[0].Records.Rows, nil
 }
 
+var lokiBodyFilter bool
+
 type nativeLog struct {
 	stamp  uint64
 	body   string
@@ -137,6 +139,12 @@ func logChunk(ctx context.Context, backend string, f Fixture, first, last int) (
 		return logs, nil
 	}
 	query := fmt.Sprintf(`{service_name="checkout"} | run=%q`, f.Run)
+	if lokiBodyFilter {
+		if last-first != 1 {
+			return nil, errors.New("body probe must cover exactly one request")
+		}
+		query = fmt.Sprintf(`{service_name="checkout"} |= %q`, hex.EncodeToString(f.traceID(first)))
+	}
 	parameters := url.Values{"query": {query}, "start": {strconv.FormatInt(startMS*1000000, 10)}, "end": {strconv.FormatInt(endMS*1000000-1, 10)}, "direction": {"forward"}, "limit": {"5000"}}
 	response, err := get(ctx, "http://loki:3100/loki/api/v1/query_range?"+parameters.Encode(), "")
 	if err != nil {

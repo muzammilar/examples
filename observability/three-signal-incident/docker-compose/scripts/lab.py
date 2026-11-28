@@ -111,6 +111,19 @@ def select_backend(backend, path):
     for rival, roles in BACKENDS.items():
         if rival != backend:
             command("stop", *roles)
+            for role in roles:
+                if command("ps", "--all", "--quiet", role).stdout.strip():
+                    stopped = owned(role)
+                    save(
+                        path / "stops" / (role + "-" + str(time.time_ns()) + ".json"),
+                        {
+                            "id": stopped["Id"],
+                            "state": stopped["State"],
+                            "reference": stopped["Config"]["Image"],
+                            "mounts": stopped["Mounts"],
+                            "scope": "Observed after stop and before any subsequent start; exit 137 differs from clean exit 0",
+                        },
+                    )
     if backend == "grafana":
         for role in ["prometheus", "loki", "tempo"]:
             initialized = command("run", "--rm", "--no-deps", role + "-storage-init")

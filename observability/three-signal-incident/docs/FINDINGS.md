@@ -133,3 +133,30 @@ recent trace samples became queryable at ACK ages **17,188.2–20,201.1 ms**. Th
 are sampled visibility observations, not a complete latency distribution. The
 [separate frozen report](../docker-compose/reports/VICTORIA_HEALTHY.json) preserves
 that distinction.
+
+## Failed retained-state restart: Loki omits previously verified ACKs
+
+Before injecting any collector fault, the retained-data prerequisite audit
+`2cf55f0ce16c4bf090ed3d80786badf5` failed. Two full native readbacks each found
+**955,726 / 1,000,000** original Loki log ACKs: **44,274 missing IDs**, spread
+across early and late input. The same case still reconciled **1,000,000 metrics
+and 30,000 spans**. Initial pre-restart readback had verified every log body.
+Grafana's collector fault was **not injected**; its recovery and performance
+qualification are blocked by this failed prerequisite.
+
+Bounded probes for requests **0 and 9,999** returned no logs with the original
+`run` metadata filter, with documented `Cache-Control: no-cache`, and with a
+metadata-independent unique trace-ID body filter plus no-cache. Nothing was
+replayed, reset or deleted. This rules out those simple query alternatives as a
+remedy; it does **not** isolate missing physical chunks from an index/read-path
+failure. The data volumes and native WAL/flush/replay logs remain preserved.
+Native replay reported no errors, which does not override the independent
+missing-ID result. [Compact failure evidence](../docker-compose/reports/LOKI_RESTART_FAILURE.json).
+
+The original lifecycle did not preserve each service's stopped exit status before
+starting it again. Therefore this is a retained stop/start failure, **not a proven
+clean-shutdown durability failure or power-loss reproduction**. Future transitions
+now record owned container state/exit and mounts between stop and start. The
+initial observation remains unchanged. Further chunk/index isolation and supported
+recovery are a future follow-up; do not erase this failure by rebuilding the
+fixture. [Native LogCLI no-cache option](https://grafana.com/docs/loki/latest/query/logcli/getting-started/).

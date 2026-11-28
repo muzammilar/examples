@@ -94,7 +94,10 @@ passed full healthy Greptime/Grafana native readback: 1M metrics, 1M logs and
 types to strings; its original partial corpus reconciled all 581k metric, 558k log
 and 17,460 span ACKs with that explicitly failed type contract. The corrected full
 Victoria case reconciled 1M metrics, 1M logs and 30k spans with the same failed
-type projection; collector recovery is in progress. The first reader
+type projection. The retained restart audit then found 44,274 missing Loki log
+ACKs in two full reads; physical loss versus index/read-path failure remains
+unisolated. Grafana collector injection is unrun; Greptime/Victoria collector
+cases continue separately. The failed data and native logs remain preserved. The first reader
 incorrectly abandoned samples before Victoria's 20-second index flush; its failed
 run remains preserved. Broader incident-stack deployments remain unrun. Comparable
 clustered/HA and further storage qualification remain a later pass.

@@ -88,6 +88,8 @@ func inspectFixture(ctx context.Context, backend string, f Fixture, id int) erro
 
 func execute(ctx context.Context, args []string) error {
 	flags := flag.NewFlagSet("incident", flag.ContinueOnError)
+	flags.BoolVar(&lokiBodyFilter, "inspect-log-body-filter", false, "Bounded Loki probe independent of the run metadata filter")
+	flags.BoolVar(&lokiNoCache, "loki-no-cache", false, "Request native Loki cache bypass for an explicit diagnostic")
 	mode := flags.String("mode", "publish", "publish, watch, verify, health, inspect, manifest, disk or filesystem")
 	metricRole := flags.String("metric-role", "", "Exact example-owned role to scrape")
 	dataUID := flags.Int("data-uid", 0, "Native service UID for an empty owned data volume")
@@ -100,6 +102,9 @@ func execute(ctx context.Context, args []string) error {
 	pace := flags.Duration("pace", 200*time.Millisecond, "Closed-loop delay after each already-batched request")
 	if err := flags.Parse(args); err != nil {
 		return err
+	}
+	if lokiBodyFilter && (*mode != "inspect-logs" || *backend != "grafana") {
+		return errors.New("body filter is only a bounded Grafana log inspection")
 	}
 	if flags.NArg() != 0 {
 		return errors.New("unexpected positional arguments")
@@ -175,6 +180,24 @@ func execute(ctx context.Context, args []string) error {
 	}
 	if err = validateFixture(fixture); err != nil {
 		return err
+	}
+	if *mode == "inspect-logs" {
+		if *inspectID < 0 || *inspectID >= fixture.Requests {
+			return errors.New("inspection request outside fixture")
+		}
+		rows, err := logChunk(ctx, *backend, fixture, *inspectID, *inspectID+1)
+		if err != nil {
+			return err
+		}
+		ids := make([]int, 0, len(rows))
+		for _, row := range rows {
+			id, err := checkLog(fixture, row, *inspectID, *inspectID+1)
+			if err != nil {
+				return err
+			}
+			ids = append(ids, id)
+		}
+		return json.NewEncoder(os.Stdout).Encode(map[string]any{"backend": *backend, "request": *inspectID, "log_ids": ids, "loki_cache_control_no_cache": lokiNoCache, "body_filter": lokiBodyFilter, "meaning": "Bounded native exact-log probe; no source replay or reset"})
 	}
 	if *mode == "inspect" {
 		if *inspectID < 0 || *inspectID >= fixture.Requests {

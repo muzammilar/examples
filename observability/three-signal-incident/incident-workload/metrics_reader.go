@@ -15,6 +15,8 @@ import (
 var readHosts = map[string]bool{"greptime-collector:8888": true, "victoria-collector:8888": true, "grafana-collector:8888": true, "greptime:4000": true, "vmetrics:8428": true, "vlogs:9428": true, "vtraces:10428": true, "prometheus:9090": true, "loki:3100": true, "tempo:3200": true,
 	"greptime-collector:13133": true, "victoria-collector:13133": true, "grafana-collector:13133": true}
 
+var lokiNoCache bool
+
 type httpError struct {
 	Status int
 	Body   string
@@ -33,6 +35,9 @@ func get(ctx context.Context, address, accept string) (*http.Response, error) {
 	}
 	if accept != "" {
 		request.Header.Set("Accept", accept)
+	}
+	if parsed.Host == "loki:3100" && lokiNoCache {
+		request.Header.Set("Cache-Control", "no-cache")
 	}
 	response, err := httpClient.Do(request)
 	if err != nil {

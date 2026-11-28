@@ -1,5 +1,9 @@
 # Three-signal checkout incident comparison
 
+**Restart qualification failed:** Loki omits 44,274 previously verified log ACKs
+after retained stop/start. No collector fault was injected into Grafana; data
+remains preserved. [Failure evidence](docs/FINDINGS.md).
+
 **Full Greptime and Grafana healthy cases have passed**; recovery is in progress. Performance depth 3.
 Greptime/Grafana pass the typed control; Victoria retains the values but its
 experimental Tempo API fails numeric attribute-type fidelity. [Observed findings](docs/FINDINGS.md).
