@@ -33,7 +33,10 @@ def main():
     node, unit, root = identify(role, run)
     if action == "start":
         count, size = map(int, sys.argv[4:6])
-        source_run = sys.argv[6] if len(sys.argv) == 7 else run
+        source_run = sys.argv[6] if len(sys.argv) >= 7 else run
+        duration = int(sys.argv[7]) if len(sys.argv) == 8 else 240
+        if not 30 <= duration <= 900:
+            raise ValueError("Unsafe actor duration")
         if not re.fullmatch("[0-9a-f]{32}", source_run) or (
             role == "writer" and source_run != run
         ):
@@ -71,7 +74,7 @@ def main():
             "--setenv=TCMALLOC_STACKTRACE_METHOD=generic_fp",
             "--setenv=FILES=" + str(count),
             "--setenv=PAYLOAD_BYTES=" + str(size),
-            "--setenv=DURATION_S=240",
+            "--setenv=DURATION_S=" + str(duration),
             "/usr/local/bin/cephfs-files",
             role,
             source_run,
@@ -87,7 +90,7 @@ def main():
         )
     elif action == "phase":
         phase = sys.argv[4]
-        if phase not in ("baseline", "injection", "recovery", "after"):
+        if phase not in ("baseline", "injection", "degraded", "recovery", "after"):
             raise ValueError("Unknown phase")
         ssh(node, "printf %s " + phase + " > " + root + "/phase")
     elif action == "stop":

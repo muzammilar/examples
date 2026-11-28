@@ -1,4 +1,4 @@
-# CephFS: native clients and metadata-server failover
+# CephFS: native clients and storage recovery
 
 Ceph Umbrella **21.2.0**, three Linux guests and nine BlueStore OSDs. One active
 MDS and one standby run on different guests; a C++17 `libcephfs` writer and an
@@ -31,11 +31,17 @@ fixture. Cleanup refuses when acknowledged bodies cannot be reconciled.
 
 ## Commands and files
 
+The bounded guest/disk/file-restore follow-up passed; see its
+[design and commands](docs/STORAGE_RECOVERY.md). Existing measured MDS and
+kernel-client results below remain separate.
+
 | Command | Purpose |
 |---|---|
 | `make verify` | Export every retained journal; fresh-client exact-body reconciliation and native topology checks |
 | `make failover` | Discover active MDS, runtime-mask it, prove SIGKILL, await a different active MDS and restore standby |
-| `make test-production` | Serial verify → failover → verify; baseline must already exist |
+| `make test-production` | Serial verify → MDS failover → guest loss → disk replacement → optional kernel case → verify; fresh baseline required |
+| `make guest-failure` / `make disk-failure` | Hold an owned guest or disk down with live clients, then reconcile ACKs and native redundancy |
+| `make backup` / `make restore BACKUP_MANIFEST=...` | Actual-byte file backup and fresh-FSID restore; see the [storage runbook](docs/STORAGE_RECOVERY.md) |
 | `make resources` | Save guest daemon/cgroup counters, Ceph storage statistics and sparse-disk usage |
 | `python3 scripts/observe.py test-production` | Also sample owned Docker CPU/memory/disk/network during the serial test |
 | `make recover-keyrings` | Narrow recovery for the diagnosed empty-keyring bootstrap bug, followed by old-ACK reconciliation |
@@ -164,6 +170,103 @@ Final checks found **zero owned containers, state volumes or image tags**; journ
 and failed evidence remain under ignored `results/`. An interactive `make cli`
 session and a second fresh deployment have not been run.
 
+## Guest and disk recovery — 2026-11-27
+
+A fresh fixture seeded **128 × 64-KiB files (8 MiB)**. A persistent C++ writer
+and historical reader on guests 1/2 stayed live through faults on guest 0.
+The final audit preserved **1,788 ACK files / 117,178,368 bytes**, zero ambiguous
+or missing/wrong bodies. Both cases restored nine OSDs, all 17 active+clean PGs
+across three guest hosts and full MON/MDS redundancy.
+
+| Observation | Whole guest power-off | Populated-disk detach/replacement |
+|---|---:|---:|
+| New live file ACKs | 1,032 | 628 |
+| Historical read successes | 1,642 | 1,099 |
+| New ACKs / reads observed while held down | 6 / 9 | 14 / 30 |
+| Native recovery after release/start of repair | 150.966 s | 75.528 s |
+| Maximum write operation | 84,286.542 ms | 4,375.622 ms |
+| Maximum read operation | 94,037.202 ms | 67.728 ms |
+| Largest writer completion gap | 84,395 ms | 4,485 ms |
+| Largest reader completion gap | 94,143 ms | 151 ms |
+
+Zero RPC errors did **not** mean uninterrupted availability: native calls stalled
+for up to 84/94 seconds during the mixed-role guest outage. This case does not
+isolate which lost role dominated the delay. Recovery briefly had all copies
+back but a `MON_CLOCK_SKEW` health warning. It cleared automatically; the later
+check reported NTP synchronized, with no threshold or clock change by the harness.
+Clock drift versus emulation/scheduling effects was not isolated.
+
+The lost disk owned **four nonempty PGs**. Native `safe-to-destroy` was required;
+OSD 0 retained its numeric ID with a new UUID on an empty, serial-allowlisted
+spare. The old disk remained fenced. A later reboot of that replacement mapping
+is unrun. Phase `degraded` spans the held outage and subsequent recovery; its
+entire operation count must not be described as traffic during the held outage.
+The smaller held-down counts above were captured before recovery began.
+
+| Whole observed workflow | Guest case | Disk case |
+|---|---:|---:|
+| Docker CPU, core-seconds | 920.096 | 682.444 |
+| VM average CPU, percent of one core | 225.485% | 238.271% |
+| Sampled aggregate charged-memory peak | 11,347,034,112 B | 10,447,011,840 B |
+| Docker disk read bytes | 571,289,600 | 294,369,792 |
+| Docker disk write bytes | 2,107,792,384 | 1,089,797,120 |
+| QCOW2 allocated bytes at final snapshot | 8,907,522,048 | 9,423,892,480 |
+
+These windows include prechecks, emulated recovery and fresh verification, not
+fault-only engine costs. Native SCSI read/write operation counts and bytes,
+actor CPU/peak memory, CPU utilization ranges, pool compression counters and
+allocation remain in the reports. At the final source snapshot, file data stored
+117,178,368 bytes and used **351,535,104 replicated bytes (3×)**. Compression was
+disabled and its counters were zero; replication is not a codec ratio. QEMU CPU
+and guest-native CPU are different scopes and cannot be added.
+
+- [Guest report, including transient health evidence](reports/STORAGE-process-failure-1795840433906362000.json).
+- [Disk replacement report](reports/STORAGE-disk-failure-1795840888169205000.json).
+- [Commands, fencing and file-level restore scope](docs/STORAGE_RECOVERY.md).
+
+The complete ACK cut was exported as **119,214,080 uncompressed archive bytes**
+and independently validated before source destruction. The original containers
+and state volume were then verified absent. A fresh FSID restored **all 1,788
+files / 117,178,368 bytes**, zero missing/wrong bodies or ambiguous outcomes,
+using archived bytes rather than generation. Independent clients verified the
+saved ACK cut and three-copy placement. Both clusters' teardown passed; the final
+owned image was removed too.
+
+| File-backup workflow diagnostic | Backup | Fresh restore |
+|---|---:|---:|
+| Controller elapsed, including checks/resources | 157.417 s | 187.368 s |
+| Docker CPU, core-seconds | 299.980 | 507.426 |
+| VM average CPU, percent of one core | 190.124% | 271.369% |
+| Sampled aggregate charged-memory peak | 10,687,287,296 B | 11,972,923,392 B |
+| Docker disk read / write bytes | 234,401,280 / 411,206,144 | 124,513,280 / 922,734,592 |
+| Guest whole-device read / write I/Os | 3,576 / 11,665 | 1,905 / 44,048 |
+| QCOW2 allocated bytes | 9,512,038,400 | 8,877,289,472 |
+
+The archived files allocate 134,955,008 host file-block bytes; this is separate
+from their 119,214,080-byte lengths and backend replication. Guest I/O includes
+whole OS and data/spare disks, excluding partitions/device-mapper duplicates.
+Fresh guest provisioning is excluded from the restore duration; emulated workflow
+timings are not production RTO estimates. The archive remains on the same computer,
+not an off-site physical backup. ACLs/xattrs, hard links, online snapshots and
+full metadata/configuration restoration were not tested.
+
+**Configuration finding:** the fresh metadata pool read back `pg_num=32` and
+`pgp_num=8`, although bootstrap requested eight PGs; autoscaling was off at
+readback. Consequently the destination had **41 healthy PGs**, versus 17 in the
+source. Creation-time autoscaling is a suspected race, not an isolated cause.
+All copies and bodies passed; no equal-PG-layout performance comparison is claimed.
+Fix creation ordering and assert effective PG counts in a future targeted run.
+
+[File backup/restore report and cleanup receipts](reports/FILE-RESTORE-bc19798d5a88422796e56e7b14c94638.json).
+Regenerate it after both teardowns with:
+
+```sh
+python3 scripts/backup_report.py \
+  results/backups/bc19798d5a88422796e56e7b14c94638/manifest.json \
+  results/backup-create-1795841187379934000 \
+  results/backup-restore-1795842366688340000
+```
+
 ## Deployment limits and next tests
 
 This manually provisioned systemd lab exercises native daemons; it does not qualify
@@ -185,13 +288,16 @@ it is not a compression ratio.
 
 - [ ] Native deep scrubs and independent raw-replica checks; an active+clean PG
   alone is not a full checksum scrub.
-- [ ] Whole-guest and empty-disk loss through this CephFS interface; existing RGW
-  disk recovery does not qualify filesystem-client recovery.
+- [x] Native-library whole-guest and populated-disk loss, fenced empty-spare
+  replacement and independent fresh-cluster file-level restore.
+- [ ] Fix and verify creation-time metadata PG-count drift; repeat a retained
+  guest boot after disk replacement to exercise the persisted spare mapping.
 - [ ] MON quorum loss, peer/client partitions and sustained MDS outage beyond the
   reconnect window, including fencing and ambiguous rename outcomes.
 - [ ] Kernel/FUSE mount primitives, close-to-open visibility, contended rename,
   deletes and client-process loss; live readers of newly acknowledged files.
-- [ ] MDS scaling, upgrades, metadata pressure and independent backup/restore.
+- [ ] MDS scaling, upgrades, metadata pressure, online/full-metadata backup and
+  interrupted restore. Current restore covers the quiescent immutable ACK set.
 - [ ] Matched native-machine comparisons with HDFS/SeaweedFS for shared-file
   workloads, after equivalent correctness/recovery gates pass.
 

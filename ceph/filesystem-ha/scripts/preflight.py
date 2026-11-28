@@ -3,6 +3,7 @@
 import json
 from pathlib import Path
 import subprocess
+import time
 
 info = json.loads(
     subprocess.check_output(["docker", "info", "--format", "{{json .}}"], text=True)
@@ -40,9 +41,18 @@ space = json.loads(
         text=True,
     )
 )
-if space["free_bytes"] < 25 * 1024**3:
-    raise RuntimeError("Less than 25 GiB Docker free space; refusing guest startup")
 Path("results").mkdir(exist_ok=True)
+record = space | {
+    k: info[k] for k in ("Architecture", "NCPU", "MemTotal", "ServerVersion")
+}
+record["required_free_bytes"] = 25 * 1024**3
+record["passed"] = space["free_bytes"] >= record["required_free_bytes"]
+Path("results", "preflight-" + str(time.time_ns()) + ".json").write_text(
+    json.dumps(record, indent=2) + "\n"
+)
+print(json.dumps(record), flush=True)
+if not record["passed"]:
+    raise RuntimeError("Less than 25 GiB Docker free space; refusing guest startup")
 Path("results/capacity.json").write_text(
     json.dumps(
         space

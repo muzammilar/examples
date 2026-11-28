@@ -53,9 +53,20 @@ execution evidence.
   819,986,432 bytes**, zero wrong/missing bodies. The initial Linux 6.8 aes256k
   mount failure and two approximately five-second kernel-read stalls remain
   documented. Different rename layouts prevent isolating client overhead; CPU,
-  memory, disk bytes/I/O, allocation and compression gaps are reported. No kernel
-  live-write MDS failover, CephFS disk loss, deep-scrub, FUSE, partition, MDS
-  scaling or independent-restore qualification is claimed.
+  memory, disk bytes/I/O, allocation and compression gaps are reported. The later
+  [kernel MDS recovery](ceph/filesystem-ha/projects/kernel-client/reports/KERNEL-MDS-RECOVERY-2026-11-27.json)
+  passed 512 live publications and preserved 768 total ACKs / 201,326,592 bytes;
+  the largest writer completion gap was 22,365 ms. Native-library guest/disk
+  recovery is recorded in the new follow-up; it does not qualify the kernel
+  interface for those faults. Deep-scrub, FUSE, partitions and MDS scaling remain
+  unrun. The [native storage follow-up](ceph/filesystem-ha/) passed whole-guest
+  loss, populated-disk replacement and fresh-FSID file restore: **1,788 ACKs /
+  117,178,368 bytes**, zero ambiguous/missing/wrong bodies. Guest write/read
+  operations stalled up to **84.287 / 94.037 seconds**. Native recovery took
+  **150.966 / 75.528 seconds** for guest/disk cases. Both source and destination
+  state were removed; archives remain ignored. The fresh metadata pool's 32 PGs
+  instead of eight remain an explicit deployment-configuration gap. File restore
+  excludes online snapshots and full metadata/configuration recovery.
 
 - [DuckDB/ZFS](duckdb/zfs-recovery/reports/FULL_SUITE_RESULTS.json): fresh five-command
   lifecycle passed on 2026-11-22. Continuous guest-crash recovery verifies

@@ -5,6 +5,11 @@ and correctness before deeper comparisons. The user selected performance
 **level 3**, focused practical comparisons. Engine release, connector compatibility and image architecture
 must be verified independently. All infrastructure is local and example-owned.
 
+**Status, 2026-11-27:** the agreed bounded level-3 deployments, cross-system
+pipelines and storage follow-ups are complete. Measured failures and limitations
+remain evidence. Optional deeper cases listed below are future work, not remaining
+level-3 blockers; further performance depth needs the user's choice.
+
 ## Deployment sequence
 
 | System | Single-node | Docker cluster | Kubernetes | Representative workload |
@@ -29,7 +34,7 @@ interfaces instead of introducing custom Java test utilities.
 - [x] Extend existing Garage and SeaweedFS S3 labs with interrupted multipart completion and fresh full-body reads. Serving-role loss during an incomplete request, retained-part resume, discarded responses and logical abort passed; internal commit interruption and physical reclamation remain unrun.
 - [x] Add a separate SeaweedFS filesystem workload with two independent mounts, file publication/rename/readback, cross-mount flock and live filer-outage recovery. The bounded initial contract passed; contended mutation, lock-owner crash, metadata quorum and filesystem disk loss remain follow-ups.
 - [x] Add a dedicated native-client [CephFS project](../../ceph/filesystem-ha/). Active-MDS crash, standby promotion, exact ACK manifests and diagnosed retained-setup recovery ran; keep CPU/emulation limits visible.
-- [ ] Extend CephFS to whole-guest/OSD loss and independent restore; RGW recovery does not establish the filesystem interface's behavior.
+- [x] Extend native-library CephFS to whole-guest/populated-OSD loss and independent fresh-cluster file restore; kernel-interface and full-metadata restore coverage remain separate.
 - [x] Qualify HDFS replication and initial live failover in the Hadoop metadata-HA example. Record client-visible publication and retain the failed native JSch fencing case; partitions/quorum loss/independent restore remain follow-ups.
 - [x] [JuiceFS dependency recovery](../../juicefs/dependency-recovery/): PostgreSQL retained-process outage and fresh-client S3 outage passed exact ACK/native RF3 checks. Failed/rejected probes and a cached-endpoint observation remain documented. Metadata HA, permanent loss, CSI and independent restore remain unrun.
 
@@ -250,9 +255,8 @@ Retained setup, final drain and scoped teardown passed. Initial setup/adapter
 failures and CPU/I/O measurement gaps remain explicit. This is level-3 recovery
 evidence, not sustained capacity or an independent-host durability claim.
 
-Next: interleave a bounded storage recovery follow-up, then version-guarded live
-CDC plus Spark historical correction and the matched ClickHouse control. Do not
-reopen completed Flink/Doris deployment examples for optional deeper matrices.
+The subsequent storage, historical-replay and matched ClickHouse outcomes are
+recorded below. Completed Flink/Doris deployment examples stay closed.
 
 ### JuiceFS storage follow-up
 
@@ -264,10 +268,9 @@ recovery retained 640 ACKs. Historical/client-cold reads, latency maxima, CPU,
 memory, block bytes, storage and disabled compression are recorded. Failed Docker
 identity and warm-cache probes remain failed/rejected; a confounded IP-movement
 case exposed old-endpoint retries consistent with the native one-minute DNS cache.
-Both fixtures are verified and removed. Ceph whole-guest/disk/restore work still
-requires the existing 25-GiB free-Docker-space gate; do not weaken it to fit the VM.
-Next cross-system work is live CDC plus Spark historical correction, then the
-matched ClickHouse control; completed Flink/Doris deployment examples stay closed.
+Both fixtures are verified and removed. The subsequent Ceph storage and
+cross-system outcomes are recorded below; the 25-GiB free-space gate was retained.
+Completed Flink/Doris deployment examples stay closed.
 
 ### Historical replay checkpoint
 
@@ -279,8 +282,9 @@ and repeated commit reconciled native finished-label errors. All 999,428 current
 active rows matched on each fixed replica, with all 330 source ACKs reconciled.
 The first controller's immediate-visibility failure remains failed; it was recovered
 in place before the separate corrected case. CPU/memory, block bytes, settled disk
-and compression limits are reported; owned teardown passed. Next is the matched
-ClickHouse control, with no throughput winner claimed from these diagnostics.
+and compression limits are reported; owned teardown passed. The subsequent
+matched ClickHouse control is recorded below; these diagnostics establish no
+throughput winner.
 
 
 ### Matched native ClickHouse control — completed bounded level 3
@@ -295,5 +299,22 @@ remain documented with in-place recovery. All owned infrastructure was removed.
 Doris short query timings varied after restart (observed FE CPU throttling);
 there is no stable overall performance winner or equal end-to-end ingestion-cost
 claim. Optional deeper comparisons are future work, not level-3 blockers.
-Next: bounded CephFS whole-guest/disk loss and independent restore, retaining the
-25-GiB free-space startup guard. Completed Flink/Doris deployment labs stay closed.
+The completed bounded CephFS follow-up below retained the 25-GiB free-space
+startup guard. Completed Flink/Doris deployment labs stay closed.
+
+
+### Bounded CephFS storage recovery — completed level 3
+
+[Guest loss, disk replacement and file restore](../../ceph/filesystem-ha/) passed.
+The complete cut contained 1,788 ACK files / 117,178,368 bytes, with zero
+ambiguous/missing/wrong bodies. Guest loss exposed 84.287-second writes and
+94.037-second reads; native recovery took 150.966 seconds. Fenced empty-spare
+replacement took 75.528 seconds and preserved the numeric OSD ID with a new UUID.
+Actual bodies were archived, the source volume destroyed, and a different FSID
+restored every ACK. Both clusters and the final guest image are removed.
+CPU utilization, memory, disk bytes/I/O, compression counters and storage
+allocation are recorded. Fresh metadata PG-count drift (32 rather than eight)
+remains a targeted deployment TODO. Online/full-metadata restore, deep scrubs,
+post-replacement boot and kernel-client guest/disk cases are future work.
+The agreed bounded cross-system and storage follow-ups are complete; do not
+reopen Flink/Doris deployment tests or expand this into a level-4/5 sweep.

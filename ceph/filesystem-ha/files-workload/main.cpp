@@ -184,7 +184,7 @@ std::string sha256(const std::vector<char> &data) {
 struct Mismatch : std::runtime_error {
   using std::runtime_error::runtime_error;
 };
-void verify_body(ceph_mount_info *connection, const json &expected) {
+std::vector<char> read_body(ceph_mount_info *connection, const json &expected) {
   const auto started = Clock::now();
   File file(connection, expected.at("path").get<std::string>(), O_RDONLY);
   const auto count = expected.at("bytes").get<std::size_t>();
@@ -213,6 +213,10 @@ void verify_body(ceph_mount_info *connection, const json &expected) {
         {"duration_ms",
          std::chrono::duration<double, std::milli>(Clock::now() - started)
              .count()}});
+  return data;
+}
+void verify_body(ceph_mount_info *connection, const json &expected) {
+  (void)read_body(connection, expected);
 }
 json expected(const std::string &run, std::size_t sequence,
               const std::vector<char> &data) {
@@ -286,6 +290,84 @@ std::map<std::size_t, json> acknowledged(const fs::path &file,
   }
   return result;
 }
+// Application-level body backup, not a Ceph metadata/configuration backup.
+// The journal is copied in by the controller; never regenerate payloads here.
+void backup_or_restore(ceph_mount_info *connection, const fs::path &directory,
+                       const std::string &run, bool restore) {
+  const auto records = acknowledged(directory / "journal.jsonl");
+  if (records.empty())
+    throw std::runtime_error("No acknowledged backup input");
+  const auto bodies = directory / "bodies";
+  if (!restore && !fs::create_directory(bodies))
+    throw std::runtime_error("Backup directory exists; never overwrite it");
+  if (restore)
+    checked(ceph_mkdirs(connection, ("/objects/" + run).c_str(), 0755),
+            "create restored publication directory");
+  std::size_t total = 0;
+  for (const auto &[sequence, item] : records) {
+    if (item.at("run") != run ||
+        item.at("path") != "/objects/" + run + "/" + std::to_string(sequence))
+      throw Mismatch("Backup witness identity differs");
+    const auto local = bodies / std::to_string(sequence);
+    const auto size = item.at("bytes").get<std::size_t>();
+    if (!size || size > 16777216)
+      throw Mismatch("Backup body size outside contract");
+    if (!restore) {
+      const auto data = read_body(connection, item);
+      // A newly created directory and exclusive files prevent old archive
+      // reuse.
+      int fd = ::open(local.c_str(), O_WRONLY | O_CREAT | O_EXCL, 0600);
+      posix_check(fd >= 0, "create backup body");
+      try {
+        std::size_t offset = 0;
+        while (offset < data.size()) {
+          auto n = ::write(fd, data.data() + offset, data.size() - offset);
+          if (n < 0 && errno == EINTR)
+            continue;
+          posix_check(n > 0, "write backup body");
+          offset += static_cast<std::size_t>(n);
+        }
+        posix_check(::fsync(fd) == 0, "fsync backup body");
+      } catch (...) {
+        ::close(fd);
+        throw;
+      }
+      posix_check(::close(fd) == 0, "close backup body");
+    } else {
+      if (fs::file_size(local) != size)
+        throw Mismatch("Backup body length differs");
+      std::ifstream input(local, std::ios::binary);
+      std::vector<char> data(size);
+      input.read(data.data(), static_cast<std::streamsize>(size));
+      if (!input || sha256(data) != item.at("sha256"))
+        throw Mismatch("Backup body checksum differs");
+      // Fresh destination only: O_EXCL rejects accidental overlay/replay.
+      File file(connection, item.at("path").get<std::string>(),
+                O_WRONLY | O_CREAT | O_EXCL);
+      std::size_t offset = 0;
+      while (offset < data.size()) {
+        auto n =
+            checked(ceph_write(connection, file.get(), data.data() + offset,
+                               static_cast<int64_t>(data.size() - offset),
+                               static_cast<int64_t>(offset)),
+                    "restore actual archived bytes");
+        if (!n)
+          throw std::runtime_error("Zero-byte restore write");
+        offset += static_cast<std::size_t>(n);
+      }
+      checked(ceph_fsync(connection, file.get(), 0), "fsync restored body");
+      file.close();
+      checked(ceph_sync_fs(connection), "flush restored publication");
+      verify_body(connection, item);
+    }
+    total += size;
+  }
+  emit({{"event", restore ? "restored" : "backed_up"},
+        {"acks", records.size()},
+        {"bytes", total},
+        {"regenerated", false}});
+}
+
 void resources() {
   rusage usage{};
   if (getrusage(RUSAGE_SELF, &usage) == 0)
@@ -309,7 +391,8 @@ int main(int argc, char **argv) {
         run.find_first_not_of("0123456789abcdef") != std::string::npos)
       throw std::invalid_argument("Invalid run ID");
     if (mode != "seed" && mode != "writer" && mode != "reader" &&
-        mode != "verify" && mode != "read-only-check")
+        mode != "verify" && mode != "read-only-check" && mode != "backup" &&
+        mode != "restore")
       throw std::invalid_argument("Unknown mode");
     const fs::path directory = argv[3];
     std::signal(SIGINT, stop);
@@ -322,13 +405,16 @@ int main(int argc, char **argv) {
     emit({{"event", "source"},
           {"sha256", WORKLOAD_SOURCE_SHA256},
           {"libcephfs_version", ceph_version(nullptr, nullptr, nullptr)}});
-    Connection connection(mode == "seed" || mode == "writer" ? "lab-writer"
-                                                             : "lab-reader");
+    Connection connection(
+        mode == "seed" || mode == "writer" || mode == "restore" ? "lab-writer"
+                                                                : "lab-reader");
     emit({{"event", "connected"},
           {"connect_ms",
            std::chrono::duration<double, std::milli>(Clock::now() - start)
                .count()}});
-    if (mode == "seed" || mode == "writer") {
+    if (mode == "backup" || mode == "restore") {
+      backup_or_restore(connection.handle, directory, run, mode == "restore");
+    } else if (mode == "seed" || mode == "writer") {
       if (!fs::create_directories(directory))
         throw std::runtime_error("Witness exists; never overwrite it");
       Journal journal(directory / "journal.jsonl");

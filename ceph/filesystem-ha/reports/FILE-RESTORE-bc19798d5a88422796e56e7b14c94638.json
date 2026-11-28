@@ -1,0 +1,1889 @@
+{
+  "classification": "Bounded file-level recovery; no throughput comparison or full metadata-backup qualification",
+  "manifest": {
+    "backup": "bc19798d5a88422796e56e7b14c94638",
+    "source_fixture": {
+      "id": "880d9d80a96343c993a7beab6d5f55a8",
+      "run": "02f337a4a2cd4a0c9c3eb1ed3663434f",
+      "fsid": "b7aa5cc6-baae-47ea-bec1-9dbb26a4db12",
+      "files": 128,
+      "payload_bytes": 65536,
+      "stage": "ready"
+    },
+    "entries": [
+      {
+        "event": "backup_archive",
+        "path": "backups/bc19798d5a88422796e56e7b14c94638/02f337a4a2cd4a0c9c3eb1ed3663434f.tar",
+        "sha256": "0186cb7000bf6abbdec7dbd9efd16a93e86f9a3bfb746154d4e5027af330a7e1",
+        "archive_bytes": 8540160,
+        "elapsed_s": 5.672547710999879,
+        "acks": 128,
+        "bytes": 8388608,
+        "run": "02f337a4a2cd4a0c9c3eb1ed3663434f",
+        "journal_sha256": "d7b038fdbb2f81c05b4fe96a71224a0f577c95f089253c0080f3d07836ec0447",
+        "ambiguous_or_incomplete": 0
+      },
+      {
+        "event": "backup_archive",
+        "path": "backups/bc19798d5a88422796e56e7b14c94638/1958ca0b5e7a4a5e98b2d00ffbff8707.tar",
+        "sha256": "6690c6aa610403cc2a8d16529f8ae7098622eb3fc499324f5d432d942746e8e7",
+        "archive_bytes": 41871360,
+        "elapsed_s": 14.400473922999936,
+        "acks": 628,
+        "bytes": 41156608,
+        "run": "1958ca0b5e7a4a5e98b2d00ffbff8707",
+        "journal_sha256": "53031a7d161809de92516ec640d8e223eab6757759fd1f68b0e5efa0ae60726a",
+        "ambiguous_or_incomplete": 0
+      },
+      {
+        "event": "backup_archive",
+        "path": "backups/bc19798d5a88422796e56e7b14c94638/7eee1e66117240b08bc909aeda18b365.tar",
+        "sha256": "07dccb74bc174cebe51118d6b9d77ce58fb7e9d14baa271ab0abe8925160ae4c",
+        "archive_bytes": 68802560,
+        "elapsed_s": 21.487931966999895,
+        "acks": 1032,
+        "bytes": 67633152,
+        "run": "7eee1e66117240b08bc909aeda18b365",
+        "journal_sha256": "ce55b34b2469fa4af2734a707d531516715b92116d808cc0ab89af0645a5e169",
+        "ambiguous_or_incomplete": 0
+      }
+    ],
+    "total_acks": 1788,
+    "total_bytes": 117178368,
+    "quiescent_cut": true,
+    "file_level_only": true
+  },
+  "manifest_sha256": "1c0a74649fe4bcd0f930363152b97e28332331e422361af008b118fe9846dd18",
+  "restore": {
+    "passed": true,
+    "source_fsid": "b7aa5cc6-baae-47ea-bec1-9dbb26a4db12",
+    "destination_fsid": "fcc2ef8f-2fa8-498a-a5e5-42e17eeb6d82",
+    "acknowledged_loss": 0,
+    "regenerated": false,
+    "histories": [
+      {
+        "attempts": 128,
+        "acks": 128,
+        "ambiguous_or_incomplete": 0,
+        "acknowledged_bytes": 8388608
+      },
+      {
+        "attempts": 628,
+        "acks": 628,
+        "ambiguous_or_incomplete": 0,
+        "acknowledged_bytes": 41156608
+      },
+      {
+        "attempts": 1032,
+        "acks": 1032,
+        "ambiguous_or_incomplete": 0,
+        "acknowledged_bytes": 67633152
+      }
+    ],
+    "total_acks": 1788,
+    "acknowledged_bytes": 117178368,
+    "osds_up_in": 9,
+    "all_pgs_active_clean": true,
+    "pgs_on_three_hosts": 41,
+    "monitor_quorum": 3
+  },
+  "cleanup": {
+    "source": {
+      "fixture": "880d9d80a96343c993a7beab6d5f55a8",
+      "containers_absent": true,
+      "volume_absent": true,
+      "image_retained_for_restore": true
+    },
+    "destination": {
+      "fixture": "ce225c197b924230901fb49f121693f8",
+      "containers_absent": true,
+      "volume_absent": true,
+      "image_retained_for_restore": false
+    }
+  },
+  "archive_total_bytes": 119214080,
+  "archive_allocated_bytes": 134955008,
+  "windows": {
+    "backup": {
+      "evidence": "results/backup-create-1795841187379934000",
+      "controller": {
+        "elapsed_s": 157.41738204099966,
+        "host_user_cpu_s": 0.97054,
+        "host_system_cpu_s": 0.07081599999999999,
+        "host_process_peak_rss_bytes": 31473664,
+        "host_io_bytes": null,
+        "scope": "Controller self only; excludes Docker daemons and guest applications"
+      },
+      "docker_resources": {
+        "evidence": "/Users/muzammil/github.com/muzammilar/examples/ceph/filesystem-ha/results/resources-1795841187352254000.jsonl",
+        "environment": {
+          "type": "environment",
+          "run_id": 1795841187352254000,
+          "command": [
+            "make",
+            "backup",
+            "PYTHON=/Users/muzammil/.local/bin/python3.13"
+          ],
+          "environment": {
+            "NCPU": 11,
+            "MemTotal": 26216296448,
+            "KernelVersion": "6.12.76-linuxkit",
+            "OperatingSystem": "Docker Desktop",
+            "Driver": "overlayfs",
+            "ServerVersion": "29.5.3",
+            "docker_api": "1.54"
+          },
+          "cotenancy": "Only this CephFS example; no other heavy lab."
+        },
+        "sampled_aggregate_memory_peak_bytes": 10687287296,
+        "actors": [
+          {
+            "name": "/ceph-filesystem-ha-guests-1",
+            "samples": 156,
+            "peak_memory_bytes": 10675449856,
+            "configuration": {
+              "image_id": "sha256:a627aa2a7f3af5d8dc824941a46d287c24f230fb788ea685981a506f21ae3433",
+              "image_reference": "ceph-filesystem-ha-guests:21.2.0",
+              "memory_limit_bytes": 17179869184,
+              "nano_cpus": 8000000000,
+              "started_at": "2026-11-28T04:18:56.402070097Z"
+            },
+            "counter_deltas": {
+              "cpu_core_s": 298.67813000000024,
+              "network_rx_bytes": 260316489,
+              "network_tx_bytes": 260316489,
+              "disk_read_bytes": 234401280,
+              "disk_write_bytes": 411206144
+            },
+            "cpu_utilization_pct_one_core_min": 126.1151364330872,
+            "cpu_utilization_pct_one_core_max": 413.4005672200134,
+            "observed_s": 157.09609508514404,
+            "sampled_mean_memory_bytes": 10490286421.333334,
+            "cpu_utilization_pct_one_core_average": 190.12447752957868
+          },
+          {
+            "name": "/ceph-filesystem-ha-control-run-8c68175b85e1",
+            "samples": 25,
+            "peak_memory_bytes": 11882496,
+            "configuration": {
+              "image_id": "sha256:a627aa2a7f3af5d8dc824941a46d287c24f230fb788ea685981a506f21ae3433",
+              "image_reference": "ceph-filesystem-ha-guests:21.2.0",
+              "memory_limit_bytes": 536870912,
+              "nano_cpus": 1000000000,
+              "started_at": "2026-11-28T04:46:27.50018768Z"
+            },
+            "counter_deltas": {
+              "cpu_core_s": 0.08650699999999999,
+              "network_rx_bytes": 7219944,
+              "network_tx_bytes": 7219944
+            },
+            "cpu_utilization_pct_one_core_min": 0.0,
+            "cpu_utilization_pct_one_core_max": 3.3676780234497734,
+            "observed_s": 24.32522177696228,
+            "sampled_mean_memory_bytes": 10887168.0,
+            "cpu_utilization_pct_one_core_average": 0.35562676794144704
+          },
+          {
+            "name": "/ceph-filesystem-ha-control-run-6dfe44657ca9",
+            "samples": 3,
+            "peak_memory_bytes": 6942720,
+            "configuration": {
+              "image_id": "sha256:a627aa2a7f3af5d8dc824941a46d287c24f230fb788ea685981a506f21ae3433",
+              "image_reference": "ceph-filesystem-ha-guests:21.2.0",
+              "memory_limit_bytes": 536870912,
+              "nano_cpus": 1000000000,
+              "started_at": "2026-11-28T04:46:52.967917137Z"
+            },
+            "counter_deltas": {
+              "cpu_core_s": 0.0,
+              "network_rx_bytes": 468613,
+              "network_tx_bytes": 468613
+            },
+            "cpu_utilization_pct_one_core_min": 0.0,
+            "cpu_utilization_pct_one_core_max": 0.0,
+            "observed_s": 2.02645206451416,
+            "sampled_mean_memory_bytes": 6942720.0,
+            "cpu_utilization_pct_one_core_average": 0.0
+          },
+          {
+            "name": "/ceph-filesystem-ha-control-run-f4c95e3a3bf5",
+            "samples": 3,
+            "peak_memory_bytes": 6955008,
+            "configuration": {
+              "image_id": "sha256:a627aa2a7f3af5d8dc824941a46d287c24f230fb788ea685981a506f21ae3433",
+              "image_reference": "ceph-filesystem-ha-guests:21.2.0",
+              "memory_limit_bytes": 536870912,
+              "nano_cpus": 1000000000,
+              "started_at": "2026-11-28T04:46:56.059623513Z"
+            },
+            "counter_deltas": {
+              "cpu_core_s": 0.0,
+              "network_rx_bytes": 739608,
+              "network_tx_bytes": 739608
+            },
+            "cpu_utilization_pct_one_core_min": 0.0,
+            "cpu_utilization_pct_one_core_max": 0.0,
+            "observed_s": 2.025103807449341,
+            "sampled_mean_memory_bytes": 6942720.0,
+            "cpu_utilization_pct_one_core_average": 0.0
+          },
+          {
+            "name": "/ceph-filesystem-ha-control-run-618d51059a55",
+            "samples": 3,
+            "peak_memory_bytes": 10158080,
+            "configuration": {
+              "image_id": "sha256:a627aa2a7f3af5d8dc824941a46d287c24f230fb788ea685981a506f21ae3433",
+              "image_reference": "ceph-filesystem-ha-guests:21.2.0",
+              "memory_limit_bytes": 536870912,
+              "nano_cpus": 1000000000,
+              "started_at": "2026-11-28T04:46:59.846979667Z"
+            },
+            "counter_deltas": {
+              "cpu_core_s": 0.012494999999999992,
+              "network_rx_bytes": 4989773,
+              "network_tx_bytes": 4989773
+            },
+            "cpu_utilization_pct_one_core_min": 0.5574358217381441,
+            "cpu_utilization_pct_one_core_max": 0.67620351425899,
+            "observed_s": 2.026279926300049,
+            "sampled_mean_memory_bytes": 9874090.666666666,
+            "cpu_utilization_pct_one_core_average": 0.6166472774971244
+          },
+          {
+            "name": "/ceph-filesystem-ha-control-run-4947609b2f53",
+            "samples": 10,
+            "peak_memory_bytes": 10567680,
+            "configuration": {
+              "image_id": "sha256:a627aa2a7f3af5d8dc824941a46d287c24f230fb788ea685981a506f21ae3433",
+              "image_reference": "ceph-filesystem-ha-guests:21.2.0",
+              "memory_limit_bytes": 536870912,
+              "nano_cpus": 1000000000,
+              "started_at": "2026-11-28T04:47:04.692186211Z"
+            },
+            "counter_deltas": {
+              "cpu_core_s": 0.118997,
+              "network_rx_bytes": 41396454,
+              "network_tx_bytes": 41396562
+            },
+            "cpu_utilization_pct_one_core_min": 0.17714581710332786,
+            "cpu_utilization_pct_one_core_max": 7.0566855528087284,
+            "observed_s": 9.114910125732422,
+            "sampled_mean_memory_bytes": 10066329.6,
+            "cpu_utilization_pct_one_core_average": 1.3055202778583415
+          },
+          {
+            "name": "/ceph-filesystem-ha-control-run-f5361dbc9a10",
+            "samples": 3,
+            "peak_memory_bytes": 8519680,
+            "configuration": {
+              "image_id": "sha256:a627aa2a7f3af5d8dc824941a46d287c24f230fb788ea685981a506f21ae3433",
+              "image_reference": "ceph-filesystem-ha-guests:21.2.0",
+              "memory_limit_bytes": 536870912,
+              "nano_cpus": 1000000000,
+              "started_at": "2026-11-28T04:47:14.894466966Z"
+            },
+            "counter_deltas": {
+              "cpu_core_s": 0.032959999999999996,
+              "network_rx_bytes": 482103,
+              "network_tx_bytes": 482103
+            },
+            "cpu_utilization_pct_one_core_min": 0.06260217219382469,
+            "cpu_utilization_pct_one_core_max": 3.185324578979986,
+            "observed_s": 2.026020050048828,
+            "sampled_mean_memory_bytes": 8437760.0,
+            "cpu_utilization_pct_one_core_average": 1.6268348380464273
+          },
+          {
+            "name": "/ceph-filesystem-ha-control-run-63f16d9cc00a",
+            "samples": 15,
+            "peak_memory_bytes": 11161600,
+            "configuration": {
+              "image_id": "sha256:a627aa2a7f3af5d8dc824941a46d287c24f230fb788ea685981a506f21ae3433",
+              "image_reference": "ceph-filesystem-ha-guests:21.2.0",
+              "memory_limit_bytes": 536870912,
+              "nano_cpus": 1000000000,
+              "started_at": "2026-11-28T04:47:17.663631884Z"
+            },
+            "counter_deltas": {
+              "cpu_core_s": 0.12193600000000002,
+              "network_rx_bytes": 68579001,
+              "network_tx_bytes": 68579001
+            },
+            "cpu_utilization_pct_one_core_min": 0.17672812151519465,
+            "cpu_utilization_pct_one_core_max": 4.032807382704114,
+            "observed_s": 14.192235946655273,
+            "sampled_mean_memory_bytes": 10377352.533333333,
+            "cpu_utilization_pct_one_core_average": 0.8591739910351268
+          },
+          {
+            "name": "/ceph-filesystem-ha-control-run-2a899adb2d3c",
+            "samples": 5,
+            "peak_memory_bytes": 6942720,
+            "configuration": {
+              "image_id": "sha256:a627aa2a7f3af5d8dc824941a46d287c24f230fb788ea685981a506f21ae3433",
+              "image_reference": "ceph-filesystem-ha-guests:21.2.0",
+              "memory_limit_bytes": 536870912,
+              "nano_cpus": 1000000000,
+              "started_at": "2026-11-28T04:47:33.122280835Z"
+            },
+            "counter_deltas": {
+              "cpu_core_s": 0.033213,
+              "network_rx_bytes": 1057438,
+              "network_tx_bytes": 1057438
+            },
+            "cpu_utilization_pct_one_core_min": 0.0,
+            "cpu_utilization_pct_one_core_max": 3.247874449313446,
+            "observed_s": 4.055214881896973,
+            "sampled_mean_memory_bytes": 6705971.2,
+            "cpu_utilization_pct_one_core_average": 0.8190194839801788
+          },
+          {
+            "name": "/ceph-filesystem-ha-control-run-e9cd8216a01d",
+            "samples": 3,
+            "peak_memory_bytes": 6942720,
+            "configuration": {
+              "image_id": "sha256:a627aa2a7f3af5d8dc824941a46d287c24f230fb788ea685981a506f21ae3433",
+              "image_reference": "ceph-filesystem-ha-guests:21.2.0",
+              "memory_limit_bytes": 536870912,
+              "nano_cpus": 1000000000,
+              "started_at": "2026-11-28T04:47:37.812466754Z"
+            },
+            "counter_deltas": {
+              "cpu_core_s": 0.0,
+              "network_rx_bytes": 765714,
+              "network_tx_bytes": 765714
+            },
+            "cpu_utilization_pct_one_core_min": 0.0,
+            "cpu_utilization_pct_one_core_max": 0.0,
+            "observed_s": 2.0255491733551025,
+            "sampled_mean_memory_bytes": 6942720.0,
+            "cpu_utilization_pct_one_core_average": 0.0
+          },
+          {
+            "name": "/ceph-filesystem-ha-control-run-51f5e98b86f0",
+            "samples": 3,
+            "peak_memory_bytes": 6963200,
+            "configuration": {
+              "image_id": "sha256:a627aa2a7f3af5d8dc824941a46d287c24f230fb788ea685981a506f21ae3433",
+              "image_reference": "ceph-filesystem-ha-guests:21.2.0",
+              "memory_limit_bytes": 536870912,
+              "nano_cpus": 1000000000,
+              "started_at": "2026-11-28T04:47:40.957883381Z"
+            },
+            "counter_deltas": {
+              "cpu_core_s": 0.00027399999999999647,
+              "network_rx_bytes": 709158,
+              "network_tx_bytes": 709158
+            },
+            "cpu_utilization_pct_one_core_min": 0.0,
+            "cpu_utilization_pct_one_core_max": 0.027000341510219114,
+            "observed_s": 2.02581787109375,
+            "sampled_mean_memory_bytes": 6896298.666666667,
+            "cpu_utilization_pct_one_core_average": 0.013525401464252183
+          },
+          {
+            "name": "/ceph-filesystem-ha-control-run-f28cada6c950",
+            "samples": 3,
+            "peak_memory_bytes": 7262208,
+            "configuration": {
+              "image_id": "sha256:a627aa2a7f3af5d8dc824941a46d287c24f230fb788ea685981a506f21ae3433",
+              "image_reference": "ceph-filesystem-ha-guests:21.2.0",
+              "memory_limit_bytes": 536870912,
+              "nano_cpus": 1000000000,
+              "started_at": "2026-11-28T04:47:43.903973799Z"
+            },
+            "counter_deltas": {
+              "cpu_core_s": 0.00033199999999999896,
+              "network_rx_bytes": 891262,
+              "network_tx_bytes": 891262
+            },
+            "cpu_utilization_pct_one_core_min": 0.0,
+            "cpu_utilization_pct_one_core_max": 0.03270901048184927,
+            "observed_s": 2.0276758670806885,
+            "sampled_mean_memory_bytes": 7057408.0,
+            "cpu_utilization_pct_one_core_average": 0.01637342562438198
+          },
+          {
+            "name": "/ceph-filesystem-ha-control-run-fb4e9d7cf28b",
+            "samples": 2,
+            "peak_memory_bytes": 6950912,
+            "configuration": {
+              "image_id": "sha256:a627aa2a7f3af5d8dc824941a46d287c24f230fb788ea685981a506f21ae3433",
+              "image_reference": "ceph-filesystem-ha-guests:21.2.0",
+              "memory_limit_bytes": 536870912,
+              "nano_cpus": 1000000000,
+              "started_at": "2026-11-28T04:47:46.663457467Z"
+            },
+            "counter_deltas": {
+              "cpu_core_s": 0.0,
+              "network_rx_bytes": 526480,
+              "network_tx_bytes": 526480
+            },
+            "cpu_utilization_pct_one_core_min": 0.0,
+            "cpu_utilization_pct_one_core_max": 0.0,
+            "observed_s": 1.011268138885498,
+            "sampled_mean_memory_bytes": 6946816.0,
+            "cpu_utilization_pct_one_core_average": 0.0
+          },
+          {
+            "name": "/ceph-filesystem-ha-control-run-a16e1f3ec610",
+            "samples": 3,
+            "peak_memory_bytes": 7303168,
+            "configuration": {
+              "image_id": "sha256:a627aa2a7f3af5d8dc824941a46d287c24f230fb788ea685981a506f21ae3433",
+              "image_reference": "ceph-filesystem-ha-guests:21.2.0",
+              "memory_limit_bytes": 536870912,
+              "nano_cpus": 1000000000,
+              "started_at": "2026-11-28T04:47:49.402373885Z"
+            },
+            "counter_deltas": {
+              "cpu_core_s": 0.030637,
+              "network_rx_bytes": 693184,
+              "network_tx_bytes": 693184
+            },
+            "cpu_utilization_pct_one_core_min": 0.0,
+            "cpu_utilization_pct_one_core_max": 3.021761508904376,
+            "observed_s": 2.028794765472412,
+            "sampled_mean_memory_bytes": 6866261.333333333,
+            "cpu_utilization_pct_one_core_average": 1.5101083915142135
+          },
+          {
+            "name": "/ceph-filesystem-ha-control-run-adc7579d5d97",
+            "samples": 2,
+            "peak_memory_bytes": 8404992,
+            "configuration": {
+              "image_id": "sha256:a627aa2a7f3af5d8dc824941a46d287c24f230fb788ea685981a506f21ae3433",
+              "image_reference": "ceph-filesystem-ha-guests:21.2.0",
+              "memory_limit_bytes": 536870912,
+              "nano_cpus": 1000000000,
+              "started_at": "2026-11-28T04:47:52.470782928Z"
+            },
+            "counter_deltas": {
+              "cpu_core_s": 0.0006639999999999979,
+              "network_rx_bytes": 204730,
+              "network_tx_bytes": 204730
+            },
+            "cpu_utilization_pct_one_core_min": 0.06563275951580518,
+            "cpu_utilization_pct_one_core_max": 0.06563275951580518,
+            "observed_s": 1.0116899013519287,
+            "sampled_mean_memory_bytes": 8398848.0,
+            "cpu_utilization_pct_one_core_average": 0.06563275951580518
+          },
+          {
+            "name": "/ceph-filesystem-ha-control-run-6c8478711631",
+            "samples": 6,
+            "peak_memory_bytes": 18501632,
+            "configuration": {
+              "image_id": "sha256:a627aa2a7f3af5d8dc824941a46d287c24f230fb788ea685981a506f21ae3433",
+              "image_reference": "ceph-filesystem-ha-guests:21.2.0",
+              "memory_limit_bytes": 536870912,
+              "nano_cpus": 1000000000,
+              "started_at": "2026-11-28T04:47:55.163356554Z"
+            },
+            "counter_deltas": {
+              "cpu_core_s": 0.12540800000000002,
+              "network_rx_bytes": 8406510,
+              "network_tx_bytes": 8406510
+            },
+            "cpu_utilization_pct_one_core_min": 0.3494799591359848,
+            "cpu_utilization_pct_one_core_max": 7.017393287626139,
+            "observed_s": 5.066801071166992,
+            "sampled_mean_memory_bytes": 11328170.666666666,
+            "cpu_utilization_pct_one_core_average": 2.475092237460112
+          },
+          {
+            "name": "/ceph-filesystem-ha-control-run-24f7e4e557a7",
+            "samples": 1,
+            "peak_memory_bytes": 0,
+            "configuration": {
+              "image_id": "sha256:a627aa2a7f3af5d8dc824941a46d287c24f230fb788ea685981a506f21ae3433",
+              "image_reference": "ceph-filesystem-ha-guests:21.2.0",
+              "memory_limit_bytes": 536870912,
+              "nano_cpus": 1000000000,
+              "started_at": "2026-11-28T04:48:01.082575751Z"
+            },
+            "observed_s": 0.0,
+            "sampled_mean_memory_bytes": 0.0,
+            "counter_deltas": {}
+          },
+          {
+            "name": "/ceph-filesystem-ha-control-run-672089f9e6cf",
+            "samples": 14,
+            "peak_memory_bytes": 52514816,
+            "configuration": {
+              "image_id": "sha256:a627aa2a7f3af5d8dc824941a46d287c24f230fb788ea685981a506f21ae3433",
+              "image_reference": "ceph-filesystem-ha-guests:21.2.0",
+              "memory_limit_bytes": 536870912,
+              "nano_cpus": 1000000000,
+              "started_at": "2026-11-28T04:48:02.616637085Z"
+            },
+            "counter_deltas": {
+              "cpu_core_s": 0.25524199999999997,
+              "network_rx_bytes": 38454804,
+              "network_tx_bytes": 38454804
+            },
+            "cpu_utilization_pct_one_core_min": 0.49492070104339236,
+            "cpu_utilization_pct_one_core_max": 10.384399528372349,
+            "observed_s": 13.167924880981445,
+            "sampled_mean_memory_bytes": 14694107.42857143,
+            "cpu_utilization_pct_one_core_average": 1.9383616044821788
+          },
+          {
+            "name": "/ceph-filesystem-ha-control-run-0ddc495e839b",
+            "samples": 1,
+            "peak_memory_bytes": 9420800,
+            "configuration": {
+              "image_id": "sha256:a627aa2a7f3af5d8dc824941a46d287c24f230fb788ea685981a506f21ae3433",
+              "image_reference": "ceph-filesystem-ha-guests:21.2.0",
+              "memory_limit_bytes": 536870912,
+              "nano_cpus": 1000000000,
+              "started_at": "2026-11-28T04:48:17.318203759Z"
+            },
+            "observed_s": 0.0,
+            "sampled_mean_memory_bytes": 9420800.0,
+            "counter_deltas": {}
+          },
+          {
+            "name": "/ceph-filesystem-ha-control-run-858488b86997",
+            "samples": 21,
+            "peak_memory_bytes": 79769600,
+            "configuration": {
+              "image_id": "sha256:a627aa2a7f3af5d8dc824941a46d287c24f230fb788ea685981a506f21ae3433",
+              "image_reference": "ceph-filesystem-ha-guests:21.2.0",
+              "memory_limit_bytes": 536870912,
+              "nano_cpus": 1000000000,
+              "started_at": "2026-11-28T04:48:18.964058218Z"
+            },
+            "counter_deltas": {
+              "cpu_core_s": 0.39642499999999997,
+              "network_rx_bytes": 60784750,
+              "network_tx_bytes": 60784750
+            },
+            "cpu_utilization_pct_one_core_min": 0.5081425167594438,
+            "cpu_utilization_pct_one_core_max": 12.408787137535333,
+            "observed_s": 20.258049964904785,
+            "sampled_mean_memory_bytes": 17067641.904761903,
+            "cpu_utilization_pct_one_core_average": 1.9568764056104608
+          },
+          {
+            "name": "/ceph-filesystem-ha-control-run-ee898ef77353",
+            "samples": 1,
+            "peak_memory_bytes": 8445952,
+            "configuration": {
+              "image_id": "sha256:a627aa2a7f3af5d8dc824941a46d287c24f230fb788ea685981a506f21ae3433",
+              "image_reference": "ceph-filesystem-ha-guests:21.2.0",
+              "memory_limit_bytes": 536870912,
+              "nano_cpus": 1000000000,
+              "started_at": "2026-11-28T04:48:40.815530714Z"
+            },
+            "observed_s": 0.0,
+            "sampled_mean_memory_bytes": 8445952.0,
+            "counter_deltas": {}
+          },
+          {
+            "name": "/ceph-filesystem-ha-control-run-d0645a078bf7",
+            "samples": 23,
+            "peak_memory_bytes": 11972608,
+            "configuration": {
+              "image_id": "sha256:a627aa2a7f3af5d8dc824941a46d287c24f230fb788ea685981a506f21ae3433",
+              "image_reference": "ceph-filesystem-ha-guests:21.2.0",
+              "memory_limit_bytes": 536870912,
+              "nano_cpus": 1000000000,
+              "started_at": "2026-11-28T04:48:41.522137714Z"
+            },
+            "counter_deltas": {
+              "cpu_core_s": 0.08649800000000002,
+              "network_rx_bytes": 7501712,
+              "network_tx_bytes": 7501712
+            },
+            "cpu_utilization_pct_one_core_min": 0.0,
+            "cpu_utilization_pct_one_core_max": 3.2824367215688968,
+            "observed_s": 22.285628080368042,
+            "sampled_mean_memory_bytes": 11000253.217391305,
+            "cpu_utilization_pct_one_core_average": 0.3881335526558403
+          }
+        ],
+        "limits": [
+          "Sample-window deltas exclude startup and exit outside observation. Decreasing counters are treated as restarts and the new counter is accumulated; reset intervals have no CPU utilization estimate.",
+          "Short-lived actors may be missed; use native pre-exit cgroup counters as well.",
+          "CPU utilization is interval-average percent of one core; short spikes may be missed.",
+          "Docker disk bytes are not device I/O latency; absent counters are unavailable, not zero."
+        ]
+      },
+      "guest_disk_io": {
+        "0": {
+          "boot_id": "0843f9b8-6500-4469-a7fa-88cb7b37bf00",
+          "same_boot": true,
+          "whole_device_deltas": {
+            "vda": {
+              "read_ios": 0,
+              "write_ios": 2099,
+              "read_bytes": 0,
+              "write_bytes": 26697728,
+              "device_io_ms": 1355
+            },
+            "vdb": {
+              "read_ios": 0,
+              "write_ios": 0,
+              "read_bytes": 0,
+              "write_bytes": 0,
+              "device_io_ms": 0
+            },
+            "vdc": {
+              "read_ios": 0,
+              "write_ios": 0,
+              "read_bytes": 0,
+              "write_bytes": 0,
+              "device_io_ms": 0
+            },
+            "sdb": {
+              "read_ios": 908,
+              "write_ios": 0,
+              "read_bytes": 59506688,
+              "write_bytes": 0,
+              "device_io_ms": 729
+            },
+            "sdc": {
+              "read_ios": 852,
+              "write_ios": 73,
+              "read_bytes": 55836672,
+              "write_bytes": 299008,
+              "device_io_ms": 753
+            },
+            "sdd": {
+              "read_ios": 444,
+              "write_ios": 0,
+              "read_bytes": 29097984,
+              "write_bytes": 0,
+              "device_io_ms": 356
+            }
+          }
+        },
+        "1": {
+          "boot_id": "9f132fcf-a0e6-41f5-8e7d-e9b0e737b5b0",
+          "same_boot": true,
+          "whole_device_deltas": {
+            "vda": {
+              "read_ios": 0,
+              "write_ios": 7342,
+              "read_bytes": 0,
+              "write_bytes": 206139392,
+              "device_io_ms": 6288
+            },
+            "vdb": {
+              "read_ios": 0,
+              "write_ios": 0,
+              "read_bytes": 0,
+              "write_bytes": 0,
+              "device_io_ms": 0
+            },
+            "vdc": {
+              "read_ios": 0,
+              "write_ios": 0,
+              "read_bytes": 0,
+              "write_bytes": 0,
+              "device_io_ms": 0
+            },
+            "sdb": {
+              "read_ios": 470,
+              "write_ios": 0,
+              "read_bytes": 30801920,
+              "write_bytes": 0,
+              "device_io_ms": 408
+            },
+            "sda": {
+              "read_ios": 448,
+              "write_ios": 15,
+              "read_bytes": 29360128,
+              "write_bytes": 65536,
+              "device_io_ms": 376
+            },
+            "sdc": {
+              "read_ios": 0,
+              "write_ios": 58,
+              "read_bytes": 0,
+              "write_bytes": 229376,
+              "device_io_ms": 44
+            }
+          }
+        },
+        "2": {
+          "boot_id": "adbe6626-d91f-458b-8d70-d5aa66130837",
+          "same_boot": true,
+          "whole_device_deltas": {
+            "vda": {
+              "read_ios": 0,
+              "write_ios": 2003,
+              "read_bytes": 0,
+              "write_bytes": 27844608,
+              "device_io_ms": 1254
+            },
+            "vdb": {
+              "read_ios": 0,
+              "write_ios": 0,
+              "read_bytes": 0,
+              "write_bytes": 0,
+              "device_io_ms": 0
+            },
+            "vdc": {
+              "read_ios": 0,
+              "write_ios": 0,
+              "read_bytes": 0,
+              "write_bytes": 0,
+              "device_io_ms": 0
+            },
+            "sdb": {
+              "read_ios": 0,
+              "write_ios": 0,
+              "read_bytes": 0,
+              "write_bytes": 0,
+              "device_io_ms": 0
+            },
+            "sda": {
+              "read_ios": 454,
+              "write_ios": 39,
+              "read_bytes": 29753344,
+              "write_bytes": 126976,
+              "device_io_ms": 475
+            },
+            "sdc": {
+              "read_ios": 0,
+              "write_ios": 36,
+              "read_bytes": 0,
+              "write_bytes": 172032,
+              "device_io_ms": 29
+            }
+          }
+        }
+      },
+      "native_storage": {
+        "df": {
+          "stats": {
+            "total_bytes": 115926368256,
+            "total_avail_bytes": 114965524480,
+            "total_used_bytes": 960843776,
+            "total_used_raw_bytes": 960843776,
+            "total_used_raw_ratio": 0.008288397453725338,
+            "num_osds": 9,
+            "num_per_pool_osds": 9,
+            "num_per_pool_omap_osds": 9
+          },
+          "stats_by_class": {
+            "hdd": {
+              "total_bytes": 115926368256,
+              "total_avail_bytes": 114965524480,
+              "total_used_bytes": 960843776,
+              "total_used_raw_bytes": 960843776,
+              "total_used_raw_ratio": 0.008288397453725338
+            }
+          },
+          "pools": [
+            {
+              "name": ".mgr",
+              "id": 1,
+              "stats": {
+                "stored": 590368,
+                "stored_data": 590368,
+                "stored_omap": 0,
+                "objects": 2,
+                "kb_used": 1740,
+                "bytes_used": 1781760,
+                "data_bytes_used": 1781760,
+                "omap_bytes_used": 0,
+                "percent_used": 1.634916043258272e-05,
+                "max_avail": 36326653952,
+                "quota_objects": 0,
+                "quota_bytes": 0,
+                "dirty": 0,
+                "rd": 136,
+                "rd_bytes": 245760,
+                "wr": 135,
+                "wr_bytes": 2201600,
+                "compress_bytes_used": 0,
+                "compress_under_bytes": 0,
+                "stored_raw": 1771104,
+                "avail_raw": 108979964577
+              }
+            },
+            {
+              "name": "labfs_meta",
+              "id": 2,
+              "stats": {
+                "stored": 18527713,
+                "stored_data": 18264346,
+                "stored_omap": 263367,
+                "objects": 26,
+                "kb_used": 54364,
+                "bytes_used": 55668310,
+                "data_bytes_used": 54878208,
+                "omap_bytes_used": 790102,
+                "percent_used": 0.0005105515592731535,
+                "max_avail": 36326653952,
+                "quota_objects": 0,
+                "quota_bytes": 0,
+                "dirty": 0,
+                "rd": 79,
+                "rd_bytes": 1750016,
+                "wr": 4527,
+                "wr_bytes": 20486144,
+                "compress_bytes_used": 0,
+                "compress_under_bytes": 0,
+                "stored_raw": 55583136,
+                "avail_raw": 108979964577
+              }
+            },
+            {
+              "name": "labfs_data",
+              "id": 3,
+              "stats": {
+                "stored": 117178368,
+                "stored_data": 117178368,
+                "stored_omap": 0,
+                "objects": 1788,
+                "kb_used": 343296,
+                "bytes_used": 351535104,
+                "data_bytes_used": 351535104,
+                "omap_bytes_used": 0,
+                "percent_used": 0.00321531412191689,
+                "max_avail": 36326653952,
+                "quota_objects": 0,
+                "quota_bytes": 0,
+                "dirty": 0,
+                "rd": 8306,
+                "rd_bytes": 540082176,
+                "wr": 1788,
+                "wr_bytes": 117178368,
+                "compress_bytes_used": 0,
+                "compress_under_bytes": 0,
+                "stored_raw": 351535104,
+                "avail_raw": 108979964577
+              }
+            }
+          ]
+        },
+        "osd_perf": {
+          "pg_ready": true,
+          "osdstats": {
+            "osd_perf_infos": [
+              {
+                "id": 0,
+                "perf_stats": {
+                  "commit_latency_ms": 0,
+                  "apply_latency_ms": 0,
+                  "commit_latency_ns": 0,
+                  "apply_latency_ns": 0
+                }
+              },
+              {
+                "id": 1,
+                "perf_stats": {
+                  "commit_latency_ms": 0,
+                  "apply_latency_ms": 0,
+                  "commit_latency_ns": 0,
+                  "apply_latency_ns": 0
+                }
+              },
+              {
+                "id": 2,
+                "perf_stats": {
+                  "commit_latency_ms": 0,
+                  "apply_latency_ms": 0,
+                  "commit_latency_ns": 0,
+                  "apply_latency_ns": 0
+                }
+              },
+              {
+                "id": 3,
+                "perf_stats": {
+                  "commit_latency_ms": 0,
+                  "apply_latency_ms": 0,
+                  "commit_latency_ns": 0,
+                  "apply_latency_ns": 0
+                }
+              },
+              {
+                "id": 4,
+                "perf_stats": {
+                  "commit_latency_ms": 0,
+                  "apply_latency_ms": 0,
+                  "commit_latency_ns": 0,
+                  "apply_latency_ns": 0
+                }
+              },
+              {
+                "id": 5,
+                "perf_stats": {
+                  "commit_latency_ms": 0,
+                  "apply_latency_ms": 0,
+                  "commit_latency_ns": 0,
+                  "apply_latency_ns": 0
+                }
+              },
+              {
+                "id": 6,
+                "perf_stats": {
+                  "commit_latency_ms": 0,
+                  "apply_latency_ms": 0,
+                  "commit_latency_ns": 0,
+                  "apply_latency_ns": 0
+                }
+              },
+              {
+                "id": 7,
+                "perf_stats": {
+                  "commit_latency_ms": 0,
+                  "apply_latency_ms": 0,
+                  "commit_latency_ns": 0,
+                  "apply_latency_ns": 0
+                }
+              },
+              {
+                "id": 8,
+                "perf_stats": {
+                  "commit_latency_ms": 0,
+                  "apply_latency_ms": 0,
+                  "commit_latency_ns": 0,
+                  "apply_latency_ns": 0
+                }
+              }
+            ]
+          }
+        },
+        "data_pool_config": {
+          "pool": "labfs_data",
+          "pool_id": 3,
+          "size": 3,
+          "min_size": 2,
+          "pg_num": 8,
+          "pgp_num": 8,
+          "crush_rule": "replicated_rule",
+          "hashpspool": true,
+          "nodelete": false,
+          "nopgchange": false,
+          "nosizechange": false,
+          "write_fadvise_dontneed": false,
+          "noscrub": false,
+          "nodeep-scrub": false,
+          "use_gmt_hitset": true,
+          "fast_read": 0,
+          "compression_mode": "none",
+          "pg_autoscale_mode": "off",
+          "eio": false,
+          "bulk": false,
+          "supports_omap": true
+        },
+        "metadata_pool_config": {
+          "pool": "labfs_meta",
+          "pool_id": 2,
+          "size": 3,
+          "min_size": 2,
+          "pg_num": 8,
+          "pgp_num": 8,
+          "crush_rule": "replicated_rule",
+          "hashpspool": true,
+          "nodelete": false,
+          "nopgchange": false,
+          "nosizechange": false,
+          "write_fadvise_dontneed": false,
+          "noscrub": false,
+          "nodeep-scrub": false,
+          "use_gmt_hitset": true,
+          "fast_read": 0,
+          "recovery_priority": 5,
+          "compression_mode": "none",
+          "pg_autoscale_mode": "off",
+          "pg_num_min": 16,
+          "pg_autoscale_bias": 4,
+          "eio": false,
+          "bulk": false,
+          "supports_omap": true
+        }
+      },
+      "qcow2_allocated_bytes": 9512038400,
+      "guest_kernels": {
+        "0": {
+          "kernel": "6.8.0-147-generic",
+          "boot_id": "0843f9b8-6500-4469-a7fa-88cb7b37bf00"
+        },
+        "1": {
+          "kernel": "6.8.0-147-generic",
+          "boot_id": "9f132fcf-a0e6-41f5-8e7d-e9b0e737b5b0"
+        },
+        "2": {
+          "kernel": "6.8.0-147-generic",
+          "boot_id": "adbe6626-d91f-458b-8d70-d5aa66130837"
+        }
+      }
+    },
+    "restore": {
+      "evidence": "results/backup-restore-1795842366688340000",
+      "controller": {
+        "elapsed_s": 187.3680429160013,
+        "host_user_cpu_s": 0.6511629999999999,
+        "host_system_cpu_s": 0.07214399999999999,
+        "host_process_peak_rss_bytes": 36225024,
+        "host_io_bytes": null,
+        "scope": "Controller self only; excludes Docker daemons and guest applications"
+      },
+      "docker_resources": {
+        "evidence": "/Users/muzammil/github.com/muzammilar/examples/ceph/filesystem-ha/results/resources-1795842366652479000.jsonl",
+        "environment": {
+          "type": "environment",
+          "run_id": 1795842366652479000,
+          "command": [
+            "make",
+            "restore",
+            "PYTHON=/Users/muzammil/.local/bin/python3.13"
+          ],
+          "environment": {
+            "NCPU": 11,
+            "MemTotal": 26216296448,
+            "KernelVersion": "6.12.76-linuxkit",
+            "OperatingSystem": "Docker Desktop",
+            "Driver": "overlayfs",
+            "ServerVersion": "29.5.3",
+            "docker_api": "1.54"
+          },
+          "cotenancy": "Only this CephFS example; no other heavy lab."
+        },
+        "sampled_aggregate_memory_peak_bytes": 11972923392,
+        "actors": [
+          {
+            "name": "/ceph-filesystem-ha-guests-1",
+            "samples": 185,
+            "peak_memory_bytes": 11961151488,
+            "configuration": {
+              "image_id": "sha256:a627aa2a7f3af5d8dc824941a46d287c24f230fb788ea685981a506f21ae3433",
+              "image_reference": "ceph-filesystem-ha-guests:21.2.0",
+              "memory_limit_bytes": 17179869184,
+              "nano_cpus": 8000000000,
+              "started_at": "2026-11-28T04:52:07.164615546Z"
+            },
+            "counter_deltas": {
+              "cpu_core_s": 506.3363969999996,
+              "network_rx_bytes": 529621072,
+              "network_tx_bytes": 529621072,
+              "disk_read_bytes": 124513280,
+              "disk_write_bytes": 922734592
+            },
+            "cpu_utilization_pct_one_core_min": 133.95732532141457,
+            "cpu_utilization_pct_one_core_max": 585.2051874954848,
+            "observed_s": 186.58568716049194,
+            "sampled_mean_memory_bytes": 11600473514.205406,
+            "cpu_utilization_pct_one_core_average": 271.3693663782869
+          },
+          {
+            "name": "/ceph-filesystem-ha-control-run-7b9cdf157f10",
+            "samples": 20,
+            "peak_memory_bytes": 11993088,
+            "configuration": {
+              "image_id": "sha256:a627aa2a7f3af5d8dc824941a46d287c24f230fb788ea685981a506f21ae3433",
+              "image_reference": "ceph-filesystem-ha-guests:21.2.0",
+              "memory_limit_bytes": 536870912,
+              "nano_cpus": 1000000000,
+              "started_at": "2026-11-28T05:06:06.802790879Z"
+            },
+            "counter_deltas": {
+              "cpu_core_s": 0.088065,
+              "network_rx_bytes": 5955174,
+              "network_tx_bytes": 5955174
+            },
+            "cpu_utilization_pct_one_core_min": 0.0,
+            "cpu_utilization_pct_one_core_max": 3.3567853230591744,
+            "observed_s": 19.253916025161743,
+            "sampled_mean_memory_bytes": 11350016.0,
+            "cpu_utilization_pct_one_core_average": 0.4573874732024038
+          },
+          {
+            "name": "/ceph-filesystem-ha-control-run-a9028fa49e2f",
+            "samples": 3,
+            "peak_memory_bytes": 6934528,
+            "configuration": {
+              "image_id": "sha256:a627aa2a7f3af5d8dc824941a46d287c24f230fb788ea685981a506f21ae3433",
+              "image_reference": "ceph-filesystem-ha-guests:21.2.0",
+              "memory_limit_bytes": 536870912,
+              "nano_cpus": 1000000000,
+              "started_at": "2026-11-28T05:06:27.736951264Z"
+            },
+            "counter_deltas": {
+              "cpu_core_s": 0.028179999999999997,
+              "network_rx_bytes": 895744,
+              "network_tx_bytes": 895744
+            },
+            "cpu_utilization_pct_one_core_min": 0.0,
+            "cpu_utilization_pct_one_core_max": 2.789780956539595,
+            "observed_s": 2.0233330726623535,
+            "sampled_mean_memory_bytes": 6916778.666666667,
+            "cpu_utilization_pct_one_core_average": 1.392751415016413
+          },
+          {
+            "name": "/ceph-filesystem-ha-control-run-20b12205166f",
+            "samples": 8,
+            "peak_memory_bytes": 18395136,
+            "configuration": {
+              "image_id": "sha256:a627aa2a7f3af5d8dc824941a46d287c24f230fb788ea685981a506f21ae3433",
+              "image_reference": "ceph-filesystem-ha-guests:21.2.0",
+              "memory_limit_bytes": 536870912,
+              "nano_cpus": 1000000000,
+              "started_at": "2026-11-28T05:06:31.131178543Z"
+            },
+            "counter_deltas": {
+              "cpu_core_s": 0.046134999999999995,
+              "network_rx_bytes": 28043529,
+              "network_tx_bytes": 28043529
+            },
+            "cpu_utilization_pct_one_core_min": 0.09728789161376916,
+            "cpu_utilization_pct_one_core_max": 2.348568669566721,
+            "observed_s": 7.104363918304443,
+            "sampled_mean_memory_bytes": 16980480.0,
+            "cpu_utilization_pct_one_core_average": 0.6493895939245573
+          },
+          {
+            "name": "/ceph-filesystem-ha-control-run-5763e300e119",
+            "samples": 26,
+            "peak_memory_bytes": 52248576,
+            "configuration": {
+              "image_id": "sha256:a627aa2a7f3af5d8dc824941a46d287c24f230fb788ea685981a506f21ae3433",
+              "image_reference": "ceph-filesystem-ha-guests:21.2.0",
+              "memory_limit_bytes": 536870912,
+              "nano_cpus": 1000000000,
+              "started_at": "2026-11-28T05:06:40.050956505Z"
+            },
+            "counter_deltas": {
+              "cpu_core_s": 0.23903,
+              "network_rx_bytes": 138840105,
+              "network_tx_bytes": 138840105
+            },
+            "cpu_utilization_pct_one_core_min": 0.21718645350704657,
+            "cpu_utilization_pct_one_core_max": 7.439372560679178,
+            "observed_s": 25.355549812316895,
+            "sampled_mean_memory_bytes": 47235859.692307696,
+            "cpu_utilization_pct_one_core_average": 0.9427127463979781
+          },
+          {
+            "name": "/ceph-filesystem-ha-control-run-0ff7076f0df8",
+            "samples": 39,
+            "peak_memory_bytes": 79220736,
+            "configuration": {
+              "image_id": "sha256:a627aa2a7f3af5d8dc824941a46d287c24f230fb788ea685981a506f21ae3433",
+              "image_reference": "ceph-filesystem-ha-guests:21.2.0",
+              "memory_limit_bytes": 536870912,
+              "nano_cpus": 1000000000,
+              "started_at": "2026-11-28T05:07:06.084106837Z"
+            },
+            "counter_deltas": {
+              "cpu_core_s": 0.305658,
+              "network_rx_bytes": 225430441,
+              "network_tx_bytes": 225430441
+            },
+            "cpu_utilization_pct_one_core_min": 0.1839140516179997,
+            "cpu_utilization_pct_one_core_max": 8.43446549858043,
+            "observed_s": 38.543235063552856,
+            "sampled_mean_memory_bytes": 74393652.51282051,
+            "cpu_utilization_pct_one_core_average": 0.7930263235455174
+          },
+          {
+            "name": "/ceph-filesystem-ha-control-run-f73c97553dee",
+            "samples": 5,
+            "peak_memory_bytes": 6938624,
+            "configuration": {
+              "image_id": "sha256:a627aa2a7f3af5d8dc824941a46d287c24f230fb788ea685981a506f21ae3433",
+              "image_reference": "ceph-filesystem-ha-guests:21.2.0",
+              "memory_limit_bytes": 536870912,
+              "nano_cpus": 1000000000,
+              "started_at": "2026-11-28T05:07:45.571399175Z"
+            },
+            "counter_deltas": {
+              "cpu_core_s": 0.0002679999999999974,
+              "network_rx_bytes": 1229081,
+              "network_tx_bytes": 1229081
+            },
+            "cpu_utilization_pct_one_core_min": 0.0,
+            "cpu_utilization_pct_one_core_max": 0.02648448866719371,
+            "observed_s": 4.048704147338867,
+            "sampled_mean_memory_bytes": 6759219.2,
+            "cpu_utilization_pct_one_core_average": 0.006619401918417489
+          },
+          {
+            "name": "/ceph-filesystem-ha-control-run-bdc34fc24eaf",
+            "samples": 6,
+            "peak_memory_bytes": 10223616,
+            "configuration": {
+              "image_id": "sha256:a627aa2a7f3af5d8dc824941a46d287c24f230fb788ea685981a506f21ae3433",
+              "image_reference": "ceph-filesystem-ha-guests:21.2.0",
+              "memory_limit_bytes": 536870912,
+              "nano_cpus": 1000000000,
+              "started_at": "2026-11-28T05:07:51.866303969Z"
+            },
+            "counter_deltas": {
+              "cpu_core_s": 0.067028,
+              "network_rx_bytes": 7031784,
+              "network_tx_bytes": 7031784
+            },
+            "cpu_utilization_pct_one_core_min": 0.07453545845653736,
+            "cpu_utilization_pct_one_core_max": 4.056229975010644,
+            "observed_s": 5.075362920761108,
+            "sampled_mean_memory_bytes": 9131349.333333334,
+            "cpu_utilization_pct_one_core_average": 1.32065432652742
+          },
+          {
+            "name": "/ceph-filesystem-ha-control-run-5d094906b138",
+            "samples": 1,
+            "peak_memory_bytes": 8421376,
+            "configuration": {
+              "image_id": "sha256:a627aa2a7f3af5d8dc824941a46d287c24f230fb788ea685981a506f21ae3433",
+              "image_reference": "ceph-filesystem-ha-guests:21.2.0",
+              "memory_limit_bytes": 536870912,
+              "nano_cpus": 1000000000,
+              "started_at": "2026-11-28T05:07:57.793006Z"
+            },
+            "observed_s": 0.0,
+            "sampled_mean_memory_bytes": 8421376.0,
+            "counter_deltas": {}
+          },
+          {
+            "name": "/ceph-filesystem-ha-control-run-1b25f74f10c6",
+            "samples": 10,
+            "peak_memory_bytes": 10280960,
+            "configuration": {
+              "image_id": "sha256:a627aa2a7f3af5d8dc824941a46d287c24f230fb788ea685981a506f21ae3433",
+              "image_reference": "ceph-filesystem-ha-guests:21.2.0",
+              "memory_limit_bytes": 536870912,
+              "nano_cpus": 1000000000,
+              "started_at": "2026-11-28T05:07:58.675799958Z"
+            },
+            "counter_deltas": {
+              "cpu_core_s": 0.08989700000000002,
+              "network_rx_bytes": 34015076,
+              "network_tx_bytes": 34015076
+            },
+            "cpu_utilization_pct_one_core_min": 0.28522078617582847,
+            "cpu_utilization_pct_one_core_max": 4.1431536265005935,
+            "observed_s": 9.117223978042603,
+            "sampled_mean_memory_bytes": 10024550.4,
+            "cpu_utilization_pct_one_core_average": 0.986012850144987
+          },
+          {
+            "name": "/ceph-filesystem-ha-control-run-dfc087dce19c",
+            "samples": 2,
+            "peak_memory_bytes": 8400896,
+            "configuration": {
+              "image_id": "sha256:a627aa2a7f3af5d8dc824941a46d287c24f230fb788ea685981a506f21ae3433",
+              "image_reference": "ceph-filesystem-ha-guests:21.2.0",
+              "memory_limit_bytes": 536870912,
+              "nano_cpus": 1000000000,
+              "started_at": "2026-11-28T05:08:09.41915613Z"
+            },
+            "counter_deltas": {
+              "cpu_core_s": 0.0006239999999999996,
+              "network_rx_bytes": 280734,
+              "network_tx_bytes": 280734
+            },
+            "cpu_utilization_pct_one_core_min": 0.06156614307033073,
+            "cpu_utilization_pct_one_core_max": 0.06156614307033073,
+            "observed_s": 1.0135440826416016,
+            "sampled_mean_memory_bytes": 8400896.0,
+            "cpu_utilization_pct_one_core_average": 0.06156614307033073
+          },
+          {
+            "name": "/ceph-filesystem-ha-control-run-bcc6e6b9de95",
+            "samples": 16,
+            "peak_memory_bytes": 10928128,
+            "configuration": {
+              "image_id": "sha256:a627aa2a7f3af5d8dc824941a46d287c24f230fb788ea685981a506f21ae3433",
+              "image_reference": "ceph-filesystem-ha-guests:21.2.0",
+              "memory_limit_bytes": 536870912,
+              "nano_cpus": 1000000000,
+              "started_at": "2026-11-28T05:08:12.092869131Z"
+            },
+            "counter_deltas": {
+              "cpu_core_s": 0.13321,
+              "network_rx_bytes": 61603140,
+              "network_tx_bytes": 61603230
+            },
+            "cpu_utilization_pct_one_core_min": 0.15721348190477444,
+            "cpu_utilization_pct_one_core_max": 4.482064869118121,
+            "observed_s": 15.21016001701355,
+            "sampled_mean_memory_bytes": 10390016.0,
+            "cpu_utilization_pct_one_core_average": 0.8757961773643143
+          },
+          {
+            "name": "/ceph-filesystem-ha-control-run-3e7b1f07c8a4",
+            "samples": 5,
+            "peak_memory_bytes": 6942720,
+            "configuration": {
+              "image_id": "sha256:a627aa2a7f3af5d8dc824941a46d287c24f230fb788ea685981a506f21ae3433",
+              "image_reference": "ceph-filesystem-ha-guests:21.2.0",
+              "memory_limit_bytes": 536870912,
+              "nano_cpus": 1000000000,
+              "started_at": "2026-11-28T05:08:27.850124291Z"
+            },
+            "counter_deltas": {
+              "cpu_core_s": 0.00026400000000000035,
+              "network_rx_bytes": 1109456,
+              "network_tx_bytes": 1109456
+            },
+            "cpu_utilization_pct_one_core_min": 0.0,
+            "cpu_utilization_pct_one_core_max": 0.026018179562466433,
+            "observed_s": 4.055801153182983,
+            "sampled_mean_memory_bytes": 6820659.2,
+            "cpu_utilization_pct_one_core_average": 0.006509194855196827
+          },
+          {
+            "name": "/ceph-filesystem-ha-control-run-f1349859046d",
+            "samples": 3,
+            "peak_memory_bytes": 6963200,
+            "configuration": {
+              "image_id": "sha256:a627aa2a7f3af5d8dc824941a46d287c24f230fb788ea685981a506f21ae3433",
+              "image_reference": "ceph-filesystem-ha-guests:21.2.0",
+              "memory_limit_bytes": 536870912,
+              "nano_cpus": 1000000000,
+              "started_at": "2026-11-28T05:08:33.00182196Z"
+            },
+            "counter_deltas": {
+              "cpu_core_s": 0.0,
+              "network_rx_bytes": 488854,
+              "network_tx_bytes": 488854
+            },
+            "cpu_utilization_pct_one_core_min": 0.0,
+            "cpu_utilization_pct_one_core_max": 0.0,
+            "observed_s": 2.0266220569610596,
+            "sampled_mean_memory_bytes": 6963200.0,
+            "cpu_utilization_pct_one_core_average": 0.0
+          },
+          {
+            "name": "/ceph-filesystem-ha-control-run-f57fd666ea21",
+            "samples": 3,
+            "peak_memory_bytes": 6955008,
+            "configuration": {
+              "image_id": "sha256:a627aa2a7f3af5d8dc824941a46d287c24f230fb788ea685981a506f21ae3433",
+              "image_reference": "ceph-filesystem-ha-guests:21.2.0",
+              "memory_limit_bytes": 536870912,
+              "nano_cpus": 1000000000,
+              "started_at": "2026-11-28T05:08:36.032693503Z"
+            },
+            "counter_deltas": {
+              "cpu_core_s": 0.0,
+              "network_rx_bytes": 453251,
+              "network_tx_bytes": 453251
+            },
+            "cpu_utilization_pct_one_core_min": 0.0,
+            "cpu_utilization_pct_one_core_max": 0.0,
+            "observed_s": 2.030499219894409,
+            "sampled_mean_memory_bytes": 6955008.0,
+            "cpu_utilization_pct_one_core_average": 0.0
+          },
+          {
+            "name": "/ceph-filesystem-ha-control-run-0d60341586c9",
+            "samples": 3,
+            "peak_memory_bytes": 7008256,
+            "configuration": {
+              "image_id": "sha256:a627aa2a7f3af5d8dc824941a46d287c24f230fb788ea685981a506f21ae3433",
+              "image_reference": "ceph-filesystem-ha-guests:21.2.0",
+              "memory_limit_bytes": 536870912,
+              "nano_cpus": 1000000000,
+              "started_at": "2026-11-28T05:08:39.140885505Z"
+            },
+            "counter_deltas": {
+              "cpu_core_s": 0.00031799999999999884,
+              "network_rx_bytes": 728044,
+              "network_tx_bytes": 728044
+            },
+            "cpu_utilization_pct_one_core_min": 0.0,
+            "cpu_utilization_pct_one_core_max": 0.03135216889602418,
+            "observed_s": 2.0253520011901855,
+            "sampled_mean_memory_bytes": 6963200.0,
+            "cpu_utilization_pct_one_core_average": 0.015700974438671803
+          },
+          {
+            "name": "/ceph-filesystem-ha-control-run-7dc570433f99",
+            "samples": 3,
+            "peak_memory_bytes": 7225344,
+            "configuration": {
+              "image_id": "sha256:a627aa2a7f3af5d8dc824941a46d287c24f230fb788ea685981a506f21ae3433",
+              "image_reference": "ceph-filesystem-ha-guests:21.2.0",
+              "memory_limit_bytes": 536870912,
+              "nano_cpus": 1000000000,
+              "started_at": "2026-11-28T05:08:42.008001465Z"
+            },
+            "counter_deltas": {
+              "cpu_core_s": 0.0009230000000000002,
+              "network_rx_bytes": 535835,
+              "network_tx_bytes": 535835
+            },
+            "cpu_utilization_pct_one_core_min": 0.0,
+            "cpu_utilization_pct_one_core_max": 0.09088198411783613,
+            "observed_s": 2.0295329093933105,
+            "sampled_mean_memory_bytes": 7110656.0,
+            "cpu_utilization_pct_one_core_average": 0.04547844460802132
+          },
+          {
+            "name": "/ceph-filesystem-ha-control-run-699c00be0791",
+            "samples": 3,
+            "peak_memory_bytes": 6942720,
+            "configuration": {
+              "image_id": "sha256:a627aa2a7f3af5d8dc824941a46d287c24f230fb788ea685981a506f21ae3433",
+              "image_reference": "ceph-filesystem-ha-guests:21.2.0",
+              "memory_limit_bytes": 536870912,
+              "nano_cpus": 1000000000,
+              "started_at": "2026-11-28T05:08:45.096104966Z"
+            },
+            "counter_deltas": {
+              "cpu_core_s": 0.0,
+              "network_rx_bytes": 523610,
+              "network_tx_bytes": 523610
+            },
+            "cpu_utilization_pct_one_core_min": 0.0,
+            "cpu_utilization_pct_one_core_max": 0.0,
+            "observed_s": 2.034615993499756,
+            "sampled_mean_memory_bytes": 6942720.0,
+            "cpu_utilization_pct_one_core_average": 0.0
+          },
+          {
+            "name": "/ceph-filesystem-ha-control-run-bf8a796b5e7c",
+            "samples": 25,
+            "peak_memory_bytes": 11776000,
+            "configuration": {
+              "image_id": "sha256:a627aa2a7f3af5d8dc824941a46d287c24f230fb788ea685981a506f21ae3433",
+              "image_reference": "ceph-filesystem-ha-guests:21.2.0",
+              "memory_limit_bytes": 536870912,
+              "nano_cpus": 1000000000,
+              "started_at": "2026-11-28T05:08:48.555944593Z"
+            },
+            "counter_deltas": {
+              "cpu_core_s": 0.08976,
+              "network_rx_bytes": 6972138,
+              "network_tx_bytes": 6972138
+            },
+            "cpu_utilization_pct_one_core_min": 0.0,
+            "cpu_utilization_pct_one_core_max": 3.4455813260426806,
+            "observed_s": 24.3239688873291,
+            "sampled_mean_memory_bytes": 11003822.08,
+            "cpu_utilization_pct_one_core_average": 0.3690187255861768
+          }
+        ],
+        "limits": [
+          "Sample-window deltas exclude startup and exit outside observation. Decreasing counters are treated as restarts and the new counter is accumulated; reset intervals have no CPU utilization estimate.",
+          "Short-lived actors may be missed; use native pre-exit cgroup counters as well.",
+          "CPU utilization is interval-average percent of one core; short spikes may be missed.",
+          "Docker disk bytes are not device I/O latency; absent counters are unavailable, not zero."
+        ]
+      },
+      "guest_disk_io": {
+        "0": {
+          "boot_id": "d7401b72-5651-4405-952f-869aef4d6ade",
+          "same_boot": true,
+          "whole_device_deltas": {
+            "vda": {
+              "read_ios": 3,
+              "write_ios": 2096,
+              "read_bytes": 12288,
+              "write_bytes": 18530304,
+              "device_io_ms": 1611
+            },
+            "vdb": {
+              "read_ios": 0,
+              "write_ios": 0,
+              "read_bytes": 0,
+              "write_bytes": 0,
+              "device_io_ms": 0
+            },
+            "vdc": {
+              "read_ios": 0,
+              "write_ios": 0,
+              "read_bytes": 0,
+              "write_bytes": 0,
+              "device_io_ms": 0
+            },
+            "sdc": {
+              "read_ios": 0,
+              "write_ios": 2290,
+              "read_bytes": 0,
+              "write_bytes": 33366016,
+              "device_io_ms": 1879
+            },
+            "sda": {
+              "read_ios": 1,
+              "write_ios": 3710,
+              "read_bytes": 4096,
+              "write_bytes": 46161920,
+              "device_io_ms": 2622
+            },
+            "sdb": {
+              "read_ios": 226,
+              "write_ios": 6480,
+              "read_bytes": 14811136,
+              "write_bytes": 88408064,
+              "device_io_ms": 4895
+            }
+          }
+        },
+        "1": {
+          "boot_id": "e13dff2b-2045-4985-8536-87627531e1dc",
+          "same_boot": true,
+          "whole_device_deltas": {
+            "vda": {
+              "read_ios": 51,
+              "write_ios": 2545,
+              "read_bytes": 5263360,
+              "write_bytes": 265207808,
+              "device_io_ms": 1854
+            },
+            "vdb": {
+              "read_ios": 0,
+              "write_ios": 0,
+              "read_bytes": 0,
+              "write_bytes": 0,
+              "device_io_ms": 0
+            },
+            "vdc": {
+              "read_ios": 0,
+              "write_ios": 0,
+              "read_bytes": 0,
+              "write_bytes": 0,
+              "device_io_ms": 0
+            },
+            "sda": {
+              "read_ios": 410,
+              "write_ios": 5566,
+              "read_bytes": 26808320,
+              "write_bytes": 78249984,
+              "device_io_ms": 4538
+            },
+            "sdb": {
+              "read_ios": 456,
+              "write_ios": 5512,
+              "read_bytes": 29884416,
+              "write_bytes": 71827456,
+              "device_io_ms": 4560
+            },
+            "sdc": {
+              "read_ios": 239,
+              "write_ios": 1164,
+              "read_bytes": 15663104,
+              "write_bytes": 17420288,
+              "device_io_ms": 1160
+            }
+          }
+        },
+        "2": {
+          "boot_id": "adb34271-1653-4b71-8ef3-790683b6dd2a",
+          "same_boot": true,
+          "whole_device_deltas": {
+            "vda": {
+              "read_ios": 60,
+              "write_ios": 2115,
+              "read_bytes": 6230016,
+              "write_bytes": 20652032,
+              "device_io_ms": 1698
+            },
+            "vdb": {
+              "read_ios": 0,
+              "write_ios": 0,
+              "read_bytes": 0,
+              "write_bytes": 0,
+              "device_io_ms": 0
+            },
+            "vdc": {
+              "read_ios": 0,
+              "write_ios": 0,
+              "read_bytes": 0,
+              "write_bytes": 0,
+              "device_io_ms": 0
+            },
+            "sdb": {
+              "read_ios": 233,
+              "write_ios": 6739,
+              "read_bytes": 15269888,
+              "write_bytes": 89784320,
+              "device_io_ms": 5429
+            },
+            "sda": {
+              "read_ios": 0,
+              "write_ios": 1154,
+              "read_bytes": 0,
+              "write_bytes": 16846848,
+              "device_io_ms": 920
+            },
+            "sdc": {
+              "read_ios": 226,
+              "write_ios": 4677,
+              "read_bytes": 14749696,
+              "write_bytes": 61505536,
+              "device_io_ms": 3913
+            }
+          }
+        }
+      },
+      "native_storage": {
+        "df": {
+          "stats": {
+            "total_bytes": 115926368256,
+            "total_avail_bytes": 115065544704,
+            "total_used_bytes": 860823552,
+            "total_used_raw_bytes": 860823552,
+            "total_used_raw_ratio": 0.0074256062507629395,
+            "num_osds": 9,
+            "num_per_pool_osds": 9,
+            "num_per_pool_omap_osds": 9
+          },
+          "stats_by_class": {
+            "hdd": {
+              "total_bytes": 115926368256,
+              "total_avail_bytes": 115065544704,
+              "total_used_bytes": 860823552,
+              "total_used_raw_bytes": 860823552,
+              "total_used_raw_ratio": 0.0074256062507629395
+            }
+          },
+          "pools": [
+            {
+              "name": ".mgr",
+              "id": 1,
+              "stats": {
+                "stored": 1377525,
+                "stored_data": 1377525,
+                "stored_omap": 0,
+                "objects": 2,
+                "kb_used": 4060,
+                "bytes_used": 4157440,
+                "data_bytes_used": 4157440,
+                "omap_bytes_used": 0,
+                "percent_used": 3.8161651900736615e-05,
+                "max_avail": 36312903680,
+                "quota_objects": 0,
+                "quota_bytes": 0,
+                "dirty": 0,
+                "rd": 76,
+                "rd_bytes": 65536,
+                "wr": 123,
+                "wr_bytes": 2201600,
+                "compress_bytes_used": 0,
+                "compress_under_bytes": 0,
+                "stored_raw": 4132575,
+                "avail_raw": 108938713761
+              }
+            },
+            {
+              "name": "labfs_meta",
+              "id": 2,
+              "stats": {
+                "stored": 11289216,
+                "stored_data": 11043322,
+                "stored_omap": 245894,
+                "objects": 24,
+                "kb_used": 33157,
+                "bytes_used": 33952147,
+                "data_bytes_used": 33214464,
+                "omap_bytes_used": 737683,
+                "percent_used": 0.0003115657018497586,
+                "max_avail": 36312903680,
+                "quota_objects": 0,
+                "quota_bytes": 0,
+                "dirty": 0,
+                "rd": 0,
+                "rd_bytes": 0,
+                "wr": 2065,
+                "wr_bytes": 11403264,
+                "compress_bytes_used": 0,
+                "compress_under_bytes": 0,
+                "stored_raw": 33867648,
+                "avail_raw": 108938713761
+              }
+            },
+            {
+              "name": "labfs_data",
+              "id": 3,
+              "stats": {
+                "stored": 117178368,
+                "stored_data": 117178368,
+                "stored_omap": 0,
+                "objects": 1788,
+                "kb_used": 343296,
+                "bytes_used": 351535104,
+                "data_bytes_used": 351535104,
+                "omap_bytes_used": 0,
+                "percent_used": 0.003216527635231614,
+                "max_avail": 36312903680,
+                "quota_objects": 0,
+                "quota_bytes": 0,
+                "dirty": 0,
+                "rd": 1791,
+                "rd_bytes": 117178368,
+                "wr": 1788,
+                "wr_bytes": 117178368,
+                "compress_bytes_used": 0,
+                "compress_under_bytes": 0,
+                "stored_raw": 351535104,
+                "avail_raw": 108938713761
+              }
+            }
+          ]
+        },
+        "osd_perf": {
+          "pg_ready": true,
+          "osdstats": {
+            "osd_perf_infos": [
+              {
+                "id": 0,
+                "perf_stats": {
+                  "commit_latency_ms": 0,
+                  "apply_latency_ms": 0,
+                  "commit_latency_ns": 0,
+                  "apply_latency_ns": 0
+                }
+              },
+              {
+                "id": 1,
+                "perf_stats": {
+                  "commit_latency_ms": 0,
+                  "apply_latency_ms": 0,
+                  "commit_latency_ns": 0,
+                  "apply_latency_ns": 0
+                }
+              },
+              {
+                "id": 2,
+                "perf_stats": {
+                  "commit_latency_ms": 0,
+                  "apply_latency_ms": 0,
+                  "commit_latency_ns": 0,
+                  "apply_latency_ns": 0
+                }
+              },
+              {
+                "id": 3,
+                "perf_stats": {
+                  "commit_latency_ms": 0,
+                  "apply_latency_ms": 0,
+                  "commit_latency_ns": 0,
+                  "apply_latency_ns": 0
+                }
+              },
+              {
+                "id": 4,
+                "perf_stats": {
+                  "commit_latency_ms": 0,
+                  "apply_latency_ms": 0,
+                  "commit_latency_ns": 0,
+                  "apply_latency_ns": 0
+                }
+              },
+              {
+                "id": 5,
+                "perf_stats": {
+                  "commit_latency_ms": 0,
+                  "apply_latency_ms": 0,
+                  "commit_latency_ns": 0,
+                  "apply_latency_ns": 0
+                }
+              },
+              {
+                "id": 6,
+                "perf_stats": {
+                  "commit_latency_ms": 0,
+                  "apply_latency_ms": 0,
+                  "commit_latency_ns": 0,
+                  "apply_latency_ns": 0
+                }
+              },
+              {
+                "id": 7,
+                "perf_stats": {
+                  "commit_latency_ms": 0,
+                  "apply_latency_ms": 0,
+                  "commit_latency_ns": 0,
+                  "apply_latency_ns": 0
+                }
+              },
+              {
+                "id": 8,
+                "perf_stats": {
+                  "commit_latency_ms": 0,
+                  "apply_latency_ms": 0,
+                  "commit_latency_ns": 0,
+                  "apply_latency_ns": 0
+                }
+              }
+            ]
+          }
+        },
+        "data_pool_config": {
+          "pool": "labfs_data",
+          "pool_id": 3,
+          "size": 3,
+          "min_size": 2,
+          "pg_num": 8,
+          "pgp_num": 8,
+          "crush_rule": "replicated_rule",
+          "hashpspool": true,
+          "nodelete": false,
+          "nopgchange": false,
+          "nosizechange": false,
+          "write_fadvise_dontneed": false,
+          "noscrub": false,
+          "nodeep-scrub": false,
+          "use_gmt_hitset": true,
+          "fast_read": 0,
+          "compression_mode": "none",
+          "pg_autoscale_mode": "off",
+          "eio": false,
+          "bulk": false,
+          "supports_omap": true
+        },
+        "metadata_pool_config": {
+          "pool": "labfs_meta",
+          "pool_id": 2,
+          "size": 3,
+          "min_size": 2,
+          "pg_num": 32,
+          "pgp_num": 8,
+          "crush_rule": "replicated_rule",
+          "hashpspool": true,
+          "nodelete": false,
+          "nopgchange": false,
+          "nosizechange": false,
+          "write_fadvise_dontneed": false,
+          "noscrub": false,
+          "nodeep-scrub": false,
+          "use_gmt_hitset": true,
+          "fast_read": 0,
+          "recovery_priority": 5,
+          "compression_mode": "none",
+          "pg_autoscale_mode": "off",
+          "pg_num_min": 16,
+          "pg_autoscale_bias": 4,
+          "eio": false,
+          "bulk": false,
+          "supports_omap": true
+        }
+      },
+      "qcow2_allocated_bytes": 8877289472,
+      "guest_kernels": {
+        "0": {
+          "kernel": "6.8.0-147-generic",
+          "boot_id": "d7401b72-5651-4405-952f-869aef4d6ade"
+        },
+        "1": {
+          "kernel": "6.8.0-147-generic",
+          "boot_id": "e13dff2b-2045-4985-8536-87627531e1dc"
+        },
+        "2": {
+          "kernel": "6.8.0-147-generic",
+          "boot_id": "adb34271-1653-4b71-8ef3-790683b6dd2a"
+        }
+      }
+    }
+  },
+  "limitations": [
+    "Quiescent immutable ACK cut only; no ACL/xattr/hard-link/configuration or online-snapshot backup.",
+    "Original containers and state volume were removed before creating the different destination FSID; only the rebuildable guest image was retained between runs.",
+    "Archive and virtual disks remain on one physical computer; no off-site failure-domain or physical power-loss qualification.",
+    "Native PG placement and fresh API readbacks are not independent raw-copy checksums or deep scrub.",
+    "Outer Docker CPU includes QEMU emulation; host-controller and guest-process CPU scopes cannot be added to it.",
+    "Workflow durations include verification/resource collection and exclude fresh guest provisioning; not production hardware RTO estimates.",
+    "Compression is disabled; pool compression counters and file/archive/replicated bytes remain separate.",
+    "Destination metadata pg_num read back 32 with pgp_num 8 despite bootstrap requesting eight PGs; source had 17 total PGs, destination 41. Creation-time autoscaling is suspected but not isolated. No matched-PG-layout performance comparison is claimed."
+  ],
+  "application_source_sha256": "f7edf68aaa466c779cb6d9a6bf1f8723f3ee49ba53842656b625194f259d4978"
+}

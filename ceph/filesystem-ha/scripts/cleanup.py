@@ -1,6 +1,7 @@
 """Verify/export before removal, and retire the fixture only after owned teardown."""
 
 import json
+import os
 import subprocess
 import sys
 import time
@@ -46,14 +47,14 @@ def main():
         proof = json.loads(receipt.read_text())
         if proof["fixture"] != data["id"] or proof["fsid"] != data["fsid"]:
             raise RuntimeError("Cleanup receipt differs from fixture")
+        keep_image = os.environ.get("KEEP_IMAGE", "0") == "1"
         removal = lab.command(
             "--profile",
             "tools",
             "down",
             "--volumes",
             "--remove-orphans",
-            "--rmi",
-            "local",
+            *([] if keep_image else ["--rmi", "local"]),
         )
         (
             lab.ROOT / "results" / ("docker-removal-" + str(time.time_ns()) + ".log")
@@ -75,9 +76,9 @@ def main():
             )
         image = "ceph-filesystem-ha-guests:21.2.0"
         listing = ["docker", "image", "ls", "--filter", "reference=" + image, "--quiet"]
-        if subprocess.check_output(listing, text=True).strip():
+        if not keep_image and subprocess.check_output(listing, text=True).strip():
             subprocess.run(["docker", "image", "rm", image], check=True)
-        if subprocess.check_output(listing, text=True).strip():
+        if not keep_image and subprocess.check_output(listing, text=True).strip():
             raise RuntimeError("Owned build tag remains")
         index = lab.ROOT / "results/fixture.json"
         for name in ("fixture", "environment"):
@@ -89,7 +90,12 @@ def main():
         index.rename(lab.ROOT / "results" / ("retired-fixture-" + data["id"] + ".json"))
         checks.save(
             lab.ROOT / "results" / ("destroyed-" + data["id"] + ".json"),
-            {"fixture": data["id"], "containers_absent": True, "volume_absent": True},
+            {
+                "fixture": data["id"],
+                "containers_absent": True,
+                "volume_absent": True,
+                "image_retained_for_restore": keep_image,
+            },
         )
     else:
         raise ValueError(mode)

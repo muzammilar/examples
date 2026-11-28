@@ -1,0 +1,378 @@
+{
+  "classification": "correctness/recovery diagnostic; no comparative performance qualification",
+  "execution_status": {
+    "passed": true,
+    "fault": "disk",
+    "witness_preserved": true
+  },
+  "case": "results/disk-failure-1795840888169205000",
+  "result": {
+    "histories": [
+      {
+        "attempts": 128,
+        "acks": 128,
+        "ambiguous_or_incomplete": 0,
+        "acknowledged_bytes": 8388608
+      },
+      {
+        "attempts": 628,
+        "acks": 628,
+        "ambiguous_or_incomplete": 0,
+        "acknowledged_bytes": 41156608
+      },
+      {
+        "attempts": 1032,
+        "acks": 1032,
+        "ambiguous_or_incomplete": 0,
+        "acknowledged_bytes": 67633152
+      }
+    ],
+    "total_acks": 1788,
+    "acknowledged_bytes": 117178368,
+    "osds_up_in": 9,
+    "all_pgs_active_clean": true,
+    "pgs_on_three_hosts": 17,
+    "monitor_quorum": 3,
+    "fault": "disk",
+    "baseline_progress": [
+      14,
+      24
+    ],
+    "held_fault_progress": [
+      14,
+      30
+    ],
+    "after_progress": [
+      29,
+      39
+    ],
+    "native_recovery_s": 75.52771612499782,
+    "recovery_and_verification_s": 154.14202737499727,
+    "elapsed_s": 175.46341116599797,
+    "input_reloaded": false
+  },
+  "writer": {
+    "operations": 628,
+    "successes": 628,
+    "payload_sizes_bytes": [
+      65536
+    ],
+    "successful_payload_bytes": 41156608,
+    "errors_or_ambiguous": 0,
+    "max_success_completion_gap_ms": 4485,
+    "phases": {
+      "startup": {
+        "operations": 33,
+        "latency_ms_nearest_rank": {
+          "p50": 59.84718,
+          "p95": 191.5572,
+          "p99": 201.959009,
+          "max": 201.959009
+        }
+      },
+      "after": {
+        "operations": 49,
+        "latency_ms_nearest_rank": {
+          "p50": 58.911805,
+          "p95": 98.383384,
+          "p99": 425.587414,
+          "max": 425.587414
+        }
+      },
+      "degraded": {
+        "operations": 453,
+        "latency_ms_nearest_rank": {
+          "p50": 50.607458,
+          "p95": 79.616711,
+          "p99": 145.296545,
+          "max": 4375.622435
+        }
+      },
+      "injection": {
+        "operations": 93,
+        "latency_ms_nearest_rank": {
+          "p50": 52.547131,
+          "p95": 80.826198,
+          "p99": 2200.040302,
+          "max": 2200.040302
+        }
+      }
+    },
+    "native_unit": {
+      "MainPID": "0",
+      "ExecMainCode": "1",
+      "ExecMainStatus": "0",
+      "MemoryPeak": "58650624",
+      "CPUUsageNSec": "13978876000",
+      "IOReadBytes": "0",
+      "IOWriteBytes": "5689344",
+      "ActiveState": "active",
+      "SubState": "exited"
+    }
+  },
+  "reader": {
+    "operations": 1099,
+    "successes": 1099,
+    "payload_sizes_bytes": [],
+    "successful_payload_bytes": 0,
+    "errors_or_ambiguous": 0,
+    "max_success_completion_gap_ms": 151,
+    "phases": {
+      "startup": {
+        "operations": 43,
+        "latency_ms_nearest_rank": {
+          "p50": 16.884826,
+          "p95": 33.124991,
+          "p99": 67.72791,
+          "max": 67.72791
+        }
+      },
+      "after": {
+        "operations": 104,
+        "latency_ms_nearest_rank": {
+          "p50": 2.410281,
+          "p95": 6.560065,
+          "p99": 7.844937,
+          "max": 16.618858
+        }
+      },
+      "degraded": {
+        "operations": 797,
+        "latency_ms_nearest_rank": {
+          "p50": 2.303468,
+          "p95": 4.135599,
+          "p99": 6.019266,
+          "max": 16.202868
+        }
+      },
+      "injection": {
+        "operations": 155,
+        "latency_ms_nearest_rank": {
+          "p50": 12.770506,
+          "p95": 21.875964,
+          "p99": 24.131706,
+          "max": 28.958015
+        }
+      }
+    },
+    "native_unit": {
+      "MainPID": "0",
+      "ExecMainCode": "1",
+      "ExecMainStatus": "0",
+      "MemoryPeak": "19910656",
+      "CPUUsageNSec": "7190795000",
+      "IOReadBytes": "0",
+      "IOWriteBytes": "454656",
+      "ActiveState": "active",
+      "SubState": "exited"
+    }
+  },
+  "environment": {
+    "NCPU": 11,
+    "MemTotal": 26216296448,
+    "KernelVersion": "6.12.76-linuxkit",
+    "OperatingSystem": "Docker Desktop",
+    "Driver": "overlayfs",
+    "ServerVersion": "29.5.3",
+    "docker_api": "1.54"
+  },
+  "docker_observation": {
+    "path": "results/resources-1795840883309100000.jsonl",
+    "counter_deltas": {
+      "cpu_core_s": 682.4441260000001,
+      "network_rx_bytes": 522728850,
+      "network_tx_bytes": 522728850,
+      "disk_read_bytes": 294369792,
+      "disk_write_bytes": 1089797120
+    },
+    "sampled_aggregate_memory_peak_bytes": 10447011840,
+    "guest_vm_actor": [
+      {
+        "name": "/ceph-filesystem-ha-guests-1",
+        "samples": 283,
+        "peak_memory_bytes": 10440077312,
+        "configuration": {
+          "image_id": "sha256:a627aa2a7f3af5d8dc824941a46d287c24f230fb788ea685981a506f21ae3433",
+          "image_reference": "ceph-filesystem-ha-guests:21.2.0",
+          "memory_limit_bytes": 17179869184,
+          "nano_cpus": 8000000000,
+          "started_at": "2026-11-28T04:18:56.402070097Z"
+        },
+        "counter_deltas": {
+          "cpu_core_s": 681.40762,
+          "network_rx_bytes": 522728850,
+          "network_tx_bytes": 522728850,
+          "disk_read_bytes": 294369792,
+          "disk_write_bytes": 1089797120
+        },
+        "cpu_utilization_pct_one_core_min": 120.33939137845248,
+        "cpu_utilization_pct_one_core_max": 663.2738987333488,
+        "observed_s": 285.98032903671265,
+        "sampled_mean_memory_bytes": 10246399775.660778,
+        "cpu_utilization_pct_one_core_average": 238.27080075585351
+      }
+    ]
+  },
+  "storage": {
+    "guest_scsi_lifetime": {
+      "read_ios": 23842,
+      "write_ios": 91697,
+      "read_bytes": 952958976,
+      "write_bytes": 4709849600,
+      "device_io_ms": 71922
+    },
+    "native_snapshot": "results/disk-failure-1795840888169205000/resources-after.json",
+    "guest_boot_ids": {
+      "0": "0843f9b8-6500-4469-a7fa-88cb7b37bf00",
+      "1": "9f132fcf-a0e6-41f5-8e7d-e9b0e737b5b0",
+      "2": "adbe6626-d91f-458b-8d70-d5aa66130837"
+    },
+    "ceph_raw_used_bytes": 960831488,
+    "file_data": {
+      "stored": 117178368,
+      "stored_data": 117178368,
+      "stored_omap": 0,
+      "objects": 1788,
+      "kb_used": 343296,
+      "bytes_used": 351535104,
+      "data_bytes_used": 351535104,
+      "omap_bytes_used": 0,
+      "percent_used": 0.00321531412191689,
+      "max_avail": 36326653952,
+      "quota_objects": 0,
+      "quota_bytes": 0,
+      "dirty": 0,
+      "rd": 4724,
+      "rd_bytes": 305725440,
+      "wr": 1788,
+      "wr_bytes": 117178368,
+      "compress_bytes_used": 0,
+      "compress_under_bytes": 0,
+      "stored_raw": 351535104,
+      "avail_raw": 108979964577
+    },
+    "metadata": {
+      "stored": 18519893,
+      "stored_data": 18260914,
+      "stored_omap": 258979,
+      "objects": 26,
+      "kb_used": 54339,
+      "bytes_used": 55642858,
+      "data_bytes_used": 54865920,
+      "omap_bytes_used": 776938,
+      "percent_used": 0.0005103182629682124,
+      "max_avail": 36326653952,
+      "quota_objects": 0,
+      "quota_bytes": 0,
+      "dirty": 0,
+      "rd": 79,
+      "rd_bytes": 1750016,
+      "wr": 4486,
+      "wr_bytes": 20462592,
+      "compress_bytes_used": 0,
+      "compress_under_bytes": 0,
+      "stored_raw": 55559676,
+      "avail_raw": 108979964577
+    },
+    "qcow2_apparent_bytes": 9424470400,
+    "qcow2_allocated_bytes": 9423892480,
+    "codec": "none",
+    "compression_ratio": null,
+    "compression_note": "Both CephFS pool compression counters are reported; no compressed counterpart or compression CPU comparison was run."
+  },
+  "limits": [
+    "Sample-window deltas exclude startup and exit outside observation. Decreasing counters are treated as restarts and the new counter is accumulated; reset intervals have no CPU utilization estimate.",
+    "Short-lived actors may be missed; use native pre-exit cgroup counters as well.",
+    "CPU utilization is interval-average percent of one core; short spikes may be missed.",
+    "Docker disk bytes are not device I/O latency; absent counters are unavailable, not zero.",
+    "Docker CPU includes QEMU TCG emulation and guests; native unit CPU is inside guest kernels. These scopes cannot be added.",
+    "Native storage counters are cumulative at the identified snapshot, not fault-only deltas.",
+    "Guest SCSI counters include all owned whole SCSI disks, including unused spares and provisioning; OS root disks and device-mapper duplicates are excluded. Per-daemon io.stat is unavailable because IOAccounting was not enabled for those native daemon units.",
+    "Historical immutable files are read during the fault; new live ACKs are reconciled by fresh clients afterwards.",
+    "Sampling misses very short controls, builder work and sub-second peaks; physical disk latency is unavailable.",
+    "Native PG placement proves the declared three-host layout, not independent raw replica hashes or a completed deep scrub.",
+    "Completion gaps include the intentional 100 ms think time and controller polling. Percentiles are diagnostic samples, not steady-state benchmark estimates."
+  ],
+  "evidence_sha256": {
+    "results/disk-failure-1795840888169205000/result.json": "ac601b88355f767e701e6fcb9cfb1c493afebf22c529da79fed5f2cec8f06ac1",
+    "results/disk-failure-1795840888169205000/injection.json": "2deee673ca2e95290595506e5571528c98a3012224f2fc1436ef30ea4086057f",
+    "results/disk-failure-1795840888169205000/writer.log": "bc9e96dda8b2a045ead2c3db921ac8e7cad9b47120cfd1861a14edb0d0f6c37b",
+    "results/disk-failure-1795840888169205000/reader.log": "16eea7ee9beab332947a5737f41b3cbbd2607af19782dddd57d572e3e03861ec",
+    "results/resources-1795840883309100000.jsonl": "60cb8674ca47e0ca2676258fd979b516315fd93bec2092ad2a0eef1c35ef15ed",
+    "results/disk-failure-1795840888169205000/resources-after.json": "8fd39cd2e237622937d3c5e1b4cbc6352caec7ef1d1b8a4563707119846f8d04"
+  },
+  "application_source_sha256": "f7edf68aaa466c779cb6d9a6bf1f8723f3ee49ba53842656b625194f259d4978",
+  "native_replacement": {
+    "fsid": "b7aa5cc6-baae-47ea-bec1-9dbb26a4db12",
+    "osd": 0,
+    "osd_fsid": "1cc1cace-bcfd-460b-9ea8-e984d138f4d8",
+    "new_osd_fsid": "d0c4e769-f8f3-4521-b348-1a225b24e085",
+    "disk": 0,
+    "spare": 3,
+    "affected_nonempty_pgs": [
+      {
+        "pgid": "3.0",
+        "state": "active+clean",
+        "acting": [
+          1,
+          2,
+          0
+        ],
+        "objects": 161
+      },
+      {
+        "pgid": "3.3",
+        "state": "active+clean",
+        "acting": [
+          4,
+          0,
+          1
+        ],
+        "objects": 169
+      },
+      {
+        "pgid": "2.5",
+        "state": "active+clean",
+        "acting": [
+          7,
+          0,
+          4
+        ],
+        "objects": 4
+      },
+      {
+        "pgid": "3.6",
+        "state": "active+clean",
+        "acting": [
+          0,
+          4,
+          7
+        ],
+        "objects": 157
+      }
+    ],
+    "plan_sha256": "c8a60e8fc32874d9265749f2bae702dc27b1c517fb5100b1e268bc183408e542"
+  },
+  "observed_member_loss": {
+    "elapsed_s": 15.790301000000909,
+    "osdmap": {
+      "epoch": 64,
+      "num_osds": 9,
+      "num_up_osds": 8,
+      "osd_up_since": 1795840979,
+      "num_in_osds": 9,
+      "osd_in_since": 1795840230,
+      "num_remapped_pgs": 0
+    },
+    "pg_states": [
+      {
+        "state_name": "active+clean",
+        "count": 16
+      },
+      {
+        "state_name": "stale+active+clean",
+        "count": 1
+      }
+    ]
+  }
+}

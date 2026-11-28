@@ -1,0 +1,413 @@
+{
+  "classification": "correctness/recovery diagnostic; no comparative performance qualification",
+  "execution_status": {
+    "passed": true,
+    "fault": "process",
+    "witness_preserved": true
+  },
+  "case": "results/process-failure-1795840433906362000",
+  "result": {
+    "histories": [
+      {
+        "attempts": 128,
+        "acks": 128,
+        "ambiguous_or_incomplete": 0,
+        "acknowledged_bytes": 8388608
+      },
+      {
+        "attempts": 1032,
+        "acks": 1032,
+        "ambiguous_or_incomplete": 0,
+        "acknowledged_bytes": 67633152
+      }
+    ],
+    "total_acks": 1160,
+    "acknowledged_bytes": 76021760,
+    "osds_up_in": 9,
+    "all_pgs_active_clean": true,
+    "pgs_on_three_hosts": 17,
+    "monitor_quorum": 3,
+    "fault": "process",
+    "baseline_progress": [
+      14,
+      23
+    ],
+    "held_fault_progress": [
+      6,
+      9
+    ],
+    "after_progress": [
+      32,
+      40
+    ],
+    "native_recovery_s": 150.96602829200128,
+    "recovery_and_verification_s": 217.61488862500119,
+    "elapsed_s": 315.42636245799804,
+    "input_reloaded": false
+  },
+  "writer": {
+    "operations": 1032,
+    "successes": 1032,
+    "payload_sizes_bytes": [
+      65536
+    ],
+    "successful_payload_bytes": 67633152,
+    "errors_or_ambiguous": 0,
+    "max_success_completion_gap_ms": 84395,
+    "phases": {
+      "startup": {
+        "operations": 32,
+        "latency_ms_nearest_rank": {
+          "p50": 58.744788,
+          "p95": 137.777756,
+          "p99": 154.88098,
+          "max": 154.88098
+        }
+      },
+      "after": {
+        "operations": 51,
+        "latency_ms_nearest_rank": {
+          "p50": 58.731014,
+          "p95": 79.16673,
+          "p99": 106.947188,
+          "max": 106.947188
+        }
+      },
+      "degraded": {
+        "operations": 932,
+        "latency_ms_nearest_rank": {
+          "p50": 51.813416,
+          "p95": 74.184525,
+          "p99": 105.332795,
+          "max": 8295.226683
+        }
+      },
+      "injection": {
+        "operations": 17,
+        "latency_ms_nearest_rank": {
+          "p50": 55.415523,
+          "p95": 84286.542342,
+          "p99": 84286.542342,
+          "max": 84286.542342
+        }
+      }
+    },
+    "native_unit": {
+      "MainPID": "0",
+      "ExecMainCode": "1",
+      "ExecMainStatus": "0",
+      "MemoryPeak": "86630400",
+      "CPUUsageNSec": "25962374000",
+      "IOReadBytes": "0",
+      "IOWriteBytes": "9433088",
+      "ActiveState": "active",
+      "SubState": "exited"
+    }
+  },
+  "reader": {
+    "operations": 1642,
+    "successes": 1642,
+    "payload_sizes_bytes": [],
+    "successful_payload_bytes": 0,
+    "errors_or_ambiguous": 0,
+    "max_success_completion_gap_ms": 94143,
+    "phases": {
+      "startup": {
+        "operations": 44,
+        "latency_ms_nearest_rank": {
+          "p50": 15.869082,
+          "p95": 36.462669,
+          "p99": 64.070047,
+          "max": 64.070047
+        }
+      },
+      "after": {
+        "operations": 105,
+        "latency_ms_nearest_rank": {
+          "p50": 2.320511,
+          "p95": 7.565809,
+          "p99": 17.249461,
+          "max": 19.448965
+        }
+      },
+      "degraded": {
+        "operations": 1477,
+        "latency_ms_nearest_rank": {
+          "p50": 2.46152,
+          "p95": 12.57265,
+          "p99": 18.144502,
+          "max": 34.798186
+        }
+      },
+      "injection": {
+        "operations": 16,
+        "latency_ms_nearest_rank": {
+          "p50": 13.348849,
+          "p95": 94037.20212,
+          "p99": 94037.20212,
+          "max": 94037.20212
+        }
+      }
+    },
+    "native_unit": {
+      "MainPID": "0",
+      "ExecMainCode": "1",
+      "ExecMainStatus": "0",
+      "MemoryPeak": "21827584",
+      "CPUUsageNSec": "10444348000",
+      "IOReadBytes": "0",
+      "IOWriteBytes": "696320",
+      "ActiveState": "active",
+      "SubState": "exited"
+    }
+  },
+  "environment": {
+    "NCPU": 11,
+    "MemTotal": 26216296448,
+    "KernelVersion": "6.12.76-linuxkit",
+    "OperatingSystem": "Docker Desktop",
+    "Driver": "overlayfs",
+    "ServerVersion": "29.5.3",
+    "docker_api": "1.54"
+  },
+  "docker_observation": {
+    "path": "results/resources-1795840429041926000.jsonl",
+    "counter_deltas": {
+      "cpu_core_s": 920.0956869999995,
+      "network_rx_bytes": 424688689,
+      "network_tx_bytes": 424681246,
+      "disk_read_bytes": 571289600,
+      "disk_write_bytes": 2107792384
+    },
+    "sampled_aggregate_memory_peak_bytes": 11347034112,
+    "guest_vm_actor": [
+      {
+        "name": "/ceph-filesystem-ha-guests-1",
+        "samples": 403,
+        "peak_memory_bytes": 11340079104,
+        "configuration": {
+          "image_id": "sha256:a627aa2a7f3af5d8dc824941a46d287c24f230fb788ea685981a506f21ae3433",
+          "image_reference": "ceph-filesystem-ha-guests:21.2.0",
+          "memory_limit_bytes": 17179869184,
+          "nano_cpus": 8000000000,
+          "started_at": "2026-11-28T04:18:56.402070097Z"
+        },
+        "counter_deltas": {
+          "cpu_core_s": 919.3166929999998,
+          "network_rx_bytes": 424688689,
+          "network_tx_bytes": 424681246,
+          "disk_read_bytes": 571289600,
+          "disk_write_bytes": 2107792384
+        },
+        "cpu_utilization_pct_one_core_min": 50.238140458093326,
+        "cpu_utilization_pct_one_core_max": 678.3616748015022,
+        "observed_s": 407.7055230140686,
+        "sampled_mean_memory_bytes": 9460954094.2134,
+        "cpu_utilization_pct_one_core_average": 225.48546465687127
+      }
+    ]
+  },
+  "storage": {
+    "guest_scsi_lifetime": {
+      "read_ios": 19713,
+      "write_ios": 69706,
+      "read_bytes": 698396672,
+      "write_bytes": 4429661184,
+      "device_io_ms": 51333
+    },
+    "native_snapshot": "results/process-failure-1795840433906362000/resources-after.json",
+    "guest_boot_ids": {
+      "0": "0843f9b8-6500-4469-a7fa-88cb7b37bf00",
+      "1": "9f132fcf-a0e6-41f5-8e7d-e9b0e737b5b0",
+      "2": "adbe6626-d91f-458b-8d70-d5aa66130837"
+    },
+    "ceph_raw_used_bytes": 705236992,
+    "file_data": {
+      "stored": 76021760,
+      "stored_data": 76021760,
+      "stored_omap": 0,
+      "objects": 1160,
+      "kb_used": 222720,
+      "bytes_used": 228065280,
+      "data_bytes_used": 228065280,
+      "omap_bytes_used": 0,
+      "percent_used": 0.002084751846268773,
+      "max_avail": 36389593088,
+      "quota_objects": 0,
+      "quota_bytes": 0,
+      "dirty": 0,
+      "rd": 1642,
+      "rd_bytes": 104136704,
+      "wr": 1160,
+      "wr_bytes": 76021760,
+      "compress_bytes_used": 0,
+      "compress_under_bytes": 0,
+      "stored_raw": 228065280,
+      "avail_raw": 109168781983
+    },
+    "metadata": {
+      "stored": 11960165,
+      "stored_data": 11816688,
+      "stored_omap": 143477,
+      "objects": 24,
+      "kb_used": 35125,
+      "bytes_used": 35967329,
+      "data_bytes_used": 35536896,
+      "omap_bytes_used": 430433,
+      "percent_used": 0.000329356815200299,
+      "max_avail": 36389593088,
+      "quota_objects": 0,
+      "quota_bytes": 0,
+      "dirty": 0,
+      "rd": 79,
+      "rd_bytes": 1750016,
+      "wr": 2889,
+      "wr_bytes": 13229056,
+      "compress_bytes_used": 0,
+      "compress_under_bytes": 0,
+      "stored_raw": 35880496,
+      "avail_raw": 109168781983
+    },
+    "qcow2_apparent_bytes": 8908046912,
+    "qcow2_allocated_bytes": 8907522048,
+    "codec": "none",
+    "compression_ratio": null,
+    "compression_note": "Both CephFS pool compression counters are reported; no compressed counterpart or compression CPU comparison was run."
+  },
+  "limits": [
+    "Sample-window deltas exclude startup and exit outside observation. Decreasing counters are treated as restarts and the new counter is accumulated; reset intervals have no CPU utilization estimate.",
+    "Short-lived actors may be missed; use native pre-exit cgroup counters as well.",
+    "CPU utilization is interval-average percent of one core; short spikes may be missed.",
+    "Docker disk bytes are not device I/O latency; absent counters are unavailable, not zero.",
+    "Docker CPU includes QEMU TCG emulation and guests; native unit CPU is inside guest kernels. These scopes cannot be added.",
+    "Native storage counters are cumulative at the identified snapshot, not fault-only deltas.",
+    "Guest SCSI counters include all owned whole SCSI disks, including unused spares and provisioning; OS root disks and device-mapper duplicates are excluded. Per-daemon io.stat is unavailable because IOAccounting was not enabled for those native daemon units.",
+    "Historical immutable files are read during the fault; new live ACKs are reconciled by fresh clients afterwards.",
+    "Sampling misses very short controls, builder work and sub-second peaks; physical disk latency is unavailable.",
+    "Native PG placement proves the declared three-host layout, not independent raw replica hashes or a completed deep scrub.",
+    "Completion gaps include the intentional 100 ms think time and controller polling. Percentiles are diagnostic samples, not steady-state benchmark estimates."
+  ],
+  "evidence_sha256": {
+    "results/process-failure-1795840433906362000/result.json": "c538c6fef1b0866ee99a38a982c3a1defc873d22e57be9cab452e6f08f0d2755",
+    "results/process-failure-1795840433906362000/injection.json": "a8356e2d4d4411bf02836e67f880d8a7b0c55b2e0d2cedba248dba30e957361f",
+    "results/process-failure-1795840433906362000/writer.log": "8608fd154dd5d4e23af0a6c7d504fb788bbe1981e9285f7541dffb7c2f8a1164",
+    "results/process-failure-1795840433906362000/reader.log": "ddaad274846f2139f1a73f3f5fd2e9c583a67e0a2d5573aa09b66508d190485f",
+    "results/resources-1795840429041926000.jsonl": "081ff6fbfcac10ef57ddfc2a56678d3816dfc847ee5522b5f81fd475e71611e3",
+    "results/process-failure-1795840433906362000/resources-after.json": "8b394eb2907f28fc8eb2e82b5081807ec967adbd941e7642b8d51f4035b55cc8"
+  },
+  "application_source_sha256": "f7edf68aaa466c779cb6d9a6bf1f8723f3ee49ba53842656b625194f259d4978",
+  "guest_reboot": {
+    "before": "eff2cbf7-79fa-41b6-90c7-46d0e14ea18e",
+    "after": "0843f9b8-6500-4469-a7fa-88cb7b37bf00"
+  },
+  "observed_member_loss": {
+    "elapsed_s": 28.333032415997877,
+    "osdmap": {
+      "epoch": 51,
+      "num_osds": 9,
+      "num_up_osds": 6,
+      "osd_up_since": 1795840519,
+      "num_in_osds": 9,
+      "osd_in_since": 1795840230,
+      "num_remapped_pgs": 0
+    },
+    "pg_states": [
+      {
+        "state_name": "active+clean",
+        "count": 17
+      }
+    ]
+  },
+  "transient_health": {
+    "during_rejoin": {
+      "fsid": "b7aa5cc6-baae-47ea-bec1-9dbb26a4db12",
+      "health": {
+        "status": "HEALTH_WARN",
+        "checks": {
+          "MON_CLOCK_SKEW": {
+            "severity": "HEALTH_WARN",
+            "summary": {
+              "message": "clock skew detected on mon.ceph1, mon.ceph2",
+              "count": 2
+            },
+            "muted": false
+          }
+        },
+        "mutes": []
+      },
+      "osdmap": {
+        "epoch": 62,
+        "num_osds": 9,
+        "num_up_osds": 9,
+        "osd_up_since": 1795840691,
+        "num_in_osds": 9,
+        "osd_in_since": 1795840230,
+        "num_remapped_pgs": 0
+      },
+      "quorum_names": [
+        "ceph0",
+        "ceph1",
+        "ceph2"
+      ],
+      "fsmap": {
+        "epoch": 14,
+        "btime": "2026-11-28T04:37:23:981899+0000",
+        "id": 1,
+        "up": 1,
+        "in": 1,
+        "max": 1,
+        "by_rank": [
+          {
+            "filesystem_id": 1,
+            "rank": 0,
+            "name": "fs1",
+            "status": "up:active",
+            "gid": 14518
+          }
+        ],
+        "up:standby": 1
+      },
+      "mgrmap": {
+        "available": true,
+        "num_standbys": 1,
+        "modules": [
+          "iostat",
+          "nfs",
+          "nvmeof"
+        ],
+        "services": {}
+      }
+    },
+    "later_time_sync": {
+      "time_skew_status": {
+        "ceph0": {
+          "skew": 0,
+          "latency": 0,
+          "health": "HEALTH_OK"
+        },
+        "ceph1": {
+          "skew": -0.0070591390876464846,
+          "latency": 0.108687888896,
+          "health": "HEALTH_OK"
+        },
+        "ceph2": {
+          "skew": -0.024149073029541016,
+          "latency": 0.104830785544,
+          "health": "HEALTH_OK"
+        }
+      },
+      "timechecks": {
+        "epoch": 12,
+        "round": 8,
+        "round_status": "finished"
+      }
+    },
+    "guest_ntp_synchronized": true,
+    "threshold_changed": false,
+    "manual_time_change": false,
+    "raw_evidence": {
+      "results/followup-guest0-rejoin-diagnostic.log": "65820c12d71c5f70c488499c5c0676f63355ef1bfe24d970752b09bfdbc1aa4a",
+      "results/followup-clock-diagnostic.log": "11c29f384007c43336b8f36d72db744f34ca91a5f354286654f19bbf0b4aa9b8"
+    }
+  }
+}

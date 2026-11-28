@@ -1,17 +1,49 @@
 {
   "backend": "CephFS libcephfs 21.2.0",
   "filesystem": "labfs",
-  "operations": ["exclusive create", "write", "fsync", "close", "rename", "sync_fs", "open", "read", "EOF", "read-only rejection"],
+  "operations": [
+    "exclusive create",
+    "write",
+    "fsync",
+    "close",
+    "rename",
+    "sync_fs",
+    "open",
+    "read",
+    "EOF",
+    "read-only rejection",
+    "quiescent actual-body backup",
+    "fresh-cluster file-level restore"
+  ],
   "atomicity": "Single same-filesystem rename publication; no multi-file transaction claim",
-  "consistency_claim": "Acknowledged immutable publication survives one active MDS process crash; exact fresh-client readback",
+  "consistency_claim": "Acknowledged immutable publications survived the measured MDS process, retained guest and populated-disk loss cases; fresh clients verified every ACK. Qualification is limited to the recorded topology/version/workload.",
   "payload_default_bytes": 262144,
   "payload_max_bytes": 16777216,
   "seed_max_bytes": 268435456,
-  "replication": {"size": 3, "min_size": 2, "failure_domain": "native guest host"},
+  "replication": {
+    "size": 3,
+    "min_size": 2,
+    "failure_domain": "native guest host"
+  },
   "ack_boundary": "ceph_fsync + close + rename + ceph_sync_fs, then fsynced external-pool witness",
   "idempotency": "Unique run/sequence paths; no automatic application mutation retries",
-  "timeouts": {"actor_duration_ceiling_s": 240, "mds_promotion_controller_s": 90, "fresh_verifier_external_s": 180},
+  "timeouts": {
+    "actor_duration_ceiling_s": 900,
+    "mds_promotion_controller_s": 90,
+    "fresh_verifier_external_s": 180,
+    "storage_failure_actor_duration_s": 600
+  },
   "timeout_semantics": "Native calls can stall beyond intended phase; external supervision does not prove a mutation failed",
   "read_path": "One persistent historical reader through fault; new connections reconcile all old and live ACKs after recovery",
-  "unclaimed": ["general POSIX linearizability", "multi-writer lock semantics", "delete/TTL", "power-loss durability", "independent backup", "physical host tolerance", "compression benefit"]
+  "unclaimed": [
+    "general POSIX linearizability",
+    "multi-writer lock semantics",
+    "delete/TTL",
+    "power-loss durability",
+    "online/full-metadata backup",
+    "physical host tolerance",
+    "compression benefit"
+  ],
+  "backup_contract": "Immutable acknowledged bodies and their external witnesses at a quiescent cut; new FSID and fresh empty namespace. Not full metadata/configuration or online snapshot backup.",
+  "fault_writer_default_bytes": 65536
 }

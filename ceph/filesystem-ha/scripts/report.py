@@ -33,6 +33,8 @@ def operations(path, role):
     return {
         "operations": len(rows),
         "successes": len(successes),
+        "payload_sizes_bytes": sorted({r["bytes"] for r in rows if "bytes" in r}),
+        "successful_payload_bytes": sum(r.get("bytes", 0) for r in successes),
         "errors_or_ambiguous": len(rows) - len(successes),
         "max_success_completion_gap_ms": max(
             (b - a for a, b in zip(stamps, stamps[1:])), default=None
@@ -82,6 +84,7 @@ def main():
             totals[key] = totals.get(key, 0) + value
     result = {
         "classification": "correctness/recovery diagnostic; no comparative performance qualification",
+        "execution_status": json.loads((case / "status.json").read_text()),
         "case": str(case),
         "result": json.loads((case / "result.json").read_text()),
         "writer": operations(case / "writer.log", "writer"),
@@ -98,6 +101,9 @@ def main():
         "storage": {
             "guest_scsi_lifetime": scsi,
             "native_snapshot": str(native),
+            "guest_boot_ids": {
+                node: value["boot_id"] for node, value in storage["guests"].items()
+            },
             "ceph_raw_used_bytes": storage["df"]["stats"]["total_used_raw_bytes"],
             "file_data": pools["labfs_data"],
             "metadata": pools["labfs_meta"],
@@ -125,7 +131,12 @@ def main():
             str(p): hashlib.sha256(p.read_bytes()).hexdigest()
             for p in [
                 case / "result.json",
-                case / "killed.json",
+                case
+                / (
+                    "killed.json"
+                    if (case / "killed.json").exists()
+                    else "injection.json"
+                ),
                 case / "writer.log",
                 case / "reader.log",
                 resource,
@@ -136,11 +147,46 @@ def main():
             (lab.ROOT / "files-workload/main.cpp").read_bytes()
         ).hexdigest(),
     }
-    target = (
-        lab.ROOT
-        / "reports"
-        / ("FAILOVER-" + case.name.removeprefix("mds-failover-") + ".json")
+    reboot = case / "reboot.json"
+    if reboot.exists():
+        result["guest_reboot"] = json.loads(reboot.read_text())
+    replacement = case / "replacement.json"
+    if replacement.exists():
+        plan = json.loads(replacement.read_text())
+        result["native_replacement"] = {
+            **{
+                key: value
+                for key, value in plan.items()
+                if key != "affected_nonempty_pgs"
+            },
+            "affected_nonempty_pgs": [
+                {
+                    "pgid": pg["pgid"],
+                    "state": pg["state"],
+                    "acting": pg["acting"],
+                    "objects": pg["stat_sum"]["num_objects"],
+                }
+                for pg in plan["affected_nonempty_pgs"]
+            ],
+            "plan_sha256": hashlib.sha256(replacement.read_bytes()).hexdigest(),
+        }
+    degraded = case / "degraded.json"
+    if degraded.exists():
+        observation = json.loads(degraded.read_text())[-1]
+        result["observed_member_loss"] = {
+            "elapsed_s": observation["elapsed_s"],
+            "osdmap": observation["status"]["osdmap"],
+            "pg_states": observation["status"]["pgmap"]["pgs_by_state"],
+        }
+    health_note = case / "transient-health.json"
+    if health_note.exists():
+        result["transient_health"] = json.loads(health_note.read_text())
+    name = (
+        "FAILOVER-" + case.name.removeprefix("mds-failover-")
+        if case.name.startswith("mds-failover-")
+        else "STORAGE-" + case.name
     )
+    target = lab.ROOT / "reports" / (name + ".json")
     target.parent.mkdir(exist_ok=True)
     target.write_text(json.dumps(result, indent=2) + "\n")
     print(target)
