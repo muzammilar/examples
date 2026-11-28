@@ -1,9 +1,10 @@
-# Observed setup and small-control findings
+# Measured results and limitations
 
 2026-11-28; initial fixture `c9a9878f6883490aba4c24bf1322174a`: **10,000 gauges,
 10,000 correlated logs and 300 spans**. Original failed statuses and histories
 remain under ignored results; no replacement publication hid these failures.
-Full healthy cases have run; collector recovery is in progress.
+Full healthy cases and Greptime/Victoria collector recovery have run. Loki
+retained-restart qualification failed; Grafana collector injection remains unrun.
 
 ## Exact typed trace fidelity fails through Victoria's experimental Tempo API
 
@@ -160,3 +161,42 @@ now record owned container state/exit and mounts between stop and start. The
 initial observation remains unchanged. Further chunk/index isolation and supported
 recovery are a future follow-up; do not erase this failure by rebuilding the
 fixture. [Native LogCLI no-cache option](https://grafana.com/docs/loki/latest/query/logcli/getting-started/).
+
+## Collector crash with publishers/readers live
+
+Each executed case SIGKILLed the collector (exit **137**, no OOM), held it down
+for **10 seconds**, restarted the **same container/queue**, continued all planned
+source attempts and fenced publication before full independent readback. Source
+clients performed no retries or repair replay.
+
+| Profile | Metric ACKs present | Log ACKs present | Span ACKs present | Missing ACKs | Sampled all-signal recovery |
+|---|---:|---:|---:|---:|---:|
+| Greptime | 951,000 | 952,000 | 28,530 | 0 | 11.873 s |
+| Victoria | 951,000 | 952,000 | 28,530 | 0 | 39.011 s |
+
+Both cases additionally had **49,000 metric points, 48,000 logs and 1,470 spans**
+unacknowledged/ambiguous during the outage; none were present at final readback.
+This is not loss of acknowledged data. The clients continued generating; they
+were not paused or restarted to hide the fault. Victoria's **28,530 acknowledged
+spans still require numeric-attribute projection**: value recovery passes, exact
+typed qualification and its command remain failed. Greptime's selected typed
+fields pass. Recovery includes the ten-second hold, native visibility/indexing
+and the reader's sampling policy; it is not raw collector process-start time or
+a production failover SLA. No backend process or disk was crashed in these cases.
+
+[Greptime recovery](../docker-compose/reports/GREPTIME_COLLECTOR_RECOVERY.json),
+[Victoria recovery](../docker-compose/reports/VICTORIA_COLLECTOR_RECOVERY.json),
+and their [Greptime](../docker-compose/reports/GREPTIME_RECOVERY_RESOURCES.json) /
+[Victoria](../docker-compose/reports/VICTORIA_RECOVERY_RESOURCES.json) resource
+reports retain exact counters, storage snapshots and scopes. The native-role
+readback audit overlapped a two-thread Go build for the next lab; no uncontended
+performance comparison is claimed from this functional work.
+
+Grafana collector injection remains **unrun**, gated by the independent Loki
+restart failure above. `make preserve-stop` was executed after actors stopped:
+**all ten owned backend/collector services are stopped**, with every container,
+volume and failed witness retained. [Preserved-stop receipt](../docker-compose/reports/PRESERVED_STOP.json)
+is explicitly **not authorized for destruction**. `down`/`docker-down` stay gated
+until failed data is reconciled; no reset or cleanup turned a failed run into a
+pass. Further Loki isolation/recovery and clustered/disk/partition/upgrade/restore
+cases remain future work outside this bounded level-3 pass.

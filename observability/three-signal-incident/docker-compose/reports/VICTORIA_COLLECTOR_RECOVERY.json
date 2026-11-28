@@ -1,0 +1,292 @@
+{
+  "case": {
+    "kind": "collector-crash",
+    "backends": [
+      "victoria"
+    ],
+    "run": "6989b22de8704570a582517341ad2271",
+    "prior": "results/cases/c9a9878f6883490aba4c24bf1322174a/fixture.json",
+    "scope": "Million-record live value/recovery diagnostic; Victoria exact numeric attribute fidelity remains failed"
+  },
+  "fixture": {
+    "run": "6989b22de8704570a582517341ad2271",
+    "payload_seed": "c9a9878f6883490aba4c24bf1322174a",
+    "start_ms": 1795856927000,
+    "requests": 10000,
+    "logs_per_request": 100,
+    "metric_points": 100
+  },
+  "scope": "Paced functional/recovery diagnostics, not repeated capacity benchmarks",
+  "backends": {
+    "victoria": {
+      "fence": {
+        "actors_stopped": true,
+        "histories": {
+          "metrics": "117e64a5f720ac199a4153791cd0efda783ed1d3f2a913f81a1c301377fec2f2",
+          "logs": "72eee8f635594d1b408e63e06eac40089d864356f0e65ce72356cf72e91cfb91",
+          "traces": "6283a8ec8b1c6137581a396cd03a3e06024aef157d638db390afbc6e29cd5399"
+        },
+        "fenced_at_unix_s": 1795868141.759907
+      },
+      "publication": [
+        {
+          "emitted_items": 10000,
+          "planned_items": 10000,
+          "signal": "traces",
+          "completed": true,
+          "requests": 1000,
+          "acknowledged_requests": 951,
+          "unacknowledged_requests": 49,
+          "elapsed_s": 208.218741929
+        },
+        {
+          "emitted_items": 1000000,
+          "planned_items": 1000000,
+          "signal": "metrics",
+          "completed": true,
+          "requests": 1000,
+          "acknowledged_requests": 951,
+          "unacknowledged_requests": 49,
+          "elapsed_s": 208.220268637
+        },
+        {
+          "emitted_items": 1000000,
+          "planned_items": 1000000,
+          "signal": "logs",
+          "completed": true,
+          "requests": 1000,
+          "acknowledged_requests": 952,
+          "unacknowledged_requests": 48,
+          "elapsed_s": 216.526666599
+        },
+        {
+          "captured_at": "2026-11-28T12:15:40.886582299Z",
+          "event": "native-cgroup-before-exit",
+          "scope": "Whole container/process lifetime",
+          "unavailable": {},
+          "values": {
+            "cpu.stat": "usage_usec 19427771\nuser_usec 16640425\nsystem_usec 2787346\nnice_usec 0\nnr_periods 2160\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+            "io.stat": "",
+            "memory.current": "16232448\n",
+            "memory.peak": "19087360\n"
+          }
+        }
+      ],
+      "signals": {
+        "metrics": {
+          "requests": 1000,
+          "outcomes": {
+            "accepted": 951,
+            "unacknowledged": 49
+          },
+          "source_protobuf_bytes": 103495100,
+          "source_gzip_bytes": 4486489,
+          "wire_compression_ratio": 23.06817201602411,
+          "request_http_latency_ms": {
+            "p50": 1.804458,
+            "p95": 3.567875,
+            "p99": 4.635541,
+            "p99_9": 12.244584,
+            "max": 13.559875
+          }
+        },
+        "logs": {
+          "requests": 1000,
+          "outcomes": {
+            "accepted": 952,
+            "unacknowledged": 48
+          },
+          "source_protobuf_bytes": 589238578,
+          "source_gzip_bytes": 34610148,
+          "wire_compression_ratio": 17.025023354421947,
+          "request_http_latency_ms": {
+            "p50": 3.047458,
+            "p95": 4.373833,
+            "p99": 5.456292,
+            "p99_9": 7.349958,
+            "max": 10.523333
+          }
+        },
+        "traces": {
+          "requests": 1000,
+          "outcomes": {
+            "accepted": 951,
+            "unacknowledged": 49
+          },
+          "source_protobuf_bytes": 8707199,
+          "source_gzip_bytes": 1701051,
+          "wire_compression_ratio": 5.118717193076516,
+          "request_http_latency_ms": {
+            "p50": 1.666709,
+            "p95": 4.060167,
+            "p99": 6.170792,
+            "p99_9": 10.485542,
+            "max": 11.677501
+          }
+        }
+      },
+      "storage": {
+        "before-ingest": {
+          "allocated_data_bytes": 66289664,
+          "logical_file_bytes": 63994548,
+          "scope": "Includes retained prior fixtures; point snapshot, not transient peak or codec compression"
+        },
+        "after-actors": {
+          "allocated_data_bytes": 104198144,
+          "logical_file_bytes": 101996064,
+          "scope": "Includes retained prior fixtures; point snapshot, not transient peak or codec compression"
+        }
+      },
+      "collector_fault": {
+        "id": "14c8b6d36c62216eebf39c7460174df6be03d17d32fe832812c70f3d32396ddd",
+        "image": "sha256:3e18fe04181de50bdd72e23ad4a4d6214b54351e63d496f1c58127cc4541ad7f",
+        "state": {
+          "Status": "exited",
+          "Running": false,
+          "Paused": false,
+          "Restarting": false,
+          "OOMKilled": false,
+          "Dead": false,
+          "Pid": 0,
+          "ExitCode": 137,
+          "Error": "",
+          "StartedAt": "2026-11-28T12:11:12.955875925Z",
+          "FinishedAt": "2026-11-28T12:12:25.686005584Z"
+        },
+        "mounts": [
+          {
+            "Type": "bind",
+            "Source": "/Users/muzammil/github.com/muzammilar/examples/observability/three-signal-incident/docker-compose/config/victoria-collector.yaml",
+            "Destination": "/config/collector.yaml",
+            "Mode": "ro",
+            "RW": false,
+            "Propagation": "rprivate"
+          },
+          {
+            "Type": "volume",
+            "Name": "obs-three-signal-incident_victoria-queue",
+            "Source": "/var/lib/docker/volumes/obs-three-signal-incident_victoria-queue/_data",
+            "Destination": "/data/queue",
+            "Driver": "local",
+            "Mode": "rw",
+            "RW": true,
+            "Propagation": ""
+          }
+        ]
+      },
+      "collector_recovery": {
+        "kill_to_new_ack_visible_s": 39.01105008299055,
+        "started_at": "2026-11-28T12:12:35.774144422Z",
+        "same_container": true
+      },
+      "live_read_outcomes": {
+        "metrics:old:visible": 216,
+        "metrics:recent:pending": 154,
+        "logs:old:visible": 216,
+        "logs:recent:pending": 92,
+        "traces:old:fidelity-mismatch": 216,
+        "traces:recent:pending": 110,
+        "logs:recent:visible": 124,
+        "metrics:recent:visible": 62,
+        "traces:recent:visibility-budget-exceeded": 96,
+        "traces:recent:fidelity-mismatch": 10
+      },
+      "visible_recent_ack_age_ms": {
+        "metrics": {
+          "samples": 62,
+          "min": 2979.266377,
+          "max": 10164.966838
+        },
+        "logs": {
+          "samples": 124,
+          "min": 15.9875,
+          "max": 9951.937879
+        },
+        "traces": {
+          "samples": 10,
+          "min": 18086.648702,
+          "max": 21102.911787
+        }
+      },
+      "frozen_readbacks": [
+        {
+          "path": "results/cases/6989b22de8704570a582517341ad2271/victoria/final/readback-1.json",
+          "report": {
+            "backend": "victoria",
+            "captured_at": "2026-11-28T12:16:13.430733592Z",
+            "fixture": {
+              "run": "6989b22de8704570a582517341ad2271",
+              "payload_seed": "c9a9878f6883490aba4c24bf1322174a",
+              "start_ms": 1795856927000,
+              "requests": 10000,
+              "logs_per_request": 100,
+              "metric_points": 100
+            },
+            "projection_diagnostic": true,
+            "scope": "Frozen ACK/value reconciliation; numeric projection is explicitly marked and cannot establish exact attribute type fidelity",
+            "signals": {
+              "logs": {
+                "complete": true,
+                "counts": {
+                  "acknowledged_records": 952000,
+                  "acknowledged_present": 952000,
+                  "missing_acknowledged_ids": [],
+                  "ambiguous_records": 48000,
+                  "ambiguous_present": 0,
+                  "ambiguous_absent_at_cut": 48000,
+                  "unexpected_ids": [],
+                  "duplicate_copies_returned_by_query": 0
+                },
+                "elapsed_s": 7.599512294,
+                "exact_attribute_type_fidelity": true,
+                "history_sha256": "72eee8f635594d1b408e63e06eac40089d864356f0e65ce72356cf72e91cfb91",
+                "numeric_attribute_projection_spans": 0
+              },
+              "metrics": {
+                "complete": true,
+                "counts": {
+                  "acknowledged_records": 951000,
+                  "acknowledged_present": 951000,
+                  "missing_acknowledged_ids": [],
+                  "ambiguous_records": 49000,
+                  "ambiguous_present": 0,
+                  "ambiguous_absent_at_cut": 49000,
+                  "unexpected_ids": [],
+                  "duplicate_copies_returned_by_query": 0
+                },
+                "elapsed_s": 0.707734376,
+                "exact_attribute_type_fidelity": true,
+                "history_sha256": "117e64a5f720ac199a4153791cd0efda783ed1d3f2a913f81a1c301377fec2f2",
+                "numeric_attribute_projection_spans": 0
+              },
+              "traces": {
+                "complete": true,
+                "counts": {
+                  "acknowledged_records": 28530,
+                  "acknowledged_present": 28530,
+                  "missing_acknowledged_ids": [],
+                  "ambiguous_records": 1470,
+                  "ambiguous_present": 0,
+                  "ambiguous_absent_at_cut": 1470,
+                  "unexpected_ids": [],
+                  "duplicate_copies_returned_by_query": 0
+                },
+                "elapsed_s": 17.145089758,
+                "exact_attribute_type_fidelity": false,
+                "history_sha256": "6283a8ec8b1c6137581a396cd03a3e06024aef157d638db390afbc6e29cd5399",
+                "numeric_attribute_projection_spans": 28530
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  "limitations": [
+    "Request latencies include collector admission, not backend durable commit or individual-record latency.",
+    "Empirical p99.9 from 1,000 requests is near the observed maximum, not established long-tail behavior.",
+    "Wire gzip ratio is not on-disk codec compression.",
+    "Recent read observations sample selected ACKs; they are not a complete visibility-latency distribution.",
+    "Use accompanying resource summaries and volume snapshots for CPU, memory, disk I/O, storage and network; missing device metrics remain unavailable."
+  ]
+}

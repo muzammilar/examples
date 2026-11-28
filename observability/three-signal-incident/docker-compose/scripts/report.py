@@ -63,6 +63,28 @@ def summarize(case):
                     ]
                 },
             }
+        item["storage"] = {}
+        for label in ["before-ingest", "after-actors"]:
+            snapshot = case / (backend + "-disk-" + label + ".json")
+            if snapshot.exists():
+                raw = json.loads(snapshot.read_text())
+                item["storage"][label] = {
+                    "allocated_data_bytes": raw["allocated_data_bytes"],
+                    "logical_file_bytes": raw["logical_file_bytes"],
+                    "scope": "Includes retained prior fixtures; point snapshot, not transient peak or codec compression",
+                }
+        fault = case / (backend + "-collector-killed.json")
+        recovery = case / (backend + "-collector-recovery.json")
+        if fault.exists():
+            native = json.loads(fault.read_text())
+            item["collector_fault"] = {
+                "id": native["Id"],
+                "image": native["Image"],
+                "state": native["State"],
+                "mounts": native["Mounts"],
+            }
+        if recovery.exists():
+            item["collector_recovery"] = json.loads(recovery.read_text())
         reads = rows(directory / "reader/reads.jsonl")
         item["live_read_outcomes"] = dict(
             collections.Counter(

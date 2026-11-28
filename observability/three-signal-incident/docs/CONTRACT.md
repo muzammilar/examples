@@ -15,8 +15,10 @@ request and 100 metric points per series: **30,000 spans, 1,000,000 logs and
 Requests 4,000–4,499 for tenant 0 form the payment incident: 250 failed requests,
 500 error spans and 25,000 error logs. Their metric series spike during seconds
 40–44. This is a deterministic incident generator, not a measured business
-application or auto-instrumentation overhead benchmark. The complete fixture,
-seed, timestamps, payload bytes and IDs are identical across backends.
+application or auto-instrumentation overhead benchmark. Within a shared case, the fixture, seed, timestamps, payload bytes and IDs are
+identical across backends. The corrected Victoria-only rerun has a fresh run/trace
+identity while retaining the payload seed, time range and logical workload; do not
+claim byte-identical trace IDs or a comparative performance trial for that rerun.
 
 Source traces include parents, names, kinds, status/messages, resource and span
 attributes, one event and a link. Choose microsecond-aligned times so a Jaeger
@@ -106,3 +108,12 @@ diagnostic, not substituted with a younger record or labeled lost. The controlle
 waits at most 120 seconds for initial/recovered old and recent visibility.
 Observed delays, timeouts and final frozen reconciliation remain separate.
 The [initial reader mistake and preserved partial case](FINDINGS.md) are explicit.
+
+## Unqualified lifecycle settings
+
+The fixture is well inside the configured seven-day retention on Victoria,
+Prometheus and Loki. Greptime table TTL and Tempo retention were not explicitly
+normalized/read back in this pass. No TTL expiry/reclamation, equal-retention
+storage-capacity or long-term storage comparison is qualified. Keep the native
+configuration files as the actual source of truth; do not infer matched retention
+from matched input timestamps or from a healthy bounded readback.

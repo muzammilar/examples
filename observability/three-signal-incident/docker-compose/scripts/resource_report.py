@@ -19,7 +19,9 @@ def main():
         if row["type"] == "environment":
             environment = row
             continue
-        if phase_prefix is not None and not row["phase"].startswith(phase_prefix):
+        if phase_prefix is not None and not any(
+            row["phase"].startswith(prefix) for prefix in phase_prefix.split(",")
+        ):
             continue
         total_memory += sum(
             a.get("counters", {}).get("memory_stats", {}).get("usage", 0)

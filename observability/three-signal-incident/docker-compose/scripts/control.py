@@ -283,6 +283,10 @@ def main():
             from lifecycle import remove
 
             remove(audit_retained)
+        elif mode == "preserve-stop":
+            from lifecycle import preserve_stop
+
+            preserve_stop()
         elif mode == "docker-down":
             from lifecycle import destroy
 

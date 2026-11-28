@@ -1,0 +1,157 @@
+{
+  "evidence": "observability/three-signal-incident/docker-compose/results/resources-1795867575332056000.jsonl",
+  "phase_prefix": "live-publish:greptime,fault:greptime,recovery:greptime",
+  "environment": {
+    "type": "environment",
+    "run_id": 1795867575332056000,
+    "fixture": "checkout-incident-v1",
+    "command": [
+      "make",
+      "collector-case",
+      "PYTHON=/Users/muzammil/.local/bin/python3.13"
+    ],
+    "environment": {
+      "NCPU": 11,
+      "MemTotal": 26216296448,
+      "KernelVersion": "6.12.76-linuxkit",
+      "OperatingSystem": "Docker Desktop",
+      "Driver": "overlayfs",
+      "ServerVersion": "29.5.3",
+      "docker_api": "1.54"
+    },
+    "cotenancy": "Only this three-signal comparison; backends run serially; no other heavy lab."
+  },
+  "sampled_aggregate_memory_peak_bytes": 4290949120,
+  "sampled_aggregate_memory_mean_bytes": 3336832204.8,
+  "actors": [
+    {
+      "name": "/obs-three-signal-incident-6e12da9eb1d8471babafea22b293de98-greptime-watch",
+      "samples": 210,
+      "peak_memory_bytes": 13000704,
+      "configuration": {
+        "image_id": "sha256:5873ff1058f68aecc2f5eed21d677529e15db5123c9485cce156fbd6e513bf8f",
+        "image_reference": "obs-three-signal-incident-workload:local",
+        "memory_limit_bytes": 134217728,
+        "nano_cpus": 250000000,
+        "started_at": "2026-11-28T12:06:36.580093297Z"
+      },
+      "counter_deltas": {
+        "cpu_core_s": 0.9678019999999999,
+        "network_rx_bytes": 25373665,
+        "network_tx_bytes": 715277
+      },
+      "cpu_utilization_pct_one_core_min": 0.2588865353139753,
+      "cpu_utilization_pct_one_core_max": 0.8228938544607128,
+      "observed_s": 213.58882594108582,
+      "sampled_mean_memory_bytes": 12332041.752380952,
+      "cpu_utilization_pct_one_core_average": 0.4531145277548127,
+      "container_lifetime_counters_at_last_sample": {
+        "cpu_core_s": 0.977359,
+        "network_rx_bytes": 25373817,
+        "network_tx_bytes": 715319
+      }
+    },
+    {
+      "name": "/obs-three-signal-incident-6e12da9eb1d8471babafea22b293de98-greptime-publish",
+      "samples": 209,
+      "peak_memory_bytes": 19996672,
+      "configuration": {
+        "image_id": "sha256:5873ff1058f68aecc2f5eed21d677529e15db5123c9485cce156fbd6e513bf8f",
+        "image_reference": "obs-three-signal-incident-workload:local",
+        "memory_limit_bytes": 402653184,
+        "nano_cpus": 750000000,
+        "started_at": "2026-11-28T12:06:36.385407505Z"
+      },
+      "counter_deltas": {
+        "cpu_core_s": 15.016542,
+        "network_rx_bytes": 724851,
+        "network_tx_bytes": 39756732
+      },
+      "cpu_utilization_pct_one_core_min": 3.622834545554811,
+      "cpu_utilization_pct_one_core_max": 10.16859903292586,
+      "observed_s": 212.5660789012909,
+      "sampled_mean_memory_bytes": 17946202.641148325,
+      "cpu_utilization_pct_one_core_average": 7.064411253957983,
+      "container_lifetime_counters_at_last_sample": {
+        "cpu_core_s": 15.047182,
+        "network_rx_bytes": 727283,
+        "network_tx_bytes": 39840978
+      }
+    },
+    {
+      "name": "/obs-three-signal-incident-greptime-1",
+      "samples": 210,
+      "peak_memory_bytes": 4172120064,
+      "counter_deltas": {
+        "cpu_core_s": 191.852823,
+        "network_rx_bytes": 41661696,
+        "network_tx_bytes": 26386315,
+        "disk_read_bytes": 0,
+        "disk_write_bytes": 269836288
+      },
+      "cpu_utilization_pct_one_core_min": 22.11303970924793,
+      "cpu_utilization_pct_one_core_max": 204.28560999895504,
+      "observed_s": 213.58637118339539,
+      "sampled_mean_memory_bytes": 3227645717.9428573,
+      "cpu_utilization_pct_one_core_average": 89.82446863862211,
+      "container_lifetime_counters_at_last_sample": {
+        "cpu_core_s": 210.662907,
+        "network_rx_bytes": 42052551,
+        "network_tx_bytes": 609214452,
+        "disk_read_bytes": 0,
+        "disk_write_bytes": 270118912
+      }
+    },
+    {
+      "name": "/obs-three-signal-incident-greptime-collector-1",
+      "samples": 200,
+      "peak_memory_bytes": 86573056,
+      "counter_deltas": {
+        "cpu_core_s": 11.850370000000002,
+        "network_rx_bytes": 40746691,
+        "network_tx_bytes": 41503533,
+        "disk_read_bytes": 0,
+        "disk_write_bytes": 1411895296
+      },
+      "cpu_utilization_pct_one_core_min": 2.1627532269608234,
+      "cpu_utilization_pct_one_core_max": 7.393677276582276,
+      "counter_resets": 4,
+      "observed_s": 213.5868330001831,
+      "sampled_mean_memory_bytes": 82910945.28,
+      "cpu_utilization_pct_one_core_average": 5.548268043278606,
+      "container_lifetime_counters_at_last_sample": {
+        "cpu_core_s": 11.795111,
+        "network_rx_bytes": 40531645,
+        "network_tx_bytes": 41320903,
+        "disk_read_bytes": 0,
+        "disk_write_bytes": 1405087744
+      }
+    },
+    {
+      "name": "/friendly_euclid",
+      "samples": 1,
+      "peak_memory_bytes": 6488064,
+      "configuration": {
+        "image_id": "sha256:5873ff1058f68aecc2f5eed21d677529e15db5123c9485cce156fbd6e513bf8f",
+        "image_reference": "obs-three-signal-incident-workload:local",
+        "memory_limit_bytes": 67108864,
+        "nano_cpus": 100000000,
+        "started_at": "2026-11-28T12:07:36.855375339Z"
+      },
+      "observed_s": 0.0,
+      "sampled_mean_memory_bytes": 6488064.0,
+      "container_lifetime_counters_at_last_sample": {
+        "cpu_core_s": 0.008094,
+        "network_rx_bytes": 0,
+        "network_tx_bytes": 0
+      },
+      "counter_deltas": {}
+    }
+  ],
+  "limits": [
+    "Sample-window deltas exclude startup and exit outside observation. Decreasing counters are treated as restarts and the new counter is accumulated; reset intervals have no CPU utilization estimate.",
+    "Short-lived actors may be missed; use native pre-exit cgroup counters as well.",
+    "CPU utilization is interval-average percent of one core; short spikes may be missed.",
+    "Docker disk bytes are not device I/O latency; absent counters are unavailable, not zero."
+  ]
+}

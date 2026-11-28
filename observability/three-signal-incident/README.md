@@ -4,16 +4,21 @@
 after retained stop/start. No collector fault was injected into Grafana; data
 remains preserved. [Failure evidence](docs/FINDINGS.md).
 
-**Full Greptime and Grafana healthy cases have passed**; recovery is in progress. Performance depth 3.
-Greptime/Grafana pass the typed control; Victoria retains the values but its
-experimental Tempo API fails numeric attribute-type fidelity. [Observed findings](docs/FINDINGS.md).
-The original Victoria full case stopped on a reader sampling error; its partial
-ACKs all reconciled, with changed numeric attribute types explicitly retained. The
-corrected full case reconciled all ACK values; collector recovery is in progress.
-Compare GreptimeDB, VictoriaMetrics/Logs/Traces, and Prometheus/Loki/Tempo using
-one deterministic checkout-incident corpus and independent native-API readers.
-The [metrics/log comparison](../greptime-victoria/) is separate: its completed
-recovery evidence does not qualify traces or collectors here.
+Performance depth **3**. Each full healthy case reconciled **1 million metrics,
+1 million logs and 30,000 spans**. Greptime and Grafana preserved the selected
+typed fields; Victoria's experimental Tempo API changed integer attributes to
+strings, so its exact-type qualification remains failed.
+
+Greptime collector recovery passed. Victoria collector values reconciled with the
+same type failure. Their sampled all-signal recovery times were **11.873 s** and
+**39.011 s**, including a ten-second outage; Grafana's collector case was blocked
+by the later Loki restart failure. All ten services are stopped with data retained.
+[Measured findings and remaining gaps](docs/FINDINGS.md) preserve every failed run,
+including the original reader sampling error. No whole-stack winner is qualified.
+
+This lab compares one deterministic checkout corpus through independent native
+readers. The completed [metrics/log comparison](../greptime-victoria/) is separate
+and does not qualify these trace, collector or restart paths.
 
 - `incident-workload/`: comparison-owned Go source and official OTLP protobufs.
 - `docs/CONTRACT.md`: data, admission/persistence, comparison and recovery design.

@@ -1,0 +1,289 @@
+{
+  "case": {
+    "kind": "collector-crash",
+    "backends": [
+      "greptime"
+    ],
+    "run": "6e12da9eb1d8471babafea22b293de98",
+    "prior": "results/cases/c9a9878f6883490aba4c24bf1322174a/fixture.json",
+    "scope": "Million-record live value/recovery diagnostic; Victoria exact numeric attribute fidelity remains failed"
+  },
+  "fixture": {
+    "run": "6e12da9eb1d8471babafea22b293de98",
+    "payload_seed": "c9a9878f6883490aba4c24bf1322174a",
+    "start_ms": 1795856927000,
+    "requests": 10000,
+    "logs_per_request": 100,
+    "metric_points": 100
+  },
+  "scope": "Paced functional/recovery diagnostics, not repeated capacity benchmarks",
+  "backends": {
+    "greptime": {
+      "fence": {
+        "actors_stopped": true,
+        "histories": {
+          "metrics": "67b642d7c1a4b8c1c1d5c9b8c15938d8e0f90c1955f33d59e6ca7bcd8c90071a",
+          "logs": "4b7f8f3cd909fb92a90e41de173aa78981a1ae06010fb61d0698e9147bf41d39",
+          "traces": "e828c8aa7c532c088a5a05ad138345be97abd889536af9f7467a493a9058bdbb"
+        },
+        "fenced_at_unix_s": 1795867810.855469
+      },
+      "publication": [
+        {
+          "emitted_items": 10000,
+          "planned_items": 10000,
+          "signal": "traces",
+          "completed": true,
+          "requests": 1000,
+          "acknowledged_requests": 951,
+          "unacknowledged_requests": 49,
+          "elapsed_s": 207.282208094
+        },
+        {
+          "emitted_items": 1000000,
+          "planned_items": 1000000,
+          "signal": "metrics",
+          "completed": true,
+          "requests": 1000,
+          "acknowledged_requests": 951,
+          "unacknowledged_requests": 49,
+          "elapsed_s": 207.284345303
+        },
+        {
+          "emitted_items": 1000000,
+          "planned_items": 1000000,
+          "signal": "logs",
+          "completed": true,
+          "requests": 1000,
+          "acknowledged_requests": 952,
+          "unacknowledged_requests": 48,
+          "elapsed_s": 213.45115843
+        },
+        {
+          "captured_at": "2026-11-28T12:10:09.883200549Z",
+          "event": "native-cgroup-before-exit",
+          "scope": "Whole container/process lifetime",
+          "unavailable": {},
+          "values": {
+            "cpu.stat": "usage_usec 15059992\nuser_usec 12904821\nsystem_usec 2155170\nnice_usec 0\nnr_periods 2130\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+            "io.stat": "",
+            "memory.current": "21106688\n",
+            "memory.peak": "21401600\n"
+          }
+        }
+      ],
+      "signals": {
+        "metrics": {
+          "requests": 1000,
+          "outcomes": {
+            "accepted": 951,
+            "unacknowledged": 49
+          },
+          "source_protobuf_bytes": 103495100,
+          "source_gzip_bytes": 4490036,
+          "wire_compression_ratio": 23.04994882000946,
+          "request_http_latency_ms": {
+            "p50": 1.628542,
+            "p95": 3.233,
+            "p99": 4.135416,
+            "p99_9": 6.073834,
+            "max": 8.295916
+          }
+        },
+        "logs": {
+          "requests": 1000,
+          "outcomes": {
+            "accepted": 952,
+            "unacknowledged": 48
+          },
+          "source_protobuf_bytes": 589238578,
+          "source_gzip_bytes": 34610836,
+          "wire_compression_ratio": 17.024684928153714,
+          "request_http_latency_ms": {
+            "p50": 2.503167,
+            "p95": 3.968834,
+            "p99": 4.802375,
+            "p99_9": 6.238667,
+            "max": 8.321666
+          }
+        },
+        "traces": {
+          "requests": 1000,
+          "outcomes": {
+            "accepted": 951,
+            "unacknowledged": 49
+          },
+          "source_protobuf_bytes": 8707199,
+          "source_gzip_bytes": 1699824,
+          "wire_compression_ratio": 5.122412085015861,
+          "request_http_latency_ms": {
+            "p50": 1.202583,
+            "p95": 3.43975,
+            "p99": 5.180583,
+            "p99_9": 7.954792,
+            "max": 8.511125
+          }
+        }
+      },
+      "storage": {
+        "before-ingest": {
+          "allocated_data_bytes": 162541568,
+          "logical_file_bytes": 162137352,
+          "scope": "Includes retained prior fixtures; point snapshot, not transient peak or codec compression"
+        },
+        "after-actors": {
+          "allocated_data_bytes": 325525504,
+          "logical_file_bytes": 325391583,
+          "scope": "Includes retained prior fixtures; point snapshot, not transient peak or codec compression"
+        }
+      },
+      "collector_fault": {
+        "id": "68bd9cca5ce722aa759f37ce6cc88462f5519ebf974979b1407681873eef682a",
+        "image": "sha256:3e18fe04181de50bdd72e23ad4a4d6214b54351e63d496f1c58127cc4541ad7f",
+        "state": {
+          "Status": "exited",
+          "Running": false,
+          "Paused": false,
+          "Restarting": false,
+          "OOMKilled": false,
+          "Dead": false,
+          "Pid": 0,
+          "ExitCode": 137,
+          "Error": "",
+          "StartedAt": "2026-11-28T12:06:17.047151719Z",
+          "FinishedAt": "2026-11-28T12:06:38.406046548Z"
+        },
+        "mounts": [
+          {
+            "Type": "bind",
+            "Source": "/Users/muzammil/github.com/muzammilar/examples/observability/three-signal-incident/docker-compose/config/greptime-collector.yaml",
+            "Destination": "/config/collector.yaml",
+            "Mode": "ro",
+            "RW": false,
+            "Propagation": "rprivate"
+          },
+          {
+            "Type": "volume",
+            "Name": "obs-three-signal-incident_greptime-queue",
+            "Source": "/var/lib/docker/volumes/obs-three-signal-incident_greptime-queue/_data",
+            "Destination": "/data/queue",
+            "Driver": "local",
+            "Mode": "rw",
+            "RW": true,
+            "Propagation": ""
+          }
+        ]
+      },
+      "collector_recovery": {
+        "kill_to_new_ack_visible_s": 11.872633291000966,
+        "started_at": "2026-11-28T12:06:48.460402678Z",
+        "same_container": true
+      },
+      "live_read_outcomes": {
+        "metrics:old:visible": 213,
+        "metrics:recent:visible": 213,
+        "logs:old:visible": 213,
+        "logs:recent:visible": 208,
+        "traces:old:visible": 213,
+        "traces:recent:visible": 213,
+        "logs:recent:pending": 5
+      },
+      "visible_recent_ack_age_ms": {
+        "metrics": {
+          "samples": 213,
+          "min": 10.997209,
+          "max": 10327.75513
+        },
+        "logs": {
+          "samples": 208,
+          "min": 13.008167,
+          "max": 10302.735546
+        },
+        "traces": {
+          "samples": 213,
+          "min": 140.426959,
+          "max": 10453.039839
+        }
+      },
+      "frozen_readbacks": [
+        {
+          "path": "results/cases/6e12da9eb1d8471babafea22b293de98/greptime/final/readback-1.json",
+          "report": {
+            "backend": "greptime",
+            "captured_at": "2026-11-28T12:10:34.767863171Z",
+            "fixture": {
+              "run": "6e12da9eb1d8471babafea22b293de98",
+              "payload_seed": "c9a9878f6883490aba4c24bf1322174a",
+              "start_ms": 1795856927000,
+              "requests": 10000,
+              "logs_per_request": 100,
+              "metric_points": 100
+            },
+            "projection_diagnostic": false,
+            "scope": "Frozen ACK/value reconciliation; numeric projection is explicitly marked and cannot establish exact attribute type fidelity",
+            "signals": {
+              "logs": {
+                "complete": true,
+                "counts": {
+                  "acknowledged_records": 952000,
+                  "acknowledged_present": 952000,
+                  "missing_acknowledged_ids": [],
+                  "ambiguous_records": 48000,
+                  "ambiguous_present": 0,
+                  "ambiguous_absent_at_cut": 48000,
+                  "unexpected_ids": [],
+                  "duplicate_copies_returned_by_query": 0
+                },
+                "elapsed_s": 9.592796421,
+                "exact_attribute_type_fidelity": true,
+                "history_sha256": "4b7f8f3cd909fb92a90e41de173aa78981a1ae06010fb61d0698e9147bf41d39",
+                "numeric_attribute_projection_spans": 0
+              },
+              "metrics": {
+                "complete": true,
+                "counts": {
+                  "acknowledged_records": 951000,
+                  "acknowledged_present": 951000,
+                  "missing_acknowledged_ids": [],
+                  "ambiguous_records": 49000,
+                  "ambiguous_present": 0,
+                  "ambiguous_absent_at_cut": 49000,
+                  "unexpected_ids": [],
+                  "duplicate_copies_returned_by_query": 0
+                },
+                "elapsed_s": 1.3956287920000001,
+                "exact_attribute_type_fidelity": true,
+                "history_sha256": "67b642d7c1a4b8c1c1d5c9b8c15938d8e0f90c1955f33d59e6ca7bcd8c90071a",
+                "numeric_attribute_projection_spans": 0
+              },
+              "traces": {
+                "complete": true,
+                "counts": {
+                  "acknowledged_records": 28530,
+                  "acknowledged_present": 28530,
+                  "missing_acknowledged_ids": [],
+                  "ambiguous_records": 1470,
+                  "ambiguous_present": 0,
+                  "ambiguous_absent_at_cut": 1470,
+                  "unexpected_ids": [],
+                  "duplicate_copies_returned_by_query": 0
+                },
+                "elapsed_s": 6.694763586,
+                "exact_attribute_type_fidelity": true,
+                "history_sha256": "e828c8aa7c532c088a5a05ad138345be97abd889536af9f7467a493a9058bdbb",
+                "numeric_attribute_projection_spans": 0
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  "limitations": [
+    "Request latencies include collector admission, not backend durable commit or individual-record latency.",
+    "Empirical p99.9 from 1,000 requests is near the observed maximum, not established long-tail behavior.",
+    "Wire gzip ratio is not on-disk codec compression.",
+    "Recent read observations sample selected ACKs; they are not a complete visibility-latency distribution.",
+    "Use accompanying resource summaries and volume snapshots for CPU, memory, disk I/O, storage and network; missing device metrics remain unavailable."
+  ]
+}

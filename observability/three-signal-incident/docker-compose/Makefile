@@ -78,3 +78,7 @@ resume-experiment-case:
 test-production: test collector-crash
 report:
 	$(PYTHON) scripts/report.py "$(CASE)"
+
+.PHONY: preserve-stop
+preserve-stop:
+	$(PYTHON) scripts/control.py preserve-stop

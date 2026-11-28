@@ -4,12 +4,12 @@
 after retained stop/start. No collector fault was injected into Grafana; data
 remains preserved. [Failure evidence](../docs/FINDINGS.md).
 
-Level 3 local comparison. Small typed controls passed on Greptime and Grafana;
-Victoria's experimental Tempo API changes integer attributes to strings. The full
-Greptime and Grafana corpora passed; Victoria
-reconciles the full corpus only with its failed type projection. Collector
-recovery remains in progress.
-See [measured findings](../docs/FINDINGS.md), including preserved failed runs.
+Level 3 local comparison. All full healthy cases reconciled one million metric
+points, one million logs and 30,000 spans. Victoria's exact trace attribute types
+failed. Greptime collector recovery passed; Victoria recovered all acknowledged
+values with that same type failure. Grafana collector injection remains unrun
+after Loki's failed retained-restart prerequisite. All services are now stopped
+with their data preserved. [Measured findings](../docs/FINDINGS.md).
 
 ## Quick start
 
@@ -123,7 +123,9 @@ compression. Raw evidence stays ignored; compact selected reports are tracked.
 Zero missing acknowledged IDs in these frozen healthy readbacks. Victoria's
 original partial-publication case and exact-type failures remain failed; the
 separate projected-value diagnostic never qualifies them as typed passes.
-Collector crash/recovery is currently running and is **not yet a passed result**.
+Greptime collector recovery passed. Victoria collector values reconcile but
+exact typed fidelity remains failed. Grafana collector injection remains **unrun**
+after Loki's failed restart prerequisite. No whole-stack winner is qualified.
 
 [Initial full/partial evidence](reports/HEALTHY_INITIAL.json),
 [corrected Victoria evidence](reports/VICTORIA_HEALTHY.json),
@@ -133,3 +135,12 @@ Collector crash/recovery is currently running and is **not yet a passed result**
 and [sampled storage](reports/STORAGE.json) retain scopes and gaps.
 [Findings](../docs/FINDINGS.md) explain adapter mistakes, visibility, type loss and
 verified counts. Eight Go tests/vet and five Python safety tests pass.
+
+## Preserve a failed lab without deleting data
+
+`make preserve-stop` refuses live actors, stops only this example's services, and
+records their stopped state and preserved witness hashes. It retains containers,
+networks and data volumes. This is **not** a verified teardown receipt or a passing
+recovery. The Loki restart failure currently prevents `make down` from producing
+that receipt, so `make docker-down` must remain blocked. Do not replay/reset Loki
+or remove its data to make cleanup appear successful.

@@ -10,7 +10,8 @@ The [three-signal incident lab](three-signal-incident/) has passing full healthy
 Greptime/Grafana controls and a preserved Victoria numeric-attribute type failure;
 corrected full Victoria values reconcile. A later Loki restart omits 44,274
 previously verified log ACKs; that unresolved failure blocks Grafana collector
-qualification. Other profiles' collector cases continue independently. The broader
+qualification. Greptime collector recovery passed; Victoria value recovery passed with its
+known failed type projection. The lab is stopped with failed data retained. The broader
 incident-platform comparison is next, with all metadata/collector/UI roles included.
 
 The [per-system example plans](../docs/example-plans/streaming-and-observability.md#observability) specify the incident, failure and data checks for each component.

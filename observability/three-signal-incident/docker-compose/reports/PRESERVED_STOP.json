@@ -1,0 +1,169 @@
+{
+  "raw_receipt": "results/preserved-stops/96d0fd5ff06f49b8ab51a2ec1c4cca96.json",
+  "verified_for_destruction": false,
+  "owned_services_running": 0,
+  "service_states": {
+    "greptime": {
+      "id": "41d304b88c5abff83c6b563661c13925c4d745107f5a8fbd1fc9b393479eac28",
+      "state": {
+        "Status": "exited",
+        "Running": false,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 0,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-11-28T12:06:17.044884302Z",
+        "FinishedAt": "2026-11-28T12:11:12.1207933Z"
+      }
+    },
+    "greptime-collector": {
+      "id": "68bd9cca5ce722aa759f37ce6cc88462f5519ebf974979b1407681873eef682a",
+      "state": {
+        "Status": "exited",
+        "Running": false,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 0,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-11-28T12:06:48.460402678Z",
+        "FinishedAt": "2026-11-28T12:11:11.929288883Z"
+      }
+    },
+    "vmetrics": {
+      "id": "a6967fe37e7ee06b810bff8b5a242cc31d1d52fc61d37421571fffdde681ca65",
+      "state": {
+        "Status": "exited",
+        "Running": false,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 0,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-11-28T12:11:12.956255467Z",
+        "FinishedAt": "2026-11-28T12:17:05.535183838Z"
+      }
+    },
+    "vlogs": {
+      "id": "62c3e53cdb1bfdf73efec21986001ef5608e7b0eed30454d5bd0bcd2c162ac21",
+      "state": {
+        "Status": "exited",
+        "Running": false,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 0,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-11-28T12:11:12.955880217Z",
+        "FinishedAt": "2026-11-28T12:17:05.504262588Z"
+      }
+    },
+    "vtraces": {
+      "id": "86909b71252587e96fa1f8382cedb6316f195a85f72d6dd54405ab5dcda09d0e",
+      "state": {
+        "Status": "exited",
+        "Running": false,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 0,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-11-28T12:11:12.954516009Z",
+        "FinishedAt": "2026-11-28T12:17:05.503153047Z"
+      }
+    },
+    "victoria-collector": {
+      "id": "14c8b6d36c62216eebf39c7460174df6be03d17d32fe832812c70f3d32396ddd",
+      "state": {
+        "Status": "exited",
+        "Running": false,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 0,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-11-28T12:12:35.774144422Z",
+        "FinishedAt": "2026-11-28T12:17:05.502356047Z"
+      }
+    },
+    "prometheus": {
+      "id": "e5e2e8c8c57c0b9493624031bab8ce9fc991a7c29619d2ac97817e1fdb3b90b5",
+      "state": {
+        "Status": "exited",
+        "Running": false,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 0,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-11-28T11:56:28.990346502Z",
+        "FinishedAt": "2026-11-28T12:06:15.81739951Z"
+      }
+    },
+    "loki": {
+      "id": "59a9d833f6c8d45e2e3d944bb2858ce1357661e7653e06d77ceb4005e14f2e3f",
+      "state": {
+        "Status": "exited",
+        "Running": false,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 0,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-11-28T11:56:28.987161377Z",
+        "FinishedAt": "2026-11-28T12:06:16.393268885Z"
+      }
+    },
+    "tempo": {
+      "id": "e1faef96a69181ef84073e2f847257799591240c64faf89a9c6cc92ab176ed71",
+      "state": {
+        "Status": "exited",
+        "Running": false,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 0,
+        "ExitCode": 137,
+        "Error": "",
+        "StartedAt": "2026-11-28T11:56:28.991859002Z",
+        "FinishedAt": "2026-11-28T12:06:16.842742469Z"
+      }
+    },
+    "grafana-collector": {
+      "id": "69ccbdf7f87437584329b6159e210d97c002fb92d8f8b8988d3c50e398f1f463",
+      "state": {
+        "Status": "exited",
+        "Running": false,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 0,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-11-28T11:56:28.991683335Z",
+        "FinishedAt": "2026-11-28T12:06:15.818181302Z"
+      }
+    }
+  },
+  "scope": "Stopped owned services only; failed histories/data volumes retained. This is not a passing audit or a teardown receipt.",
+  "preserved_cases": 5
+}

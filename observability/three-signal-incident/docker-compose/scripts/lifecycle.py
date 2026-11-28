@@ -5,7 +5,7 @@ import json
 import subprocess
 import uuid
 
-from lab import ROOT, PROJECT, BACKENDS, command, save, running_actors
+from lab import ROOT, PROJECT, BACKENDS, command, save, running_actors, owned
 
 
 def witness_hashes():
@@ -153,3 +153,31 @@ def destroy():
     save(registry_path, registry)
     (ROOT / "results/plan.json").rename(archive / "plan.json")
     receipt_path.rename(archive / "verified-down.json")
+
+
+def preserve_stop():
+    """Stop only owned services; failed data cannot authorize deletion."""
+    if running_actors():
+        raise RuntimeError(
+            "Live actors must stop before preserving the backend services"
+        )
+    roles = [role for group in BACKENDS.values() for role in group]
+    command("stop", *roles)
+    states = {}
+    for role in roles:
+        if command("ps", "--all", "--quiet", role).stdout.strip():
+            row = owned(role)
+            states[role] = {
+                "id": row["Id"],
+                "state": row["State"],
+                "mounts": row["Mounts"],
+            }
+    save(
+        ROOT / "results/preserved-stops" / (uuid.uuid4().hex + ".json"),
+        {
+            "verified_for_destruction": False,
+            "witnesses": witness_hashes(),
+            "services": states,
+            "scope": "Stopped owned services only; failed histories/data volumes retained. This is not a passing audit or a teardown receipt.",
+        },
+    )
