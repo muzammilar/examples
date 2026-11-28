@@ -64,7 +64,7 @@ def main():
                 for signal in value.get("signals", {}).values():
                     counts = signal.get("counts", {})
                     for key in ["missing_acknowledged_ids", "unexpected_ids"]:
-                        ids = counts.get(key, [])
+                        ids = counts.get(key) or []
                         if len(ids) > 100:
                             ranges = []
                             for item in ids:

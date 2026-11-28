@@ -148,7 +148,7 @@ def disk_snapshot(path, label, roles=None):
                     "ALL",
                     *(
                         ["--cap-add", "DAC_READ_SEARCH"]
-                        if role == "clickstack-mongo"
+                        if role in ["clickstack-mongo", "signoz-postgres"]
                         else []
                     ),
                     "--cpus",
@@ -158,7 +158,7 @@ def disk_snapshot(path, label, roles=None):
                     "--user",
                     (
                         "0:0"
-                        if role == "clickstack-mongo"
+                        if role in ["clickstack-mongo", "signoz-postgres"]
                         else row["Config"].get("User") or "0:0"
                     ),
                     "--label",
@@ -245,6 +245,12 @@ def run(kind, backend_name="openobserve"):
             "clickstack-collector",
             list(ROLES),
         )
+        fault_label = "native-collector"
+    elif backend_name == "signoz":
+        from signoz import active, ROLES
+
+        active()
+        variant, sut_service, storage_roles = "signoz", "signoz-collector", list(ROLES)
         fault_label = "native-collector"
     elif backend_name == "openobserve":
         active_backend()

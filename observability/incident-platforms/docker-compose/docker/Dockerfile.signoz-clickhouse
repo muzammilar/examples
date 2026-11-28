@@ -1,0 +1,6 @@
+FROM clickhouse/clickhouse-server:26.11.4.11@sha256:630693b4a8bce41954fe497ed371918aefe99434139d2da5786276459722fbb6 AS helper
+ARG TARGETARCH
+ADD --checksum=sha256:e5605ebffa82a450ebbcdf6cf19dad546e1e40d52dbf3e03cfd2d2d5b7394211 https://github.com/SigNoz/signoz/releases/download/histogram-quantile%2Fv0.0.1/histogram-quantile_linux_arm64.tar.gz /tmp/histogram.tar.gz
+RUN test "$TARGETARCH" = arm64 && mkdir /histogram && tar -xzf /tmp/histogram.tar.gz -C /histogram && chmod 0555 /histogram/histogram-quantile
+FROM clickhouse/clickhouse-server:26.11.4.11@sha256:630693b4a8bce41954fe497ed371918aefe99434139d2da5786276459722fbb6
+COPY --from=helper --chown=101:101 /histogram/histogram-quantile /var/lib/clickhouse/user_scripts/histogramQuantile

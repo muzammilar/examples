@@ -107,3 +107,14 @@ replay or reset occurred. This **single** bounded process-crash result supports
 this configuration's measured ACK survival, not physical power-loss, permanent
 disk loss, HA or a statistical durability guarantee. Native trace type/scope/state
 limitations still apply. See [curated evidence](../docker-compose/reports/f3b84be721604799933b2304d50bd49d.json).
+
+
+## Native SigNoz: healthy values pass, collector ACK survival fails
+
+The [native SigNoz deployment](../docker-compose/deploy/signoz/) reconciled the
+canonical million metrics, million logs and 30,000 spans. Its ten-second collector
+crash failed the 120-second recovery gate; the final independent audit found
+**3,000 metric, 9,000 log and 210 span ACKs missing**. All failed input/state is
+retained. The metadata-cap and live disk-walk harness issues are separately
+documented, with original failed and corrected audits preserved. No qualified
+durability-equivalent performance ranking follows from these runs.

@@ -19,6 +19,11 @@ ALL_BACKENDS = [
     "clickstack-mongo",
     "clickstack-app",
     "clickstack-collector",
+    "signoz-clickhouse",
+    "signoz-keeper",
+    "signoz-postgres",
+    "signoz-app",
+    "signoz-collector",
 ]
 SERVICE = os.environ.get("OPENOBSERVE_SERVICE", "openobserve-sync")
 if SERVICE not in ["openobserve", "openobserve-sync"]:
@@ -462,8 +467,13 @@ def main():
         mode = sys.argv[1]
         (ROOT / "results/phase").write_text(mode)
         platform = os.environ.get("PLATFORM", "openobserve")
-        if platform not in ["openobserve", "clickstack"]:
+        if platform not in ["openobserve", "clickstack", "signoz"]:
             raise ValueError("Unknown isolated platform")
+        if platform == "signoz" and mode != "check":
+            from signoz import execute
+
+            execute(mode)
+            return
         if platform == "clickstack" and mode != "check":
             from clickstack import execute
 
@@ -477,6 +487,8 @@ def main():
                 "openobserve-buffered",
                 "--profile",
                 "clickstack",
+                "--profile",
+                "signoz",
                 "--profile",
                 "tools",
                 "config",

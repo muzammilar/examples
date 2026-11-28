@@ -49,6 +49,9 @@ func execute(ctx context.Context, args []string) error {
 	if *mode == "disk" {
 		return diskSnapshot()
 	}
+	if *mode == "schema" && *backend == "signoz" {
+		return inspectSigNoz(ctx)
+	}
 	if *mode == "schema" && *backend == "clickstack" {
 		return inspectClickStack(ctx)
 	}
@@ -88,7 +91,7 @@ func execute(ctx context.Context, args []string) error {
 		return errors.New("negative source pace")
 	}
 	if *mode == "watch" {
-		if *backend != "openobserve" && *backend != "clickstack" {
+		if *backend != "openobserve" && *backend != "clickstack" && *backend != "signoz" {
 			return errors.New("live native reader is not implemented for this backend yet")
 		}
 		priorRaw, err := os.ReadFile(*priorPath)
@@ -104,14 +107,28 @@ func execute(ctx context.Context, args []string) error {
 		}
 		ctx, cancel := context.WithTimeout(ctx, 15*time.Minute)
 		defer cancel()
+		if *backend == "signoz" {
+			return watchNative(ctx, f, prior, *output, "SigNoz", sigNozPoint)
+		}
 		if *backend == "clickstack" {
 			return watchNative(ctx, f, prior, *output, "ClickStack", clickStackPoint)
 		}
 		return watchOpenObserve(ctx, f, prior, *output)
 	}
 	if *mode == "sample" || *mode == "verify" || *mode == "queries" {
+		if *mode == "sample" && *backend == "signoz" {
+			return sampleSigNoz(ctx, f)
+		}
 		if *mode == "sample" && *backend == "clickstack" {
 			return sampleClickStack(ctx, f)
+		}
+		if *mode == "verify" && *backend == "signoz" {
+			if *report == "" {
+				return errors.New("verification requires a report path")
+			}
+			ctx, cancel := context.WithTimeout(ctx, 10*time.Minute)
+			defer cancel()
+			return verifySigNoz(ctx, f, *output, *report)
 		}
 		if *mode == "verify" && *backend == "clickstack" {
 			if *report == "" {

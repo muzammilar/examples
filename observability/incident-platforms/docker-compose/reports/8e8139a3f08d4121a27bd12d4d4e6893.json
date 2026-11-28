@@ -1,0 +1,593 @@
+{
+  "case": "8e8139a3f08d4121a27bd12d4d4e6893",
+  "metadata": {
+    "kind": "healthy",
+    "backend": "signoz",
+    "service": "signoz",
+    "backends_planned": [
+      "clickstack",
+      "openobserve",
+      "signoz",
+      "grafana"
+    ],
+    "prior": "results/cases/a4355b33d2bd4fba8356b86b48cae11a",
+    "scope": "Shared logical incident projection, not lossless OTLP or a capacity winner"
+  },
+  "fixture": {
+    "run": "bd209e76f1ee4eacb0cdfb16d8d1381c",
+    "payload_seed": "b4587bd2c2314cc7a7c4062660ad874c",
+    "start_ms": 1795865479000,
+    "requests": 10000,
+    "logs_per_request": 100,
+    "metric_points": 100
+  },
+  "status.json": {
+    "common_projection_passed": true,
+    "lossless_otlp_roundtrip": false,
+    "measurement_errors": [],
+    "scope": "Common logical values only; native trace projection limits are unchanged"
+  },
+  "source.json": {
+    "admission-history.go": "4903f0e4af40a86781b8de8bebd77e309e1a73d6279d2ee12a68a0558f23c780",
+    "clickstack_oracle.go": "223a53f6e0f07dae391b566476dae219157e15b3040a1cd503988b099dd17fce",
+    "clickstack_query.go": "1a8fee51005977ca67ad2216a4a7d77497444fd9953d32e0ac1bc4ce3e8dc6c7",
+    "corpus.go": "3d455e48b883f256a7e170fafa3576e99caf2e91b661339982714c3c89d3cd0c",
+    "incident_queries.go": "bee17ad3f4dbbdfb54448a14ffe3871e4d39eb451fca417d864e1deb660f14e9",
+    "main.go": "ad86051e3db076cc0f755b1dc87391347ce5a7f074ec4b1a634e3db4dafb527e",
+    "native_clickhouse.go": "83f2ffcf5d1176036032bb587a2977fcf51a63200f5185472e6794ecf0250715",
+    "native_fields.go": "923d6b98e8a5787768945fc2852a788afe4ada17e4651541422ebde64c8c067e",
+    "openobserve.go": "bb5f1df83dd6ed1a8125fb15f70950897657ba6f9ad9e6608ecc18351698d92e",
+    "openobserve_oracle.go": "0898d7e335d426947e9d4b07ee9be55a1feecf68cfd1dc7a92d97e03709dc210",
+    "openobserve_oracle_test.go": "48bcccfe7e9f4d4248905301ddaa3dad8134c099399ee7724b9315fe9683a076",
+    "publisher.go": "68189a4193c1ead05a0f672e58c7f6e5f4c4599e37478638dde5099d5d3bd083",
+    "publisher_test.go": "f1bd2fe1f2e55a91b66db32c443ea42a400d8ba3d3baf1437be2403258656b0d",
+    "resources.go": "5beca55107018a2aa3eca9a2624b5018e270db6deab951e0d671d00b0373af86",
+    "signoz_oracle.go": "a5a7083c38a2ab568360739e40667e800dde9ffb4395443cc68526181bebc898",
+    "signoz_query.go": "aef8905850f8025842aef86726cca7a10d4bd416a1980b5b1d61c8975b3c374a",
+    "storage-observer.go": "337a52ae7e8c323306d795a6dd4b164761656a91fe11df9e561f1bcef67848a1",
+    "verify.go": "e8354cc4507fc4f1de71237f67c9927936e4d124803a11abe2c730acc2c1e3ed",
+    "watch.go": "9eac1e62af11654f67d231e1de1c6ee4cb25a78b8f10047c13e8946313d99371",
+    "go.mod": "1c5602d9aa19331922bd05ee7facde1660db55488bf6f7f0818ae4a503ae4c38",
+    "go.sum": "2c01bdcd45c6b5012d9881b961a487fcdc0c1042f23716b35bc14d313e86e8aa"
+  },
+  "disk-before-ingest.json": {
+    "volumes": {
+      "obs-incident-platforms_signoz-clickhouse": {
+        "allocated_bytes": 88465408,
+        "event": "data-volume-snapshot",
+        "filesystem": {
+          "filesystem_available_bytes": 11617280000,
+          "filesystem_total_bytes": 83954712576,
+          "filesystem_type": "0xef53"
+        },
+        "logical_regular_file_bytes": 53352925,
+        "regular_files": 9119,
+        "scope": "read-only mounted owned data volume; inode-deduplicated; not a transient peak or native codec ratio"
+      },
+      "obs-incident-platforms_signoz-keeper": {
+        "allocated_bytes": 105037824,
+        "event": "data-volume-snapshot",
+        "filesystem": {
+          "filesystem_available_bytes": 11616534528,
+          "filesystem_total_bytes": 83954712576,
+          "filesystem_type": "0xef53"
+        },
+        "logical_regular_file_bytes": 4999569,
+        "regular_files": 5,
+        "scope": "read-only mounted owned data volume; inode-deduplicated; not a transient peak or native codec ratio"
+      },
+      "obs-incident-platforms_signoz-keeper-image-data": {
+        "allocated_bytes": 4096,
+        "event": "data-volume-snapshot",
+        "filesystem": {
+          "filesystem_available_bytes": 11615539200,
+          "filesystem_total_bytes": 83954712576,
+          "filesystem_type": "0xef53"
+        },
+        "logical_regular_file_bytes": 0,
+        "regular_files": 0,
+        "scope": "read-only mounted owned data volume; inode-deduplicated; not a transient peak or native codec ratio"
+      },
+      "obs-incident-platforms_signoz-postgres": {
+        "allocated_bytes": 69074944,
+        "event": "data-volume-snapshot",
+        "filesystem": {
+          "filesystem_available_bytes": 11615346688,
+          "filesystem_total_bytes": 83954712576,
+          "filesystem_type": "0xef53"
+        },
+        "logical_regular_file_bytes": 68878186,
+        "regular_files": 1546,
+        "scope": "read-only mounted owned data volume; inode-deduplicated; not a transient peak or native codec ratio"
+      },
+      "obs-incident-platforms_signoz-collector": {
+        "allocated_bytes": 28672,
+        "event": "data-volume-snapshot",
+        "filesystem": {
+          "filesystem_available_bytes": 11615272960,
+          "filesystem_total_bytes": 83954712576,
+          "filesystem_type": "0xef53"
+        },
+        "logical_regular_file_bytes": 17752,
+        "regular_files": 2,
+        "scope": "read-only mounted owned data volume; inode-deduplicated; not a transient peak or native codec ratio"
+      }
+    },
+    "allocated_data_bytes": 262610944,
+    "logical_file_bytes": 127248432,
+    "scope": "Read-only sampled allocation including retained fixtures; not continuous peak or codec ratio"
+  },
+  "disk-after-actors.json": {
+    "volumes": {
+      "obs-incident-platforms_signoz-clickhouse": {
+        "allocated_bytes": 592646144,
+        "event": "data-volume-snapshot",
+        "filesystem": {
+          "filesystem_available_bytes": 11113074688,
+          "filesystem_total_bytes": 83954712576,
+          "filesystem_type": "0xef53"
+        },
+        "logical_regular_file_bytes": 422419291,
+        "regular_files": 52121,
+        "scope": "read-only mounted owned data volume; inode-deduplicated; not a transient peak or native codec ratio"
+      },
+      "obs-incident-platforms_signoz-keeper": {
+        "allocated_bytes": 105037824,
+        "event": "data-volume-snapshot",
+        "filesystem": {
+          "filesystem_available_bytes": 11113070592,
+          "filesystem_total_bytes": 83954712576,
+          "filesystem_type": "0xef53"
+        },
+        "logical_regular_file_bytes": 6632598,
+        "regular_files": 5,
+        "scope": "read-only mounted owned data volume; inode-deduplicated; not a transient peak or native codec ratio"
+      },
+      "obs-incident-platforms_signoz-keeper-image-data": {
+        "allocated_bytes": 4096,
+        "event": "data-volume-snapshot",
+        "filesystem": {
+          "filesystem_available_bytes": 11113066496,
+          "filesystem_total_bytes": 83954712576,
+          "filesystem_type": "0xef53"
+        },
+        "logical_regular_file_bytes": 0,
+        "regular_files": 0,
+        "scope": "read-only mounted owned data volume; inode-deduplicated; not a transient peak or native codec ratio"
+      },
+      "obs-incident-platforms_signoz-postgres": {
+        "allocated_bytes": 69099520,
+        "event": "data-volume-snapshot",
+        "filesystem": {
+          "filesystem_available_bytes": 11113074688,
+          "filesystem_total_bytes": 83954712576,
+          "filesystem_type": "0xef53"
+        },
+        "logical_regular_file_bytes": 68902762,
+        "regular_files": 1546,
+        "scope": "read-only mounted owned data volume; inode-deduplicated; not a transient peak or native codec ratio"
+      },
+      "obs-incident-platforms_signoz-collector": {
+        "allocated_bytes": 28672,
+        "event": "data-volume-snapshot",
+        "filesystem": {
+          "filesystem_available_bytes": 11113005056,
+          "filesystem_total_bytes": 83954712576,
+          "filesystem_type": "0xef53"
+        },
+        "logical_regular_file_bytes": 17752,
+        "regular_files": 2,
+        "scope": "read-only mounted owned data volume; inode-deduplicated; not a transient peak or native codec ratio"
+      }
+    },
+    "allocated_data_bytes": 766816256,
+    "logical_file_bytes": 497972403,
+    "scope": "Read-only sampled allocation including retained fixtures; not continuous peak or codec ratio"
+  },
+  "readbacks": {
+    "results/cases/8e8139a3f08d4121a27bd12d4d4e6893/signoz/final/readback.json": {
+      "backend": "signoz",
+      "common_projection_passed": true,
+      "fixture": {
+        "run": "bd209e76f1ee4eacb0cdfb16d8d1381c",
+        "payload_seed": "b4587bd2c2314cc7a7c4062660ad874c",
+        "start_ms": 1795865479000,
+        "requests": 10000,
+        "logs_per_request": 100,
+        "metric_points": 100
+      },
+      "lossless_otlp_roundtrip": false,
+      "scope": "Native logical-value projection; millisecond metrics and nanosecond logs/traces; integer event attributes become strings; links become CHILD_OF/FOLLOWS_FROM references without OTLP link attributes/state/flags; not lossless OTLP",
+      "signals": {
+        "logs": {
+          "complete": true,
+          "counts": {
+            "acknowledged_records": 1000000,
+            "acknowledged_present": 1000000,
+            "missing_acknowledged_ids": [],
+            "ambiguous_records": 0,
+            "ambiguous_present": 0,
+            "ambiguous_absent_at_cut": 0,
+            "unexpected_ids": [],
+            "duplicate_copies_returned_by_query": 0
+          },
+          "elapsed_s": 11.838425297,
+          "history_sha256": "60a9791e3f9e58bf887b7c4f3e644b523635a63f483d9487a1006914b39cc277"
+        },
+        "metrics": {
+          "complete": true,
+          "counts": {
+            "acknowledged_records": 1000000,
+            "acknowledged_present": 1000000,
+            "missing_acknowledged_ids": [],
+            "ambiguous_records": 0,
+            "ambiguous_present": 0,
+            "ambiguous_absent_at_cut": 0,
+            "unexpected_ids": [],
+            "duplicate_copies_returned_by_query": 0
+          },
+          "elapsed_s": 2.428417001,
+          "history_sha256": "2373444f2e13f451c3765fd367dc646b40751c39974b59d0ed765b26fd25d80d"
+        },
+        "traces": {
+          "complete": true,
+          "counts": {
+            "acknowledged_records": 30000,
+            "acknowledged_present": 30000,
+            "missing_acknowledged_ids": [],
+            "ambiguous_records": 0,
+            "ambiguous_present": 0,
+            "ambiguous_absent_at_cut": 0,
+            "unexpected_ids": [],
+            "duplicate_copies_returned_by_query": 0
+          },
+          "elapsed_s": 0.525754126,
+          "history_sha256": "932afe6aa61271f3b8490c05828e5090b4281ed7fbc9b0ef61205c19d15ecbc7"
+        }
+      },
+      "raw_report_sha256": "ff421fa924fc6963b48c97a750fabe33582ae29d02a44a0f16de228bb975edc7"
+    }
+  },
+  "resources": [
+    {
+      "evidence": "/Users/muzammil/github.com/muzammilar/examples/observability/incident-platforms/docker-compose/results/resources-1795878663355422000.jsonl",
+      "phase_prefix": "live-publish:,fault:,recovery:",
+      "environment": {
+        "type": "environment",
+        "run_id": 1795878663355422000,
+        "fixture": null,
+        "command": [
+          "make",
+          "full-case",
+          "PYTHON=/Users/muzammil/.local/bin/python3.13"
+        ],
+        "environment": {
+          "NCPU": 11,
+          "MemTotal": 26216296448,
+          "KernelVersion": "6.12.76-linuxkit",
+          "OperatingSystem": "Docker Desktop",
+          "Driver": "overlayfs",
+          "ServerVersion": "29.5.3",
+          "docker_api": "1.54"
+        },
+        "cotenancy": "Only this isolated incident-platform lab; profiles run serially; previous lab stopped with data retained."
+      },
+      "sampled_aggregate_memory_peak_bytes": 4126547968,
+      "sampled_aggregate_memory_mean_bytes": 3363410934.0582523,
+      "actors": [
+        {
+          "name": "/obs-incident-platforms-8e8139a3f08d4121a27bd12d4d4e6893-watch",
+          "samples": 206,
+          "peak_memory_bytes": 9744384,
+          "configuration": {
+            "image_id": "sha256:5ca8409648ba4aaa3a50e598e0bed05baa9807878145742627047a3caf1b8762",
+            "image_reference": "obs-incident-platforms-workload:local",
+            "memory_limit_bytes": 134217728,
+            "nano_cpus": 250000000,
+            "started_at": "2026-11-28T15:11:06.99536751Z"
+          },
+          "counter_deltas": {
+            "cpu_core_s": 0.484572,
+            "network_rx_bytes": 2814761,
+            "network_tx_bytes": 1444414
+          },
+          "cpu_utilization_pct_one_core_min": 0.13237681552750147,
+          "cpu_utilization_pct_one_core_max": 0.6261159399869334,
+          "observed_s": 212.03139400482178,
+          "sampled_mean_memory_bytes": 9197051.029126214,
+          "cpu_utilization_pct_one_core_average": 0.22853785510129712,
+          "container_lifetime_counters_at_last_sample": {
+            "cpu_core_s": 0.495226,
+            "network_rx_bytes": 2815023,
+            "network_tx_bytes": 1444456
+          }
+        },
+        {
+          "name": "/obs-incident-platforms-8e8139a3f08d4121a27bd12d4d4e6893-publish",
+          "samples": 205,
+          "peak_memory_bytes": 18075648,
+          "configuration": {
+            "image_id": "sha256:5ca8409648ba4aaa3a50e598e0bed05baa9807878145742627047a3caf1b8762",
+            "image_reference": "obs-incident-platforms-workload:local",
+            "memory_limit_bytes": 402653184,
+            "nano_cpus": 750000000,
+            "started_at": "2026-11-28T15:11:06.773025593Z"
+          },
+          "counter_deltas": {
+            "cpu_core_s": 13.944474,
+            "network_rx_bytes": 743496,
+            "network_tx_bytes": 41674056
+          },
+          "cpu_utilization_pct_one_core_min": 2.9619776082222438,
+          "cpu_utilization_pct_one_core_max": 11.0155810017436,
+          "observed_s": 211.0035810470581,
+          "sampled_mean_memory_bytes": 15537966.204878049,
+          "cpu_utilization_pct_one_core_average": 6.60864328975066,
+          "container_lifetime_counters_at_last_sample": {
+            "cpu_core_s": 13.999689,
+            "network_rx_bytes": 747610,
+            "network_tx_bytes": 41841711
+          }
+        },
+        {
+          "name": "/obs-incident-platforms-signoz-keeper-1",
+          "samples": 206,
+          "peak_memory_bytes": 267120640,
+          "counter_deltas": {
+            "cpu_core_s": 3.65597,
+            "network_rx_bytes": 2751573,
+            "network_tx_bytes": 2621854,
+            "disk_read_bytes": 0,
+            "disk_write_bytes": 10993664
+          },
+          "cpu_utilization_pct_one_core_min": 0.6883051885991436,
+          "cpu_utilization_pct_one_core_max": 3.101286851532475,
+          "observed_s": 212.02706813812256,
+          "sampled_mean_memory_bytes": 265118849.24271846,
+          "cpu_utilization_pct_one_core_average": 1.7242939932642756,
+          "container_lifetime_counters_at_last_sample": {
+            "cpu_core_s": 4.309944,
+            "network_rx_bytes": 3081608,
+            "network_tx_bytes": 3030252,
+            "disk_read_bytes": 86016,
+            "disk_write_bytes": 11034624
+          }
+        },
+        {
+          "name": "/obs-incident-platforms-signoz-app-1",
+          "samples": 206,
+          "peak_memory_bytes": 40464384,
+          "counter_deltas": {
+            "cpu_core_s": 0.08910099999999999,
+            "network_rx_bytes": 32102,
+            "network_tx_bytes": 30242,
+            "disk_read_bytes": 0,
+            "disk_write_bytes": 0
+          },
+          "cpu_utilization_pct_one_core_min": 0.006034355116508581,
+          "cpu_utilization_pct_one_core_max": 0.7808989943319667,
+          "observed_s": 212.02732300758362,
+          "sampled_mean_memory_bytes": 40384671.067961164,
+          "cpu_utilization_pct_one_core_average": 0.04202335752586618,
+          "container_lifetime_counters_at_last_sample": {
+            "cpu_core_s": 0.864812,
+            "network_rx_bytes": 282812,
+            "network_tx_bytes": 597107,
+            "disk_read_bytes": 0,
+            "disk_write_bytes": 4096
+          }
+        },
+        {
+          "name": "/obs-incident-platforms-signoz-collector-1",
+          "samples": 206,
+          "peak_memory_bytes": 545689600,
+          "counter_deltas": {
+            "cpu_core_s": 36.757017999999995,
+            "network_rx_bytes": 46692478,
+            "network_tx_bytes": 1479163243,
+            "disk_read_bytes": 0,
+            "disk_write_bytes": 0
+          },
+          "cpu_utilization_pct_one_core_min": 0.8202497966997438,
+          "cpu_utilization_pct_one_core_max": 77.17468821561035,
+          "observed_s": 212.02703499794006,
+          "sampled_mean_memory_bytes": 397267301.9029126,
+          "cpu_utilization_pct_one_core_average": 17.336005288361978,
+          "container_lifetime_counters_at_last_sample": {
+            "cpu_core_s": 38.542094,
+            "network_rx_bytes": 47845583,
+            "network_tx_bytes": 1494352072,
+            "disk_read_bytes": 0,
+            "disk_write_bytes": 49152
+          }
+        },
+        {
+          "name": "/obs-incident-platforms-signoz-postgres-1",
+          "samples": 206,
+          "peak_memory_bytes": 125181952,
+          "counter_deltas": {
+            "cpu_core_s": 0.08662400000000003,
+            "network_rx_bytes": 28527,
+            "network_tx_bytes": 29456,
+            "disk_read_bytes": 0,
+            "disk_write_bytes": 49152
+          },
+          "cpu_utilization_pct_one_core_min": 0.0,
+          "cpu_utilization_pct_one_core_max": 1.6245318288286068,
+          "observed_s": 212.02740788459778,
+          "sampled_mean_memory_bytes": 125138924.11650485,
+          "cpu_utilization_pct_one_core_average": 0.040855095510646304,
+          "container_lifetime_counters_at_last_sample": {
+            "cpu_core_s": 2.543409,
+            "network_rx_bytes": 1281273,
+            "network_tx_bytes": 896966,
+            "disk_read_bytes": 22736896,
+            "disk_write_bytes": 85946368
+          }
+        },
+        {
+          "name": "/obs-incident-platforms-signoz-clickhouse-1",
+          "samples": 206,
+          "peak_memory_bytes": 3173339136,
+          "counter_deltas": {
+            "cpu_core_s": 96.84780799999999,
+            "network_rx_bytes": 1482483687,
+            "network_tx_bytes": 10511289,
+            "disk_read_bytes": 9494528,
+            "disk_write_bytes": 528183296
+          },
+          "cpu_utilization_pct_one_core_min": 8.906483034606566,
+          "cpu_utilization_pct_one_core_max": 151.3473092334667,
+          "observed_s": 212.0273768901825,
+          "sampled_mean_memory_bytes": 2510683682.7961164,
+          "cpu_utilization_pct_one_core_average": 45.67702974043836,
+          "container_lifetime_counters_at_last_sample": {
+            "cpu_core_s": 235.458702,
+            "network_rx_bytes": 1612043107,
+            "network_tx_bytes": 53969048,
+            "disk_read_bytes": 540409856,
+            "disk_write_bytes": 703545344
+          }
+        },
+        {
+          "name": "/charming_bouman",
+          "samples": 1,
+          "peak_memory_bytes": 0,
+          "configuration": {
+            "image_id": "sha256:5ca8409648ba4aaa3a50e598e0bed05baa9807878145742627047a3caf1b8762",
+            "image_reference": "obs-incident-platforms-workload:local",
+            "memory_limit_bytes": 67108864,
+            "nano_cpus": 100000000,
+            "started_at": "2026-11-28T15:11:37.55201376Z"
+          },
+          "observed_s": 0.0,
+          "sampled_mean_memory_bytes": 0.0,
+          "container_lifetime_counters_at_last_sample": {
+            "cpu_core_s": 0.0,
+            "network_rx_bytes": 0,
+            "network_tx_bytes": 0
+          },
+          "counter_deltas": {}
+        },
+        {
+          "name": "/optimistic_burnell",
+          "samples": 1,
+          "peak_memory_bytes": 9752576,
+          "configuration": {
+            "image_id": "sha256:5ca8409648ba4aaa3a50e598e0bed05baa9807878145742627047a3caf1b8762",
+            "image_reference": "obs-incident-platforms-workload:local",
+            "memory_limit_bytes": 67108864,
+            "nano_cpus": 100000000,
+            "started_at": "2026-11-28T15:12:08.384647094Z"
+          },
+          "observed_s": 0.0,
+          "sampled_mean_memory_bytes": 9752576.0,
+          "container_lifetime_counters_at_last_sample": {
+            "cpu_core_s": 0.036048,
+            "network_rx_bytes": 0,
+            "network_tx_bytes": 0
+          },
+          "counter_deltas": {}
+        },
+        {
+          "name": "/goofy_chatelet",
+          "samples": 1,
+          "peak_memory_bytes": 11124736,
+          "configuration": {
+            "image_id": "sha256:5ca8409648ba4aaa3a50e598e0bed05baa9807878145742627047a3caf1b8762",
+            "image_reference": "obs-incident-platforms-workload:local",
+            "memory_limit_bytes": 67108864,
+            "nano_cpus": 100000000,
+            "started_at": "2026-11-28T15:12:40.092615803Z"
+          },
+          "observed_s": 0.0,
+          "sampled_mean_memory_bytes": 11124736.0,
+          "container_lifetime_counters_at_last_sample": {
+            "cpu_core_s": 0.06853,
+            "network_rx_bytes": 0,
+            "network_tx_bytes": 0
+          },
+          "counter_deltas": {}
+        },
+        {
+          "name": "/amazing_roentgen",
+          "samples": 1,
+          "peak_memory_bytes": 11653120,
+          "configuration": {
+            "image_id": "sha256:5ca8409648ba4aaa3a50e598e0bed05baa9807878145742627047a3caf1b8762",
+            "image_reference": "obs-incident-platforms-workload:local",
+            "memory_limit_bytes": 67108864,
+            "nano_cpus": 100000000,
+            "started_at": "2026-11-28T15:14:16.015224208Z"
+          },
+          "observed_s": 0.0,
+          "sampled_mean_memory_bytes": 11653120.0,
+          "container_lifetime_counters_at_last_sample": {
+            "cpu_core_s": 0.095461,
+            "network_rx_bytes": 0,
+            "network_tx_bytes": 0
+          },
+          "counter_deltas": {}
+        }
+      ],
+      "limits": [
+        "Sample-window deltas exclude startup and exit outside observation. Decreasing counters are treated as restarts and the new counter is accumulated; reset intervals have no CPU utilization estimate.",
+        "Short-lived actors may be missed; use native pre-exit cgroup counters as well.",
+        "CPU utilization is interval-average percent of one core; short spikes may be missed.",
+        "Docker disk bytes are not device I/O latency; absent counters are unavailable, not zero."
+      ]
+    }
+  ],
+  "raw_witnesses": {
+    "results/cases/8e8139a3f08d4121a27bd12d4d4e6893/signoz/logs/requests.jsonl": "60a9791e3f9e58bf887b7c4f3e644b523635a63f483d9487a1006914b39cc277",
+    "results/cases/8e8139a3f08d4121a27bd12d4d4e6893/signoz/metrics/requests.jsonl": "2373444f2e13f451c3765fd367dc646b40751c39974b59d0ed765b26fd25d80d",
+    "results/cases/8e8139a3f08d4121a27bd12d4d4e6893/signoz/traces/requests.jsonl": "932afe6aa61271f3b8490c05828e5090b4281ed7fbc9b0ef61205c19d15ecbc7"
+  },
+  "source_batches": {
+    "logs": {
+      "timing_scope": "HTTP batch admission, not durable commit, visibility or per-record latency",
+      "timer": "Go monotonic duration, reported ms; nanosecond representation does not establish nanosecond accuracy",
+      "accepted": {
+        "batches": 1000,
+        "http_ms_mean": 3.33410256,
+        "raw_bytes": 589238578,
+        "gzip_bytes": 34605548,
+        "http_ms_p50": 2.846625,
+        "http_ms_p95": 5.654625,
+        "http_ms_p99": 8.159,
+        "http_ms_p99.9": 16.069083,
+        "source_wire_compression_ratio": 17.02728643395562
+      }
+    },
+    "metrics": {
+      "timing_scope": "HTTP batch admission, not durable commit, visibility or per-record latency",
+      "timer": "Go monotonic duration, reported ms; nanosecond representation does not establish nanosecond accuracy",
+      "accepted": {
+        "batches": 1000,
+        "http_ms_mean": 1.388780239,
+        "raw_bytes": 103495100,
+        "gzip_bytes": 4490555,
+        "http_ms_p50": 1.064167,
+        "http_ms_p95": 2.72825,
+        "http_ms_p99": 3.572583,
+        "http_ms_p99.9": 17.439791,
+        "source_wire_compression_ratio": 23.047284801099195
+      }
+    },
+    "traces": {
+      "timing_scope": "HTTP batch admission, not durable commit, visibility or per-record latency",
+      "timer": "Go monotonic duration, reported ms; nanosecond representation does not establish nanosecond accuracy",
+      "accepted": {
+        "batches": 1000,
+        "http_ms_mean": 0.7402551909999999,
+        "raw_bytes": 8707199,
+        "gzip_bytes": 1699926,
+        "http_ms_p50": 0.490458,
+        "http_ms_p95": 1.799667,
+        "http_ms_p99": 3.081292,
+        "http_ms_p99.9": 6.599958,
+        "source_wire_compression_ratio": 5.122104726911642
+      }
+    }
+  }
+}

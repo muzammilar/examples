@@ -1,0 +1,19 @@
+{
+  "backend": "SigNoz 0.152.0, native collector 0.144.19, ClickHouse/Keeper 26.11.4.11, PostgreSQL 16.16 metadata",
+  "operations": ["native OTLP logs/metrics/traces", "independent native SQL logical projection", "native root/org setup"],
+  "consistency": "eventual query visibility; fenced acknowledged source records must reconcile",
+  "atomicity": "no cross-signal or whole-source-batch atomicity claim",
+  "idempotency": "not claimed; source has no automatic retries; duplicate returned source copies fail qualification",
+  "durability": "native batch processors precede exporters and exporter queues are disabled; source ACK is not assumed to prove backend persistence; process-crash ACK survival is an explicit empirical gate",
+  "retention": "native logs initially 15 days; native stale-data filter 360h; current corpus lies inside tested retention windows; equal-TTL and retention/reclamation comparison not qualified",
+  "replication": {"hosts": 1, "clickhouse_copies": 1, "keeper_members": 1, "metadata_copies": 1, "cluster_qualified": false},
+  "selected_logs": "exact body, nanosecond timestamp/observed time, trace/span IDs and flags, source logical attributes, severity, resource and scope",
+  "selected_metrics": "millisecond time/value/flags, verified fingerprint-to-series metadata, name/unit/type/labels/resource/scope",
+  "selected_traces": "IDs, parent, state, flags, name/kind/status/message, nanosecond start/duration, logical attributes, scope, events and native references",
+  "projection_limits": ["event integer attributes are strings", "OTLP links become CHILD_OF/FOLLOWS_FROM references without OTLP link attributes/state/flags", "millisecond metric schema does not qualify submillisecond precision", "not lossless typed OTLP export"],
+  "client": {"language": "Go", "protobuf": "official OTLP 1.11.1", "retries": 0, "connect_timeout_s": 5, "request_timeout_s": 30, "max_connections_per_host": 4, "metric_log_batch": 1000, "trace_request_batch": 10, "closed_loop_delay_ms": 200},
+  "budgets": {"whole_backend_cpu": 8, "whole_backend_memory_gib": 12, "workload_cpu": 1, "workload_memory_mib": 512},
+  "fault": {"component": "native collector only", "hold_s": 10, "old_new_ack_visibility_deadline_s": 120, "other_roles": "must stay running"},
+  "known_findings_before_full": ["PostgreSQL agent cleanup reports DISTINCT/ORDER BY error", "active-query logging directory warning", "native attributes_number filter with integer literal fails BAD_GET on current ClickHouse; explicit float or native JSON path works"],
+  "limits": "single-host compatibility evaluation; no HA, Kubernetes, disk/power loss, independent restore or production security qualification"
+}

@@ -36,6 +36,30 @@ services:
     extends:
       file: ./deploy/clickstack/compose.yaml
       service: clickstack-collector
+  signoz-clickhouse:
+    extends:
+      file: ./deploy/signoz/compose.yaml
+      service: signoz-clickhouse
+  signoz-keeper:
+    extends:
+      file: ./deploy/signoz/compose.yaml
+      service: signoz-keeper
+  signoz-postgres:
+    extends:
+      file: ./deploy/signoz/compose.yaml
+      service: signoz-postgres
+  signoz-app:
+    extends:
+      file: ./deploy/signoz/compose.yaml
+      service: signoz-app
+  signoz-collector:
+    extends:
+      file: ./deploy/signoz/compose.yaml
+      service: signoz-collector
+  signoz-migrator:
+    extends:
+      file: ./deploy/signoz/compose.yaml
+      service: signoz-migrator
   incident-workload:
     <<: *workload
     build:
@@ -61,3 +85,8 @@ volumes:
   clickstack-mongo:
   clickstack-mongo-config:
   clickstack-supervisor:
+  signoz-clickhouse:
+  signoz-keeper:
+  signoz-postgres:
+  signoz-collector:
+  signoz-keeper-image-data:

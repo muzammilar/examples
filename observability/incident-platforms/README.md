@@ -26,4 +26,4 @@ Only compact curated evidence will be committed. Raw evidence and materialized
 build contexts remain ignored. The Compose README documents the five
 lifecycle commands and failed-data preservation guards. ClickStack
 [healthy/full and failed collector results](docker-compose/deploy/clickstack/)
-are recorded. SigNoz and the new whole-platform Grafana profile remain unrun; their comparison is pending.
+are recorded. SigNoz healthy full projection passes, but its collector crash loses acknowledged records; see the [native SigNoz results](docker-compose/deploy/signoz/). The new whole-platform Grafana profile and final comparison remain pending.

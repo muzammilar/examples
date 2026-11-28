@@ -18,7 +18,7 @@ class TeardownSafety(unittest.TestCase):
             side_effect=lambda *args: SimpleNamespace(
                 stdout=(
                     ""
-                    if any(str(arg).startswith("clickstack-") for arg in args)
+                    if any(str(arg).startswith(("clickstack-", "signoz-")) for arg in args)
                     else "owned-id"
                 )
             )
@@ -101,7 +101,7 @@ class TeardownSafety(unittest.TestCase):
     def test_other_platform_state_blocks_project_destruction(self):
         self.command.side_effect = None
         self.command.return_value = SimpleNamespace(stdout="other-platform")
-        with self.assertRaisesRegex(RuntimeError, "ClickStack state requires"):
+        with self.assertRaisesRegex(RuntimeError, "Native platform state requires"):
             self.module.destroy()
         self.assertFalse(
             any("down" in call.args for call in self.command.call_args_list)

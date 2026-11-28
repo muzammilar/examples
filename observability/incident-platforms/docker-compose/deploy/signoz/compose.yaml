@@ -1,0 +1,96 @@
+x-native: &native
+  profiles: [signoz]
+  pull_policy: never
+  networks: [lab]
+  security_opt: [no-new-privileges:true]
+  logging:
+    driver: json-file
+    options: {max-size: 10m, max-file: '3'}
+x-collector-env: &collector-env
+  SIGNOZ_OTEL_COLLECTOR_CLICKHOUSE_DSN: tcp://default:Local-Signoz-only@signoz-clickhouse:9000
+  SIGNOZ_OTEL_COLLECTOR_TIMEOUT: 10m
+  LOW_CARDINAL_EXCEPTION_GROUPING: 'false'
+  AWS_EC2_METADATA_DISABLED: 'true'
+services:
+  signoz-clickhouse:
+    <<: *native
+    image: obs-incident-platforms-signoz-clickhouse:local
+    build:
+      context: ../../docker
+      dockerfile: Dockerfile.signoz-clickhouse
+    cpus: 4
+    mem_limit: 7g
+    user: 101:101
+    cap_drop: [ALL]
+    environment:
+      CLICKHOUSE_SKIP_USER_SETUP: '1'
+      CLICKHOUSE_CONFIG: /etc/clickhouse-server/config.yaml
+      AWS_EC2_METADATA_DISABLED: 'true'
+    volumes:
+      - signoz-clickhouse:/var/lib/clickhouse
+      - ./clickhouse.yaml:/etc/clickhouse-server/config.yaml:ro
+      - ./functions.yaml:/etc/clickhouse-server/functions.yaml:ro
+  signoz-keeper:
+    <<: *native
+    image: clickhouse/clickhouse-keeper:26.11.4.11@sha256:1512a05cfca9f2212325edcbf0e71114ff924025b28d11e3b58bba92623bf76b
+    cpus: 0.5
+    mem_limit: 512m
+    user: 101:101
+    cap_drop: [ALL]
+    entrypoint: [/usr/bin/clickhouse-keeper, --config-file=/etc/clickhouse-keeper/keeper.yaml]
+    volumes:
+      - signoz-keeper:/var/lib/clickhouse-keeper
+      - signoz-keeper-image-data:/var/lib/clickhouse
+      - ./keeper.yaml:/etc/clickhouse-keeper/keeper.yaml:ro
+  signoz-postgres:
+    <<: *native
+    image: postgres:16.16@sha256:ce81150802644ddfac1db4da9e63be6f2a3818aa6ee98a7a28838aeea65dc37a
+    cpus: 0.5
+    mem_limit: 512m
+    environment:
+      POSTGRES_DB: signoz
+      POSTGRES_USER: signoz
+      POSTGRES_PASSWORD: Local-Signoz-P4ssword!
+      AWS_EC2_METADATA_DISABLED: 'true'
+    volumes: [signoz-postgres:/var/lib/postgresql/data]
+  signoz-app:
+    <<: *native
+    image: signoz/signoz:v0.152.0@sha256:27ed50b3a022f72646675082c65b3011a00df28568488faada71a664651e5387
+    cpus: 1.5
+    mem_limit: 2g
+    cap_drop: [ALL]
+    environment:
+      SIGNOZ_SQLSTORE_POSTGRES_DSN: postgres://signoz:Local-Signoz-P4ssword!@signoz-postgres:5432/signoz?sslmode=disable
+      SIGNOZ_SQLSTORE_PROVIDER: postgres
+      SIGNOZ_TELEMETRYSTORE_CLICKHOUSE_DSN: tcp://default:Local-Signoz-only@signoz-clickhouse:9000
+      SIGNOZ_TELEMETRYSTORE_PROVIDER: clickhouse
+      SIGNOZ_USER_ROOT_ENABLED: 'true'
+      SIGNOZ_USER_ROOT_EMAIL: incident@example.test
+      SIGNOZ_USER_ROOT_PASSWORD: Local-Incident-P4ssword!
+      SIGNOZ_USER_ROOT_ORG_ID: 11111111-2222-4333-8444-555555555555
+      SIGNOZ_USER_ROOT_ORG_NAME: incident-lab
+      TELEMETRY_ENABLED: 'false'
+      SIGNOZ_ANALYTICS_ENABLED: 'false'
+      AWS_EC2_METADATA_DISABLED: 'true'
+  signoz-collector:
+    <<: *native
+    image: signoz/signoz-otel-collector:v0.144.19@sha256:0d1fbafa9ee8aecc9fead3d577362d04a771158f3622d0e3fcde792017f5faae
+    cpus: 1.5
+    mem_limit: 2g
+    cap_drop: [ALL]
+    environment: *collector-env
+    entrypoint: [/bin/sh, -ec]
+    command: ['/signoz-otel-collector migrate sync check && exec /signoz-otel-collector --config=/etc/otel-collector-config.yaml --manager-config=/etc/opamp-config.yaml --copy-path=/var/tmp/collector-config.yaml']
+    volumes:
+      - ./collector.yaml:/etc/otel-collector-config.yaml:ro
+      - ./opamp.yaml:/etc/opamp-config.yaml:ro
+      - signoz-collector:/var/tmp
+  signoz-migrator:
+    <<: *native
+    image: signoz/signoz-otel-collector:v0.144.19@sha256:0d1fbafa9ee8aecc9fead3d577362d04a771158f3622d0e3fcde792017f5faae
+    cpus: 1.5
+    mem_limit: 2g
+    cap_drop: [ALL]
+    environment: *collector-env
+    entrypoint: [/bin/sh, -ec]
+    command: ['/signoz-otel-collector migrate ready && /signoz-otel-collector migrate bootstrap && /signoz-otel-collector migrate sync up && /signoz-otel-collector migrate async up']

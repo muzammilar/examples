@@ -30,14 +30,22 @@ func filesystemSnapshot() error {
 }
 
 func diskSnapshot() error {
-	var allocated, logical, files int64
+	var allocated, logical, files, disappeared int64
 	seen := make(map[[2]uint64]bool)
 	err := filepath.WalkDir("/data", func(path string, entry fs.DirEntry, walkErr error) error {
 		if walkErr != nil {
+			if errors.Is(walkErr, fs.ErrNotExist) && path != "/data" {
+				disappeared++
+				return nil
+			}
 			return walkErr
 		}
 		info, err := entry.Info()
 		if err != nil {
+			if errors.Is(err, fs.ErrNotExist) {
+				disappeared++
+				return nil
+			}
 			return err
 		}
 		stat, ok := info.Sys().(*syscall.Stat_t)
@@ -63,5 +71,5 @@ func diskSnapshot() error {
 	if err != nil {
 		return err
 	}
-	return json.NewEncoder(os.Stdout).Encode(map[string]any{"filesystem": capacity, "event": "data-volume-snapshot", "logical_regular_file_bytes": logical, "allocated_bytes": allocated, "regular_files": files, "scope": "read-only mounted owned data volume; inode-deduplicated; not a transient peak or native codec ratio"})
+	return json.NewEncoder(os.Stdout).Encode(map[string]any{"filesystem": capacity, "event": "data-volume-snapshot", "logical_regular_file_bytes": logical, "allocated_bytes": allocated, "regular_files": files, "disappeared_during_scan": disappeared, "scope": "read-only mounted owned data volume; inode-deduplicated; not a transient peak or native codec ratio"})
 }
