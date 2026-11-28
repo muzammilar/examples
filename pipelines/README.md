@@ -30,5 +30,13 @@ under their system directories. All infrastructure and credentials are local.
   backends, with ClickHouse quorum-write recovery. Matched serving budgets and
   unstable post-restart query timings are recorded; no overall winner is claimed.
 
-The [current batch plan](../docs/example-plans/flink-doris-spark-storage.md)
+- [PostgreSQL snapshot/WAL handoff](postgres-cdc-clickhouse/): live source
+  writes during initial snapshot and a retained-slot/offset Connect crash.
+  The corrected million-order run retained 1,310 live ACKs and matched all eight
+  fields on three ClickHouse replicas; failed setup/oracle attempts remain visible.
+
+The [CDC and observability batch](../docs/example-plans/cdc-observability-level3.md)
+tracks MySQL/Airflow and the fair observability comparisons.
+
+The [previous batch plan](../docs/example-plans/flink-doris-spark-storage.md)
 tracks completed paths and bounded storage recovery follow-ups.

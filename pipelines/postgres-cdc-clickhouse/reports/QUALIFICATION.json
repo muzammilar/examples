@@ -1,0 +1,1283 @@
+{
+  "classification": "Level 3 focused recovery diagnostics; one successful sweep, no capacity ranking or physical-host HA claim",
+  "status": {
+    "passed": true,
+    "fixture": "9a87eb87e9e1403bb56fe3d11cdc7489",
+    "run": "6347d602567e49a994dfe99df2fbdddf"
+  },
+  "application_teardown": {
+    "verified": true,
+    "evidence": "results/down-1795845899181017000"
+  },
+  "infrastructure_teardown": [
+    {
+      "passed": true,
+      "fixture": "9a87eb87e9e1403bb56fe3d11cdc7489",
+      "owned_resources_absent": true
+    }
+  ],
+  "evidence": "results/test-1795845674900347000",
+  "failed_cases": [
+    {
+      "evidence": "results/test-1795844976809597000",
+      "passed": false,
+      "fixture": "1f2962c01540472ca6403513809d011f",
+      "run": "44b0a2215a2545c39e2453184cdc8d8c"
+    }
+  ],
+  "snapshot_overlap": {
+    "snapshot-overlap-start": {
+      "counts": {
+        "reads": 276,
+        "last": 0,
+        "changes": 0
+      },
+      "source_acks": 39,
+      "utc_ns": 1795845678971609000
+    },
+    "snapshot-live-progress": {
+      "counts": {
+        "reads": 950,
+        "last": 0,
+        "changes": 0
+      },
+      "source_acks": 51,
+      "utc_ns": 1795845680170272000
+    }
+  },
+  "recovery": {
+    "held": {
+      "hold_s": 12.43364629199641,
+      "acks_before": 612,
+      "acks_while_down": 731,
+      "slot": [
+        {
+          "slot_name": "handoff",
+          "active": false,
+          "confirmed_flush_lsn": "0/C219488"
+        }
+      ]
+    },
+    "recovery-timing": {
+      "restart_to_task_running_s": 58.205126000000746,
+      "kill_to_task_running_s": 70.74767666700063
+    },
+    "snapshot-counts-after": {
+      "reads": 1010018,
+      "last": 1,
+      "changes": 2838
+    },
+    "source-offsets-before": {
+      "offsets": [
+        {
+          "partition": {
+            "server": "cdc"
+          },
+          "offset": {
+            "transaction_id": "1387",
+            "lsn_proc": 203527304,
+            "messageType": "COMMIT",
+            "transaction_data_collection_order_public.orders": 2,
+            "lsn_commit": 203527304,
+            "lsn": 203527304,
+            "txId": 1387,
+            "ts_usec": 1795845737327671
+          }
+        }
+      ]
+    },
+    "source-offsets-after": {
+      "offsets": [
+        {
+          "partition": {
+            "server": "cdc"
+          },
+          "offset": {
+            "lsn_proc": 204267632,
+            "messageType": "COMMIT",
+            "lsn_commit": 204267632,
+            "lsn": 204267632,
+            "txId": 2092,
+            "ts_usec": 1795845809937762
+          }
+        }
+      ]
+    }
+  },
+  "exact_reconciliation": {
+    "replicas": [
+      {
+        "body_sha256": "74305e4c99e94b58219becdd8803fde95809e435a266c362ebf09c1b47512111",
+        "duration_ms": 3372.348002,
+        "event": "verified",
+        "host": "ch1",
+        "rows": 1000861
+      },
+      {
+        "body_sha256": "74305e4c99e94b58219becdd8803fde95809e435a266c362ebf09c1b47512111",
+        "duration_ms": 3474.35096,
+        "event": "verified",
+        "host": "ch2",
+        "rows": 1000861
+      },
+      {
+        "body_sha256": "74305e4c99e94b58219becdd8803fde95809e435a266c362ebf09c1b47512111",
+        "duration_ms": 3428.03246,
+        "event": "verified",
+        "host": "ch3",
+        "rows": 1000861
+      }
+    ],
+    "histories": [
+      {
+        "journal": "results/cases/6347d602567e49a994dfe99df2fbdddf/witness.jsonl",
+        "acks": 1310
+      }
+    ],
+    "total_acks": 1310,
+    "wrong_or_missing": 0
+  },
+  "operation_timings": {
+    "writer": {
+      "after": {
+        "timing": {
+          "samples": 10,
+          "unit": "ms",
+          "average": 0.9205124,
+          "p50": 0.8585,
+          "p95": 1.302125,
+          "p99": 1.302125,
+          "max": 1.302125
+        },
+        "results": {
+          "ack": 10
+        }
+      },
+      "before-snapshot": {
+        "timing": {
+          "samples": 39,
+          "unit": "ms",
+          "average": 0.9373974615384615,
+          "p50": 0.797291,
+          "p95": 3.417,
+          "p99": 3.93675,
+          "max": 3.93675
+        },
+        "results": {
+          "ack": 39
+        }
+      },
+      "connect-down": {
+        "timing": {
+          "samples": 120,
+          "unit": "ms",
+          "average": 2.0443642083333335,
+          "p50": 0.862625,
+          "p95": 1.240375,
+          "p99": 2.32175,
+          "max": 135.581542
+        },
+        "results": {
+          "ack": 120
+        }
+      },
+      "connect-recovery": {
+        "timing": {
+          "samples": 568,
+          "unit": "ms",
+          "average": 0.8940254911971831,
+          "p50": 0.833583,
+          "p95": 1.197291,
+          "p99": 2.362958,
+          "max": 5.761458
+        },
+        "results": {
+          "ack": 568
+        }
+      },
+      "snapshot-overla": {
+        "timing": {
+          "samples": 1,
+          "unit": "ms",
+          "average": 0.92425,
+          "p50": 0.92425,
+          "p95": 0.92425,
+          "p99": 0.92425,
+          "max": 0.92425
+        },
+        "results": {
+          "ack": 1
+        }
+      },
+      "snapshot-overlap": {
+        "timing": {
+          "samples": 548,
+          "unit": "ms",
+          "average": 1.0785287317518248,
+          "p50": 0.747291,
+          "p95": 1.311375,
+          "p99": 8.273209,
+          "max": 68.352166
+        },
+        "results": {
+          "ack": 548
+        }
+      },
+      "streaming": {
+        "timing": {
+          "samples": 24,
+          "unit": "ms",
+          "average": 0.9573836666666667,
+          "p50": 0.668125,
+          "p95": 1.181458,
+          "p99": 6.750625,
+          "max": 6.750625
+        },
+        "results": {
+          "ack": 24
+        }
+      }
+    },
+    "reader": {
+      "after": {
+        "timing": {
+          "samples": 249,
+          "unit": "ms",
+          "average": 7.586881024096385,
+          "p50": 6.625,
+          "p95": 9.243,
+          "p99": 50.116167,
+          "max": 54.362584
+        },
+        "results": {
+          "ok": 249
+        }
+      },
+      "before-snapshot": {
+        "timing": {
+          "samples": 20,
+          "unit": "ms",
+          "average": 4.849425,
+          "p50": 3.71475,
+          "p95": 4.791166,
+          "p99": 23.267792,
+          "max": 23.267792
+        },
+        "results": {
+          "not_visible": 20
+        }
+      },
+      "connect-down": {
+        "timing": {
+          "samples": 60,
+          "unit": "ms",
+          "average": 6.902937516666666,
+          "p50": 6.722958,
+          "p95": 8.785458,
+          "p99": 12.206125,
+          "max": 12.206125
+        },
+        "results": {
+          "ok": 60
+        }
+      },
+      "connect-recovery": {
+        "timing": {
+          "samples": 282,
+          "unit": "ms",
+          "average": 6.174946673758865,
+          "p50": 6.023125,
+          "p95": 7.451875,
+          "p99": 8.480125,
+          "max": 9.970209
+        },
+        "results": {
+          "ok": 282
+        }
+      },
+      "snapshot-overlap": {
+        "timing": {
+          "samples": 274,
+          "unit": "ms",
+          "average": 5.297231591240876,
+          "p50": 4.456916,
+          "p95": 6.621625,
+          "p99": 41.754542,
+          "max": 48.009209
+        },
+        "results": {
+          "not_visible": 264,
+          "ok": 10
+        }
+      },
+      "streaming": {
+        "timing": {
+          "samples": 11,
+          "unit": "ms",
+          "average": 5.825287636363637,
+          "p50": 5.716875,
+          "p95": 6.490416,
+          "p99": 6.490416,
+          "max": 6.490416
+        },
+        "results": {
+          "ok": 11
+        }
+      }
+    }
+  },
+  "resources": {
+    "evidence": "/Users/muzammil/github.com/muzammilar/examples/pipelines/postgres-cdc-clickhouse/results/resources-1795845674872984000.jsonl",
+    "environment": {
+      "type": "environment",
+      "run_id": 1795845674872984000,
+      "fixture": "9a87eb87e9e1403bb56fe3d11cdc7489",
+      "command": [
+        "make",
+        "snapshot-recovery",
+        "PYTHON=/Users/muzammil/.local/bin/python3.13"
+      ],
+      "environment": {
+        "NCPU": 11,
+        "MemTotal": 26216296448,
+        "KernelVersion": "6.12.76-linuxkit",
+        "OperatingSystem": "Docker Desktop",
+        "Driver": "overlayfs",
+        "ServerVersion": "29.5.3",
+        "docker_api": "1.54"
+      },
+      "cotenancy": "Only this order CDC pipeline; no other heavy lab."
+    },
+    "sampled_aggregate_memory_peak_bytes": 6953361408,
+    "sampled_aggregate_memory_mean_bytes": 6330893243.733334,
+    "actors": [
+      {
+        "name": "/postgres-cdc-clickhouse-connect-1",
+        "samples": 167,
+        "peak_memory_bytes": 923295744,
+        "configuration": {
+          "image_id": "sha256:667078edf71f67610370592ca067370044f9c289d07d014093b1f8f034fa52ce",
+          "image_reference": "quay.io/debezium/connect:3.7.1.Final@sha256:667078edf71f67610370592ca067370044f9c289d07d014093b1f8f034fa52ce",
+          "memory_limit_bytes": 1073741824,
+          "nano_cpus": 500000000,
+          "started_at": "2026-11-28T05:59:35.731912762Z"
+        },
+        "counter_deltas": {
+          "cpu_core_s": 60.14020400000001,
+          "network_rx_bytes": 60248549,
+          "network_tx_bytes": 56757929,
+          "disk_read_bytes": 8192,
+          "disk_write_bytes": 802816
+        },
+        "cpu_utilization_pct_one_core_min": 1.0143564150461761,
+        "cpu_utilization_pct_one_core_max": 52.696993174441936,
+        "counter_resets": 5,
+        "observed_s": 189.3820550441742,
+        "sampled_mean_memory_bytes": 694702619.5928143,
+        "cpu_utilization_pct_one_core_average": 31.75602038216981,
+        "container_lifetime_counters_at_last_sample": {
+          "cpu_core_s": 32.11439,
+          "network_rx_bytes": 899993,
+          "network_tx_bytes": 607076,
+          "disk_read_bytes": 0,
+          "disk_write_bytes": 483328
+        }
+      },
+      {
+        "name": "/postgres-cdc-clickhouse-orders-workload-1",
+        "samples": 180,
+        "peak_memory_bytes": 30339072,
+        "configuration": {
+          "image_id": "sha256:804803e5f19b3797f874f7cfb44d3c639a926c32ecb47c95cdf59af433c86cc6",
+          "image_reference": "examples/postgres-handoff-workload:1",
+          "memory_limit_bytes": 536870912,
+          "nano_cpus": 500000000,
+          "started_at": "2026-11-28T05:59:35.228425637Z"
+        },
+        "counter_deltas": {
+          "cpu_core_s": 6.361934,
+          "network_rx_bytes": 319608099,
+          "network_tx_bytes": 2224334
+        },
+        "cpu_utilization_pct_one_core_min": 0.0,
+        "cpu_utilization_pct_one_core_max": 51.9985324738248,
+        "observed_s": 189.38189697265625,
+        "sampled_mean_memory_bytes": 20793776.355555557,
+        "cpu_utilization_pct_one_core_average": 3.359314750616614,
+        "container_lifetime_counters_at_last_sample": {
+          "cpu_core_s": 6.384715,
+          "network_rx_bytes": 319611421,
+          "network_tx_bytes": 2226454
+        }
+      },
+      {
+        "name": "/postgres-cdc-clickhouse-postgres-1",
+        "samples": 180,
+        "peak_memory_bytes": 493957120,
+        "configuration": {
+          "image_id": "sha256:64c8b0d31e4ab6ea665e8426ea406a94bf52de3c05b3a4a8bf713704eefa9328",
+          "image_reference": "postgres:18.7@sha256:64c8b0d31e4ab6ea665e8426ea406a94bf52de3c05b3a4a8bf713704eefa9328",
+          "memory_limit_bytes": 536870912,
+          "nano_cpus": 500000000,
+          "started_at": "2026-11-28T05:57:53.718553798Z"
+        },
+        "counter_deltas": {
+          "cpu_core_s": 2.9874780000000003,
+          "network_rx_bytes": 2321302,
+          "network_tx_bytes": 350942840,
+          "disk_read_bytes": 0,
+          "disk_write_bytes": 47394816
+        },
+        "cpu_utilization_pct_one_core_min": 0.05889661579878947,
+        "cpu_utilization_pct_one_core_max": 11.550515802224949,
+        "observed_s": 189.38014888763428,
+        "sampled_mean_memory_bytes": 484466892.8,
+        "cpu_utilization_pct_one_core_average": 1.5775032481216251,
+        "container_lifetime_counters_at_last_sample": {
+          "cpu_core_s": 6.711876,
+          "network_rx_bytes": 2327846,
+          "network_tx_bytes": 350944744,
+          "disk_read_bytes": 1646592,
+          "disk_write_bytes": 559906816
+        }
+      },
+      {
+        "name": "/postgres-cdc-clickhouse-ch1-1",
+        "samples": 180,
+        "peak_memory_bytes": 1036288000,
+        "configuration": {
+          "image_id": "sha256:630693b4a8bce41954fe497ed371918aefe99434139d2da5786276459722fbb6",
+          "image_reference": "clickhouse/clickhouse-server:26.11.4.11@sha256:630693b4a8bce41954fe497ed371918aefe99434139d2da5786276459722fbb6",
+          "memory_limit_bytes": 3758096384,
+          "nano_cpus": 1250000000,
+          "started_at": "2026-11-28T05:57:53.715501382Z"
+        },
+        "counter_deltas": {
+          "cpu_core_s": 49.374987000000004,
+          "network_rx_bytes": 51250095,
+          "network_tx_bytes": 48347129,
+          "disk_read_bytes": 0,
+          "disk_write_bytes": 187043840
+        },
+        "cpu_utilization_pct_one_core_min": 5.8593334482609745,
+        "cpu_utilization_pct_one_core_max": 121.30497779571688,
+        "observed_s": 189.3778030872345,
+        "sampled_mean_memory_bytes": 868647048.5333333,
+        "cpu_utilization_pct_one_core_average": 26.072214480836507,
+        "container_lifetime_counters_at_last_sample": {
+          "cpu_core_s": 62.200405,
+          "network_rx_bytes": 51373595,
+          "network_tx_bytes": 48455763,
+          "disk_read_bytes": 0,
+          "disk_write_bytes": 203747328
+        }
+      },
+      {
+        "name": "/postgres-cdc-clickhouse-ch2-1",
+        "samples": 180,
+        "peak_memory_bytes": 980492288,
+        "configuration": {
+          "image_id": "sha256:630693b4a8bce41954fe497ed371918aefe99434139d2da5786276459722fbb6",
+          "image_reference": "clickhouse/clickhouse-server:26.11.4.11@sha256:630693b4a8bce41954fe497ed371918aefe99434139d2da5786276459722fbb6",
+          "memory_limit_bytes": 3758096384,
+          "nano_cpus": 1250000000,
+          "started_at": "2026-11-28T05:57:53.71838584Z"
+        },
+        "counter_deltas": {
+          "cpu_core_s": 19.508861,
+          "network_rx_bytes": 43669747,
+          "network_tx_bytes": 28663896,
+          "disk_read_bytes": 0,
+          "disk_write_bytes": 184774656
+        },
+        "cpu_utilization_pct_one_core_min": 3.1260421252801365,
+        "cpu_utilization_pct_one_core_max": 67.66427896879856,
+        "observed_s": 189.37655997276306,
+        "sampled_mean_memory_bytes": 813455405.5111111,
+        "cpu_utilization_pct_one_core_average": 10.301623919457533,
+        "container_lifetime_counters_at_last_sample": {
+          "cpu_core_s": 32.404325,
+          "network_rx_bytes": 43780136,
+          "network_tx_bytes": 28759776,
+          "disk_read_bytes": 0,
+          "disk_write_bytes": 201449472
+        }
+      },
+      {
+        "name": "/postgres-cdc-clickhouse-controller1-1",
+        "samples": 180,
+        "peak_memory_bytes": 182915072,
+        "configuration": {
+          "image_id": "sha256:852a0d49fc4e656b022e7f23785411802c9a088c78a7c5e39f33969de9c227a7",
+          "image_reference": "apache/kafka:4.3.2@sha256:852a0d49fc4e656b022e7f23785411802c9a088c78a7c5e39f33969de9c227a7",
+          "memory_limit_bytes": 402653184,
+          "nano_cpus": 250000000,
+          "started_at": "2026-11-28T05:57:53.703034173Z"
+        },
+        "counter_deltas": {
+          "cpu_core_s": 1.3380019999999995,
+          "network_rx_bytes": 267316,
+          "network_tx_bytes": 205114,
+          "disk_read_bytes": 0,
+          "disk_write_bytes": 1835008
+        },
+        "cpu_utilization_pct_one_core_min": 0.4074519184891234,
+        "cpu_utilization_pct_one_core_max": 7.493815501885704,
+        "observed_s": 189.37533712387085,
+        "sampled_mean_memory_bytes": 165066569.95555556,
+        "cpu_utilization_pct_one_core_average": 0.7065344518039376,
+        "container_lifetime_counters_at_last_sample": {
+          "cpu_core_s": 5.820892,
+          "network_rx_bytes": 597990,
+          "network_tx_bytes": 451853,
+          "disk_read_bytes": 10436608,
+          "disk_write_bytes": 4046848
+        }
+      },
+      {
+        "name": "/postgres-cdc-clickhouse-ch3-1",
+        "samples": 180,
+        "peak_memory_bytes": 898064384,
+        "configuration": {
+          "image_id": "sha256:630693b4a8bce41954fe497ed371918aefe99434139d2da5786276459722fbb6",
+          "image_reference": "clickhouse/clickhouse-server:26.11.4.11@sha256:630693b4a8bce41954fe497ed371918aefe99434139d2da5786276459722fbb6",
+          "memory_limit_bytes": 3758096384,
+          "nano_cpus": 1250000000,
+          "started_at": "2026-11-28T05:57:53.71731159Z"
+        },
+        "counter_deltas": {
+          "cpu_core_s": 19.26688,
+          "network_rx_bytes": 43729629,
+          "network_tx_bytes": 29990375,
+          "disk_read_bytes": 0,
+          "disk_write_bytes": 182501376
+        },
+        "cpu_utilization_pct_one_core_min": 3.1258208974873996,
+        "cpu_utilization_pct_one_core_max": 65.11368530720561,
+        "observed_s": 189.37403798103333,
+        "sampled_mean_memory_bytes": 807949971.9111111,
+        "cpu_utilization_pct_one_core_average": 10.173981716506287,
+        "container_lifetime_counters_at_last_sample": {
+          "cpu_core_s": 31.947326,
+          "network_rx_bytes": 43841547,
+          "network_tx_bytes": 30086172,
+          "disk_read_bytes": 0,
+          "disk_write_bytes": 200859648
+        }
+      },
+      {
+        "name": "/postgres-cdc-clickhouse-broker3-1",
+        "samples": 180,
+        "peak_memory_bytes": 536870912,
+        "configuration": {
+          "image_id": "sha256:852a0d49fc4e656b022e7f23785411802c9a088c78a7c5e39f33969de9c227a7",
+          "image_reference": "apache/kafka:4.3.2@sha256:852a0d49fc4e656b022e7f23785411802c9a088c78a7c5e39f33969de9c227a7",
+          "memory_limit_bytes": 536870912,
+          "nano_cpus": 250000000,
+          "started_at": "2026-11-28T05:57:53.698385798Z"
+        },
+        "counter_deltas": {
+          "cpu_core_s": 18.823370999999998,
+          "network_rx_bytes": 58264213,
+          "network_tx_bytes": 45980919,
+          "disk_read_bytes": 479232,
+          "disk_write_bytes": 56762368
+        },
+        "cpu_utilization_pct_one_core_min": 0.8216503160721514,
+        "cpu_utilization_pct_one_core_max": 26.552741375733557,
+        "observed_s": 189.37283301353455,
+        "sampled_mean_memory_bytes": 439731108.9777778,
+        "cpu_utilization_pct_one_core_average": 9.939847601400505,
+        "container_lifetime_counters_at_last_sample": {
+          "cpu_core_s": 38.334908,
+          "network_rx_bytes": 58888968,
+          "network_tx_bytes": 46549175,
+          "disk_read_bytes": 4362240,
+          "disk_write_bytes": 58572800
+        }
+      },
+      {
+        "name": "/postgres-cdc-clickhouse-controller2-1",
+        "samples": 180,
+        "peak_memory_bytes": 185860096,
+        "configuration": {
+          "image_id": "sha256:852a0d49fc4e656b022e7f23785411802c9a088c78a7c5e39f33969de9c227a7",
+          "image_reference": "apache/kafka:4.3.2@sha256:852a0d49fc4e656b022e7f23785411802c9a088c78a7c5e39f33969de9c227a7",
+          "memory_limit_bytes": 402653184,
+          "nano_cpus": 250000000,
+          "started_at": "2026-11-28T05:57:53.70059309Z"
+        },
+        "counter_deltas": {
+          "cpu_core_s": 1.3812350000000002,
+          "network_rx_bytes": 267316,
+          "network_tx_bytes": 205114,
+          "disk_read_bytes": 0,
+          "disk_write_bytes": 1843200
+        },
+        "cpu_utilization_pct_one_core_min": 0.40217667946282876,
+        "cpu_utilization_pct_one_core_max": 9.832126353457431,
+        "observed_s": 189.37189412117004,
+        "sampled_mean_memory_bytes": 171580347.73333332,
+        "cpu_utilization_pct_one_core_average": 0.7293769787802904,
+        "container_lifetime_counters_at_last_sample": {
+          "cpu_core_s": 5.780305,
+          "network_rx_bytes": 595961,
+          "network_tx_bytes": 450355,
+          "disk_read_bytes": 16773120,
+          "disk_write_bytes": 4067328
+        }
+      },
+      {
+        "name": "/postgres-cdc-clickhouse-broker1-1",
+        "samples": 180,
+        "peak_memory_bytes": 536567808,
+        "configuration": {
+          "image_id": "sha256:852a0d49fc4e656b022e7f23785411802c9a088c78a7c5e39f33969de9c227a7",
+          "image_reference": "apache/kafka:4.3.2@sha256:852a0d49fc4e656b022e7f23785411802c9a088c78a7c5e39f33969de9c227a7",
+          "memory_limit_bytes": 536870912,
+          "nano_cpus": 250000000,
+          "started_at": "2026-11-28T05:57:53.704559423Z"
+        },
+        "counter_deltas": {
+          "cpu_core_s": 24.588127999999998,
+          "network_rx_bytes": 58003101,
+          "network_tx_bytes": 43685141,
+          "disk_read_bytes": 7114752,
+          "disk_write_bytes": 106328064
+        },
+        "cpu_utilization_pct_one_core_min": 0.8484851944141989,
+        "cpu_utilization_pct_one_core_max": 26.038310768383774,
+        "observed_s": 189.37091493606567,
+        "sampled_mean_memory_bytes": 438709225.24444443,
+        "cpu_utilization_pct_one_core_average": 12.984110051061062,
+        "container_lifetime_counters_at_last_sample": {
+          "cpu_core_s": 57.583726,
+          "network_rx_bytes": 58613345,
+          "network_tx_bytes": 44243182,
+          "disk_read_bytes": 36900864,
+          "disk_write_bytes": 108257280
+        }
+      },
+      {
+        "name": "/postgres-cdc-clickhouse-broker2-1",
+        "samples": 180,
+        "peak_memory_bytes": 535687168,
+        "configuration": {
+          "image_id": "sha256:852a0d49fc4e656b022e7f23785411802c9a088c78a7c5e39f33969de9c227a7",
+          "image_reference": "apache/kafka:4.3.2@sha256:852a0d49fc4e656b022e7f23785411802c9a088c78a7c5e39f33969de9c227a7",
+          "memory_limit_bytes": 536870912,
+          "nano_cpus": 250000000,
+          "started_at": "2026-11-28T05:57:53.705755715Z"
+        },
+        "counter_deltas": {
+          "cpu_core_s": 20.076515999999998,
+          "network_rx_bytes": 58634157,
+          "network_tx_bytes": 85327922,
+          "disk_read_bytes": 143360,
+          "disk_write_bytes": 56483840
+        },
+        "cpu_utilization_pct_one_core_min": 0.8621866861280892,
+        "cpu_utilization_pct_one_core_max": 26.396983714578763,
+        "observed_s": 189.36952114105225,
+        "sampled_mean_memory_bytes": 446050349.51111114,
+        "cpu_utilization_pct_one_core_average": 10.601767316634849,
+        "container_lifetime_counters_at_last_sample": {
+          "cpu_core_s": 39.596101,
+          "network_rx_bytes": 59278928,
+          "network_tx_bytes": 85929175,
+          "disk_read_bytes": 5349376,
+          "disk_write_bytes": 58101760
+        }
+      },
+      {
+        "name": "/postgres-cdc-clickhouse-keeper1-1",
+        "samples": 180,
+        "peak_memory_bytes": 278536192,
+        "configuration": {
+          "image_id": "sha256:1512a05cfca9f2212325edcbf0e71114ff924025b28d11e3b58bba92623bf76b",
+          "image_reference": "clickhouse/clickhouse-keeper:26.11.4.11@sha256:1512a05cfca9f2212325edcbf0e71114ff924025b28d11e3b58bba92623bf76b",
+          "memory_limit_bytes": 536870912,
+          "nano_cpus": 250000000,
+          "started_at": "2026-11-28T05:57:53.687371632Z"
+        },
+        "counter_deltas": {
+          "cpu_core_s": 4.081885,
+          "network_rx_bytes": 4331037,
+          "network_tx_bytes": 6665523,
+          "disk_read_bytes": 0,
+          "disk_write_bytes": 18567168
+        },
+        "cpu_utilization_pct_one_core_min": 0.8794685298615965,
+        "cpu_utilization_pct_one_core_max": 6.761671841440822,
+        "observed_s": 189.3683500289917,
+        "sampled_mean_memory_bytes": 276681864.53333336,
+        "cpu_utilization_pct_one_core_average": 2.155526517168828,
+        "container_lifetime_counters_at_last_sample": {
+          "cpu_core_s": 6.948722,
+          "network_rx_bytes": 4579111,
+          "network_tx_bytes": 7046325,
+          "disk_read_bytes": 0,
+          "disk_write_bytes": 19345408
+        }
+      },
+      {
+        "name": "/postgres-cdc-clickhouse-keeper2-1",
+        "samples": 180,
+        "peak_memory_bytes": 290918400,
+        "configuration": {
+          "image_id": "sha256:1512a05cfca9f2212325edcbf0e71114ff924025b28d11e3b58bba92623bf76b",
+          "image_reference": "clickhouse/clickhouse-keeper:26.11.4.11@sha256:1512a05cfca9f2212325edcbf0e71114ff924025b28d11e3b58bba92623bf76b",
+          "memory_limit_bytes": 536870912,
+          "nano_cpus": 250000000,
+          "started_at": "2026-11-28T05:57:53.694625257Z"
+        },
+        "counter_deltas": {
+          "cpu_core_s": 4.698818,
+          "network_rx_bytes": 5424410,
+          "network_tx_bytes": 5047990,
+          "disk_read_bytes": 0,
+          "disk_write_bytes": 20344832
+        },
+        "cpu_utilization_pct_one_core_min": 1.037589255523594,
+        "cpu_utilization_pct_one_core_max": 7.1181206176527585,
+        "observed_s": 189.36769104003906,
+        "sampled_mean_memory_bytes": 287219370.6666667,
+        "cpu_utilization_pct_one_core_average": 2.481319793357201,
+        "container_lifetime_counters_at_last_sample": {
+          "cpu_core_s": 7.54799,
+          "network_rx_bytes": 5695242,
+          "network_tx_bytes": 5245990,
+          "disk_read_bytes": 0,
+          "disk_write_bytes": 21123072
+        }
+      },
+      {
+        "name": "/postgres-cdc-clickhouse-controller3-1",
+        "samples": 180,
+        "peak_memory_bytes": 189472768,
+        "configuration": {
+          "image_id": "sha256:852a0d49fc4e656b022e7f23785411802c9a088c78a7c5e39f33969de9c227a7",
+          "image_reference": "apache/kafka:4.3.2@sha256:852a0d49fc4e656b022e7f23785411802c9a088c78a7c5e39f33969de9c227a7",
+          "memory_limit_bytes": 402653184,
+          "nano_cpus": 250000000,
+          "started_at": "2026-11-28T05:57:53.716007798Z"
+        },
+        "counter_deltas": {
+          "cpu_core_s": 2.2444510000000006,
+          "network_rx_bytes": 1094995,
+          "network_tx_bytes": 1340927,
+          "disk_read_bytes": 0,
+          "disk_write_bytes": 1863680
+        },
+        "cpu_utilization_pct_one_core_min": 0.6656872037420538,
+        "cpu_utilization_pct_one_core_max": 7.9519272781859724,
+        "observed_s": 189.36558294296265,
+        "sampled_mean_memory_bytes": 181422512.35555556,
+        "cpu_utilization_pct_one_core_average": 1.1852475857115146,
+        "container_lifetime_counters_at_last_sample": {
+          "cpu_core_s": 9.712182,
+          "network_rx_bytes": 2283098,
+          "network_tx_bytes": 2867778,
+          "disk_read_bytes": 0,
+          "disk_write_bytes": 4079616
+        }
+      },
+      {
+        "name": "/postgres-cdc-clickhouse-keeper3-1",
+        "samples": 180,
+        "peak_memory_bytes": 287858688,
+        "configuration": {
+          "image_id": "sha256:1512a05cfca9f2212325edcbf0e71114ff924025b28d11e3b58bba92623bf76b",
+          "image_reference": "clickhouse/clickhouse-keeper:26.11.4.11@sha256:1512a05cfca9f2212325edcbf0e71114ff924025b28d11e3b58bba92623bf76b",
+          "memory_limit_bytes": 536870912,
+          "nano_cpus": 250000000,
+          "started_at": "2026-11-28T05:57:53.709158965Z"
+        },
+        "counter_deltas": {
+          "cpu_core_s": 5.486913,
+          "network_rx_bytes": 7782825,
+          "network_tx_bytes": 9429403,
+          "disk_read_bytes": 0,
+          "disk_write_bytes": 20570112
+        },
+        "cpu_utilization_pct_one_core_min": 1.072971894631641,
+        "cpu_utilization_pct_one_core_max": 8.776564150384955,
+        "observed_s": 189.36354112625122,
+        "sampled_mean_memory_bytes": 284589147.0222222,
+        "cpu_utilization_pct_one_core_average": 2.897555129866209,
+        "container_lifetime_counters_at_last_sample": {
+          "cpu_core_s": 8.377045,
+          "network_rx_bytes": 8138324,
+          "network_tx_bytes": 9738658,
+          "disk_read_bytes": 0,
+          "disk_write_bytes": 21356544
+        }
+      }
+    ],
+    "limits": [
+      "Sample-window deltas exclude startup and exit outside observation. Decreasing counters are treated as restarts and the new counter is accumulated; reset intervals have no CPU utilization estimate.",
+      "Short-lived actors may be missed; use native pre-exit cgroup counters as well.",
+      "CPU utilization is interval-average percent of one core; short spikes may be missed.",
+      "Docker disk bytes are not device I/O latency; absent counters are unavailable, not zero."
+    ]
+  },
+  "native_accounting": {
+    "native-cgroup": {
+      "scope": "Current-container-incarnation cumulative CPU/I/O and native memory high-water. Unrestarted roles include setup/import; restarted Connect does not retain its pre-crash cgroup totals. Empty values are unavailable, not zero.",
+      "roles": {
+        "postgres": {
+          "cpu.stat": "usage_usec 8104495\nuser_usec 6874614\nsystem_usec 1229881\nnice_usec 0\nnr_periods 1733\nnr_throttled 54\nthrottled_usec 2611279\nnr_bursts 0\nburst_usec 0",
+          "memory.peak": "513515520",
+          "memory.current": "487133184",
+          "io.stat": "254:0 rbytes=1646592 wbytes=590315520 rios=52 wios=6016 dbytes=0 dios=0"
+        },
+        "connect": {
+          "cpu.stat": "usage_usec 34514920\nuser_usec 33004067\nsystem_usec 1510852\nnice_usec 0\nnr_periods 1899\nnr_throttled 612\nthrottled_usec 122616198\nnr_bursts 0\nburst_usec 0",
+          "memory.peak": "738050048",
+          "memory.current": "591134720",
+          "io.stat": "254:0 rbytes=0 wbytes=557056 rios=0 wios=40 dbytes=0 dios=0"
+        },
+        "controller1": {
+          "cpu.stat": "usage_usec 6704123\nuser_usec 5906098\nsystem_usec 798024\nnice_usec 0\nnr_periods 2917\nnr_throttled 107\nthrottled_usec 15430982\nnr_bursts 0\nburst_usec 0",
+          "memory.peak": "191070208",
+          "memory.current": "167608320",
+          "io.stat": "254:0 rbytes=10477568 wbytes=4837376 rios=171 wios=4828 dbytes=0 dios=0"
+        },
+        "controller2": {
+          "cpu.stat": "usage_usec 6569122\nuser_usec 5709588\nsystem_usec 859533\nnice_usec 0\nnr_periods 2978\nnr_throttled 95\nthrottled_usec 12899523\nnr_bursts 0\nburst_usec 0",
+          "memory.peak": "196026368",
+          "memory.current": "173170688",
+          "io.stat": "254:0 rbytes=16773120 wbytes=4857856 rios=145 wios=4837 dbytes=0 dios=0"
+        },
+        "controller3": {
+          "cpu.stat": "usage_usec 10653973\nuser_usec 8990926\nsystem_usec 1663047\nnice_usec 0\nnr_periods 3450\nnr_throttled 134\nthrottled_usec 21710378\nnr_bursts 0\nburst_usec 0",
+          "memory.peak": "199651328",
+          "memory.current": "188715008",
+          "io.stat": "254:0 rbytes=0 wbytes=4882432 rios=0 wios=4834 dbytes=0 dios=0"
+        },
+        "broker1": {
+          "cpu.stat": "usage_usec 70460455\nuser_usec 62569150\nsystem_usec 7891305\nnice_usec 0\nnr_periods 4555\nnr_throttled 2567\nthrottled_usec 626757494\nnr_bursts 0\nburst_usec 0",
+          "memory.peak": "536928256",
+          "memory.current": "210804736",
+          "io.stat": "254:0 rbytes=44343296 wbytes=115957760 rios=3887 wios=14635 dbytes=0 dios=0"
+        },
+        "broker2": {
+          "cpu.stat": "usage_usec 46387225\nuser_usec 41086502\nsystem_usec 5300722\nnice_usec 0\nnr_periods 4503\nnr_throttled 1439\nthrottled_usec 262713190\nnr_bursts 0\nburst_usec 0",
+          "memory.peak": "536870912",
+          "memory.current": "525631488",
+          "io.stat": "254:0 rbytes=5349376 wbytes=58540032 rios=100 wios=715 dbytes=0 dios=0"
+        },
+        "broker3": {
+          "cpu.stat": "usage_usec 45178925\nuser_usec 40122533\nsystem_usec 5056391\nnice_usec 0\nnr_periods 4473\nnr_throttled 1416\nthrottled_usec 273177199\nnr_bursts 0\nburst_usec 0",
+          "memory.peak": "536891392",
+          "memory.current": "472039424",
+          "io.stat": "254:0 rbytes=4362240 wbytes=58990592 rios=107 wios=830 dbytes=0 dios=0"
+        },
+        "ch1": {
+          "cpu.stat": "usage_usec 68825277\nuser_usec 58340473\nsystem_usec 10484804\nnice_usec 0\nnr_periods 4744\nnr_throttled 86\nthrottled_usec 6177444\nnr_bursts 0\nburst_usec 0",
+          "memory.peak": "1107894272",
+          "memory.current": "951238656",
+          "io.stat": "254:0 rbytes=28672 wbytes=216776704 rios=2 wios=12265 dbytes=0 dios=0"
+        },
+        "ch2": {
+          "cpu.stat": "usage_usec 38829865\nuser_usec 29870774\nsystem_usec 8959090\nnice_usec 0\nnr_periods 4747\nnr_throttled 8\nthrottled_usec 160280\nnr_bursts 0\nburst_usec 0",
+          "memory.peak": "1038262272",
+          "memory.current": "914657280",
+          "io.stat": "254:0 rbytes=0 wbytes=213102592 rios=0 wios=12307 dbytes=0 dios=0"
+        },
+        "ch3": {
+          "cpu.stat": "usage_usec 38446147\nuser_usec 29528885\nsystem_usec 8917261\nnice_usec 0\nnr_periods 4749\nnr_throttled 7\nthrottled_usec 170369\nnr_bursts 0\nburst_usec 0",
+          "memory.peak": "1019019264",
+          "memory.current": "900206592",
+          "io.stat": "254:0 rbytes=0 wbytes=212361216 rios=0 wios=12309 dbytes=0 dios=0"
+        },
+        "keeper1": {
+          "cpu.stat": "usage_usec 8089204\nuser_usec 2207631\nsystem_usec 5881573\nnice_usec 0\nnr_periods 4196\nnr_throttled 5\nthrottled_usec 399833\nnr_bursts 0\nburst_usec 0",
+          "memory.peak": "281149440",
+          "memory.current": "280272896",
+          "io.stat": "254:0 rbytes=0 wbytes=19456000 rios=0 wios=4768 dbytes=0 dios=0"
+        },
+        "keeper2": {
+          "cpu.stat": "usage_usec 9003063\nuser_usec 2243136\nsystem_usec 6759927\nnice_usec 0\nnr_periods 4311\nnr_throttled 6\nthrottled_usec 490335\nnr_bursts 0\nburst_usec 0",
+          "memory.peak": "303267840",
+          "memory.current": "302579712",
+          "io.stat": "254:0 rbytes=0 wbytes=21233664 rios=0 wios=5203 dbytes=0 dios=0"
+        },
+        "keeper3": {
+          "cpu.stat": "usage_usec 9969269\nuser_usec 2543479\nsystem_usec 7425790\nnice_usec 0\nnr_periods 4344\nnr_throttled 5\nthrottled_usec 476169\nnr_bursts 0\nburst_usec 0",
+          "memory.peak": "289730560",
+          "memory.current": "289202176",
+          "io.stat": "254:0 rbytes=0 wbytes=21479424 rios=0 wios=5271 dbytes=0 dios=0"
+        }
+      }
+    },
+    "compression": {
+      "ch1": [
+        {
+          "table": "orders_state",
+          "rows": 1002783,
+          "compressed": 6990131,
+          "uncompressed": 30088091,
+          "disk": 7044770
+        },
+        {
+          "table": "cdc_history",
+          "rows": 1012856,
+          "compressed": 20368904,
+          "uncompressed": 583946304,
+          "disk": 20387052
+        },
+        {
+          "table": "customers_state",
+          "rows": 10036,
+          "compressed": 19420,
+          "uncompressed": 150876,
+          "disk": 28558
+        }
+      ],
+      "ch2": [
+        {
+          "table": "orders_state",
+          "rows": 1002783,
+          "compressed": 6990131,
+          "uncompressed": 30088091,
+          "disk": 7044770
+        },
+        {
+          "table": "cdc_history",
+          "rows": 1012856,
+          "compressed": 20368904,
+          "uncompressed": 583946304,
+          "disk": 20387052
+        },
+        {
+          "table": "customers_state",
+          "rows": 10036,
+          "compressed": 19420,
+          "uncompressed": 150876,
+          "disk": 28558
+        }
+      ],
+      "ch3": [
+        {
+          "table": "orders_state",
+          "rows": 1002783,
+          "compressed": 6990131,
+          "uncompressed": 30088091,
+          "disk": 7044770
+        },
+        {
+          "table": "cdc_history",
+          "rows": 1012856,
+          "compressed": 20368904,
+          "uncompressed": 583946304,
+          "disk": 20387052
+        },
+        {
+          "table": "customers_state",
+          "rows": 10036,
+          "compressed": 19420,
+          "uncompressed": 150876,
+          "disk": 28558
+        }
+      ]
+    },
+    "disk-space": {
+      "roles": {
+        "postgres": {
+          "allocated_bytes": 334479360,
+          "mount": "/var/lib/postgresql"
+        },
+        "controller1": {
+          "allocated_bytes": 122880,
+          "mount": "/var/lib/kafka/data"
+        },
+        "controller2": {
+          "allocated_bytes": 122880,
+          "mount": "/var/lib/kafka/data"
+        },
+        "controller3": {
+          "allocated_bytes": 122880,
+          "mount": "/var/lib/kafka/data"
+        },
+        "broker1": {
+          "allocated_bytes": 55934976,
+          "mount": "/var/lib/kafka/data"
+        },
+        "broker2": {
+          "allocated_bytes": 55910400,
+          "mount": "/var/lib/kafka/data"
+        },
+        "broker3": {
+          "allocated_bytes": 55943168,
+          "mount": "/var/lib/kafka/data"
+        },
+        "ch1": {
+          "allocated_bytes": 229445632,
+          "mount": "/var/lib/clickhouse"
+        },
+        "ch2": {
+          "allocated_bytes": 224845824,
+          "mount": "/var/lib/clickhouse"
+        },
+        "ch3": {
+          "allocated_bytes": 223297536,
+          "mount": "/var/lib/clickhouse"
+        },
+        "keeper1": {
+          "allocated_bytes": 104890368,
+          "mount": "/var/lib/clickhouse"
+        },
+        "keeper2": {
+          "allocated_bytes": 104890368,
+          "mount": "/var/lib/clickhouse"
+        },
+        "keeper3": {
+          "allocated_bytes": 104890368,
+          "mount": "/var/lib/clickhouse"
+        }
+      },
+      "physical_copies_total_bytes": 1494896640,
+      "scope": "Allocated data-volume blocks; includes WAL/logs/indexes and all replicas, not image layers or device write amplification."
+    },
+    "source-settings": {
+      "version": "PostgreSQL 18.7 (Debian 18.7-1.pgdg13+5) on aarch64-unknown-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit",
+      "wal_level": "logical",
+      "synchronous_commit": "on",
+      "fsync": "on",
+      "full_page_writes": "on"
+    },
+    "clickhouse-settings": {
+      "ch1": {
+        "version": [
+          {
+            "version": "26.11.4.11"
+          }
+        ],
+        "durability": [
+          {
+            "name": "max_threads",
+            "value": "1"
+          },
+          {
+            "name": "insert_quorum",
+            "value": "2"
+          },
+          {
+            "name": "insert_quorum_parallel",
+            "value": "1"
+          }
+        ],
+        "table_durability": [
+          {
+            "name": "cdc_history",
+            "fsync_after_insert": "1",
+            "fsync_part_directory": "1"
+          },
+          {
+            "name": "customers_state",
+            "fsync_after_insert": "1",
+            "fsync_part_directory": "1"
+          },
+          {
+            "name": "orders_state",
+            "fsync_after_insert": "1",
+            "fsync_part_directory": "1"
+          }
+        ]
+      },
+      "ch2": {
+        "version": [
+          {
+            "version": "26.11.4.11"
+          }
+        ],
+        "durability": [
+          {
+            "name": "max_threads",
+            "value": "1"
+          },
+          {
+            "name": "insert_quorum",
+            "value": "2"
+          },
+          {
+            "name": "insert_quorum_parallel",
+            "value": "1"
+          }
+        ],
+        "table_durability": [
+          {
+            "name": "cdc_history",
+            "fsync_after_insert": "1",
+            "fsync_part_directory": "1"
+          },
+          {
+            "name": "customers_state",
+            "fsync_after_insert": "1",
+            "fsync_part_directory": "1"
+          },
+          {
+            "name": "orders_state",
+            "fsync_after_insert": "1",
+            "fsync_part_directory": "1"
+          }
+        ]
+      },
+      "ch3": {
+        "version": [
+          {
+            "version": "26.11.4.11"
+          }
+        ],
+        "durability": [
+          {
+            "name": "max_threads",
+            "value": "1"
+          },
+          {
+            "name": "insert_quorum",
+            "value": "2"
+          },
+          {
+            "name": "insert_quorum_parallel",
+            "value": "1"
+          }
+        ],
+        "table_durability": [
+          {
+            "name": "cdc_history",
+            "fsync_after_insert": "1",
+            "fsync_part_directory": "1"
+          },
+          {
+            "name": "customers_state",
+            "fsync_after_insert": "1",
+            "fsync_part_directory": "1"
+          },
+          {
+            "name": "orders_state",
+            "fsync_after_insert": "1",
+            "fsync_part_directory": "1"
+          }
+        ]
+      }
+    },
+    "replicas": {
+      "ch1": [
+        {
+          "table": "cdc_history",
+          "is_readonly": 0,
+          "active_replicas": 3,
+          "total_replicas": 3,
+          "queue_size": 0,
+          "absolute_delay": 0
+        },
+        {
+          "table": "customers_state",
+          "is_readonly": 0,
+          "active_replicas": 3,
+          "total_replicas": 3,
+          "queue_size": 0,
+          "absolute_delay": 0
+        },
+        {
+          "table": "orders_state",
+          "is_readonly": 0,
+          "active_replicas": 3,
+          "total_replicas": 3,
+          "queue_size": 0,
+          "absolute_delay": 0
+        }
+      ],
+      "ch2": [
+        {
+          "table": "cdc_history",
+          "is_readonly": 0,
+          "active_replicas": 3,
+          "total_replicas": 3,
+          "queue_size": 0,
+          "absolute_delay": 0
+        },
+        {
+          "table": "customers_state",
+          "is_readonly": 0,
+          "active_replicas": 3,
+          "total_replicas": 3,
+          "queue_size": 0,
+          "absolute_delay": 0
+        },
+        {
+          "table": "orders_state",
+          "is_readonly": 0,
+          "active_replicas": 3,
+          "total_replicas": 3,
+          "queue_size": 0,
+          "absolute_delay": 0
+        }
+      ],
+      "ch3": [
+        {
+          "table": "cdc_history",
+          "is_readonly": 0,
+          "active_replicas": 3,
+          "total_replicas": 3,
+          "queue_size": 0,
+          "absolute_delay": 0
+        },
+        {
+          "table": "customers_state",
+          "is_readonly": 0,
+          "active_replicas": 3,
+          "total_replicas": 3,
+          "queue_size": 0,
+          "absolute_delay": 0
+        },
+        {
+          "table": "orders_state",
+          "is_readonly": 0,
+          "active_replicas": 3,
+          "total_replicas": 3,
+          "queue_size": 0,
+          "absolute_delay": 0
+        }
+      ]
+    }
+  },
+  "measurement_gaps": [
+    "Unrecognized raw phase labels remain separate buckets in operation_timings; they are not silently normalized. The current controller publishes phases atomically.",
+    "Resource time series starts before snapshot/recovery, after source seeding. Native cumulative counters/high-water cover earlier work only for unrestarted roles; setup/seed phase averages are unavailable.",
+    "Allocated disk space and compression are settled snapshots, not measured transient peak disk usage. No physical-device I/O latency/queue-depth or power-loss measurement.",
+    "Rate-limited mutation/reader timings are diagnostics from one bounded successful sweep; they do not establish sustainable throughput or comparative tail latency."
+  ],
+  "source_manifest_scope": "Current checkout at curation, including post-run atomic phase publication fix. Actor logs separately contain the actual Go build source manifest.",
+  "source_sha256": {
+    "orders-workload/main.go": "4342502f596cd1826a3ffe9efb698eb16c90766c04ba1992bab73f0645ca82ce",
+    "orders-workload/main_test.go": "85164313c8905cb738ecfd80bf2b5c80bea33cd95eea00a8f4fb79fdbd4d8614",
+    "orders-workload/go.mod": "81f6481f1cdee0503d7725261fc301b8b24ec4365efd49c8d86e902603122577",
+    "orders-workload/go.sum": "6c8e259af81256f3e42211d20cbe59cc012a73c8d0b319530374267923144223",
+    "orders-workload/Dockerfile": "49bae37627f161624b18453701d1b634a8d78053b88c4b3bdd1156a1b2095e08",
+    "scripts/curate.py": "ceedaa0ad56875aac045fa4596be45ffb915a55d33f77f6aef3678186556423a",
+    "scripts/recovery.py": "2c3e2d6f41e0daf9d181e3e0832b00d8e606634dc3cfa7a461330d218126334e",
+    "scripts/correctness.py": "421dcc1e8b570262e08613fee7fd715cf95836a8a5e83c1753ffa4afb498aaae",
+    "scripts/observations.py": "fdaccb3cc979fe0acd5bf773e140a59de3303a7b2343ad8adc825001c45c8dbd",
+    "scripts/control.py": "1b37bc41145be9d42fe7c3b13cdb166d670dfd3383991c431e690d926cab0d95",
+    "scripts/observe.py": "5256cba37fe1a615e2888c030b8892eff37c1d7e5cb7e1aa276112f7e0a87d2e",
+    "scripts/resource_report.py": "e106754c78b779f48f78331888f7a67862928452e0e2e3334c03732fe9dfc88b",
+    "scripts/lab.py": "4befe678125b055e11e92a5d82cc210329c6755687a59406c9acae3fb8945c30",
+    "config/keeper2.xml": "b2ff32406ffe0e311d6e8db0534c8471262a48e6b5a3a57e47e4c474104097ab",
+    "config/keeper3.xml": "1d4e24cfd6d43c201b7fa9682debadec1411ff6851bd5f84603b2781edbdaa61",
+    "config/keeper1.xml": "45b9a63dc6748b5212897773662f14789959919aae67f5e904cc46ed048fc779",
+    "config/server.xml": "048797d325926f5e444757038cea013b5d155c7eab069b35ca520785321599c1",
+    "config/connector.json": "54c2c10d644ef866a95d9e6f9622c730a45a18093768374e5e28c586ab96f426",
+    "config/replica1.xml": "be21352adba6dd1902dc084152f4831f46dd7cccdeaa30aaaae2f3a16bf9c190",
+    "config/replica3.xml": "57ca63fe24eabbe2284d12cf6d1d42a4e1068ea04cd17d7285b2e6bbd5ff7d7f",
+    "config/replica2.xml": "bc6f20ac20ec521e1b97b2787ff6173f2009d8aa52d9000e329bcae2dde90138",
+    "config/users.xml": "3af24c4012760a59e9d5c03cfe2fd22bd206d46350056ef5625dcd9ce9ef5246",
+    "sql/state.sql": "3519d860f41d34aa6e714b5db8e3bce8bb25325aedc97823a4409b451000c2ad",
+    "sql/source.sql": "357cf1078cb36681a29200e636e351bee4895b4bf4afa85cf8218949d8a0e00a",
+    "sql/ingest.sql": "60dc2cbb07e37270bbd59538a3098c65a143cda78449d1a271d4b0306f3ea337",
+    "compose.yaml": "d62e39fec22cf18eb155f23ec49e418973c9c9ca4689045a98441f7a5ca18812",
+    "Makefile": "bc82a33be351166d064a565489d7602a727f11b85b6c5d88bd96c1d4457ea3e6"
+  }
+}
