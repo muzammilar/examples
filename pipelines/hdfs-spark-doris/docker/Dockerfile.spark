@@ -1,0 +1,18 @@
+FROM spark:4.3.0-scala2.13-java21-python3-ubuntu@sha256:e1831ac4e26f91c80de8c360d7853ff507b08934ed0974a2823ec7080f73f3c7 AS distribution
+# The distribution image's ARM64 Python is 3.10, below Spark 4.3's 3.11 minimum.
+# Noble's maintained Python 3.12 and Java 17 are both supported by Spark 4.3.
+FROM eclipse-temurin:17-jre-noble@sha256:ad806840ae514b83d3d8e3a00a5c1b7302fb0a6ae02bbbaf8a8bf1ffdf5367c6
+RUN apt-get update && apt-get install -y --no-install-recommends python3 procps \
+    && rm -rf /var/lib/apt/lists/* \
+    && python3 -c 'import sys; assert sys.version_info >= (3,11)' \
+    && groupadd -g 185 spark && useradd -m -u 185 -g spark spark \
+    && mkdir /data && chown 185:185 /data
+COPY --from=distribution --chown=185:185 /opt/spark /opt/spark
+COPY deploy/hadoop/ /opt/hadoop-conf/
+COPY orders-workload/ /app/
+COPY scripts/wait_workers.py /app/wait_workers.py
+ENV SPARK_HOME=/opt/spark PATH=/opt/spark/bin:$PATH \
+    HADOOP_CONF_DIR=/opt/hadoop-conf HADOOP_USER_NAME=hadoop \
+    PYSPARK_PYTHON=/usr/bin/python3 AWS_EC2_METADATA_DISABLED=true
+USER 185
+WORKDIR /opt/spark

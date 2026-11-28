@@ -1,0 +1,50 @@
+{
+  "workload": "Immutable batch orders/customer join and regional aggregates",
+  "recipe": "orders-v1-one-based",
+  "default_orders": 1000000,
+  "default_customers": 10000,
+  "operations": [
+    "seed-once",
+    "read",
+    "publish-batch",
+    "label-reconcile"
+  ],
+  "publication": "One controller; verified HDFS staging directory renamed into an absent final path",
+  "atomicity": "One Doris INSERT is atomic; orders and regional aggregates are separate transactions",
+  "retry": "No blind write retries; same label reused only after native FINISHED receipt reconciliation",
+  "hdfs": {
+    "replication": 3,
+    "minimum_pipeline": 2,
+    "sync_on_close": true,
+    "metadata_ha": false
+  },
+  "doris": {
+    "voting_frontends": 3,
+    "backends": 3,
+    "tablet_replicas": 3,
+    "table_model": "unique-key merge-on-write",
+    "compression": "ZSTD",
+    "min_load_replica_num": 2,
+    "acknowledgement": "At least two of three copies; final independent readback requires all three current copies"
+  },
+  "client": {
+    "driver": "go-sql-driver/mysql 1.11.0",
+    "pool": 1,
+    "connect_timeout_s": 5,
+    "read_timeout_s": 180,
+    "write_timeout_s": 10,
+    "supervisor_timeout_s": 900
+  },
+  "fault_expectations": {
+    "worker_loss": "Task recomputation; exact complete batch, no duplicated load receipts",
+    "one_datanode_loss": "Retained-copy availability; exact complete batch and restored RF3"
+  },
+  "unsupported_in_this_lab": [
+    "cross-table atomicity",
+    "host/AZ survival",
+    "NameNode HA",
+    "power-loss durability",
+    "independent backup restore"
+  ],
+  "performance_depth": 3
+}

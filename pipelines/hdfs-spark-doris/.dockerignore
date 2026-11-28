@@ -1,0 +1,6 @@
+results
+.build
+.git
+**/__pycache__
+reports
+docs

@@ -204,3 +204,32 @@ remain open; this MDS result does not substitute for them.
 
 The current Ceph recovery fixture’s full teardown also passed after fresh body
 and namespace reconciliation; only curated outcomes are committed.
+
+### Upcoming Iceberg compatibility gate
+
+The current Iceberg 1.12.0 release publishes Flink 2.3 and Spark 4.1/4.0/3.5
+runtime artifacts, not a Spark 4.3 runtime. The HDFS/Spark/Doris path can use
+Spark 4.3.0 independently. For the separate Iceberg path, select the newest
+maintained compatible Spark 4.1 patch (currently 4.1.4) and verify the native
+artifact/source matrix; matching Scala alone does not establish engine compatibility.
+Use a local catalog and explicit lab-only S3 endpoints/credentials. No managed
+cloud fallback or host credential discovery is permitted.
+Sources: [Iceberg release artifacts](https://iceberg.apache.org/releases/),
+[Spark releases](https://spark.apache.org/news/).
+
+### HDFS/Spark/Doris execution checkpoint
+
+[HDFS batch analytics](../../pipelines/hdfs-spark-doris/) ran one million source
+orders / 10,000 customers into three distinct output batches. Exact Arrow body
+and customer-partition checks, three fixed Doris replica reads and stable native
+load labels passed. Active-worker SIGKILL produced one failed task/recomputation;
+DataNode SIGKILL preserved reads/writes but **failed the 180-second RF3 gate**:
+14 blocks remained at RF2. Effective 300-second pending-reconstruction timeout
+and 300-second monitor interval correlated with all 14 native timeout messages
+at 385.54 s; full RF3 was verified by 430.78 s without intervention. All 225
+published physical copies matched. The failed gate remains failed; eventual
+recovery is a separate result. Warm query trials are diagnostics, not a winner.
+Runtime/startup/parser/preflight findings and resource gaps remain documented.
+The full five-command lifecycle and final all-batch reconciliation passed;
+owned state was removed. Next is the compatible Iceberg pipeline above, followed
+by historical corrections/control and bounded remaining storage work.

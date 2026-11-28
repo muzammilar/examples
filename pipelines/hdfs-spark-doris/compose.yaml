@@ -1,0 +1,338 @@
+---
+name: hdfs-spark-doris
+services:
+  fe1:
+    image: examples/hdfs-spark-doris-fe:4.1.5
+    cpus: 0.5
+    mem_limit: 1280m
+    networks:
+      lab:
+        ipv4_address: 172.30.68.11
+    build:
+      context: "."
+      dockerfile: docker/Dockerfile.fe
+    environment:
+      FE_SERVERS: fe1:172.30.68.11:9010,fe2:172.30.68.12:9010,fe3:172.30.68.13:9010
+      FE_ID: '1'
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - mysql -h127.0.0.1 -P9030 -uroot -e 'SHOW FRONTENDS'
+      interval: 10s
+      timeout: 5s
+      retries: 60
+    volumes:
+    - fe1:/opt/apache-doris/fe/doris-meta
+  be1:
+    image: examples/hdfs-spark-doris-be:4.1.5
+    cpus: 1
+    mem_limit: 2816m
+    networks:
+      lab:
+        ipv4_address: 172.30.68.21
+    build:
+      context: "."
+      dockerfile: docker/Dockerfile.be
+    environment:
+      FE_SERVERS: fe1:172.30.68.11:9010,fe2:172.30.68.12:9010,fe3:172.30.68.13:9010
+      BE_ADDR: 172.30.68.21:9050
+    depends_on:
+      fe1:
+        condition: service_healthy
+    volumes:
+    - be1:/opt/apache-doris/be/storage
+  fe2:
+    image: examples/hdfs-spark-doris-fe:4.1.5
+    cpus: 0.5
+    mem_limit: 1280m
+    networks:
+      lab:
+        ipv4_address: 172.30.68.12
+    build:
+      context: "."
+      dockerfile: docker/Dockerfile.fe
+    environment:
+      FE_SERVERS: fe1:172.30.68.11:9010,fe2:172.30.68.12:9010,fe3:172.30.68.13:9010
+      FE_ID: '2'
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - mysql -h127.0.0.1 -P9030 -uroot -e 'SHOW FRONTENDS'
+      interval: 10s
+      timeout: 5s
+      retries: 60
+    depends_on:
+      fe1:
+        condition: service_started
+    volumes:
+    - fe2:/opt/apache-doris/fe/doris-meta
+  be2:
+    image: examples/hdfs-spark-doris-be:4.1.5
+    cpus: 1
+    mem_limit: 2816m
+    networks:
+      lab:
+        ipv4_address: 172.30.68.22
+    build:
+      context: "."
+      dockerfile: docker/Dockerfile.be
+    environment:
+      FE_SERVERS: fe1:172.30.68.11:9010,fe2:172.30.68.12:9010,fe3:172.30.68.13:9010
+      BE_ADDR: 172.30.68.22:9050
+    depends_on:
+      fe1:
+        condition: service_healthy
+    volumes:
+    - be2:/opt/apache-doris/be/storage
+  fe3:
+    image: examples/hdfs-spark-doris-fe:4.1.5
+    cpus: 0.5
+    mem_limit: 1280m
+    networks:
+      lab:
+        ipv4_address: 172.30.68.13
+    build:
+      context: "."
+      dockerfile: docker/Dockerfile.fe
+    environment:
+      FE_SERVERS: fe1:172.30.68.11:9010,fe2:172.30.68.12:9010,fe3:172.30.68.13:9010
+      FE_ID: '3'
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - mysql -h127.0.0.1 -P9030 -uroot -e 'SHOW FRONTENDS'
+      interval: 10s
+      timeout: 5s
+      retries: 60
+    depends_on:
+      fe1:
+        condition: service_started
+    volumes:
+    - fe3:/opt/apache-doris/fe/doris-meta
+  be3:
+    image: examples/hdfs-spark-doris-be:4.1.5
+    cpus: 1
+    mem_limit: 2816m
+    networks:
+      lab:
+        ipv4_address: 172.30.68.23
+    build:
+      context: "."
+      dockerfile: docker/Dockerfile.be
+    environment:
+      FE_SERVERS: fe1:172.30.68.11:9010,fe2:172.30.68.12:9010,fe3:172.30.68.13:9010
+      BE_ADDR: 172.30.68.23:9050
+    depends_on:
+      fe1:
+        condition: service_healthy
+    volumes:
+    - be3:/opt/apache-doris/be/storage
+  namenode:
+    image: examples/hdfs-spark-doris-hadoop:3.5.0
+    cpus: 0.5
+    mem_limit: 768m
+    networks:
+    - lab
+    build:
+      context: "."
+      dockerfile: docker/Dockerfile.hadoop
+      target: hadoop
+    command:
+    - namenode
+    healthcheck:
+      test:
+      - CMD
+      - python3
+      - "-c"
+      - import socket; socket.create_connection(('namenode',9000),2).close()
+      interval: 3s
+      timeout: 3s
+      retries: 60
+    volumes:
+    - namenode:/data/name
+  dn1:
+    image: examples/hdfs-spark-doris-hadoop:3.5.0
+    cpus: 0.25
+    mem_limit: 512m
+    networks:
+    - lab
+    build:
+      context: "."
+      dockerfile: docker/Dockerfile.hadoop
+      target: hadoop
+    command:
+    - datanode
+    hostname: dn1
+    depends_on:
+      namenode:
+        condition: service_healthy
+    volumes:
+    - dn1:/data/data
+  dn2:
+    image: examples/hdfs-spark-doris-hadoop:3.5.0
+    cpus: 0.25
+    mem_limit: 512m
+    networks:
+    - lab
+    build:
+      context: "."
+      dockerfile: docker/Dockerfile.hadoop
+      target: hadoop
+    command:
+    - datanode
+    hostname: dn2
+    depends_on:
+      namenode:
+        condition: service_healthy
+    volumes:
+    - dn2:/data/data
+  dn3:
+    image: examples/hdfs-spark-doris-hadoop:3.5.0
+    cpus: 0.25
+    mem_limit: 512m
+    networks:
+    - lab
+    build:
+      context: "."
+      dockerfile: docker/Dockerfile.hadoop
+      target: hadoop
+    command:
+    - datanode
+    hostname: dn3
+    depends_on:
+      namenode:
+        condition: service_healthy
+    volumes:
+    - dn3:/data/data
+  master:
+    image: examples/hdfs-spark-doris-spark:4.3.0
+    cpus: 0.25
+    mem_limit: 512m
+    networks:
+    - lab
+    build:
+      context: "."
+      dockerfile: docker/Dockerfile.spark
+    command:
+    - "/opt/spark/bin/spark-class"
+    - org.apache.spark.deploy.master.Master
+    - "--host"
+    - master
+  worker1:
+    image: examples/hdfs-spark-doris-spark:4.3.0
+    cpus: 1
+    mem_limit: 1536m
+    networks:
+    - lab
+    build:
+      context: "."
+      dockerfile: docker/Dockerfile.spark
+    command:
+    - "/opt/spark/bin/spark-class"
+    - org.apache.spark.deploy.worker.Worker
+    - "--host"
+    - worker1
+    - "--cores"
+    - '1'
+    - "--memory"
+    - 1g
+    - spark://master:7077
+  worker2:
+    image: examples/hdfs-spark-doris-spark:4.3.0
+    cpus: 1
+    mem_limit: 1536m
+    networks:
+    - lab
+    build:
+      context: "."
+      dockerfile: docker/Dockerfile.spark
+    command:
+    - "/opt/spark/bin/spark-class"
+    - org.apache.spark.deploy.worker.Worker
+    - "--host"
+    - worker2
+    - "--cores"
+    - '1'
+    - "--memory"
+    - 1g
+    - spark://master:7077
+  orders:
+    image: examples/hdfs-spark-doris-spark:4.3.0
+    cpus: 1
+    mem_limit: 2g
+    networks:
+    - lab
+    build:
+      context: "."
+      dockerfile: docker/Dockerfile.spark
+    profiles:
+    - tools
+    entrypoint:
+    - "/opt/spark/bin/spark-submit"
+    - "--master"
+    - spark://master:7077
+    - "--driver-memory"
+    - 1g
+    - "--executor-memory"
+    - 1g
+    - "--total-executor-cores"
+    - '2'
+    - "--conf"
+    - spark.driver.host=orders
+    - "--conf"
+    - spark.sql.shuffle.partitions=6
+    - "--conf"
+    - spark.sql.adaptive.enabled=false
+    - "--conf"
+    - spark.hadoop.mapreduce.fileoutputcommitter.algorithm.version=1
+    - "/app/orders.py"
+    environment:
+      ORDER_COUNT: "${ORDER_COUNT:-1000000}"
+      CUSTOMER_COUNT: "${CUSTOMER_COUNT:-10000}"
+  oracle:
+    image: examples/hdfs-spark-doris-oracle:1
+    cpus: 0.5
+    mem_limit: 512m
+    networks:
+    - lab
+    build:
+      context: ./serving-oracle
+      dockerfile: Dockerfile
+    profiles:
+    - tools
+    environment:
+      ORDER_COUNT: "${ORDER_COUNT:-1000000}"
+      CUSTOMER_COUNT: "${CUSTOMER_COUNT:-10000}"
+  parquet-verifier:
+    build:
+      context: "."
+      dockerfile: docker/Dockerfile.hadoop
+      target: parquet-verifier
+    image: examples/hdfs-spark-doris-parquet:26.0.1
+    cpus: 0.5
+    mem_limit: 512m
+    networks:
+    - lab
+    profiles:
+    - tools
+    environment:
+      ORDER_COUNT: "${ORDER_COUNT:-1000000}"
+      CUSTOMER_COUNT: "${CUSTOMER_COUNT:-10000}"
+volumes:
+  fe1: {}
+  be1: {}
+  fe2: {}
+  be2: {}
+  fe3: {}
+  be3: {}
+  namenode: {}
+  dn1: {}
+  dn2: {}
+  dn3: {}
+networks:
+  lab:
+    internal: true
+    ipam:
+      config:
+      - subnet: 172.30.68.0/24
+        ip_range: 172.30.68.128/25

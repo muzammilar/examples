@@ -1,0 +1,2779 @@
+{
+  "verdict": {
+    "healthy_correctness": "passed",
+    "worker_recovery": "passed",
+    "datanode_180s_redundancy_deadline": "failed",
+    "eventual_automatic_repair": "passed separately",
+    "performance": "diagnostics only; no qualified competitive winner"
+  },
+  "fixture": {
+    "id": "a108fb95af6249709e76bb574ee05148",
+    "rows": 1000000,
+    "customers": 10000,
+    "cpu_caps": 8.0,
+    "memory_caps": 19058917376,
+    "docker_cpus": 11,
+    "docker_memory": 26216296448,
+    "kernel": "6.12.76-linuxkit",
+    "driver": "spark-native/parquet;mysql-go1.11.0",
+    "local_only": true
+  },
+  "supplements": {
+    "budget-correction-a108fb95af6249709e76bb574ee05148.json": {
+      "fixture_id": "a108fb95af6249709e76bb574ee05148",
+      "reason": "Initial header/preflight filtered profile-only tools; resource declarations and effective actor caps were unchanged.",
+      "persistent_role_cpu_caps": 8.0,
+      "persistent_role_memory_caps": 19058917376,
+      "all_role_cpu_caps": 10.0,
+      "all_role_memory_caps": 22280142848,
+      "reserved_memory_bytes": 2147483648,
+      "docker_cpus": 11,
+      "docker_memory_bytes": 26216296448,
+      "within_budget": true,
+      "per_service": {
+        "be1": {
+          "cpus": 1,
+          "memory_bytes": "2952790016"
+        },
+        "be2": {
+          "cpus": 1,
+          "memory_bytes": "2952790016"
+        },
+        "be3": {
+          "cpus": 1,
+          "memory_bytes": "2952790016"
+        },
+        "dn1": {
+          "cpus": 0.25,
+          "memory_bytes": "536870912"
+        },
+        "dn2": {
+          "cpus": 0.25,
+          "memory_bytes": "536870912"
+        },
+        "dn3": {
+          "cpus": 0.25,
+          "memory_bytes": "536870912"
+        },
+        "fe1": {
+          "cpus": 0.5,
+          "memory_bytes": "1342177280"
+        },
+        "fe2": {
+          "cpus": 0.5,
+          "memory_bytes": "1342177280"
+        },
+        "fe3": {
+          "cpus": 0.5,
+          "memory_bytes": "1342177280"
+        },
+        "master": {
+          "cpus": 0.25,
+          "memory_bytes": "536870912"
+        },
+        "namenode": {
+          "cpus": 0.5,
+          "memory_bytes": "805306368"
+        },
+        "oracle": {
+          "cpus": 0.5,
+          "memory_bytes": "536870912"
+        },
+        "orders": {
+          "cpus": 1,
+          "memory_bytes": "2147483648"
+        },
+        "parquet-verifier": {
+          "cpus": 0.5,
+          "memory_bytes": "536870912"
+        },
+        "worker1": {
+          "cpus": 1,
+          "memory_bytes": "1610612736"
+        },
+        "worker2": {
+          "cpus": 1,
+          "memory_bytes": "1610612736"
+        }
+      }
+    },
+    "native-repair-evidence.json": {
+      "fixture_id": "a108fb95af6249709e76bb574ee05148",
+      "default_pending_timeout_s": 300,
+      "source_monitor_recheck_interval_s": 300,
+      "native_timed_out_requests": 14,
+      "first_native_timeout_after_fault_s": 385.53942,
+      "last_native_timeout_after_fault_s": 385.54042,
+      "automatic": true,
+      "settings_changed": false,
+      "resource_gap": "Full repair completed between the failed-case collector and the later verification collector; isolated repair CPU and IO are unavailable.",
+      "raw_sources": [
+        "results/effective-reconstruction-timeout.xml",
+        "results/automatic-repair-native.log",
+        "results/post-datanode-jmx.json",
+        "results/current-replication-check.log"
+      ],
+      "fault_injected_at": "2026-11-28T00:00:40.210580+00:00"
+    }
+  },
+  "effective_runtime_roles": {
+    "be1": {
+      "image": "examples/hdfs-spark-doris-be:4.1.5",
+      "local_image_config_id": "sha256:472d5dd2482e1933175eabd285106ecedf6122aacdea574850a1817c48c034fd",
+      "effective_cpu_cap": 1.0,
+      "effective_memory_bytes": 2952790016
+    },
+    "be2": {
+      "image": "examples/hdfs-spark-doris-be:4.1.5",
+      "local_image_config_id": "sha256:472d5dd2482e1933175eabd285106ecedf6122aacdea574850a1817c48c034fd",
+      "effective_cpu_cap": 1.0,
+      "effective_memory_bytes": 2952790016
+    },
+    "be3": {
+      "image": "examples/hdfs-spark-doris-be:4.1.5",
+      "local_image_config_id": "sha256:472d5dd2482e1933175eabd285106ecedf6122aacdea574850a1817c48c034fd",
+      "effective_cpu_cap": 1.0,
+      "effective_memory_bytes": 2952790016
+    },
+    "dn1": {
+      "image": "examples/hdfs-spark-doris-hadoop:3.5.0",
+      "local_image_config_id": "sha256:0c04c38169980300dd3ab289bf00476f5882439027f1ba1b1bd5cfc50222b5e7",
+      "effective_cpu_cap": 0.25,
+      "effective_memory_bytes": 536870912
+    },
+    "dn2": {
+      "image": "examples/hdfs-spark-doris-hadoop:3.5.0",
+      "local_image_config_id": "sha256:0c04c38169980300dd3ab289bf00476f5882439027f1ba1b1bd5cfc50222b5e7",
+      "effective_cpu_cap": 0.25,
+      "effective_memory_bytes": 536870912
+    },
+    "dn3": {
+      "image": "examples/hdfs-spark-doris-hadoop:3.5.0",
+      "local_image_config_id": "sha256:0c04c38169980300dd3ab289bf00476f5882439027f1ba1b1bd5cfc50222b5e7",
+      "effective_cpu_cap": 0.25,
+      "effective_memory_bytes": 536870912
+    },
+    "fe1": {
+      "image": "examples/hdfs-spark-doris-fe:4.1.5",
+      "local_image_config_id": "sha256:78df71cb8717fbe3f4c59b44a6be07990d4ae1ac28baf3b4cb38111f28b2cf77",
+      "effective_cpu_cap": 0.5,
+      "effective_memory_bytes": 1342177280
+    },
+    "fe2": {
+      "image": "examples/hdfs-spark-doris-fe:4.1.5",
+      "local_image_config_id": "sha256:78df71cb8717fbe3f4c59b44a6be07990d4ae1ac28baf3b4cb38111f28b2cf77",
+      "effective_cpu_cap": 0.5,
+      "effective_memory_bytes": 1342177280
+    },
+    "fe3": {
+      "image": "examples/hdfs-spark-doris-fe:4.1.5",
+      "local_image_config_id": "sha256:78df71cb8717fbe3f4c59b44a6be07990d4ae1ac28baf3b4cb38111f28b2cf77",
+      "effective_cpu_cap": 0.5,
+      "effective_memory_bytes": 1342177280
+    },
+    "master": {
+      "image": "examples/hdfs-spark-doris-spark:4.3.0",
+      "local_image_config_id": "sha256:c5d74739ae17e135cbe268a195a9b1d339d4e9f240f39b1724b223b9be0ddd47",
+      "effective_cpu_cap": 0.25,
+      "effective_memory_bytes": 536870912
+    },
+    "namenode": {
+      "image": "examples/hdfs-spark-doris-hadoop:3.5.0",
+      "local_image_config_id": "sha256:0c04c38169980300dd3ab289bf00476f5882439027f1ba1b1bd5cfc50222b5e7",
+      "effective_cpu_cap": 0.5,
+      "effective_memory_bytes": 805306368
+    },
+    "worker1": {
+      "image": "examples/hdfs-spark-doris-spark:4.3.0",
+      "local_image_config_id": "sha256:c5d74739ae17e135cbe268a195a9b1d339d4e9f240f39b1724b223b9be0ddd47",
+      "effective_cpu_cap": 1.0,
+      "effective_memory_bytes": 1610612736
+    },
+    "worker2": {
+      "image": "examples/hdfs-spark-doris-spark:4.3.0",
+      "local_image_config_id": "sha256:c5d74739ae17e135cbe268a195a9b1d339d4e9f240f39b1724b223b9be0ddd47",
+      "effective_cpu_cap": 1.0,
+      "effective_memory_bytes": 1610612736
+    },
+    "oracle": {
+      "image": "examples/hdfs-spark-doris-oracle:1",
+      "local_image_config_id": "sha256:c7b0f338d9acc41cb469b5a2a6e07942931f3372c88f26a955afcfaa99b484f7",
+      "effective_cpu_cap": 0.5,
+      "effective_memory_bytes": 536870912
+    },
+    "orders": {
+      "image": "examples/hdfs-spark-doris-spark:4.3.0",
+      "local_image_config_id": "sha256:c5d74739ae17e135cbe268a195a9b1d339d4e9f240f39b1724b223b9be0ddd47",
+      "effective_cpu_cap": 1.0,
+      "effective_memory_bytes": 2147483648
+    },
+    "parquet-verifier": {
+      "image": "examples/hdfs-spark-doris-parquet:26.0.1",
+      "local_image_config_id": "sha256:e5842fc722fb9a9366d746a30a1f0030131d6254caa357d7602ee5bc60920514",
+      "effective_cpu_cap": 0.5,
+      "effective_memory_bytes": 536870912
+    }
+  },
+  "source_sha256": {
+    "scripts/curate.py": "dfb615c23490f75178444a53676d9133e8877e4eee8ed3a649634304491f2572",
+    "scripts/failure.py": "ff82e5e7fbdcfb923fda3823de61308199cc27d2ae1566d9ff20f6d81f06c697",
+    "scripts/lab.py": "6bb892ba1bf68e1cf26d68533b729c4fa94e08315beb5344d89a2d1c8e0f2934",
+    "scripts/lifecycle.py": "d5d4b7c957fc4f0218cd8e53cca4013bb6b6089dd00db8ffeada9b8e27520991",
+    "scripts/publication.py": "9df9b5ca0fd10e70b21698bce17fa9cb19b567efe3f7e3fe8f22d301515de0c9",
+    "scripts/repair.py": "2b8fce2e68042fe1c06209e6feef507d16586ace0637d8ffa7859b5dce359959",
+    "scripts/resource_report.py": "57b2bf77cd6d6bafe05600c21994c3e6911a8e438b0f0902c7f72319f6b559cd",
+    "scripts/start-hadoop.sh": "4914df873eb27944e2b9d198ecb591174c7cd17713eb7bc3e99e12935edab306",
+    "scripts/topology.py": "381973199a1aa1e1dbcac25b50b5f0d3424dff291c6ce43a537d39c9e54d74c2",
+    "scripts/verify_parquet.py": "e89dced8bd144c9983d64c2433d1ef0954e7abe2ec53c854a302daa8796f384e",
+    "scripts/volume_usage.py": "39dfd35791c33998b9f295b1c39fd23b932b774e71d110e286475e094ab221a1",
+    "scripts/wait_workers.py": "b555113e47460bb90171683d8416db7f87b7222504dfd116f505925c9e2f7fc1",
+    "orders-workload/orders.py": "7fead0653d0ae7be9f8fd62b4e068e5cfd4659a09ed492f297fb29e718d338de",
+    "serving-oracle/Dockerfile": "ffc8b90462f1d6c3e58bd1ca7ec7db4221b29fbff0dd9e7a3582f3f60dae629a",
+    "serving-oracle/go.mod": "4aab269af0808fbf151c5e9acac2708fc38ad9b6c0c4d412e35c83bbd2daf2a2",
+    "serving-oracle/go.sum": "e11120ac80707bb0ad8e75965011e630b9cb64c0bf2ac74ba49ce569d77d345e",
+    "serving-oracle/main.go": "5f472afa961f0c8e7adafe9dfe6007e89f686f3fab3c65899178fbca3e3ffdd5",
+    "serving-oracle/query.go": "4f11af3350b8ace3526e0c420ec714e73adc284ee507ddd6a6df7bfc1492ef5c",
+    "docker/Dockerfile.be": "352084cc6b653f29cb0f9b8d37d14c4ebf45d23b557dca126db4a06328443056",
+    "docker/Dockerfile.fe": "8791429e1a1cce7ed716354e6a473281a27390e735e59564f85ab0c69245ae6f",
+    "docker/Dockerfile.hadoop": "b3db9b4796ed0f3ed45b449ad24bd5b92152c19670918794e550db96d71133e6",
+    "docker/Dockerfile.spark": "bc0d37d74c0668910b819a56257c4a6610ff2b944afe62b9e60bd4d68219a09b",
+    "deploy/contract.json": "738cb27866d4b2eb0e3c91c0790ff5f907e039abdeb9cccc133a412f399a13af",
+    "deploy/hadoop/core-site.xml": "969a548c548221dc8d09482f6a74cdd6a7ee51a48ff4ea0f0fc15d02860ec358",
+    "deploy/hadoop/hdfs-site.xml": "5ca2cf59fa020d62c832b619090526161ebb32070b2c05a40db25762894173e9",
+    "Makefile": "0d35738fb606f71b0fe07df99ba085e31d8232ed09599f621f9469460021f384",
+    "compose.yaml": "fc6f59a43f1b4501b3be13c91a7f9b8c500a967454e8dbc79f8c3ee144335406"
+  },
+  "phases": {
+    "docker-up": {
+      "raw_path": "results/docker-up-1795823492694389000",
+      "status": {
+        "passed": true,
+        "mode": "docker-up",
+        "started_ns": 1795823492694445000,
+        "ended_ns": 1795823558747115000
+      },
+      "resources": {
+        "native_retained_role_deltas": {
+          "cpu_us": 70504526,
+          "rbytes": 43786240,
+          "wbytes": 6144000,
+          "rios": 5776,
+          "wios": 452
+        },
+        "native_delta_scope": "phase end",
+        "restarted_roles_excluded_from_delta": [],
+        "roles_stopped_before_final_counter": [
+          "be1",
+          "be2",
+          "be3",
+          "dn1",
+          "dn2",
+          "dn3",
+          "fe1",
+          "fe2",
+          "fe3",
+          "master",
+          "namenode",
+          "worker1",
+          "worker2"
+        ],
+        "roles_created_within_phase_from_zero": [
+          "be1",
+          "be2",
+          "be3",
+          "dn1",
+          "dn2",
+          "dn3",
+          "fe1",
+          "fe2",
+          "fe3",
+          "master",
+          "namenode",
+          "worker1",
+          "worker2"
+        ],
+        "sampled_aggregate_memory_peak_bytes": 6608381805,
+        "sampled_aggregate_memory_mean_bytes": 4137405270.285714,
+        "sampled_cpu_peak_percent_one_core_100": 238.43,
+        "sampled_cpu_mean_percent_one_core_100": 163.8842857142857,
+        "sample_count": 7,
+        "limitations": [
+          "Phase native deltas exclude restarted roles; newly created roles use their full within-phase counters. Actor lifetimes are separate.",
+          "Docker memory samples use rounded display values and can miss short peaks; native actor memory.peak is separately retained.",
+          "Stopped roles without a final counter are unavailable, not zero; shutdown work is not inferred.",
+          "No physical device service-time measurement."
+        ],
+        "actor_role_totals": {
+          "oracle": {
+            "actors": 2,
+            "counters": {
+              "cpu_us": 33348,
+              "memory.peak": 5963776,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0
+            },
+            "missing_metrics": []
+          }
+        },
+        "actor_peak_scope": "Maximum individual actor memory.peak per role, not simultaneous aggregate memory"
+      },
+      "volumes.json": {
+        "hdfs-spark-doris_dn2": {
+          "apparent_bytes": 564,
+          "allocated_bytes": 20480,
+          "files": 5,
+          "concurrently_vanished_entries": 0
+        },
+        "hdfs-spark-doris_dn3": {
+          "apparent_bytes": 564,
+          "allocated_bytes": 20480,
+          "files": 5,
+          "concurrently_vanished_entries": 0
+        },
+        "hdfs-spark-doris_be1": {
+          "apparent_bytes": 641678,
+          "allocated_bytes": 83337216,
+          "files": 40,
+          "concurrently_vanished_entries": 0
+        },
+        "hdfs-spark-doris_be3": {
+          "apparent_bytes": 168238,
+          "allocated_bytes": 82952192,
+          "files": 22,
+          "concurrently_vanished_entries": 0
+        },
+        "hdfs-spark-doris_dn1": {
+          "apparent_bytes": 564,
+          "allocated_bytes": 20480,
+          "files": 5,
+          "concurrently_vanished_entries": 0
+        },
+        "hdfs-spark-doris_be2": {
+          "apparent_bytes": 642399,
+          "allocated_bytes": 83337216,
+          "files": 40,
+          "concurrently_vanished_entries": 0
+        },
+        "hdfs-spark-doris_fe2": {
+          "apparent_bytes": 591834,
+          "allocated_bytes": 622592,
+          "files": 12,
+          "concurrently_vanished_entries": 0
+        },
+        "hdfs-spark-doris_fe1": {
+          "apparent_bytes": 596852,
+          "allocated_bytes": 626688,
+          "files": 12,
+          "concurrently_vanished_entries": 0
+        },
+        "hdfs-spark-doris_namenode": {
+          "apparent_bytes": 5243577,
+          "allocated_bytes": 5263360,
+          "files": 10,
+          "concurrently_vanished_entries": 0
+        },
+        "hdfs-spark-doris_fe3": {
+          "apparent_bytes": 601870,
+          "allocated_bytes": 630784,
+          "files": 12,
+          "concurrently_vanished_entries": 0
+        },
+        "_inventory_actor_cgroups": {
+          "cpu.stat": "usage_usec 58633\nuser_usec 29316\nsystem_usec 29316\nnice_usec 0\nnr_periods 6\nnr_throttled 6\nthrottled_usec 623413\nnr_bursts 0\nburst_usec 0\n",
+          "memory.peak": "7577600\n",
+          "io.stat": "254:0 rbytes=24576 wbytes=0 rios=6 wios=0 dbytes=0 dios=0\n"
+        }
+      },
+      "native_engine_version": [
+        {
+          "@@version_comment": "doris version doris-4.1.5-release-917b20be838"
+        }
+      ],
+      "native_load_receipts": [],
+      "results": [
+        {
+          "batch": "baseline",
+          "customers": 10000,
+          "mode": "setup",
+          "passed": true,
+          "replica": "",
+          "rows": 1000000,
+          "wall_ms": 620.779542
+        },
+        {
+          "batch": "baseline",
+          "customers": 10000,
+          "mode": "topology",
+          "passed": true,
+          "replica": "",
+          "rows": 1000000,
+          "wall_ms": 151.995041
+        }
+      ]
+    },
+    "up": {
+      "raw_path": "results/up-1795823585157516000",
+      "status": {
+        "passed": true,
+        "mode": "up",
+        "started_ns": 1795823585157589000,
+        "ended_ns": 1795823717613580000
+      },
+      "resources": {
+        "native_retained_role_deltas": {
+          "cpu_us": 164197768,
+          "rbytes": 1216512,
+          "wbytes": 83275776,
+          "rios": 131,
+          "wios": 2487
+        },
+        "native_delta_scope": "phase end",
+        "restarted_roles_excluded_from_delta": [],
+        "roles_stopped_before_final_counter": [],
+        "roles_created_within_phase_from_zero": [],
+        "sampled_aggregate_memory_peak_bytes": 7863078486,
+        "sampled_aggregate_memory_mean_bytes": 7221384839.208333,
+        "sampled_cpu_peak_percent_one_core_100": 283.35,
+        "sampled_cpu_mean_percent_one_core_100": 144.72166666666666,
+        "sample_count": 24,
+        "limitations": [
+          "Phase native deltas exclude restarted roles; newly created roles use their full within-phase counters. Actor lifetimes are separate.",
+          "Docker memory samples use rounded display values and can miss short peaks; native actor memory.peak is separately retained.",
+          "Stopped roles without a final counter are unavailable, not zero; shutdown work is not inferred.",
+          "No physical device service-time measurement."
+        ],
+        "actor_role_totals": {
+          "oracle": {
+            "actors": 8,
+            "counters": {
+              "cpu_us": 961755,
+              "memory.peak": 9965568,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0
+            },
+            "missing_metrics": []
+          },
+          "orders": {
+            "actors": 2,
+            "counters": {
+              "cpu_us": 22601602,
+              "memory.peak": 550871040,
+              "rbytes": 1138688,
+              "wbytes": 2015232,
+              "rios": 92,
+              "wios": 8
+            },
+            "missing_metrics": []
+          },
+          "parquet-verifier": {
+            "actors": 1,
+            "counters": {
+              "cpu_us": 2620442,
+              "memory.peak": 129187840,
+              "rbytes": 57344,
+              "wbytes": 32768,
+              "rios": 8,
+              "wios": 1
+            },
+            "missing_metrics": []
+          }
+        },
+        "actor_peak_scope": "Maximum individual actor memory.peak per role, not simultaneous aggregate memory"
+      },
+      "volumes.json": {
+        "hdfs-spark-doris_dn2": {
+          "apparent_bytes": 7404321,
+          "allocated_bytes": 7704576,
+          "files": 115,
+          "concurrently_vanished_entries": 0
+        },
+        "hdfs-spark-doris_dn3": {
+          "apparent_bytes": 7404321,
+          "allocated_bytes": 7704576,
+          "files": 115,
+          "concurrently_vanished_entries": 0
+        },
+        "hdfs-spark-doris_be1": {
+          "apparent_bytes": 9090507,
+          "allocated_bytes": 91312128,
+          "files": 57,
+          "concurrently_vanished_entries": 0
+        },
+        "hdfs-spark-doris_be3": {
+          "apparent_bytes": 7911109,
+          "allocated_bytes": 90693632,
+          "files": 28,
+          "concurrently_vanished_entries": 0
+        },
+        "hdfs-spark-doris_dn1": {
+          "apparent_bytes": 7404321,
+          "allocated_bytes": 7704576,
+          "files": 115,
+          "concurrently_vanished_entries": 0
+        },
+        "hdfs-spark-doris_be2": {
+          "apparent_bytes": 9085181,
+          "allocated_bytes": 91308032,
+          "files": 57,
+          "concurrently_vanished_entries": 0
+        },
+        "hdfs-spark-doris_fe2": {
+          "apparent_bytes": 649832,
+          "allocated_bytes": 675840,
+          "files": 12,
+          "concurrently_vanished_entries": 0
+        },
+        "hdfs-spark-doris_fe1": {
+          "apparent_bytes": 654851,
+          "allocated_bytes": 688128,
+          "files": 12,
+          "concurrently_vanished_entries": 0
+        },
+        "hdfs-spark-doris_namenode": {
+          "apparent_bytes": 5243577,
+          "allocated_bytes": 5263360,
+          "files": 10,
+          "concurrently_vanished_entries": 0
+        },
+        "hdfs-spark-doris_fe3": {
+          "apparent_bytes": 662087,
+          "allocated_bytes": 692224,
+          "files": 12,
+          "concurrently_vanished_entries": 0
+        },
+        "_inventory_actor_cgroups": {
+          "cpu.stat": "usage_usec 71682\nuser_usec 36837\nsystem_usec 34845\nnice_usec 0\nnr_periods 7\nnr_throttled 7\nthrottled_usec 599143\nnr_bursts 0\nburst_usec 0\n",
+          "memory.peak": "6283264\n",
+          "io.stat": "254:0 rbytes=24576 wbytes=0 rios=6 wios=0 dbytes=0 dios=0\n"
+        }
+      },
+      "client_reference": {
+        "connect_timeout_s": 5,
+        "context_timeout_s": 600,
+        "driver": "go-sql-driver/mysql 1.11.0",
+        "go": "go1.27.4",
+        "max_inflight": 1,
+        "mutation_retry": "no blind retries; reconcile native label",
+        "pool": 1,
+        "read_timeout_s": 180,
+        "supervisor_timeout_s": 900,
+        "write_timeout_s": 10
+      },
+      "native_engine_version": [
+        {
+          "@@version_comment": "doris version doris-4.1.5-release-917b20be838"
+        }
+      ],
+      "native_load_receipts": [
+        {
+          "Label": "hdfs_baseline_orders",
+          "State": "FINISHED",
+          "TransactionId": "3007",
+          "Type": "INSERT",
+          "CreateTime": "2026-11-27 23:53:55",
+          "LoadFinishTime": "2026-11-27 23:53:56",
+          "details": {
+            "ScannedRows": 1000000,
+            "LoadBytes": 97375000,
+            "FileNumber": 18,
+            "FileSize": 2676075,
+            "FilteredRows": 0
+          }
+        },
+        {
+          "Label": "hdfs_baseline_regions",
+          "State": "FINISHED",
+          "TransactionId": "3008",
+          "Type": "INSERT",
+          "CreateTime": "2026-11-27 23:53:57",
+          "LoadFinishTime": "2026-11-27 23:53:57",
+          "details": {
+            "ScannedRows": 16,
+            "LoadBytes": 838,
+            "FileNumber": 6,
+            "FileSize": 6679,
+            "FilteredRows": 0
+          }
+        }
+      ],
+      "results": [
+        {
+          "label": "hdfs_baseline_orders",
+          "mode": "ack",
+          "wall_ms": 4754.248878
+        },
+        {
+          "label": "hdfs_baseline_regions",
+          "mode": "ack",
+          "wall_ms": 404.438042
+        },
+        {
+          "batch": "baseline",
+          "customers": 10000,
+          "mode": "load",
+          "passed": true,
+          "replica": "",
+          "rows": 1000000,
+          "wall_ms": 5187.094586
+        },
+        {
+          "batch": "baseline",
+          "customers": 10000,
+          "mode": "verify",
+          "passed": true,
+          "replica": "0",
+          "rows": 1000000,
+          "wall_ms": 20565.915218
+        },
+        {
+          "batch": "baseline",
+          "customers": 10000,
+          "mode": "verify",
+          "passed": true,
+          "replica": "1",
+          "rows": 1000000,
+          "wall_ms": 17294.249091
+        },
+        {
+          "batch": "baseline",
+          "customers": 10000,
+          "mode": "verify",
+          "passed": true,
+          "replica": "2",
+          "rows": 1000000,
+          "wall_ms": 17347.837925
+        },
+        {
+          "batch": "baseline",
+          "customers": 10000,
+          "mode": "topology",
+          "passed": true,
+          "replica": "",
+          "rows": 1000000,
+          "wall_ms": 74.294708
+        },
+        {
+          "batch": "baseline",
+          "customers": 10000,
+          "mode": "load",
+          "passed": true,
+          "replica": "",
+          "rows": 1000000,
+          "wall_ms": 11.822042
+        },
+        {
+          "batch": "baseline",
+          "customers": 10000,
+          "mode": "topology",
+          "passed": true,
+          "replica": "",
+          "rows": 1000000,
+          "wall_ms": 28.698875
+        },
+        {
+          "batch": "baseline",
+          "customers": 10000,
+          "mode": "verify",
+          "passed": true,
+          "replica": "",
+          "rows": 1000000,
+          "wall_ms": 17295.659133
+        },
+        {
+          "mode": "seed",
+          "batch": "baseline",
+          "totals": {
+            "rows": 1000000,
+            "ids": 1000000,
+            "first": 1,
+            "last": 1000000,
+            "amount": 599500000
+          },
+          "wall_s": 10.634172003999993
+        },
+        {
+          "mode": "join",
+          "batch": "baseline",
+          "totals": {
+            "rows": 1000000,
+            "ids": 1000000,
+            "first": 1,
+            "last": 1000000,
+            "amount": 599500000
+          },
+          "wall_s": 13.644212173000142
+        },
+        {
+          "passed": true,
+          "batch": "baseline",
+          "rows": 1000000,
+          "customer_partitions": [
+            0,
+            1,
+            2
+          ],
+          "parquet_column_compressed_bytes": 2633094,
+          "parquet_column_uncompressed_bytes": 16268725,
+          "parquet_file_bytes": 2682754,
+          "codecs": [
+            "ZSTD"
+          ],
+          "compression_ratio": 6.178558380369254,
+          "oracle_cpu_s": 0.940423773,
+          "oracle_wall_s": 1.8281709999998839,
+          "parquet_file_count": 24
+        }
+      ]
+    },
+    "test": {
+      "raw_path": "results/test-1795823737178087000",
+      "status": {
+        "passed": true,
+        "mode": "test",
+        "started_ns": 1795823737178141000,
+        "ended_ns": 1795823854511656000
+      },
+      "resources": {
+        "native_retained_role_deltas": {
+          "cpu_us": 131914784,
+          "rbytes": 339968,
+          "wbytes": 12120064,
+          "rios": 34,
+          "wios": 1213
+        },
+        "native_delta_scope": "phase end",
+        "restarted_roles_excluded_from_delta": [],
+        "roles_stopped_before_final_counter": [],
+        "roles_created_within_phase_from_zero": [],
+        "sampled_aggregate_memory_peak_bytes": 8267312923,
+        "sampled_aggregate_memory_mean_bytes": 7528890027.3,
+        "sampled_cpu_peak_percent_one_core_100": 233.17999999999998,
+        "sampled_cpu_mean_percent_one_core_100": 115.754,
+        "sample_count": 20,
+        "limitations": [
+          "Phase native deltas exclude restarted roles; newly created roles use their full within-phase counters. Actor lifetimes are separate.",
+          "Docker memory samples use rounded display values and can miss short peaks; native actor memory.peak is separately retained.",
+          "Stopped roles without a final counter are unavailable, not zero; shutdown work is not inferred.",
+          "No physical device service-time measurement."
+        ],
+        "actor_role_totals": {
+          "oracle": {
+            "actors": 9,
+            "counters": {
+              "cpu_us": 1013410,
+              "memory.peak": 12095488,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0
+            },
+            "missing_metrics": []
+          },
+          "parquet-verifier": {
+            "actors": 1,
+            "counters": {
+              "cpu_us": 2682156,
+              "memory.peak": 122867712,
+              "rbytes": 4096,
+              "wbytes": 32768,
+              "rios": 1,
+              "wios": 1
+            },
+            "missing_metrics": []
+          },
+          "orders": {
+            "actors": 1,
+            "counters": {
+              "cpu_us": 9313442,
+              "memory.peak": 454021120,
+              "rbytes": 610304,
+              "wbytes": 917504,
+              "rios": 47,
+              "wios": 3
+            },
+            "missing_metrics": []
+          }
+        },
+        "actor_peak_scope": "Maximum individual actor memory.peak per role, not simultaneous aggregate memory"
+      },
+      "topology-verdict.json": {
+        "voting_fes": 3,
+        "live_bes": 3,
+        "tablets": 6,
+        "current_replicas": 18,
+        "hdfs": {
+          "published_blocks": 25,
+          "physical_copies": 75,
+          "bytes_read": 8062497
+        }
+      },
+      "volumes.json": {
+        "hdfs-spark-doris_dn2": {
+          "apparent_bytes": 7708351,
+          "allocated_bytes": 8011776,
+          "files": 117,
+          "concurrently_vanished_entries": 0
+        },
+        "hdfs-spark-doris_dn3": {
+          "apparent_bytes": 7708351,
+          "allocated_bytes": 8011776,
+          "files": 117,
+          "concurrently_vanished_entries": 0
+        },
+        "hdfs-spark-doris_be1": {
+          "apparent_bytes": 9773506,
+          "allocated_bytes": 91566080,
+          "files": 76,
+          "concurrently_vanished_entries": 0
+        },
+        "hdfs-spark-doris_be3": {
+          "apparent_bytes": 8111568,
+          "allocated_bytes": 90791936,
+          "files": 40,
+          "concurrently_vanished_entries": 0
+        },
+        "hdfs-spark-doris_dn1": {
+          "apparent_bytes": 7708351,
+          "allocated_bytes": 8011776,
+          "files": 117,
+          "concurrently_vanished_entries": 0
+        },
+        "hdfs-spark-doris_be2": {
+          "apparent_bytes": 9778949,
+          "allocated_bytes": 91574272,
+          "files": 76,
+          "concurrently_vanished_entries": 0
+        },
+        "hdfs-spark-doris_fe2": {
+          "apparent_bytes": 692679,
+          "allocated_bytes": 724992,
+          "files": 12,
+          "concurrently_vanished_entries": 0
+        },
+        "hdfs-spark-doris_fe1": {
+          "apparent_bytes": 697701,
+          "allocated_bytes": 733184,
+          "files": 12,
+          "concurrently_vanished_entries": 0
+        },
+        "hdfs-spark-doris_namenode": {
+          "apparent_bytes": 5243577,
+          "allocated_bytes": 5263360,
+          "files": 10,
+          "concurrently_vanished_entries": 0
+        },
+        "hdfs-spark-doris_fe3": {
+          "apparent_bytes": 706456,
+          "allocated_bytes": 741376,
+          "files": 12,
+          "concurrently_vanished_entries": 0
+        },
+        "_inventory_actor_cgroups": {
+          "cpu.stat": "usage_usec 61774\nuser_usec 33876\nsystem_usec 27898\nnice_usec 0\nnr_periods 6\nnr_throttled 6\nthrottled_usec 454384\nnr_bursts 0\nburst_usec 0\n",
+          "memory.peak": "6238208\n",
+          "io.stat": "254:0 rbytes=12288 wbytes=0 rios=3 wios=0 dbytes=0 dios=0\n"
+        }
+      },
+      "verified-batches.json": [
+        "baseline"
+      ],
+      "client_reference": {
+        "connect_timeout_s": 5,
+        "context_timeout_s": 600,
+        "driver": "go-sql-driver/mysql 1.11.0",
+        "go": "go1.27.4",
+        "max_inflight": 1,
+        "mutation_retry": "no blind retries; reconcile native label",
+        "pool": 1,
+        "read_timeout_s": 180,
+        "supervisor_timeout_s": 900,
+        "write_timeout_s": 10
+      },
+      "native_engine_version": [
+        {
+          "@@version_comment": "doris version doris-4.1.5-release-917b20be838"
+        }
+      ],
+      "native_load_receipts": [
+        {
+          "Label": "hdfs_baseline_orders",
+          "State": "FINISHED",
+          "TransactionId": "3007",
+          "Type": "INSERT",
+          "CreateTime": "2026-11-27 23:53:55",
+          "LoadFinishTime": "2026-11-27 23:53:56",
+          "details": {
+            "ScannedRows": 1000000,
+            "LoadBytes": 97375000,
+            "FileNumber": 18,
+            "FileSize": 2676075,
+            "FilteredRows": 0
+          }
+        },
+        {
+          "Label": "hdfs_baseline_regions",
+          "State": "FINISHED",
+          "TransactionId": "3008",
+          "Type": "INSERT",
+          "CreateTime": "2026-11-27 23:53:57",
+          "LoadFinishTime": "2026-11-27 23:53:57",
+          "details": {
+            "ScannedRows": 16,
+            "LoadBytes": 838,
+            "FileNumber": 6,
+            "FileSize": 6679,
+            "FilteredRows": 0
+          }
+        }
+      ],
+      "results": [
+        {
+          "batch": "baseline",
+          "customers": 10000,
+          "mode": "load",
+          "passed": true,
+          "replica": "",
+          "rows": 1000000,
+          "wall_ms": 11.986167
+        },
+        {
+          "batch": "baseline",
+          "customers": 10000,
+          "mode": "verify",
+          "passed": true,
+          "replica": "0",
+          "rows": 1000000,
+          "wall_ms": 17229.645091
+        },
+        {
+          "batch": "baseline",
+          "customers": 10000,
+          "mode": "verify",
+          "passed": true,
+          "replica": "1",
+          "rows": 1000000,
+          "wall_ms": 17510.320799
+        },
+        {
+          "batch": "baseline",
+          "customers": 10000,
+          "mode": "verify",
+          "passed": true,
+          "replica": "2",
+          "rows": 1000000,
+          "wall_ms": 17186.678716
+        },
+        {
+          "batch": "baseline",
+          "customers": 10000,
+          "mode": "topology",
+          "passed": true,
+          "replica": "",
+          "rows": 1000000,
+          "wall_ms": 25.856583
+        },
+        {
+          "batch": "baseline",
+          "customers": 10000,
+          "mode": "load",
+          "passed": true,
+          "replica": "",
+          "rows": 1000000,
+          "wall_ms": 10.177209
+        },
+        {
+          "batch": "baseline",
+          "customers": 10000,
+          "mode": "topology",
+          "passed": true,
+          "replica": "",
+          "rows": 1000000,
+          "wall_ms": 25.645666
+        },
+        {
+          "batch": "baseline",
+          "customers": 10000,
+          "mode": "verify",
+          "passed": true,
+          "replica": "",
+          "rows": 1000000,
+          "wall_ms": 17364.232133
+        },
+        {
+          "batch": "baseline",
+          "customers": 10000,
+          "mode": "topology",
+          "passed": true,
+          "replica": "",
+          "rows": 1000000,
+          "wall_ms": 44.142833
+        },
+        {
+          "mode": "verify",
+          "batch": "baseline",
+          "totals": {
+            "rows": 1000000,
+            "ids": 1000000,
+            "first": 1,
+            "last": 1000000,
+            "amount": 599500000
+          },
+          "wall_s": 7.6602290870000616
+        },
+        {
+          "passed": true,
+          "batch": "baseline",
+          "rows": 1000000,
+          "customer_partitions": [
+            0,
+            1,
+            2
+          ],
+          "parquet_column_compressed_bytes": 2633094,
+          "parquet_column_uncompressed_bytes": 16268725,
+          "parquet_file_bytes": 2682754,
+          "codecs": [
+            "ZSTD"
+          ],
+          "compression_ratio": 6.178558380369254,
+          "oracle_cpu_s": 0.9442787480000001,
+          "oracle_wall_s": 1.8384946670000772,
+          "parquet_file_count": 24
+        }
+      ]
+    },
+    "executor-failure": {
+      "raw_path": "results/executor-failure-1795823889865184000",
+      "status": {
+        "passed": true,
+        "mode": "executor-failure",
+        "started_ns": 1795823889865253000,
+        "ended_ns": 1795824024263278000
+      },
+      "resources": {
+        "native_retained_role_deltas": {
+          "cpu_us": 142618954,
+          "rbytes": 122880,
+          "wbytes": 69238784,
+          "rios": 8,
+          "wios": 2109
+        },
+        "native_delta_scope": "phase end",
+        "restarted_roles_excluded_from_delta": [
+          "worker1"
+        ],
+        "roles_stopped_before_final_counter": [],
+        "roles_created_within_phase_from_zero": [],
+        "sampled_aggregate_memory_peak_bytes": 8290230600,
+        "sampled_aggregate_memory_mean_bytes": 7738984257.782609,
+        "sampled_cpu_peak_percent_one_core_100": 305.82,
+        "sampled_cpu_mean_percent_one_core_100": 126.47217391304348,
+        "sample_count": 23,
+        "limitations": [
+          "Phase native deltas exclude restarted roles; newly created roles use their full within-phase counters. Actor lifetimes are separate.",
+          "Docker memory samples use rounded display values and can miss short peaks; native actor memory.peak is separately retained.",
+          "Stopped roles without a final counter are unavailable, not zero; shutdown work is not inferred.",
+          "No physical device service-time measurement."
+        ],
+        "actor_role_totals": {
+          "oracle": {
+            "actors": 9,
+            "counters": {
+              "cpu_us": 1039539,
+              "memory.peak": 10190848,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0
+            },
+            "missing_metrics": []
+          },
+          "parquet-verifier": {
+            "actors": 2,
+            "counters": {
+              "cpu_us": 4887786,
+              "memory.peak": 122568704,
+              "rbytes": 4096,
+              "wbytes": 65536,
+              "rios": 1,
+              "wios": 2
+            },
+            "missing_metrics": []
+          },
+          "orders": {
+            "actors": 1,
+            "counters": {
+              "cpu_us": 13176975,
+              "memory.peak": 540557312,
+              "rbytes": 24576,
+              "wbytes": 1130496,
+              "rios": 3,
+              "wios": 10
+            },
+            "missing_metrics": []
+          }
+        },
+        "actor_peak_scope": "Maximum individual actor memory.peak per role, not simultaneous aggregate memory"
+      },
+      "topology-verdict.json": {
+        "voting_fes": 3,
+        "live_bes": 3,
+        "tablets": 6,
+        "current_replicas": 18,
+        "hdfs": {
+          "published_blocks": 50,
+          "physical_copies": 150,
+          "bytes_read": 16124988
+        }
+      },
+      "recovery.json": {
+        "passed": true,
+        "batch": "executor",
+        "wall_s": 31.84946379200119,
+        "failed_tasks": [
+          {
+            "Stage ID": 2,
+            "Stage Attempt ID": 0,
+            "Task End Reason": {
+              "Reason": "ExecutorLostFailure",
+              "Executor ID": "1",
+              "Exit Caused By App": false,
+              "Loss Reason": "worker lost: worker1:38939 got disassociated"
+            }
+          }
+        ],
+        "publication_verified": true
+      },
+      "volumes.json": {
+        "hdfs-spark-doris_dn2": {
+          "apparent_bytes": 11204086,
+          "allocated_bytes": 11644928,
+          "files": 169,
+          "concurrently_vanished_entries": 0
+        },
+        "hdfs-spark-doris_dn3": {
+          "apparent_bytes": 11204086,
+          "allocated_bytes": 11644928,
+          "files": 169,
+          "concurrently_vanished_entries": 0
+        },
+        "hdfs-spark-doris_be1": {
+          "apparent_bytes": 18869459,
+          "allocated_bytes": 99590144,
+          "files": 105,
+          "concurrently_vanished_entries": 0
+        },
+        "hdfs-spark-doris_be3": {
+          "apparent_bytes": 16190581,
+          "allocated_bytes": 98689024,
+          "files": 65,
+          "concurrently_vanished_entries": 0
+        },
+        "hdfs-spark-doris_dn1": {
+          "apparent_bytes": 11204086,
+          "allocated_bytes": 11644928,
+          "files": 169,
+          "concurrently_vanished_entries": 0
+        },
+        "hdfs-spark-doris_be2": {
+          "apparent_bytes": 18880163,
+          "allocated_bytes": 99614720,
+          "files": 105,
+          "concurrently_vanished_entries": 0
+        },
+        "hdfs-spark-doris_fe2": {
+          "apparent_bytes": 752470,
+          "allocated_bytes": 782336,
+          "files": 12,
+          "concurrently_vanished_entries": 0
+        },
+        "hdfs-spark-doris_fe1": {
+          "apparent_bytes": 757493,
+          "allocated_bytes": 790528,
+          "files": 12,
+          "concurrently_vanished_entries": 0
+        },
+        "hdfs-spark-doris_namenode": {
+          "apparent_bytes": 5243577,
+          "allocated_bytes": 5263360,
+          "files": 10,
+          "concurrently_vanished_entries": 0
+        },
+        "hdfs-spark-doris_fe3": {
+          "apparent_bytes": 768537,
+          "allocated_bytes": 802816,
+          "files": 12,
+          "concurrently_vanished_entries": 0
+        },
+        "_inventory_actor_cgroups": {
+          "cpu.stat": "usage_usec 79949\nuser_usec 40973\nsystem_usec 38975\nnice_usec 0\nnr_periods 8\nnr_throttled 8\nthrottled_usec 629621\nnr_bursts 0\nburst_usec 0\n",
+          "memory.peak": "6287360\n",
+          "io.stat": "254:0 rbytes=12288 wbytes=0 rios=3 wios=0 dbytes=0 dios=0\n"
+        }
+      },
+      "client_reference": {
+        "connect_timeout_s": 5,
+        "context_timeout_s": 600,
+        "driver": "go-sql-driver/mysql 1.11.0",
+        "go": "go1.27.4",
+        "max_inflight": 1,
+        "mutation_retry": "no blind retries; reconcile native label",
+        "pool": 1,
+        "read_timeout_s": 180,
+        "supervisor_timeout_s": 900,
+        "write_timeout_s": 10
+      },
+      "native_engine_version": [
+        {
+          "@@version_comment": "doris version doris-4.1.5-release-917b20be838"
+        }
+      ],
+      "native_load_receipts": [
+        {
+          "Label": "hdfs_baseline_orders",
+          "State": "FINISHED",
+          "TransactionId": "3007",
+          "Type": "INSERT",
+          "CreateTime": "2026-11-27 23:53:55",
+          "LoadFinishTime": "2026-11-27 23:53:56",
+          "details": {
+            "ScannedRows": 1000000,
+            "LoadBytes": 97375000,
+            "FileNumber": 18,
+            "FileSize": 2676075,
+            "FilteredRows": 0
+          }
+        },
+        {
+          "Label": "hdfs_baseline_regions",
+          "State": "FINISHED",
+          "TransactionId": "3008",
+          "Type": "INSERT",
+          "CreateTime": "2026-11-27 23:53:57",
+          "LoadFinishTime": "2026-11-27 23:53:57",
+          "details": {
+            "ScannedRows": 16,
+            "LoadBytes": 838,
+            "FileNumber": 6,
+            "FileSize": 6679,
+            "FilteredRows": 0
+          }
+        },
+        {
+          "Label": "hdfs_executor_orders",
+          "State": "FINISHED",
+          "TransactionId": "3028",
+          "Type": "INSERT",
+          "CreateTime": "2026-11-27 23:58:51",
+          "LoadFinishTime": "2026-11-27 23:58:52",
+          "details": {
+            "ScannedRows": 1000000,
+            "LoadBytes": 97375000,
+            "FileNumber": 18,
+            "FileSize": 2676075,
+            "FilteredRows": 0
+          }
+        },
+        {
+          "Label": "hdfs_executor_regions",
+          "State": "FINISHED",
+          "TransactionId": "3029",
+          "Type": "INSERT",
+          "CreateTime": "2026-11-27 23:58:52",
+          "LoadFinishTime": "2026-11-27 23:58:52",
+          "details": {
+            "ScannedRows": 16,
+            "LoadBytes": 838,
+            "FileNumber": 6,
+            "FileSize": 6677,
+            "FilteredRows": 0
+          }
+        }
+      ],
+      "results": [
+        {
+          "mode": "join",
+          "batch": "executor",
+          "totals": {
+            "rows": 1000000,
+            "ids": 1000000,
+            "first": 1,
+            "last": 1000000,
+            "amount": 599500000
+          },
+          "wall_s": 15.351344298999948
+        },
+        {
+          "label": "hdfs_executor_orders",
+          "mode": "ack",
+          "wall_ms": 941.805417
+        },
+        {
+          "label": "hdfs_executor_regions",
+          "mode": "ack",
+          "wall_ms": 195.71625
+        },
+        {
+          "batch": "executor",
+          "customers": 10000,
+          "mode": "load",
+          "passed": true,
+          "replica": "",
+          "rows": 1000000,
+          "wall_ms": 1148.359126
+        },
+        {
+          "batch": "executor",
+          "customers": 10000,
+          "mode": "verify",
+          "passed": true,
+          "replica": "0",
+          "rows": 1000000,
+          "wall_ms": 17165.484342
+        },
+        {
+          "batch": "executor",
+          "customers": 10000,
+          "mode": "verify",
+          "passed": true,
+          "replica": "1",
+          "rows": 1000000,
+          "wall_ms": 17245.212299
+        },
+        {
+          "batch": "executor",
+          "customers": 10000,
+          "mode": "verify",
+          "passed": true,
+          "replica": "2",
+          "rows": 1000000,
+          "wall_ms": 17555.2793
+        },
+        {
+          "batch": "baseline",
+          "customers": 10000,
+          "mode": "topology",
+          "passed": true,
+          "replica": "",
+          "rows": 1000000,
+          "wall_ms": 174.300791
+        },
+        {
+          "batch": "executor",
+          "customers": 10000,
+          "mode": "load",
+          "passed": true,
+          "replica": "",
+          "rows": 1000000,
+          "wall_ms": 70.034584
+        },
+        {
+          "batch": "baseline",
+          "customers": 10000,
+          "mode": "topology",
+          "passed": true,
+          "replica": "",
+          "rows": 1000000,
+          "wall_ms": 141.481875
+        },
+        {
+          "batch": "executor",
+          "customers": 10000,
+          "mode": "verify",
+          "passed": true,
+          "replica": "",
+          "rows": 1000000,
+          "wall_ms": 17251.635299
+        },
+        {
+          "batch": "baseline",
+          "customers": 10000,
+          "mode": "topology",
+          "passed": true,
+          "replica": "",
+          "rows": 1000000,
+          "wall_ms": 23.263
+        },
+        {
+          "passed": true,
+          "batch": "baseline",
+          "rows": 1000000,
+          "customer_partitions": [
+            0,
+            1,
+            2
+          ],
+          "parquet_column_compressed_bytes": 2633094,
+          "parquet_column_uncompressed_bytes": 16268725,
+          "parquet_file_bytes": 2682754,
+          "codecs": [
+            "ZSTD"
+          ],
+          "compression_ratio": 6.178558380369254,
+          "oracle_cpu_s": 0.9073337260000001,
+          "oracle_wall_s": 1.7498723339999742,
+          "parquet_file_count": 24
+        },
+        {
+          "passed": true,
+          "batch": "executor",
+          "rows": 1000000,
+          "customer_partitions": [
+            0,
+            1,
+            2
+          ],
+          "parquet_column_compressed_bytes": 2633092,
+          "parquet_column_uncompressed_bytes": 16268724,
+          "parquet_file_bytes": 2682752,
+          "codecs": [
+            "ZSTD"
+          ],
+          "compression_ratio": 6.178562693593691,
+          "oracle_cpu_s": 0.9060220210000001,
+          "oracle_wall_s": 1.7780654169998797,
+          "parquet_file_count": 24
+        }
+      ]
+    },
+    "datanode-failure": {
+      "raw_path": "results/datanode-failure-1795824024299894000",
+      "status": {
+        "passed": false,
+        "name": "datanode-failure",
+        "started_ns": 1795824024299974000
+      },
+      "resources": {
+        "native_retained_role_deltas": {
+          "cpu_us": 284932613,
+          "rbytes": 2588672,
+          "wbytes": 77078528,
+          "rios": 88,
+          "wios": 2968
+        },
+        "native_delta_scope": "phase end",
+        "restarted_roles_excluded_from_delta": [
+          "dn1"
+        ],
+        "roles_stopped_before_final_counter": [],
+        "roles_created_within_phase_from_zero": [],
+        "sampled_aggregate_memory_peak_bytes": 8942415512,
+        "sampled_aggregate_memory_mean_bytes": 7911756814.067797,
+        "sampled_cpu_peak_percent_one_core_100": 291.62,
+        "sampled_cpu_mean_percent_one_core_100": 96.3177966101695,
+        "sample_count": 59,
+        "limitations": [
+          "Phase native deltas exclude restarted roles; newly created roles use their full within-phase counters. Actor lifetimes are separate.",
+          "Docker memory samples use rounded display values and can miss short peaks; native actor memory.peak is separately retained.",
+          "Stopped roles without a final counter are unavailable, not zero; shutdown work is not inferred.",
+          "No physical device service-time measurement."
+        ],
+        "actor_role_totals": {
+          "oracle": {
+            "actors": 8,
+            "counters": {
+              "cpu_us": 1027606,
+              "memory.peak": 11644928,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0
+            },
+            "missing_metrics": []
+          },
+          "parquet-verifier": {
+            "actors": 2,
+            "counters": {
+              "cpu_us": 5180615,
+              "memory.peak": 126222336,
+              "rbytes": 425984,
+              "wbytes": 65536,
+              "rios": 27,
+              "wios": 2
+            },
+            "missing_metrics": []
+          },
+          "orders": {
+            "actors": 1,
+            "counters": {
+              "cpu_us": 13238641,
+              "memory.peak": 534216704,
+              "rbytes": 0,
+              "wbytes": 1130496,
+              "rios": 0,
+              "wios": 7
+            },
+            "missing_metrics": []
+          }
+        },
+        "actor_peak_scope": "Maximum individual actor memory.peak per role, not simultaneous aggregate memory"
+      },
+      "recovery.json": {
+        "passed": true,
+        "batch": "datanode",
+        "wall_s": 42.33266183300293,
+        "failed_tasks": [],
+        "publication_verified": true
+      },
+      "client_reference": {
+        "connect_timeout_s": 5,
+        "context_timeout_s": 600,
+        "driver": "go-sql-driver/mysql 1.11.0",
+        "go": "go1.27.4",
+        "max_inflight": 1,
+        "mutation_retry": "no blind retries; reconcile native label",
+        "pool": 1,
+        "read_timeout_s": 180,
+        "supervisor_timeout_s": 900,
+        "write_timeout_s": 10
+      },
+      "native_engine_version": [
+        {
+          "@@version_comment": "doris version doris-4.1.5-release-917b20be838"
+        }
+      ],
+      "native_load_receipts": [
+        {
+          "Label": "hdfs_baseline_orders",
+          "State": "FINISHED",
+          "TransactionId": "3007",
+          "Type": "INSERT",
+          "CreateTime": "2026-11-27 23:53:55",
+          "LoadFinishTime": "2026-11-27 23:53:56",
+          "details": {
+            "ScannedRows": 1000000,
+            "LoadBytes": 97375000,
+            "FileNumber": 18,
+            "FileSize": 2676075,
+            "FilteredRows": 0
+          }
+        },
+        {
+          "Label": "hdfs_baseline_regions",
+          "State": "FINISHED",
+          "TransactionId": "3008",
+          "Type": "INSERT",
+          "CreateTime": "2026-11-27 23:53:57",
+          "LoadFinishTime": "2026-11-27 23:53:57",
+          "details": {
+            "ScannedRows": 16,
+            "LoadBytes": 838,
+            "FileNumber": 6,
+            "FileSize": 6679,
+            "FilteredRows": 0
+          }
+        },
+        {
+          "Label": "hdfs_executor_orders",
+          "State": "FINISHED",
+          "TransactionId": "3028",
+          "Type": "INSERT",
+          "CreateTime": "2026-11-27 23:58:51",
+          "LoadFinishTime": "2026-11-27 23:58:52",
+          "details": {
+            "ScannedRows": 1000000,
+            "LoadBytes": 97375000,
+            "FileNumber": 18,
+            "FileSize": 2676075,
+            "FilteredRows": 0
+          }
+        },
+        {
+          "Label": "hdfs_executor_regions",
+          "State": "FINISHED",
+          "TransactionId": "3029",
+          "Type": "INSERT",
+          "CreateTime": "2026-11-27 23:58:52",
+          "LoadFinishTime": "2026-11-27 23:58:52",
+          "details": {
+            "ScannedRows": 16,
+            "LoadBytes": 838,
+            "FileNumber": 6,
+            "FileSize": 6677,
+            "FilteredRows": 0
+          }
+        },
+        {
+          "Label": "hdfs_datanode_orders",
+          "State": "FINISHED",
+          "TransactionId": "3042",
+          "Type": "INSERT",
+          "CreateTime": "2026-11-28 00:01:17",
+          "LoadFinishTime": "2026-11-28 00:01:18",
+          "details": {
+            "ScannedRows": 1000000,
+            "LoadBytes": 97375000,
+            "FileNumber": 18,
+            "FileSize": 2676075,
+            "FilteredRows": 0
+          }
+        },
+        {
+          "Label": "hdfs_datanode_regions",
+          "State": "FINISHED",
+          "TransactionId": "3043",
+          "Type": "INSERT",
+          "CreateTime": "2026-11-28 00:01:18",
+          "LoadFinishTime": "2026-11-28 00:01:18",
+          "details": {
+            "ScannedRows": 16,
+            "LoadBytes": 838,
+            "FileNumber": 6,
+            "FileSize": 6677,
+            "FilteredRows": 0
+          }
+        }
+      ],
+      "results": [
+        {
+          "mode": "join",
+          "batch": "datanode",
+          "totals": {
+            "rows": 1000000,
+            "ids": 1000000,
+            "first": 1,
+            "last": 1000000,
+            "amount": 599500000
+          },
+          "wall_s": 26.229188054000133
+        },
+        {
+          "label": "hdfs_datanode_orders",
+          "mode": "ack",
+          "wall_ms": 1426.986376
+        },
+        {
+          "label": "hdfs_datanode_regions",
+          "mode": "ack",
+          "wall_ms": 88.542125
+        },
+        {
+          "batch": "datanode",
+          "customers": 10000,
+          "mode": "load",
+          "passed": true,
+          "replica": "",
+          "rows": 1000000,
+          "wall_ms": 1525.947917
+        },
+        {
+          "batch": "datanode",
+          "customers": 10000,
+          "mode": "verify",
+          "passed": true,
+          "replica": "0",
+          "rows": 1000000,
+          "wall_ms": 17196.266383
+        },
+        {
+          "batch": "datanode",
+          "customers": 10000,
+          "mode": "verify",
+          "passed": true,
+          "replica": "1",
+          "rows": 1000000,
+          "wall_ms": 17315.819383
+        },
+        {
+          "batch": "datanode",
+          "customers": 10000,
+          "mode": "verify",
+          "passed": true,
+          "replica": "2",
+          "rows": 1000000,
+          "wall_ms": 17530.055467
+        },
+        {
+          "batch": "baseline",
+          "customers": 10000,
+          "mode": "topology",
+          "passed": true,
+          "replica": "",
+          "rows": 1000000,
+          "wall_ms": 193.008792
+        },
+        {
+          "batch": "datanode",
+          "customers": 10000,
+          "mode": "load",
+          "passed": true,
+          "replica": "",
+          "rows": 1000000,
+          "wall_ms": 47.433125
+        },
+        {
+          "batch": "baseline",
+          "customers": 10000,
+          "mode": "topology",
+          "passed": true,
+          "replica": "",
+          "rows": 1000000,
+          "wall_ms": 76.895375
+        },
+        {
+          "batch": "datanode",
+          "customers": 10000,
+          "mode": "verify",
+          "passed": true,
+          "replica": "",
+          "rows": 1000000,
+          "wall_ms": 17404.735758
+        },
+        {
+          "passed": true,
+          "batch": "baseline",
+          "rows": 1000000,
+          "customer_partitions": [
+            0,
+            1,
+            2
+          ],
+          "parquet_column_compressed_bytes": 2633094,
+          "parquet_column_uncompressed_bytes": 16268725,
+          "parquet_file_bytes": 2682754,
+          "codecs": [
+            "ZSTD"
+          ],
+          "compression_ratio": 6.178558380369254,
+          "oracle_cpu_s": 0.9633075310000001,
+          "oracle_wall_s": 1.8519767930001763,
+          "parquet_file_count": 24
+        },
+        {
+          "passed": true,
+          "batch": "datanode",
+          "rows": 1000000,
+          "customer_partitions": [
+            0,
+            1,
+            2
+          ],
+          "parquet_column_compressed_bytes": 2633092,
+          "parquet_column_uncompressed_bytes": 16268725,
+          "parquet_file_bytes": 2682752,
+          "codecs": [
+            "ZSTD"
+          ],
+          "compression_ratio": 6.178563073375332,
+          "oracle_cpu_s": 0.894438231,
+          "oracle_wall_s": 1.6968817930001023,
+          "parquet_file_count": 24
+        }
+      ]
+    },
+    "benchmark": {
+      "raw_path": "results/benchmark-1795824568706076000",
+      "status": {
+        "passed": true,
+        "mode": "benchmark",
+        "started_ns": 1795824568706139000,
+        "ended_ns": 1795824618346334000
+      },
+      "resources": {
+        "native_retained_role_deltas": {
+          "cpu_us": 43373133,
+          "rbytes": 0,
+          "wbytes": 3874816,
+          "rios": 0,
+          "wios": 354
+        },
+        "native_delta_scope": "phase end",
+        "restarted_roles_excluded_from_delta": [],
+        "roles_stopped_before_final_counter": [],
+        "roles_created_within_phase_from_zero": [],
+        "sampled_aggregate_memory_peak_bytes": 8049334944,
+        "sampled_aggregate_memory_mean_bytes": 7964561113,
+        "sampled_cpu_peak_percent_one_core_100": 132.54999999999998,
+        "sampled_cpu_mean_percent_one_core_100": 94.04875,
+        "sample_count": 8,
+        "limitations": [
+          "Phase native deltas exclude restarted roles; newly created roles use their full within-phase counters. Actor lifetimes are separate.",
+          "Docker memory samples use rounded display values and can miss short peaks; native actor memory.peak is separately retained.",
+          "Stopped roles without a final counter are unavailable, not zero; shutdown work is not inferred.",
+          "No physical device service-time measurement."
+        ],
+        "actor_role_totals": {
+          "oracle": {
+            "actors": 2,
+            "counters": {
+              "cpu_us": 350479,
+              "memory.peak": 8650752,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0
+            },
+            "missing_metrics": []
+          }
+        },
+        "actor_peak_scope": "Maximum individual actor memory.peak per role, not simultaneous aggregate memory"
+      },
+      "volumes.json": {
+        "hdfs-spark-doris_dn2": {
+          "apparent_bytes": 14069778,
+          "allocated_bytes": 14655488,
+          "files": 223,
+          "concurrently_vanished_entries": 0
+        },
+        "hdfs-spark-doris_dn3": {
+          "apparent_bytes": 14069778,
+          "allocated_bytes": 14655488,
+          "files": 223,
+          "concurrently_vanished_entries": 0
+        },
+        "hdfs-spark-doris_be1": {
+          "apparent_bytes": 28255001,
+          "allocated_bytes": 107294720,
+          "files": 122,
+          "concurrently_vanished_entries": 0
+        },
+        "hdfs-spark-doris_be3": {
+          "apparent_bytes": 27290129,
+          "allocated_bytes": 107610112,
+          "files": 145,
+          "concurrently_vanished_entries": 0
+        },
+        "hdfs-spark-doris_dn1": {
+          "apparent_bytes": 14069771,
+          "allocated_bytes": 14651392,
+          "files": 221,
+          "concurrently_vanished_entries": 0
+        },
+        "hdfs-spark-doris_be2": {
+          "apparent_bytes": 30087326,
+          "allocated_bytes": 107974656,
+          "files": 157,
+          "concurrently_vanished_entries": 0
+        },
+        "hdfs-spark-doris_fe2": {
+          "apparent_bytes": 923477,
+          "allocated_bytes": 954368,
+          "files": 12,
+          "concurrently_vanished_entries": 0
+        },
+        "hdfs-spark-doris_fe1": {
+          "apparent_bytes": 928503,
+          "allocated_bytes": 958464,
+          "files": 12,
+          "concurrently_vanished_entries": 0
+        },
+        "hdfs-spark-doris_namenode": {
+          "apparent_bytes": 5243577,
+          "allocated_bytes": 5263360,
+          "files": 10,
+          "concurrently_vanished_entries": 0
+        },
+        "hdfs-spark-doris_fe3": {
+          "apparent_bytes": 947187,
+          "allocated_bytes": 974848,
+          "files": 12,
+          "concurrently_vanished_entries": 0
+        },
+        "_inventory_actor_cgroups": {
+          "cpu.stat": "usage_usec 65371\nuser_usec 32685\nsystem_usec 32685\nnice_usec 0\nnr_periods 6\nnr_throttled 6\nthrottled_usec 447651\nnr_bursts 0\nburst_usec 0\n",
+          "memory.peak": "6221824\n",
+          "io.stat": ""
+        }
+      },
+      "client_reference": {
+        "connect_timeout_s": 5,
+        "context_timeout_s": 600,
+        "driver": "go-sql-driver/mysql 1.11.0",
+        "go": "go1.27.4",
+        "max_inflight": 1,
+        "mutation_retry": "no blind retries; reconcile native label",
+        "pool": 1,
+        "read_timeout_s": 180,
+        "supervisor_timeout_s": 900,
+        "write_timeout_s": 10
+      },
+      "results": [
+        {
+          "batch": "baseline",
+          "customers": 10000,
+          "mode": "verify",
+          "passed": true,
+          "replica": "",
+          "rows": 1000000,
+          "wall_ms": 17216.015467
+        },
+        {
+          "cache": "warm; physical cold unproven",
+          "max_ms": 50.916,
+          "mean_ms": 12.218009766666666,
+          "measured": 30,
+          "p50_ms": 11.464542,
+          "p95_ms": 15.219583,
+          "p999_ms": null,
+          "p99_ms": 50.916,
+          "query": "point",
+          "think_ms": 100,
+          "trial": 1,
+          "warmup": 5
+        },
+        {
+          "cache": "warm; physical cold unproven",
+          "max_ms": 20.14825,
+          "mean_ms": 14.677327766666668,
+          "measured": 30,
+          "p50_ms": 14.489875,
+          "p95_ms": 18.573083,
+          "p999_ms": null,
+          "p99_ms": 20.14825,
+          "query": "regional-rollup",
+          "think_ms": 100,
+          "trial": 1,
+          "warmup": 5
+        },
+        {
+          "cache": "warm; physical cold unproven",
+          "max_ms": 71.418334,
+          "mean_ms": 16.182462533333332,
+          "measured": 30,
+          "p50_ms": 13.9985,
+          "p95_ms": 22.131958,
+          "p999_ms": null,
+          "p99_ms": 71.418334,
+          "query": "regional-rollup",
+          "think_ms": 100,
+          "trial": 2,
+          "warmup": 5
+        },
+        {
+          "cache": "warm; physical cold unproven",
+          "max_ms": 14.301417,
+          "mean_ms": 10.213581866666669,
+          "measured": 30,
+          "p50_ms": 10.140708,
+          "p95_ms": 13.694833,
+          "p999_ms": null,
+          "p99_ms": 14.301417,
+          "query": "point",
+          "think_ms": 100,
+          "trial": 2,
+          "warmup": 5
+        },
+        {
+          "cache": "warm; physical cold unproven",
+          "max_ms": 43.354334,
+          "mean_ms": 11.0209694,
+          "measured": 30,
+          "p50_ms": 8.95375,
+          "p95_ms": 21.557916,
+          "p999_ms": null,
+          "p99_ms": 43.354334,
+          "query": "point",
+          "think_ms": 100,
+          "trial": 3,
+          "warmup": 5
+        },
+        {
+          "cache": "warm; physical cold unproven",
+          "max_ms": 16.684834,
+          "mean_ms": 12.016475066666668,
+          "measured": 30,
+          "p50_ms": 12.124209,
+          "p95_ms": 16.215708,
+          "p999_ms": null,
+          "p99_ms": 16.684834,
+          "query": "regional-rollup",
+          "think_ms": 100,
+          "trial": 3,
+          "warmup": 5
+        },
+        {
+          "batch": "baseline",
+          "customers": 10000,
+          "mode": "query",
+          "passed": true,
+          "replica": "",
+          "rows": 1000000,
+          "wall_ms": 24252.504261
+        }
+      ]
+    },
+    "down": {
+      "raw_path": "results/down-1795824667624057000",
+      "status": {
+        "passed": true,
+        "mode": "down",
+        "started_ns": 1795824667624130000,
+        "ended_ns": 1795824914881073000
+      },
+      "resources": {
+        "native_retained_role_deltas": {},
+        "native_delta_scope": "phase end",
+        "restarted_roles_excluded_from_delta": [],
+        "roles_stopped_before_final_counter": [
+          "be1",
+          "be2",
+          "be3",
+          "dn1",
+          "dn2",
+          "dn3",
+          "fe1",
+          "fe2",
+          "fe3",
+          "master",
+          "namenode",
+          "worker1",
+          "worker2"
+        ],
+        "roles_created_within_phase_from_zero": [],
+        "sampled_aggregate_memory_peak_bytes": 8206352908,
+        "sampled_aggregate_memory_mean_bytes": 8133804433.595745,
+        "sampled_cpu_peak_percent_one_core_100": 133.07,
+        "sampled_cpu_mean_percent_one_core_100": 121.1668085106383,
+        "sample_count": 47,
+        "limitations": [
+          "Phase native deltas exclude restarted roles; newly created roles use their full within-phase counters. Actor lifetimes are separate.",
+          "Docker memory samples use rounded display values and can miss short peaks; native actor memory.peak is separately retained.",
+          "Stopped roles without a final counter are unavailable, not zero; shutdown work is not inferred.",
+          "No physical device service-time measurement."
+        ],
+        "actor_role_totals": {
+          "oracle": {
+            "actors": 24,
+            "counters": {
+              "cpu_us": 3124417,
+              "memory.peak": 14262272,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0
+            },
+            "missing_metrics": []
+          },
+          "parquet-verifier": {
+            "actors": 3,
+            "counters": {
+              "cpu_us": 7970694,
+              "memory.peak": 127430656,
+              "rbytes": 0,
+              "wbytes": 98304,
+              "rios": 0,
+              "wios": 3
+            },
+            "missing_metrics": []
+          }
+        },
+        "actor_peak_scope": "Maximum individual actor memory.peak per role, not simultaneous aggregate memory"
+      },
+      "verified-batches.json": [
+        "baseline",
+        "executor",
+        "datanode"
+      ],
+      "client_reference": {
+        "connect_timeout_s": 5,
+        "context_timeout_s": 600,
+        "driver": "go-sql-driver/mysql 1.11.0",
+        "go": "go1.27.4",
+        "max_inflight": 1,
+        "mutation_retry": "no blind retries; reconcile native label",
+        "pool": 1,
+        "read_timeout_s": 180,
+        "supervisor_timeout_s": 900,
+        "write_timeout_s": 10
+      },
+      "native_engine_version": [
+        {
+          "@@version_comment": "doris version doris-4.1.5-release-917b20be838"
+        }
+      ],
+      "native_load_receipts": [
+        {
+          "Label": "hdfs_baseline_orders",
+          "State": "FINISHED",
+          "TransactionId": "3007",
+          "Type": "INSERT",
+          "CreateTime": "2026-11-27 23:53:55",
+          "LoadFinishTime": "2026-11-27 23:53:56",
+          "details": {
+            "ScannedRows": 1000000,
+            "LoadBytes": 97375000,
+            "FileNumber": 18,
+            "FileSize": 2676075,
+            "FilteredRows": 0
+          }
+        },
+        {
+          "Label": "hdfs_baseline_regions",
+          "State": "FINISHED",
+          "TransactionId": "3008",
+          "Type": "INSERT",
+          "CreateTime": "2026-11-27 23:53:57",
+          "LoadFinishTime": "2026-11-27 23:53:57",
+          "details": {
+            "ScannedRows": 16,
+            "LoadBytes": 838,
+            "FileNumber": 6,
+            "FileSize": 6679,
+            "FilteredRows": 0
+          }
+        },
+        {
+          "Label": "hdfs_executor_orders",
+          "State": "FINISHED",
+          "TransactionId": "3028",
+          "Type": "INSERT",
+          "CreateTime": "2026-11-27 23:58:51",
+          "LoadFinishTime": "2026-11-27 23:58:52",
+          "details": {
+            "ScannedRows": 1000000,
+            "LoadBytes": 97375000,
+            "FileNumber": 18,
+            "FileSize": 2676075,
+            "FilteredRows": 0
+          }
+        },
+        {
+          "Label": "hdfs_executor_regions",
+          "State": "FINISHED",
+          "TransactionId": "3029",
+          "Type": "INSERT",
+          "CreateTime": "2026-11-27 23:58:52",
+          "LoadFinishTime": "2026-11-27 23:58:52",
+          "details": {
+            "ScannedRows": 16,
+            "LoadBytes": 838,
+            "FileNumber": 6,
+            "FileSize": 6677,
+            "FilteredRows": 0
+          }
+        },
+        {
+          "Label": "hdfs_datanode_orders",
+          "State": "FINISHED",
+          "TransactionId": "3042",
+          "Type": "INSERT",
+          "CreateTime": "2026-11-28 00:01:17",
+          "LoadFinishTime": "2026-11-28 00:01:18",
+          "details": {
+            "ScannedRows": 1000000,
+            "LoadBytes": 97375000,
+            "FileNumber": 18,
+            "FileSize": 2676075,
+            "FilteredRows": 0
+          }
+        },
+        {
+          "Label": "hdfs_datanode_regions",
+          "State": "FINISHED",
+          "TransactionId": "3043",
+          "Type": "INSERT",
+          "CreateTime": "2026-11-28 00:01:18",
+          "LoadFinishTime": "2026-11-28 00:01:18",
+          "details": {
+            "ScannedRows": 16,
+            "LoadBytes": 838,
+            "FileNumber": 6,
+            "FileSize": 6677,
+            "FilteredRows": 0
+          }
+        }
+      ],
+      "results": [
+        {
+          "batch": "baseline",
+          "customers": 10000,
+          "mode": "load",
+          "passed": true,
+          "replica": "",
+          "rows": 1000000,
+          "wall_ms": 8.551
+        },
+        {
+          "batch": "baseline",
+          "customers": 10000,
+          "mode": "verify",
+          "passed": true,
+          "replica": "0",
+          "rows": 1000000,
+          "wall_ms": 17010.452716
+        },
+        {
+          "batch": "baseline",
+          "customers": 10000,
+          "mode": "verify",
+          "passed": true,
+          "replica": "1",
+          "rows": 1000000,
+          "wall_ms": 17162.009466
+        },
+        {
+          "batch": "baseline",
+          "customers": 10000,
+          "mode": "verify",
+          "passed": true,
+          "replica": "2",
+          "rows": 1000000,
+          "wall_ms": 17240.681509
+        },
+        {
+          "batch": "baseline",
+          "customers": 10000,
+          "mode": "topology",
+          "passed": true,
+          "replica": "",
+          "rows": 1000000,
+          "wall_ms": 23.00925
+        },
+        {
+          "batch": "baseline",
+          "customers": 10000,
+          "mode": "load",
+          "passed": true,
+          "replica": "",
+          "rows": 1000000,
+          "wall_ms": 8.938625
+        },
+        {
+          "batch": "baseline",
+          "customers": 10000,
+          "mode": "topology",
+          "passed": true,
+          "replica": "",
+          "rows": 1000000,
+          "wall_ms": 20.611125
+        },
+        {
+          "batch": "baseline",
+          "customers": 10000,
+          "mode": "verify",
+          "passed": true,
+          "replica": "",
+          "rows": 1000000,
+          "wall_ms": 17491.986049
+        },
+        {
+          "batch": "executor",
+          "customers": 10000,
+          "mode": "load",
+          "passed": true,
+          "replica": "",
+          "rows": 1000000,
+          "wall_ms": 8.202959
+        },
+        {
+          "batch": "executor",
+          "customers": 10000,
+          "mode": "verify",
+          "passed": true,
+          "replica": "0",
+          "rows": 1000000,
+          "wall_ms": 17428.384883
+        },
+        {
+          "batch": "executor",
+          "customers": 10000,
+          "mode": "verify",
+          "passed": true,
+          "replica": "1",
+          "rows": 1000000,
+          "wall_ms": 17486.1933
+        },
+        {
+          "batch": "executor",
+          "customers": 10000,
+          "mode": "verify",
+          "passed": true,
+          "replica": "2",
+          "rows": 1000000,
+          "wall_ms": 17411.5933
+        },
+        {
+          "batch": "baseline",
+          "customers": 10000,
+          "mode": "topology",
+          "passed": true,
+          "replica": "",
+          "rows": 1000000,
+          "wall_ms": 17.891458
+        },
+        {
+          "batch": "executor",
+          "customers": 10000,
+          "mode": "load",
+          "passed": true,
+          "replica": "",
+          "rows": 1000000,
+          "wall_ms": 7.28925
+        },
+        {
+          "batch": "baseline",
+          "customers": 10000,
+          "mode": "topology",
+          "passed": true,
+          "replica": "",
+          "rows": 1000000,
+          "wall_ms": 17.377541
+        },
+        {
+          "batch": "executor",
+          "customers": 10000,
+          "mode": "verify",
+          "passed": true,
+          "replica": "",
+          "rows": 1000000,
+          "wall_ms": 17470.492925
+        },
+        {
+          "batch": "datanode",
+          "customers": 10000,
+          "mode": "load",
+          "passed": true,
+          "replica": "",
+          "rows": 1000000,
+          "wall_ms": 9.350542
+        },
+        {
+          "batch": "datanode",
+          "customers": 10000,
+          "mode": "verify",
+          "passed": true,
+          "replica": "0",
+          "rows": 1000000,
+          "wall_ms": 17320.544842
+        },
+        {
+          "batch": "datanode",
+          "customers": 10000,
+          "mode": "verify",
+          "passed": true,
+          "replica": "1",
+          "rows": 1000000,
+          "wall_ms": 17367.471008
+        },
+        {
+          "batch": "datanode",
+          "customers": 10000,
+          "mode": "verify",
+          "passed": true,
+          "replica": "2",
+          "rows": 1000000,
+          "wall_ms": 17323.312174
+        },
+        {
+          "batch": "baseline",
+          "customers": 10000,
+          "mode": "topology",
+          "passed": true,
+          "replica": "",
+          "rows": 1000000,
+          "wall_ms": 18.544542
+        },
+        {
+          "batch": "datanode",
+          "customers": 10000,
+          "mode": "load",
+          "passed": true,
+          "replica": "",
+          "rows": 1000000,
+          "wall_ms": 7.45475
+        },
+        {
+          "batch": "baseline",
+          "customers": 10000,
+          "mode": "topology",
+          "passed": true,
+          "replica": "",
+          "rows": 1000000,
+          "wall_ms": 18.167416
+        },
+        {
+          "batch": "datanode",
+          "customers": 10000,
+          "mode": "verify",
+          "passed": true,
+          "replica": "",
+          "rows": 1000000,
+          "wall_ms": 17403.930841
+        },
+        {
+          "passed": true,
+          "batch": "baseline",
+          "rows": 1000000,
+          "customer_partitions": [
+            0,
+            1,
+            2
+          ],
+          "parquet_column_compressed_bytes": 2633094,
+          "parquet_column_uncompressed_bytes": 16268725,
+          "parquet_file_bytes": 2682754,
+          "codecs": [
+            "ZSTD"
+          ],
+          "compression_ratio": 6.178558380369254,
+          "oracle_cpu_s": 0.958149132,
+          "oracle_wall_s": 1.8427279600000475,
+          "parquet_file_count": 24
+        },
+        {
+          "passed": true,
+          "batch": "executor",
+          "rows": 1000000,
+          "customer_partitions": [
+            0,
+            1,
+            2
+          ],
+          "parquet_column_compressed_bytes": 2633092,
+          "parquet_column_uncompressed_bytes": 16268724,
+          "parquet_file_bytes": 2682752,
+          "codecs": [
+            "ZSTD"
+          ],
+          "compression_ratio": 6.178562693593691,
+          "oracle_cpu_s": 1.011729214,
+          "oracle_wall_s": 1.9591682929999479,
+          "parquet_file_count": 24
+        },
+        {
+          "passed": true,
+          "batch": "datanode",
+          "rows": 1000000,
+          "customer_partitions": [
+            0,
+            1,
+            2
+          ],
+          "parquet_column_compressed_bytes": 2633092,
+          "parquet_column_uncompressed_bytes": 16268725,
+          "parquet_file_bytes": 2682752,
+          "codecs": [
+            "ZSTD"
+          ],
+          "compression_ratio": 6.178563073375332,
+          "oracle_cpu_s": 0.914536948,
+          "oracle_wall_s": 1.7502665430001798,
+          "parquet_file_count": 24
+        }
+      ]
+    },
+    "docker-down": {
+      "raw_path": "results/docker-down-1795824947229878000",
+      "status": {
+        "passed": true,
+        "mode": "docker-down",
+        "started_ns": 1795824947229937000,
+        "ended_ns": 1795824948260224000
+      },
+      "resources": {
+        "native_retained_role_deltas": {},
+        "native_delta_scope": "phase end",
+        "restarted_roles_excluded_from_delta": [],
+        "roles_stopped_before_final_counter": [],
+        "roles_created_within_phase_from_zero": [],
+        "sampled_aggregate_memory_peak_bytes": null,
+        "sampled_aggregate_memory_mean_bytes": null,
+        "sampled_cpu_peak_percent_one_core_100": null,
+        "sampled_cpu_mean_percent_one_core_100": null,
+        "sample_count": 0,
+        "limitations": [
+          "Phase native deltas exclude restarted roles; newly created roles use their full within-phase counters. Actor lifetimes are separate.",
+          "Docker memory samples use rounded display values and can miss short peaks; native actor memory.peak is separately retained.",
+          "Stopped roles without a final counter are unavailable, not zero; shutdown work is not inferred.",
+          "No physical device service-time measurement."
+        ],
+        "actor_role_totals": {},
+        "actor_peak_scope": "Maximum individual actor memory.peak per role, not simultaneous aggregate memory"
+      },
+      "results": []
+    },
+    "observe-repair": {
+      "raw_path": "results/observe-repair-1795824466402015000",
+      "status": {
+        "passed": true,
+        "mode": "observe-repair",
+        "started_ns": 1795824466402084000,
+        "ended_ns": 1795824487201976000
+      },
+      "resources": {
+        "native_retained_role_deltas": {
+          "cpu_us": 15295924,
+          "rbytes": 8605696,
+          "wbytes": 1314816,
+          "rios": 83,
+          "wios": 199
+        },
+        "native_delta_scope": "phase end",
+        "restarted_roles_excluded_from_delta": [],
+        "roles_stopped_before_final_counter": [],
+        "roles_created_within_phase_from_zero": [],
+        "sampled_aggregate_memory_peak_bytes": 7980560941,
+        "sampled_aggregate_memory_mean_bytes": 7941947130,
+        "sampled_cpu_peak_percent_one_core_100": 90.4,
+        "sampled_cpu_mean_percent_one_core_100": 74.93,
+        "sample_count": 4,
+        "limitations": [
+          "Phase native deltas exclude restarted roles; newly created roles use their full within-phase counters. Actor lifetimes are separate.",
+          "Docker memory samples use rounded display values and can miss short peaks; native actor memory.peak is separately retained.",
+          "Stopped roles without a final counter are unavailable, not zero; shutdown work is not inferred.",
+          "No physical device service-time measurement."
+        ],
+        "actor_role_totals": {
+          "oracle": {
+            "actors": 1,
+            "counters": {
+              "cpu_us": 15182,
+              "memory.peak": 5324800,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0
+            },
+            "missing_metrics": []
+          }
+        },
+        "actor_peak_scope": "Maximum individual actor memory.peak per role, not simultaneous aggregate memory"
+      },
+      "topology-verdict.json": {
+        "voting_fes": 3,
+        "live_bes": 3,
+        "tablets": 6,
+        "current_replicas": 18,
+        "hdfs": {
+          "published_blocks": 75,
+          "physical_copies": 225,
+          "bytes_read": 24187479
+        }
+      },
+      "volumes.json": {
+        "hdfs-spark-doris_dn2": {
+          "apparent_bytes": 14069778,
+          "allocated_bytes": 14655488,
+          "files": 223,
+          "concurrently_vanished_entries": 0
+        },
+        "hdfs-spark-doris_dn3": {
+          "apparent_bytes": 14069778,
+          "allocated_bytes": 14655488,
+          "files": 223,
+          "concurrently_vanished_entries": 0
+        },
+        "hdfs-spark-doris_be1": {
+          "apparent_bytes": 28255001,
+          "allocated_bytes": 107294720,
+          "files": 122,
+          "concurrently_vanished_entries": 0
+        },
+        "hdfs-spark-doris_be3": {
+          "apparent_bytes": 26537392,
+          "allocated_bytes": 107393024,
+          "files": 134,
+          "concurrently_vanished_entries": 0
+        },
+        "hdfs-spark-doris_dn1": {
+          "apparent_bytes": 14069771,
+          "allocated_bytes": 14651392,
+          "files": 221,
+          "concurrently_vanished_entries": 0
+        },
+        "hdfs-spark-doris_be2": {
+          "apparent_bytes": 29317197,
+          "allocated_bytes": 107753472,
+          "files": 146,
+          "concurrently_vanished_entries": 0
+        },
+        "hdfs-spark-doris_fe2": {
+          "apparent_bytes": 889641,
+          "allocated_bytes": 925696,
+          "files": 12,
+          "concurrently_vanished_entries": 0
+        },
+        "hdfs-spark-doris_fe1": {
+          "apparent_bytes": 894665,
+          "allocated_bytes": 929792,
+          "files": 12,
+          "concurrently_vanished_entries": 0
+        },
+        "hdfs-spark-doris_namenode": {
+          "apparent_bytes": 5243577,
+          "allocated_bytes": 5263360,
+          "files": 10,
+          "concurrently_vanished_entries": 0
+        },
+        "hdfs-spark-doris_fe3": {
+          "apparent_bytes": 911058,
+          "allocated_bytes": 942080,
+          "files": 12,
+          "concurrently_vanished_entries": 0
+        },
+        "_inventory_actor_cgroups": {
+          "cpu.stat": "usage_usec 89493\nuser_usec 42391\nsystem_usec 47101\nnice_usec 0\nnr_periods 8\nnr_throttled 8\nthrottled_usec 696682\nnr_bursts 0\nburst_usec 0\n",
+          "memory.peak": "6238208\n",
+          "io.stat": "254:0 rbytes=12288 wbytes=0 rios=3 wios=0 dbytes=0 dios=0\n"
+        }
+      },
+      "automatic-repair.json": {
+        "passed": true,
+        "failed_case": "datanode-failure-1795824024299894000",
+        "original_180s_gate": "failed and preserved",
+        "fault_to_first_observed_full_rf3_s": 430.78029894828796,
+        "settings_changed": false,
+        "data_reseeded": false,
+        "samples": [
+          {
+            "LowRedundancyBlocks": 0,
+            "PendingReconstructionBlocks": 0,
+            "NumLiveDataNodes": 3,
+            "NumDeadDataNodes": 0,
+            "observed_ns": 1795824467379669000
+          }
+        ]
+      },
+      "client_reference": {
+        "connect_timeout_s": 5,
+        "context_timeout_s": 600,
+        "driver": "go-sql-driver/mysql 1.11.0",
+        "go": "go1.27.4",
+        "max_inflight": 1,
+        "mutation_retry": "no blind retries; reconcile native label",
+        "pool": 1,
+        "read_timeout_s": 180,
+        "supervisor_timeout_s": 900,
+        "write_timeout_s": 10
+      },
+      "native_engine_version": [
+        {
+          "@@version_comment": "doris version doris-4.1.5-release-917b20be838"
+        }
+      ],
+      "native_load_receipts": [
+        {
+          "Label": "hdfs_baseline_orders",
+          "State": "FINISHED",
+          "TransactionId": "3007",
+          "Type": "INSERT",
+          "CreateTime": "2026-11-27 23:53:55",
+          "LoadFinishTime": "2026-11-27 23:53:56",
+          "details": {
+            "ScannedRows": 1000000,
+            "LoadBytes": 97375000,
+            "FileNumber": 18,
+            "FileSize": 2676075,
+            "FilteredRows": 0
+          }
+        },
+        {
+          "Label": "hdfs_baseline_regions",
+          "State": "FINISHED",
+          "TransactionId": "3008",
+          "Type": "INSERT",
+          "CreateTime": "2026-11-27 23:53:57",
+          "LoadFinishTime": "2026-11-27 23:53:57",
+          "details": {
+            "ScannedRows": 16,
+            "LoadBytes": 838,
+            "FileNumber": 6,
+            "FileSize": 6679,
+            "FilteredRows": 0
+          }
+        },
+        {
+          "Label": "hdfs_executor_orders",
+          "State": "FINISHED",
+          "TransactionId": "3028",
+          "Type": "INSERT",
+          "CreateTime": "2026-11-27 23:58:51",
+          "LoadFinishTime": "2026-11-27 23:58:52",
+          "details": {
+            "ScannedRows": 1000000,
+            "LoadBytes": 97375000,
+            "FileNumber": 18,
+            "FileSize": 2676075,
+            "FilteredRows": 0
+          }
+        },
+        {
+          "Label": "hdfs_executor_regions",
+          "State": "FINISHED",
+          "TransactionId": "3029",
+          "Type": "INSERT",
+          "CreateTime": "2026-11-27 23:58:52",
+          "LoadFinishTime": "2026-11-27 23:58:52",
+          "details": {
+            "ScannedRows": 16,
+            "LoadBytes": 838,
+            "FileNumber": 6,
+            "FileSize": 6677,
+            "FilteredRows": 0
+          }
+        },
+        {
+          "Label": "hdfs_datanode_orders",
+          "State": "FINISHED",
+          "TransactionId": "3042",
+          "Type": "INSERT",
+          "CreateTime": "2026-11-28 00:01:17",
+          "LoadFinishTime": "2026-11-28 00:01:18",
+          "details": {
+            "ScannedRows": 1000000,
+            "LoadBytes": 97375000,
+            "FileNumber": 18,
+            "FileSize": 2676075,
+            "FilteredRows": 0
+          }
+        },
+        {
+          "Label": "hdfs_datanode_regions",
+          "State": "FINISHED",
+          "TransactionId": "3043",
+          "Type": "INSERT",
+          "CreateTime": "2026-11-28 00:01:18",
+          "LoadFinishTime": "2026-11-28 00:01:18",
+          "details": {
+            "ScannedRows": 16,
+            "LoadBytes": 838,
+            "FileNumber": 6,
+            "FileSize": 6677,
+            "FilteredRows": 0
+          }
+        }
+      ],
+      "results": [
+        {
+          "batch": "baseline",
+          "customers": 10000,
+          "mode": "topology",
+          "passed": true,
+          "replica": "",
+          "rows": 1000000,
+          "wall_ms": 26.22025
+        }
+      ]
+    }
+  },
+  "preserved_failed_phases": [
+    {
+      "phase": "datanode-failure-1795824024299894000",
+      "status": {
+        "passed": false,
+        "name": "datanode-failure",
+        "started_ns": 1795824024299974000
+      }
+    },
+    {
+      "phase": "docker-up-1795823146519726000",
+      "status": {
+        "passed": false,
+        "name": "docker-up",
+        "started_ns": 1795823146519787000
+      }
+    }
+  ],
+  "limitations": [
+    "One Docker VM and disk; no physical host/AZ fault claim.",
+    "One NameNode/master/driver; metadata and driver HA unqualified.",
+    "Separate atomic table loads, not cross-table atomic publication.",
+    "Finite label retention; no permanent deduplication claim.",
+    "Parquet codec CPU not isolated from verification.",
+    "No physical cold-cache or capacity/comparative winner claim."
+  ]
+}
