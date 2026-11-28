@@ -28,13 +28,23 @@ def main():
         "status.json",
         "source.json",
         "monolith-recovery.json",
+        "native-collector-recovery.json",
         "disk-before-ingest.json",
         "disk-after-actors.json",
+        "disk-post-failure-audit.json",
     ]:
         if (case / name).exists():
             result[name] = load(case / name)
-    if (case / "monolith-killed.json").exists():
-        row = load(case / "monolith-killed.json")
+    killed = next(
+        (
+            case / name
+            for name in ["monolith-killed.json", "native-collector-killed.json"]
+            if (case / name).exists()
+        ),
+        None,
+    )
+    if killed is not None:
+        row = load(killed)
         result["proven_fault"] = {
             "state": row["State"],
             "image": row["Image"],
@@ -47,7 +57,30 @@ def main():
     for base in [case, ROOT / "results/restart-audits"]:
         for report in base.rglob("readback.json"):
             value = load(report)
-            if value.get("fixture", {}).get("run") == identifier:
+            if (
+                value.get("fixture", {}).get("run") == result["fixture"]["run"]
+                and value.get("backend") == result["metadata"]["backend"]
+            ):
+                for signal in value.get("signals", {}).values():
+                    counts = signal.get("counts", {})
+                    for key in ["missing_acknowledged_ids", "unexpected_ids"]:
+                        ids = counts.get(key, [])
+                        if len(ids) > 100:
+                            ranges = []
+                            for item in ids:
+                                if ranges and item == ranges[-1][1]:
+                                    ranges[-1][1] += 1
+                                else:
+                                    ranges.append([item, item + 1])
+                            counts[key + "_count"] = len(ids)
+                            counts[key + "_ranges_start_inclusive_end_exclusive"] = (
+                                ranges[:100]
+                            )
+                            counts[key + "_ranges_truncated"] = len(ranges) > 100
+                            del counts[key]
+                value["raw_report_sha256"] = hashlib.sha256(
+                    report.read_bytes()
+                ).hexdigest()
                 result["readbacks"][str(report.relative_to(ROOT))] = value
     for resource in sys.argv[2:]:
         path = ROOT / resource

@@ -1,0 +1,23 @@
+{
+  "scope": "Healthy canonical corpus only; exact protobuf event bytes and IDs, same source batch boundaries; fault runs have separately witnessed IDs",
+  "signals": {
+    "metrics": {
+      "batches": 1000,
+      "all_protobuf_hashes_boundaries_and_sizes_equal": true,
+      "openobserve_history_sha256": "0f810b101cc7dda61b5446b69dccf22269069c2cae1d2ce5b4085462b936d2ba",
+      "clickstack_history_sha256": "51a73dcc131bc9fc899028edf19c999c02ab67155c0605741cac8561e3b87e2e"
+    },
+    "logs": {
+      "batches": 1000,
+      "all_protobuf_hashes_boundaries_and_sizes_equal": true,
+      "openobserve_history_sha256": "862f7b16dda812058a7843c93cdfc3496a533699518b0bb1103406971b0a4e64",
+      "clickstack_history_sha256": "e9caf8e17b279099a84b641ea94880c7462a04db037427b31b27ebde1c2f2bba"
+    },
+    "traces": {
+      "batches": 1000,
+      "all_protobuf_hashes_boundaries_and_sizes_equal": true,
+      "openobserve_history_sha256": "7def088ad5a3d9cd377de2138cc752371e1b68e7d0aa4226f8730b3f61b05f24",
+      "clickstack_history_sha256": "acfd149ad185783f7e5877b0ab2f6c046fe6205911dbd47dbf4255a2455edb16"
+    }
+  }
+}

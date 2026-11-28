@@ -1,6 +1,7 @@
 SHELL := /bin/bash
 .SHELLFLAGS := -eu -o pipefail -c
 PYTHON ?= python3.13
+export PLATFORM ?= openobserve
 export OPENOBSERVE_SERVICE ?= openobserve-sync
 export LAB_UID := $(shell id -u)
 export COMPOSE_PROJECT_NAME := obs-incident-platforms

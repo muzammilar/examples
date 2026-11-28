@@ -1,0 +1,18 @@
+{
+  "backend": "ClickStack 2.47.0 native OpAMP collector/app plus ClickHouse 26.11.4.11 and MongoDB 9.0.8",
+  "operations": ["authenticated OTLP metrics/logs/traces", "independent native SQL logical-value readback", "native authenticated app metadata APIs"],
+  "consistency": "eventual native query visibility; frozen acknowledged source IDs/selected values must reconcile",
+  "durability": "OTLP admission precedes native batching/export; ACK survival is an empirical lab gate, not an assumed vendor power-loss promise",
+  "atomicity": "no cross-signal or whole-batch transaction claim; partial acceptance makes source batch ambiguous",
+  "idempotency": "not claimed; source never retries automatically; duplicate returned copies fail healthy qualification",
+  "delete_ttl": "native schema creation defaults to 720h; TTL/reclamation and equal-retention storage comparison unqualified; current corpus is inside every tested retention window",
+  "replication": {"copies": 1, "hosts": 1, "ha_qualified": false},
+  "selected_logs": "exact body, nanosecond source timestamp, IDs, numeric severity, lowercased native severity text, original logical attributes, resource/scope and flags",
+  "selected_metrics": "whole-second timestamp, exact gauge value/name/unit/labels, resource/scope and flags",
+  "selected_traces": "IDs, parent, trace state, scope, service, name/kind/status/message, start/duration, logical attributes, events and links",
+  "projection_limits": ["native log severity text is lowercased", "integer attribute types become strings", "gauge TimeUnix is whole-second DateTime", "trace main/link flags and log observed-time are absent from this schema", "not lossless typed OTLP export"],
+  "client": {"language": "Go", "protobuf": "official OTLP 1.11.1", "retries": 0, "connect_timeout_s": 5, "request_timeout_s": 30, "max_connections_per_host": 4, "source_metric_log_batch": 1000, "source_trace_request_batch": 10, "closed_loop_delay_ms": 200},
+  "budgets": {"whole_backend_cpu": 8, "whole_backend_memory_gib": 12, "workload_cpu": 1, "workload_memory_mib": 512},
+  "fault": {"component": "native collector and supervisor only", "method": "SIGKILL with retained container/storage", "hold_s": 10, "all_signal_old_new_ack_visibility_deadline_s": 120, "other_roles": "must remain running"},
+  "limits": "single local compatibility experiment; not an upstream-supported current-dependency guarantee, physical-cold benchmark, native cluster, disk/power-loss, independent restore or production security qualification"
+}

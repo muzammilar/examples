@@ -95,12 +95,12 @@ def fence(directory):
     )
 
 
-def readback(fixture, directory, destination):
+def readback(fixture, directory, destination, backend_name="openobserve"):
     destination.mkdir(parents=True, exist_ok=True)
     report = destination / "readback.json"
     response = tool(
         "--mode=verify",
-        "--backend=openobserve",
+        "--backend=" + backend_name,
         "--fixture=/" + str(fixture.relative_to(ROOT)),
         "--output=/" + str(directory.relative_to(ROOT)),
         "--report=/" + str(report.relative_to(ROOT)),
@@ -121,53 +121,65 @@ def readback(fixture, directory, destination):
     return value
 
 
-def disk_snapshot(path, label):
-    row = owned(SERVICE)
+def disk_snapshot(path, label, roles=None):
     volumes = {}
-    for mount in row["Mounts"]:
-        if mount["Type"] != "volume":
-            continue
-        metadata = json.loads(
-            subprocess.check_output(
-                [*DOCKER, "volume", "inspect", mount["Name"]], text=True
+    for role in roles or [SERVICE]:
+        row = owned(role)
+        for mount in row["Mounts"]:
+            if mount["Type"] != "volume" or mount.get("Name") in volumes:
+                continue
+            metadata = json.loads(
+                subprocess.check_output(
+                    [*DOCKER, "volume", "inspect", mount["Name"]], text=True
+                )
+            )[0]
+            if metadata.get("Labels", {}).get("com.docker.compose.project") != PROJECT:
+                raise RuntimeError("Foreign volume")
+            response = subprocess.run(
+                [
+                    *DOCKER,
+                    "run",
+                    "--rm",
+                    "--pull=never",
+                    "--network",
+                    "none",
+                    "--read-only",
+                    "--cap-drop",
+                    "ALL",
+                    *(
+                        ["--cap-add", "DAC_READ_SEARCH"]
+                        if role == "clickstack-mongo"
+                        else []
+                    ),
+                    "--cpus",
+                    ".1",
+                    "--memory",
+                    "64m",
+                    "--user",
+                    (
+                        "0:0"
+                        if role == "clickstack-mongo"
+                        else row["Config"].get("User") or "0:0"
+                    ),
+                    "--label",
+                    "com.docker.compose.project=" + PROJECT,
+                    "--label",
+                    "com.docker.compose.service=disk-observer",
+                    "--mount",
+                    "type=volume,source=" + mount["Name"] + ",target=/data,readonly",
+                    "obs-incident-platforms-workload:local",
+                    "--mode=disk",
+                ],
+                text=True,
+                capture_output=True,
+                timeout=120,
             )
-        )[0]
-        if metadata.get("Labels", {}).get("com.docker.compose.project") != PROJECT:
-            raise RuntimeError("Foreign volume")
-        response = subprocess.run(
-            [
-                *DOCKER,
-                "run",
-                "--rm",
-                "--pull=never",
-                "--network",
-                "none",
-                "--read-only",
-                "--cap-drop",
-                "ALL",
-                "--cpus",
-                ".1",
-                "--memory",
-                "64m",
-                "--user",
-                "0:0",
-                "--label",
-                "com.docker.compose.project=" + PROJECT,
-                "--label",
-                "com.docker.compose.service=disk-observer",
-                "--mount",
-                "type=volume,source=" + mount["Name"] + ",target=/data,readonly",
-                "obs-incident-platforms-workload:local",
-                "--mode=disk",
-            ],
-            text=True,
-            capture_output=True,
-            timeout=120,
-        )
-        (path / ("disk-helper-" + label + ".log")).write_text(response.stderr)
-        if response.returncode:
-            raise RuntimeError("Read-only disk measurement failed")
-        volumes[mount["Name"]] = json.loads(response.stdout)
+            (path / ("disk-helper-" + label + "-" + mount["Name"] + ".log")).write_text(
+                response.stderr
+            )
+            if response.returncode:
+                raise RuntimeError("Read-only disk measurement failed")
+            volumes[mount["Name"]] = json.loads(response.stdout)
     save(
         path / ("disk-" + label + ".json"),
         {
@@ -221,10 +233,25 @@ def wait_ready(directory, actors, after=None):
     )
 
 
-def run(kind):
+def run(kind, backend_name="openobserve"):
     if kind not in ["healthy", "ingress-crash"]:
         raise ValueError(kind)
-    active_backend()
+    if backend_name == "clickstack":
+        from clickstack import active, ROLES
+
+        active()
+        variant, sut_service, storage_roles = (
+            "clickstack",
+            "clickstack-collector",
+            list(ROLES),
+        )
+        fault_label = "native-collector"
+    elif backend_name == "openobserve":
+        active_backend()
+        variant, sut_service, storage_roles = SERVICE, SERVICE, [SERVICE]
+        fault_label = "monolith"
+    else:
+        raise ValueError("Native platform not implemented")
     if running_actors():
         raise RuntimeError("A live actor prevents a new case")
     controls = [
@@ -232,7 +259,7 @@ def run(kind):
         for p in (ROOT / "results/cases").glob("*/case.json")
         if not retired(p.parent)
         and json.loads(p.read_text())["kind"] == "driver-control"
-        and json.loads(p.read_text()).get("service", "openobserve") == SERVICE
+        and json.loads(p.read_text()).get("service", "openobserve") == variant
     ]
     if not controls:
         raise RuntimeError("Establish the small driver control first")
@@ -246,10 +273,10 @@ def run(kind):
     for metadata in sorted((ROOT / "results/cases").glob("*/case.json")):
         if (
             retired(metadata.parent)
-            or json.loads(metadata.read_text()).get("service", "openobserve") != SERVICE
+            or json.loads(metadata.read_text()).get("service", "openobserve") != variant
         ):
             continue
-        directory = metadata.parent / "openobserve"
+        directory = metadata.parent / backend_name
         if not any(directory.glob("*/requests.jsonl")):
             continue
         if not (directory / "fenced.json").exists():
@@ -261,29 +288,67 @@ def run(kind):
     path = ROOT / "results/cases" / identifier
     fixture = json.loads((prior / "fixture.json").read_text())
     fixture.update(run=identifier, requests=10000)
+    if kind == "healthy":
+        from corpus_plan import healthy_fixture
+
+        fixture = healthy_fixture()
+        for old in retained:
+            if json.loads((old / "fixture.json").read_text())["run"] == fixture["run"]:
+                status = old / "status.json"
+                if not status.exists() or not json.loads(status.read_text()).get(
+                    "common_projection_passed"
+                ):
+                    raise RuntimeError(
+                        "Unqualified prior input owns the shared fixture; preserve it"
+                    )
+                audit = ROOT / "results/rechecks" / identifier
+                source_manifest(audit)
+                readback(
+                    old / "fixture.json",
+                    old / backend_name,
+                    audit / "readback",
+                    backend_name,
+                )
+                print(
+                    "Rechecked existing healthy corpus without reseeding: " + str(old)
+                )
+                return
     save(path / "fixture.json", fixture)
     save(
         path / "case.json",
         {
             "kind": kind,
-            "backend": "openobserve",
-            "service": SERVICE,
+            "backend": backend_name,
+            "service": variant,
             "backends_planned": ["clickstack", "openobserve", "signoz", "grafana"],
             "prior": str(prior.relative_to(ROOT)),
             "scope": "Shared logical incident projection, not lossless OTLP or a capacity winner",
         },
     )
     source_manifest(path)
-    for old in retained:
-        readback(
-            old / "fixture.json",
-            old / "openobserve",
-            path / "retained-before" / old.name,
+    try:
+        for old in retained:
+            readback(
+                old / "fixture.json",
+                old / backend_name,
+                path / "retained-before" / old.name,
+                backend_name,
+            )
+        disk_snapshot(path, "before-ingest", storage_roles)
+    except BaseException:
+        (path / "preflight-failure.txt").write_text(traceback.format_exc())
+        save(
+            path / "status.json",
+            {
+                "common_projection_passed": False,
+                "publication_started": False,
+                "scope": "Pre-input gate failed; no new corpus was published",
+            },
         )
-    disk_snapshot(path, "before-ingest")
-    directory = path / "openobserve"
+        raise
+    directory = path / backend_name
     actors = []
-    backend = None
+    faulted = None
     sampler_stop = threading.Event()
     sampler_errors = []
 
@@ -292,7 +357,7 @@ def run(kind):
         while not sampler_stop.wait(30):
             index += 1
             try:
-                disk_snapshot(path, "sample-" + str(index))
+                disk_snapshot(path, "sample-" + str(index), storage_roles)
             except Exception as error:
                 sampler_errors.append(str(error))
                 return
@@ -301,7 +366,7 @@ def run(kind):
     sampler.start()
     passed = False
     try:
-        phase("live-publish:openobserve")
+        phase("live-publish:" + backend_name)
         try:
             for role, mode in [
                 ("incident-publisher", "publish"),
@@ -321,7 +386,7 @@ def run(kind):
                     PROJECT + "-" + identifier + "-" + mode,
                     role,
                     "--mode=" + mode,
-                    "--backend=openobserve",
+                    "--backend=" + backend_name,
                     "--fixture=/" + str((path / "fixture.json").relative_to(ROOT)),
                     "--output=/" + str(directory.relative_to(ROOT)),
                 ]
@@ -346,23 +411,31 @@ def run(kind):
                     raise RuntimeError("Effective workload budget differs")
             wait_ready(directory, actors)
             if kind == "ingress-crash":
-                backend = owned(SERVICE)
+                faulted = owned(sut_service)
                 began = time.monotonic()
-                phase("fault:openobserve:monolith")
+                phase("fault:" + backend_name + ":" + fault_label)
                 subprocess.run(
-                    [*DOCKER, "kill", "--signal", "KILL", backend["Id"]],
+                    [*DOCKER, "kill", "--signal", "KILL", faulted["Id"]],
                     check=True,
                     capture_output=True,
                 )
-                killed = owned(SERVICE)
+                killed = owned(sut_service)
                 if (
                     killed["State"]["Running"]
                     or killed["State"]["ExitCode"] != 137
                     or killed["State"]["OOMKilled"]
                 ):
                     raise RuntimeError("SIGKILL was not demonstrated")
-                save(path / "monolith-killed.json", killed)
+                save(path / (fault_label + "-killed.json"), killed)
                 while time.monotonic() - began < 10:
+                    for role in storage_roles:
+                        if role != sut_service:
+                            state = owned(role)["State"]
+                            if not state["Running"] or state["Paused"]:
+                                raise RuntimeError(
+                                    "A non-target native role failed during the collector fault: "
+                                    + role
+                                )
                     for container, role in actors:
                         state = actor(container, role)["State"]
                         if not state["Running"] or state["Paused"]:
@@ -371,18 +444,22 @@ def run(kind):
                             )
                     time.sleep(0.5)
                 subprocess.run(
-                    [*DOCKER, "start", backend["Id"]], check=True, capture_output=True
+                    [*DOCKER, "start", faulted["Id"]], check=True, capture_output=True
                 )
-                started = owned(SERVICE)["State"]["StartedAt"]
-                phase("recovery:openobserve:monolith")
+                started = owned(sut_service)["State"]["StartedAt"]
+                phase("recovery:" + backend_name + ":" + fault_label)
                 wait_ready(directory, actors, started)
                 save(
-                    path / "monolith-recovery.json",
+                    path / (fault_label + "-recovery.json"),
                     {
                         "kill_to_new_ack_visible_s": time.monotonic() - began,
                         "started_at": started,
-                        "same_container": owned(SERVICE)["Id"] == backend["Id"],
-                        "scope": "Whole native monolith, including reads/UI/storage; not equivalent to a separate collector fault",
+                        "same_container": owned(sut_service)["Id"] == faulted["Id"],
+                        "scope": (
+                            "Whole native monolith including reads/UI/storage"
+                            if backend_name == "openobserve"
+                            else "Only native collector/supervisor; storage, metadata and app stay up; not equivalent to a monolith outage"
+                        ),
                     },
                 )
             subprocess.run(
@@ -392,9 +469,9 @@ def run(kind):
                 timeout=660,
             )
         finally:
-            if backend is not None and not owned(SERVICE)["State"]["Running"]:
+            if faulted is not None and not owned(sut_service)["State"]["Running"]:
                 subprocess.run(
-                    [*DOCKER, "start", backend["Id"]], check=True, capture_output=True
+                    [*DOCKER, "start", faulted["Id"]], check=True, capture_output=True
                 )
             failures = []
             for container, role in actors:
@@ -417,18 +494,45 @@ def run(kind):
         if kind == "healthy" and any(r["unacknowledged_requests"] for r in summaries):
             raise RuntimeError("Healthy input had unacknowledged batches")
         fence(directory)
-        phase("fenced-readback:openobserve")
-        readback(path / "fixture.json", directory, directory / "final")
+        phase("fenced-readback:" + backend_name)
+        readback(path / "fixture.json", directory, directory / "final", backend_name)
         for old in retained:
             readback(
                 old / "fixture.json",
-                old / "openobserve",
+                old / backend_name,
                 path / "retained-after" / old.name,
+                backend_name,
             )
-        disk_snapshot(path, "after-actors")
+        disk_snapshot(path, "after-actors", storage_roles)
         passed = True
     except BaseException:
         (path / "failure.txt").write_text(traceback.format_exc())
+        # A failed continuity gate must still retain a frozen ACK audit after
+        # both actors have demonstrably exited. Never turn this into a pass.
+        try:
+            if actors and not running_actors():
+                for _, role in actors:
+                    state = json.loads((directory / (role + "-exit.json")).read_text())[
+                        "State"
+                    ]
+                    if state["Running"] or state["ExitCode"] or state["OOMKilled"]:
+                        raise RuntimeError("Cannot freeze an unclean actor exit")
+                fence(directory)
+                phase("post-failure-audit:" + backend_name)
+                for old in [path, *retained]:
+                    try:
+                        readback(
+                            old / "fixture.json",
+                            old / backend_name,
+                            path / "failure-audits" / old.name,
+                            backend_name,
+                        )
+                    except Exception:
+                        (path / ("audit-error-" + old.name + ".txt")).write_text(
+                            traceback.format_exc()
+                        )
+        except Exception:
+            (path / "failure-audit-incomplete.txt").write_text(traceback.format_exc())
         raise
     finally:
         sampler_stop.set()

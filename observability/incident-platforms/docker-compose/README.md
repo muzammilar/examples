@@ -4,8 +4,9 @@
 
 Run from this directory. Requires local Docker Compose and Python 3.13; workload
 Go, official OTLP protobufs, vet and tests build inside Docker. The default is the
-separate OpenObserve **synchronous-WAL** profile. Other platform profiles are not
-implemented yet. Run profiles serially; backend budget is 8 CPU / 12 GiB, with
+separate OpenObserve **synchronous-WAL** profile. Select the native
+[ClickStack component](deploy/clickstack/) with `export PLATFORM=clickstack` before
+the lifecycle sequence. SigNoz and the new Grafana profile remain unrun. Run profiles serially; backend budget is 8 CPU / 12 GiB, with
 another 1 CPU / 512 MiB for publisher/reader and additional measurement overhead.
 
 1. `make docker-up` — validate/build and start the pinned native platform.

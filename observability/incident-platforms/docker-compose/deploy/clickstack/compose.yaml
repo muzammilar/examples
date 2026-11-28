@@ -1,0 +1,78 @@
+x-native: &native
+  profiles: [clickstack]
+  pull_policy: never
+  networks: [lab]
+  security_opt: [no-new-privileges:true]
+  logging:
+    driver: json-file
+    options: {max-size: 10m, max-file: '3'}
+services:
+  clickstack-clickhouse:
+    <<: *native
+    image: clickhouse/clickhouse-server:26.11.4.11@sha256:630693b4a8bce41954fe497ed371918aefe99434139d2da5786276459722fbb6
+    cpus: 4
+    mem_limit: 7g
+    user: 101:101
+    cap_drop: [ALL]
+    environment: {CLICKHOUSE_SKIP_USER_SETUP: '1'}
+    volumes:
+      - clickstack-clickhouse:/var/lib/clickhouse
+      - ./clickhouse.xml:/etc/clickhouse-server/config.xml:ro
+      - ./users.xml:/etc/clickhouse-server/users.xml:ro
+  clickstack-mongo:
+    <<: *native
+    image: mongo:9.0@sha256:b0c835c26e5997413e985000f1013c275377cd9607761c1784d486f6dd620b7f
+    cpus: 1
+    mem_limit: 1g
+    cap_drop: [ALL]
+    cap_add: [CHOWN, SETUID, SETGID, DAC_OVERRIDE]
+    command: [mongod, --bind_ip_all, --wiredTigerCacheSizeGB, '0.25']
+    volumes: [clickstack-mongo:/data/db, clickstack-mongo-config:/data/configdb]
+  clickstack-app:
+    <<: *native
+    image: docker.clickhouse.com/clickhouse/clickstack:2.47.0@sha256:adf415d369d060e44615d59e1c809cc292f1add4c3c44677e532606465f6bb9a
+    cpus: 1.5
+    mem_limit: 2g
+    cap_drop: [ALL]
+    environment:
+      HYPERDX_API_PORT: '8000'
+      PORT: '8000'
+      HYPERDX_APP_PORT: '8080'
+      HYPERDX_APP_URL: http://clickstack-app
+      FRONTEND_URL: http://clickstack-app:8080
+      SERVER_URL: http://127.0.0.1:8000
+      OPAMP_PORT: '4320'
+      MONGO_URI: mongodb://clickstack-mongo:27017/hyperdx
+      HYPERDX_LOG_LEVEL: warn
+      USAGE_STATS_ENABLED: 'false'
+      NEXT_TELEMETRY_DISABLED: '1'
+      AWS_EC2_METADATA_DISABLED: 'true'
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://clickstack-collector:4318
+      OTEL_SERVICE_NAME: incident-clickstack-app
+      HYPERDX_API_KEY: ''
+      INGESTION_API_KEY: local-incident-ingestion-token-only
+      ENABLE_INGESTION_API_KEY: 'true'
+      EXPRESS_SESSION_SECRET: Local-incident-session-secret-only-2026
+      TOKEN_ENCRYPTION_KEY: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      DEFAULT_CONNECTIONS: "[{\"name\":\"Local ClickHouse\",\"host\":\"http://clickstack-clickhouse:8123\",\"username\":\"lab\",\"password\":\"Local-clickstack-only\"}]"
+      DEFAULT_SOURCES: "[{\"from\":{\"databaseName\":\"default\",\"tableName\":\"otel_logs\"},\"kind\":\"log\",\"timestampValueExpression\":\"Timestamp\",\"name\":\"Logs\",\"displayedTimestampValueExpression\":\"Timestamp\",\"implicitColumnExpression\":\"Body\",\"serviceNameExpression\":\"ServiceName\",\"bodyExpression\":\"Body\",\"eventAttributesExpression\":\"LogAttributes\",\"resourceAttributesExpression\":\"ResourceAttributes\",\"defaultTableSelectExpression\":\"Timestamp,ServiceName,SeverityText,Body\",\"severityTextExpression\":\"SeverityText\",\"severityNumberExpression\":\"SeverityNumber\",\"eventNameExpression\":\"EventName\",\"traceIdExpression\":\"TraceId\",\"spanIdExpression\":\"SpanId\",\"metadataMaterializedViews\":{\"kvRollupTable\":\"otel_logs_kv_rollup_15m\",\"granularity\":\"15 minute\"},\"connection\":\"Local ClickHouse\",\"traceSourceId\":\"Traces\",\"metricSourceId\":\"Metrics\"},{\"from\":{\"databaseName\":\"default\",\"tableName\":\"otel_traces\"},\"kind\":\"trace\",\"timestampValueExpression\":\"Timestamp\",\"name\":\"Traces\",\"displayedTimestampValueExpression\":\"Timestamp\",\"implicitColumnExpression\":\"SpanName\",\"serviceNameExpression\":\"ServiceName\",\"eventAttributesExpression\":\"SpanAttributes\",\"resourceAttributesExpression\":\"ResourceAttributes\",\"defaultTableSelectExpression\":\"Timestamp,ServiceName,StatusCode,round(Duration/1e6),SpanName\",\"traceIdExpression\":\"TraceId\",\"spanIdExpression\":\"SpanId\",\"durationExpression\":\"Duration\",\"durationPrecision\":9,\"parentSpanIdExpression\":\"ParentSpanId\",\"spanNameExpression\":\"SpanName\",\"spanKindExpression\":\"SpanKind\",\"statusCodeExpression\":\"StatusCode\",\"statusMessageExpression\":\"StatusMessage\",\"spanEventsValueExpression\":\"Events\",\"spanLinksValueExpression\":\"Links\",\"metadataMaterializedViews\":{\"kvRollupTable\":\"otel_traces_kv_rollup_15m\",\"granularity\":\"15 minute\"},\"connection\":\"Local ClickHouse\",\"logSourceId\":\"Logs\",\"sessionSourceId\":\"Sessions\",\"metricSourceId\":\"Metrics\"},{\"from\":{\"databaseName\":\"default\",\"tableName\":\"\"},\"kind\":\"metric\",\"timestampValueExpression\":\"TimeUnix\",\"name\":\"Metrics\",\"resourceAttributesExpression\":\"ResourceAttributes\",\"metricTables\":{\"gauge\":\"otel_metrics_gauge\",\"histogram\":\"otel_metrics_histogram\",\"sum\":\"otel_metrics_sum\",\"summary\":\"otel_metrics_summary\",\"exponential histogram\":\"otel_metrics_exponential_histogram\"},\"connection\":\"Local ClickHouse\",\"logSourceId\":\"Logs\"},{\"from\":{\"databaseName\":\"default\",\"tableName\":\"hyperdx_sessions\"},\"kind\":\"session\",\"timestampValueExpression\":\"TimestampTime\",\"name\":\"Sessions\",\"resourceAttributesExpression\":\"ResourceAttributes\",\"connection\":\"Local ClickHouse\",\"traceSourceId\":\"Traces\"}]"
+  clickstack-collector:
+    <<: *native
+    image: docker.clickhouse.com/clickhouse/clickstack-otel-collector:2.47.0@sha256:90efc9abe92b3f1ae6ba9032bd22bfdf8a0d9ddfb46d86178aaebe22ba68cdd0
+    cpus: 1.5
+    mem_limit: 2g
+    cap_drop: [ALL]
+    read_only: true
+    tmpfs: [/tmp:size=64m]
+    environment:
+      CLICKHOUSE_PROMETHEUS_METRICS_ENDPOINT: clickstack-clickhouse:9363
+      CLICKHOUSE_ENDPOINT: tcp://clickstack-clickhouse:9000?dial_timeout=10s
+      CLICKHOUSE_USER: lab
+      CLICKHOUSE_PASSWORD: Local-clickstack-only
+      HYPERDX_OTEL_EXPORTER_CLICKHOUSE_DATABASE: default
+      HYPERDX_OTEL_EXPORTER_CREATE_LEGACY_SCHEMA: 'true'
+      HYPERDX_LOG_LEVEL: warn
+      OPAMP_SERVER_URL: http://clickstack-app:4320
+      OTEL_SUPERVISOR_LOGS: 'true'
+      AWS_EC2_METADATA_DISABLED: 'true'
+    volumes: [clickstack-supervisor:/etc/otel/supervisor-data]

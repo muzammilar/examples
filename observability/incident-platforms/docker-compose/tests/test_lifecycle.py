@@ -14,7 +14,15 @@ class TeardownSafety(unittest.TestCase):
     def setUp(self):
         self.temporary = tempfile.TemporaryDirectory()
         self.root = Path(self.temporary.name)
-        self.command = Mock(return_value=SimpleNamespace(stdout="owned-id"))
+        self.command = Mock(
+            side_effect=lambda *args: SimpleNamespace(
+                stdout=(
+                    ""
+                    if any(str(arg).startswith("clickstack-") for arg in args)
+                    else "owned-id"
+                )
+            )
+        )
         self.readback = Mock()
         self.fence = Mock()
         self.owned = Mock(
@@ -79,12 +87,22 @@ class TeardownSafety(unittest.TestCase):
 
     def test_missing_container_does_not_authorize_deleting_preserved_volume(self):
         self.case()
-        self.command.return_value.stdout = ""
+        self.command.side_effect = None
+        self.command.return_value = SimpleNamespace(stdout="")
         with patch.object(
             self.module.subprocess, "run", return_value=SimpleNamespace(returncode=1)
         ):
             with self.assertRaisesRegex(RuntimeError, "Preserved cases lack"):
                 self.module.destroy()
+        self.assertFalse(
+            any("down" in call.args for call in self.command.call_args_list)
+        )
+
+    def test_other_platform_state_blocks_project_destruction(self):
+        self.command.side_effect = None
+        self.command.return_value = SimpleNamespace(stdout="other-platform")
+        with self.assertRaisesRegex(RuntimeError, "ClickStack state requires"):
+            self.module.destroy()
         self.assertFalse(
             any("down" in call.args for call in self.command.call_args_list)
         )

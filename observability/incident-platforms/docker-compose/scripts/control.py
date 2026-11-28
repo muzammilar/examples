@@ -12,6 +12,14 @@ import uuid
 
 ROOT = Path(__file__).resolve().parents[1]
 PROJECT = "obs-incident-platforms"
+ALL_BACKENDS = [
+    "openobserve",
+    "openobserve-sync",
+    "clickstack-clickhouse",
+    "clickstack-mongo",
+    "clickstack-app",
+    "clickstack-collector",
+]
 SERVICE = os.environ.get("OPENOBSERVE_SERVICE", "openobserve-sync")
 if SERVICE not in ["openobserve", "openobserve-sync"]:
     raise ValueError("Unknown local OpenObserve variant")
@@ -83,7 +91,7 @@ def active_backend():
         raise RuntimeError("Active backend budget differs")
     if not row["State"]["Running"]:
         raise RuntimeError("Requested native variant is not running")
-    for rival in ["openobserve", "openobserve-sync"]:
+    for rival in ALL_BACKENDS:
         if rival != SERVICE and command("ps", "--quiet", rival).stdout.strip():
             raise RuntimeError(
                 "Two backend variants are running; endpoint/budget ambiguous"
@@ -162,7 +170,12 @@ def bootstrap():
         "ps", "--quiet", "incident-workload", "incident-publisher", "incident-reader"
     ).stdout.strip():
         raise RuntimeError("Live actors prevent changing the backend variant")
-    for rival in ["openobserve", "openobserve-sync"]:
+    for role in ALL_BACKENDS[2:]:
+        if command("ps", "--quiet", role).stdout.strip():
+            raise RuntimeError(
+                "Stop/reconcile ClickStack before changing the OpenObserve platform"
+            )
+    for rival in ALL_BACKENDS:
         if rival != SERVICE:
             if command("ps", "--all", "--quiet", rival).stdout.strip():
                 owned(rival)
@@ -448,12 +461,22 @@ def main():
         fcntl.flock(lock.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
         mode = sys.argv[1]
         (ROOT / "results/phase").write_text(mode)
+        platform = os.environ.get("PLATFORM", "openobserve")
+        if platform not in ["openobserve", "clickstack"]:
+            raise ValueError("Unknown isolated platform")
+        if platform == "clickstack" and mode != "check":
+            from clickstack import execute
+
+            execute(mode)
+            return
         if mode == "check":
             command(
                 "--profile",
                 "openobserve",
                 "--profile",
                 "openobserve-buffered",
+                "--profile",
+                "clickstack",
                 "--profile",
                 "tools",
                 "config",

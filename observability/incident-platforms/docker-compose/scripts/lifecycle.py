@@ -104,6 +104,17 @@ def remove():
 
 
 def destroy():
+    # A profile cannot authorize deleting another platform's volumes.
+    for role in [
+        "clickstack-clickhouse",
+        "clickstack-mongo",
+        "clickstack-app",
+        "clickstack-collector",
+    ]:
+        if command("ps", "--all", "--quiet", role).stdout.strip():
+            raise RuntimeError(
+                "ClickStack state requires its own verified teardown before project destruction"
+            )
     if running_actors():
         raise RuntimeError("A live actor prevents destruction")
     for service in SERVICES:

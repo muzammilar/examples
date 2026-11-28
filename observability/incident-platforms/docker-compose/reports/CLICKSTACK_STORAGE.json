@@ -1,0 +1,481 @@
+{
+  "scope": "Point-in-time native parts/configuration after healthy qualification; includes retained control, native self-telemetry and background merges; native codec bytes exclude Mongo, supervisor, WAL and whole-platform overhead",
+  "when": "before fault publication; preflight still reading retained full corpus",
+  "parts": [
+    {
+      "table": "otel_logs",
+      "active_parts": 8,
+      "rows": 1010000,
+      "compressed_bytes": 52336314,
+      "uncompressed_bytes": 1113182581,
+      "bytes_on_disk": 149638728
+    },
+    {
+      "table": "otel_metrics_gauge",
+      "active_parts": 1,
+      "rows": 1087006,
+      "compressed_bytes": 1258500,
+      "uncompressed_bytes": 257767314,
+      "bytes_on_disk": 1299508
+    },
+    {
+      "table": "otel_metrics_histogram",
+      "active_parts": 3,
+      "rows": 1172,
+      "compressed_bytes": 12029,
+      "uncompressed_bytes": 660293,
+      "bytes_on_disk": 34975
+    },
+    {
+      "table": "otel_metrics_sum",
+      "active_parts": 2,
+      "rows": 132631,
+      "compressed_bytes": 457405,
+      "uncompressed_bytes": 49933682,
+      "bytes_on_disk": 489561
+    },
+    {
+      "table": "otel_traces",
+      "active_parts": 2,
+      "rows": 30300,
+      "compressed_bytes": 1518248,
+      "uncompressed_bytes": 11818167,
+      "bytes_on_disk": 1644076
+    },
+    {
+      "table": "otel_traces_trace_id_ts",
+      "active_parts": 3,
+      "rows": 10100,
+      "compressed_bytes": 194385,
+      "uncompressed_bytes": 484800,
+      "bytes_on_disk": 217064
+    }
+  ],
+  "codecs": [
+    {
+      "table": "otel_logs",
+      "name": "Timestamp",
+      "type": "DateTime64(9)",
+      "compression_codec": "CODEC(Delta(8), ZSTD(3))"
+    },
+    {
+      "table": "otel_logs",
+      "name": "TraceId",
+      "type": "String",
+      "compression_codec": "CODEC(ZSTD(3))"
+    },
+    {
+      "table": "otel_logs",
+      "name": "SpanId",
+      "type": "String",
+      "compression_codec": "CODEC(ZSTD(3))"
+    },
+    {
+      "table": "otel_logs",
+      "name": "TraceFlags",
+      "type": "UInt8",
+      "compression_codec": ""
+    },
+    {
+      "table": "otel_logs",
+      "name": "SeverityText",
+      "type": "LowCardinality(String)",
+      "compression_codec": "CODEC(ZSTD(3))"
+    },
+    {
+      "table": "otel_logs",
+      "name": "SeverityNumber",
+      "type": "UInt8",
+      "compression_codec": ""
+    },
+    {
+      "table": "otel_logs",
+      "name": "ServiceName",
+      "type": "LowCardinality(String)",
+      "compression_codec": "CODEC(ZSTD(3))"
+    },
+    {
+      "table": "otel_logs",
+      "name": "Body",
+      "type": "String",
+      "compression_codec": "CODEC(ZSTD(3))"
+    },
+    {
+      "table": "otel_logs",
+      "name": "ResourceSchemaUrl",
+      "type": "LowCardinality(String)",
+      "compression_codec": "CODEC(ZSTD(3))"
+    },
+    {
+      "table": "otel_logs",
+      "name": "ResourceAttributes",
+      "type": "Map(LowCardinality(String), String)",
+      "compression_codec": "CODEC(ZSTD(3))"
+    },
+    {
+      "table": "otel_logs",
+      "name": "ScopeSchemaUrl",
+      "type": "LowCardinality(String)",
+      "compression_codec": "CODEC(ZSTD(3))"
+    },
+    {
+      "table": "otel_logs",
+      "name": "ScopeName",
+      "type": "String",
+      "compression_codec": "CODEC(ZSTD(3))"
+    },
+    {
+      "table": "otel_logs",
+      "name": "ScopeVersion",
+      "type": "LowCardinality(String)",
+      "compression_codec": "CODEC(ZSTD(3))"
+    },
+    {
+      "table": "otel_logs",
+      "name": "ScopeAttributes",
+      "type": "Map(LowCardinality(String), String)",
+      "compression_codec": "CODEC(ZSTD(3))"
+    },
+    {
+      "table": "otel_logs",
+      "name": "LogAttributes",
+      "type": "Map(LowCardinality(String), String)",
+      "compression_codec": "CODEC(ZSTD(3))"
+    },
+    {
+      "table": "otel_logs",
+      "name": "EventName",
+      "type": "String",
+      "compression_codec": "CODEC(ZSTD(3))"
+    },
+    {
+      "table": "otel_logs",
+      "name": "__otel_materialized_k8s.cluster.name",
+      "type": "LowCardinality(String)",
+      "compression_codec": "CODEC(ZSTD(3))"
+    },
+    {
+      "table": "otel_logs",
+      "name": "__otel_materialized_k8s.container.name",
+      "type": "LowCardinality(String)",
+      "compression_codec": "CODEC(ZSTD(3))"
+    },
+    {
+      "table": "otel_logs",
+      "name": "__otel_materialized_k8s.deployment.name",
+      "type": "LowCardinality(String)",
+      "compression_codec": "CODEC(ZSTD(3))"
+    },
+    {
+      "table": "otel_logs",
+      "name": "__otel_materialized_k8s.namespace.name",
+      "type": "LowCardinality(String)",
+      "compression_codec": "CODEC(ZSTD(3))"
+    },
+    {
+      "table": "otel_logs",
+      "name": "__otel_materialized_k8s.node.name",
+      "type": "LowCardinality(String)",
+      "compression_codec": "CODEC(ZSTD(3))"
+    },
+    {
+      "table": "otel_logs",
+      "name": "__otel_materialized_k8s.pod.name",
+      "type": "LowCardinality(String)",
+      "compression_codec": "CODEC(ZSTD(3))"
+    },
+    {
+      "table": "otel_logs",
+      "name": "__otel_materialized_k8s.pod.uid",
+      "type": "LowCardinality(String)",
+      "compression_codec": "CODEC(ZSTD(3))"
+    },
+    {
+      "table": "otel_logs",
+      "name": "__otel_materialized_deployment.environment.name",
+      "type": "LowCardinality(String)",
+      "compression_codec": "CODEC(ZSTD(3))"
+    },
+    {
+      "table": "otel_metrics_gauge",
+      "name": "ResourceAttributes",
+      "type": "Map(LowCardinality(String), String)",
+      "compression_codec": "CODEC(ZSTD(3))"
+    },
+    {
+      "table": "otel_metrics_gauge",
+      "name": "ResourceSchemaUrl",
+      "type": "String",
+      "compression_codec": "CODEC(ZSTD(3))"
+    },
+    {
+      "table": "otel_metrics_gauge",
+      "name": "ScopeName",
+      "type": "String",
+      "compression_codec": "CODEC(ZSTD(3))"
+    },
+    {
+      "table": "otel_metrics_gauge",
+      "name": "ScopeVersion",
+      "type": "String",
+      "compression_codec": "CODEC(ZSTD(3))"
+    },
+    {
+      "table": "otel_metrics_gauge",
+      "name": "ScopeAttributes",
+      "type": "Map(LowCardinality(String), String)",
+      "compression_codec": "CODEC(ZSTD(3))"
+    },
+    {
+      "table": "otel_metrics_gauge",
+      "name": "ScopeDroppedAttrCount",
+      "type": "UInt32",
+      "compression_codec": "CODEC(ZSTD(3))"
+    },
+    {
+      "table": "otel_metrics_gauge",
+      "name": "ScopeSchemaUrl",
+      "type": "String",
+      "compression_codec": "CODEC(ZSTD(3))"
+    },
+    {
+      "table": "otel_metrics_gauge",
+      "name": "ServiceName",
+      "type": "LowCardinality(String)",
+      "compression_codec": "CODEC(ZSTD(3))"
+    },
+    {
+      "table": "otel_metrics_gauge",
+      "name": "MetricName",
+      "type": "LowCardinality(String)",
+      "compression_codec": "CODEC(ZSTD(3))"
+    },
+    {
+      "table": "otel_metrics_gauge",
+      "name": "MetricDescription",
+      "type": "String",
+      "compression_codec": "CODEC(ZSTD(3))"
+    },
+    {
+      "table": "otel_metrics_gauge",
+      "name": "MetricUnit",
+      "type": "String",
+      "compression_codec": "CODEC(ZSTD(3))"
+    },
+    {
+      "table": "otel_metrics_gauge",
+      "name": "Attributes",
+      "type": "Map(LowCardinality(String), String)",
+      "compression_codec": "CODEC(ZSTD(3))"
+    },
+    {
+      "table": "otel_metrics_gauge",
+      "name": "StartTimeUnix",
+      "type": "DateTime",
+      "compression_codec": "CODEC(Delta(4), ZSTD(3))"
+    },
+    {
+      "table": "otel_metrics_gauge",
+      "name": "TimeUnix",
+      "type": "DateTime",
+      "compression_codec": "CODEC(Delta(4), ZSTD(3))"
+    },
+    {
+      "table": "otel_metrics_gauge",
+      "name": "Value",
+      "type": "Float64",
+      "compression_codec": "CODEC(ZSTD(3))"
+    },
+    {
+      "table": "otel_metrics_gauge",
+      "name": "Flags",
+      "type": "UInt32",
+      "compression_codec": "CODEC(ZSTD(3))"
+    },
+    {
+      "table": "otel_metrics_gauge",
+      "name": "Exemplars.FilteredAttributes",
+      "type": "Array(Map(LowCardinality(String), String))",
+      "compression_codec": "CODEC(ZSTD(3))"
+    },
+    {
+      "table": "otel_metrics_gauge",
+      "name": "Exemplars.TimeUnix",
+      "type": "Array(DateTime)",
+      "compression_codec": "CODEC(ZSTD(3))"
+    },
+    {
+      "table": "otel_metrics_gauge",
+      "name": "Exemplars.Value",
+      "type": "Array(Float64)",
+      "compression_codec": "CODEC(ZSTD(3))"
+    },
+    {
+      "table": "otel_metrics_gauge",
+      "name": "Exemplars.SpanId",
+      "type": "Array(String)",
+      "compression_codec": "CODEC(ZSTD(3))"
+    },
+    {
+      "table": "otel_metrics_gauge",
+      "name": "Exemplars.TraceId",
+      "type": "Array(String)",
+      "compression_codec": "CODEC(ZSTD(3))"
+    },
+    {
+      "table": "otel_traces",
+      "name": "Timestamp",
+      "type": "DateTime64(9)",
+      "compression_codec": "CODEC(Delta(8), ZSTD(3))"
+    },
+    {
+      "table": "otel_traces",
+      "name": "TraceId",
+      "type": "String",
+      "compression_codec": "CODEC(ZSTD(3))"
+    },
+    {
+      "table": "otel_traces",
+      "name": "SpanId",
+      "type": "String",
+      "compression_codec": "CODEC(ZSTD(3))"
+    },
+    {
+      "table": "otel_traces",
+      "name": "ParentSpanId",
+      "type": "String",
+      "compression_codec": "CODEC(ZSTD(3))"
+    },
+    {
+      "table": "otel_traces",
+      "name": "TraceState",
+      "type": "String",
+      "compression_codec": "CODEC(ZSTD(3))"
+    },
+    {
+      "table": "otel_traces",
+      "name": "SpanName",
+      "type": "LowCardinality(String)",
+      "compression_codec": "CODEC(ZSTD(3))"
+    },
+    {
+      "table": "otel_traces",
+      "name": "SpanKind",
+      "type": "LowCardinality(String)",
+      "compression_codec": "CODEC(ZSTD(3))"
+    },
+    {
+      "table": "otel_traces",
+      "name": "ServiceName",
+      "type": "LowCardinality(String)",
+      "compression_codec": "CODEC(ZSTD(3))"
+    },
+    {
+      "table": "otel_traces",
+      "name": "ResourceAttributes",
+      "type": "Map(LowCardinality(String), String)",
+      "compression_codec": "CODEC(ZSTD(3))"
+    },
+    {
+      "table": "otel_traces",
+      "name": "ScopeName",
+      "type": "String",
+      "compression_codec": "CODEC(ZSTD(3))"
+    },
+    {
+      "table": "otel_traces",
+      "name": "ScopeVersion",
+      "type": "String",
+      "compression_codec": "CODEC(ZSTD(3))"
+    },
+    {
+      "table": "otel_traces",
+      "name": "SpanAttributes",
+      "type": "Map(LowCardinality(String), String)",
+      "compression_codec": "CODEC(ZSTD(3))"
+    },
+    {
+      "table": "otel_traces",
+      "name": "Duration",
+      "type": "UInt64",
+      "compression_codec": "CODEC(ZSTD(3))"
+    },
+    {
+      "table": "otel_traces",
+      "name": "StatusCode",
+      "type": "LowCardinality(String)",
+      "compression_codec": "CODEC(ZSTD(3))"
+    },
+    {
+      "table": "otel_traces",
+      "name": "StatusMessage",
+      "type": "String",
+      "compression_codec": "CODEC(ZSTD(3))"
+    },
+    {
+      "table": "otel_traces",
+      "name": "Events.Timestamp",
+      "type": "Array(DateTime64(9))",
+      "compression_codec": "CODEC(ZSTD(3))"
+    },
+    {
+      "table": "otel_traces",
+      "name": "Events.Name",
+      "type": "Array(LowCardinality(String))",
+      "compression_codec": "CODEC(ZSTD(3))"
+    },
+    {
+      "table": "otel_traces",
+      "name": "Events.Attributes",
+      "type": "Array(Map(LowCardinality(String), String))",
+      "compression_codec": "CODEC(ZSTD(3))"
+    },
+    {
+      "table": "otel_traces",
+      "name": "Links.TraceId",
+      "type": "Array(String)",
+      "compression_codec": "CODEC(ZSTD(3))"
+    },
+    {
+      "table": "otel_traces",
+      "name": "Links.SpanId",
+      "type": "Array(String)",
+      "compression_codec": "CODEC(ZSTD(3))"
+    },
+    {
+      "table": "otel_traces",
+      "name": "Links.TraceState",
+      "type": "Array(String)",
+      "compression_codec": "CODEC(ZSTD(3))"
+    },
+    {
+      "table": "otel_traces",
+      "name": "Links.Attributes",
+      "type": "Array(Map(LowCardinality(String), String))",
+      "compression_codec": "CODEC(ZSTD(3))"
+    }
+  ],
+  "settings": [
+    {
+      "name": "async_insert",
+      "value": "1"
+    },
+    {
+      "name": "max_memory_usage",
+      "value": "2147483648"
+    },
+    {
+      "name": "max_threads",
+      "value": "4"
+    },
+    {
+      "name": "use_query_cache",
+      "value": "0"
+    },
+    {
+      "name": "wait_for_async_insert",
+      "value": "1"
+    }
+  ],
+  "captured_at": "2026-11-28T14:29:57.235406+00:00"
+}

@@ -1,0 +1,272 @@
+{
+  "up": "passed without reseeding",
+  "test": "passed in a separate invocation",
+  "down": "refused known failed acknowledged-data case before stopping/deletion receipt",
+  "preserve_stop": "passed, all native services stopped and all volumes retained",
+  "docker_down": "not executed; live destructive cleanup remains blocked by approval review and retained failed data",
+  "services": {
+    "clickstack-clickhouse": {
+      "state": {
+        "Status": "exited",
+        "Running": false,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 0,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-11-28T14:04:16.886735886Z",
+        "FinishedAt": "2026-11-28T14:41:45.079153885Z"
+      },
+      "mounts": [
+        {
+          "Type": "volume",
+          "Name": "obs-incident-platforms_clickstack-clickhouse",
+          "Source": "/var/lib/docker/volumes/obs-incident-platforms_clickstack-clickhouse/_data",
+          "Destination": "/var/lib/clickhouse",
+          "Driver": "local",
+          "Mode": "rw",
+          "RW": true,
+          "Propagation": ""
+        },
+        {
+          "Type": "bind",
+          "Source": "/host_mnt/Users/muzammil/github.com/muzammilar/examples/observability/incident-platforms/docker-compose/deploy/clickstack/clickhouse.xml",
+          "Destination": "/etc/clickhouse-server/config.xml",
+          "Mode": "ro",
+          "RW": false,
+          "Propagation": "rprivate"
+        },
+        {
+          "Type": "bind",
+          "Source": "/host_mnt/Users/muzammil/github.com/muzammilar/examples/observability/incident-platforms/docker-compose/deploy/clickstack/users.xml",
+          "Destination": "/etc/clickhouse-server/users.xml",
+          "Mode": "ro",
+          "RW": false,
+          "Propagation": "rprivate"
+        }
+      ]
+    },
+    "clickstack-mongo": {
+      "state": {
+        "Status": "exited",
+        "Running": false,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 0,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-11-28T13:57:04.92262388Z",
+        "FinishedAt": "2026-11-28T14:41:44.901690301Z"
+      },
+      "mounts": [
+        {
+          "Type": "volume",
+          "Name": "obs-incident-platforms_clickstack-mongo-config",
+          "Source": "/var/lib/docker/volumes/obs-incident-platforms_clickstack-mongo-config/_data",
+          "Destination": "/data/configdb",
+          "Driver": "local",
+          "Mode": "rw",
+          "RW": true,
+          "Propagation": ""
+        },
+        {
+          "Type": "volume",
+          "Name": "obs-incident-platforms_clickstack-mongo",
+          "Source": "/var/lib/docker/volumes/obs-incident-platforms_clickstack-mongo/_data",
+          "Destination": "/data/db",
+          "Driver": "local",
+          "Mode": "rw",
+          "RW": true,
+          "Propagation": ""
+        }
+      ]
+    },
+    "clickstack-app": {
+      "state": {
+        "Status": "exited",
+        "Running": false,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 0,
+        "ExitCode": 137,
+        "Error": "",
+        "StartedAt": "2026-11-28T13:57:04.919938755Z",
+        "FinishedAt": "2026-11-28T14:41:45.913560594Z",
+        "Health": {
+          "Status": "unhealthy",
+          "FailingStreak": 0,
+          "Log": [
+            {
+              "Start": "2026-11-28T14:39:16.00416251Z",
+              "End": "2026-11-28T14:39:16.080338594Z",
+              "ExitCode": 0,
+              "Output": ""
+            },
+            {
+              "Start": "2026-11-28T14:39:46.081546469Z",
+              "End": "2026-11-28T14:39:46.160006302Z",
+              "ExitCode": 0,
+              "Output": ""
+            },
+            {
+              "Start": "2026-11-28T14:40:16.160834177Z",
+              "End": "2026-11-28T14:40:16.23899676Z",
+              "ExitCode": 0,
+              "Output": ""
+            },
+            {
+              "Start": "2026-11-28T14:40:46.242058385Z",
+              "End": "2026-11-28T14:40:46.324963594Z",
+              "ExitCode": 0,
+              "Output": ""
+            },
+            {
+              "Start": "2026-11-28T14:41:16.326066344Z",
+              "End": "2026-11-28T14:41:16.402115677Z",
+              "ExitCode": 0,
+              "Output": ""
+            }
+          ]
+        }
+      },
+      "mounts": []
+    },
+    "clickstack-collector": {
+      "state": {
+        "Status": "exited",
+        "Running": false,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 0,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-11-28T14:30:43.502428926Z",
+        "FinishedAt": "2026-11-28T14:41:44.889093468Z",
+        "Health": {
+          "Status": "unhealthy",
+          "FailingStreak": 0,
+          "Log": [
+            {
+              "Start": "2026-11-28T14:39:19.208402595Z",
+              "End": "2026-11-28T14:39:19.244446137Z",
+              "ExitCode": 0,
+              "Output": ""
+            },
+            {
+              "Start": "2026-11-28T14:39:49.247230179Z",
+              "End": "2026-11-28T14:39:49.28400647Z",
+              "ExitCode": 0,
+              "Output": ""
+            },
+            {
+              "Start": "2026-11-28T14:40:19.285120012Z",
+              "End": "2026-11-28T14:40:19.32155397Z",
+              "ExitCode": 0,
+              "Output": ""
+            },
+            {
+              "Start": "2026-11-28T14:40:49.322763345Z",
+              "End": "2026-11-28T14:40:49.359017637Z",
+              "ExitCode": 0,
+              "Output": ""
+            },
+            {
+              "Start": "2026-11-28T14:41:19.359904762Z",
+              "End": "2026-11-28T14:41:19.390815637Z",
+              "ExitCode": 0,
+              "Output": ""
+            }
+          ]
+        }
+      },
+      "mounts": [
+        {
+          "Type": "volume",
+          "Name": "obs-incident-platforms_clickstack-supervisor",
+          "Source": "/var/lib/docker/volumes/obs-incident-platforms_clickstack-supervisor/_data",
+          "Destination": "/etc/otel/supervisor-data",
+          "Driver": "local",
+          "Mode": "rw",
+          "RW": true,
+          "Propagation": ""
+        }
+      ]
+    }
+  },
+  "witnesses": {
+    "results/cases/0c4c2fd57dc54308b618415dbb06e22c/case.json": "96cfacbe233b71acc3e4b9beea195b887d9f27d7aeb68c48cb6d9a391cfa7539",
+    "results/cases/22adfae45f594f0a8a212c38ec62d714/case.json": "d3bb14dcfd5fef21e3c6e691321a85077f2cb473a016449f0c03f0b75ad2aed5",
+    "results/cases/394804bc0ac64c869a7f6eef819af923/case.json": "053bbd8a7e44381b9ec5027b4b53e227c41aa036a0e744bb59cc73e75f028be8",
+    "results/cases/7394da0773a04d169db860d23a517b68/case.json": "ac718a7cf9f920e55af093609a7e45d6bfbdd1bd8ad3808ed1cf2ab65bc67ce6",
+    "results/cases/7957dd7b3a064fe4b6c974570015f9b1/case.json": "d3bb14dcfd5fef21e3c6e691321a85077f2cb473a016449f0c03f0b75ad2aed5",
+    "results/cases/b13c086902e3479b9403459c0372e702/case.json": "61fe54f5b354d35bb5161a6a7a4ec5a775e7ee4a186f01c31a77c97321061be1",
+    "results/cases/bd209e76f1ee4eacb0cdfb16d8d1381c/case.json": "c39971c36babd7051bfd8048cfa6d90f60331ea1c9e8a7fb8f2ef9533d280bcf",
+    "results/cases/cb051f2ed3574474a756187f31b7cab2/case.json": "79d3b973c5ae9be3ef405b287f6cdb9bec7176eade8ea961e4f97d11605e079a",
+    "results/cases/ea4765f19b2f49bc9a775df084de006b/case.json": "9690a6a1a1b4638818f47d2f7407c01bae0c82ad2a88b488e566e715185cbfe7",
+    "results/cases/f3b84be721604799933b2304d50bd49d/case.json": "19b1fcf3bc03023bef99453d8d02c9740be849a24ecc1d6881bb0b8be32b8797",
+    "results/cases/0c4c2fd57dc54308b618415dbb06e22c/fixture.json": "87588b611aaa2117d3cac6a009bcef982f5a2efdc035a56f1496b0be662a0360",
+    "results/cases/22adfae45f594f0a8a212c38ec62d714/fixture.json": "773936391cdee01d4490c6f721c3026ebfcaa25fa08b504a7e76131519ce75eb",
+    "results/cases/394804bc0ac64c869a7f6eef819af923/fixture.json": "c269894a102afd68084bf3c12eacb11d039dbec7a7c6422d42496ef85cc48641",
+    "results/cases/7394da0773a04d169db860d23a517b68/fixture.json": "e5aa43492f88b1c7c00e3f5d92b804340c317b2fa9e7514612a54aefacb00155",
+    "results/cases/7957dd7b3a064fe4b6c974570015f9b1/fixture.json": "773936391cdee01d4490c6f721c3026ebfcaa25fa08b504a7e76131519ce75eb",
+    "results/cases/b13c086902e3479b9403459c0372e702/fixture.json": "e8923efe6280c472c7a4420e49b188de43da3eaf752d6fa7b457db95d4f51102",
+    "results/cases/bd209e76f1ee4eacb0cdfb16d8d1381c/fixture.json": "773936391cdee01d4490c6f721c3026ebfcaa25fa08b504a7e76131519ce75eb",
+    "results/cases/cb051f2ed3574474a756187f31b7cab2/fixture.json": "e0081d69fffcb8d270e2cd26fb2d1af48a2c3fa337a489bd332190af87c03ecb",
+    "results/cases/ea4765f19b2f49bc9a775df084de006b/fixture.json": "48db4e736a4a17f52e9ffa244ee7c195aeb2e03a728d9867223ec6c5d5f107f2",
+    "results/cases/f3b84be721604799933b2304d50bd49d/fixture.json": "8f5e75641c70f0724103340778ca00c46149190cad337c80b9be7b14f84b8bc4",
+    "results/cases/0c4c2fd57dc54308b618415dbb06e22c/openobserve/configuration.json": "066525a3660afe0ead49e226ce3a05010a7489f225951c0b9adbf4d16a517b0e",
+    "results/cases/394804bc0ac64c869a7f6eef819af923/openobserve/configuration.json": "df472b6163a0aa798b508e0a70850ee3411d683cfca800c3d0c0e5bd1ccb9dac",
+    "results/cases/7394da0773a04d169db860d23a517b68/openobserve/configuration.json": "ab39d4de4144005a0a5f11caaa2123f2ead5d17a97c2bedef2d16527df5340a9",
+    "results/cases/7957dd7b3a064fe4b6c974570015f9b1/clickstack/configuration.json": "915d0af6caadddd29f9021915a519f2ba600a1fbc0fbf54442c99c6a8170a754",
+    "results/cases/b13c086902e3479b9403459c0372e702/openobserve/configuration.json": "d23aa99d923b7556a60c9563d15ec197dd7a9f003359d1bcd92da0411c1dcaa0",
+    "results/cases/bd209e76f1ee4eacb0cdfb16d8d1381c/openobserve/configuration.json": "4db5890a5b720d1bd3798213e4a4b85ad851249adeddb18d7317075970cff8fa",
+    "results/cases/cb051f2ed3574474a756187f31b7cab2/clickstack/configuration.json": "251d40580c9b3567cdf9249bf03b6c732604c0cd05fa201f91e7862548baacf2",
+    "results/cases/ea4765f19b2f49bc9a775df084de006b/clickstack/configuration.json": "08788ba8f8e29c102ae588a40b34863d76ed6bb65e9a0a8c3e630ee4ffa2c2cd",
+    "results/cases/f3b84be721604799933b2304d50bd49d/openobserve/configuration.json": "9d4427821326ee89fb10095004ef0de051daac7ed3f1d2a9056982a7ed5a3497",
+    "results/cases/0c4c2fd57dc54308b618415dbb06e22c/openobserve/logs/requests.jsonl": "92d715fd8932388c02237704f1af7c5a404c9368f3ce2ba481d3b9724622d58e",
+    "results/cases/0c4c2fd57dc54308b618415dbb06e22c/openobserve/metrics/requests.jsonl": "1d56f7bf68f921661d3ab5a1d0463015a1d1af42baaf0ce4f1e71db05ae9306b",
+    "results/cases/0c4c2fd57dc54308b618415dbb06e22c/openobserve/traces/requests.jsonl": "e1b00909989b99a0c2c3eab053ec28a45a6b4f3c661e9d328e5abf71cfa43763",
+    "results/cases/394804bc0ac64c869a7f6eef819af923/openobserve/logs/requests.jsonl": "3cfdee46d1c262a6a5da0fb5f3cfe133ff92b55c0bb0fda6a55c6ff613b22f43",
+    "results/cases/394804bc0ac64c869a7f6eef819af923/openobserve/metrics/requests.jsonl": "c982522ca8beec21fd2bae6d7632dff83134b0b9f743b309e2ca0465c32164ba",
+    "results/cases/394804bc0ac64c869a7f6eef819af923/openobserve/traces/requests.jsonl": "33dfc16636150a3ada01deffae5540c0d542dcc018c4f47dc20be6a99f3e6c5f",
+    "results/cases/7394da0773a04d169db860d23a517b68/openobserve/logs/requests.jsonl": "a8c79eb18380ddc7ffdfe657f500ab807fe0211db002991c8b350cf481b06ad9",
+    "results/cases/7394da0773a04d169db860d23a517b68/openobserve/metrics/requests.jsonl": "a154c27950b91fe537abc089cbf5c78f70023f21bd7987a6ad511d9dc7a56641",
+    "results/cases/7394da0773a04d169db860d23a517b68/openobserve/traces/requests.jsonl": "7fb89feeeba3a6ae4a0992cceca775cefd49646c1a3f6d247b64ecf373d0661d",
+    "results/cases/7957dd7b3a064fe4b6c974570015f9b1/clickstack/logs/requests.jsonl": "e9caf8e17b279099a84b641ea94880c7462a04db037427b31b27ebde1c2f2bba",
+    "results/cases/7957dd7b3a064fe4b6c974570015f9b1/clickstack/metrics/requests.jsonl": "51a73dcc131bc9fc899028edf19c999c02ab67155c0605741cac8561e3b87e2e",
+    "results/cases/7957dd7b3a064fe4b6c974570015f9b1/clickstack/traces/requests.jsonl": "acfd149ad185783f7e5877b0ab2f6c046fe6205911dbd47dbf4255a2455edb16",
+    "results/cases/b13c086902e3479b9403459c0372e702/openobserve/logs/requests.jsonl": "c12208145f9250472af73bdc844b4de379cc43342a4472f5b0508c163486cbd1",
+    "results/cases/b13c086902e3479b9403459c0372e702/openobserve/metrics/requests.jsonl": "42b86a8457268d91915ee3b19827e35c2f2886f028d899bca9ec0c948acf4d93",
+    "results/cases/b13c086902e3479b9403459c0372e702/openobserve/traces/requests.jsonl": "6a312ecfbf3c95bd4139ffce9072eda19a2cb00f51ae02ccf7873414fb01086b",
+    "results/cases/bd209e76f1ee4eacb0cdfb16d8d1381c/openobserve/logs/requests.jsonl": "862f7b16dda812058a7843c93cdfc3496a533699518b0bb1103406971b0a4e64",
+    "results/cases/bd209e76f1ee4eacb0cdfb16d8d1381c/openobserve/metrics/requests.jsonl": "0f810b101cc7dda61b5446b69dccf22269069c2cae1d2ce5b4085462b936d2ba",
+    "results/cases/bd209e76f1ee4eacb0cdfb16d8d1381c/openobserve/traces/requests.jsonl": "7def088ad5a3d9cd377de2138cc752371e1b68e7d0aa4226f8730b3f61b05f24",
+    "results/cases/cb051f2ed3574474a756187f31b7cab2/clickstack/logs/requests.jsonl": "bd5230c30337b57f62438db624f6f344a2dabcd3a160e686a6931a3d3308a33d",
+    "results/cases/cb051f2ed3574474a756187f31b7cab2/clickstack/metrics/requests.jsonl": "4eb89dbb456fe99b218b5156442be4318febaa5548fce4ef0860c04468d1df1b",
+    "results/cases/cb051f2ed3574474a756187f31b7cab2/clickstack/traces/requests.jsonl": "17e8401cc271b5356acd67eb91da58e58f5c3fe5fa80f458d1d87f448fe9d9ed",
+    "results/cases/ea4765f19b2f49bc9a775df084de006b/clickstack/logs/requests.jsonl": "e124651366ad4932f3fb512c3d1b0bf1541cf9d5b440f143c08c2c4142647352",
+    "results/cases/ea4765f19b2f49bc9a775df084de006b/clickstack/metrics/requests.jsonl": "be4cbf36e3bbc0e4429c5673914ada639ceed567ea7372ccecdecd530667d0dc",
+    "results/cases/ea4765f19b2f49bc9a775df084de006b/clickstack/traces/requests.jsonl": "b5454eb395350cbe08bfa3e3bdded28d26850d40195d2535c62bbce20a45b921",
+    "results/cases/f3b84be721604799933b2304d50bd49d/openobserve/logs/requests.jsonl": "830097a9b05ee58a44ab0deac7e3014372f75e66ba423ec1d94960408d1edcdc",
+    "results/cases/f3b84be721604799933b2304d50bd49d/openobserve/metrics/requests.jsonl": "e999f20bd322da4c2ba48293839e5c33ba399e0203534ac6808c72874cebde55",
+    "results/cases/f3b84be721604799933b2304d50bd49d/openobserve/traces/requests.jsonl": "0e652fa2822774f7ba651639b8a4b269e9e4f1f4121e3d192d5e902487f39104",
+    "results/cases/0c4c2fd57dc54308b618415dbb06e22c/openobserve/fenced.json": "b0282b001b365313c47ad0b7ce4d57565506341a179c1eaba57418f07f55362b",
+    "results/cases/394804bc0ac64c869a7f6eef819af923/openobserve/fenced.json": "d02c992b30b7ac162de512f484c8fc6dce7721d51fce54a1314da5d20ec19d98",
+    "results/cases/7394da0773a04d169db860d23a517b68/openobserve/fenced.json": "202e6a7613d1432a45aaaffc8272089616214d3cd8414070ac641ce39d339f8c",
+    "results/cases/7957dd7b3a064fe4b6c974570015f9b1/clickstack/fenced.json": "fd9664515d10b1fd9129260998312cb60efb891d77458dfaf6cd613c88bd07fa",
+    "results/cases/b13c086902e3479b9403459c0372e702/openobserve/fenced.json": "6a5a8e11d3ab5e2bbd8ec1a57d38250ab0b0b452efda4f0c481176c2cfc47744",
+    "results/cases/bd209e76f1ee4eacb0cdfb16d8d1381c/openobserve/fenced.json": "6c1bcb2cbb8a32b7f205a9d2902274aa3714c63cd3bea51a0c3a87a3e2219fca",
+    "results/cases/cb051f2ed3574474a756187f31b7cab2/clickstack/fenced.json": "47cec1aead3011df460f6db9f73fd9904ef7775590f04296c59fda12cf7946ee",
+    "results/cases/ea4765f19b2f49bc9a775df084de006b/clickstack/fenced.json": "51df346230919aae978b8b3d0e10e3064c9c83272657b9b94967a04de9323576",
+    "results/cases/f3b84be721604799933b2304d50bd49d/openobserve/fenced.json": "0b03a3f2c9b2fce9af8529ed98d32d254120938d7b17ecd6dfc31d5ad2677f77"
+  },
+  "scope": "No verified destruction receipt; no cluster or Kubernetes qualification"
+}

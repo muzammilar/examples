@@ -1,7 +1,7 @@
 # Shared incident: ClickStack, OpenObserve, SigNoz and Grafana
 
-Implementation in progress, **performance level 3**. OpenObserve native controls and a buffered crash
-case have run; no cross-platform winner is qualified. The earlier [three-signal lab](../three-signal-incident/) qualifies
+Implementation in progress, **performance level 3**. OpenObserve and ClickStack native controls and crash cases
+have run; no cross-platform winner is qualified. The earlier [three-signal lab](../three-signal-incident/) qualifies
 a different set of backend paths and does not qualify these products.
 
 Use the same deterministic checkout corpus: **10,000 requests, 1 million gauge
@@ -24,5 +24,6 @@ No real AWS configuration, hosted exports, MinIO or external accounts are used.
 
 Only compact curated evidence will be committed. Raw evidence and materialized
 build contexts remain ignored. The Compose README documents the five
-lifecycle commands and failed-data preservation guards. ClickStack, SigNoz and
-the new whole-platform Grafana profile remain unrun; their comparison is pending.
+lifecycle commands and failed-data preservation guards. ClickStack
+[healthy/full and failed collector results](docker-compose/deploy/clickstack/)
+are recorded. SigNoz and the new whole-platform Grafana profile remain unrun; their comparison is pending.

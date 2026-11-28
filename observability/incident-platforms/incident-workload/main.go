@@ -49,6 +49,9 @@ func execute(ctx context.Context, args []string) error {
 	if *mode == "disk" {
 		return diskSnapshot()
 	}
+	if *mode == "schema" && *backend == "clickstack" {
+		return inspectClickStack(ctx)
+	}
 	if (*mode == "health" || *mode == "schema") && *backend != "" && *backend != "openobserve" {
 		return errors.New("native endpoint not implemented for this backend yet")
 	}
@@ -85,7 +88,7 @@ func execute(ctx context.Context, args []string) error {
 		return errors.New("negative source pace")
 	}
 	if *mode == "watch" {
-		if *backend != "openobserve" {
+		if *backend != "openobserve" && *backend != "clickstack" {
 			return errors.New("live native reader is not implemented for this backend yet")
 		}
 		priorRaw, err := os.ReadFile(*priorPath)
@@ -101,9 +104,23 @@ func execute(ctx context.Context, args []string) error {
 		}
 		ctx, cancel := context.WithTimeout(ctx, 15*time.Minute)
 		defer cancel()
+		if *backend == "clickstack" {
+			return watchNative(ctx, f, prior, *output, "ClickStack", clickStackPoint)
+		}
 		return watchOpenObserve(ctx, f, prior, *output)
 	}
 	if *mode == "sample" || *mode == "verify" || *mode == "queries" {
+		if *mode == "sample" && *backend == "clickstack" {
+			return sampleClickStack(ctx, f)
+		}
+		if *mode == "verify" && *backend == "clickstack" {
+			if *report == "" {
+				return errors.New("verification requires a report path")
+			}
+			ctx, cancel := context.WithTimeout(ctx, 10*time.Minute)
+			defer cancel()
+			return verifyClickStack(ctx, f, *output, *report)
+		}
 		if *backend != "openobserve" {
 			return errors.New("native readback for this platform is not implemented yet")
 		}

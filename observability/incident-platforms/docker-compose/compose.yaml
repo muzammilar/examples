@@ -20,6 +20,22 @@ services:
     extends:
       file: ./deploy/openobserve/synchronous-wal/compose.yaml
       service: openobserve-sync
+  clickstack-clickhouse:
+    extends:
+      file: ./deploy/clickstack/compose.yaml
+      service: clickstack-clickhouse
+  clickstack-mongo:
+    extends:
+      file: ./deploy/clickstack/compose.yaml
+      service: clickstack-mongo
+  clickstack-app:
+    extends:
+      file: ./deploy/clickstack/compose.yaml
+      service: clickstack-app
+  clickstack-collector:
+    extends:
+      file: ./deploy/clickstack/compose.yaml
+      service: clickstack-collector
   incident-workload:
     <<: *workload
     build:
@@ -41,3 +57,7 @@ networks:
 volumes:
   openobserve:
   openobserve-sync:
+  clickstack-clickhouse:
+  clickstack-mongo:
+  clickstack-mongo-config:
+  clickstack-supervisor:

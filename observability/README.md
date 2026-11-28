@@ -15,7 +15,11 @@ known failed type projection. The lab is stopped with failed data retained. The 
 [incident-platform comparison](incident-platforms/) is active, with all metadata/collector/UI roles
 included. OpenObserve healthy native controls passed; the default-buffered crash
 left **30 acknowledged spans missing**. Its separate synchronous-WAL reference
-passed the bounded crash/readback gate; ClickStack/SigNoz/new Grafana profiles remain unrun.
+passed the bounded crash/readback gate; ClickStack
+[healthy full and failed collector results](incident-platforms/docker-compose/deploy/clickstack/)
+are recorded: 4,000 metric, 3,000 log and 90 span ACKs are missing after its
+collector crash. SigNoz/new Grafana profiles remain unrun. ClickStack clustered
+storage and Kubernetes deployment are not implemented.
 
 The [per-system example plans](../docs/example-plans/streaming-and-observability.md#observability) specify the incident, failure and data checks for each component.
 

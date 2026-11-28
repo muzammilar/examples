@@ -106,7 +106,7 @@ func openObservePoint(ctx context.Context, f Fixture, kind string, id int) (bool
 	return len(seen) == expected, nil
 }
 
-func watchOpenObserve(ctx context.Context, f, prior Fixture, directory string) error {
+func watchNative(ctx context.Context, f, prior Fixture, directory, backend string, point func(context.Context, Fixture, string, int) (bool, error)) error {
 	if err := os.MkdirAll(filepath.Join(directory, "reader"), 0755); err != nil {
 		return err
 	}
@@ -162,7 +162,7 @@ func watchOpenObserve(ctx context.Context, f, prior Fixture, directory string) e
 					fixture, id = f, anchors[kind].Last-1
 				}
 				began := time.Now()
-				visible, queryErr := openObservePoint(ctx, fixture, kind, id)
+				visible, queryErr := point(ctx, fixture, kind, id)
 				result := "pending"
 				if visible {
 					result = "visible"
@@ -177,7 +177,7 @@ func watchOpenObserve(ctx context.Context, f, prior Fixture, directory string) e
 						result = "mismatch"
 					}
 				}
-				row := map[string]any{"sequence": sequence, "signal": kind, "kind": age, "run": fixture.Run, "id": id, "started_at": began.UTC(), "ended_at": time.Now().UTC(), "query_ms": float64(time.Since(began).Nanoseconds()) / 1e6, "result": result, "selected_projection": "OpenObserve native SQL logical fields; not lossless OTLP"}
+				row := map[string]any{"sequence": sequence, "signal": kind, "kind": age, "run": fixture.Run, "id": id, "started_at": began.UTC(), "ended_at": time.Now().UTC(), "query_ms": float64(time.Since(began).Nanoseconds()) / 1e6, "result": result, "selected_projection": backend + " native SQL logical fields; not lossless OTLP"}
 				if age == "recent" {
 					row["ack_completed_at"] = anchors[kind].EndedAt
 					row["sampled_ack_age_ms"] = float64(time.Since(anchors[kind].EndedAt).Nanoseconds()) / 1e6
@@ -202,4 +202,8 @@ func watchOpenObserve(ctx context.Context, f, prior Fixture, directory string) e
 		}
 		sequence++
 	}
+}
+
+func watchOpenObserve(ctx context.Context, f, prior Fixture, directory string) error {
+	return watchNative(ctx, f, prior, directory, "OpenObserve", openObservePoint)
 }
