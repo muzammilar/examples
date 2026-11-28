@@ -1,0 +1,8 @@
+<clickhouse><profiles><default>
+<max_threads>1</max_threads><max_insert_threads>1</max_insert_threads>
+<max_memory_usage>2147483648</max_memory_usage><max_execution_time>60</max_execution_time>
+<max_rows_to_read>6000000</max_rows_to_read><max_bytes_to_read>1073741824</max_bytes_to_read>
+<max_result_rows>2000001</max_result_rows><result_overflow_mode>throw</result_overflow_mode>
+<use_query_cache>0</use_query_cache><join_algorithm>parallel_hash</join_algorithm>
+<insert_quorum>2</insert_quorum><insert_quorum_timeout>30000</insert_quorum_timeout>
+</default></profiles><users><lab><password>local-control-only</password><networks><ip>172.30.67.0/24</ip><ip>127.0.0.1</ip></networks><profile>default</profile><quota>default</quota><access_management>1</access_management></lab></users></clickhouse>

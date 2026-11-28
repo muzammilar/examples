@@ -1,0 +1,64 @@
+{
+  "performance_depth": 3,
+  "input": "same retained PostgreSQL/Debezium Kafka topics, 1M default orders/10k customers; corrections, source hard deletes and cancellations; quiescent source with application mutation grants revoked",
+  "source_fence": "full ordered source SHA256 plus durable parent source receipts and captured topic end offsets; fingerprint must remain unchanged across serial backend phases",
+  "doris": {
+    "state": "Unique Key merge-on-write, source composite revision, prejoined Flink results",
+    "copies": 3,
+    "serving_cpu": 4.5,
+    "serving_memory_gib": 12,
+    "scope": "same validated parent 4.1.5 pinned images/configuration"
+  },
+  "clickhouse": {
+    "version": "26.11.4.11",
+    "state": "ReplicatedReplacingMergeTree by source ID/LSN, query-time FINAL and current customer join",
+    "raw": "full Debezium envelopes plus native topic/partition/offset; at least once ingestion, no skipped broken records",
+    "copies": 3,
+    "serving_cpu_including_keepers": 4.5,
+    "serving_memory_gib_including_keepers": 12,
+    "keepers": 3,
+    "insert_quorum": 2,
+    "fsync_after_insert": true,
+    "fsync_part_directory": true,
+    "server_memory_mib": 3584,
+    "keeper_memory_mib": 512
+  },
+  "correctness": "all eight fields match source; direct full reads from every data replica, native healthy/current membership; conflicting payload/version ties and ambiguous partial batches fail",
+  "atomicity": "no cross-topic join transaction; eventual settled-state contract at the source fence; witness INSERT is eight rows in one partition/block, independently reconciled",
+  "deletes": "native full before-image plus newer source LSN; retain tombstones, filter after replacement; no unsafe cleanup",
+  "queries": {
+    "driver": "same pinned go-sql-driver/mysql for both",
+    "pool": 1,
+    "max_in_flight": 1,
+    "retry": 0,
+    "connect_timeout_s": 5,
+    "read_timeout_s": 60,
+    "write_timeout_s": 30,
+    "trials": 3,
+    "warmup_queries_per_trial": 10,
+    "measured_warm_queries_per_trial": 30,
+    "approaches": [
+      "fresh connection, server/OS cache unspecified",
+      "warm reused connection"
+    ],
+    "physical_cold": "unrun"
+  },
+  "failure": "separate serving-role SIGKILL while independent queries and new direct quorum witness writes run; acknowledged batches survive on all three replicas after retained-node recovery",
+  "witness": {
+    "batches": 256,
+    "rows_per_batch": 8,
+    "payload": "SHA256 of fixed namespace/run/sequence",
+    "retry": 0,
+    "deduplicate": false,
+    "identity": "unique UUID/sequence; external fsynced intents/ACKs; unresolved commits remain ambiguous"
+  },
+  "unrun": [
+    "physical power loss",
+    "independent hosts",
+    "whole quorum loss",
+    "independent restore",
+    "physical cold-query comparison",
+    "CDC ingestion interruption under fresh source mutations",
+    "sustained capacity ranking"
+  ]
+}

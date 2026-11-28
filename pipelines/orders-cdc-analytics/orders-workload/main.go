@@ -133,6 +133,8 @@ func run() error {
 		return nil
 	case "seed", "mutate", "dimensions", "delete":
 		return source(ctx, pg, mode, os.Getenv("RUN_ID"), n, customers)
+	case "verify-receipts":
+		return receipts(ctx, pg)
 	case "verify":
 		return verify(ctx, pg, doris)
 	case "reader", "query":

@@ -23,7 +23,12 @@ public service endpoints or published host ports are used. Stop other heavy labs
 fixtures need at least 10,000 orders and 100 customers. Do not delete journals or
 reseed an existing fixture after failure; use `make verify` and diagnose it.
 
-## Related project
+## Related projects
+
+[Native ClickHouse control](projects/clickhouse-control/) compares the same fenced
+CDC tape with the checkpointed Flink/Doris path at matched serving budgets.
+All copies and quorum-write recovery passed; query timing variability prevents
+a stable overall winner. It shares this lab and owns its comparison entry points.
 
 [Historical Spark replay](projects/historical-replay/) shares this owned lab and
 lifecycle. It tests stale source-version replay beside live CDC and interrupted

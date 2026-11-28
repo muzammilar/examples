@@ -25,6 +25,10 @@ under their system directories. All infrastructure and credentials are local.
   in the corrected controller; the initial visibility-gate failure and recovery
   remain documented. This project explicitly shares the owning CDC lab.
 
+- [Native ClickHouse control](orders-cdc-analytics/projects/clickhouse-control/):
+  the same million-order CDC tape passed exact three-copy validation in both
+  backends, with ClickHouse quorum-write recovery. Matched serving budgets and
+  unstable post-restart query timings are recorded; no overall winner is claimed.
+
 The [current batch plan](../docs/example-plans/flink-doris-spark-storage.md)
-tracks completed paths, a remaining matched
-ClickHouse control and bounded storage recovery follow-ups.
+tracks completed paths and bounded storage recovery follow-ups.

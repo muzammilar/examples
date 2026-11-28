@@ -43,7 +43,7 @@ dependency services. MinIO is excluded from all new work in this batch.
 - [x] **Kafka → Flink → Iceberg on SeaweedFS → Spark.** [Bounded snapshot/maintenance recovery](../../pipelines/orders-lakehouse/) ran three million acknowledged events, blocked catalog publication, active compaction-worker loss, exact current/pinned reads and orphan-candidate inventory. Eight candidates were preserved; destructive expiry and independent restore remain unrun.
 - [x] **HDFS → Spark → Doris.** Publish daily input partitions with manifests, join and aggregate them in Spark, then load Doris under stable batch identifiers. Fail an executor and a DataNode separately. Re-run the same input partition and verify its final rows and receipt count.
 - [x] **Live Flink path plus Spark historical correction.** [Historical replay](../../pipelines/orders-cdc-analytics/projects/historical-replay/) passed source-version protection, live cancellation, publisher SIGKILL and original-label commit retry with exact reads from all three fixed replicas. Initial immediate-visibility gate failure and independent in-place recovery remain documented. This replays a corrected source snapshot, not an independently authored correction; hard-delete and dimension-merge races remain future scope.
-- [ ] **Matched ClickHouse control.** Use the same raw events, dimensions, deletion rules and settled watermark. Compare native serving queries and complete ingestion/processing/serving costs separately. Record preprocessing and materialization costs for every path, including ClickHouse.
+- [x] **Matched ClickHouse control.** Use the same raw events, dimensions, deletion rules and settled watermark. Compare native serving queries and complete ingestion/processing/serving costs separately. Record preprocessing and materialization costs for every path, including ClickHouse.
 
 ## Comparison questions
 
@@ -281,3 +281,19 @@ The first controller's immediate-visibility failure remains failed; it was recov
 in place before the separate corrected case. CPU/memory, block bytes, settled disk
 and compression limits are reported; owned teardown passed. Next is the matched
 ClickHouse control, with no throughput winner claimed from these diagnostics.
+
+
+### Matched native ClickHouse control — completed bounded level 3
+
+The [control](../../pipelines/orders-cdc-analytics/projects/clickhouse-control/)
+consumed the same 1,012,100-event fence as one checkpointed Flink/Doris sink.
+All 998,000 active eight-field rows matched on three copies of each backend.
+Serving caps were 4.5 CPU/12 GiB each, including coordination. ClickHouse
+retained-replica loss passed 2,048 new quorum-ACK rows and 275 live reads.
+Failed Keeper sizing, SQL alias, controller and retained-start ordering phases
+remain documented with in-place recovery. All owned infrastructure was removed.
+Doris short query timings varied after restart (observed FE CPU throttling);
+there is no stable overall performance winner or equal end-to-end ingestion-cost
+claim. Optional deeper comparisons are future work, not level-3 blockers.
+Next: bounded CephFS whole-guest/disk loss and independent restore, retaining the
+25-GiB free-space startup guard. Completed Flink/Doris deployment labs stay closed.

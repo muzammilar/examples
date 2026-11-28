@@ -1,0 +1,95 @@
+# Merged with the owning CDC lab. Paths are relative to that lab.
+services:
+  ch1:
+    profiles: [control]
+    image: clickhouse/clickhouse-server:26.11.4.11@sha256:630693b4a8bce41954fe497ed371918aefe99434139d2da5786276459722fbb6
+    cpus: 1.25
+    mem_limit: 3584m
+    networks: [lab]
+    cap_drop: [ALL]
+    user: "101:101"
+    environment: {CLICKHOUSE_SKIP_USER_SETUP: "1"}
+    volumes: [ch1:/var/lib/clickhouse, ./projects/clickhouse-control/config/server.xml:/etc/clickhouse-server/config.d/lab.xml:ro, ./projects/clickhouse-control/config/users.xml:/etc/clickhouse-server/users.d/lab.xml:ro, ./projects/clickhouse-control/config/replica1.xml:/etc/clickhouse-server/config.d/replica.xml:ro]
+    healthcheck:
+      test: [CMD, clickhouse-client, --user, lab, --password, local-control-only, --query, "SELECT 1"]
+      interval: 5s
+      timeout: 4s
+      retries: 60
+  keeper1:
+    profiles: [control]
+    image: clickhouse/clickhouse-keeper:26.11.4.11@sha256:1512a05cfca9f2212325edcbf0e71114ff924025b28d11e3b58bba92623bf76b
+    cpus: 0.25
+    mem_limit: 512m
+    networks: [lab]
+    cap_drop: [ALL]
+    user: "101:101"
+    volumes: [keeper1:/var/lib/clickhouse, ./projects/clickhouse-control/config/keeper1.xml:/etc/clickhouse-keeper/keeper_config.xml:ro]
+  ch2:
+    profiles: [control]
+    image: clickhouse/clickhouse-server:26.11.4.11@sha256:630693b4a8bce41954fe497ed371918aefe99434139d2da5786276459722fbb6
+    cpus: 1.25
+    mem_limit: 3584m
+    networks: [lab]
+    cap_drop: [ALL]
+    user: "101:101"
+    environment: {CLICKHOUSE_SKIP_USER_SETUP: "1"}
+    volumes: [ch2:/var/lib/clickhouse, ./projects/clickhouse-control/config/server.xml:/etc/clickhouse-server/config.d/lab.xml:ro, ./projects/clickhouse-control/config/users.xml:/etc/clickhouse-server/users.d/lab.xml:ro, ./projects/clickhouse-control/config/replica2.xml:/etc/clickhouse-server/config.d/replica.xml:ro]
+    healthcheck:
+      test: [CMD, clickhouse-client, --user, lab, --password, local-control-only, --query, "SELECT 1"]
+      interval: 5s
+      timeout: 4s
+      retries: 60
+  keeper2:
+    profiles: [control]
+    image: clickhouse/clickhouse-keeper:26.11.4.11@sha256:1512a05cfca9f2212325edcbf0e71114ff924025b28d11e3b58bba92623bf76b
+    cpus: 0.25
+    mem_limit: 512m
+    networks: [lab]
+    cap_drop: [ALL]
+    user: "101:101"
+    volumes: [keeper2:/var/lib/clickhouse, ./projects/clickhouse-control/config/keeper2.xml:/etc/clickhouse-keeper/keeper_config.xml:ro]
+  ch3:
+    profiles: [control]
+    image: clickhouse/clickhouse-server:26.11.4.11@sha256:630693b4a8bce41954fe497ed371918aefe99434139d2da5786276459722fbb6
+    cpus: 1.25
+    mem_limit: 3584m
+    networks: [lab]
+    cap_drop: [ALL]
+    user: "101:101"
+    environment: {CLICKHOUSE_SKIP_USER_SETUP: "1"}
+    volumes: [ch3:/var/lib/clickhouse, ./projects/clickhouse-control/config/server.xml:/etc/clickhouse-server/config.d/lab.xml:ro, ./projects/clickhouse-control/config/users.xml:/etc/clickhouse-server/users.d/lab.xml:ro, ./projects/clickhouse-control/config/replica3.xml:/etc/clickhouse-server/config.d/replica.xml:ro]
+    healthcheck:
+      test: [CMD, clickhouse-client, --user, lab, --password, local-control-only, --query, "SELECT 1"]
+      interval: 5s
+      timeout: 4s
+      retries: 60
+  keeper3:
+    profiles: [control]
+    image: clickhouse/clickhouse-keeper:26.11.4.11@sha256:1512a05cfca9f2212325edcbf0e71114ff924025b28d11e3b58bba92623bf76b
+    cpus: 0.25
+    mem_limit: 512m
+    networks: [lab]
+    cap_drop: [ALL]
+    user: "101:101"
+    volumes: [keeper3:/var/lib/clickhouse, ./projects/clickhouse-control/config/keeper3.xml:/etc/clickhouse-keeper/keeper_config.xml:ro]
+  comparison:
+    profiles: [control]
+    build: ./projects/clickhouse-control/orders-comparison
+    image: examples/orders-analytics-comparison:1
+    cpus: 0.25
+    mem_limit: 256m
+    networks: [lab]
+    cap_drop: [ALL]
+    read_only: true
+    volumes: ['./results:/results']
+    environment:
+      ORDER_COUNT: '${ORDER_COUNT:-1000000}'
+      CUSTOMER_COUNT: '${CUSTOMER_COUNT:-10000}'
+    command: [idle]
+volumes:
+  ch1:
+  keeper1:
+  ch2:
+  keeper2:
+  ch3:
+  keeper3:
