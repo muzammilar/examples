@@ -197,3 +197,44 @@ def disk_snapshot(backend, path, label):
             ),
         },
     )
+
+
+def native_cgroups(backend, path, label):
+    snapshots = {}
+    for role in BACKENDS[backend]:
+        owned(role)
+        values, unavailable = {}, {}
+        for counter in ["cpu.stat", "memory.peak", "memory.current", "io.stat"]:
+            result = command(
+                "exec", "-T", role, "cat", "/sys/fs/cgroup/" + counter, check=False
+            )
+            if result.returncode:
+                unavailable[counter] = {
+                    "return_code": result.returncode,
+                    "message": (result.stdout + "\n" + result.stderr).strip(),
+                }
+            else:
+                values[counter] = result.stdout.strip()
+        snapshots[role] = {"values": values, "unavailable": unavailable}
+    save(path / (backend + "-native-cgroup-" + label + ".json"), snapshots)
+
+
+def running_actors():
+    found = []
+    for role in ["telemetry-workload", "metrics-writer-reader", "logs-writer-reader"]:
+        raw = subprocess.check_output(
+            [
+                "docker",
+                "ps",
+                "--quiet",
+                "--filter",
+                "label=com.docker.compose.project=" + PROJECT,
+                "--filter",
+                "label=com.docker.compose.service=" + role,
+            ],
+            text=True,
+        )
+        found.extend(
+            (identifier, role) for identifier in raw.splitlines() if identifier
+        )
+    return found

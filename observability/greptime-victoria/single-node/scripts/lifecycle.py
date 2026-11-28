@@ -5,18 +5,13 @@ import json
 import subprocess
 import uuid
 
-from lab import ROOT, PROJECT, BACKENDS, command, save
+from lab import ROOT, PROJECT, BACKENDS, command, save, running_actors
 
 
 def witness_hashes():
     paths = set()
-    for pattern in [
-        "*/case.json",
-        "*/fixture.json",
-        "*/*/*/requests.jsonl",
-        "*/*/*/configuration.json",
-    ]:
-        paths.update((ROOT / "results/cases").glob(pattern))
+    for name in ["case.json", "fixture.json", "requests.jsonl", "configuration.json"]:
+        paths.update((ROOT / "results/cases").rglob(name))
     return {
         str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest()
         for p in sorted(paths)
@@ -47,7 +42,7 @@ def is_retired(case):
 
 
 def remove(audit):
-    if command("ps", "--quiet", "telemetry-workload").stdout.strip():
+    if running_actors():
         raise RuntimeError("A workload actor is still running")
     audit()
     command("stop", *[role for roles in BACKENDS.values() for role in roles])

@@ -17,6 +17,7 @@ from lab import (
     save,
     disk_snapshot,
     phase,
+    running_actors,
 )
 
 
@@ -150,6 +151,8 @@ def verify(backend, signal, path, fixture, protocol="otlp"):
 
 
 def audit_retained():
+    if running_actors():
+        raise RuntimeError("Stop live actors before a frozen-history audit")
     audit = ROOT / "results/audits" / uuid.uuid4().hex
     audit.mkdir(parents=True)
     verified, passed = [], False
@@ -159,6 +162,11 @@ def audit_retained():
             from lifecycle import is_retired
 
             if is_retired(case):
+                continue
+            if json.loads(case.read_text())["kind"] == "live-recovery":
+                from recovery import verify_live_case
+
+                verify_live_case(case, audit)
                 continue
             fixture = case.parent / "fixture.json"
             protocol = json.loads(case.read_text()).get("protocol", "otlp")
@@ -292,6 +300,14 @@ def dispatch():
         bootstrap()
     elif mode == "up":
         initialize()
+    elif mode in ["live-control", "crash-metrics", "crash-logs"]:
+        from recovery import run_case
+
+        run_case(mode, audit_retained)
+    elif mode == "recover-witness":
+        from recovery import recover_witness
+
+        recover_witness()
     elif mode == "down":
         from lifecycle import remove
 

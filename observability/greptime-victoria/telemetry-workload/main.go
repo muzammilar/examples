@@ -18,6 +18,11 @@ func execute(ctx context.Context, args []string) error {
 	flags := flag.NewFlagSet("telemetry", flag.ContinueOnError)
 	protocol := flags.String("protocol", "otlp", "otlp or native")
 	mode := flags.String("mode", "push", "push, verify, health or manifest")
+	missingReport := flags.String("missing-report", "", "Preserved pre-replay missing-ack report")
+	ackCutoff := flags.String("ack-before", "", "Restart timestamp; replay only older acknowledged records")
+	priorPath := flags.String("prior-fixture", "", "Previously verified immutable corpus for the live reader")
+	reportPath := flags.String("report", "", "New exclusive history-reconciliation report path")
+	historyPath := flags.String("history", "", "Request journal; defaults to output/requests.jsonl")
 	fixturePath := flags.String("fixture", "/results/fixture.json", "Persisted common corpus identity")
 	output := flags.String("output", "/results/trial", "Owned trial evidence directory")
 	backend := flags.String("backend", "", "greptime or victoria")
@@ -47,7 +52,7 @@ func execute(ctx context.Context, args []string) error {
 	if *mode == "health" {
 		return health(ctx, *backend)
 	}
-	if *mode != "push" && *mode != "verify" {
+	if *mode != "push" && *mode != "verify" && *mode != "live" && *mode != "verify-history" && *mode != "replay" {
 		return errors.New("invalid mode")
 	}
 	if *protocol != "otlp" && *protocol != "native" {
@@ -64,8 +69,8 @@ func execute(ctx context.Context, args []string) error {
 	if err = json.Unmarshal(raw, &fixture); err != nil {
 		return err
 	}
-	if !regexp.MustCompile(`^[a-f0-9]{32}$`).MatchString(fixture.Run) || fixture.Series < 1 || fixture.Series > 100000 || fixture.Points < 1 || fixture.Points > 10000 || fixture.Logs < 1 || fixture.Logs > 2000000 || fixture.StartMS <= 0 {
-		return errors.New("fixture outside supported bounds")
+	if err = validateFixture(fixture); err != nil {
+		return err
 	}
 	total := fixture.Series * fixture.Points
 	if total > 2000000 {
@@ -86,6 +91,35 @@ func execute(ctx context.Context, args []string) error {
 	}
 	if *signalName == "logs" {
 		total = fixture.Logs
+	}
+	if *mode == "verify-history" {
+		if *reportPath == "" {
+			return errors.New("an exclusive --report path is required")
+		}
+		journalPath := *historyPath
+		if journalPath == "" {
+			journalPath = filepath.Join(*output, "requests.jsonl")
+		}
+		history, err := readHistory(journalPath, total)
+		if err != nil {
+			return err
+		}
+		var outcome reconciliation
+		if *signalName == "metrics" {
+			name := "fleet_value"
+			if *protocol == "native" {
+				name = "fleet_native"
+			}
+			outcome, err = metricReadback(ctx, *backend, fixture, name, history)
+		} else {
+			outcome, err = logReadback(ctx, *backend, fixture, *protocol, history)
+		}
+		result := map[string]any{"fixture": fixture, "backend": *backend, "signal": *signalName, "protocol": *protocol, "mode": *mode, "live_think_ms": 200, "live_reader_period_ms": 1000, "history_sha256": history.digest, "result": outcome, "complete": err == nil}
+		if err != nil {
+			result["error"] = err.Error()
+		}
+		saved := saveExclusiveJSON(*reportPath, result)
+		return errors.Join(err, saved)
 	}
 	if *mode == "verify" {
 		began := time.Now()
@@ -115,7 +149,7 @@ func execute(ctx context.Context, args []string) error {
 		return err
 	}
 	defer journal.file.Close()
-	metadata := map[string]any{"fixture": fixture, "backend": *backend, "signal": *signalName, "protocol": *protocol, "requested_otlp_gzip": *compressed, "batch": *batch, "workers": 1, "retry_attempts": 0, "http_timeout_s": 30, "connect_timeout_s": 5, "max_connections_per_host": 4, "started_at": time.Now().UTC()}
+	metadata := map[string]any{"fixture": fixture, "backend": *backend, "signal": *signalName, "protocol": *protocol, "mode": *mode, "live_think_ms": 200, "live_reader_period_ms": 1000, "requested_otlp_gzip": *compressed, "batch": *batch, "workers": 1, "retry_attempts": 0, "http_timeout_s": 30, "connect_timeout_s": 5, "max_connections_per_host": 4, "started_at": time.Now().UTC()}
 	data, err := json.MarshalIndent(metadata, "", "  ")
 	if err != nil {
 		return err
@@ -127,6 +161,29 @@ func execute(ctx context.Context, args []string) error {
 		if err = setupNativeLogs(ctx); err != nil {
 			return err
 		}
+	}
+	if *mode == "replay" {
+		if *protocol != "otlp" {
+			return errors.New("witness replay is qualified only for the common OTLP path")
+		}
+		return replayMissing(ctx, journal, *backend, *signalName, fixture, *historyPath, *missingReport, *ackCutoff, *compressed)
+	}
+	if *mode == "live" {
+		if *protocol != "otlp" || *priorPath == "" {
+			return errors.New("live mode requires common OTLP and a prior verified fixture")
+		}
+		raw, err := os.ReadFile(*priorPath)
+		if err != nil {
+			return err
+		}
+		var prior Fixture
+		if err = json.Unmarshal(raw, &prior); err != nil {
+			return err
+		}
+		if err = validateFixture(prior); err != nil {
+			return err
+		}
+		return runLive(ctx, journal, *backend, *signalName, fixture, prior, *batch, *compressed, *output)
 	}
 	began := time.Now()
 	for first := 0; first < total; first += *batch {
@@ -142,6 +199,25 @@ func execute(ctx context.Context, args []string) error {
 		}
 	}
 	return json.NewEncoder(os.Stdout).Encode(map[string]any{"event": "admission-complete", "records": total, "elapsed_s": time.Since(began).Seconds(), "meaning": "API acceptance, not verified visibility or crash durability"})
+}
+
+func validateFixture(f Fixture) error {
+	identifier := regexp.MustCompile(`^[a-f0-9]{32}$`)
+	if !identifier.MatchString(f.Run) || (f.PayloadSeed != "" && !identifier.MatchString(f.PayloadSeed)) || f.Series < 1 || f.Series > 100000 || f.Points < 1 || f.Points > 10000 || f.Logs < 1 || f.Logs > 2000000 || f.StartMS <= 0 || f.Series*f.Points > 2000000 {
+		return errors.New("fixture outside supported bounds")
+	}
+	return nil
+}
+
+func saveExclusiveJSON(path string, value any) error {
+	file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0644)
+	if err != nil {
+		return err
+	}
+	written := json.NewEncoder(file).Encode(value)
+	synced := file.Sync()
+	closed := file.Close()
+	return errors.Join(written, synced, closed)
 }
 
 func main() {

@@ -2,8 +2,10 @@
 
 Focused performance depth **3**, agreed for this batch. The first healthy
 controls passed at one million metrics and one million logs per engine/protocol,
-with verified lifecycle cleanup. Recovery and sustained comparisons are still in
-progress; there is no qualified winner.
+with verified lifecycle cleanup. Live crash checks now expose buffered Victoria
+ACK loss and demonstrate external-witness repair; Greptime retained its synchronous
+WAL ACKs. [Recovery evidence](single-node/docs/RECOVERY.md) preserves the failure.
+Sustained comparisons remain in progress; there is no qualified winner.
 
 - `single-node/`: equal whole-backend budget, GreptimeDB versus VictoriaMetrics +
   VictoriaLogs. Common OTLP protobuf ingestion, native ingestion separately,

@@ -71,7 +71,21 @@ func (j *Journal) append(value any) error {
 	return j.file.Sync()
 }
 
+type requestError struct{ err error }
+
+func (e *requestError) Error() string { return e.err.Error() }
+func (e *requestError) Unwrap() error { return e.err }
+
+func currentPhase() string {
+	value, err := os.ReadFile("/results/phase")
+	if err != nil {
+		return "unlabeled"
+	}
+	return string(value)
+}
+
 type RequestRecord struct {
+	Phase        string    `json:"phase"`
 	Event        string    `json:"event"`
 	Signal       string    `json:"signal"`
 	First        int       `json:"first"`
@@ -164,7 +178,7 @@ func sendBytes(ctx context.Context, journal *Journal, address, signal string, fi
 		return err
 	}
 	sum := sha256.Sum256(raw)
-	record := RequestRecord{Event: "intent", StartedAt: time.Now().UTC(), Signal: signal, First: first, Last: last, EncodingMS: encodingMS, RawBytes: len(raw), WireBytes: len(wire), BodySHA256: hex.EncodeToString(sum[:]), Outcome: "not-issued", ContentType: contentType, WireEncoding: encoding}
+	record := RequestRecord{Event: "intent", StartedAt: time.Now().UTC(), Signal: signal, First: first, Last: last, EncodingMS: encodingMS, RawBytes: len(raw), WireBytes: len(wire), BodySHA256: hex.EncodeToString(sum[:]), Outcome: "not-issued", Phase: currentPhase(), ContentType: contentType, WireEncoding: encoding}
 	if err := journal.append(record); err != nil {
 		return err
 	}
@@ -183,7 +197,7 @@ func sendBytes(ctx context.Context, journal *Journal, address, signal string, fi
 	request.Header.Set("X-Greptime-Log-Extract-Keys", "run,tenant")
 	request.Header.Set("VL-Stream-Fields", "run,tenant,service.name")
 	record.Event = "response"
-	issuedAt := time.Now().UTC()
+	issuedAt := time.Now()
 	response, err := httpClient.Do(request)
 	if err == nil {
 		record.Status = response.StatusCode
@@ -201,14 +215,17 @@ func sendBytes(ctx context.Context, journal *Journal, address, signal string, fi
 		}
 	}
 	record.EndedAt = time.Now().UTC()
-	record.HTTPMS = float64(record.EndedAt.Sub(issuedAt).Nanoseconds()) / 1e6
+	record.HTTPMS = float64(time.Since(issuedAt).Nanoseconds()) / 1e6
 	record.Outcome = "accepted"
 	if err != nil {
-		record.Outcome = "ambiguous-or-rejected"
+		record.Outcome = "unacknowledged"
 		record.Error = err.Error()
 	}
 	if journalErr := journal.append(record); journalErr != nil {
 		return errors.Join(err, journalErr)
 	}
-	return err
+	if err != nil {
+		return &requestError{err: err}
+	}
+	return nil
 }

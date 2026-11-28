@@ -2,8 +2,8 @@
 
 Pass 1 is complete: exact healthy ingestion controls and two verified lifecycle
 generations ran. **This is not yet a qualified performance/recovery comparison.**
-Live abrupt-loss tests, batch screens, cold/warm queries and sustained repeated
-trials remain in the [follow-up list](#remaining-level-3-work).
+Live abrupt-loss tests now have [measured recovery evidence](docs/RECOVERY.md).
+Batch screens, cold/warm queries and sustained repeated trials remain in the [follow-up list](#remaining-level-3-work).
 
 ## Quick start
 
@@ -103,6 +103,22 @@ is skipped. Destruction refuses a stale receipt or a receipt for another fixture
 The first million-record cases ran through independent targets after small driver
 controls; the combined `make test` target invokes those same tested functions.
 
+## Live crash and recovery results
+
+Greptime retained all **37,000 acknowledged metric/log records** in each of three
+crash cases. VictoriaMetrics lost **47,000 / 95,000** acknowledged metrics in the
+first crash and **48,000 / 96,000** in the repeat; VictoriaLogs lost **29,000 /
+80,000** acknowledged logs in its crash. All were restored by explicit external
+application-witness replay, with exact body readback. Buffered admission differs
+from Greptime’s synchronous WAL contract; these results establish no equal-durability
+performance winner. The first failed status is preserved. See the [numbers,
+resource measurements and recovery runbook](docs/RECOVERY.md) and
+[curated recovery report](reports/RECOVERY.json).
+
+`make live-control`, `make crash-metrics`, `make crash-logs` and serial
+`make test-production` expose the cases. Eleven Go checks and three offline
+cleanup guards pass; the fault targets ran independently.
+
 ## Findings and limits
 
 The first strict verifier rejected VictoriaMetrics' added `scope.name`; a later
@@ -121,7 +137,7 @@ retention or upgrade qualification is implied.
 
 ## Remaining level-3 work
 
-- [ ] Live writer/reader during abrupt process loss; classify successful,
+- [x] Live writer/reader during abrupt process loss; classify successful,
   failed and ambiguous requests, reconcile acknowledged loss and recovery.
 - [ ] Batch 1/100/1,000/10,000 screen; one representative sustained cell with
   three alternating trials at the same logical starting state and resource caps.

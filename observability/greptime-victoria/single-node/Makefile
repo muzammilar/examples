@@ -57,3 +57,31 @@ docker-down:
 .PHONY: report
 report:
 	$(PYTHON) scripts/curate.py
+
+.PHONY: live-control live-case crash-metrics metrics-fault-case crash-logs logs-fault-case
+live-control:
+	$(PYTHON) scripts/observe.py live-case PYTHON=$(PYTHON)
+live-case:
+	$(PYTHON) scripts/control.py live-control
+crash-metrics:
+	$(PYTHON) scripts/observe.py metrics-fault-case PYTHON=$(PYTHON)
+metrics-fault-case:
+	$(PYTHON) scripts/control.py crash-metrics
+crash-logs:
+	$(PYTHON) scripts/observe.py logs-fault-case PYTHON=$(PYTHON)
+logs-fault-case:
+	$(PYTHON) scripts/control.py crash-logs
+
+.PHONY: recover-witness witness-case
+export CASE
+recover-witness:
+	$(PYTHON) scripts/observe.py witness-case PYTHON=$(PYTHON)
+witness-case:
+	$(PYTHON) scripts/control.py recover-witness
+
+.PHONY: test-production
+test-production: live-control crash-metrics crash-logs verify-retained
+
+.PHONY: recovery-report
+recovery-report:
+	$(PYTHON) scripts/curate_recovery.py

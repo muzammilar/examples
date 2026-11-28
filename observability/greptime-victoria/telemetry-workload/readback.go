@@ -73,6 +73,15 @@ func timestampMS(value json.RawMessage) (int64, error) {
 }
 
 func verifyMetrics(ctx context.Context, backend string, f Fixture, metricName string) error {
+	_, err := metricReadback(ctx, backend, f, metricName, nil)
+	return err
+}
+
+func metricReadback(ctx context.Context, backend string, f Fixture, metricName string, history *deliveryHistory) (reconciliation, error) {
+	strict := history == nil
+	if strict {
+		history = allAcknowledged(f.Series * f.Points)
+	}
 	endpoint := "http://greptime:4000/v1/prometheus/api/v1/query"
 	if backend == "victoria" {
 		endpoint = "http://vmetrics:8428/api/v1/query"
@@ -80,9 +89,13 @@ func verifyMetrics(ctx context.Context, backend string, f Fixture, metricName st
 	query := fmt.Sprintf(`%s{run="%s"}[%ds]`, metricName, f.Run, f.Points+1)
 	at := f.StartMS + int64(f.Points-1)*1000
 	seconds := fmt.Sprintf("%d.%03d", at/1000, at%1000)
-	response, err := get(ctx, endpoint+"?"+url.Values{"query": {query}, "time": {seconds}}.Encode())
+	parameters := url.Values{"query": {query}, "time": {seconds}}
+	if backend == "victoria" {
+		parameters.Set("nocache", "1")
+	}
+	response, err := get(ctx, endpoint+"?"+parameters.Encode())
 	if err != nil {
-		return err
+		return reconciliation{}, err
 	}
 	defer response.Body.Close()
 	var result struct {
@@ -97,17 +110,17 @@ func verifyMetrics(ctx context.Context, backend string, f Fixture, metricName st
 		} `json:"data"`
 	}
 	if err = json.NewDecoder(io.LimitReader(response.Body, 128<<20)).Decode(&result); err != nil {
-		return err
+		return reconciliation{}, err
 	}
 	if result.Status != "success" || result.Data.ResultType != "matrix" {
-		return fmt.Errorf("unexpected raw metric response: status=%s type=%s error=%s", result.Status, result.Data.ResultType, result.Error)
+		return reconciliation{}, fmt.Errorf("unexpected raw metric response: status=%s type=%s error=%s", result.Status, result.Data.ResultType, result.Error)
 	}
 	seen := make([]bool, f.Series*f.Points)
 	count := 0
 	for _, series := range result.Data.Result {
 		id, parseErr := strconv.Atoi(series.Metric["series"])
 		if parseErr != nil || id < 0 || id >= f.Series || series.Metric["run"] != f.Run || series.Metric["tenant"] != tenant(id) || series.Metric["__name__"] != metricName {
-			return errors.New("wrong series labels")
+			return reconciliation{}, errors.New("wrong series labels")
 		}
 		// Resource naming differs across OTLP implementations; these fixed
 		// labels may represent the identical service, never business identity.
@@ -116,47 +129,47 @@ func verifyMetrics(ctx context.Context, backend string, f Fixture, metricName st
 			case "__name__", "run", "tenant", "series":
 			case "scope.version":
 				if value != "unknown" {
-					return errors.New("wrong instrumentation scope version")
+					return reconciliation{}, errors.New("wrong instrumentation scope version")
 				}
 			case "scope.name":
 				if value != "incident-corpus-v1" {
-					return errors.New("wrong instrumentation scope")
+					return reconciliation{}, errors.New("wrong instrumentation scope")
 				}
 			case "job", "service.name", "service_name":
 				if value != "checkout-lab" {
-					return errors.New("wrong service identity")
+					return reconciliation{}, errors.New("wrong service identity")
 				}
 			default:
-				return fmt.Errorf("unexpected metric label %q", key)
+				return reconciliation{}, fmt.Errorf("unexpected metric label %q", key)
 			}
 		}
 		for _, sample := range series.Values {
 			stamp, e := timestampMS(sample[0])
 			if e != nil {
-				return e
+				return reconciliation{}, e
 			}
 			delta := stamp - f.StartMS
 			if delta < 0 || delta%1000 != 0 || delta/1000 >= int64(f.Points) {
-				return errors.New("unexpected sample timestamp")
+				return reconciliation{}, errors.New("unexpected sample timestamp")
 			}
 			index := int(delta/1000)*f.Series + id
 			var text string
 			if e = json.Unmarshal(sample[1], &text); e != nil {
-				return e
+				return reconciliation{}, e
 			}
 			value, e := strconv.ParseFloat(text, 64)
 			_, _, expected := f.metricValue(index)
 			if e != nil || value != expected || seen[index] {
-				return fmt.Errorf("wrong/duplicate metric index=%d value=%s", index, text)
+				return reconciliation{}, fmt.Errorf("wrong/duplicate metric index=%d value=%s", index, text)
 			}
 			seen[index] = true
 			count++
 		}
 	}
-	if count != len(seen) {
-		return fmt.Errorf("missing metric samples: observed=%d expected=%d", count, len(seen))
+	if strict && count != len(seen) {
+		return reconciliation{}, fmt.Errorf("missing metric samples: observed=%d expected=%d", count, len(seen))
 	}
-	return nil
+	return history.reconcile(seen)
 }
 
 func greptimeRows(ctx context.Context, query string) ([][]json.RawMessage, error) {
@@ -184,14 +197,14 @@ func greptimeRows(ctx context.Context, query string) ([][]json.RawMessage, error
 	return result.Output[0].Records.Rows, nil
 }
 
-func verifyLogBody(f Fixture, stamp int64, text string, first, last int, seen []bool) error {
+func verifyLogBody(f Fixture, stamp int64, text, indexedTenant string, first, last int, seen []bool) error {
 	var body LogBody
 	decoder := json.NewDecoder(strings.NewReader(text))
 	decoder.DisallowUnknownFields()
 	if err := decoder.Decode(&body); err != nil {
 		return err
 	}
-	if body.ID < first || body.ID >= last || stamp != f.StartMS+int64(body.ID) || seen[body.ID-first] || body != f.logBody(body.ID) {
+	if body.ID < first || body.ID >= last || stamp != f.StartMS+int64(body.ID) || seen[body.ID-first] || body != f.logBody(body.ID) || indexedTenant != body.Tenant {
 		return fmt.Errorf("wrong/duplicate log body or timestamp: id=%d timestamp=%d", body.ID, stamp)
 	}
 	// Comparing the canonical full body also catches duplicate JSON keys and
@@ -208,44 +221,57 @@ func verifyLogBody(f Fixture, stamp int64, text string, first, last int, seen []
 }
 
 func verifyLogs(ctx context.Context, backend string, f Fixture, protocol string) error {
+	_, err := logReadback(ctx, backend, f, protocol, nil)
+	return err
+}
+
+func logReadback(ctx context.Context, backend string, f Fixture, protocol string, history *deliveryHistory) (reconciliation, error) {
+	strict := history == nil
+	if strict {
+		history = allAcknowledged(f.Logs)
+	}
+	seen := make([]bool, f.Logs)
 	table, unitsPerMS := "opentelemetry_logs", int64(1000000)
 	if protocol == "native" {
 		table, unitsPerMS = "native_logs", 1
 	}
 	for first := 0; first < f.Logs; first += 10000 {
 		last := min(first+10000, f.Logs)
-		seen := make([]bool, last-first)
+		batchSeen := seen[first:last]
 		start := time.UnixMilli(f.StartMS + int64(first)).UTC().Format(time.RFC3339Nano)
 		end := time.UnixMilli(f.StartMS + int64(last)).UTC().Format(time.RFC3339Nano)
 		if backend == "greptime" {
-			rows, err := greptimeRows(ctx, fmt.Sprintf("SELECT CAST(timestamp AS BIGINT),body FROM %s WHERE run='%s' AND timestamp >= '%s' AND timestamp < '%s'", table, f.Run, start, end))
+			rows, err := greptimeRows(ctx, fmt.Sprintf("SELECT CAST(timestamp AS BIGINT),body,tenant FROM %s WHERE run='%s' AND timestamp >= '%s' AND timestamp < '%s'", table, f.Run, start, end))
 			if err != nil {
-				return err
+				return reconciliation{}, err
 			}
 			for _, row := range rows {
-				if len(row) != 2 {
-					return errors.New("unexpected log columns")
+				if len(row) != 3 {
+					return reconciliation{}, errors.New("unexpected log columns")
 				}
 				var nanos int64
-				var body string
+				var body, indexedTenant string
 				if err = json.Unmarshal(row[0], &nanos); err != nil {
-					return err
+					return reconciliation{}, err
 				}
 				if err = json.Unmarshal(row[1], &body); err != nil {
-					return err
+					return reconciliation{}, err
+				}
+				if err = json.Unmarshal(row[2], &indexedTenant); err != nil {
+					return reconciliation{}, err
 				}
 				if nanos%unitsPerMS != 0 {
-					return errors.New("log timestamp lost millisecond contract")
+					return reconciliation{}, errors.New("log timestamp lost millisecond contract")
 				}
-				if err = verifyLogBody(f, nanos/unitsPerMS, body, first, last, seen); err != nil {
-					return err
+				if err = verifyLogBody(f, nanos/unitsPerMS, body, indexedTenant, first, last, batchSeen); err != nil {
+					return reconciliation{}, err
 				}
 			}
 		} else {
 			query := fmt.Sprintf(`run:%q _time:[%s,%s)`, f.Run, start, end)
 			response, err := get(ctx, "http://vlogs:9428/select/logsql/query?"+url.Values{"query": {query}}.Encode())
 			if err != nil {
-				return err
+				return reconciliation{}, err
 			}
 			decoder := json.NewDecoder(io.LimitReader(response.Body, 32<<20))
 			for decoder.More() {
@@ -266,20 +292,20 @@ func verifyLogs(ctx context.Context, backend string, f Fixture, protocol string)
 					err = errors.New("wrong run label")
 					break
 				}
-				if err = verifyLogBody(f, stamp.UnixMilli(), row["_msg"], first, last, seen); err != nil {
+				if err = verifyLogBody(f, stamp.UnixMilli(), row["_msg"], row["tenant"], first, last, batchSeen); err != nil {
 					break
 				}
 			}
 			closeErr := response.Body.Close()
 			if err = errors.Join(err, closeErr); err != nil {
-				return err
+				return reconciliation{}, err
 			}
 		}
-		for offset, ok := range seen {
-			if !ok {
-				return fmt.Errorf("missing log id=%d", first+offset)
+		for offset, ok := range batchSeen {
+			if strict && !ok {
+				return reconciliation{}, fmt.Errorf("missing log id=%d", first+offset)
 			}
 		}
 	}
-	return nil
+	return history.reconcile(seen)
 }

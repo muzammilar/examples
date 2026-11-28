@@ -50,3 +50,14 @@ func TestIndependentNamespacesCanShareExactPayloadSeed(t *testing.T) {
 		}
 	}
 }
+
+func TestCorrectLogBodyCannotHideAnIncorrectIndexedTenant(t *testing.T) {
+	f := Fixture{Run: "test", StartMS: 100000, Series: 100}
+	text, err := json.Marshal(f.logBody(0))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if verifyLogBody(f, f.StartMS, string(text), "wrong-tenant", 0, 1, make([]bool, 1)) == nil {
+		t.Fatal("misindexed log accepted")
+	}
+}

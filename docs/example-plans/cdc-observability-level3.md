@@ -120,3 +120,12 @@ Sources: [MySQL current patch](https://dev.mysql.com/doc/relnotes/mysql/9.7/en/n
 [Debezium incremental snapshots and schema boundaries](https://debezium.io/documentation/reference/3.7/connectors/mysql.html#mysql-incremental-snapshots),
 [Flink changelog JSON](https://nightlies.apache.org/flink/flink-docs-release-2.3/docs/connectors/table/formats/debezium/),
 [Airflow 3.4 architecture](https://airflow.apache.org/docs/apache-airflow/3.4.0/core-concepts/overview.html).
+
+Live single-node recovery is now measured: three Greptime SIGKILL cases retained
+all 37,000 acknowledged metric/log records per case. VictoriaMetrics needed
+external replay for 47,000 and 48,000 missing acknowledged metrics; VictoriaLogs
+needed replay for 29,000 logs. All original ACK bodies matched after repair.
+The failed original status and unequal persistence semantics remain explicit in
+[the recovery runbook](../../observability/greptime-victoria/single-node/docs/RECOVERY.md).
+Batch/query screens, repeated comparisons, the cluster profile and the later
+three-signal/full-stack examples remain unfinished.

@@ -50,6 +50,12 @@ def main():
         (ROOT / "results/cases").glob("*/case.json"), key=lambda p: p.stat().st_mtime_ns
     ):
         metadata = load(path)
+        if metadata["kind"] not in [
+            "driver-control",
+            "healthy-common-otlp",
+            "healthy-native",
+        ]:
+            continue
         status_path = path.parent / "status.json"
         status = (
             load(status_path)
