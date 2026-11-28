@@ -1,0 +1,859 @@
+---
+name: orders-lakehouse
+services:
+  master1:
+    image: chrislusf/seaweedfs:4.55@sha256:7ca46aeae2f223b37e5d91593c17ab37738eec6df6ab69b48a0487f7643342b9
+    cpus: 0.125
+    mem_limit: 192m
+    networks:
+    - lab
+    hostname: master1
+    command:
+    - master
+    - "-ip=master1"
+    - "-ip.bind=0.0.0.0"
+    - "-mdir=/data"
+    - "-peers=master1:9333,master2:9333,master3:9333"
+    - "-volumeSizeLimitMB=64"
+    - "-defaultReplication=200"
+    healthcheck:
+      test:
+      - CMD
+      - wget
+      - "-q"
+      - "-O"
+      - "/dev/null"
+      - http://127.0.0.1:9333/healthz
+      interval: 3s
+      timeout: 3s
+      retries: 60
+    volumes:
+    - master1:/data
+  etcd1:
+    image: gcr.io/etcd-development/etcd:v3.7.4@sha256:47d217be8ec4ca943954b5f4bf8029ee9bc0ffb05fbe2a44d579a1f640e03ed4
+    cpus: 0.25
+    mem_limit: 384m
+    networks:
+    - lab
+    hostname: etcd1
+    entrypoint:
+    - "/usr/local/bin/etcd"
+    command:
+    - "--name=etcd1"
+    - "--data-dir=/data"
+    - "--listen-client-urls=http://0.0.0.0:2379"
+    - "--advertise-client-urls=http://etcd1:2379"
+    - "--listen-peer-urls=http://0.0.0.0:2380"
+    - "--initial-advertise-peer-urls=http://etcd1:2380"
+    - "--initial-cluster=etcd1=http://etcd1:2380,etcd2=http://etcd2:2380,etcd3=http://etcd3:2380"
+    - "--initial-cluster-token=orders-lakehouse"
+    - "--auto-compaction-retention=1"
+    healthcheck:
+      test:
+      - CMD
+      - "/usr/local/bin/etcdctl"
+      - endpoint
+      - health
+      interval: 3s
+      timeout: 3s
+      retries: 60
+    volumes:
+    - etcd1:/data
+  volume1:
+    image: chrislusf/seaweedfs:4.55@sha256:7ca46aeae2f223b37e5d91593c17ab37738eec6df6ab69b48a0487f7643342b9
+    cpus: 0.25
+    mem_limit: 256m
+    networks:
+    - lab
+    hostname: volume1
+    command:
+    - volume
+    - "-ip=volume1"
+    - "-ip.bind=0.0.0.0"
+    - "-port=8080"
+    - "-dir=/data"
+    - "-master=master1:9333,master2:9333,master3:9333"
+    - "-max=16"
+    - "-dataCenter=zone1"
+    - "-rack=rack1"
+    - "-minFreeSpace=1GiB"
+    healthcheck:
+      test:
+      - CMD
+      - wget
+      - "-q"
+      - "-O"
+      - "/dev/null"
+      - http://127.0.0.1:8080/healthz
+      interval: 3s
+      timeout: 3s
+      retries: 60
+    depends_on:
+      master1:
+        condition: service_healthy
+      master2:
+        condition: service_healthy
+      master3:
+        condition: service_healthy
+    volumes:
+    - volume1:/data
+  master2:
+    image: chrislusf/seaweedfs:4.55@sha256:7ca46aeae2f223b37e5d91593c17ab37738eec6df6ab69b48a0487f7643342b9
+    cpus: 0.125
+    mem_limit: 192m
+    networks:
+    - lab
+    hostname: master2
+    command:
+    - master
+    - "-ip=master2"
+    - "-ip.bind=0.0.0.0"
+    - "-mdir=/data"
+    - "-peers=master1:9333,master2:9333,master3:9333"
+    - "-volumeSizeLimitMB=64"
+    - "-defaultReplication=200"
+    healthcheck:
+      test:
+      - CMD
+      - wget
+      - "-q"
+      - "-O"
+      - "/dev/null"
+      - http://127.0.0.1:9333/healthz
+      interval: 3s
+      timeout: 3s
+      retries: 60
+    volumes:
+    - master2:/data
+  etcd2:
+    image: gcr.io/etcd-development/etcd:v3.7.4@sha256:47d217be8ec4ca943954b5f4bf8029ee9bc0ffb05fbe2a44d579a1f640e03ed4
+    cpus: 0.25
+    mem_limit: 384m
+    networks:
+    - lab
+    hostname: etcd2
+    entrypoint:
+    - "/usr/local/bin/etcd"
+    command:
+    - "--name=etcd2"
+    - "--data-dir=/data"
+    - "--listen-client-urls=http://0.0.0.0:2379"
+    - "--advertise-client-urls=http://etcd2:2379"
+    - "--listen-peer-urls=http://0.0.0.0:2380"
+    - "--initial-advertise-peer-urls=http://etcd2:2380"
+    - "--initial-cluster=etcd1=http://etcd1:2380,etcd2=http://etcd2:2380,etcd3=http://etcd3:2380"
+    - "--initial-cluster-token=orders-lakehouse"
+    - "--auto-compaction-retention=1"
+    healthcheck:
+      test:
+      - CMD
+      - "/usr/local/bin/etcdctl"
+      - endpoint
+      - health
+      interval: 3s
+      timeout: 3s
+      retries: 60
+    volumes:
+    - etcd2:/data
+  volume2:
+    image: chrislusf/seaweedfs:4.55@sha256:7ca46aeae2f223b37e5d91593c17ab37738eec6df6ab69b48a0487f7643342b9
+    cpus: 0.25
+    mem_limit: 256m
+    networks:
+    - lab
+    hostname: volume2
+    command:
+    - volume
+    - "-ip=volume2"
+    - "-ip.bind=0.0.0.0"
+    - "-port=8080"
+    - "-dir=/data"
+    - "-master=master1:9333,master2:9333,master3:9333"
+    - "-max=16"
+    - "-dataCenter=zone2"
+    - "-rack=rack2"
+    - "-minFreeSpace=1GiB"
+    healthcheck:
+      test:
+      - CMD
+      - wget
+      - "-q"
+      - "-O"
+      - "/dev/null"
+      - http://127.0.0.1:8080/healthz
+      interval: 3s
+      timeout: 3s
+      retries: 60
+    depends_on:
+      master1:
+        condition: service_healthy
+      master2:
+        condition: service_healthy
+      master3:
+        condition: service_healthy
+    volumes:
+    - volume2:/data
+  master3:
+    image: chrislusf/seaweedfs:4.55@sha256:7ca46aeae2f223b37e5d91593c17ab37738eec6df6ab69b48a0487f7643342b9
+    cpus: 0.125
+    mem_limit: 192m
+    networks:
+    - lab
+    hostname: master3
+    command:
+    - master
+    - "-ip=master3"
+    - "-ip.bind=0.0.0.0"
+    - "-mdir=/data"
+    - "-peers=master1:9333,master2:9333,master3:9333"
+    - "-volumeSizeLimitMB=64"
+    - "-defaultReplication=200"
+    healthcheck:
+      test:
+      - CMD
+      - wget
+      - "-q"
+      - "-O"
+      - "/dev/null"
+      - http://127.0.0.1:9333/healthz
+      interval: 3s
+      timeout: 3s
+      retries: 60
+    volumes:
+    - master3:/data
+  etcd3:
+    image: gcr.io/etcd-development/etcd:v3.7.4@sha256:47d217be8ec4ca943954b5f4bf8029ee9bc0ffb05fbe2a44d579a1f640e03ed4
+    cpus: 0.25
+    mem_limit: 384m
+    networks:
+    - lab
+    hostname: etcd3
+    entrypoint:
+    - "/usr/local/bin/etcd"
+    command:
+    - "--name=etcd3"
+    - "--data-dir=/data"
+    - "--listen-client-urls=http://0.0.0.0:2379"
+    - "--advertise-client-urls=http://etcd3:2379"
+    - "--listen-peer-urls=http://0.0.0.0:2380"
+    - "--initial-advertise-peer-urls=http://etcd3:2380"
+    - "--initial-cluster=etcd1=http://etcd1:2380,etcd2=http://etcd2:2380,etcd3=http://etcd3:2380"
+    - "--initial-cluster-token=orders-lakehouse"
+    - "--auto-compaction-retention=1"
+    healthcheck:
+      test:
+      - CMD
+      - "/usr/local/bin/etcdctl"
+      - endpoint
+      - health
+      interval: 3s
+      timeout: 3s
+      retries: 60
+    volumes:
+    - etcd3:/data
+  volume3:
+    image: chrislusf/seaweedfs:4.55@sha256:7ca46aeae2f223b37e5d91593c17ab37738eec6df6ab69b48a0487f7643342b9
+    cpus: 0.25
+    mem_limit: 256m
+    networks:
+    - lab
+    hostname: volume3
+    command:
+    - volume
+    - "-ip=volume3"
+    - "-ip.bind=0.0.0.0"
+    - "-port=8080"
+    - "-dir=/data"
+    - "-master=master1:9333,master2:9333,master3:9333"
+    - "-max=16"
+    - "-dataCenter=zone3"
+    - "-rack=rack3"
+    - "-minFreeSpace=1GiB"
+    healthcheck:
+      test:
+      - CMD
+      - wget
+      - "-q"
+      - "-O"
+      - "/dev/null"
+      - http://127.0.0.1:8080/healthz
+      interval: 3s
+      timeout: 3s
+      retries: 60
+    depends_on:
+      master1:
+        condition: service_healthy
+      master2:
+        condition: service_healthy
+      master3:
+        condition: service_healthy
+    volumes:
+    - volume3:/data
+  filer1:
+    image: chrislusf/seaweedfs:4.55@sha256:7ca46aeae2f223b37e5d91593c17ab37738eec6df6ab69b48a0487f7643342b9
+    cpus: 0.25
+    mem_limit: 384m
+    networks:
+    - lab
+    hostname: filer1
+    command:
+    - filer
+    - "-ip=filer1"
+    - "-ip.bind=0.0.0.0"
+    - "-master=master1:9333,master2:9333,master3:9333"
+    - "-defaultReplicaPlacement=200"
+    - "-maxMB=2"
+    volumes:
+    - "./deploy/seaweed/filer.toml:/etc/seaweedfs/filer.toml:ro"
+    healthcheck:
+      test:
+      - CMD
+      - wget
+      - "-q"
+      - "-O"
+      - "/dev/null"
+      - http://127.0.0.1:8888/healthz
+      interval: 3s
+      timeout: 3s
+      retries: 60
+    depends_on:
+      etcd1:
+        condition: service_healthy
+      etcd2:
+        condition: service_healthy
+      etcd3:
+        condition: service_healthy
+  filer2:
+    image: chrislusf/seaweedfs:4.55@sha256:7ca46aeae2f223b37e5d91593c17ab37738eec6df6ab69b48a0487f7643342b9
+    cpus: 0.25
+    mem_limit: 384m
+    networks:
+    - lab
+    hostname: filer2
+    command:
+    - filer
+    - "-ip=filer2"
+    - "-ip.bind=0.0.0.0"
+    - "-master=master1:9333,master2:9333,master3:9333"
+    - "-defaultReplicaPlacement=200"
+    - "-maxMB=2"
+    volumes:
+    - "./deploy/seaweed/filer.toml:/etc/seaweedfs/filer.toml:ro"
+    healthcheck:
+      test:
+      - CMD
+      - wget
+      - "-q"
+      - "-O"
+      - "/dev/null"
+      - http://127.0.0.1:8888/healthz
+      interval: 3s
+      timeout: 3s
+      retries: 60
+    depends_on:
+      etcd1:
+        condition: service_healthy
+      etcd2:
+        condition: service_healthy
+      etcd3:
+        condition: service_healthy
+  s3:
+    image: chrislusf/seaweedfs:4.55@sha256:7ca46aeae2f223b37e5d91593c17ab37738eec6df6ab69b48a0487f7643342b9
+    cpus: 0.125
+    mem_limit: 256m
+    networks:
+    - lab
+    command:
+    - s3
+    - "-ip.bind=0.0.0.0"
+    - "-port=8333"
+    - "-filer=filer1:8888,filer2:8888"
+    - "-config=/etc/seaweedfs/s3.json"
+    - "-cacheCapacityMB=0"
+    - "-port.iceberg=0"
+    - "-port.lance=0"
+    volumes:
+    - "./deploy/seaweed/s3.json:/etc/seaweedfs/s3.json:ro"
+    healthcheck:
+      test:
+      - CMD
+      - wget
+      - "-q"
+      - "-O"
+      - "/dev/null"
+      - http://127.0.0.1:8333/status
+      interval: 3s
+      timeout: 3s
+      retries: 60
+    depends_on:
+      filer1:
+        condition: service_healthy
+      filer2:
+        condition: service_healthy
+  controller1:
+    image: apache/kafka:4.3.2@sha256:852a0d49fc4e656b022e7f23785411802c9a088c78a7c5e39f33969de9c227a7
+    cpus: 0.125
+    mem_limit: 384m
+    networks:
+    - lab
+    environment:
+      CLUSTER_ID: R3LkX9xjRkKybvE8y3UfPQ
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@controller1:9093,2@controller2:9093,3@controller3:9093
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_LOG_DIRS: "/var/lib/kafka/data"
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: controller
+      KAFKA_LISTENERS: CONTROLLER://:9093
+      KAFKA_HEAP_OPTS: "-Xms128m -Xmx128m"
+    stop_grace_period: 30s
+    volumes:
+    - controller1:/var/lib/kafka/data
+  broker1:
+    image: apache/kafka:4.3.2@sha256:852a0d49fc4e656b022e7f23785411802c9a088c78a7c5e39f33969de9c227a7
+    cpus: 0.25
+    mem_limit: 768m
+    networks:
+    - lab
+    environment:
+      CLUSTER_ID: R3LkX9xjRkKybvE8y3UfPQ
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@controller1:9093,2@controller2:9093,3@controller3:9093
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_LOG_DIRS: "/var/lib/kafka/data"
+      KAFKA_NODE_ID: 4
+      KAFKA_PROCESS_ROLES: broker
+      KAFKA_LISTENERS: PLAINTEXT://:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker1:9092
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_HEAP_OPTS: "-Xms256m -Xmx256m"
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 3
+      KAFKA_MIN_INSYNC_REPLICAS: 2
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 3
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 2
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'false'
+      KAFKA_UNCLEAN_LEADER_ELECTION_ENABLE: 'false'
+      KAFKA_LOG_PREALLOCATE: 'false'
+      KAFKA_LOG_SEGMENT_BYTES: 67108864
+      KAFKA_LOG_INDEX_SIZE_MAX_BYTES: 1048576
+      KAFKA_NUM_NETWORK_THREADS: 2
+      KAFKA_NUM_IO_THREADS: 4
+    stop_grace_period: 30s
+    volumes:
+    - broker1:/var/lib/kafka/data
+  controller2:
+    image: apache/kafka:4.3.2@sha256:852a0d49fc4e656b022e7f23785411802c9a088c78a7c5e39f33969de9c227a7
+    cpus: 0.125
+    mem_limit: 384m
+    networks:
+    - lab
+    environment:
+      CLUSTER_ID: R3LkX9xjRkKybvE8y3UfPQ
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@controller1:9093,2@controller2:9093,3@controller3:9093
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_LOG_DIRS: "/var/lib/kafka/data"
+      KAFKA_NODE_ID: 2
+      KAFKA_PROCESS_ROLES: controller
+      KAFKA_LISTENERS: CONTROLLER://:9093
+      KAFKA_HEAP_OPTS: "-Xms128m -Xmx128m"
+    stop_grace_period: 30s
+    volumes:
+    - controller2:/var/lib/kafka/data
+  broker2:
+    image: apache/kafka:4.3.2@sha256:852a0d49fc4e656b022e7f23785411802c9a088c78a7c5e39f33969de9c227a7
+    cpus: 0.25
+    mem_limit: 768m
+    networks:
+    - lab
+    environment:
+      CLUSTER_ID: R3LkX9xjRkKybvE8y3UfPQ
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@controller1:9093,2@controller2:9093,3@controller3:9093
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_LOG_DIRS: "/var/lib/kafka/data"
+      KAFKA_NODE_ID: 5
+      KAFKA_PROCESS_ROLES: broker
+      KAFKA_LISTENERS: PLAINTEXT://:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker2:9092
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_HEAP_OPTS: "-Xms256m -Xmx256m"
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 3
+      KAFKA_MIN_INSYNC_REPLICAS: 2
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 3
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 2
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'false'
+      KAFKA_UNCLEAN_LEADER_ELECTION_ENABLE: 'false'
+      KAFKA_LOG_PREALLOCATE: 'false'
+      KAFKA_LOG_SEGMENT_BYTES: 67108864
+      KAFKA_LOG_INDEX_SIZE_MAX_BYTES: 1048576
+      KAFKA_NUM_NETWORK_THREADS: 2
+      KAFKA_NUM_IO_THREADS: 4
+    stop_grace_period: 30s
+    volumes:
+    - broker2:/var/lib/kafka/data
+  controller3:
+    image: apache/kafka:4.3.2@sha256:852a0d49fc4e656b022e7f23785411802c9a088c78a7c5e39f33969de9c227a7
+    cpus: 0.125
+    mem_limit: 384m
+    networks:
+    - lab
+    environment:
+      CLUSTER_ID: R3LkX9xjRkKybvE8y3UfPQ
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@controller1:9093,2@controller2:9093,3@controller3:9093
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_LOG_DIRS: "/var/lib/kafka/data"
+      KAFKA_NODE_ID: 3
+      KAFKA_PROCESS_ROLES: controller
+      KAFKA_LISTENERS: CONTROLLER://:9093
+      KAFKA_HEAP_OPTS: "-Xms128m -Xmx128m"
+    stop_grace_period: 30s
+    volumes:
+    - controller3:/var/lib/kafka/data
+  broker3:
+    image: apache/kafka:4.3.2@sha256:852a0d49fc4e656b022e7f23785411802c9a088c78a7c5e39f33969de9c227a7
+    cpus: 0.25
+    mem_limit: 768m
+    networks:
+    - lab
+    environment:
+      CLUSTER_ID: R3LkX9xjRkKybvE8y3UfPQ
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@controller1:9093,2@controller2:9093,3@controller3:9093
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_LOG_DIRS: "/var/lib/kafka/data"
+      KAFKA_NODE_ID: 6
+      KAFKA_PROCESS_ROLES: broker
+      KAFKA_LISTENERS: PLAINTEXT://:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker3:9092
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_HEAP_OPTS: "-Xms256m -Xmx256m"
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 3
+      KAFKA_MIN_INSYNC_REPLICAS: 2
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 3
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 2
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'false'
+      KAFKA_UNCLEAN_LEADER_ELECTION_ENABLE: 'false'
+      KAFKA_LOG_PREALLOCATE: 'false'
+      KAFKA_LOG_SEGMENT_BYTES: 67108864
+      KAFKA_LOG_INDEX_SIZE_MAX_BYTES: 1048576
+      KAFKA_NUM_NETWORK_THREADS: 2
+      KAFKA_NUM_IO_THREADS: 4
+    stop_grace_period: 30s
+    volumes:
+    - broker3:/var/lib/kafka/data
+  catalog-db:
+    image: postgres:19.0@sha256:4ea94de574c17f0372722806c949757050fbb1cd7648410fe45d6bba275cc00e
+    cpus: 0.25
+    mem_limit: 768m
+    networks:
+    - lab
+    environment:
+      POSTGRES_USER: lake
+      POSTGRES_PASSWORD: local-catalog-only
+      POSTGRES_DB: lake
+    healthcheck:
+      test:
+      - CMD
+      - pg_isready
+      - "-U"
+      - lake
+      - "-d"
+      - lake
+      interval: 3s
+      timeout: 3s
+      retries: 60
+    volumes:
+    - catalog-db:/var/lib/postgresql
+  jobmanager:
+    image: examples/orders-lakehouse-flink:2.3.0
+    cpus: 0.5
+    mem_limit: 1280m
+    networks:
+    - lab
+    build:
+      context: "."
+      dockerfile: docker/Dockerfile.flink
+    environment:
+      FLINK_PROPERTIES: |
+        jobmanager.rpc.address: jobmanager
+        jobmanager.memory.process.size: 1024m
+        taskmanager.memory.process.size: 1280m
+        taskmanager.numberOfTaskSlots: 1
+        parallelism.default: 2
+        rest.address: jobmanager
+        rest.bind-address: 0.0.0.0
+        state.backend.type: rocksdb
+        state.checkpoints.dir: file:///state/checkpoints
+        execution.checkpointing.max-concurrent-checkpoints: 1
+        restart-strategy.type: fixed-delay
+        restart-strategy.fixed-delay.attempts: 20
+        restart-strategy.fixed-delay.delay: 5s
+      AWS_EC2_METADATA_DISABLED: 'true'
+    command:
+    - jobmanager
+    volumes:
+    - flink-state:/state
+  taskmanager1:
+    image: examples/orders-lakehouse-flink:2.3.0
+    cpus: 1
+    mem_limit: 1536m
+    networks:
+    - lab
+    build:
+      context: "."
+      dockerfile: docker/Dockerfile.flink
+    environment:
+      FLINK_PROPERTIES: |
+        jobmanager.rpc.address: jobmanager
+        jobmanager.memory.process.size: 1024m
+        taskmanager.memory.process.size: 1280m
+        taskmanager.numberOfTaskSlots: 1
+        parallelism.default: 2
+        rest.address: jobmanager
+        rest.bind-address: 0.0.0.0
+        state.backend.type: rocksdb
+        state.checkpoints.dir: file:///state/checkpoints
+        execution.checkpointing.max-concurrent-checkpoints: 1
+        restart-strategy.type: fixed-delay
+        restart-strategy.fixed-delay.attempts: 20
+        restart-strategy.fixed-delay.delay: 5s
+        taskmanager.host: taskmanager1
+      AWS_EC2_METADATA_DISABLED: 'true'
+    command:
+    - taskmanager
+    volumes:
+    - flink-state:/state
+  taskmanager2:
+    image: examples/orders-lakehouse-flink:2.3.0
+    cpus: 1
+    mem_limit: 1536m
+    networks:
+    - lab
+    build:
+      context: "."
+      dockerfile: docker/Dockerfile.flink
+    environment:
+      FLINK_PROPERTIES: |
+        jobmanager.rpc.address: jobmanager
+        jobmanager.memory.process.size: 1024m
+        taskmanager.memory.process.size: 1280m
+        taskmanager.numberOfTaskSlots: 1
+        parallelism.default: 2
+        rest.address: jobmanager
+        rest.bind-address: 0.0.0.0
+        state.backend.type: rocksdb
+        state.checkpoints.dir: file:///state/checkpoints
+        execution.checkpointing.max-concurrent-checkpoints: 1
+        restart-strategy.type: fixed-delay
+        restart-strategy.fixed-delay.attempts: 20
+        restart-strategy.fixed-delay.delay: 5s
+        taskmanager.host: taskmanager2
+      AWS_EC2_METADATA_DISABLED: 'true'
+    command:
+    - taskmanager
+    volumes:
+    - flink-state:/state
+  sql-client:
+    image: examples/orders-lakehouse-flink:2.3.0
+    cpus: 0.5
+    mem_limit: 1g
+    networks:
+    - lab
+    build:
+      context: "."
+      dockerfile: docker/Dockerfile.flink
+    environment:
+      FLINK_PROPERTIES: |
+        jobmanager.rpc.address: jobmanager
+        jobmanager.memory.process.size: 1024m
+        taskmanager.memory.process.size: 1280m
+        taskmanager.numberOfTaskSlots: 1
+        parallelism.default: 2
+        rest.address: jobmanager
+        rest.bind-address: 0.0.0.0
+        state.backend.type: rocksdb
+        state.checkpoints.dir: file:///state/checkpoints
+        execution.checkpointing.max-concurrent-checkpoints: 1
+        restart-strategy.type: fixed-delay
+        restart-strategy.fixed-delay.attempts: 20
+        restart-strategy.fixed-delay.delay: 5s
+      AWS_EC2_METADATA_DISABLED: 'true'
+    command:
+    - "/opt/flink/bin/sql-client.sh"
+    - "-f"
+    - "/app/pipeline.sql"
+    volumes:
+    - flink-state:/state
+    - "./.build/pipeline.sql:/app/pipeline.sql:ro"
+    profiles:
+    - tools
+    entrypoint:
+    - "/docker-entrypoint.sh"
+  spark-master:
+    image: examples/orders-lakehouse-spark:4.1.4
+    cpus: 0.125
+    mem_limit: 512m
+    networks:
+    - lab
+    build:
+      context: "."
+      dockerfile: docker/Dockerfile.spark
+    command:
+    - "/opt/spark/bin/spark-class"
+    - org.apache.spark.deploy.master.Master
+    - "--host"
+    - spark-master
+    volumes:
+    - spark-state:/data
+  spark-worker1:
+    image: examples/orders-lakehouse-spark:4.1.4
+    cpus: 1
+    mem_limit: 1536m
+    networks:
+    - lab
+    build:
+      context: "."
+      dockerfile: docker/Dockerfile.spark
+    command:
+    - "/opt/spark/bin/spark-class"
+    - org.apache.spark.deploy.worker.Worker
+    - "--host"
+    - spark-worker1
+    - "--cores"
+    - '1'
+    - "--memory"
+    - 1g
+    - spark://spark-master:7077
+    volumes:
+    - spark-state:/data
+  spark-worker2:
+    image: examples/orders-lakehouse-spark:4.1.4
+    cpus: 1
+    mem_limit: 1536m
+    networks:
+    - lab
+    build:
+      context: "."
+      dockerfile: docker/Dockerfile.spark
+    command:
+    - "/opt/spark/bin/spark-class"
+    - org.apache.spark.deploy.worker.Worker
+    - "--host"
+    - spark-worker2
+    - "--cores"
+    - '1'
+    - "--memory"
+    - 1g
+    - spark://spark-master:7077
+    volumes:
+    - spark-state:/data
+  spark-job:
+    image: examples/orders-lakehouse-spark:4.1.4
+    cpus: 1
+    mem_limit: 2g
+    networks:
+    - lab
+    build:
+      context: "."
+      dockerfile: docker/Dockerfile.spark
+    profiles:
+    - tools
+    entrypoint:
+    - "/opt/spark/bin/spark-submit"
+    - "--master"
+    - spark://spark-master:7077
+    - "--driver-memory"
+    - 1g
+    - "--executor-memory"
+    - 1g
+    - "--total-executor-cores"
+    - '2'
+    - "--conf"
+    - spark.driver.host=spark-job
+    - "--conf"
+    - spark.sql.shuffle.partitions=6
+    - "/app/jobs.py"
+    volumes:
+    - spark-state:/data
+  orders:
+    image: examples/orders-lakehouse-workload:1
+    cpus: 0.25
+    mem_limit: 256m
+    networks:
+    - lab
+    build:
+      context: "."
+      dockerfile: orders-workload/Dockerfile
+    profiles:
+    - tools
+    environment:
+      ORDER_COUNT: "${ORDER_COUNT:-1000000}"
+      CUSTOMER_COUNT: "${CUSTOMER_COUNT:-10000}"
+      INSERT_RATE: "${INSERT_RATE:-10000}"
+    entrypoint:
+    - "/producer"
+    volumes:
+    - witness:/witness
+  lake-control:
+    image: examples/orders-lakehouse-workload:1
+    cpus: 0.125
+    mem_limit: 256m
+    networks:
+    - lab
+    build:
+      context: "."
+      dockerfile: orders-workload/Dockerfile
+    profiles:
+    - tools
+    environment:
+      ORDER_COUNT: "${ORDER_COUNT:-1000000}"
+      CUSTOMER_COUNT: "${CUSTOMER_COUNT:-10000}"
+      INSERT_RATE: "${INSERT_RATE:-10000}"
+    entrypoint:
+    - "/lake-control"
+    volumes:
+    - witness:/witness
+  lake-oracle:
+    image: examples/orders-lakehouse-oracle:0.12.0
+    cpus: 0.5
+    mem_limit: 512m
+    networks:
+    - lab
+    build:
+      context: "."
+      dockerfile: docker/Dockerfile.oracle
+    profiles:
+    - tools
+    environment:
+      ORDER_COUNT: "${ORDER_COUNT:-1000000}"
+      CUSTOMER_COUNT: "${CUSTOMER_COUNT:-10000}"
+    volumes:
+    - witness:/witness:ro
+volumes:
+  master1: {}
+  etcd1: {}
+  volume1: {}
+  master2: {}
+  etcd2: {}
+  volume2: {}
+  master3: {}
+  etcd3: {}
+  volume3: {}
+  controller1: {}
+  broker1: {}
+  controller2: {}
+  broker2: {}
+  controller3: {}
+  broker3: {}
+  catalog-db: {}
+  flink-state: {}
+  witness: {}
+  spark-state: {}
+networks:
+  lab:
+    internal: true

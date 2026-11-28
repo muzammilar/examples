@@ -40,7 +40,7 @@ dependency services. MinIO is excluded from all new work in this batch.
 ## Pipelines after the deployment examples
 
 - [ ] **PostgreSQL → Debezium/Kafka → Flink → Doris.** Process order/customer CDC with out-of-order corrections, cancellations and dimension updates. Crash around a checkpoint and sink commit, then reconcile exact latest rows and totals at a common source watermark. Test the Doris connector's checkpoint/2PC mode separately from its asynchronous batch mode.
-- [ ] **Kafka → Flink → Iceberg on SeaweedFS → Spark.** Flink publishes table commits while Spark reads pinned snapshots and performs a bounded backfill or compaction. Interrupt publication and maintenance separately. Check snapshot ancestry, orphan files and every acknowledged input ID before cleanup.
+- [x] **Kafka → Flink → Iceberg on SeaweedFS → Spark.** [Bounded snapshot/maintenance recovery](../../pipelines/orders-lakehouse/) ran three million acknowledged events, blocked catalog publication, active compaction-worker loss, exact current/pinned reads and orphan-candidate inventory. Eight candidates were preserved; destructive expiry and independent restore remain unrun.
 - [ ] **HDFS → Spark → Doris.** Publish daily input partitions with manifests, join and aggregate them in Spark, then load Doris under stable batch identifiers. Fail an executor and a DataNode separately. Re-run the same input partition and verify its final rows and receipt count.
 - [ ] **Live Flink path plus Spark historical correction.** Feed recent orders through the CDC path and rebuild an older interval with Spark. Publish explicit source versions so a late live update survives backfill. Compare exact results after interrupted publication and retry.
 - [ ] **Matched ClickHouse control.** Use the same raw events, dimensions, deletion rules and settled watermark. Compare native serving queries and complete ingestion/processing/serving costs separately. Record preprocessing and materialization costs for every path, including ClickHouse.
@@ -205,7 +205,7 @@ remain open; this MDS result does not substitute for them.
 The current Ceph recovery fixture’s full teardown also passed after fresh body
 and namespace reconciliation; only curated outcomes are committed.
 
-### Upcoming Iceberg compatibility gate
+### Iceberg compatibility selection
 
 The current Iceberg 1.12.0 release publishes Flink 2.3 and Spark 4.1/4.0/3.5
 runtime artifacts, not a Spark 4.3 runtime. The HDFS/Spark/Doris path can use
@@ -231,5 +231,25 @@ published physical copies matched. The failed gate remains failed; eventual
 recovery is a separate result. Warm query trials are diagnostics, not a winner.
 Runtime/startup/parser/preflight findings and resource gaps remain documented.
 The full five-command lifecycle and final all-batch reconciliation passed;
-owned state was removed. Next is the compatible Iceberg pipeline above, followed
-by historical corrections/control and bounded remaining storage work.
+owned state was removed. The compatible Iceberg path is now recorded below;
+historical corrections/control and bounded remaining storage work follow.
+
+### Iceberg execution checkpoint — 2026-11-27
+
+[Snapshot recovery](../../pipelines/orders-lakehouse/) used native Iceberg 1.12.0,
+Flink 2.3.0, compatible Spark 4.1.4 and a PostgreSQL 19.0 JDBC catalog over local
+SeaweedFS RF3. Three million source ACKs reconciled exactly, including every field,
+Kafka offset and file partition. A proven blocked checkpoint-48 publication held
+8,000 records; its TaskManager was killed and the same job restored checkpoint 48.
+The separate compaction failure produced one native failed task and recovered
+119→9 file replacement while source ACKs continued. Old snapshots remained exact.
+Final 198 physical replica reads / 36,668,493 bytes matched; live Parquet column
+compression was 7.014×. Eight unreferenced candidates / 503,220 bytes were exported
+with host-verified hashes, alongside all source witnesses and Spark events.
+Retained setup, final drain and scoped teardown passed. Initial setup/adapter
+failures and CPU/I/O measurement gaps remain explicit. This is level-3 recovery
+evidence, not sustained capacity or an independent-host durability claim.
+
+Next: interleave a bounded storage recovery follow-up, then version-guarded live
+CDC plus Spark historical correction and the matched ClickHouse control. Do not
+reopen completed Flink/Doris deployment examples for optional deeper matrices.

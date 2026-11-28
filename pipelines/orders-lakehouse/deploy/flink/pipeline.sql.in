@@ -1,0 +1,35 @@
+SET 'execution.runtime-mode' = 'streaming';
+SET 'execution.attached' = 'false';
+SET 'pipeline.name' = 'orders-lakehouse';
+SET 'parallelism.default' = '2';
+SET 'execution.checkpointing.interval' = '5s';
+SET 'execution.checkpointing.timeout' = '120s';
+SET 'execution.checkpointing.min-pause' = '1s';
+SET 'execution.checkpointing.max-concurrent-checkpoints' = '1';
+SET 'execution.checkpointing.externalized-checkpoint-retention' = 'RETAIN_ON_CANCELLATION';
+@@CATALOG@@
+CREATE DATABASE IF NOT EXISTS lake.lab;
+CREATE TABLE IF NOT EXISTS lake.lab.orders (
+ phase STRING, order_id BIGINT, customer_id BIGINT, amount_cents BIGINT, region STRING,
+ order_revision BIGINT, customer_revision BIGINT, event_second BIGINT,
+ source_partition INT, source_offset BIGINT, customer_shard INT
+) PARTITIONED BY (phase,customer_shard) WITH (
+ 'format-version'='2', 'write.format.default'='parquet',
+ 'write.parquet.compression-codec'='zstd', 'write.target-file-size-bytes'='134217728'
+);
+CREATE TABLE input_orders (
+ phase STRING, order_id BIGINT, customer_id BIGINT, amount_cents BIGINT, region STRING,
+ order_revision BIGINT, customer_revision BIGINT, event_second BIGINT,
+ source_partition INT METADATA FROM 'partition' VIRTUAL,
+ source_offset BIGINT METADATA FROM 'offset' VIRTUAL
+) WITH (
+ 'connector'='kafka', 'topic'='lake-orders',
+ 'properties.bootstrap.servers'='broker1:9092,broker2:9092,broker3:9092',
+ 'properties.group.id'='orders-lakehouse', 'properties.isolation.level'='read_committed',
+ 'scan.startup.mode'='earliest-offset', 'format'='json',
+ 'json.fail-on-missing-field'='true', 'json.ignore-parse-errors'='false'
+);
+INSERT INTO lake.lab.orders
+ SELECT phase,order_id,customer_id,amount_cents,region,order_revision,customer_revision,
+ event_second,source_partition,source_offset,CAST(MOD(customer_id,3) AS INT)
+ FROM input_orders;

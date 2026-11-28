@@ -1,0 +1,17 @@
+FROM spark:4.1.4-scala2.13-java21-python3-ubuntu@sha256:cbd76af4bcc14057374006b6f217b812b1f5ebbb9e27b7dd7afbf25c0a62b3e7 AS distribution
+FROM eclipse-temurin:17-jre-noble@sha256:ad806840ae514b83d3d8e3a00a5c1b7302fb0a6ae02bbbaf8a8bf1ffdf5367c6
+RUN apt-get update && apt-get install -y --no-install-recommends python3 procps \
+    && rm -rf /var/lib/apt/lists/* \
+    && python3 -c 'import sys; assert sys.version_info >= (3,11)' \
+    && groupadd -g 185 spark && useradd -m -u 185 -g spark spark
+COPY --from=distribution --chown=185:185 /opt/spark /opt/spark
+ADD --chmod=0644 --checksum=sha256:3123c3798af642dd537230923548e013ef41cc28b6626e5225808cf5670a0f82 https://repo.maven.apache.org/maven2/org/apache/iceberg/iceberg-spark-runtime-4.1_2.13/1.12.0/iceberg-spark-runtime-4.1_2.13-1.12.0.jar /opt/spark/jars/
+ADD --chmod=0644 --checksum=sha256:dd7e49ffa4ac9b215bed846581991259e3aec9bb2fa08d6cec029c46cd66d957 https://repo.maven.apache.org/maven2/org/apache/iceberg/iceberg-aws-bundle/1.12.0/iceberg-aws-bundle-1.12.0.jar /opt/spark/jars/
+ADD --chmod=0644 --checksum=sha256:9776fca62dfc84f312d5c1aff9791f6f3cf56d518a8eca4a3a8dca7a95ef8881 https://repo.maven.apache.org/maven2/org/postgresql/postgresql/42.7.15/postgresql-42.7.15.jar /opt/spark/jars/
+COPY lake-oracle/ /app/
+COPY deploy/catalog.json /app/catalog.json
+RUN mkdir -p /data/events && chown -R 185:185 /data
+ENV SPARK_HOME=/opt/spark PATH=/opt/spark/bin:$PATH PYSPARK_PYTHON=/usr/bin/python3 \
+    AWS_EC2_METADATA_DISABLED=true
+USER 185
+WORKDIR /opt/spark

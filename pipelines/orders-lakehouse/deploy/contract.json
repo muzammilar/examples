@@ -1,0 +1,43 @@
+{
+  "workload": "append-only order events; logical key (phase,order_id)",
+  "seed": 0,
+  "default_orders_per_phase": 1000000,
+  "default_customers": 10000,
+  "phases": ["baseline", "live", "maintenance"],
+  "kafka": {
+    "partitions": 3,
+    "replication_factor": 3,
+    "min_in_sync_replicas": 2,
+    "acks": "all",
+    "partition": "customer_id modulo 3",
+    "idempotence": "same producer session; no blind application retry of ambiguous batches",
+    "durability_limit": "Kafka replication ACK, no physical power-loss or all-disk-loss qualification"
+  },
+  "iceberg": {
+    "format": 2,
+    "writer": "Flink checkpointed append",
+    "publication": "JDBC metadata pointer compare-and-swap; snapshot atomicity, not a cross-system transaction",
+    "partition": ["phase", "customer_shard"],
+    "source_offsets": "every committed row must exactly match an external acknowledged Kafka offset",
+    "reader": "Spark pinned snapshot plus independent PyIceberg/Arrow complete body oracle",
+    "maintenance": "native Spark rewrite_data_files while Flink appends",
+    "retention": "keep old snapshots/data for time travel; no destructive orphan expiry during live writes"
+  },
+  "seaweedfs": {
+    "replication": "200: three copies in three simulated zones",
+    "verification": "direct native full-body reads from all three volume owners for current data files",
+    "metadata": "three-member etcd; two filers; one S3 gateway"
+  },
+  "failures": {
+    "publication": "hold catalog table metadata row, prove blocked UPDATE, kill its TaskManager, release row lock and restart",
+    "maintenance": "kill a native active Spark executor's owned worker during rewrite, then restart",
+    "expected": "source ACKs and pinned old reads continue; eventual exact snapshots without missing or duplicate acknowledged events",
+    "post_fault_settlement_deadline_s": 240
+  },
+  "unsupported_claims": [
+    "No catalog/JobManager/Spark-driver HA or independent disk/AZ durability",
+    "No update/delete/merge semantics or serializable multi-engine transaction",
+    "No physical power-loss durability or independent backup restore",
+    "No sustained-capacity winner from paced diagnostic phases"
+  ]
+}

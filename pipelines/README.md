@@ -14,6 +14,11 @@ under their system directories. All infrastructure and credentials are local.
   live worker/DataNode failures and exact physical-copy readbacks ran. Stock HDFS
   repair missed the 180-second gate; all copies recovered automatically later.
 
+- [Iceberg snapshot recovery](orders-lakehouse/): Kafka → Flink → Iceberg on
+  local SeaweedFS → Spark. Three million acknowledged events, blocked-publication
+  recovery, active compaction-worker loss and pinned old snapshots passed exact
+  readback. Eight small unreferenced-file candidates are documented and exported.
+
 The [current batch plan](../docs/example-plans/flink-doris-spark-storage.md)
-tracks the subsequent Spark/HDFS/Doris, Iceberg and historical-correction paths,
-plus a matched ClickHouse control and bounded storage recovery follow-ups.
+tracks completed paths and remaining historical corrections, a matched
+ClickHouse control and bounded storage recovery follow-ups.

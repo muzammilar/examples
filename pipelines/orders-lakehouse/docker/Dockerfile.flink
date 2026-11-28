@@ -1,0 +1,13 @@
+FROM flink:2.3.0-scala_2.12-java17@sha256:4a3d00effd7e78f253e30e558700dd2c0474ffbc1840472fc198d87857b177f4
+ADD --chmod=0644 --checksum=sha256:08630bfc4bf1e82cf8d65fbdb04a97967216fc44acd4215708f9a5256fd2928a https://repo.maven.apache.org/maven2/org/apache/flink/flink-sql-connector-kafka/5.1.0-2.3/flink-sql-connector-kafka-5.1.0-2.3.jar /opt/flink/lib/
+ADD --chmod=0644 --checksum=sha256:c79bbee8792b1115c321e4be99fab3fb36db0bf8fa2bba24b481e6da14416de3 https://repo.maven.apache.org/maven2/org/apache/iceberg/iceberg-flink-runtime-2.3/1.12.0/iceberg-flink-runtime-2.3-1.12.0.jar /opt/flink/lib/
+ADD --chmod=0644 --checksum=sha256:dd7e49ffa4ac9b215bed846581991259e3aec9bb2fa08d6cec029c46cd66d957 https://repo.maven.apache.org/maven2/org/apache/iceberg/iceberg-aws-bundle/1.12.0/iceberg-aws-bundle-1.12.0.jar /opt/flink/lib/
+ADD --chmod=0644 --checksum=sha256:9776fca62dfc84f312d5c1aff9791f6f3cf56d518a8eca4a3a8dca7a95ef8881 https://repo.maven.apache.org/maven2/org/postgresql/postgresql/42.7.15/postgresql-42.7.15.jar /opt/flink/lib/
+ADD --chmod=0644 --checksum=sha256:cc59446ec9ebaceae56fdb8d8c21477766dc5d426325642151c796bec5c4e6b7 https://repo.maven.apache.org/maven2/org/apache/hadoop/hadoop-client-api/3.5.0/hadoop-client-api-3.5.0.jar /opt/flink/lib/
+ADD --chmod=0644 --checksum=sha256:b7db3e60c5df1cd37c2995b3e0142e57487260706834e5325bbe0a5e683eedf1 https://repo.maven.apache.org/maven2/org/apache/hadoop/hadoop-client-runtime/3.5.0/hadoop-client-runtime-3.5.0.jar /opt/flink/lib/
+USER root
+RUN mkdir /state && chown flink:flink /state
+COPY deploy/flink/ /app/
+ENV AWS_EC2_METADATA_DISABLED=true
+USER flink
+RUN test -r /opt/flink/lib/iceberg-flink-runtime-2.3-1.12.0.jar

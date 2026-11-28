@@ -1,0 +1,3683 @@
+{
+  "performance_depth": 3,
+  "phases": [
+    {
+      "passed": true,
+      "name": "candidate-preservation",
+      "started_ns": 1795829812698537000,
+      "ended_ns": 1795829839406516000,
+      "raw_path": "results/candidate-preservation-1795829812698500000",
+      "wall_s": 26.707979,
+      "source_manifest_sha256": "e9dec56e2d0d12c88855687b35ea5a5a5125860682c46060826b5d9e7af69a44",
+      "resources": {
+        "native_retained_role_deltas": {
+          "cpu_us": 1859373,
+          "rbytes": 1613824,
+          "wbytes": 73728,
+          "rios": 16,
+          "wios": 33
+        },
+        "native_delta_scope": "through pre-stop snapshot; shutdown tail unavailable",
+        "restarted_roles_excluded_from_delta": [],
+        "roles_stopped_before_final_counter": [],
+        "roles_created_within_phase_from_zero": [
+          "etcd1",
+          "etcd2",
+          "etcd3",
+          "filer1",
+          "filer2",
+          "master1",
+          "master2",
+          "master3",
+          "s3",
+          "volume1",
+          "volume2",
+          "volume3"
+        ],
+        "roles_with_unavailable_native_counters": [
+          "etcd1",
+          "etcd2",
+          "etcd3"
+        ],
+        "actor_lifetime_counters": [],
+        "sampled_aggregate_memory_peak_bytes": 650976952,
+        "sampled_aggregate_memory_mean_bytes": 413684203.4,
+        "sampled_cpu_peak_percent_one_core_100": 10.2,
+        "sampled_cpu_mean_percent_one_core_100": 6.632,
+        "sample_count": 5,
+        "limitations": [
+          "Phase native deltas exclude restarted roles; newly created roles use their full within-phase counters. Actor lifetimes are separate.",
+          "Docker memory samples use rounded display values and can miss short peaks; native actor memory.peak is separately retained.",
+          "Stopped roles without a final counter are unavailable, not zero; shutdown work is not inferred.",
+          "No physical device service-time measurement."
+        ],
+        "observed_native_plus_actor_lower_bound": {
+          "cpu_us": 1859373,
+          "rbytes": 1613824,
+          "wbytes": 73728,
+          "rios": 16,
+          "wios": 33
+        }
+      },
+      "producer_1000_record_batch_with_witness_timing": null,
+      "pinned_old_parquet_body_read_timing": null,
+      "candidate-export": {
+        "files": 8,
+        "bytes": 503220,
+        "host_sha256_verified": true
+      }
+    },
+    {
+      "passed": true,
+      "name": "compaction-failure",
+      "started_ns": 1795829278030955000,
+      "ended_ns": 1795829440812031000,
+      "raw_path": "results/compaction-failure-1795829278030899000",
+      "wall_s": 162.781076,
+      "source_manifest_sha256": "fd2a220df936ca3891df963657c7222ba65e3a0445837ab4be5bbeec0114e61a",
+      "resources": {
+        "native_retained_role_deltas": {
+          "cpu_us": 64111754,
+          "rbytes": 49152,
+          "wbytes": 119930880,
+          "rios": 3,
+          "wios": 7874
+        },
+        "native_delta_scope": "phase end",
+        "restarted_roles_excluded_from_delta": [
+          "spark-worker2"
+        ],
+        "roles_stopped_before_final_counter": [],
+        "roles_created_within_phase_from_zero": [],
+        "roles_with_unavailable_native_counters": [
+          "etcd1",
+          "etcd2",
+          "etcd3"
+        ],
+        "actor_lifetime_counters": [
+          {
+            "log": "orders-lakehouse-orders-1795829283101782000.log",
+            "counters": {
+              "cpu_us": 3395831,
+              "rbytes": 0,
+              "wbytes": 52461568,
+              "rios": 0,
+              "wios": 3070,
+              "memory.current": 61607936,
+              "memory.peak": 62324736
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-oracle-1795829384101413000.log",
+            "counters": {
+              "cpu_us": 203193,
+              "memory.current": 52449280,
+              "memory.peak": 52498432,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-control-1795829438060330000.log",
+            "counters": {
+              "cpu_us": 11024,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0,
+              "memory.current": 5750784,
+              "memory.peak": 6238208
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-control-1795829383645586000.log",
+            "counters": {
+              "cpu_us": 11956,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0,
+              "memory.current": 8208384,
+              "memory.peak": 8208384
+            }
+          },
+          {
+            "log": "orders-lakehouse-spark-job-1795829422751870000.log",
+            "counters": {
+              "cpu_us": 9599185,
+              "memory.current": 461643776,
+              "memory.peak": 469598208,
+              "rbytes": 0,
+              "wbytes": 913408,
+              "rios": 0,
+              "wios": 3
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-control-1795829386991799000.log",
+            "counters": {
+              "cpu_us": 11876,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0,
+              "memory.current": 7958528,
+              "memory.peak": 8445952
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-oracle-1795829388538728000.log",
+            "counters": {
+              "cpu_us": 5326742,
+              "memory.current": 191025152,
+              "memory.peak": 230948864,
+              "rbytes": 0,
+              "wbytes": 4096,
+              "rios": 0,
+              "wios": 1
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-oracle-1795829281095103000.log",
+            "counters": {
+              "cpu_us": 372974,
+              "memory.current": 57188352,
+              "memory.peak": 58478592,
+              "rbytes": 0,
+              "wbytes": 4096,
+              "rios": 0,
+              "wios": 1
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-oracle-1795829280131791000.log",
+            "counters": {
+              "cpu_us": 196914,
+              "memory.current": 52031488,
+              "memory.peak": 52031488,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0
+            }
+          },
+          {
+            "log": "orders-lakehouse-spark-job-1795829399677841000.log",
+            "counters": {
+              "cpu_us": 9348362,
+              "memory.current": 457723904,
+              "memory.peak": 465776640,
+              "rbytes": 0,
+              "wbytes": 913408,
+              "rios": 0,
+              "wios": 3
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-oracle-1795829414768479000.log",
+            "counters": {
+              "cpu_us": 3730484,
+              "memory.current": 219840512,
+              "memory.peak": 244862976,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0
+            }
+          },
+          {
+            "log": "orders-lakehouse-spark-job-1795829286895032000.log",
+            "counters": {
+              "cpu_us": 12000316,
+              "memory.current": 494313472,
+              "memory.peak": 522137600,
+              "rbytes": 479232,
+              "wbytes": 1171456,
+              "rios": 32,
+              "wios": 49
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-oracle-1795829387521982000.log",
+            "counters": {
+              "cpu_us": 202090,
+              "memory.current": 52281344,
+              "memory.peak": 52330496,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-control-1795829279581586000.log",
+            "counters": {
+              "cpu_us": 12789,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0,
+              "memory.current": 5595136,
+              "memory.peak": 6492160
+            }
+          }
+        ],
+        "sampled_aggregate_memory_peak_bytes": 7403397448,
+        "sampled_aggregate_memory_mean_bytes": 6307005962.64,
+        "sampled_cpu_peak_percent_one_core_100": 263.04,
+        "sampled_cpu_mean_percent_one_core_100": 76.6484,
+        "sample_count": 25,
+        "limitations": [
+          "Phase native deltas exclude restarted roles; newly created roles use their full within-phase counters. Actor lifetimes are separate.",
+          "Docker memory samples use rounded display values and can miss short peaks; native actor memory.peak is separately retained.",
+          "Stopped roles without a final counter are unavailable, not zero; shutdown work is not inferred.",
+          "No physical device service-time measurement."
+        ],
+        "observed_native_plus_actor_lower_bound": {
+          "cpu_us": 108535490,
+          "rbytes": 528384,
+          "wbytes": 175398912,
+          "rios": 35,
+          "wios": 11001
+        }
+      },
+      "producer_1000_record_batch_with_witness_timing": {
+        "count": 1000,
+        "mean_ms": 6.220735615,
+        "p50_ms": 4.760125,
+        "p99_ms": 62.388709,
+        "max_ms": 73.574,
+        "p999_ms": null,
+        "note": "Nearest-rank p99; fewer than 100 samples makes p99 effectively maximum; no established p99.9"
+      },
+      "pinned_old_parquet_body_read_timing": {
+        "count": 77,
+        "mean_ms": 4.152087610402139,
+        "p50_ms": 3.0659169999580627,
+        "p99_ms": 31.778499999973064,
+        "max_ms": 31.778499999973064,
+        "p999_ms": null,
+        "note": "Nearest-rank p99; fewer than 100 samples makes p99 effectively maximum; no established p99.9"
+      },
+      "compaction_receipts": [
+        [
+          {
+            "rewritten_data_files_count": 119,
+            "added_data_files_count": 9,
+            "rewritten_bytes_count": 9300641,
+            "failed_data_files_count": 0,
+            "removed_delete_files_count": 0
+          }
+        ]
+      ],
+      "recovery": {
+        "passed": true,
+        "before_acks": 146000,
+        "outage_acks": 249000,
+        "final": {
+          "snapshot": 318959209154034940,
+          "metadata": "s3://warehouse/lab/orders/metadata/00064-873b6b10-b5e1-4c7f-91af-4fd58c822a18.metadata.json",
+          "table_uuid": "cd37e74d-07af-4423-9d8f-ba0a4ac58e03",
+          "snapshot_count": 64,
+          "oracle": {
+            "passed": true,
+            "metadata": "s3://warehouse/lab/orders/metadata/00064-873b6b10-b5e1-4c7f-91af-4fd58c822a18.metadata.json",
+            "snapshot": 318959209154034940,
+            "parent": 2486447826613199841,
+            "phases": [
+              "baseline",
+              "live",
+              "maintenance"
+            ],
+            "rows": 3000000,
+            "files": 66,
+            "file_bytes": 12222831,
+            "column_uncompressed_bytes": 84150406,
+            "column_compressed_bytes": 11998051,
+            "native_replica_reads": 0,
+            "native_replica_bytes": 0,
+            "compression_ratio": 7.013672970718328
+          },
+          "spark": {
+            "snapshot": 318959209154034940,
+            "aggregates": [
+              {
+                "phase": "baseline",
+                "rows": 1000000,
+                "distinct_ids": 1000000,
+                "cents": 599500000,
+                "customers": 10000
+              },
+              {
+                "phase": "live",
+                "rows": 1000000,
+                "distinct_ids": 1000000,
+                "cents": 599500000,
+                "customers": 10000
+              },
+              {
+                "phase": "maintenance",
+                "rows": 1000000,
+                "distinct_ids": 1000000,
+                "cents": 599500000,
+                "customers": 10000
+              }
+            ]
+          }
+        },
+        "frozen_read": {
+          "snapshot": 6340307485312732131,
+          "metadata": "s3://warehouse/lab/orders/metadata/00042-ee7393c7-131c-4806-9e4a-3ad274509d97.metadata.json",
+          "table_uuid": "cd37e74d-07af-4423-9d8f-ba0a4ac58e03",
+          "snapshot_count": 42,
+          "oracle": {
+            "passed": true,
+            "metadata": "s3://warehouse/lab/orders/metadata/00042-ee7393c7-131c-4806-9e4a-3ad274509d97.metadata.json",
+            "snapshot": 6340307485312732131,
+            "parent": 6526280173798680781,
+            "phases": [
+              "baseline",
+              "live"
+            ],
+            "rows": 2000000,
+            "files": 113,
+            "file_bytes": 8909876,
+            "column_uncompressed_bytes": 58463708,
+            "column_compressed_bytes": 8581976,
+            "native_replica_reads": 0,
+            "native_replica_bytes": 0,
+            "compression_ratio": 6.812383068887631
+          },
+          "spark": {
+            "snapshot": 6340307485312732131,
+            "aggregates": [
+              {
+                "phase": "baseline",
+                "rows": 1000000,
+                "distinct_ids": 1000000,
+                "cents": 599500000,
+                "customers": 10000
+              },
+              {
+                "phase": "live",
+                "rows": 1000000,
+                "distinct_ids": 1000000,
+                "cents": 599500000,
+                "customers": 10000
+              }
+            ]
+          }
+        },
+        "app_id": "app-20261128012809-0004"
+      },
+      "fault": {
+        "role": "spark-worker2",
+        "exit_code": 137,
+        "oom": false,
+        "killed_at": "2026-11-28T01:28:18.112031468Z",
+        "restarted_at": "2026-11-28T01:28:28.354620292Z",
+        "process_down_s": 10.242589
+      },
+      "failed_spark_tasks": [
+        {
+          "stage": 0,
+          "reason": {
+            "Reason": "ExecutorLostFailure",
+            "Executor ID": "0",
+            "Exit Caused By App": false,
+            "Loss Reason": "worker lost: spark-worker2:37815 got disassociated"
+          }
+        }
+      ],
+      "storage_samples": [
+        {
+          "orders-lakehouse_controller1": {
+            "apparent_bytes": 21137467,
+            "allocated_bytes": 200704,
+            "files": 9,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_broker2": {
+            "apparent_bytes": 176434827,
+            "allocated_bytes": 44875776,
+            "files": 278,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_etcd2": {
+            "apparent_bytes": 144801792,
+            "allocated_bytes": 129007616,
+            "files": 3,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_broker3": {
+            "apparent_bytes": 176434827,
+            "allocated_bytes": 44875776,
+            "files": 278,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_witness": {
+            "apparent_bytes": 132475404,
+            "allocated_bytes": 132497408,
+            "files": 4,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_controller2": {
+            "apparent_bytes": 21137467,
+            "allocated_bytes": 200704,
+            "files": 9,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_etcd1": {
+            "apparent_bytes": 144801792,
+            "allocated_bytes": 128991232,
+            "files": 3,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_flink-state": {
+            "apparent_bytes": 3186,
+            "allocated_bytes": 4096,
+            "files": 1,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_master3": {
+            "apparent_bytes": 1089,
+            "allocated_bytes": 12288,
+            "files": 3,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_etcd3": {
+            "apparent_bytes": 144801792,
+            "allocated_bytes": 128978944,
+            "files": 3,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_volume3": {
+            "apparent_bytes": 26370595,
+            "allocated_bytes": 26460160,
+            "files": 20,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_master1": {
+            "apparent_bytes": 1471,
+            "allocated_bytes": 16384,
+            "files": 4,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_broker1": {
+            "apparent_bytes": 176434835,
+            "allocated_bytes": 44879872,
+            "files": 278,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_volume2": {
+            "apparent_bytes": 26370595,
+            "allocated_bytes": 26460160,
+            "files": 20,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_catalog-db": {
+            "apparent_bytes": 65903334,
+            "allocated_bytes": 65982464,
+            "files": 1287,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_master2": {
+            "apparent_bytes": 1089,
+            "allocated_bytes": 12288,
+            "files": 3,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_spark-state": {
+            "apparent_bytes": 3512949,
+            "allocated_bytes": 3522560,
+            "files": 7,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_controller3": {
+            "apparent_bytes": 21137468,
+            "allocated_bytes": 200704,
+            "files": 9,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_volume1": {
+            "apparent_bytes": 26370595,
+            "allocated_bytes": 26460160,
+            "files": 20,
+            "concurrently_vanished_entries": 0
+          }
+        }
+      ]
+    },
+    {
+      "passed": true,
+      "name": "docker-down",
+      "started_ns": 1795829891691252000,
+      "ended_ns": 1795829892454812000,
+      "raw_path": "results/docker-down-1795829891691185000",
+      "wall_s": 0.76356,
+      "source_manifest_sha256": "a814a7653c414a1f403760476e9c3773a2b7d8fac0e0dabaa7049c9749a12d7d",
+      "resources": {
+        "unavailable": "No full collector window; see failure/status"
+      },
+      "producer_1000_record_batch_with_witness_timing": null,
+      "pinned_old_parquet_body_read_timing": null,
+      "remnants": {}
+    },
+    {
+      "passed": false,
+      "name": "docker-up",
+      "started_ns": 1795828092973256000,
+      "error": "unsupported operand type(s) for +: 'int' and 'str'",
+      "ended_ns": 1795828093413386000,
+      "raw_path": "results/docker-up-1795828092973214000",
+      "wall_s": 0.44013,
+      "resources": {
+        "unavailable": "No full collector window; see failure/status"
+      },
+      "producer_1000_record_batch_with_witness_timing": null,
+      "pinned_old_parquet_body_read_timing": null
+    },
+    {
+      "passed": true,
+      "name": "docker-up",
+      "started_ns": 1795828102775774000,
+      "ended_ns": 1795828361644659000,
+      "raw_path": "results/docker-up-1795828102775706000",
+      "wall_s": 258.868885,
+      "resources": {
+        "native_retained_role_deltas": {
+          "cpu_us": 49741670,
+          "rbytes": 306958336,
+          "wbytes": 131805184,
+          "rios": 4937,
+          "wios": 3358
+        },
+        "native_delta_scope": "phase end",
+        "restarted_roles_excluded_from_delta": [],
+        "roles_stopped_before_final_counter": [],
+        "roles_created_within_phase_from_zero": [
+          "broker1",
+          "broker2",
+          "broker3",
+          "catalog-db",
+          "controller1",
+          "controller2",
+          "controller3",
+          "etcd1",
+          "etcd2",
+          "etcd3",
+          "filer1",
+          "filer2",
+          "jobmanager",
+          "master1",
+          "master2",
+          "master3",
+          "s3",
+          "spark-master",
+          "spark-worker1",
+          "spark-worker2",
+          "taskmanager1",
+          "taskmanager2",
+          "volume1",
+          "volume2",
+          "volume3"
+        ],
+        "roles_with_unavailable_native_counters": [
+          "etcd1",
+          "etcd2",
+          "etcd3"
+        ],
+        "actor_lifetime_counters": [
+          {
+            "log": "orders-lakehouse-lake-control-1795828358310989000.log",
+            "counters": {
+              "cpu_us": 11975,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0,
+              "memory.current": 6762496,
+              "memory.peak": 7995392
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-control-1795828351197196000.log",
+            "counters": {
+              "cpu_us": 14663,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0,
+              "memory.current": 6057984,
+              "memory.peak": 6320128
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-control-1795828357831264000.log",
+            "counters": {
+              "cpu_us": 11561,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0,
+              "memory.current": 5570560,
+              "memory.peak": 5808128
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-control-1795828357127262000.log",
+            "counters": {
+              "cpu_us": 12078,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0,
+              "memory.current": 5591040,
+              "memory.peak": 6844416
+            }
+          }
+        ],
+        "sampled_aggregate_memory_peak_bytes": 4656418783,
+        "sampled_aggregate_memory_mean_bytes": 3513313132.5,
+        "sampled_cpu_peak_percent_one_core_100": 396.32,
+        "sampled_cpu_mean_percent_one_core_100": 190.59,
+        "sample_count": 4,
+        "limitations": [
+          "Phase native deltas exclude restarted roles; newly created roles use their full within-phase counters. Actor lifetimes are separate.",
+          "Docker memory samples use rounded display values and can miss short peaks; native actor memory.peak is separately retained.",
+          "Stopped roles without a final counter are unavailable, not zero; shutdown work is not inferred.",
+          "No physical device service-time measurement."
+        ],
+        "observed_native_plus_actor_lower_bound": {
+          "cpu_us": 49791947,
+          "rbytes": 306958336,
+          "wbytes": 131805184,
+          "rios": 4937,
+          "wios": 3358
+        }
+      },
+      "producer_1000_record_batch_with_witness_timing": null,
+      "pinned_old_parquet_body_read_timing": null,
+      "storage_samples": [
+        {
+          "orders-lakehouse_controller1": {
+            "apparent_bytes": 20975863,
+            "allocated_bytes": 24576,
+            "files": 9,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_broker2": {
+            "apparent_bytes": 27267497,
+            "allocated_bytes": 45056,
+            "files": 28,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_etcd2": {
+            "apparent_bytes": 144801792,
+            "allocated_bytes": 128036864,
+            "files": 3,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_broker3": {
+            "apparent_bytes": 27267569,
+            "allocated_bytes": 45056,
+            "files": 28,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_witness": {
+            "apparent_bytes": 0,
+            "allocated_bytes": 0,
+            "files": 0,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_controller2": {
+            "apparent_bytes": 20975935,
+            "allocated_bytes": 24576,
+            "files": 9,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_etcd1": {
+            "apparent_bytes": 144801792,
+            "allocated_bytes": 128032768,
+            "files": 3,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_flink-state": {
+            "apparent_bytes": 0,
+            "allocated_bytes": 0,
+            "files": 0,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_master3": {
+            "apparent_bytes": 513,
+            "allocated_bytes": 12288,
+            "files": 3,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_etcd3": {
+            "apparent_bytes": 144801792,
+            "allocated_bytes": 128032768,
+            "files": 3,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_volume3": {
+            "apparent_bytes": 105,
+            "allocated_bytes": 8192,
+            "files": 2,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_master1": {
+            "apparent_bytes": 895,
+            "allocated_bytes": 16384,
+            "files": 4,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_broker1": {
+            "apparent_bytes": 27267569,
+            "allocated_bytes": 45056,
+            "files": 28,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_volume2": {
+            "apparent_bytes": 105,
+            "allocated_bytes": 8192,
+            "files": 2,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_catalog-db": {
+            "apparent_bytes": 48622278,
+            "allocated_bytes": 48693248,
+            "files": 1274,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_master2": {
+            "apparent_bytes": 513,
+            "allocated_bytes": 12288,
+            "files": 3,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_spark-state": {
+            "apparent_bytes": 0,
+            "allocated_bytes": 0,
+            "files": 0,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_controller3": {
+            "apparent_bytes": 20975936,
+            "allocated_bytes": 24576,
+            "files": 9,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_volume1": {
+            "apparent_bytes": 105,
+            "allocated_bytes": 8192,
+            "files": 2,
+            "concurrently_vanished_entries": 0
+          }
+        }
+      ]
+    },
+    {
+      "passed": true,
+      "name": "docker-up",
+      "started_ns": 1795828385086191000,
+      "ended_ns": 1795828481062296000,
+      "raw_path": "results/docker-up-1795828385086156000",
+      "wall_s": 95.976105,
+      "source_manifest_sha256": "0009b9192260b0c94ac70077c8ea1b3e721996e0d84e04adbe546625ea8b2442",
+      "resources": {
+        "native_retained_role_deltas": {
+          "cpu_us": 24366470,
+          "rbytes": 0,
+          "wbytes": 76820480,
+          "rios": 0,
+          "wios": 1162
+        },
+        "native_delta_scope": "phase end",
+        "restarted_roles_excluded_from_delta": [],
+        "roles_stopped_before_final_counter": [
+          "jobmanager",
+          "spark-master",
+          "spark-worker1",
+          "spark-worker2",
+          "taskmanager1",
+          "taskmanager2"
+        ],
+        "roles_created_within_phase_from_zero": [
+          "jobmanager",
+          "spark-master",
+          "spark-worker1",
+          "spark-worker2",
+          "taskmanager1",
+          "taskmanager2"
+        ],
+        "roles_with_unavailable_native_counters": [
+          "etcd1",
+          "etcd2",
+          "etcd3"
+        ],
+        "actor_lifetime_counters": [
+          {
+            "log": "orders-lakehouse-lake-control-1795828476766261000.log",
+            "counters": {
+              "cpu_us": 13505,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0,
+              "memory.current": 7979008,
+              "memory.peak": 7979008
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-control-1795828477151502000.log",
+            "counters": {
+              "cpu_us": 11096,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0,
+              "memory.current": 5754880,
+              "memory.peak": 6234112
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-control-1795828477616681000.log",
+            "counters": {
+              "cpu_us": 12043,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0,
+              "memory.current": 6107136,
+              "memory.peak": 7933952
+            }
+          }
+        ],
+        "sampled_aggregate_memory_peak_bytes": 4667348091,
+        "sampled_aggregate_memory_mean_bytes": 4534357197,
+        "sampled_cpu_peak_percent_one_core_100": 82.23,
+        "sampled_cpu_mean_percent_one_core_100": 50.10666666666667,
+        "sample_count": 3,
+        "limitations": [
+          "Phase native deltas exclude restarted roles; newly created roles use their full within-phase counters. Actor lifetimes are separate.",
+          "Docker memory samples use rounded display values and can miss short peaks; native actor memory.peak is separately retained.",
+          "Stopped roles without a final counter are unavailable, not zero; shutdown work is not inferred.",
+          "No physical device service-time measurement."
+        ],
+        "observed_native_plus_actor_lower_bound": {
+          "cpu_us": 24403114,
+          "rbytes": 0,
+          "wbytes": 76820480,
+          "rios": 0,
+          "wios": 1162
+        }
+      },
+      "producer_1000_record_batch_with_witness_timing": null,
+      "pinned_old_parquet_body_read_timing": null,
+      "storage_samples": [
+        {
+          "orders-lakehouse_controller1": {
+            "apparent_bytes": 20993071,
+            "allocated_bytes": 57344,
+            "files": 9,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_broker2": {
+            "apparent_bytes": 27284761,
+            "allocated_bytes": 86016,
+            "files": 28,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_etcd2": {
+            "apparent_bytes": 144801792,
+            "allocated_bytes": 128061440,
+            "files": 3,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_broker3": {
+            "apparent_bytes": 27284761,
+            "allocated_bytes": 86016,
+            "files": 28,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_witness": {
+            "apparent_bytes": 0,
+            "allocated_bytes": 0,
+            "files": 0,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_controller2": {
+            "apparent_bytes": 20993071,
+            "allocated_bytes": 57344,
+            "files": 9,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_etcd1": {
+            "apparent_bytes": 144801792,
+            "allocated_bytes": 128061440,
+            "files": 3,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_flink-state": {
+            "apparent_bytes": 0,
+            "allocated_bytes": 0,
+            "files": 0,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_master3": {
+            "apparent_bytes": 801,
+            "allocated_bytes": 12288,
+            "files": 3,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_etcd3": {
+            "apparent_bytes": 144801792,
+            "allocated_bytes": 128045056,
+            "files": 3,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_volume3": {
+            "apparent_bytes": 1738,
+            "allocated_bytes": 40960,
+            "files": 11,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_master1": {
+            "apparent_bytes": 1183,
+            "allocated_bytes": 16384,
+            "files": 4,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_broker1": {
+            "apparent_bytes": 27284761,
+            "allocated_bytes": 86016,
+            "files": 28,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_volume2": {
+            "apparent_bytes": 1738,
+            "allocated_bytes": 40960,
+            "files": 11,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_catalog-db": {
+            "apparent_bytes": 48866006,
+            "allocated_bytes": 48939008,
+            "files": 1275,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_master2": {
+            "apparent_bytes": 801,
+            "allocated_bytes": 12288,
+            "files": 3,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_spark-state": {
+            "apparent_bytes": 0,
+            "allocated_bytes": 0,
+            "files": 0,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_controller3": {
+            "apparent_bytes": 20993072,
+            "allocated_bytes": 57344,
+            "files": 9,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_volume1": {
+            "apparent_bytes": 1738,
+            "allocated_bytes": 40960,
+            "files": 11,
+            "concurrently_vanished_entries": 0
+          }
+        }
+      ]
+    },
+    {
+      "passed": true,
+      "name": "docker-up",
+      "started_ns": 1795828767372629000,
+      "ended_ns": 1795828791707035000,
+      "raw_path": "results/docker-up-1795828767372588000",
+      "wall_s": 24.334406,
+      "source_manifest_sha256": "9e7e4df79f93a780af95669f78dcb83924924327e43451c518ea1a3140844c46",
+      "resources": {
+        "native_retained_role_deltas": {
+          "cpu_us": 23733318,
+          "rbytes": 0,
+          "wbytes": 76701696,
+          "rios": 0,
+          "wios": 1144
+        },
+        "native_delta_scope": "phase end",
+        "restarted_roles_excluded_from_delta": [],
+        "roles_stopped_before_final_counter": [
+          "jobmanager",
+          "spark-master",
+          "spark-worker1",
+          "spark-worker2",
+          "taskmanager1",
+          "taskmanager2"
+        ],
+        "roles_created_within_phase_from_zero": [
+          "jobmanager",
+          "spark-master",
+          "spark-worker1",
+          "spark-worker2",
+          "taskmanager1",
+          "taskmanager2"
+        ],
+        "roles_with_unavailable_native_counters": [
+          "etcd1",
+          "etcd2",
+          "etcd3"
+        ],
+        "actor_lifetime_counters": [
+          {
+            "log": "orders-lakehouse-lake-control-1795828788451036000.log",
+            "counters": {
+              "cpu_us": 11477,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0,
+              "memory.current": 5857280,
+              "memory.peak": 7368704
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-control-1795828787548038000.log",
+            "counters": {
+              "cpu_us": 12228,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0,
+              "memory.current": 5718016,
+              "memory.peak": 6127616
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-control-1795828787998820000.log",
+            "counters": {
+              "cpu_us": 11213,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0,
+              "memory.current": 5603328,
+              "memory.peak": 6352896
+            }
+          }
+        ],
+        "sampled_aggregate_memory_peak_bytes": 4758752461,
+        "sampled_aggregate_memory_mean_bytes": 4585947136,
+        "sampled_cpu_peak_percent_one_core_100": 111.78,
+        "sampled_cpu_mean_percent_one_core_100": 63.723333333333336,
+        "sample_count": 3,
+        "limitations": [
+          "Phase native deltas exclude restarted roles; newly created roles use their full within-phase counters. Actor lifetimes are separate.",
+          "Docker memory samples use rounded display values and can miss short peaks; native actor memory.peak is separately retained.",
+          "Stopped roles without a final counter are unavailable, not zero; shutdown work is not inferred.",
+          "No physical device service-time measurement."
+        ],
+        "observed_native_plus_actor_lower_bound": {
+          "cpu_us": 23768236,
+          "rbytes": 0,
+          "wbytes": 76701696,
+          "rios": 0,
+          "wios": 1144
+        }
+      },
+      "producer_1000_record_batch_with_witness_timing": null,
+      "pinned_old_parquet_body_read_timing": null,
+      "storage_samples": [
+        {
+          "orders-lakehouse_controller1": {
+            "apparent_bytes": 21037711,
+            "allocated_bytes": 98304,
+            "files": 9,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_broker2": {
+            "apparent_bytes": 27329401,
+            "allocated_bytes": 126976,
+            "files": 28,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_etcd2": {
+            "apparent_bytes": 144801792,
+            "allocated_bytes": 128061440,
+            "files": 3,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_broker3": {
+            "apparent_bytes": 27329401,
+            "allocated_bytes": 126976,
+            "files": 28,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_witness": {
+            "apparent_bytes": 0,
+            "allocated_bytes": 0,
+            "files": 0,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_controller2": {
+            "apparent_bytes": 21037711,
+            "allocated_bytes": 98304,
+            "files": 9,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_etcd1": {
+            "apparent_bytes": 144801792,
+            "allocated_bytes": 128061440,
+            "files": 3,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_flink-state": {
+            "apparent_bytes": 0,
+            "allocated_bytes": 0,
+            "files": 0,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_master3": {
+            "apparent_bytes": 1089,
+            "allocated_bytes": 12288,
+            "files": 3,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_etcd3": {
+            "apparent_bytes": 144801792,
+            "allocated_bytes": 128057344,
+            "files": 3,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_volume3": {
+            "apparent_bytes": 4891,
+            "allocated_bytes": 73728,
+            "files": 20,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_master1": {
+            "apparent_bytes": 1471,
+            "allocated_bytes": 16384,
+            "files": 4,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_broker1": {
+            "apparent_bytes": 27329401,
+            "allocated_bytes": 126976,
+            "files": 28,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_volume2": {
+            "apparent_bytes": 4891,
+            "allocated_bytes": 73728,
+            "files": 20,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_catalog-db": {
+            "apparent_bytes": 65870566,
+            "allocated_bytes": 65949696,
+            "files": 1285,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_master2": {
+            "apparent_bytes": 1089,
+            "allocated_bytes": 12288,
+            "files": 3,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_spark-state": {
+            "apparent_bytes": 0,
+            "allocated_bytes": 0,
+            "files": 0,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_controller3": {
+            "apparent_bytes": 21037712,
+            "allocated_bytes": 98304,
+            "files": 9,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_volume1": {
+            "apparent_bytes": 4891,
+            "allocated_bytes": 73728,
+            "files": 20,
+            "concurrently_vanished_entries": 0
+          }
+        }
+      ]
+    },
+    {
+      "passed": true,
+      "name": "down",
+      "started_ns": 1795829570756007000,
+      "ended_ns": 1795829669304531000,
+      "raw_path": "results/down-1795829570755973000",
+      "wall_s": 98.548524,
+      "source_manifest_sha256": "e644a8cddfd2d5d62e6366ee212e251c5cc8cedfe50f56a75c6f67aca9e77626",
+      "resources": {
+        "native_retained_role_deltas": {
+          "cpu_us": 6312249,
+          "rbytes": 0,
+          "wbytes": 4685824,
+          "rios": 0,
+          "wios": 2909
+        },
+        "native_delta_scope": "through pre-stop snapshot; shutdown tail unavailable",
+        "restarted_roles_excluded_from_delta": [],
+        "roles_stopped_before_final_counter": [
+          "jobmanager",
+          "spark-master",
+          "spark-worker1",
+          "spark-worker2",
+          "taskmanager1",
+          "taskmanager2"
+        ],
+        "roles_created_within_phase_from_zero": [],
+        "roles_with_unavailable_native_counters": [
+          "etcd1",
+          "etcd2",
+          "etcd3"
+        ],
+        "actor_lifetime_counters": [
+          {
+            "log": "orders-lakehouse-lake-oracle-1795829572789493000.log",
+            "counters": {
+              "cpu_us": 201610,
+              "memory.current": 52064256,
+              "memory.peak": 52113408,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-control-1795829572313527000.log",
+            "counters": {
+              "cpu_us": 11926,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0,
+              "memory.current": 5840896,
+              "memory.peak": 6332416
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-oracle-1795829573718127000.log",
+            "counters": {
+              "cpu_us": 5423222,
+              "memory.current": 189779968,
+              "memory.peak": 225656832,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-oracle-1795829606114722000.log",
+            "counters": {
+              "cpu_us": 5429113,
+              "memory.current": 188133376,
+              "memory.peak": 225644544,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0
+            }
+          },
+          {
+            "log": "orders-lakehouse-spark-job-1795829617455092000.log",
+            "counters": {
+              "cpu_us": 9258648,
+              "memory.current": 462974976,
+              "memory.peak": 470065152,
+              "rbytes": 0,
+              "wbytes": 913408,
+              "rios": 0,
+              "wios": 3
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-oracle-1795829632475616000.log",
+            "counters": {
+              "cpu_us": 347261,
+              "memory.current": 53104640,
+              "memory.peak": 53334016,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-control-1795829604668100000.log",
+            "counters": {
+              "cpu_us": 11628,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0,
+              "memory.current": 5566464,
+              "memory.peak": 5996544
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-control-1795829631973646000.log",
+            "counters": {
+              "cpu_us": 13486,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0,
+              "memory.current": 7942144,
+              "memory.peak": 8036352
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-oracle-1795829605179551000.log",
+            "counters": {
+              "cpu_us": 197334,
+              "memory.current": 52293632,
+              "memory.peak": 52346880,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0
+            }
+          },
+          {
+            "log": "orders-lakehouse-spark-job-1795829585103229000.log",
+            "counters": {
+              "cpu_us": 9517984,
+              "memory.current": 460685312,
+              "memory.peak": 471498752,
+              "rbytes": 0,
+              "wbytes": 913408,
+              "rios": 0,
+              "wios": 3
+            }
+          }
+        ],
+        "sampled_aggregate_memory_peak_bytes": 7372537856,
+        "sampled_aggregate_memory_mean_bytes": 4730319667.125,
+        "sampled_cpu_peak_percent_one_core_100": 223.7,
+        "sampled_cpu_mean_percent_one_core_100": 99.10375,
+        "sample_count": 16,
+        "limitations": [
+          "Phase native deltas exclude restarted roles; newly created roles use their full within-phase counters. Actor lifetimes are separate.",
+          "Docker memory samples use rounded display values and can miss short peaks; native actor memory.peak is separately retained.",
+          "Stopped roles without a final counter are unavailable, not zero; shutdown work is not inferred.",
+          "No physical device service-time measurement."
+        ],
+        "observed_native_plus_actor_lower_bound": {
+          "cpu_us": 36724461,
+          "rbytes": 0,
+          "wbytes": 6512640,
+          "rios": 0,
+          "wios": 2915
+        }
+      },
+      "producer_1000_record_batch_with_witness_timing": null,
+      "pinned_old_parquet_body_read_timing": null,
+      "final-verification": {
+        "snapshot": 8874666937654641137,
+        "metadata": "s3://warehouse/lab/orders/metadata/00067-d80dacd8-fbb2-4f84-b8ee-b12519ce1fc2.metadata.json",
+        "table_uuid": "cd37e74d-07af-4423-9d8f-ba0a4ac58e03",
+        "snapshot_count": 67,
+        "oracle": {
+          "passed": true,
+          "metadata": "s3://warehouse/lab/orders/metadata/00067-d80dacd8-fbb2-4f84-b8ee-b12519ce1fc2.metadata.json",
+          "snapshot": 8874666937654641137,
+          "parent": 6112112585773118571,
+          "phases": [
+            "baseline",
+            "live",
+            "maintenance"
+          ],
+          "rows": 3000000,
+          "files": 66,
+          "file_bytes": 12222831,
+          "column_uncompressed_bytes": 84150406,
+          "column_compressed_bytes": 11998051,
+          "native_replica_reads": 198,
+          "native_replica_bytes": 36668493,
+          "compression_ratio": 7.013672970718328
+        },
+        "spark": {
+          "snapshot": 8874666937654641137,
+          "aggregates": [
+            {
+              "phase": "baseline",
+              "rows": 1000000,
+              "distinct_ids": 1000000,
+              "cents": 599500000,
+              "customers": 10000
+            },
+            {
+              "phase": "live",
+              "rows": 1000000,
+              "distinct_ids": 1000000,
+              "cents": 599500000,
+              "customers": 10000
+            },
+            {
+              "phase": "maintenance",
+              "rows": 1000000,
+              "distinct_ids": 1000000,
+              "cents": 599500000,
+              "customers": 10000
+            }
+          ]
+        }
+      },
+      "post-drain-verification": {
+        "snapshot": 6736975216219385113,
+        "metadata": "s3://warehouse/lab/orders/metadata/00068-ae2f6ea4-9da7-416e-970e-5b13d8e01e0d.metadata.json",
+        "table_uuid": "cd37e74d-07af-4423-9d8f-ba0a4ac58e03",
+        "snapshot_count": 68,
+        "oracle": {
+          "passed": true,
+          "metadata": "s3://warehouse/lab/orders/metadata/00068-ae2f6ea4-9da7-416e-970e-5b13d8e01e0d.metadata.json",
+          "snapshot": 6736975216219385113,
+          "parent": 8874666937654641137,
+          "phases": [
+            "baseline",
+            "live",
+            "maintenance"
+          ],
+          "rows": 3000000,
+          "files": 66,
+          "file_bytes": 12222831,
+          "column_uncompressed_bytes": 84150406,
+          "column_compressed_bytes": 11998051,
+          "native_replica_reads": 198,
+          "native_replica_bytes": 36668493,
+          "compression_ratio": 7.013672970718328
+        },
+        "spark": {
+          "snapshot": 6736975216219385113,
+          "aggregates": [
+            {
+              "phase": "baseline",
+              "rows": 1000000,
+              "distinct_ids": 1000000,
+              "cents": 599500000,
+              "customers": 10000
+            },
+            {
+              "phase": "live",
+              "rows": 1000000,
+              "distinct_ids": 1000000,
+              "cents": 599500000,
+              "customers": 10000
+            },
+            {
+              "phase": "maintenance",
+              "rows": 1000000,
+              "distinct_ids": 1000000,
+              "cents": 599500000,
+              "customers": 10000
+            }
+          ]
+        }
+      },
+      "retention": {
+        "retained_snapshots": 68,
+        "unique_manifests": 100,
+        "retained_data_files": 185,
+        "listed_parquet_files": 193,
+        "candidate_unreferenced_data_files": {
+          "s3://warehouse/lab/orders/data/phase=live/customer_shard=0/00001-0-28141960-3bd5-4c50-8d74-c1db92eca2fa-00044.parquet": 76959,
+          "s3://warehouse/lab/orders/data/phase=live/customer_shard=0/00001-0-28141960-3bd5-4c50-8d74-c1db92eca2fa-00046.parquet": 76979,
+          "s3://warehouse/lab/orders/data/phase=live/customer_shard=0/00001-0-28141960-3bd5-4c50-8d74-c1db92eca2fa-00048.parquet": 76984,
+          "s3://warehouse/lab/orders/data/phase=live/customer_shard=0/00001-0-28141960-3bd5-4c50-8d74-c1db92eca2fa-00050.parquet": 20678,
+          "s3://warehouse/lab/orders/data/phase=live/customer_shard=2/00001-0-28141960-3bd5-4c50-8d74-c1db92eca2fa-00043.parquet": 76952,
+          "s3://warehouse/lab/orders/data/phase=live/customer_shard=2/00001-0-28141960-3bd5-4c50-8d74-c1db92eca2fa-00045.parquet": 76973,
+          "s3://warehouse/lab/orders/data/phase=live/customer_shard=2/00001-0-28141960-3bd5-4c50-8d74-c1db92eca2fa-00047.parquet": 76975,
+          "s3://warehouse/lab/orders/data/phase=live/customer_shard=2/00001-0-28141960-3bd5-4c50-8d74-c1db92eca2fa-00049.parquet": 20720
+        },
+        "candidate_bytes": 503220,
+        "logical_object_bytes": 25970258,
+        "deleted_files": 0,
+        "passed": true,
+        "limitation": "Conservative retained-manifest union; candidates are not proven safe to delete"
+      },
+      "storage_samples": [
+        {
+          "orders-lakehouse_controller1": {
+            "apparent_bytes": 21165835,
+            "allocated_bytes": 229376,
+            "files": 9,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_broker2": {
+            "apparent_bytes": 176475729,
+            "allocated_bytes": 44916736,
+            "files": 278,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_etcd2": {
+            "apparent_bytes": 144801792,
+            "allocated_bytes": 129015808,
+            "files": 3,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_broker3": {
+            "apparent_bytes": 176475729,
+            "allocated_bytes": 44916736,
+            "files": 278,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_witness": {
+            "apparent_bytes": 132475404,
+            "allocated_bytes": 132497408,
+            "files": 4,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_controller2": {
+            "apparent_bytes": 21165835,
+            "allocated_bytes": 229376,
+            "files": 9,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_etcd1": {
+            "apparent_bytes": 144801792,
+            "allocated_bytes": 129007616,
+            "files": 3,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_flink-state": {
+            "apparent_bytes": 3286,
+            "allocated_bytes": 4096,
+            "files": 1,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_master3": {
+            "apparent_bytes": 1089,
+            "allocated_bytes": 12288,
+            "files": 3,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_etcd3": {
+            "apparent_bytes": 144801792,
+            "allocated_bytes": 128983040,
+            "files": 3,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_volume3": {
+            "apparent_bytes": 26620443,
+            "allocated_bytes": 26701824,
+            "files": 20,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_master1": {
+            "apparent_bytes": 1471,
+            "allocated_bytes": 16384,
+            "files": 4,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_broker1": {
+            "apparent_bytes": 176475737,
+            "allocated_bytes": 44920832,
+            "files": 278,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_volume2": {
+            "apparent_bytes": 26620443,
+            "allocated_bytes": 26701824,
+            "files": 20,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_catalog-db": {
+            "apparent_bytes": 65903334,
+            "allocated_bytes": 65982464,
+            "files": 1287,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_master2": {
+            "apparent_bytes": 1089,
+            "allocated_bytes": 12288,
+            "files": 3,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_spark-state": {
+            "apparent_bytes": 5501175,
+            "allocated_bytes": 5513216,
+            "files": 11,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_controller3": {
+            "apparent_bytes": 21165836,
+            "allocated_bytes": 229376,
+            "files": 9,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_volume1": {
+            "apparent_bytes": 26620443,
+            "allocated_bytes": 26701824,
+            "files": 20,
+            "concurrently_vanished_entries": 0
+          }
+        }
+      ]
+    },
+    {
+      "passed": true,
+      "name": "publication-failure",
+      "started_ns": 1795829056325243000,
+      "ended_ns": 1795829212753306000,
+      "raw_path": "results/publication-failure-1795829056325181000",
+      "wall_s": 156.428063,
+      "source_manifest_sha256": "7c382755b266e9ec71d38eac1f7df8729ee86f49de52cb3c582c60208c64c250",
+      "resources": {
+        "native_retained_role_deltas": {
+          "cpu_us": 68302147,
+          "rbytes": 24576,
+          "wbytes": 81686528,
+          "rios": 2,
+          "wios": 7440
+        },
+        "native_delta_scope": "phase end",
+        "restarted_roles_excluded_from_delta": [
+          "taskmanager2"
+        ],
+        "roles_stopped_before_final_counter": [],
+        "roles_created_within_phase_from_zero": [],
+        "roles_with_unavailable_native_counters": [
+          "etcd1",
+          "etcd2",
+          "etcd3"
+        ],
+        "actor_lifetime_counters": [
+          {
+            "log": "orders-lakehouse-lake-control-1795829057852235000.log",
+            "counters": {
+              "cpu_us": 20170,
+              "rbytes": 0,
+              "wbytes": 4096,
+              "rios": 0,
+              "wios": 1,
+              "memory.current": 5603328,
+              "memory.peak": 8306688
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-oracle-1795829169077438000.log",
+            "counters": {
+              "cpu_us": 3691167,
+              "memory.current": 217653248,
+              "memory.peak": 243032064,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-control-1795829065453280000.log",
+            "counters": {
+              "cpu_us": 11407,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0,
+              "memory.current": 6111232,
+              "memory.peak": 6111232
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-oracle-1795829060370788000.log",
+            "counters": {
+              "cpu_us": 204438,
+              "memory.current": 51785728,
+              "memory.peak": 51802112,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-control-1795829164165608000.log",
+            "counters": {
+              "cpu_us": 11390,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0,
+              "memory.current": 5836800,
+              "memory.peak": 6082560
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-oracle-1795829061383371000.log",
+            "counters": {
+              "cpu_us": 354401,
+              "memory.current": 56262656,
+              "memory.peak": 57679872,
+              "rbytes": 0,
+              "wbytes": 4096,
+              "rios": 0,
+              "wios": 1
+            }
+          },
+          {
+            "log": "orders-lakehouse-orders-1795829063385782000.log",
+            "counters": {
+              "cpu_us": 3561208,
+              "rbytes": 0,
+              "wbytes": 52453376,
+              "rios": 0,
+              "wios": 3097,
+              "memory.current": 66629632,
+              "memory.peak": 67084288
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-oracle-1795829168106784000.log",
+            "counters": {
+              "cpu_us": 200646,
+              "memory.current": 51793920,
+              "memory.peak": 51822592,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-oracle-1795829192069730000.log",
+            "counters": {
+              "cpu_us": 1987446,
+              "memory.current": 186863616,
+              "memory.peak": 203083776,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-oracle-1795829164623294000.log",
+            "counters": {
+              "cpu_us": 211592,
+              "memory.current": 52023296,
+              "memory.peak": 52088832,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-control-1795829059859519000.log",
+            "counters": {
+              "cpu_us": 11806,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0,
+              "memory.current": 5840896,
+              "memory.peak": 7938048
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-control-1795829167540080000.log",
+            "counters": {
+              "cpu_us": 11787,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0,
+              "memory.current": 5537792,
+              "memory.peak": 7614464
+            }
+          },
+          {
+            "log": "orders-lakehouse-spark-job-1795829176935728000.log",
+            "counters": {
+              "cpu_us": 9792714,
+              "memory.current": 457961472,
+              "memory.peak": 465936384,
+              "rbytes": 0,
+              "wbytes": 913408,
+              "rios": 0,
+              "wios": 3
+            }
+          },
+          {
+            "log": "orders-lakehouse-spark-job-1795829196618283000.log",
+            "counters": {
+              "cpu_us": 9212098,
+              "memory.current": 458502144,
+              "memory.peak": 467410944,
+              "rbytes": 0,
+              "wbytes": 913408,
+              "rios": 0,
+              "wios": 3
+            }
+          }
+        ],
+        "sampled_aggregate_memory_peak_bytes": 7013337661,
+        "sampled_aggregate_memory_mean_bytes": 5878676717.576923,
+        "sampled_cpu_peak_percent_one_core_100": 327.11,
+        "sampled_cpu_mean_percent_one_core_100": 80.94115384615385,
+        "sample_count": 26,
+        "limitations": [
+          "Phase native deltas exclude restarted roles; newly created roles use their full within-phase counters. Actor lifetimes are separate.",
+          "Docker memory samples use rounded display values and can miss short peaks; native actor memory.peak is separately retained.",
+          "Stopped roles without a final counter are unavailable, not zero; shutdown work is not inferred.",
+          "No physical device service-time measurement."
+        ],
+        "observed_native_plus_actor_lower_bound": {
+          "cpu_us": 97584417,
+          "rbytes": 24576,
+          "wbytes": 135974912,
+          "rios": 2,
+          "wios": 10545
+        }
+      },
+      "producer_1000_record_batch_with_witness_timing": {
+        "count": 1000,
+        "mean_ms": 6.543775189,
+        "p50_ms": 5.17825,
+        "p99_ms": 54.48875,
+        "max_ms": 105.660875,
+        "p999_ms": null,
+        "note": "Nearest-rank p99; fewer than 100 samples makes p99 effectively maximum; no established p99.9"
+      },
+      "pinned_old_parquet_body_read_timing": {
+        "count": 74,
+        "mean_ms": 3.7523805405366812,
+        "p50_ms": 3.2696040000246285,
+        "p99_ms": 7.344249999960084,
+        "max_ms": 7.344249999960084,
+        "p999_ms": null,
+        "note": "Nearest-rank p99; fewer than 100 samples makes p99 effectively maximum; no established p99.9"
+      },
+      "recovery": {
+        "passed": true,
+        "fault_at_ns": 1795829066145038000,
+        "before_acks": 27000,
+        "outage_acks": 146000,
+        "final": {
+          "snapshot": 4363025759903395106,
+          "metadata": "s3://warehouse/lab/orders/metadata/00040-d9976540-d84b-4072-b1fc-710b4417dd5f.metadata.json",
+          "table_uuid": "cd37e74d-07af-4423-9d8f-ba0a4ac58e03",
+          "snapshot_count": 40,
+          "oracle": {
+            "passed": true,
+            "metadata": "s3://warehouse/lab/orders/metadata/00040-d9976540-d84b-4072-b1fc-710b4417dd5f.metadata.json",
+            "snapshot": 4363025759903395106,
+            "parent": 5962535965225605826,
+            "phases": [
+              "baseline",
+              "live"
+            ],
+            "rows": 2000000,
+            "files": 113,
+            "file_bytes": 8909876,
+            "column_uncompressed_bytes": 58463708,
+            "column_compressed_bytes": 8581976,
+            "native_replica_reads": 0,
+            "native_replica_bytes": 0,
+            "compression_ratio": 6.812383068887631
+          },
+          "spark": {
+            "snapshot": 4363025759903395106,
+            "aggregates": [
+              {
+                "phase": "baseline",
+                "rows": 1000000,
+                "distinct_ids": 1000000,
+                "cents": 599500000,
+                "customers": 10000
+              },
+              {
+                "phase": "live",
+                "rows": 1000000,
+                "distinct_ids": 1000000,
+                "cents": 599500000,
+                "customers": 10000
+              }
+            ]
+          }
+        },
+        "frozen_read": {
+          "snapshot": 9215510380935025171,
+          "metadata": "s3://warehouse/lab/orders/metadata/00022-3efbc944-077a-48f2-98d9-dfb899ef21a4.metadata.json",
+          "table_uuid": "cd37e74d-07af-4423-9d8f-ba0a4ac58e03",
+          "snapshot_count": 22,
+          "oracle": {
+            "passed": true,
+            "metadata": "s3://warehouse/lab/orders/metadata/00022-3efbc944-077a-48f2-98d9-dfb899ef21a4.metadata.json",
+            "snapshot": 9215510380935025171,
+            "parent": 485169002580358544,
+            "phases": [
+              "baseline"
+            ],
+            "rows": 1000000,
+            "files": 60,
+            "file_bytes": 4503273,
+            "column_uncompressed_bytes": 29386256,
+            "column_compressed_bytes": 4329789,
+            "native_replica_reads": 0,
+            "native_replica_bytes": 0,
+            "compression_ratio": 6.786994932085605
+          },
+          "spark": {
+            "snapshot": 9215510380935025171,
+            "aggregates": [
+              {
+                "phase": "baseline",
+                "rows": 1000000,
+                "distinct_ids": 1000000,
+                "cents": 599500000,
+                "customers": 10000
+              }
+            ]
+          }
+        },
+        "reconciled_at_ns": 1795829210459166000
+      },
+      "native_checkpoints": {
+        "counts": {
+          "restored": 1,
+          "total": 67,
+          "in_progress": 0,
+          "completed": 64,
+          "failed": 3
+        },
+        "restored": {
+          "id": 48,
+          "restore_timestamp": 1795829085345,
+          "is_savepoint": false,
+          "external_path": "file:/state/checkpoints/389ef9472c2fcd4a4700ce69f0c56922/chk-48"
+        }
+      },
+      "fault": {
+        "role": "taskmanager2",
+        "exit_code": 137,
+        "oom": false,
+        "killed_at": "2026-11-28T01:24:28.065618708Z",
+        "restarted_at": "2026-11-28T01:24:38.51756738Z",
+        "process_down_s": 10.451949
+      },
+      "storage_samples": [
+        {
+          "orders-lakehouse_controller1": {
+            "apparent_bytes": 21104707,
+            "allocated_bytes": 167936,
+            "files": 9,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_broker2": {
+            "apparent_bytes": 161626132,
+            "allocated_bytes": 30003200,
+            "files": 278,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_etcd2": {
+            "apparent_bytes": 144801792,
+            "allocated_bytes": 128602112,
+            "files": 3,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_broker3": {
+            "apparent_bytes": 161626132,
+            "allocated_bytes": 30003200,
+            "files": 278,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_witness": {
+            "apparent_bytes": 88199155,
+            "allocated_bytes": 88215552,
+            "files": 3,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_controller2": {
+            "apparent_bytes": 21104707,
+            "allocated_bytes": 167936,
+            "files": 9,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_etcd1": {
+            "apparent_bytes": 144801792,
+            "allocated_bytes": 128606208,
+            "files": 3,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_flink-state": {
+            "apparent_bytes": 3183,
+            "allocated_bytes": 4096,
+            "files": 1,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_master3": {
+            "apparent_bytes": 1089,
+            "allocated_bytes": 12288,
+            "files": 3,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_etcd3": {
+            "apparent_bytes": 144801792,
+            "allocated_bytes": 128602112,
+            "files": 3,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_volume3": {
+            "apparent_bytes": 11339827,
+            "allocated_bytes": 11411456,
+            "files": 20,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_master1": {
+            "apparent_bytes": 1471,
+            "allocated_bytes": 16384,
+            "files": 4,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_broker1": {
+            "apparent_bytes": 161626140,
+            "allocated_bytes": 30003200,
+            "files": 278,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_volume2": {
+            "apparent_bytes": 11339827,
+            "allocated_bytes": 11415552,
+            "files": 20,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_catalog-db": {
+            "apparent_bytes": 65903334,
+            "allocated_bytes": 65982464,
+            "files": 1287,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_master2": {
+            "apparent_bytes": 1089,
+            "allocated_bytes": 12288,
+            "files": 3,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_spark-state": {
+            "apparent_bytes": 2017964,
+            "allocated_bytes": 2023424,
+            "files": 4,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_controller3": {
+            "apparent_bytes": 21104708,
+            "allocated_bytes": 167936,
+            "files": 9,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_volume1": {
+            "apparent_bytes": 11339827,
+            "allocated_bytes": 11411456,
+            "files": 20,
+            "concurrently_vanished_entries": 0
+          }
+        }
+      ]
+    },
+    {
+      "passed": true,
+      "name": "publication-native-check",
+      "started_ns": 1795829258077756000,
+      "ended_ns": 1795829263406166000,
+      "raw_path": "results/publication-native-check-1795829258077711000",
+      "wall_s": 5.32841,
+      "source_manifest_sha256": "fd2a220df936ca3891df963657c7222ba65e3a0445837ab4be5bbeec0114e61a",
+      "resources": {
+        "native_retained_role_deltas": {
+          "cpu_us": 909098,
+          "rbytes": 0,
+          "wbytes": 462848,
+          "rios": 0,
+          "wios": 178
+        },
+        "native_delta_scope": "phase end",
+        "restarted_roles_excluded_from_delta": [],
+        "roles_stopped_before_final_counter": [],
+        "roles_created_within_phase_from_zero": [],
+        "roles_with_unavailable_native_counters": [
+          "etcd1",
+          "etcd2",
+          "etcd3"
+        ],
+        "actor_lifetime_counters": [
+          {
+            "log": "orders-lakehouse-lake-control-1795829260164269000.log",
+            "counters": {
+              "cpu_us": 11926,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0,
+              "memory.current": 5648384,
+              "memory.peak": 7852032
+            }
+          }
+        ],
+        "sampled_aggregate_memory_peak_bytes": 5857282621,
+        "sampled_aggregate_memory_mean_bytes": 5857282621,
+        "sampled_cpu_peak_percent_one_core_100": 35.75,
+        "sampled_cpu_mean_percent_one_core_100": 35.75,
+        "sample_count": 1,
+        "limitations": [
+          "Phase native deltas exclude restarted roles; newly created roles use their full within-phase counters. Actor lifetimes are separate.",
+          "Docker memory samples use rounded display values and can miss short peaks; native actor memory.peak is separately retained.",
+          "Stopped roles without a final counter are unavailable, not zero; shutdown work is not inferred.",
+          "No physical device service-time measurement."
+        ],
+        "observed_native_plus_actor_lower_bound": {
+          "cpu_us": 921024,
+          "rbytes": 0,
+          "wbytes": 462848,
+          "rios": 0,
+          "wios": 178
+        }
+      },
+      "producer_1000_record_batch_with_witness_timing": null,
+      "pinned_old_parquet_body_read_timing": null
+    },
+    {
+      "passed": true,
+      "name": "test",
+      "started_ns": 1795829023242568000,
+      "ended_ns": 1795829047355928000,
+      "raw_path": "results/test-1795829023242510000",
+      "wall_s": 24.11336,
+      "source_manifest_sha256": "9e41647e1bd322fa99b82f162737ec58deae181e8e00605af8f3eaccb94859d9",
+      "resources": {
+        "native_retained_role_deltas": {
+          "cpu_us": 17056313,
+          "rbytes": 0,
+          "wbytes": 4767744,
+          "rios": 0,
+          "wios": 1180
+        },
+        "native_delta_scope": "phase end",
+        "restarted_roles_excluded_from_delta": [],
+        "roles_stopped_before_final_counter": [],
+        "roles_created_within_phase_from_zero": [],
+        "roles_with_unavailable_native_counters": [
+          "etcd1",
+          "etcd2",
+          "etcd3"
+        ],
+        "actor_lifetime_counters": [
+          {
+            "log": "orders-lakehouse-lake-control-1795829044540510000.log",
+            "counters": {
+              "cpu_us": 11972,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0,
+              "memory.current": 5885952,
+              "memory.peak": 6377472
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-control-1795829024860187000.log",
+            "counters": {
+              "cpu_us": 12716,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0,
+              "memory.current": 5984256,
+              "memory.peak": 5984256
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-oracle-1795829025386264000.log",
+            "counters": {
+              "cpu_us": 216117,
+              "memory.current": 52039680,
+              "memory.peak": 52056064,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0
+            }
+          },
+          {
+            "log": "orders-lakehouse-spark-job-1795829030985654000.log",
+            "counters": {
+              "cpu_us": 9177807,
+              "memory.current": 458969088,
+              "memory.peak": 464183296,
+              "rbytes": 0,
+              "wbytes": 913408,
+              "rios": 0,
+              "wios": 3
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-oracle-1795829026446524000.log",
+            "counters": {
+              "cpu_us": 2046652,
+              "memory.current": 187322368,
+              "memory.peak": 201965568,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0
+            }
+          }
+        ],
+        "sampled_aggregate_memory_peak_bytes": 6731931320,
+        "sampled_aggregate_memory_mean_bytes": 6194759816.666667,
+        "sampled_cpu_peak_percent_one_core_100": 241.12,
+        "sampled_cpu_mean_percent_one_core_100": 122.36,
+        "sample_count": 3,
+        "limitations": [
+          "Phase native deltas exclude restarted roles; newly created roles use their full within-phase counters. Actor lifetimes are separate.",
+          "Docker memory samples use rounded display values and can miss short peaks; native actor memory.peak is separately retained.",
+          "Stopped roles without a final counter are unavailable, not zero; shutdown work is not inferred.",
+          "No physical device service-time measurement."
+        ],
+        "observed_native_plus_actor_lower_bound": {
+          "cpu_us": 28521577,
+          "rbytes": 0,
+          "wbytes": 5681152,
+          "rios": 0,
+          "wios": 1183
+        }
+      },
+      "producer_1000_record_batch_with_witness_timing": null,
+      "pinned_old_parquet_body_read_timing": null,
+      "verification": {
+        "snapshot": 485169002580358544,
+        "metadata": "s3://warehouse/lab/orders/metadata/00021-951f9819-84db-4b19-ac28-5fabc39f6ed9.metadata.json",
+        "table_uuid": "cd37e74d-07af-4423-9d8f-ba0a4ac58e03",
+        "snapshot_count": 21,
+        "oracle": {
+          "passed": true,
+          "metadata": "s3://warehouse/lab/orders/metadata/00021-951f9819-84db-4b19-ac28-5fabc39f6ed9.metadata.json",
+          "snapshot": 485169002580358544,
+          "parent": 2485627112817746080,
+          "phases": [
+            "baseline"
+          ],
+          "rows": 1000000,
+          "files": 60,
+          "file_bytes": 4503273,
+          "column_uncompressed_bytes": 29386256,
+          "column_compressed_bytes": 4329789,
+          "native_replica_reads": 180,
+          "native_replica_bytes": 13509819,
+          "compression_ratio": 6.786994932085605
+        },
+        "spark": {
+          "snapshot": 485169002580358544,
+          "aggregates": [
+            {
+              "phase": "baseline",
+              "rows": 1000000,
+              "distinct_ids": 1000000,
+              "cents": 599500000,
+              "customers": 10000
+            }
+          ]
+        }
+      },
+      "storage_samples": [
+        {
+          "orders-lakehouse_controller1": {
+            "apparent_bytes": 21080947,
+            "allocated_bytes": 143360,
+            "files": 9,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_broker2": {
+            "apparent_bytes": 146934292,
+            "allocated_bytes": 15228928,
+            "files": 278,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_etcd2": {
+            "apparent_bytes": 144801792,
+            "allocated_bytes": 128335872,
+            "files": 3,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_broker3": {
+            "apparent_bytes": 146934292,
+            "allocated_bytes": 15228928,
+            "files": 278,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_witness": {
+            "apparent_bytes": 43936837,
+            "allocated_bytes": 43941888,
+            "files": 1,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_controller2": {
+            "apparent_bytes": 21080947,
+            "allocated_bytes": 143360,
+            "files": 9,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_etcd1": {
+            "apparent_bytes": 144801792,
+            "allocated_bytes": 128323584,
+            "files": 3,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_flink-state": {
+            "apparent_bytes": 3183,
+            "allocated_bytes": 4096,
+            "files": 1,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_master3": {
+            "apparent_bytes": 1089,
+            "allocated_bytes": 12288,
+            "files": 3,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_etcd3": {
+            "apparent_bytes": 144801792,
+            "allocated_bytes": 128319488,
+            "files": 3,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_volume3": {
+            "apparent_bytes": 5317107,
+            "allocated_bytes": 5386240,
+            "files": 20,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_master1": {
+            "apparent_bytes": 1471,
+            "allocated_bytes": 16384,
+            "files": 4,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_broker1": {
+            "apparent_bytes": 146934300,
+            "allocated_bytes": 15233024,
+            "files": 278,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_volume2": {
+            "apparent_bytes": 5317107,
+            "allocated_bytes": 5386240,
+            "files": 20,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_catalog-db": {
+            "apparent_bytes": 65870566,
+            "allocated_bytes": 65949696,
+            "files": 1285,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_master2": {
+            "apparent_bytes": 1089,
+            "allocated_bytes": 12288,
+            "files": 3,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_spark-state": {
+            "apparent_bytes": 964829,
+            "allocated_bytes": 966656,
+            "files": 2,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_controller3": {
+            "apparent_bytes": 21080948,
+            "allocated_bytes": 143360,
+            "files": 9,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_volume1": {
+            "apparent_bytes": 5317107,
+            "allocated_bytes": 5386240,
+            "files": 20,
+            "concurrently_vanished_entries": 0
+          }
+        }
+      ]
+    },
+    {
+      "passed": false,
+      "name": "up",
+      "started_ns": 1795828544932638000,
+      "error": "Command '['docker', 'compose', '--project-name', 'orders-lakehouse', 'run', '--name', 'orders-lakehouse-sql-client-1795828547938088000', '--use-aliases', 'sql-client']' timed out after 180 seconds",
+      "ended_ns": 1795828729534300000,
+      "raw_path": "results/up-1795828544932573000",
+      "wall_s": 184.601662,
+      "source_manifest_sha256": "1c96e2d5e23b6df1bf0063e939b4f8f2e090d0346bbc37c33d9cd4a4e62eaea3",
+      "resources": {
+        "native_retained_role_deltas": {
+          "cpu_us": 38825843,
+          "rbytes": 503808,
+          "wbytes": 26402816,
+          "rios": 10,
+          "wios": 7309
+        },
+        "native_delta_scope": "phase end",
+        "restarted_roles_excluded_from_delta": [],
+        "roles_stopped_before_final_counter": [],
+        "roles_created_within_phase_from_zero": [],
+        "roles_with_unavailable_native_counters": [
+          "etcd1",
+          "etcd2",
+          "etcd3"
+        ],
+        "actor_lifetime_counters": [
+          {
+            "log": "orders-lakehouse-lake-control-1795828547257194000.log",
+            "counters": {
+              "cpu_us": 11423,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0,
+              "memory.current": 5820416,
+              "memory.peak": 6565888
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-control-1795828546362357000.log",
+            "counters": {
+              "cpu_us": 13424,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0,
+              "memory.current": 5885952,
+              "memory.peak": 6377472
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-control-1795828546803657000.log",
+            "counters": {
+              "cpu_us": 10988,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0,
+              "memory.current": 5812224,
+              "memory.peak": 6889472
+            }
+          }
+        ],
+        "sampled_aggregate_memory_peak_bytes": 5116495135,
+        "sampled_aggregate_memory_mean_bytes": 4994238799.212121,
+        "sampled_cpu_peak_percent_one_core_100": 44.48,
+        "sampled_cpu_mean_percent_one_core_100": 34.412424242424244,
+        "sample_count": 33,
+        "limitations": [
+          "Phase native deltas exclude restarted roles; newly created roles use their full within-phase counters. Actor lifetimes are separate.",
+          "Docker memory samples use rounded display values and can miss short peaks; native actor memory.peak is separately retained.",
+          "Stopped roles without a final counter are unavailable, not zero; shutdown work is not inferred.",
+          "No physical device service-time measurement."
+        ],
+        "observed_native_plus_actor_lower_bound": {
+          "cpu_us": 38861678,
+          "rbytes": 503808,
+          "wbytes": 26402816,
+          "rios": 10,
+          "wios": 7309
+        }
+      },
+      "producer_1000_record_batch_with_witness_timing": null,
+      "pinned_old_parquet_body_read_timing": null
+    },
+    {
+      "passed": true,
+      "name": "up",
+      "started_ns": 1795828806426794000,
+      "ended_ns": 1795829004231692000,
+      "raw_path": "results/up-1795828806426720000",
+      "wall_s": 197.804898,
+      "source_manifest_sha256": "c431f37bf8a66950b255bf1e798a8db4b760cabae09ba653bbfccc721890100f",
+      "resources": {
+        "native_retained_role_deltas": {
+          "cpu_us": 87816459,
+          "rbytes": 1245184,
+          "wbytes": 94699520,
+          "rios": 66,
+          "wios": 10583
+        },
+        "native_delta_scope": "phase end",
+        "restarted_roles_excluded_from_delta": [],
+        "roles_stopped_before_final_counter": [],
+        "roles_created_within_phase_from_zero": [],
+        "roles_with_unavailable_native_counters": [
+          "etcd1",
+          "etcd2",
+          "etcd3"
+        ],
+        "actor_lifetime_counters": [
+          {
+            "log": "orders-lakehouse-lake-control-1795828808354426000.log",
+            "counters": {
+              "cpu_us": 11083,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0,
+              "memory.current": 5873664,
+              "memory.peak": 7749632
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-oracle-1795828948668848000.log",
+            "counters": {
+              "cpu_us": 195545,
+              "memory.current": 51777536,
+              "memory.peak": 51777536,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-control-1795828941506541000.log",
+            "counters": {
+              "cpu_us": 11903,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0,
+              "memory.current": 5844992,
+              "memory.peak": 6041600
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-control-1795828938262355000.log",
+            "counters": {
+              "cpu_us": 12610,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0,
+              "memory.current": 7970816,
+              "memory.peak": 8458240
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-control-1795828968280080000.log",
+            "counters": {
+              "cpu_us": 12951,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0,
+              "memory.current": 5820416,
+              "memory.peak": 6246400
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-control-1795828964899794000.log",
+            "counters": {
+              "cpu_us": 12132,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0,
+              "memory.current": 5853184,
+              "memory.peak": 8003584
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-control-1795828951521260000.log",
+            "counters": {
+              "cpu_us": 11796,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0,
+              "memory.current": 5558272,
+              "memory.peak": 6053888
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-control-1795828961492158000.log",
+            "counters": {
+              "cpu_us": 13196,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0,
+              "memory.current": 5881856,
+              "memory.peak": 8278016
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-oracle-1795828965433138000.log",
+            "counters": {
+              "cpu_us": 200761,
+              "memory.current": 51757056,
+              "memory.peak": 51757056,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-control-1795828931493370000.log",
+            "counters": {
+              "cpu_us": 11450,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0,
+              "memory.current": 6107136,
+              "memory.peak": 7684096
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-oracle-1795828941952722000.log",
+            "counters": {
+              "cpu_us": 198799,
+              "memory.current": 51773440,
+              "memory.peak": 51773440,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-control-1795828934927630000.log",
+            "counters": {
+              "cpu_us": 13069,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0,
+              "memory.current": 5844992,
+              "memory.peak": 6311936
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-oracle-1795828952016801000.log",
+            "counters": {
+              "cpu_us": 195779,
+              "memory.current": 52224000,
+              "memory.peak": 52224000,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-oracle-1795828958641602000.log",
+            "counters": {
+              "cpu_us": 204337,
+              "memory.current": 51761152,
+              "memory.peak": 51892224,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0
+            }
+          },
+          {
+            "log": "orders-lakehouse-orders-1795828827854878000.log",
+            "counters": {
+              "cpu_us": 3442892,
+              "rbytes": 0,
+              "wbytes": 52125696,
+              "rios": 0,
+              "wios": 3058,
+              "memory.current": 61845504,
+              "memory.peak": 62808064
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-oracle-1795828935415453000.log",
+            "counters": {
+              "cpu_us": 201336,
+              "memory.current": 51978240,
+              "memory.peak": 51978240,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-oracle-1795828962049334000.log",
+            "counters": {
+              "cpu_us": 196163,
+              "memory.current": 51994624,
+              "memory.peak": 51994624,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-control-1795828971558862000.log",
+            "counters": {
+              "cpu_us": 12092,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0,
+              "memory.current": 5550080,
+              "memory.peak": 7741440
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-control-1795828948154584000.log",
+            "counters": {
+              "cpu_us": 11792,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0,
+              "memory.current": 5836800,
+              "memory.peak": 6070272
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-control-1795828958102067000.log",
+            "counters": {
+              "cpu_us": 11361,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0,
+              "memory.current": 5857280,
+              "memory.peak": 8138752
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-oracle-1795828932024374000.log",
+            "counters": {
+              "cpu_us": 195957,
+              "memory.current": 51769344,
+              "memory.peak": 51769344,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-oracle-1795828975405943000.log",
+            "counters": {
+              "cpu_us": 200804,
+              "memory.current": 51507200,
+              "memory.peak": 51601408,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-control-1795828974970027000.log",
+            "counters": {
+              "cpu_us": 11637,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0,
+              "memory.current": 6098944,
+              "memory.peak": 6098944
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-oracle-1795828928705540000.log",
+            "counters": {
+              "cpu_us": 199269,
+              "memory.current": 51503104,
+              "memory.peak": 51810304,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-control-1795828944759420000.log",
+            "counters": {
+              "cpu_us": 11856,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0,
+              "memory.current": 5828608,
+              "memory.peak": 7847936
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-control-1795828954819530000.log",
+            "counters": {
+              "cpu_us": 11540,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0,
+              "memory.current": 5586944,
+              "memory.peak": 8228864
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-oracle-1795828968723067000.log",
+            "counters": {
+              "cpu_us": 201096,
+              "memory.current": 51720192,
+              "memory.peak": 52064256,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0
+            }
+          },
+          {
+            "log": "orders-lakehouse-spark-job-1795828984199369000.log",
+            "counters": {
+              "cpu_us": 9681663,
+              "memory.current": 462635008,
+              "memory.peak": 466034688,
+              "rbytes": 561152,
+              "wbytes": 913408,
+              "rios": 35,
+              "wios": 3
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-control-1795828928308193000.log",
+            "counters": {
+              "cpu_us": 12430,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0,
+              "memory.current": 5824512,
+              "memory.peak": 6336512
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-control-1795828807868294000.log",
+            "counters": {
+              "cpu_us": 15061,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0,
+              "memory.current": 5582848,
+              "memory.peak": 6365184
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-control-1795828808795315000.log",
+            "counters": {
+              "cpu_us": 11789,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0,
+              "memory.current": 8077312,
+              "memory.peak": 8077312
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-oracle-1795828972091211000.log",
+            "counters": {
+              "cpu_us": 208966,
+              "memory.current": 52011008,
+              "memory.peak": 52011008,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-oracle-1795828978693135000.log",
+            "counters": {
+              "cpu_us": 208700,
+              "memory.current": 52273152,
+              "memory.peak": 52289536,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-oracle-1795828955267755000.log",
+            "counters": {
+              "cpu_us": 192978,
+              "memory.current": 51499008,
+              "memory.peak": 51904512,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-control-1795828978258074000.log",
+            "counters": {
+              "cpu_us": 11531,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0,
+              "memory.current": 5844992,
+              "memory.peak": 6344704
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-oracle-1795828945314414000.log",
+            "counters": {
+              "cpu_us": 206848,
+              "memory.current": 51769344,
+              "memory.peak": 51769344,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-oracle-1795828979719560000.log",
+            "counters": {
+              "cpu_us": 1961875,
+              "memory.current": 198721536,
+              "memory.peak": 213794816,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-oracle-1795828938766336000.log",
+            "counters": {
+              "cpu_us": 191587,
+              "memory.current": 51744768,
+              "memory.peak": 51769344,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0
+            }
+          }
+        ],
+        "sampled_aggregate_memory_peak_bytes": 6645581087,
+        "sampled_aggregate_memory_mean_bytes": 5459681882.645162,
+        "sampled_cpu_peak_percent_one_core_100": 246.27,
+        "sampled_cpu_mean_percent_one_core_100": 61.083225806451615,
+        "sample_count": 31,
+        "limitations": [
+          "Phase native deltas exclude restarted roles; newly created roles use their full within-phase counters. Actor lifetimes are separate.",
+          "Docker memory samples use rounded display values and can miss short peaks; native actor memory.peak is separately retained.",
+          "Stopped roles without a final counter are unavailable, not zero; shutdown work is not inferred.",
+          "No physical device service-time measurement."
+        ],
+        "observed_native_plus_actor_lower_bound": {
+          "cpu_us": 106333093,
+          "rbytes": 1806336,
+          "wbytes": 147738624,
+          "rios": 101,
+          "wios": 13644
+        }
+      },
+      "producer_1000_record_batch_with_witness_timing": {
+        "count": 1000,
+        "mean_ms": 15.002743975,
+        "p50_ms": 6.442583,
+        "p99_ms": 102.558917,
+        "max_ms": 1942.907209,
+        "p999_ms": null,
+        "note": "Nearest-rank p99; fewer than 100 samples makes p99 effectively maximum; no established p99.9"
+      },
+      "pinned_old_parquet_body_read_timing": null,
+      "baseline": {
+        "snapshot": 2485627112817746080,
+        "metadata": "s3://warehouse/lab/orders/metadata/00020-3c365395-5d8a-499d-87c2-b27fd764ab2e.metadata.json",
+        "table_uuid": "cd37e74d-07af-4423-9d8f-ba0a4ac58e03",
+        "snapshot_count": 20,
+        "oracle": {
+          "passed": true,
+          "metadata": "s3://warehouse/lab/orders/metadata/00020-3c365395-5d8a-499d-87c2-b27fd764ab2e.metadata.json",
+          "snapshot": 2485627112817746080,
+          "parent": 401018563515368626,
+          "phases": [
+            "baseline"
+          ],
+          "rows": 1000000,
+          "files": 60,
+          "file_bytes": 4503273,
+          "column_uncompressed_bytes": 29386256,
+          "column_compressed_bytes": 4329789,
+          "native_replica_reads": 0,
+          "native_replica_bytes": 0,
+          "compression_ratio": 6.786994932085605
+        },
+        "spark": {
+          "snapshot": 2485627112817746080,
+          "aggregates": [
+            {
+              "phase": "baseline",
+              "rows": 1000000,
+              "distinct_ids": 1000000,
+              "cents": 599500000,
+              "customers": 10000
+            }
+          ]
+        }
+      },
+      "storage_samples": [
+        {
+          "orders-lakehouse_controller1": {
+            "apparent_bytes": 21074323,
+            "allocated_bytes": 135168,
+            "files": 9,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_broker2": {
+            "apparent_bytes": 146924736,
+            "allocated_bytes": 15216640,
+            "files": 278,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_etcd2": {
+            "apparent_bytes": 144801792,
+            "allocated_bytes": 128335872,
+            "files": 3,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_broker3": {
+            "apparent_bytes": 146924736,
+            "allocated_bytes": 15216640,
+            "files": 278,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_witness": {
+            "apparent_bytes": 43936837,
+            "allocated_bytes": 43941888,
+            "files": 1,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_controller2": {
+            "apparent_bytes": 21074395,
+            "allocated_bytes": 135168,
+            "files": 9,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_etcd1": {
+            "apparent_bytes": 144801792,
+            "allocated_bytes": 128323584,
+            "files": 3,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_flink-state": {
+            "apparent_bytes": 3183,
+            "allocated_bytes": 4096,
+            "files": 1,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_master3": {
+            "apparent_bytes": 1089,
+            "allocated_bytes": 12288,
+            "files": 3,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_etcd3": {
+            "apparent_bytes": 144801792,
+            "allocated_bytes": 128319488,
+            "files": 3,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_volume3": {
+            "apparent_bytes": 5285515,
+            "allocated_bytes": 5353472,
+            "files": 20,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_master1": {
+            "apparent_bytes": 1471,
+            "allocated_bytes": 16384,
+            "files": 4,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_broker1": {
+            "apparent_bytes": 146924744,
+            "allocated_bytes": 15220736,
+            "files": 278,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_volume2": {
+            "apparent_bytes": 5285515,
+            "allocated_bytes": 5353472,
+            "files": 20,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_catalog-db": {
+            "apparent_bytes": 65870566,
+            "allocated_bytes": 65949696,
+            "files": 1285,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_master2": {
+            "apparent_bytes": 1089,
+            "allocated_bytes": 12288,
+            "files": 3,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_spark-state": {
+            "apparent_bytes": 482845,
+            "allocated_bytes": 483328,
+            "files": 1,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_controller3": {
+            "apparent_bytes": 21074396,
+            "allocated_bytes": 135168,
+            "files": 9,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_volume1": {
+            "apparent_bytes": 5285515,
+            "allocated_bytes": 5353472,
+            "files": 20,
+            "concurrently_vanished_entries": 0
+          }
+        }
+      ]
+    },
+    {
+      "passed": true,
+      "name": "up",
+      "started_ns": 1795829477887224000,
+      "ended_ns": 1795829510413363000,
+      "raw_path": "results/up-1795829477887159000",
+      "wall_s": 32.526139,
+      "source_manifest_sha256": "5b39e7c4ceea141453e0c98cb54524bcd88a49fd94f1402a1c3f83be6e96ff9d",
+      "resources": {
+        "native_retained_role_deltas": {
+          "cpu_us": 19293929,
+          "rbytes": 0,
+          "wbytes": 5562368,
+          "rios": 0,
+          "wios": 1587
+        },
+        "native_delta_scope": "phase end",
+        "restarted_roles_excluded_from_delta": [],
+        "roles_stopped_before_final_counter": [],
+        "roles_created_within_phase_from_zero": [],
+        "roles_with_unavailable_native_counters": [
+          "etcd1",
+          "etcd2",
+          "etcd3"
+        ],
+        "actor_lifetime_counters": [
+          {
+            "log": "orders-lakehouse-lake-control-1795829480541635000.log",
+            "counters": {
+              "cpu_us": 11351,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0,
+              "memory.current": 5550080,
+              "memory.peak": 6504448
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-oracle-1795829481707990000.log",
+            "counters": {
+              "cpu_us": 197987,
+              "memory.current": 52064256,
+              "memory.peak": 52113408,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-control-1795829481202698000.log",
+            "counters": {
+              "cpu_us": 11995,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0,
+              "memory.current": 6098944,
+              "memory.peak": 6103040
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-oracle-1795829482684005000.log",
+            "counters": {
+              "cpu_us": 5329416,
+              "memory.current": 190976000,
+              "memory.peak": 231743488,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-control-1795829480063486000.log",
+            "counters": {
+              "cpu_us": 11259,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0,
+              "memory.current": 5873664,
+              "memory.peak": 7581696
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-control-1795829479577023000.log",
+            "counters": {
+              "cpu_us": 14794,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0,
+              "memory.current": 5615616,
+              "memory.peak": 7938048
+            }
+          },
+          {
+            "log": "orders-lakehouse-spark-job-1795829493843018000.log",
+            "counters": {
+              "cpu_us": 9235722,
+              "memory.current": 461422592,
+              "memory.peak": 471240704,
+              "rbytes": 0,
+              "wbytes": 913408,
+              "rios": 0,
+              "wios": 3
+            }
+          }
+        ],
+        "sampled_aggregate_memory_peak_bytes": 7185734042,
+        "sampled_aggregate_memory_mean_bytes": 6523289862.2,
+        "sampled_cpu_peak_percent_one_core_100": 230.38,
+        "sampled_cpu_mean_percent_one_core_100": 119.378,
+        "sample_count": 5,
+        "limitations": [
+          "Phase native deltas exclude restarted roles; newly created roles use their full within-phase counters. Actor lifetimes are separate.",
+          "Docker memory samples use rounded display values and can miss short peaks; native actor memory.peak is separately retained.",
+          "Stopped roles without a final counter are unavailable, not zero; shutdown work is not inferred.",
+          "No physical device service-time measurement."
+        ],
+        "observed_native_plus_actor_lower_bound": {
+          "cpu_us": 34106453,
+          "rbytes": 0,
+          "wbytes": 6475776,
+          "rios": 0,
+          "wios": 1590
+        }
+      },
+      "producer_1000_record_batch_with_witness_timing": null,
+      "pinned_old_parquet_body_read_timing": null,
+      "retained-verify": {
+        "snapshot": 2053698755307860958,
+        "metadata": "s3://warehouse/lab/orders/metadata/00065-5b5b1405-9d6f-4d28-bdbb-ef9ccf89622b.metadata.json",
+        "table_uuid": "cd37e74d-07af-4423-9d8f-ba0a4ac58e03",
+        "snapshot_count": 65,
+        "oracle": {
+          "passed": true,
+          "metadata": "s3://warehouse/lab/orders/metadata/00065-5b5b1405-9d6f-4d28-bdbb-ef9ccf89622b.metadata.json",
+          "snapshot": 2053698755307860958,
+          "parent": 318959209154034940,
+          "phases": [
+            "baseline",
+            "live",
+            "maintenance"
+          ],
+          "rows": 3000000,
+          "files": 66,
+          "file_bytes": 12222831,
+          "column_uncompressed_bytes": 84150406,
+          "column_compressed_bytes": 11998051,
+          "native_replica_reads": 0,
+          "native_replica_bytes": 0,
+          "compression_ratio": 7.013672970718328
+        },
+        "spark": {
+          "snapshot": 2053698755307860958,
+          "aggregates": [
+            {
+              "phase": "baseline",
+              "rows": 1000000,
+              "distinct_ids": 1000000,
+              "cents": 599500000,
+              "customers": 10000
+            },
+            {
+              "phase": "live",
+              "rows": 1000000,
+              "distinct_ids": 1000000,
+              "cents": 599500000,
+              "customers": 10000
+            },
+            {
+              "phase": "maintenance",
+              "rows": 1000000,
+              "distinct_ids": 1000000,
+              "cents": 599500000,
+              "customers": 10000
+            }
+          ]
+        }
+      }
+    },
+    {
+      "passed": true,
+      "name": "verify",
+      "started_ns": 1795829528521271000,
+      "ended_ns": 1795829562422067000,
+      "raw_path": "results/verify-1795829528521207000",
+      "wall_s": 33.900796,
+      "source_manifest_sha256": "64cb0148aadf6800aea7b9c947cd775377cdde9aea76bf3d7ecbf0f8d6c81e6f",
+      "resources": {
+        "native_retained_role_deltas": {
+          "cpu_us": 19401747,
+          "rbytes": 0,
+          "wbytes": 5312512,
+          "rios": 0,
+          "wios": 1596
+        },
+        "native_delta_scope": "phase end",
+        "restarted_roles_excluded_from_delta": [],
+        "roles_stopped_before_final_counter": [],
+        "roles_created_within_phase_from_zero": [],
+        "roles_with_unavailable_native_counters": [
+          "etcd1",
+          "etcd2",
+          "etcd3"
+        ],
+        "actor_lifetime_counters": [
+          {
+            "log": "orders-lakehouse-lake-control-1795829557631617000.log",
+            "counters": {
+              "cpu_us": 11861,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0,
+              "memory.current": 5894144,
+              "memory.peak": 6647808
+            }
+          },
+          {
+            "log": "orders-lakehouse-spark-job-1795829543009357000.log",
+            "counters": {
+              "cpu_us": 9328036,
+              "memory.current": 458936320,
+              "memory.peak": 468971520,
+              "rbytes": 0,
+              "wbytes": 913408,
+              "rios": 0,
+              "wios": 3
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-control-1795829530145126000.log",
+            "counters": {
+              "cpu_us": 14234,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0,
+              "memory.current": 6107136,
+              "memory.peak": 7634944
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-oracle-1795829530626579000.log",
+            "counters": {
+              "cpu_us": 206927,
+              "memory.current": 52494336,
+              "memory.peak": 52527104,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0
+            }
+          },
+          {
+            "log": "orders-lakehouse-lake-oracle-1795829531638786000.log",
+            "counters": {
+              "cpu_us": 5450984,
+              "memory.current": 181841920,
+              "memory.peak": 219709440,
+              "rbytes": 0,
+              "wbytes": 0,
+              "rios": 0,
+              "wios": 0
+            }
+          }
+        ],
+        "sampled_aggregate_memory_peak_bytes": 7469426278,
+        "sampled_aggregate_memory_mean_bytes": 6556733145,
+        "sampled_cpu_peak_percent_one_core_100": 233.69,
+        "sampled_cpu_mean_percent_one_core_100": 88.728,
+        "sample_count": 5,
+        "limitations": [
+          "Phase native deltas exclude restarted roles; newly created roles use their full within-phase counters. Actor lifetimes are separate.",
+          "Docker memory samples use rounded display values and can miss short peaks; native actor memory.peak is separately retained.",
+          "Stopped roles without a final counter are unavailable, not zero; shutdown work is not inferred.",
+          "No physical device service-time measurement."
+        ],
+        "observed_native_plus_actor_lower_bound": {
+          "cpu_us": 34413789,
+          "rbytes": 0,
+          "wbytes": 6225920,
+          "rios": 0,
+          "wios": 1599
+        }
+      },
+      "producer_1000_record_batch_with_witness_timing": null,
+      "pinned_old_parquet_body_read_timing": null,
+      "verification": {
+        "snapshot": 6112112585773118571,
+        "metadata": "s3://warehouse/lab/orders/metadata/00066-a3aeac93-79f8-47de-905b-375b4997ed7a.metadata.json",
+        "table_uuid": "cd37e74d-07af-4423-9d8f-ba0a4ac58e03",
+        "snapshot_count": 66,
+        "oracle": {
+          "passed": true,
+          "metadata": "s3://warehouse/lab/orders/metadata/00066-a3aeac93-79f8-47de-905b-375b4997ed7a.metadata.json",
+          "snapshot": 6112112585773118571,
+          "parent": 2053698755307860958,
+          "phases": [
+            "baseline",
+            "live",
+            "maintenance"
+          ],
+          "rows": 3000000,
+          "files": 66,
+          "file_bytes": 12222831,
+          "column_uncompressed_bytes": 84150406,
+          "column_compressed_bytes": 11998051,
+          "native_replica_reads": 198,
+          "native_replica_bytes": 36668493,
+          "compression_ratio": 7.013672970718328
+        },
+        "spark": {
+          "snapshot": 6112112585773118571,
+          "aggregates": [
+            {
+              "phase": "baseline",
+              "rows": 1000000,
+              "distinct_ids": 1000000,
+              "cents": 599500000,
+              "customers": 10000
+            },
+            {
+              "phase": "live",
+              "rows": 1000000,
+              "distinct_ids": 1000000,
+              "cents": 599500000,
+              "customers": 10000
+            },
+            {
+              "phase": "maintenance",
+              "rows": 1000000,
+              "distinct_ids": 1000000,
+              "cents": 599500000,
+              "customers": 10000
+            }
+          ]
+        }
+      },
+      "storage_samples": [
+        {
+          "orders-lakehouse_controller1": {
+            "apparent_bytes": 21154675,
+            "allocated_bytes": 217088,
+            "files": 9,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_broker2": {
+            "apparent_bytes": 176461044,
+            "allocated_bytes": 44900352,
+            "files": 278,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_etcd2": {
+            "apparent_bytes": 144801792,
+            "allocated_bytes": 129015808,
+            "files": 3,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_broker3": {
+            "apparent_bytes": 176461044,
+            "allocated_bytes": 44900352,
+            "files": 278,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_witness": {
+            "apparent_bytes": 132475404,
+            "allocated_bytes": 132497408,
+            "files": 4,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_controller2": {
+            "apparent_bytes": 21154675,
+            "allocated_bytes": 217088,
+            "files": 9,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_etcd1": {
+            "apparent_bytes": 144801792,
+            "allocated_bytes": 129003520,
+            "files": 3,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_flink-state": {
+            "apparent_bytes": 3186,
+            "allocated_bytes": 4096,
+            "files": 1,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_master3": {
+            "apparent_bytes": 1089,
+            "allocated_bytes": 12288,
+            "files": 3,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_etcd3": {
+            "apparent_bytes": 144801792,
+            "allocated_bytes": 128983040,
+            "files": 3,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_volume3": {
+            "apparent_bytes": 26536563,
+            "allocated_bytes": 26619904,
+            "files": 20,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_master1": {
+            "apparent_bytes": 1471,
+            "allocated_bytes": 16384,
+            "files": 4,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_broker1": {
+            "apparent_bytes": 176461052,
+            "allocated_bytes": 44904448,
+            "files": 278,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_volume2": {
+            "apparent_bytes": 26536563,
+            "allocated_bytes": 26619904,
+            "files": 20,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_catalog-db": {
+            "apparent_bytes": 65903334,
+            "allocated_bytes": 65982464,
+            "files": 1287,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_master2": {
+            "apparent_bytes": 1089,
+            "allocated_bytes": 12288,
+            "files": 3,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_spark-state": {
+            "apparent_bytes": 4511410,
+            "allocated_bytes": 4521984,
+            "files": 9,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_controller3": {
+            "apparent_bytes": 21154676,
+            "allocated_bytes": 217088,
+            "files": 9,
+            "concurrently_vanished_entries": 0
+          },
+          "orders-lakehouse_volume1": {
+            "apparent_bytes": 26536563,
+            "allocated_bytes": 26619904,
+            "files": 20,
+            "concurrently_vanished_entries": 0
+          }
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "One shared Docker VM, simulated zones and no physical power-loss proof.",
+    "Paced one-million-message phases are correctness/recovery diagnostics, not sustained capacity.",
+    "Producer timing is a 1000-record ProduceSync batch plus local witness work; not individual record latency.",
+    "Pinned reader measures one previously verified Parquet body, not full-table SQL or latest-snapshot visibility.",
+    "Snapshot timestamp is allocated before commit; it does not prove publication visibility time.",
+    "Per-phase resources include verification and background maintenance; one-shot tools are separately reported.",
+    "Native cgroup I/O excludes cache hits; disk service time/queue depth and isolated codec CPU unavailable.",
+    "Volume allocation is not unique physical extent usage; container temporary-layer peaks and host instrumentation overhead are incomplete.",
+    "No all-role HA, independent restore, update/delete semantics or destructive orphan expiration."
+  ]
+}
