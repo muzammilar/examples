@@ -9,7 +9,7 @@ completed examples separately to main. No level-4/5 expansion.
 - [x] PostgreSQL → Debezium/Kafka → ClickHouse: mutate during initial snapshot,
   observe snapshot-to-WAL transition, interrupt Connect with its offsets/slot
   retained, keep source writer/readers active, reconcile complete rows and ACKs.
-- [ ] MySQL → Debezium/Kafka → Flink → ClickHouse + Airflow: corrected margins,
+- [x] MySQL → Debezium/Kafka → Flink → ClickHouse + Airflow: corrected margins,
   connector lifecycle, incremental backfill, schema evolution and reconciliation
   DAGs; exercise worker/task recovery and preserve all failed attempts.
 - [ ] GreptimeDB versus Victoria: matched single-node and comparable clustered
@@ -59,7 +59,23 @@ through the held connector outage, and exact 1,000,861-row readbacks on each of
 three replicas. Task restart took 58.205 seconds. The initial failed reader,
 missing heartbeat topic and verified retained-state recovery remain documented.
 Resource measurements and their explicit setup/peak-disk gaps are in the curated
-report. MySQL/Airflow and the three observability comparisons remain unrun.
+report.
+
+[MySQL current margins + Airflow](../../pipelines/mysql-flink-clickhouse-airflow/)
+completed the corrected required case set and verified teardown: 5,953 ACKs
+including failed attempts reconciled, 1,005,325 current rows matched on all three
+copies, no repeated initial snapshot, native backfill/reconciliation DAGs succeeded.
+Connect kill-to-recovery was 77.173 s and TaskManager recovery 32.101 s. Six failed
+case statuses remain in the curated evidence; infrastructure/SQL submission and
+controller mistakes are documented separately from backend behavior. Corrected
+cases ran independently after the initial `make test` failures; no reseeding hid
+those attempts. Nine offline controller controls and three Go checks passed.
+
+The three observability comparisons remain unrun. The
+matched metrics/log project is being
+implemented, with pinned OTLP-handler research and equal total budgets; its source
+is not yet a qualified experiment. Comparative trials wait for the CDC lab to be
+fully stopped (now verified).
 
 ## Next pipeline design
 

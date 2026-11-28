@@ -1,0 +1,95 @@
+{
+  "workload": "integer-margin-v1",
+  "operations": [
+    "atomic seed and receipt",
+    "insert order and receipt",
+    "revise or cancel order",
+    "delete order",
+    "revise customer region and discount",
+    "add shipping column",
+    "correct shipping costs",
+    "idempotent incremental-snapshot signal",
+    "query current margins"
+  ],
+  "input": {
+    "default_orders": 1000000,
+    "default_customers": 10000,
+    "order_range": [
+      1000000,
+      2000000
+    ],
+    "customer_range": [
+      10000,
+      10000
+    ],
+    "generator": "deterministic integer formulas, no RNG",
+    "money": "signed 64-bit integer cents; no floating-point money",
+    "shipping_before_ddl": "missing nullable field is projected as zero",
+    "measured_counts": {
+      "orders": 1000000,
+      "customers": 10000
+    }
+  },
+  "consistency": {
+    "source": "InnoDB REPEATABLE-READ transactions, verified from effective server isolation; each mutation includes an atomic operation receipt",
+    "sink": "eventually convergent current table at a fenced source/input/output cut",
+    "live_reads": "exact historical immutable rows; sampled acknowledged inserts may remain pending during pipeline lag",
+    "not_claimed": [
+      "cross-table atomic CDC visibility",
+      "linearizable sink reads",
+      "end-to-end exactly-once",
+      "independent-host HA"
+    ]
+  },
+  "ordering": {
+    "enriched_topic_partitions": 4,
+    "key": "JSON order_id with Kafka's default keyed partitioner",
+    "target_version": "Kafka offset, only while each order remains in one fixed partition",
+    "partition_expansion": "not qualified; requires a migration/version design",
+    "updates": "Flink emits delete/insert pairs; business revision alone cannot order identical-revision pairs"
+  },
+  "durability": {
+    "mysql_sync_binlog": 1,
+    "mysql_innodb_flush_log_at_trx_commit": 1,
+    "kafka_replication_factor": 3,
+    "kafka_min_insync_replicas": 2,
+    "kafka_producer_acks": "all",
+    "flink_output": "checkpointed Kafka transactions; consumer read-committed behavior is independently probed",
+    "clickhouse_replicas": 3,
+    "clickhouse_insert_quorum": 2,
+    "clickhouse_insert_and_directory_fsync": true,
+    "checkpoint_storage": "owned local shared Docker volume; two retained checkpoints, not an independent backup",
+    "witness": "external intent/ACK JSONL with fsync, surviving component faults; no physical power-loss claim"
+  },
+  "retries": {
+    "business_mutations": "none; a commit error remains ambiguous until reconciled",
+    "backfill_signal": "reuse the same primary-key identity; reject conflicting type/content",
+    "target": "latest committed keyed changelog offset; retain delete tombstones",
+    "airflow": "one task retry, same DAG run identity"
+  },
+  "delete_and_ttl": {
+    "source": "hard order deletion",
+    "target": "logical absence in the current view; raw CDC and tombstones remain",
+    "ttl": "not exercised; no claim of physical erasure or bounded whole-history retention"
+  },
+  "client": {
+    "sql_pool_max": 4,
+    "sql_connect_timeout_s": 5,
+    "sql_read_timeout_s": 60,
+    "sql_write_timeout_s": 30,
+    "mutation_context_s": 30,
+    "target_http_timeout_s": 90,
+    "http_proxy_and_redirects": "disabled",
+    "writer_think_time_ms": 100
+  },
+  "fault_expectations": {
+    "source_acknowledged_data_loss": 0,
+    "wrong_visible_immutable_bodies": 0,
+    "historical_read_errors": 0,
+    "source_progress_during_hold": "at least five additional transaction ACKs",
+    "recent_insert_after_recovery": "a newly observed sampled ACK becomes visible within 180 seconds",
+    "final_cut": "all eleven output fields and EOF match source SQL on each fixed replica"
+  },
+  "performance": "Level 3 recovery/operation diagnostics; no exhaustive matrix or capacity winner",
+  "isolation": "local internal Docker network, owned static credentials, no real AWS configuration/resources or hosted exports"
+}

@@ -35,6 +35,13 @@ under their system directories. All infrastructure and credentials are local.
   The corrected million-order run retained 1,310 live ACKs and matched all eight
   fields on three ClickHouse replicas; failed setup/oracle attempts remain visible.
 
+- [MySQL current margins + Airflow](mysql-flink-clickhouse-airflow/): MySQL →
+  Debezium/Kafka → Flink current customer/order join → three ClickHouse replicas.
+  Connector pause/resume, interrupted incremental backfill after planned shipping
+  DDL, TaskManager checkpoint recovery and Airflow reconciliation passed after
+  documented controller fixes. All 5,953 source ACK effects and 1,005,325 current
+  rows reconciled; CPU/memory, compression, disk and I/O diagnostics are recorded.
+
 The [CDC and observability batch](../docs/example-plans/cdc-observability-level3.md)
 tracks MySQL/Airflow and the fair observability comparisons.
 
