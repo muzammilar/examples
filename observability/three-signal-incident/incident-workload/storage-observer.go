@@ -1,0 +1,1 @@
+../../greptime-victoria/telemetry-workload/disk.go

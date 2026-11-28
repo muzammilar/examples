@@ -1,0 +1,184 @@
+{
+  "evidence": "observability/three-signal-incident/docker-compose/results/resources-1795866625206235000.jsonl",
+  "phase_prefix": "live-publish:victoria",
+  "environment": {
+    "type": "environment",
+    "run_id": 1795866625206235000,
+    "fixture": "checkout-incident-v1",
+    "command": [
+      "make",
+      "correctness-case",
+      "PYTHON=/Users/muzammil/.local/bin/python3.13"
+    ],
+    "environment": {
+      "NCPU": 11,
+      "MemTotal": 26216296448,
+      "KernelVersion": "6.12.76-linuxkit",
+      "OperatingSystem": "Docker Desktop",
+      "Driver": "overlayfs",
+      "ServerVersion": "29.5.3",
+      "docker_api": "1.54"
+    },
+    "cotenancy": "Only this three-signal comparison; backends run serially; no other heavy lab."
+  },
+  "sampled_aggregate_memory_peak_bytes": 550854656,
+  "sampled_aggregate_memory_mean_bytes": 468800794.81904763,
+  "actors": [
+    {
+      "name": "/obs-three-signal-incident-44b30bb93c104a0f98c1fcb6b2ffd163-victoria-watch",
+      "samples": 210,
+      "peak_memory_bytes": 10735616,
+      "configuration": {
+        "image_id": "sha256:2412e759ae669d487b2d8d8bf3b816e98d24c0a599041314e1022878fe022db8",
+        "image_reference": "obs-three-signal-incident-workload:local",
+        "memory_limit_bytes": 134217728,
+        "nano_cpus": 250000000,
+        "started_at": "2026-11-28T11:50:47.075413761Z"
+      },
+      "counter_deltas": {
+        "cpu_core_s": 1.003608,
+        "network_rx_bytes": 2265029,
+        "network_tx_bytes": 470857
+      },
+      "cpu_utilization_pct_one_core_min": 0.16650363642109042,
+      "cpu_utilization_pct_one_core_max": 1.0008154883039855,
+      "observed_s": 216.35289096832275,
+      "sampled_mean_memory_bytes": 9940894.476190476,
+      "cpu_utilization_pct_one_core_average": 0.4638754746970047,
+      "container_lifetime_counters_at_last_sample": {
+        "cpu_core_s": 1.013238,
+        "network_rx_bytes": 2265291,
+        "network_tx_bytes": 470899
+      }
+    },
+    {
+      "name": "/obs-three-signal-incident-44b30bb93c104a0f98c1fcb6b2ffd163-victoria-publish",
+      "samples": 209,
+      "peak_memory_bytes": 17149952,
+      "configuration": {
+        "image_id": "sha256:2412e759ae669d487b2d8d8bf3b816e98d24c0a599041314e1022878fe022db8",
+        "image_reference": "obs-three-signal-incident-workload:local",
+        "memory_limit_bytes": 402653184,
+        "nano_cpus": 750000000,
+        "started_at": "2026-11-28T11:50:46.868004594Z"
+      },
+      "counter_deltas": {
+        "cpu_core_s": 19.201105999999996,
+        "network_rx_bytes": 758059,
+        "network_tx_bytes": 41747032
+      },
+      "cpu_utilization_pct_one_core_min": 4.300987051316787,
+      "cpu_utilization_pct_one_core_max": 11.237207159990527,
+      "observed_s": 215.3257691860199,
+      "sampled_mean_memory_bytes": 14723120.995215312,
+      "cpu_utilization_pct_one_core_average": 8.917235532274896,
+      "container_lifetime_counters_at_last_sample": {
+        "cpu_core_s": 19.267894,
+        "network_rx_bytes": 762859,
+        "network_tx_bytes": 41922097
+      }
+    },
+    {
+      "name": "/obs-three-signal-incident-vlogs-1",
+      "samples": 210,
+      "peak_memory_bytes": 218836992,
+      "counter_deltas": {
+        "cpu_core_s": 7.307418000000001,
+        "network_rx_bytes": 36017784,
+        "network_tx_bytes": 2053014,
+        "disk_read_bytes": 663552,
+        "disk_write_bytes": 115671040
+      },
+      "cpu_utilization_pct_one_core_min": 0.6477535575979593,
+      "cpu_utilization_pct_one_core_max": 70.66468318618428,
+      "observed_s": 216.34858798980713,
+      "sampled_mean_memory_bytes": 143157111.46666667,
+      "cpu_utilization_pct_one_core_average": 3.3776129846265865,
+      "container_lifetime_counters_at_last_sample": {
+        "cpu_core_s": 9.169199,
+        "network_rx_bytes": 36427685,
+        "network_tx_bytes": 26988036,
+        "disk_read_bytes": 798720,
+        "disk_write_bytes": 115671040
+      }
+    },
+    {
+      "name": "/obs-three-signal-incident-vmetrics-1",
+      "samples": 210,
+      "peak_memory_bytes": 171184128,
+      "counter_deltas": {
+        "cpu_core_s": 2.936416,
+        "network_rx_bytes": 5046929,
+        "network_tx_bytes": 524880,
+        "disk_read_bytes": 184320,
+        "disk_write_bytes": 10436608
+      },
+      "cpu_utilization_pct_one_core_min": 0.10985748257238623,
+      "cpu_utilization_pct_one_core_max": 11.378939393949029,
+      "observed_s": 216.34832310676575,
+      "sampled_mean_memory_bytes": 167307088.45714286,
+      "cpu_utilization_pct_one_core_average": 1.3572631198767866,
+      "container_lifetime_counters_at_last_sample": {
+        "cpu_core_s": 3.216545,
+        "network_rx_bytes": 5087735,
+        "network_tx_bytes": 1107434,
+        "disk_read_bytes": 204800,
+        "disk_write_bytes": 10436608
+      }
+    },
+    {
+      "name": "/obs-three-signal-incident-vtraces-1",
+      "samples": 210,
+      "peak_memory_bytes": 73428992,
+      "counter_deltas": {
+        "cpu_core_s": 2.3792820000000017,
+        "network_rx_bytes": 2232443,
+        "network_tx_bytes": 538374,
+        "disk_read_bytes": 442368,
+        "disk_write_bytes": 9375744
+      },
+      "cpu_utilization_pct_one_core_min": 0.30868386453793967,
+      "cpu_utilization_pct_one_core_max": 7.394878176129766,
+      "observed_s": 216.3478980064392,
+      "sampled_mean_memory_bytes": 48511327.08571429,
+      "cpu_utilization_pct_one_core_average": 1.0997481472776716,
+      "container_lifetime_counters_at_last_sample": {
+        "cpu_core_s": 11.478357,
+        "network_rx_bytes": 4735601,
+        "network_tx_bytes": 7394905,
+        "disk_read_bytes": 647168,
+        "disk_write_bytes": 9375744
+      }
+    },
+    {
+      "name": "/obs-three-signal-incident-victoria-collector-1",
+      "samples": 210,
+      "peak_memory_bytes": 89690112,
+      "counter_deltas": {
+        "cpu_core_s": 14.531870000000001,
+        "network_rx_bytes": 42599769,
+        "network_tx_bytes": 43583133,
+        "disk_read_bytes": 0,
+        "disk_write_bytes": 1485463552
+      },
+      "cpu_utilization_pct_one_core_min": 0.42653631347780185,
+      "cpu_utilization_pct_one_core_max": 8.744145795970017,
+      "observed_s": 216.3479950428009,
+      "sampled_mean_memory_bytes": 85231362.43809524,
+      "cpu_utilization_pct_one_core_average": 6.716896080837315,
+      "container_lifetime_counters_at_last_sample": {
+        "cpu_core_s": 14.6696,
+        "network_rx_bytes": 42819472,
+        "network_tx_bytes": 43770037,
+        "disk_read_bytes": 0,
+        "disk_write_bytes": 1491759104
+      }
+    }
+  ],
+  "limits": [
+    "Sample-window deltas exclude startup and exit outside observation. Decreasing counters are treated as restarts and the new counter is accumulated; reset intervals have no CPU utilization estimate.",
+    "Short-lived actors may be missed; use native pre-exit cgroup counters as well.",
+    "CPU utilization is interval-average percent of one core; short spikes may be missed.",
+    "Docker disk bytes are not device I/O latency; absent counters are unavailable, not zero."
+  ]
+}

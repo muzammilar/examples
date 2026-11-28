@@ -1,0 +1,136 @@
+{
+  "evidence": "observability/three-signal-incident/docker-compose/results/resources-1795865102265436000.jsonl",
+  "phase_prefix": "live-publish:greptime",
+  "environment": {
+    "type": "environment",
+    "run_id": 1795865102265436000,
+    "fixture": "checkout-incident-v1",
+    "command": [
+      "make",
+      "correctness-case",
+      "PYTHON=/Users/muzammil/.local/bin/python3.13"
+    ],
+    "environment": {
+      "NCPU": 11,
+      "MemTotal": 26216296448,
+      "KernelVersion": "6.12.76-linuxkit",
+      "OperatingSystem": "Docker Desktop",
+      "Driver": "overlayfs",
+      "ServerVersion": "29.5.3",
+      "docker_api": "1.54"
+    },
+    "cotenancy": "Only this three-signal comparison; backends run serially; no other heavy lab."
+  },
+  "sampled_aggregate_memory_peak_bytes": 2965897216,
+  "sampled_aggregate_memory_mean_bytes": 1699043482.5660377,
+  "actors": [
+    {
+      "name": "/obs-three-signal-incident-greptime-1",
+      "samples": 212,
+      "peak_memory_bytes": 2855755776,
+      "counter_deltas": {
+        "cpu_core_s": 74.56012899999999,
+        "network_rx_bytes": 43796562,
+        "network_tx_bytes": 26782486,
+        "disk_read_bytes": 135168,
+        "disk_write_bytes": 220667904
+      },
+      "cpu_utilization_pct_one_core_min": 7.713013240815,
+      "cpu_utilization_pct_one_core_max": 102.04656756277714,
+      "observed_s": 216.01419305801392,
+      "sampled_mean_memory_bytes": 1595645391.6981132,
+      "cpu_utilization_pct_one_core_average": 34.51631022225272,
+      "container_lifetime_counters_at_last_sample": {
+        "cpu_core_s": 74.658311,
+        "network_rx_bytes": 43798837,
+        "network_tx_bytes": 26823129,
+        "disk_read_bytes": 135168,
+        "disk_write_bytes": 221478912
+      }
+    },
+    {
+      "name": "/obs-three-signal-incident-greptime-collector-1",
+      "samples": 212,
+      "peak_memory_bytes": 86437888,
+      "counter_deltas": {
+        "cpu_core_s": 13.481723,
+        "network_rx_bytes": 43057293,
+        "network_tx_bytes": 43840212,
+        "disk_read_bytes": 0,
+        "disk_write_bytes": 1491673088
+      },
+      "cpu_utilization_pct_one_core_min": 0.04319267326283176,
+      "cpu_utilization_pct_one_core_max": 7.721137382947953,
+      "observed_s": 216.01420497894287,
+      "sampled_mean_memory_bytes": 81188303.6981132,
+      "cpu_utilization_pct_one_core_average": 6.241127985686961,
+      "container_lifetime_counters_at_last_sample": {
+        "cpu_core_s": 13.563669,
+        "network_rx_bytes": 43059825,
+        "network_tx_bytes": 43842070,
+        "disk_read_bytes": 0,
+        "disk_write_bytes": 1491759104
+      }
+    },
+    {
+      "name": "/obs-three-signal-incident-9bae05ff7ecb4206a821c9cfd82f925d-greptime-watch",
+      "samples": 211,
+      "peak_memory_bytes": 10690560,
+      "configuration": {
+        "image_id": "sha256:70aa35a57bfbc60ab5026d9550e48209cca45ada856c5c8476b3b7a12eee3d2c",
+        "image_reference": "obs-three-signal-incident-workload:local",
+        "memory_limit_bytes": 134217728,
+        "nano_cpus": 250000000,
+        "started_at": "2026-11-28T11:25:29.102586919Z"
+      },
+      "counter_deltas": {
+        "cpu_core_s": 0.9285669999999999,
+        "network_rx_bytes": 25701984,
+        "network_tx_bytes": 722146
+      },
+      "cpu_utilization_pct_one_core_min": 0.2562134558123648,
+      "cpu_utilization_pct_one_core_max": 0.8621373326056642,
+      "observed_s": 214.97857093811035,
+      "sampled_mean_memory_bytes": 9867438.710900474,
+      "cpu_utilization_pct_one_core_average": 0.431934678860305,
+      "container_lifetime_counters_at_last_sample": {
+        "cpu_core_s": 0.937699,
+        "network_rx_bytes": 25702458,
+        "network_tx_bytes": 722188
+      }
+    },
+    {
+      "name": "/obs-three-signal-incident-9bae05ff7ecb4206a821c9cfd82f925d-greptime-publish",
+      "samples": 210,
+      "peak_memory_bytes": 16019456,
+      "configuration": {
+        "image_id": "sha256:70aa35a57bfbc60ab5026d9550e48209cca45ada856c5c8476b3b7a12eee3d2c",
+        "image_reference": "obs-three-signal-incident-workload:local",
+        "memory_limit_bytes": 402653184,
+        "nano_cpus": 750000000,
+        "started_at": "2026-11-28T11:25:28.910134127Z"
+      },
+      "counter_deltas": {
+        "cpu_core_s": 17.533796,
+        "network_rx_bytes": 762277,
+        "network_tx_bytes": 41765279
+      },
+      "cpu_utilization_pct_one_core_min": 4.334199230485496,
+      "cpu_utilization_pct_one_core_max": 10.48570871630387,
+      "observed_s": 213.9497938156128,
+      "sampled_mean_memory_bytes": 12506882.438095238,
+      "cpu_utilization_pct_one_core_average": 8.195285299087999,
+      "container_lifetime_counters_at_last_sample": {
+        "cpu_core_s": 17.614283,
+        "network_rx_bytes": 767564,
+        "network_tx_bytes": 41975667
+      }
+    }
+  ],
+  "limits": [
+    "Sample-window deltas exclude startup and exit outside observation. Decreasing counters are treated as restarts and the new counter is accumulated; reset intervals have no CPU utilization estimate.",
+    "Short-lived actors may be missed; use native pre-exit cgroup counters as well.",
+    "CPU utilization is interval-average percent of one core; short spikes may be missed.",
+    "Docker disk bytes are not device I/O latency; absent counters are unavailable, not zero."
+  ]
+}

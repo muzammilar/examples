@@ -1,0 +1,637 @@
+{
+  "case": {
+    "kind": "healthy",
+    "run": "9bae05ff7ecb4206a821c9cfd82f925d",
+    "prior": "results/cases/c9a9878f6883490aba4c24bf1322174a/fixture.json",
+    "scope": "Million-record live value/recovery diagnostic; Victoria exact numeric attribute fidelity remains failed"
+  },
+  "fixture": {
+    "run": "9bae05ff7ecb4206a821c9cfd82f925d",
+    "payload_seed": "c9a9878f6883490aba4c24bf1322174a",
+    "start_ms": 1795856927000,
+    "requests": 10000,
+    "logs_per_request": 100,
+    "metric_points": 100
+  },
+  "scope": "Paced functional/recovery diagnostics, not repeated capacity benchmarks",
+  "backends": {
+    "greptime": {
+      "fence": {
+        "actors_stopped": true,
+        "histories": {
+          "metrics": "2668454b7c1aeb94ece15653d455c849f6867782a59c9eb9f34d64dd3f6c923e",
+          "logs": "70e51ad70372159d43ce8e4f492eacf7240a5642f40a3ff6ca78687101e0b679",
+          "traces": "9c60ceed84abdba3749eba92ab1696e42599f0fb72c80c8ff558d9bc85b318cf"
+        },
+        "fenced_at_unix_s": 1795865345.3781629
+      },
+      "publication": [
+        {
+          "emitted_items": 10000,
+          "planned_items": 10000,
+          "signal": "traces",
+          "completed": true,
+          "requests": 1000,
+          "acknowledged_requests": 1000,
+          "unacknowledged_requests": 0,
+          "elapsed_s": 208.184051885
+        },
+        {
+          "emitted_items": 1000000,
+          "planned_items": 1000000,
+          "signal": "metrics",
+          "completed": true,
+          "requests": 1000,
+          "acknowledged_requests": 1000,
+          "unacknowledged_requests": 0,
+          "elapsed_s": 208.185623593
+        },
+        {
+          "emitted_items": 1000000,
+          "planned_items": 1000000,
+          "signal": "logs",
+          "completed": true,
+          "requests": 1000,
+          "acknowledged_requests": 1000,
+          "unacknowledged_requests": 0,
+          "elapsed_s": 215.11635043
+        },
+        {
+          "captured_at": "2026-11-28T11:29:04.079938921Z",
+          "event": "native-cgroup-before-exit",
+          "scope": "Whole container/process lifetime",
+          "unavailable": {},
+          "values": {
+            "cpu.stat": "usage_usec 17614463\nuser_usec 15369387\nsystem_usec 2245076\nnice_usec 0\nnr_periods 2147\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+            "io.stat": "",
+            "memory.current": "14127104\n",
+            "memory.peak": "17018880\n"
+          }
+        }
+      ],
+      "signals": {
+        "metrics": {
+          "requests": 1000,
+          "outcomes": {
+            "accepted": 1000
+          },
+          "source_protobuf_bytes": 103495100,
+          "source_gzip_bytes": 4490398,
+          "wire_compression_ratio": 23.048090614684934,
+          "request_http_latency_ms": {
+            "p50": 1.94025,
+            "p95": 3.567375,
+            "p99": 4.304958,
+            "p99_9": 5.743,
+            "max": 6.437208
+          }
+        },
+        "logs": {
+          "requests": 1000,
+          "outcomes": {
+            "accepted": 1000
+          },
+          "source_protobuf_bytes": 589238578,
+          "source_gzip_bytes": 34610832,
+          "wire_compression_ratio": 17.02468689570941,
+          "request_http_latency_ms": {
+            "p50": 2.656167,
+            "p95": 4.011292,
+            "p99": 5.117125,
+            "p99_9": 6.972541,
+            "max": 8.301583
+          }
+        },
+        "traces": {
+          "requests": 1000,
+          "outcomes": {
+            "accepted": 1000
+          },
+          "source_protobuf_bytes": 8707199,
+          "source_gzip_bytes": 1700387,
+          "wire_compression_ratio": 5.120716048758312,
+          "request_http_latency_ms": {
+            "p50": 1.585875,
+            "p95": 3.82025,
+            "p99": 5.418416,
+            "p99_9": 6.293833,
+            "max": 6.454916
+          }
+        }
+      },
+      "live_read_outcomes": {
+        "metrics:old:visible": 215,
+        "metrics:recent:visible": 215,
+        "logs:old:visible": 215,
+        "logs:recent:visible": 212,
+        "traces:old:visible": 215,
+        "traces:recent:visible": 215,
+        "logs:recent:pending": 3
+      },
+      "visible_recent_ack_age_ms": {
+        "metrics": {
+          "samples": 215,
+          "min": 12.731792,
+          "max": 7233.141878
+        },
+        "logs": {
+          "samples": 212,
+          "min": 14.386958,
+          "max": 1018.250293
+        },
+        "traces": {
+          "samples": 215,
+          "min": 19.29575,
+          "max": 7354.601379
+        }
+      },
+      "frozen_readbacks": [
+        {
+          "path": "results/cases/9bae05ff7ecb4206a821c9cfd82f925d/greptime/final/readback-1.json",
+          "report": {
+            "backend": "greptime",
+            "captured_at": "2026-11-28T11:29:24.173270291Z",
+            "fixture": {
+              "run": "9bae05ff7ecb4206a821c9cfd82f925d",
+              "payload_seed": "c9a9878f6883490aba4c24bf1322174a",
+              "start_ms": 1795856927000,
+              "requests": 10000,
+              "logs_per_request": 100,
+              "metric_points": 100
+            },
+            "projection_diagnostic": false,
+            "scope": "Frozen ACK/value reconciliation; numeric projection is explicitly marked and cannot establish exact attribute type fidelity",
+            "signals": {
+              "logs": {
+                "complete": true,
+                "counts": {
+                  "acknowledged_records": 1000000,
+                  "acknowledged_present": 1000000,
+                  "missing_acknowledged_ids": [],
+                  "ambiguous_records": 0,
+                  "ambiguous_present": 0,
+                  "ambiguous_absent_at_cut": 0,
+                  "unexpected_ids": [],
+                  "duplicate_copies_returned_by_query": 0
+                },
+                "elapsed_s": 6.9454270860000005,
+                "exact_attribute_type_fidelity": true,
+                "history_sha256": "70e51ad70372159d43ce8e4f492eacf7240a5642f40a3ff6ca78687101e0b679",
+                "numeric_attribute_projection_spans": 0
+              },
+              "metrics": {
+                "complete": true,
+                "counts": {
+                  "acknowledged_records": 1000000,
+                  "acknowledged_present": 1000000,
+                  "missing_acknowledged_ids": [],
+                  "ambiguous_records": 0,
+                  "ambiguous_present": 0,
+                  "ambiguous_absent_at_cut": 0,
+                  "unexpected_ids": [],
+                  "duplicate_copies_returned_by_query": 0
+                },
+                "elapsed_s": 1.451528959,
+                "exact_attribute_type_fidelity": true,
+                "history_sha256": "2668454b7c1aeb94ece15653d455c849f6867782a59c9eb9f34d64dd3f6c923e",
+                "numeric_attribute_projection_spans": 0
+              },
+              "traces": {
+                "complete": true,
+                "counts": {
+                  "acknowledged_records": 30000,
+                  "acknowledged_present": 30000,
+                  "missing_acknowledged_ids": [],
+                  "ambiguous_records": 0,
+                  "ambiguous_present": 0,
+                  "ambiguous_absent_at_cut": 0,
+                  "unexpected_ids": [],
+                  "duplicate_copies_returned_by_query": 0
+                },
+                "elapsed_s": 4.172488335,
+                "exact_attribute_type_fidelity": true,
+                "history_sha256": "9c60ceed84abdba3749eba92ab1696e42599f0fb72c80c8ff558d9bc85b318cf",
+                "numeric_attribute_projection_spans": 0
+              }
+            }
+          }
+        }
+      ]
+    },
+    "victoria": {
+      "fence": {
+        "actors_stopped": true,
+        "histories": {
+          "metrics": "dc8bd8ee14d843a26cfb7ea8e7183cb532d14fb3f29848c35fdf7636790feca1",
+          "logs": "319d5e7dbb9e6e8c6142b0bb67e3c0710770d0b837c3ddb88f9879572b5f6f8e",
+          "traces": "9c68cb4545b035c2c49116efd830229f04bd109431fb0c0c9e41d626855507af"
+        },
+        "fenced_at_unix_s": 1795865785.5740721
+      },
+      "publication": [
+        {
+          "emitted_items": 558000,
+          "planned_items": 1000000,
+          "signal": "logs",
+          "completed": false,
+          "requests": 558,
+          "acknowledged_requests": 558,
+          "unacknowledged_requests": 0,
+          "elapsed_s": 120.846245348
+        },
+        {
+          "emitted_items": 5820,
+          "planned_items": 10000,
+          "signal": "traces",
+          "completed": false,
+          "requests": 582,
+          "acknowledged_requests": 582,
+          "unacknowledged_requests": 0,
+          "elapsed_s": 120.845587097
+        },
+        {
+          "emitted_items": 581000,
+          "planned_items": 1000000,
+          "signal": "metrics",
+          "completed": false,
+          "requests": 581,
+          "acknowledged_requests": 581,
+          "unacknowledged_requests": 0,
+          "elapsed_s": 120.84190789
+        },
+        {
+          "captured_at": "2026-11-28T11:31:29.415262044Z",
+          "event": "native-cgroup-before-exit",
+          "scope": "Whole container/process lifetime",
+          "unavailable": {},
+          "values": {
+            "cpu.stat": "usage_usec 11048796\nuser_usec 9375775\nsystem_usec 1673020\nnice_usec 0\nnr_periods 1208\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+            "io.stat": "",
+            "memory.current": "17096704\n",
+            "memory.peak": "20709376\n"
+          }
+        }
+      ],
+      "signals": {
+        "metrics": {
+          "requests": 581,
+          "outcomes": {
+            "accepted": 581
+          },
+          "source_protobuf_bytes": 60129650,
+          "source_gzip_bytes": 2609120,
+          "wire_compression_ratio": 23.045950358741646,
+          "request_http_latency_ms": {
+            "p50": 1.826417,
+            "p95": 3.580333,
+            "p99": 4.496125,
+            "p99_9": 13.583583,
+            "max": 13.583583
+          }
+        },
+        "logs": {
+          "requests": 558,
+          "outcomes": {
+            "accepted": 558
+          },
+          "source_protobuf_bytes": 328821280,
+          "source_gzip_bytes": 19314682,
+          "wire_compression_ratio": 17.024421111359743,
+          "request_http_latency_ms": {
+            "p50": 3.1165,
+            "p95": 4.337917,
+            "p99": 5.831416,
+            "p99_9": 17.671666,
+            "max": 17.671666
+          }
+        },
+        "traces": {
+          "requests": 582,
+          "outcomes": {
+            "accepted": 582
+          },
+          "source_protobuf_bytes": 5072838,
+          "source_gzip_bytes": 991691,
+          "wire_compression_ratio": 5.115341371455423,
+          "request_http_latency_ms": {
+            "p50": 1.555417,
+            "p95": 3.651458,
+            "p99": 5.610167,
+            "p99_9": 9.992125,
+            "max": 9.992125
+          }
+        }
+      },
+      "live_read_outcomes": {
+        "metrics:old:visible": 120,
+        "metrics:recent:pending": 91,
+        "logs:old:visible": 120,
+        "logs:recent:visible": 68,
+        "traces:old:fidelity-mismatch": 120,
+        "traces:recent:pending": 110,
+        "logs:recent:pending": 52,
+        "metrics:recent:visible": 29,
+        "traces:recent:visibility-budget-exceeded": 10
+      },
+      "visible_recent_ack_age_ms": {
+        "metrics": {
+          "samples": 29,
+          "min": 2026.309585,
+          "max": 7164.988795
+        },
+        "logs": {
+          "samples": 68,
+          "min": 17.901042,
+          "max": 1224.721917
+        },
+        "traces": {
+          "samples": 0,
+          "min": null,
+          "max": null
+        }
+      },
+      "frozen_readbacks": [
+        {
+          "path": "results/cases/9bae05ff7ecb4206a821c9cfd82f925d/victoria/partial-reconciliation/readback-1.json",
+          "report": {
+            "backend": "victoria",
+            "captured_at": "2026-11-28T11:36:39.163063048Z",
+            "fixture": {
+              "run": "9bae05ff7ecb4206a821c9cfd82f925d",
+              "payload_seed": "c9a9878f6883490aba4c24bf1322174a",
+              "start_ms": 1795856927000,
+              "requests": 10000,
+              "logs_per_request": 100,
+              "metric_points": 100
+            },
+            "projection_diagnostic": true,
+            "scope": "Frozen ACK/value reconciliation; numeric projection is explicitly marked and cannot establish exact attribute type fidelity",
+            "signals": {
+              "logs": {
+                "complete": true,
+                "counts": {
+                  "acknowledged_records": 558000,
+                  "acknowledged_present": 558000,
+                  "missing_acknowledged_ids": [],
+                  "ambiguous_records": 0,
+                  "ambiguous_present": 0,
+                  "ambiguous_absent_at_cut": 0,
+                  "unexpected_ids": [],
+                  "duplicate_copies_returned_by_query": 0
+                },
+                "elapsed_s": 4.575950836,
+                "exact_attribute_type_fidelity": true,
+                "history_sha256": "319d5e7dbb9e6e8c6142b0bb67e3c0710770d0b837c3ddb88f9879572b5f6f8e",
+                "numeric_attribute_projection_spans": 0
+              },
+              "metrics": {
+                "complete": true,
+                "counts": {
+                  "acknowledged_records": 581000,
+                  "acknowledged_present": 581000,
+                  "missing_acknowledged_ids": [],
+                  "ambiguous_records": 0,
+                  "ambiguous_present": 0,
+                  "ambiguous_absent_at_cut": 0,
+                  "unexpected_ids": [],
+                  "duplicate_copies_returned_by_query": 0
+                },
+                "elapsed_s": 0.436698876,
+                "exact_attribute_type_fidelity": true,
+                "history_sha256": "dc8bd8ee14d843a26cfb7ea8e7183cb532d14fb3f29848c35fdf7636790feca1",
+                "numeric_attribute_projection_spans": 0
+              },
+              "traces": {
+                "complete": true,
+                "counts": {
+                  "acknowledged_records": 17460,
+                  "acknowledged_present": 17460,
+                  "missing_acknowledged_ids": [],
+                  "ambiguous_records": 0,
+                  "ambiguous_present": 0,
+                  "ambiguous_absent_at_cut": 0,
+                  "unexpected_ids": [],
+                  "duplicate_copies_returned_by_query": 0
+                },
+                "elapsed_s": 8.394605754,
+                "exact_attribute_type_fidelity": false,
+                "history_sha256": "9c68cb4545b035c2c49116efd830229f04bd109431fb0c0c9e41d626855507af",
+                "numeric_attribute_projection_spans": 17460
+              }
+            }
+          }
+        }
+      ]
+    },
+    "grafana": {
+      "fence": {
+        "actors_stopped": true,
+        "histories": {
+          "metrics": "d869645a9daa0782d26cc5d3ab186571b3db907afe3bc2cb8c9c686d59a1caab",
+          "logs": "e33651fd3c87f8a6dc8967522e78a46959956f7a390f72509516c3a7a8404d0f",
+          "traces": "4e75319c7475717bd0defe9821b84d006dac9b0e15a669664e7a17e2b6d348b3"
+        },
+        "fenced_at_unix_s": 1795866410.507893
+      },
+      "publication": [
+        {
+          "emitted_items": 10000,
+          "planned_items": 10000,
+          "signal": "traces",
+          "completed": true,
+          "requests": 1000,
+          "acknowledged_requests": 1000,
+          "unacknowledged_requests": 0,
+          "elapsed_s": 206.817298427
+        },
+        {
+          "emitted_items": 1000000,
+          "planned_items": 1000000,
+          "signal": "metrics",
+          "completed": true,
+          "requests": 1000,
+          "acknowledged_requests": 1000,
+          "unacknowledged_requests": 0,
+          "elapsed_s": 206.821263719
+        },
+        {
+          "emitted_items": 1000000,
+          "planned_items": 1000000,
+          "signal": "logs",
+          "completed": true,
+          "requests": 1000,
+          "acknowledged_requests": 1000,
+          "unacknowledged_requests": 0,
+          "elapsed_s": 215.660817765
+        },
+        {
+          "captured_at": "2026-11-28T11:46:49.77166347Z",
+          "event": "native-cgroup-before-exit",
+          "scope": "Whole container/process lifetime",
+          "unavailable": {},
+          "values": {
+            "cpu.stat": "usage_usec 17776027\nuser_usec 15435358\nsystem_usec 2340669\nnice_usec 0\nnr_periods 2149\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+            "io.stat": "",
+            "memory.current": "14721024\n",
+            "memory.peak": "17227776\n"
+          }
+        }
+      ],
+      "signals": {
+        "metrics": {
+          "requests": 1000,
+          "outcomes": {
+            "accepted": 1000
+          },
+          "source_protobuf_bytes": 103495100,
+          "source_gzip_bytes": 4490398,
+          "wire_compression_ratio": 23.048090614684934,
+          "request_http_latency_ms": {
+            "p50": 1.496542,
+            "p95": 3.304875,
+            "p99": 4.014333,
+            "p99_9": 20.917,
+            "max": 38.381625
+          }
+        },
+        "logs": {
+          "requests": 1000,
+          "outcomes": {
+            "accepted": 1000
+          },
+          "source_protobuf_bytes": 589238578,
+          "source_gzip_bytes": 34610832,
+          "wire_compression_ratio": 17.02468689570941,
+          "request_http_latency_ms": {
+            "p50": 2.964375,
+            "p95": 4.440042,
+            "p99": 6.302042,
+            "p99_9": 23.758917,
+            "max": 24.236583
+          }
+        },
+        "traces": {
+          "requests": 1000,
+          "outcomes": {
+            "accepted": 1000
+          },
+          "source_protobuf_bytes": 8707199,
+          "source_gzip_bytes": 1700387,
+          "wire_compression_ratio": 5.120716048758312,
+          "request_http_latency_ms": {
+            "p50": 1.346209,
+            "p95": 3.948917,
+            "p99": 6.446125,
+            "p99_9": 46.956875,
+            "max": 51.273584
+          }
+        }
+      },
+      "live_read_outcomes": {
+        "metrics:old:visible": 215,
+        "metrics:recent:visible": 213,
+        "logs:old:visible": 215,
+        "logs:recent:visible": 215,
+        "traces:old:visible": 215,
+        "traces:recent:visible": 215,
+        "metrics:recent:pending": 2
+      },
+      "visible_recent_ack_age_ms": {
+        "metrics": {
+          "samples": 213,
+          "min": 4.833458,
+          "max": 8581.469004
+        },
+        "logs": {
+          "samples": 215,
+          "min": 20.050875,
+          "max": 247.647042
+        },
+        "traces": {
+          "samples": 215,
+          "min": 3.960375,
+          "max": 8620.743254
+        }
+      },
+      "frozen_readbacks": [
+        {
+          "path": "results/cases/9bae05ff7ecb4206a821c9cfd82f925d/grafana/final/readback-1.json",
+          "report": {
+            "backend": "grafana",
+            "captured_at": "2026-11-28T11:49:41.657248841Z",
+            "fixture": {
+              "run": "9bae05ff7ecb4206a821c9cfd82f925d",
+              "payload_seed": "c9a9878f6883490aba4c24bf1322174a",
+              "start_ms": 1795856927000,
+              "requests": 10000,
+              "logs_per_request": 100,
+              "metric_points": 100
+            },
+            "projection_diagnostic": false,
+            "scope": "Frozen ACK/value reconciliation; numeric projection is explicitly marked and cannot establish exact attribute type fidelity",
+            "signals": {
+              "logs": {
+                "complete": true,
+                "counts": {
+                  "acknowledged_records": 1000000,
+                  "acknowledged_present": 1000000,
+                  "missing_acknowledged_ids": [],
+                  "ambiguous_records": 0,
+                  "ambiguous_present": 0,
+                  "ambiguous_absent_at_cut": 0,
+                  "unexpected_ids": [],
+                  "duplicate_copies_returned_by_query": 0
+                },
+                "elapsed_s": 38.648727726,
+                "exact_attribute_type_fidelity": true,
+                "history_sha256": "e33651fd3c87f8a6dc8967522e78a46959956f7a390f72509516c3a7a8404d0f",
+                "numeric_attribute_projection_spans": 0
+              },
+              "metrics": {
+                "complete": true,
+                "counts": {
+                  "acknowledged_records": 1000000,
+                  "acknowledged_present": 1000000,
+                  "missing_acknowledged_ids": [],
+                  "ambiguous_records": 0,
+                  "ambiguous_present": 0,
+                  "ambiguous_absent_at_cut": 0,
+                  "unexpected_ids": [],
+                  "duplicate_copies_returned_by_query": 0
+                },
+                "elapsed_s": 0.757248667,
+                "exact_attribute_type_fidelity": true,
+                "history_sha256": "d869645a9daa0782d26cc5d3ab186571b3db907afe3bc2cb8c9c686d59a1caab",
+                "numeric_attribute_projection_spans": 0
+              },
+              "traces": {
+                "complete": true,
+                "counts": {
+                  "acknowledged_records": 30000,
+                  "acknowledged_present": 30000,
+                  "missing_acknowledged_ids": [],
+                  "ambiguous_records": 0,
+                  "ambiguous_present": 0,
+                  "ambiguous_absent_at_cut": 0,
+                  "unexpected_ids": [],
+                  "duplicate_copies_returned_by_query": 0
+                },
+                "elapsed_s": 125.509440849,
+                "exact_attribute_type_fidelity": true,
+                "history_sha256": "4e75319c7475717bd0defe9821b84d006dac9b0e15a669664e7a17e2b6d348b3",
+                "numeric_attribute_projection_spans": 0
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  "limitations": [
+    "Request latencies include collector admission, not backend durable commit or individual-record latency.",
+    "Empirical p99.9 from 1,000 requests is near the observed maximum, not established long-tail behavior.",
+    "Wire gzip ratio is not on-disk codec compression.",
+    "Recent read observations sample selected ACKs; they are not a complete visibility-latency distribution.",
+    "Use accompanying resource summaries and volume snapshots for CPU, memory, disk I/O, storage and network; missing device metrics remain unavailable."
+  ]
+}

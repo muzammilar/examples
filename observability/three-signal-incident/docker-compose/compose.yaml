@@ -1,0 +1,158 @@
+name: obs-three-signal-incident
+x-collector: &collector
+  image: otel/opentelemetry-collector-contrib:0.166.0@sha256:3e18fe04181de50bdd72e23ad4a4d6214b54351e63d496f1c58127cc4541ad7f
+  pull_policy: never
+  command: [--config=/config/collector.yaml]
+  user: '0:0'
+  cpus: 0.5
+  mem_limit: 512m
+  read_only: true
+  cap_drop: [ALL]
+  security_opt: [no-new-privileges:true]
+  networks: [lab]
+x-tool: &tool
+  profiles: [tools]
+  image: obs-three-signal-incident-workload:local
+  pull_policy: never
+  user: '${LAB_UID:?run through Make}:0'
+  read_only: true
+  cap_drop: [ALL]
+  security_opt: [no-new-privileges:true]
+  cpus: 1
+  mem_limit: 512m
+  volumes: [./results:/results]
+  networks: [lab]
+x-storage-init: &storage-init
+  profiles: [grafana]
+  image: obs-three-signal-incident-workload:local
+  pull_policy: never
+  user: '0:0'
+  read_only: true
+  cap_drop: [ALL]
+  cap_add: [CHOWN]
+  security_opt: [no-new-privileges:true]
+  network_mode: none
+  cpus: 0.25
+  mem_limit: 64m
+services:
+  greptime:
+    profiles: [greptime]
+    image: greptime/greptimedb:v1.3.1@sha256:a10181273b9400a30fbad6f5043b3d08e388c7d4ee30a7570e5f0241496e9ee1
+    pull_policy: never
+    cpus: 5.5
+    mem_limit: 7680m
+    command: ["standalone", "start", "-c", "/config/greptime.toml"]
+    volumes: ["./config/greptime.toml:/config/greptime.toml:ro", "greptime:/data"]
+    networks: [lab]
+  vmetrics:
+    profiles: [victoria]
+    image: victoriametrics/victoria-metrics:v1.157.0@sha256:322a7a92fdcc269280e9c38af94c83bc76827a31b792acbc60e44394e7f29c20
+    pull_policy: never
+    cpus: 2
+    mem_limit: 3g
+    command: ["-storageDataPath=/data", "-retentionPeriod=7d", "-dedup.minScrapeInterval=1ms"]
+    volumes: ["vmetrics:/data"]
+    networks: [lab]
+  vlogs:
+    profiles: [victoria]
+    image: victoriametrics/victoria-logs:v1.55.0@sha256:7bec543b83cbff641e4b568c6f28d8e9cd779e4eab3add9f8806c32af23ea1e1
+    pull_policy: never
+    cpus: 2
+    mem_limit: 3g
+    command: ["-storageDataPath=/data", "-retentionPeriod=7d"]
+    volumes: ["vlogs:/data"]
+    networks: [lab]
+  vtraces:
+    profiles: [victoria]
+    image: victoriametrics/victoria-traces:v0.13.0@sha256:3018df8f99429d7d3029167ab9f70848bf0a778c31c49dff16c86c7e34759fbd
+    pull_policy: never
+    cpus: 1.5
+    mem_limit: 1536m
+    command: ["-storageDataPath=/data", "-retentionPeriod=7d"]
+    volumes: ["vtraces:/data"]
+    networks: [lab]
+  prometheus:
+    profiles: [grafana]
+    image: prom/prometheus:v3.16.0@sha256:e04987641b57704f408e31f6373ba4138ecf27cb4a165d24aabb6c38fddd0f06
+    pull_policy: never
+    cpus: 2
+    mem_limit: 3g
+    command: ["--config.file=/config/prometheus.yaml", "--storage.tsdb.path=/data", "--storage.tsdb.retention.time=7d", "--web.enable-otlp-receiver"]
+    volumes: ["./config/prometheus.yaml:/config/prometheus.yaml:ro", "prometheus:/data"]
+    networks: [lab]
+  loki:
+    profiles: [grafana]
+    image: grafana/loki:3.7.11@sha256:4c86f2ad5003304c8da84d29da2279b04eb999d716f8089c88e4fa4a44b0781e
+    pull_policy: never
+    cpus: 2
+    mem_limit: 3g
+    command: ["-config.file=/config/loki.yaml"]
+    volumes: ["./config/loki.yaml:/config/loki.yaml:ro", "loki:/data"]
+    networks: [lab]
+  tempo:
+    profiles: [grafana]
+    image: grafana/tempo:3.1.1@sha256:64e2fbd56d9c2b3412a4b430a58ea59e91a670b1e75f920a0c702213ad145044
+    pull_policy: never
+    cpus: 1.5
+    mem_limit: 1536m
+    command: ["-config.file=/config/tempo.yaml"]
+    volumes: ["./config/tempo.yaml:/config/tempo.yaml:ro", "tempo:/data"]
+    networks: [lab]
+  greptime-collector:
+    <<: *collector
+    profiles: [greptime]
+    volumes:
+      - ./config/greptime-collector.yaml:/config/collector.yaml:ro
+      - greptime-queue:/data/queue
+  victoria-collector:
+    <<: *collector
+    profiles: [victoria]
+    volumes:
+      - ./config/victoria-collector.yaml:/config/collector.yaml:ro
+      - victoria-queue:/data/queue
+  grafana-collector:
+    <<: *collector
+    profiles: [grafana]
+    volumes:
+      - ./config/grafana-collector.yaml:/config/collector.yaml:ro
+      - grafana-queue:/data/queue
+  prometheus-storage-init:
+    <<: *storage-init
+    command: [--mode=prepare-data, --data-uid=65534]
+    volumes: [prometheus:/data]
+  loki-storage-init:
+    <<: *storage-init
+    command: [--mode=prepare-data, --data-uid=10001]
+    volumes: [loki:/data]
+  tempo-storage-init:
+    <<: *storage-init
+    command: [--mode=prepare-data, --data-uid=10001]
+    volumes: [tempo:/data]
+  incident-workload:
+    <<: *tool
+    build:
+      context: ./.build/incident-workload
+  incident-publisher:
+    <<: *tool
+    cpus: 0.75
+    mem_limit: 384m
+  incident-reader:
+    <<: *tool
+    cpus: 0.25
+    mem_limit: 128m
+networks:
+  lab:
+    internal: true
+    ipam:
+      config: [{subnet: 172.30.74.0/24}]
+volumes:
+  greptime: {}
+  vmetrics: {}
+  vlogs: {}
+  vtraces: {}
+  prometheus: {}
+  loki: {}
+  tempo: {}
+  greptime-queue: {}
+  victoria-queue: {}
+  grafana-queue: {}

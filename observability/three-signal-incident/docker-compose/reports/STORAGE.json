@@ -1,0 +1,220 @@
+{
+  "greptime": {
+    "case": "9bae05ff7ecb4206a821c9cfd82f925d",
+    "snapshots": 9,
+    "volumes": {
+      "obs-three-signal-incident_greptime": {
+        "role": "greptime",
+        "allocated_min_bytes": 4403200,
+        "allocated_max_bytes": 161566720,
+        "logical_min_bytes": 4039264,
+        "logical_max_bytes": 161137550,
+        "before-ingest": {
+          "allocated_bytes": 4403200,
+          "logical_regular_file_bytes": 4039264
+        },
+        "after-actors": {
+          "allocated_bytes": 161566720,
+          "logical_regular_file_bytes": 161137550
+        }
+      },
+      "obs-three-signal-incident_greptime-queue": {
+        "role": "greptime-collector",
+        "allocated_min_bytes": 69632,
+        "allocated_max_bytes": 2056192,
+        "logical_min_bytes": 98304,
+        "logical_max_bytes": 2424832,
+        "before-ingest": {
+          "allocated_bytes": 69632,
+          "logical_regular_file_bytes": 98304
+        },
+        "after-actors": {
+          "allocated_bytes": 2056192,
+          "logical_regular_file_bytes": 2424832
+        }
+      }
+    },
+    "evidence_sha256": {
+      "results/cases/9bae05ff7ecb4206a821c9cfd82f925d/greptime-disk-after-actors.json": "4168f57a4b66deed54807d8630f7c1cef4539fcb1eb0fe104a64a9f31b91fda8",
+      "results/cases/9bae05ff7ecb4206a821c9cfd82f925d/greptime-disk-before-ingest.json": "d65009b54763d3c02b25b3bd242cda5136277de95cdf25defc3bc906e7445b7f",
+      "results/cases/9bae05ff7ecb4206a821c9cfd82f925d/greptime-disk-sample-1.json": "cdfd23d7db7b219607a9147d58eca71c7247b20210d7b996df67682389effe39",
+      "results/cases/9bae05ff7ecb4206a821c9cfd82f925d/greptime-disk-sample-2.json": "28d3f3e21569eb3ae4dd44b8f26be81c9903aaae9b2ccebcbfdc961851b9c896",
+      "results/cases/9bae05ff7ecb4206a821c9cfd82f925d/greptime-disk-sample-3.json": "9ec79d7655531f828931c9638e751f602f0b52643694579dc66ed1b3fccb4089",
+      "results/cases/9bae05ff7ecb4206a821c9cfd82f925d/greptime-disk-sample-4.json": "0f03ec161f51a78b4222294268b3d7a7b6059cf33feec692628ed4e1bff41620",
+      "results/cases/9bae05ff7ecb4206a821c9cfd82f925d/greptime-disk-sample-5.json": "176ad0a1ed2bcab718c884284a1882a22b044e4e9eefae57141b2f5817ea4669",
+      "results/cases/9bae05ff7ecb4206a821c9cfd82f925d/greptime-disk-sample-6.json": "d6b4734ccb0cf77cd8d6d54ec36e7ae76b5af300cb163e98f5158614c98a50c0",
+      "results/cases/9bae05ff7ecb4206a821c9cfd82f925d/greptime-disk-sample-7.json": "75937cb3b3c87defc10467963fc10b7c5fc8de8cfa127c48c98e9f20e1a02392"
+    },
+    "scope": "Includes previous small controls and preserved prior cases; sampled min/max, not continuous peak, isolated per-record storage or native codec compression."
+  },
+  "grafana": {
+    "case": "9bae05ff7ecb4206a821c9cfd82f925d",
+    "snapshots": 8,
+    "volumes": {
+      "obs-three-signal-incident_prometheus": {
+        "role": "prometheus",
+        "allocated_min_bytes": 102400,
+        "allocated_max_bytes": 6332416,
+        "logical_min_bytes": 85537,
+        "logical_max_bytes": 6313974,
+        "before-ingest": {
+          "allocated_bytes": 102400,
+          "logical_regular_file_bytes": 85537
+        },
+        "after-actors": {
+          "allocated_bytes": 6332416,
+          "logical_regular_file_bytes": 6313974
+        }
+      },
+      "0d4a18626c696272298320151ea4d9bea3889c5a96772eaf94f3efec56c3b100": {
+        "role": "prometheus",
+        "allocated_min_bytes": 4096,
+        "allocated_max_bytes": 4096,
+        "logical_min_bytes": 0,
+        "logical_max_bytes": 0,
+        "before-ingest": {
+          "allocated_bytes": 4096,
+          "logical_regular_file_bytes": 0
+        },
+        "after-actors": {
+          "allocated_bytes": 4096,
+          "logical_regular_file_bytes": 0
+        }
+      },
+      "obs-three-signal-incident_loki": {
+        "role": "loki",
+        "allocated_min_bytes": 7344128,
+        "allocated_max_bytes": 778797056,
+        "logical_min_bytes": 7274528,
+        "logical_max_bytes": 778594977,
+        "before-ingest": {
+          "allocated_bytes": 7344128,
+          "logical_regular_file_bytes": 7274528
+        },
+        "after-actors": {
+          "allocated_bytes": 778797056,
+          "logical_regular_file_bytes": 778594977
+        }
+      },
+      "obs-three-signal-incident_tempo": {
+        "role": "tempo",
+        "allocated_min_bytes": 212992,
+        "allocated_max_bytes": 10895360,
+        "logical_min_bytes": 166788,
+        "logical_max_bytes": 10675855,
+        "before-ingest": {
+          "allocated_bytes": 212992,
+          "logical_regular_file_bytes": 166788
+        },
+        "after-actors": {
+          "allocated_bytes": 10895360,
+          "logical_regular_file_bytes": 10675855
+        }
+      },
+      "obs-three-signal-incident_grafana-queue": {
+        "role": "grafana-collector",
+        "allocated_min_bytes": 69632,
+        "allocated_max_bytes": 2056192,
+        "logical_min_bytes": 98304,
+        "logical_max_bytes": 2424832,
+        "before-ingest": {
+          "allocated_bytes": 69632,
+          "logical_regular_file_bytes": 98304
+        },
+        "after-actors": {
+          "allocated_bytes": 2056192,
+          "logical_regular_file_bytes": 2424832
+        }
+      }
+    },
+    "evidence_sha256": {
+      "results/cases/9bae05ff7ecb4206a821c9cfd82f925d/grafana-disk-after-actors.json": "3c7da5da41801b129bf6cc5eb12daf68ecc1e407110f57afc2ae5ee2703a45cf",
+      "results/cases/9bae05ff7ecb4206a821c9cfd82f925d/grafana-disk-before-ingest.json": "981c70351c5a531b59d2f2f9491917445599d80e3ac718cb70d988b29653b13d",
+      "results/cases/9bae05ff7ecb4206a821c9cfd82f925d/grafana-disk-sample-1.json": "591a9e07587437df924f33ab4e8ca54fe9d51eb65decd55152b3ae46f17881c9",
+      "results/cases/9bae05ff7ecb4206a821c9cfd82f925d/grafana-disk-sample-2.json": "5c38e1aca5204cd332020f657bbbc1897eac6a482a60a3e8f7379620bd2b8bd8",
+      "results/cases/9bae05ff7ecb4206a821c9cfd82f925d/grafana-disk-sample-3.json": "c8c3b010b5afb8b6f93367e63cd02e7721c3de3889bb09f17ddf827074250f0c",
+      "results/cases/9bae05ff7ecb4206a821c9cfd82f925d/grafana-disk-sample-4.json": "c729d903a48440fde9f89128ae3ca1d68e7e91c65222bcd195385e573115b9b3",
+      "results/cases/9bae05ff7ecb4206a821c9cfd82f925d/grafana-disk-sample-5.json": "f12eaa4af9dfeee6074aff24b6b5f2bf78416fe8332aa8072b305b03f9824bfe",
+      "results/cases/9bae05ff7ecb4206a821c9cfd82f925d/grafana-disk-sample-6.json": "0ed1196957f28d4bb25bf7ad7ef6ef0088fb225a5eec44c0fb41eeaaae20391f"
+    },
+    "scope": "Includes previous small controls and preserved prior cases; sampled min/max, not continuous peak, isolated per-record storage or native codec compression."
+  },
+  "victoria": {
+    "case": "44b30bb93c104a0f98c1fcb6b2ffd163",
+    "snapshots": 9,
+    "volumes": {
+      "obs-three-signal-incident_vmetrics": {
+        "role": "vmetrics",
+        "allocated_min_bytes": 5545984,
+        "allocated_max_bytes": 8335360,
+        "logical_min_bytes": 5291823,
+        "logical_max_bytes": 7930107,
+        "before-ingest": {
+          "allocated_bytes": 5545984,
+          "logical_regular_file_bytes": 5291823
+        },
+        "after-actors": {
+          "allocated_bytes": 7483392,
+          "logical_regular_file_bytes": 7165701
+        }
+      },
+      "obs-three-signal-incident_vlogs": {
+        "role": "vlogs",
+        "allocated_min_bytes": 19206144,
+        "allocated_max_bytes": 51744768,
+        "logical_min_bytes": 18731704,
+        "logical_max_bytes": 51381982,
+        "before-ingest": {
+          "allocated_bytes": 19206144,
+          "logical_regular_file_bytes": 18731704
+        },
+        "after-actors": {
+          "allocated_bytes": 51744768,
+          "logical_regular_file_bytes": 51381982
+        }
+      },
+      "obs-three-signal-incident_vtraces": {
+        "role": "vtraces",
+        "allocated_min_bytes": 3264512,
+        "allocated_max_bytes": 7000064,
+        "logical_min_bytes": 2092738,
+        "logical_max_bytes": 5348478,
+        "before-ingest": {
+          "allocated_bytes": 3264512,
+          "logical_regular_file_bytes": 2092738
+        },
+        "after-actors": {
+          "allocated_bytes": 7000064,
+          "logical_regular_file_bytes": 5348478
+        }
+      },
+      "obs-three-signal-incident_victoria-queue": {
+        "role": "victoria-collector",
+        "allocated_min_bytes": 69632,
+        "allocated_max_bytes": 2654208,
+        "logical_min_bytes": 98304,
+        "logical_max_bytes": 4521984,
+        "before-ingest": {
+          "allocated_bytes": 69632,
+          "logical_regular_file_bytes": 98304
+        },
+        "after-actors": {
+          "allocated_bytes": 2654208,
+          "logical_regular_file_bytes": 4521984
+        }
+      }
+    },
+    "evidence_sha256": {
+      "results/cases/44b30bb93c104a0f98c1fcb6b2ffd163/victoria-disk-after-actors.json": "c586259b193f192b558d2a61afd841160ee5844b13040ca4a9d7fc4e39bea138",
+      "results/cases/44b30bb93c104a0f98c1fcb6b2ffd163/victoria-disk-before-ingest.json": "3fda5aed0c4dbd32395f6068040e1669bedb8dbfe246d69cc9e07bbc19d47720",
+      "results/cases/44b30bb93c104a0f98c1fcb6b2ffd163/victoria-disk-sample-1.json": "9ca1f0cb0af14fc361dde46988a416f9370c6cd68451dad3050f4eb0dcf26246",
+      "results/cases/44b30bb93c104a0f98c1fcb6b2ffd163/victoria-disk-sample-2.json": "9de1a73f42ad26b68faadf6cd9522b26db34663a4a07d52142dbde30872b3fd3",
+      "results/cases/44b30bb93c104a0f98c1fcb6b2ffd163/victoria-disk-sample-3.json": "702b6394287e9fb0dd4f72358e68e556f10fa07d4a16b174024e669912fac4a4",
+      "results/cases/44b30bb93c104a0f98c1fcb6b2ffd163/victoria-disk-sample-4.json": "cef392238abae196840e307462d0560486c34b8a7fb143b15f64726877621d92",
+      "results/cases/44b30bb93c104a0f98c1fcb6b2ffd163/victoria-disk-sample-5.json": "7328c598f77ff5f6c82f971588dcf86e9c4673b7e1389b8a1df3084e7c17a30e",
+      "results/cases/44b30bb93c104a0f98c1fcb6b2ffd163/victoria-disk-sample-6.json": "27b2b16467695d37f1e9a23a1f8df77c6e211aedc57e608fcfe1bedf47165630",
+      "results/cases/44b30bb93c104a0f98c1fcb6b2ffd163/victoria-disk-sample-7.json": "a5aaeadb75076cdf8544ed0fdf3e90a19dbbf7bcadd81fd08dab52b60c5450b3"
+    },
+    "scope": "Includes previous small controls and preserved prior cases; sampled min/max, not continuous peak, isolated per-record storage or native codec compression."
+  }
+}

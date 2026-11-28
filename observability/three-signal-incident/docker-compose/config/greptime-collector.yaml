@@ -1,0 +1,97 @@
+extensions:
+  health_check:
+    endpoint: 0.0.0.0:13133
+  file_storage:
+    directory: /data/queue
+    create_directory: true
+    fsync: true
+    compaction:
+      directory: /data/queue/compaction
+      on_start: true
+receivers:
+  otlp:
+    protocols:
+      http:
+        endpoint: 0.0.0.0:4318
+processors:
+  memory_limiter:
+    check_interval: 1s
+    limit_mib: 384
+    spike_limit_mib: 64
+exporters:
+  otlp_http/metrics:
+    metrics_endpoint: http://greptime:4000/v1/otlp/v1/metrics
+    compression: gzip
+    timeout: 20s
+    sending_queue:
+      enabled: true
+      sizer: requests
+      queue_size: 1000
+      num_consumers: 2
+      storage: file_storage
+    retry_on_failure:
+      enabled: true
+      initial_interval: 1s
+      max_interval: 5s
+      max_elapsed_time: 0s
+  otlp_http/logs:
+    logs_endpoint: http://greptime:4000/v1/otlp/v1/logs
+    compression: gzip
+    timeout: 20s
+    sending_queue:
+      enabled: true
+      sizer: requests
+      queue_size: 1000
+      num_consumers: 2
+      storage: file_storage
+    retry_on_failure:
+      enabled: true
+      initial_interval: 1s
+      max_interval: 5s
+      max_elapsed_time: 0s
+    headers:
+      X-Greptime-Log-Extract-Keys: "run,tenant"
+  otlp_http/traces:
+    traces_endpoint: http://greptime:4000/v1/otlp/v1/traces
+    compression: gzip
+    timeout: 20s
+    sending_queue:
+      enabled: true
+      sizer: requests
+      queue_size: 1000
+      num_consumers: 2
+      storage: file_storage
+    retry_on_failure:
+      enabled: true
+      initial_interval: 1s
+      max_interval: 5s
+      max_elapsed_time: 0s
+    headers:
+      X-Greptime-Pipeline-Name: "greptime_trace_v2"
+      X-Greptime-Trace-Table-Name: "checkout_traces_v2"
+service:
+  extensions: [health_check, file_storage]
+  telemetry:
+    metrics:
+      level: normal
+      readers:
+        - pull:
+            exporter:
+              prometheus:
+                host: 0.0.0.0
+                port: 8888
+    logs:
+      level: info
+  pipelines:
+    metrics:
+      receivers: [otlp]
+      processors: [memory_limiter]
+      exporters: [otlp_http/metrics]
+    logs:
+      receivers: [otlp]
+      processors: [memory_limiter]
+      exporters: [otlp_http/logs]
+    traces:
+      receivers: [otlp]
+      processors: [memory_limiter]
+      exporters: [otlp_http/traces]

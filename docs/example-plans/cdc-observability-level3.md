@@ -88,9 +88,16 @@ Three Greptime crash cases retained all 37,000 ACKs each. VictoriaMetrics needed
 replay for 47,000 and 48,000 missing metrics; VictoriaLogs needed replay for
 29,000 logs. All original ACK bodies matched after repair.
 [Recovery runbook](../../observability/greptime-victoria/single-node/docs/RECOVERY.md).
-The three-signal workload/configuration is being implemented; its runtime and the
-broader incident-stack deployments remain unrun. Comparable clustered/HA and
-further storage qualification remain a later pass.
+The [three-signal incident lab](../../observability/three-signal-incident/) has
+passed full healthy Greptime/Grafana native readback: 1M metrics, 1M logs and
+30k spans each. Victoria's experimental Tempo API changes numeric attribute
+types to strings; its original partial corpus reconciled all 581k metric, 558k log
+and 17,460 span ACKs with that explicitly failed type contract. The corrected full
+Victoria case reconciled 1M metrics, 1M logs and 30k spans with the same failed
+type projection; collector recovery is in progress. The first reader
+incorrectly abandoned samples before Victoria's 20-second index flush; its failed
+run remains preserved. Broader incident-stack deployments remain unrun. Comparable
+clustered/HA and further storage qualification remain a later pass.
 
 Current upstream deployment research found that SigNoz now uses Foundry (pinned
 research release 0.5.0); its old repository-bundled Compose deployment is deprecated.

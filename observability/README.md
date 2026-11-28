@@ -6,7 +6,10 @@ stacks and infrastructure monitoring. The
 OTLP/native million-record controls, measured crash/witness recovery and three
 matched fresh-state paced trials with first/warm queries. The [comparison](greptime-victoria/single-node/docs/COMPARISON.md)
 reports workload-specific costs and unequal durability; it establishes no overall winner.
-The three-signal and incident-stack comparisons are being prepared.
+The [three-signal incident lab](three-signal-incident/) has passing full healthy
+Greptime/Grafana controls and a preserved Victoria numeric-attribute type failure;
+corrected full Victoria values reconcile, while collector recovery is in progress. The broader
+incident-platform comparison is next, with all metadata/collector/UI roles included.
 
 The [per-system example plans](../docs/example-plans/streaming-and-observability.md#observability) specify the incident, failure and data checks for each component.
 

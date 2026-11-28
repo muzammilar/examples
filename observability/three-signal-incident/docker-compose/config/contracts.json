@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "corpus": "checkout-incident-v1",
+  "required_operations": [
+    "publish-gauge",
+    "publish-log",
+    "publish-span",
+    "read-sample",
+    "read-log-body",
+    "read-trace-tree"
+  ],
+  "unsupported_claims": [
+    "cross-signal atomicity",
+    "exactly-once collector delivery",
+    "physical power-loss durability",
+    "production HA",
+    "complete OTLP field retention"
+  ],
+  "consistency": "Eventual query visibility; exact selected values and complete logical IDs after queues drain and publication is fenced",
+  "batch_atomicity": "not-supported; any partial OTLP response leaves the source batch unacknowledged/ambiguous",
+  "source_retry": "none; preserve intent and response journal",
+  "collector_retry": "at-least-once; persistent exporter queue with fsync, 1s initial/5s maximum backoff and unlimited elapsed retry",
+  "idempotency": "Native metric timestamp/key behavior; append-only log/span replays may duplicate. No universal retry-safe mutation claim.",
+  "delete": "not-declared in this initial comparison",
+  "ttl": "Native retained-storage policies are configured where supported; deletion/physical reclamation is unqualified here",
+  "timestamp_common_subset": "Millisecond log/metric and microsecond-aligned span timestamps; physical clock and arbitrary nanosecond preservation unqualified",
+  "limits": {
+    "requests": 10000,
+    "metric_points_per_series": 100,
+    "logs_per_request": 100,
+    "spans_per_request": 3,
+    "rare_log_payload_bytes": 4096,
+    "request_timeout_s": 30,
+    "connect_timeout_s": 5,
+    "maximum_publication_s": 600
+  },
+  "budget": {
+    "backend_cpu": 6,
+    "backend_memory_bytes": 8589934592,
+    "publisher_plus_reader_cpu": 1,
+    "publisher_plus_reader_memory_bytes": 536870912,
+    "nanocpu_serialization_tolerance": 1024
+  },
+  "profiles": {
+    "greptime": {
+      "roles": [
+        "greptime",
+        "greptime-collector"
+      ],
+      "data_copies": 1,
+      "wal_sync_write": true,
+      "traces": "experimental native v2 model"
+    },
+    "victoria": {
+      "roles": [
+        "vmetrics",
+        "vlogs",
+        "vtraces",
+        "victoria-collector"
+      ],
+      "data_copies": 1,
+      "durability": "native buffered admission, no synchronous ACK equivalence",
+      "tempo_query_api": "experimental compatibility path"
+    },
+    "grafana": {
+      "roles": [
+        "prometheus",
+        "loki",
+        "tempo",
+        "grafana-collector"
+      ],
+      "data_copies": 1,
+      "durability": "native WAL/default flush policies, to be observed; not assumed synchronous",
+      "tempo_mode": "monolithic local development storage; no Kafka"
+    }
+  },
+  "visibility_observation": {
+    "trace_id_lookup": "Eventual; VictoriaTraces default trace-index flush interval is 20 seconds. Retain an acknowledged sample until it is observed rather than replacing it at 10 seconds.",
+    "diagnostic_age_threshold_s": 10,
+    "controller_readiness_deadline_s": 120,
+    "claim": "The diagnostic age threshold is not an immediate-read consistency or durability SLA."
+  }
+}
