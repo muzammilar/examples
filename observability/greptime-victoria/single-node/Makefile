@@ -85,3 +85,23 @@ test-production: live-control crash-metrics crash-logs verify-retained
 .PHONY: recovery-report
 recovery-report:
 	$(PYTHON) scripts/curate_recovery.py
+
+.PHONY: batch-screen batch-case query-screen query-case
+batch-screen:
+	$(PYTHON) scripts/observe.py batch-case PYTHON=$(PYTHON)
+batch-case:
+	$(PYTHON) scripts/control.py batch-screen
+query-screen:
+	$(PYTHON) scripts/observe.py query-case PYTHON=$(PYTHON)
+query-case:
+	$(PYTHON) scripts/control.py query-screen
+
+.PHONY: benchmark benchmark-case
+benchmark:
+	$(PYTHON) scripts/observe.py benchmark-case PYTHON=$(PYTHON)
+benchmark-case:
+	$(PYTHON) scripts/control.py benchmark
+
+.PHONY: comparison-report
+comparison-report:
+	$(PYTHON) scripts/curate_comparison.py

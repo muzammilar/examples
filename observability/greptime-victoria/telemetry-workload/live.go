@@ -101,7 +101,7 @@ func liveReader(ctx context.Context, backend, signal string, f, prior Fixture, d
 	}
 }
 
-func runLive(ctx context.Context, journal *Journal, backend, signal string, f, prior Fixture, batch int, compressed bool, output string) error {
+func runLive(ctx context.Context, journal *Journal, backend, signal string, f, prior Fixture, batch int, compressed bool, output string, limit time.Duration, measured bool) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 	var latest atomic.Pointer[acknowledgement]
@@ -128,8 +128,10 @@ func runLive(ctx context.Context, journal *Journal, backend, signal string, f, p
 	var writeErr error
 	began := time.Now()
 	for first := 0; first < total; first += batch {
-		if time.Since(began) > 5*time.Minute {
-			writeErr = errors.New("live actor exceeded its five-minute bound")
+		if time.Since(began) >= limit {
+			if !measured {
+				writeErr = errors.New("live actor exceeded its five-minute bound")
+			}
 			break
 		}
 		if _, err := os.Stat(filepath.Join(output, "stop")); err == nil {
@@ -181,6 +183,9 @@ func runLive(ctx context.Context, journal *Journal, backend, signal string, f, p
 		if writeErr != nil {
 			break
 		}
+	}
+	if measured && time.Since(began) < limit && writeErr == nil {
+		writeErr = errors.New("measured actor stopped or exhausted its fixture before its declared window completed")
 	}
 	cancel()
 	readerErr := <-readerDone

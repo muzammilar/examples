@@ -5,7 +5,10 @@ controls passed at one million metrics and one million logs per engine/protocol,
 with verified lifecycle cleanup. Live crash checks now expose buffered Victoria
 ACK loss and demonstrate external-witness repair; Greptime retained its synchronous
 WAL ACKs. [Recovery evidence](single-node/docs/RECOVERY.md) preserves the failure.
-Sustained comparisons remain in progress; there is no qualified winner.
+The selected level-3 single-node pass now includes three fresh-state paced
+trials and correct first/warm queries. [Measured comparison](single-node/docs/COMPARISON.md)
+reports lower Victoria costs for this workload and the unequal durability contracts;
+there is no overall winner. Clustered coverage remains future work.
 
 - `single-node/`: equal whole-backend budget, GreptimeDB versus VictoriaMetrics +
   VictoriaLogs. Common OTLP protobuf ingestion, native ingestion separately,

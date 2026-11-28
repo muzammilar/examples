@@ -18,6 +18,10 @@ func execute(ctx context.Context, args []string) error {
 	flags := flag.NewFlagSet("telemetry", flag.ContinueOnError)
 	protocol := flags.String("protocol", "otlp", "otlp or native")
 	mode := flags.String("mode", "push", "push, verify, health or manifest")
+	queryName := flags.String("query", "metric-count", "metric-count, metric-sum or log-count")
+	queryRepeats := flags.Int("query-repeats", 31, "First query plus bounded identical warm repetitions")
+	warmup := flags.Duration("warmup", time.Minute, "Discarded benchmark warmup")
+	duration := flags.Duration("duration", 5*time.Minute, "Measured benchmark duration")
 	missingReport := flags.String("missing-report", "", "Preserved pre-replay missing-ack report")
 	ackCutoff := flags.String("ack-before", "", "Restart timestamp; replay only older acknowledged records")
 	priorPath := flags.String("prior-fixture", "", "Previously verified immutable corpus for the live reader")
@@ -49,10 +53,13 @@ func execute(ctx context.Context, args []string) error {
 		_, err = os.Stdout.Write(raw)
 		return err
 	}
+	if *mode == "scrape" {
+		return scrapeNativeMetrics(ctx, *backend, *signalName)
+	}
 	if *mode == "health" {
 		return health(ctx, *backend)
 	}
-	if *mode != "push" && *mode != "verify" && *mode != "live" && *mode != "verify-history" && *mode != "replay" {
+	if *mode != "push" && *mode != "verify" && *mode != "live" && *mode != "verify-history" && *mode != "replay" && *mode != "query" && *mode != "bench" {
 		return errors.New("invalid mode")
 	}
 	if *protocol != "otlp" && *protocol != "native" {
@@ -137,6 +144,15 @@ func execute(ctx context.Context, args []string) error {
 		}
 		return json.NewEncoder(os.Stdout).Encode(map[string]any{"event": "exact-readback", "backend": *backend, "signal": *signalName, "expected_records": total, "missing": 0, "duplicates": 0, "wrong": 0, "duration_s": time.Since(began).Seconds()})
 	}
+	if *mode == "query" {
+		if *protocol != "otlp" || *reportPath == "" || *queryRepeats < 1 || *queryRepeats > 1000 {
+			return errors.New("query needs an exclusive report and 1..1000 repetitions")
+		}
+		return runQueries(ctx, *backend, fixture, *queryName, *reportPath, *queryRepeats)
+	}
+	if *mode == "bench" && (*warmup < time.Minute || *duration < 5*time.Minute || *warmup+*duration > 7*time.Minute) {
+		return errors.New("benchmark requires >=60s warmup and >=5min measurement within its seven-minute lab bound")
+	}
 	// A completed/failed trial is immutable. Recover using its journal, not a
 	// second push over a partially accepted append-only log fixture.
 	if _, err = os.Stat(filepath.Join(*output, "requests.jsonl")); err == nil {
@@ -149,7 +165,7 @@ func execute(ctx context.Context, args []string) error {
 		return err
 	}
 	defer journal.file.Close()
-	metadata := map[string]any{"fixture": fixture, "backend": *backend, "signal": *signalName, "protocol": *protocol, "mode": *mode, "live_think_ms": 200, "live_reader_period_ms": 1000, "requested_otlp_gzip": *compressed, "batch": *batch, "workers": 1, "retry_attempts": 0, "http_timeout_s": 30, "connect_timeout_s": 5, "max_connections_per_host": 4, "started_at": time.Now().UTC()}
+	metadata := map[string]any{"fixture": fixture, "backend": *backend, "signal": *signalName, "protocol": *protocol, "mode": *mode, "live_think_ms": 200, "live_reader_period_ms": 1000, "requested_otlp_gzip": *compressed, "batch": *batch, "workers": 1, "retry_attempts": 0, "http_timeout_s": 30, "connect_timeout_s": 5, "max_connections_per_host": 4, "started_at": time.Now().UTC(), "benchmark_warmup_s": warmup.Seconds(), "benchmark_measurement_s": duration.Seconds()}
 	data, err := json.MarshalIndent(metadata, "", "  ")
 	if err != nil {
 		return err
@@ -168,7 +184,7 @@ func execute(ctx context.Context, args []string) error {
 		}
 		return replayMissing(ctx, journal, *backend, *signalName, fixture, *historyPath, *missingReport, *ackCutoff, *compressed)
 	}
-	if *mode == "live" {
+	if *mode == "live" || *mode == "bench" {
 		if *protocol != "otlp" || *priorPath == "" {
 			return errors.New("live mode requires common OTLP and a prior verified fixture")
 		}
@@ -183,7 +199,11 @@ func execute(ctx context.Context, args []string) error {
 		if err = validateFixture(prior); err != nil {
 			return err
 		}
-		return runLive(ctx, journal, *backend, *signalName, fixture, prior, *batch, *compressed, *output)
+		limit := 5 * time.Minute
+		if *mode == "bench" {
+			limit = *warmup + *duration
+		}
+		return runLive(ctx, journal, *backend, *signalName, fixture, prior, *batch, *compressed, *output, limit, *mode == "bench")
 	}
 	began := time.Now()
 	for first := 0; first < total; first += *batch {

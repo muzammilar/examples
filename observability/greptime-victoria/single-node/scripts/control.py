@@ -163,7 +163,10 @@ def audit_retained():
 
             if is_retired(case):
                 continue
-            if json.loads(case.read_text())["kind"] == "live-recovery":
+            if json.loads(case.read_text())["kind"] in [
+                "live-recovery",
+                "measured-baseline",
+            ]:
                 from recovery import verify_live_case
 
                 verify_live_case(case, audit)
@@ -206,7 +209,7 @@ def audit_retained():
         save(audit / "status.json", {"passed": passed, "verified_journals": verified})
 
 
-def driver_control(small, protocol="otlp"):
+def driver_control(small, protocol="otlp", template=None):
     if not (ROOT / "results/plan.json").exists():
         raise RuntimeError("Run make up first")
     run = uuid.uuid4().hex
@@ -220,6 +223,12 @@ def driver_control(small, protocol="otlp"):
         "points": 100,
         "logs": 10000 if small else 1000000,
     }
+    if template is not None:
+        data = dict(
+            template,
+            run=run,
+            payload_seed=template.get("payload_seed") or template["run"],
+        )
     if protocol == "native" and not small:
         candidates = [
             p
@@ -304,6 +313,16 @@ def dispatch():
         from recovery import run_case
 
         run_case(mode, audit_retained)
+    elif mode == "benchmark":
+        from benchmark import run_matrix
+
+        run_matrix(audit_retained)
+    elif mode in ["batch-screen", "query-screen"]:
+        from compare import batch_screen, query_screen
+
+        {"batch-screen": batch_screen, "query-screen": query_screen}[mode](
+            audit_retained
+        )
     elif mode == "recover-witness":
         from recovery import recover_witness
 

@@ -1,9 +1,11 @@
 # Matched single-node metrics/log comparison
 
-Pass 1 is complete: exact healthy ingestion controls and two verified lifecycle
-generations ran. **This is not yet a qualified performance/recovery comparison.**
-Live abrupt-loss tests now have [measured recovery evidence](docs/RECOVERY.md).
-Batch screens, cold/warm queries and sustained repeated trials remain in the [follow-up list](#remaining-level-3-work).
+The selected **level-3 single-node pass is complete**: OTLP/native million-record
+controls, live crash/witness recovery, four batch sizes, three first/warm query
+trials and three fresh-state paced ingestion trials. [Comparison tables and
+limits](docs/COMPARISON.md) and [recovery findings](docs/RECOVERY.md) retain the
+measured successes and buffered ACK loss. Clustered/deeper coverage remains
+[future work](#further-coverage); no overall equal-durability winner is implied.
 
 ## Quick start
 
@@ -103,6 +105,39 @@ is skipped. Destruction refuses a stale receipt or a receipt for another fixture
 The first million-record cases ran through independent targets after small driver
 controls; the combined `make test` target invokes those same tested functions.
 
+## Repeated ingestion and query results
+
+[COMPARISON.json](reports/COMPARISON.json) and [the detailed method/tables](docs/COMPARISON.md)
+record three fresh-volume trials, 60-second warmup and five-minute measured windows,
+with independent old/recent readers. All **9,971,000 Greptime** and **10,168,000
+Victoria** writer ACKs across warmup/measurement reconciled, with no missing,
+wrong or ambiguous records. CPU/memory, disk activity/space, native/wire compression
+and network measurements retain their scopes and unavailable counters.
+
+| Median of three per-trial results | Greptime | Victoria |
+|---|---:|---:|
+| Paced metrics admission | 4,663.3 records/s | 4,750.0 records/s |
+| Paced logs admission | 4,563.3 records/s | 4,663.3 records/s |
+| Metric request p99, batch 1,000 | 9.791 ms | 3.729 ms |
+| Log request p99, batch 1,000 | 11.591 ms | 3.192 ms |
+| Backend + workload CPU, sampled measured window | 59.744 core-s | 44.334 core-s |
+| Mean container memory, including workload/cache | 1.338 GiB | 0.379 GiB |
+| Warm grouped metric-sum query | 106.457 ms | 12.133 ms |
+| Warm grouped log-count query | 5.976 ms | 0.970 ms |
+
+The writers wait 200 ms after each request: these are **paced rates, not maximum
+capacity**. The 558 first/warm query executions all matched the independent
+oracle; engine restarts retained host filesystem cache. Victoria's measured CPU,
+memory and selected query costs were lower in this synthetic workload, while the
+crash tests below expose its different buffered durability contract. Native
+VictoriaLogs disk data-part compression was about **21.38×**; it excludes indexes
+and is distinct from wire gzip or whole-volume allocation.
+
+`make batch-screen`, `make query-screen`, `make benchmark` and
+`make comparison-report` expose this bounded work. `benchmark` verifies and
+recycles this example's own volumes between its three trials; original witnesses
+remain in ignored results. Twelve Go checks and three cleanup guards pass.
+
 ## Live crash and recovery results
 
 Greptime retained all **37,000 acknowledged metric/log records** in each of three
@@ -135,16 +170,17 @@ physical power-loss durability. Graceful process switches between backends are
 not abrupt-loss tests. No replica/quorum, independent restore, pressure/soak,
 retention or upgrade qualification is implied.
 
-## Remaining level-3 work
+## Further coverage
 
 - [x] Live writer/reader during abrupt process loss; classify successful,
   failed and ambiguous requests, reconcile acknowledged loss and recovery.
-- [ ] Batch 1/100/1,000/10,000 screen; one representative sustained cell with
+- [x] Batch 1/100/1,000/10,000 screen; one representative paced cell with
   three alternating trials at the same logical starting state and resource caps.
-- [ ] Independent analytical query oracles, engine-cold versus warm timing and
+- [x] Independent analytical query oracles, engine-cold versus warm timing and
   explicit query-cache policy. Physical OS-cache-cold remains a separate unrun scope.
-- [ ] Native storage/compression/IOPS observability and equivalent quiescence,
-  without interpreting wire compression as database codec compression.
+- [ ] Further storage qualification: comparable Greptime/VictoriaMetrics codec
+  ratios, continuous peak allocation, device IOPS/latency and equivalent compaction
+  states. VictoriaLogs native part compression is measured; wire gzip remains separate.
 - [ ] Comparable clustered contract/topology profile, including WAL/object-store,
   metadata, routers and all replication/fanout costs. Do not equate consensus
   replication with asynchronous copies merely because both have three processes.

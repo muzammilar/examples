@@ -12,9 +12,10 @@ completed examples separately to main. No level-4/5 expansion.
 - [x] MySQL → Debezium/Kafka → Flink → ClickHouse + Airflow: corrected margins,
   connector lifecycle, incremental backfill, schema evolution and reconciliation
   DAGs; exercise worker/task recovery and preserve all failed attempts.
-- [ ] GreptimeDB versus Victoria: matched single-node and comparable clustered
-  durability/resource profiles; metrics/logs, batch/native ingestion, cold/warm
-  queries and bounded recovery. Existing unequal baseline results are not a winner.
+- [x] Focused single-node GreptimeDB versus VictoriaMetrics/Logs: matched budgets,
+  OTLP/native correctness, batch screen, three paced fresh-state trials, first/warm
+  exact queries and live crash/witness recovery. Buffered and synchronous durability
+  differ. Comparable clustered/HA profiles remain a later pass, not a claimed result.
 - [ ] GreptimeDB versus Victoria versus Prometheus/Loki/Tempo: identical Go/Rust
   instrumented application, collector and request/span/log/sample corpus. Compare
   common query/correctness subsets; distinguish scrape gaps and push admission.
@@ -72,14 +73,24 @@ cases ran independently after the initial `make test` failures; no reseeding hid
 those attempts. Nine offline controller controls and three Go checks passed.
 
 The [matched metrics/log lab](../../observability/greptime-victoria/single-node/)
-completed its first healthy controls: both engines matched one million metric
-points and one million log bodies through OTLP/gzip and native Remote Write/JSON.
-Six Go checks and three destructive-cleanup guards passed; two generations were
-independently verified before destruction. Failed scope-metadata expectations
-and measurement gaps remain documented. This is a driver/healthy baseline, not a
-qualified performance or abrupt-recovery comparison. Live fault/ACK reconciliation,
-batch screens, cold/warm queries and repeated sustained trials remain next.
-The three-signal and broader incident-stack deployments remain unrun.
+completed the selected level-3 single-node pass: common/native million-record
+controls, four batch sizes, three fresh-state paced trials, exact first/warm queries
+and live SIGKILL/witness recovery. Twelve Go checks and three cleanup guards pass.
+All 9,971,000 Greptime and 10,168,000 Victoria writer ACKs across warmup/measurement
+reconciled; all 558 analytical queries matched their independent oracle. Victoria
+used lower CPU/memory and returned these selected queries faster. Its buffered
+profile lost acknowledged data under crash, while Greptime retained synchronous-WAL
+ACKs; there is no equal-durability overall winner. Failed verifier expectations,
+the first failed crash status and explicit external replay remain documented.
+[Comparison numbers and limits](../../observability/greptime-victoria/single-node/docs/COMPARISON.md).
+
+Three Greptime crash cases retained all 37,000 ACKs each. VictoriaMetrics needed
+replay for 47,000 and 48,000 missing metrics; VictoriaLogs needed replay for
+29,000 logs. All original ACK bodies matched after repair.
+[Recovery runbook](../../observability/greptime-victoria/single-node/docs/RECOVERY.md).
+The three-signal workload/configuration is being implemented; its runtime and the
+broader incident-stack deployments remain unrun. Comparable clustered/HA and
+further storage qualification remain a later pass.
 
 Current upstream deployment research found that SigNoz now uses Foundry (pinned
 research release 0.5.0); its old repository-bundled Compose deployment is deprecated.
@@ -93,11 +104,11 @@ Sources: [SigNoz supported Docker workflow](https://signoz.io/docs/install/docke
 [ClickStack 2.47 compose source](https://github.com/ClickHouse/ClickStack/blob/%40hyperdx/app%402.47.0/docker-compose.yml),
 [OpenObserve deployment modes](https://openobserve.ai/docs/architecture/).
 
-## Next pipeline design
+## Implemented pipeline architecture
 
-The MySQL margin pipeline will use current stable supported artifacts: MySQL
+The MySQL margin pipeline uses pinned supported artifacts: MySQL
 9.7.4.1, Debezium 3.7.1.Final, Kafka 4.3.2, Flink 2.3.0 and Airflow 3.4.0.
-Verify effective versions/digests and the combined budget before startup.
+Its README/report record effective versions, digests and the combined budget.
 
 - Source orders carry integer revenue/cost, revisions and cancellations; customer
   changes must update existing joined margins. Flink maintains a current-table
@@ -120,12 +131,3 @@ Sources: [MySQL current patch](https://dev.mysql.com/doc/relnotes/mysql/9.7/en/n
 [Debezium incremental snapshots and schema boundaries](https://debezium.io/documentation/reference/3.7/connectors/mysql.html#mysql-incremental-snapshots),
 [Flink changelog JSON](https://nightlies.apache.org/flink/flink-docs-release-2.3/docs/connectors/table/formats/debezium/),
 [Airflow 3.4 architecture](https://airflow.apache.org/docs/apache-airflow/3.4.0/core-concepts/overview.html).
-
-Live single-node recovery is now measured: three Greptime SIGKILL cases retained
-all 37,000 acknowledged metric/log records per case. VictoriaMetrics needed
-external replay for 47,000 and 48,000 missing acknowledged metrics; VictoriaLogs
-needed replay for 29,000 logs. All original ACK bodies matched after repair.
-The failed original status and unequal persistence semantics remain explicit in
-[the recovery runbook](../../observability/greptime-victoria/single-node/docs/RECOVERY.md).
-Batch/query screens, repeated comparisons, the cluster profile and the later
-three-signal/full-stack examples remain unfinished.

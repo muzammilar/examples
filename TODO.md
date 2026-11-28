@@ -528,7 +528,11 @@ Plan and source links: [`observability/README.md`](observability/README.md), inc
 - [ ] `nagios/`: GPLv2 Nagios Core host/service checks, plugin-based fleet monitoring, detection/recovery and alert accounting under injected failures; exclude commercial XI features.
 - [ ] `zabbix/`: agents/proxies, discovery, supported server HA and database recovery; compare the same host/service fault schedule with Nagios Core and the modern stacks.
 
-- [ ] **Planned comparison:** fair GreptimeDB vs Victoria stack
+- [x] Focused single-node GreptimeDB versus VictoriaMetrics/Logs: matched whole-backend
+  budgets, common/native million-record controls, batch screen, three fresh-state
+  paced trials, exact first/warm queries and live crash/witness recovery.
+  [Measured results and unequal durability](observability/greptime-victoria/single-node/docs/COMPARISON.md).
+- [ ] **Follow-up comparison:** clustered/HA and equal-durability GreptimeDB vs Victoria stack
   comparison using [the comparison contract](observability/README.md#greptimedb-vs-victoria-planned-comparison).
   Match machine class, per-node and whole-stack budgets and durability. Replay
   identical input/queries; compare single versus batched ingestion and supported

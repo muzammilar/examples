@@ -3,8 +3,9 @@
 Future reproducible comparisons of telemetry backends, complete observability
 stacks and infrastructure monitoring. The
 [GreptimeDB/Victoria lab](greptime-victoria/single-node/) now has passing healthy
-OTLP/native million-record controls and verified lifecycle evidence. Its recovery
-and repeated performance comparison remain unfinished; it establishes no winner.
+OTLP/native million-record controls, measured crash/witness recovery and three
+matched fresh-state paced trials with first/warm queries. The [comparison](greptime-victoria/single-node/docs/COMPARISON.md)
+reports workload-specific costs and unequal durability; it establishes no overall winner.
 The three-signal and incident-stack comparisons are being prepared.
 
 The [per-system example plans](../docs/example-plans/streaming-and-observability.md#observability) specify the incident, failure and data checks for each component.
@@ -26,10 +27,13 @@ results from this repository.
 
 ## GreptimeDB vs Victoria: planned comparison
 
-- [ ] Execute the agreed **GreptimeDB versus Victoria stack** comparison at a
-  user-selected performance depth. This is a valid planned experiment; it need
-  not wait for every optional test across the repository. Establish correctness
-  and equivalent durability/resource budgets for the selected comparison first.
+- [x] Focused level-3 **single-node GreptimeDB versus VictoriaMetrics/Logs**:
+  common/native healthy controls, batch screen, three paced fresh-state trials,
+  exact first/warm queries and live crash/ACK-loss recovery. The measured buffered
+  and synchronous persistence contracts remain separate.
+- [ ] Comparable clustered/HA profiles and a qualified equal-durability capacity
+  comparison remain future work. The completed local observations do not qualify
+  a whole Victoria stack or erase its measured buffered losses.
 
 The existing Greptime examples benchmark
 VictoriaMetrics and VictoriaLogs as baselines; they do not qualify a complete
