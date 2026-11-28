@@ -1,0 +1,886 @@
+{
+  "configuration": {
+    "service": "openobserve-sync",
+    "fixture": "results/cases/bd209e76f1ee4eacb0cdfb16d8d1381c/fixture.json",
+    "trials": 3,
+    "warm_repeats": 10,
+    "scope": "Within-profile bounded diagnostics; cross-platform alternating trials and winner not qualified"
+  },
+  "trials": [
+    {
+      "backend": "openobserve",
+      "fixture": {
+        "run": "bd209e76f1ee4eacb0cdfb16d8d1381c",
+        "payload_seed": "b4587bd2c2314cc7a7c4062660ad874c",
+        "start_ms": 1795865479000,
+        "requests": 10000,
+        "logs_per_request": 100,
+        "metric_points": 100
+      },
+      "passed": true,
+      "queries": [
+        {
+          "first_in_fresh_worker": true,
+          "http_body_ms": 21.177958,
+          "query": "incident-error-logs",
+          "records": 25000,
+          "repetition": 0
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 10.545208,
+          "query": "incident-error-logs",
+          "records": 25000,
+          "repetition": 1
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 9.364,
+          "query": "incident-error-logs",
+          "records": 25000,
+          "repetition": 2
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 8.053708,
+          "query": "incident-error-logs",
+          "records": 25000,
+          "repetition": 3
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 8.607708,
+          "query": "incident-error-logs",
+          "records": 25000,
+          "repetition": 4
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 8.974958,
+          "query": "incident-error-logs",
+          "records": 25000,
+          "repetition": 5
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 9.670667,
+          "query": "incident-error-logs",
+          "records": 25000,
+          "repetition": 6
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 9.419459,
+          "query": "incident-error-logs",
+          "records": 25000,
+          "repetition": 7
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 8.910375,
+          "query": "incident-error-logs",
+          "records": 25000,
+          "repetition": 8
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 9.916792,
+          "query": "incident-error-logs",
+          "records": 25000,
+          "repetition": 9
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 12.179875,
+          "query": "incident-error-logs",
+          "records": 25000,
+          "repetition": 10
+        },
+        {
+          "first_in_fresh_worker": true,
+          "http_body_ms": 9.820041,
+          "query": "incident-error-spans",
+          "records": 500,
+          "repetition": 0
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 7.017667,
+          "query": "incident-error-spans",
+          "records": 500,
+          "repetition": 1
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 7.020209,
+          "query": "incident-error-spans",
+          "records": 500,
+          "repetition": 2
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 11.141208,
+          "query": "incident-error-spans",
+          "records": 500,
+          "repetition": 3
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 7.233125,
+          "query": "incident-error-spans",
+          "records": 500,
+          "repetition": 4
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 5.897334,
+          "query": "incident-error-spans",
+          "records": 500,
+          "repetition": 5
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 6.361584,
+          "query": "incident-error-spans",
+          "records": 500,
+          "repetition": 6
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 6.138791,
+          "query": "incident-error-spans",
+          "records": 500,
+          "repetition": 7
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 6.288625,
+          "query": "incident-error-spans",
+          "records": 500,
+          "repetition": 8
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 6.652292,
+          "query": "incident-error-spans",
+          "records": 500,
+          "repetition": 9
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 6.071792,
+          "query": "incident-error-spans",
+          "records": 500,
+          "repetition": 10
+        },
+        {
+          "first_in_fresh_worker": true,
+          "http_body_ms": 72.827625,
+          "query": "incident-slow-points",
+          "records": 1250,
+          "repetition": 0
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 57.932583,
+          "query": "incident-slow-points",
+          "records": 1250,
+          "repetition": 1
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 61.52625,
+          "query": "incident-slow-points",
+          "records": 1250,
+          "repetition": 2
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 53.860792,
+          "query": "incident-slow-points",
+          "records": 1250,
+          "repetition": 3
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 51.903792,
+          "query": "incident-slow-points",
+          "records": 1250,
+          "repetition": 4
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 51.653583,
+          "query": "incident-slow-points",
+          "records": 1250,
+          "repetition": 5
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 55.099083,
+          "query": "incident-slow-points",
+          "records": 1250,
+          "repetition": 6
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 52.609958,
+          "query": "incident-slow-points",
+          "records": 1250,
+          "repetition": 7
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 51.168083,
+          "query": "incident-slow-points",
+          "records": 1250,
+          "repetition": 8
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 50.332583,
+          "query": "incident-slow-points",
+          "records": 1250,
+          "repetition": 9
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 50.181959,
+          "query": "incident-slow-points",
+          "records": 1250,
+          "repetition": 10
+        }
+      ],
+      "scope": "Native incident SQL after full-value qualification; result cache disabled; OS/engine caches retained. First access by a fresh worker is not physical-cold storage.",
+      "timing": "Go monotonic HTTP request plus response body, ms; source encoding and result parsing excluded"
+    },
+    {
+      "backend": "openobserve",
+      "fixture": {
+        "run": "bd209e76f1ee4eacb0cdfb16d8d1381c",
+        "payload_seed": "b4587bd2c2314cc7a7c4062660ad874c",
+        "start_ms": 1795865479000,
+        "requests": 10000,
+        "logs_per_request": 100,
+        "metric_points": 100
+      },
+      "passed": true,
+      "queries": [
+        {
+          "first_in_fresh_worker": true,
+          "http_body_ms": 21.649875,
+          "query": "incident-error-logs",
+          "records": 25000,
+          "repetition": 0
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 9.134084,
+          "query": "incident-error-logs",
+          "records": 25000,
+          "repetition": 1
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 9.186917,
+          "query": "incident-error-logs",
+          "records": 25000,
+          "repetition": 2
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 9.142375,
+          "query": "incident-error-logs",
+          "records": 25000,
+          "repetition": 3
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 10.427084,
+          "query": "incident-error-logs",
+          "records": 25000,
+          "repetition": 4
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 8.787209,
+          "query": "incident-error-logs",
+          "records": 25000,
+          "repetition": 5
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 9.642417,
+          "query": "incident-error-logs",
+          "records": 25000,
+          "repetition": 6
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 9.315083,
+          "query": "incident-error-logs",
+          "records": 25000,
+          "repetition": 7
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 9.269167,
+          "query": "incident-error-logs",
+          "records": 25000,
+          "repetition": 8
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 15.803875,
+          "query": "incident-error-logs",
+          "records": 25000,
+          "repetition": 9
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 8.698208,
+          "query": "incident-error-logs",
+          "records": 25000,
+          "repetition": 10
+        },
+        {
+          "first_in_fresh_worker": true,
+          "http_body_ms": 6.905667,
+          "query": "incident-error-spans",
+          "records": 500,
+          "repetition": 0
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 6.470166,
+          "query": "incident-error-spans",
+          "records": 500,
+          "repetition": 1
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 6.388167,
+          "query": "incident-error-spans",
+          "records": 500,
+          "repetition": 2
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 6.073167,
+          "query": "incident-error-spans",
+          "records": 500,
+          "repetition": 3
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 6.183167,
+          "query": "incident-error-spans",
+          "records": 500,
+          "repetition": 4
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 5.975042,
+          "query": "incident-error-spans",
+          "records": 500,
+          "repetition": 5
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 5.952791,
+          "query": "incident-error-spans",
+          "records": 500,
+          "repetition": 6
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 6.490417,
+          "query": "incident-error-spans",
+          "records": 500,
+          "repetition": 7
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 6.124917,
+          "query": "incident-error-spans",
+          "records": 500,
+          "repetition": 8
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 6.407,
+          "query": "incident-error-spans",
+          "records": 500,
+          "repetition": 9
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 5.903834,
+          "query": "incident-error-spans",
+          "records": 500,
+          "repetition": 10
+        },
+        {
+          "first_in_fresh_worker": true,
+          "http_body_ms": 72.082333,
+          "query": "incident-slow-points",
+          "records": 1250,
+          "repetition": 0
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 54.308792,
+          "query": "incident-slow-points",
+          "records": 1250,
+          "repetition": 1
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 52.50275,
+          "query": "incident-slow-points",
+          "records": 1250,
+          "repetition": 2
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 54.653708,
+          "query": "incident-slow-points",
+          "records": 1250,
+          "repetition": 3
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 52.852001,
+          "query": "incident-slow-points",
+          "records": 1250,
+          "repetition": 4
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 49.986375,
+          "query": "incident-slow-points",
+          "records": 1250,
+          "repetition": 5
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 51.807625,
+          "query": "incident-slow-points",
+          "records": 1250,
+          "repetition": 6
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 50.41125,
+          "query": "incident-slow-points",
+          "records": 1250,
+          "repetition": 7
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 50.77675,
+          "query": "incident-slow-points",
+          "records": 1250,
+          "repetition": 8
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 51.132584,
+          "query": "incident-slow-points",
+          "records": 1250,
+          "repetition": 9
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 49.431125,
+          "query": "incident-slow-points",
+          "records": 1250,
+          "repetition": 10
+        }
+      ],
+      "scope": "Native incident SQL after full-value qualification; result cache disabled; OS/engine caches retained. First access by a fresh worker is not physical-cold storage.",
+      "timing": "Go monotonic HTTP request plus response body, ms; source encoding and result parsing excluded"
+    },
+    {
+      "backend": "openobserve",
+      "fixture": {
+        "run": "bd209e76f1ee4eacb0cdfb16d8d1381c",
+        "payload_seed": "b4587bd2c2314cc7a7c4062660ad874c",
+        "start_ms": 1795865479000,
+        "requests": 10000,
+        "logs_per_request": 100,
+        "metric_points": 100
+      },
+      "passed": true,
+      "queries": [
+        {
+          "first_in_fresh_worker": true,
+          "http_body_ms": 20.591959,
+          "query": "incident-error-logs",
+          "records": 25000,
+          "repetition": 0
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 9.6805,
+          "query": "incident-error-logs",
+          "records": 25000,
+          "repetition": 1
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 8.930208,
+          "query": "incident-error-logs",
+          "records": 25000,
+          "repetition": 2
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 9.046042,
+          "query": "incident-error-logs",
+          "records": 25000,
+          "repetition": 3
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 9.786334,
+          "query": "incident-error-logs",
+          "records": 25000,
+          "repetition": 4
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 8.8335,
+          "query": "incident-error-logs",
+          "records": 25000,
+          "repetition": 5
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 9.122875,
+          "query": "incident-error-logs",
+          "records": 25000,
+          "repetition": 6
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 10.064542,
+          "query": "incident-error-logs",
+          "records": 25000,
+          "repetition": 7
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 8.767708,
+          "query": "incident-error-logs",
+          "records": 25000,
+          "repetition": 8
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 15.224458,
+          "query": "incident-error-logs",
+          "records": 25000,
+          "repetition": 9
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 9.33375,
+          "query": "incident-error-logs",
+          "records": 25000,
+          "repetition": 10
+        },
+        {
+          "first_in_fresh_worker": true,
+          "http_body_ms": 6.427542,
+          "query": "incident-error-spans",
+          "records": 500,
+          "repetition": 0
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 6.942167,
+          "query": "incident-error-spans",
+          "records": 500,
+          "repetition": 1
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 6.816208,
+          "query": "incident-error-spans",
+          "records": 500,
+          "repetition": 2
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 6.299375,
+          "query": "incident-error-spans",
+          "records": 500,
+          "repetition": 3
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 6.040417,
+          "query": "incident-error-spans",
+          "records": 500,
+          "repetition": 4
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 6.107708,
+          "query": "incident-error-spans",
+          "records": 500,
+          "repetition": 5
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 6.19075,
+          "query": "incident-error-spans",
+          "records": 500,
+          "repetition": 6
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 6.559625,
+          "query": "incident-error-spans",
+          "records": 500,
+          "repetition": 7
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 6.333541,
+          "query": "incident-error-spans",
+          "records": 500,
+          "repetition": 8
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 6.158083,
+          "query": "incident-error-spans",
+          "records": 500,
+          "repetition": 9
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 5.840042,
+          "query": "incident-error-spans",
+          "records": 500,
+          "repetition": 10
+        },
+        {
+          "first_in_fresh_worker": true,
+          "http_body_ms": 71.951791,
+          "query": "incident-slow-points",
+          "records": 1250,
+          "repetition": 0
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 51.388292,
+          "query": "incident-slow-points",
+          "records": 1250,
+          "repetition": 1
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 52.029791,
+          "query": "incident-slow-points",
+          "records": 1250,
+          "repetition": 2
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 55.091375,
+          "query": "incident-slow-points",
+          "records": 1250,
+          "repetition": 3
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 50.136792,
+          "query": "incident-slow-points",
+          "records": 1250,
+          "repetition": 4
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 50.861083,
+          "query": "incident-slow-points",
+          "records": 1250,
+          "repetition": 5
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 50.952709,
+          "query": "incident-slow-points",
+          "records": 1250,
+          "repetition": 6
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 49.569584,
+          "query": "incident-slow-points",
+          "records": 1250,
+          "repetition": 7
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 49.260792,
+          "query": "incident-slow-points",
+          "records": 1250,
+          "repetition": 8
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 51.919792,
+          "query": "incident-slow-points",
+          "records": 1250,
+          "repetition": 9
+        },
+        {
+          "first_in_fresh_worker": false,
+          "http_body_ms": 49.367875,
+          "query": "incident-slow-points",
+          "records": 1250,
+          "repetition": 10
+        }
+      ],
+      "scope": "Native incident SQL after full-value qualification; result cache disabled; OS/engine caches retained. First access by a fresh worker is not physical-cold storage.",
+      "timing": "Go monotonic HTTP request plus response body, ms; source encoding and result parsing excluded"
+    }
+  ],
+  "resources": {
+    "evidence": "observability/incident-platforms/docker-compose/results/resources-1795873403459087000.jsonl",
+    "phase_prefix": "incident-query:",
+    "environment": {
+      "type": "environment",
+      "run_id": 1795873403459087000,
+      "fixture": null,
+      "command": [
+        "make",
+        "queries-case",
+        "PYTHON=/Users/muzammil/.local/bin/python3.13"
+      ],
+      "environment": {
+        "NCPU": 11,
+        "MemTotal": 26216296448,
+        "KernelVersion": "6.12.76-linuxkit",
+        "OperatingSystem": "Docker Desktop",
+        "Driver": "overlayfs",
+        "ServerVersion": "29.5.3",
+        "docker_api": "1.54"
+      },
+      "cotenancy": "Only this isolated incident-platform lab; profiles run serially; previous lab stopped with data retained."
+    },
+    "sampled_aggregate_memory_peak_bytes": 2525818880,
+    "sampled_aggregate_memory_mean_bytes": 2413468330.6666665,
+    "actors": [
+      {
+        "name": "/obs-incident-platforms-incident-workload-run-4c62feb7f677",
+        "samples": 1,
+        "peak_memory_bytes": 8024064,
+        "configuration": {
+          "image_id": "sha256:4b6a1ae3f6a3bff464a3f586002324a59b43008e644de08aa395870cb66e4aff",
+          "image_reference": "obs-incident-platforms-workload:local",
+          "memory_limit_bytes": 536870912,
+          "nano_cpus": 1000000000,
+          "started_at": "2026-11-28T13:43:23.988668292Z"
+        },
+        "observed_s": 0.0,
+        "sampled_mean_memory_bytes": 8024064.0,
+        "container_lifetime_counters_at_last_sample": {
+          "cpu_core_s": 0.015755,
+          "network_rx_bytes": 18644,
+          "network_tx_bytes": 16157
+        },
+        "counter_deltas": {}
+      },
+      {
+        "name": "/obs-incident-platforms-openobserve-sync-1",
+        "samples": 3,
+        "peak_memory_bytes": 2520428544,
+        "counter_deltas": {
+          "cpu_core_s": 2.462558999999999,
+          "network_rx_bytes": 39244,
+          "network_tx_bytes": 46490,
+          "disk_read_bytes": 0,
+          "disk_write_bytes": 0
+        },
+        "cpu_utilization_pct_one_core_min": 120.04072694068604,
+        "cpu_utilization_pct_one_core_max": 122.05940079516988,
+        "observed_s": 2.0343120098114014,
+        "sampled_mean_memory_bytes": 2406494208.0,
+        "cpu_utilization_pct_one_core_average": 121.05119510297241,
+        "container_lifetime_counters_at_last_sample": {
+          "cpu_core_s": 211.532037,
+          "network_rx_bytes": 41925161,
+          "network_tx_bytes": 114391098,
+          "disk_read_bytes": 0,
+          "disk_write_bytes": 255987712
+        }
+      },
+      {
+        "name": "/obs-incident-platforms-incident-workload-run-c12704f8acce",
+        "samples": 1,
+        "peak_memory_bytes": 7507968,
+        "configuration": {
+          "image_id": "sha256:4b6a1ae3f6a3bff464a3f586002324a59b43008e644de08aa395870cb66e4aff",
+          "image_reference": "obs-incident-platforms-workload:local",
+          "memory_limit_bytes": 536870912,
+          "nano_cpus": 1000000000,
+          "started_at": "2026-11-28T13:43:25.037310792Z"
+        },
+        "observed_s": 0.0,
+        "sampled_mean_memory_bytes": 7507968.0,
+        "container_lifetime_counters_at_last_sample": {
+          "cpu_core_s": 0.014871,
+          "network_rx_bytes": 17884,
+          "network_tx_bytes": 15551
+        },
+        "counter_deltas": {}
+      },
+      {
+        "name": "/obs-incident-platforms-incident-workload-run-f23136fc7c94",
+        "samples": 1,
+        "peak_memory_bytes": 5390336,
+        "configuration": {
+          "image_id": "sha256:4b6a1ae3f6a3bff464a3f586002324a59b43008e644de08aa395870cb66e4aff",
+          "image_reference": "obs-incident-platforms-workload:local",
+          "memory_limit_bytes": 536870912,
+          "nano_cpus": 1000000000,
+          "started_at": "2026-11-28T13:43:26.061223293Z"
+        },
+        "observed_s": 0.0,
+        "sampled_mean_memory_bytes": 5390336.0,
+        "container_lifetime_counters_at_last_sample": {
+          "cpu_core_s": 0.015029,
+          "network_rx_bytes": 17878,
+          "network_tx_bytes": 15551
+        },
+        "counter_deltas": {}
+      }
+    ],
+    "limits": [
+      "Sample-window deltas exclude startup and exit outside observation. Decreasing counters are treated as restarts and the new counter is accumulated; reset intervals have no CPU utilization estimate.",
+      "Short-lived actors may be missed; use native pre-exit cgroup counters as well.",
+      "CPU utilization is interval-average percent of one core; short spikes may be missed.",
+      "Docker disk bytes are not device I/O latency; absent counters are unavailable, not zero."
+    ]
+  },
+  "source": {
+    "admission-history.go": "4903f0e4af40a86781b8de8bebd77e309e1a73d6279d2ee12a68a0558f23c780",
+    "corpus.go": "3d455e48b883f256a7e170fafa3576e99caf2e91b661339982714c3c89d3cd0c",
+    "incident_queries.go": "bee17ad3f4dbbdfb54448a14ffe3871e4d39eb451fca417d864e1deb660f14e9",
+    "main.go": "58de03f3d373a892557a2f0b1419344f31d06155b5c9ee16316d63775918b09b",
+    "openobserve.go": "bb5f1df83dd6ed1a8125fb15f70950897657ba6f9ad9e6608ecc18351698d92e",
+    "openobserve_oracle.go": "ea342457d1a66dc63a7a093dc7faed87e3443cbc7e2881e6b0281b77558141ee",
+    "openobserve_oracle_test.go": "48bcccfe7e9f4d4248905301ddaa3dad8134c099399ee7724b9315fe9683a076",
+    "publisher.go": "68189a4193c1ead05a0f672e58c7f6e5f4c4599e37478638dde5099d5d3bd083",
+    "publisher_test.go": "f1bd2fe1f2e55a91b66db32c443ea42a400d8ba3d3baf1437be2403258656b0d",
+    "resources.go": "5beca55107018a2aa3eca9a2624b5018e270db6deab951e0d671d00b0373af86",
+    "storage-observer.go": "337a52ae7e8c323306d795a6dd4b164761656a91fe11df9e561f1bcef67848a1",
+    "watch.go": "daade65de6cc530b00cbb8e1fa825adb2d554f723b1bb42e321f8e5dd6cdc602",
+    "go.mod": "1c5602d9aa19331922bd05ee7facde1660db55488bf6f7f0818ae4a503ae4c38",
+    "go.sum": "2c01bdcd45c6b5012d9881b961a487fcdc0c1042f23716b35bc14d313e86e8aa"
+  }
+}

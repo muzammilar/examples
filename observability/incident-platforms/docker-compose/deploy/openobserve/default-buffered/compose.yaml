@@ -1,0 +1,10 @@
+services:
+  openobserve:
+    extends:
+      file: ../base.compose.yaml
+      service: openobserve-base
+    profiles: [openobserve-buffered]
+    environment:
+      ZO_WAL_FSYNC_DISABLED: 'true'
+    volumes: [openobserve:/data]
+    networks: [lab]

@@ -1,0 +1,43 @@
+name: obs-incident-platforms
+x-workload: &workload
+  profiles: [tools]
+  image: obs-incident-platforms-workload:local
+  pull_policy: never
+  user: '${LAB_UID:?run through Make}:0'
+  cpus: 1
+  mem_limit: 512m
+  read_only: true
+  cap_drop: [ALL]
+  security_opt: [no-new-privileges:true]
+  volumes: [./results:/results]
+  networks: [lab]
+services:
+  openobserve:
+    extends:
+      file: ./deploy/openobserve/default-buffered/compose.yaml
+      service: openobserve
+  openobserve-sync:
+    extends:
+      file: ./deploy/openobserve/synchronous-wal/compose.yaml
+      service: openobserve-sync
+  incident-workload:
+    <<: *workload
+    build:
+      context: ./.build/incident-workload
+  incident-publisher:
+    <<: *workload
+    cpus: 0.75
+    mem_limit: 384m
+  incident-reader:
+    <<: *workload
+    cpus: 0.25
+    mem_limit: 128m
+
+networks:
+  lab:
+    internal: true
+    ipam:
+      config: [{subnet: 172.30.75.0/24}]
+volumes:
+  openobserve:
+  openobserve-sync:

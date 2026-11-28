@@ -12,7 +12,10 @@ corrected full Victoria values reconcile. A later Loki restart omits 44,274
 previously verified log ACKs; that unresolved failure blocks Grafana collector
 qualification. Greptime collector recovery passed; Victoria value recovery passed with its
 known failed type projection. The lab is stopped with failed data retained. The broader
-incident-platform comparison is next, with all metadata/collector/UI roles included.
+[incident-platform comparison](incident-platforms/) is active, with all metadata/collector/UI roles
+included. OpenObserve healthy native controls passed; the default-buffered crash
+left **30 acknowledged spans missing**. Its separate synchronous-WAL reference
+passed the bounded crash/readback gate; ClickStack/SigNoz/new Grafana profiles remain unrun.
 
 The [per-system example plans](../docs/example-plans/streaming-and-observability.md#observability) specify the incident, failure and data checks for each component.
 

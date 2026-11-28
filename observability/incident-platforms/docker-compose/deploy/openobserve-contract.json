@@ -1,0 +1,25 @@
+{
+  "backend": "OpenObserve OSS 1.2.0 local SQLite/filesystem",
+  "required_operations": ["OTLP ingest metrics/logs/traces", "uncached native SQL readback of declared logical projection"],
+  "consistency": "eventual native query visibility; fenced acknowledged IDs and selected values must reconcile",
+  "batch_atomicity": "not claimed; partial OTLP acceptance leaves the full source batch ambiguous",
+  "idempotency": "not claimed; source uses no automatic retries; duplicate returned copies are counted and fail healthy qualification",
+  "durability": "native local WAL/filesystem settings; HTTP ACK is not assumed to mean power-loss durability",
+  "replication": {"copies": 1, "hosts": 1, "ha_qualified": false},
+  "delete_ttl": "not exercised; stream retention initially inherits native defaults, to be normalized/read back before a retention comparison",
+  "client": {"runtime": "Go 1.27.4", "protobuf": "official OTLP 1.11.1", "retries": 0, "connect_timeout_s": 5, "request_timeout_s": 30, "max_connections_per_host": 4, "batch_metrics_logs": 1000, "batch_trace_requests": 10, "pace_ms": 200},
+  "budgets": {"backend_cpu": 8, "backend_memory_gib": 12, "workload_cpu": 1, "workload_memory_mib": 512},
+  "selected_log_fields": "exact body bytes, source ID, native trace/span correlation, severity, tenant, timestamp, resource and scope",
+  "selected_metric_fields": "exact point identity, timestamp/value, metric name and business/resource/scope labels",
+  "selected_trace_fields": "IDs/parents, service, tenant, names/kinds/status/message, start/end, microsecond duration, logical numeric attributes, events and links",
+  "native_trace_projection": {
+    "integer_span_and_event_attributes": "decimal strings in the native SQL representation",
+    "ordinary_trace_scope": "absent from the default stored trace schema",
+    "main_span_trace_state": "absent from the default stored trace schema",
+    "main_span_flags": "pinned source hardcodes 1; alternate flags unqualified",
+    "events_links": "JSON strings; verify their selected parsed fields",
+    "lossless_otlp_roundtrip": false
+  },
+  "oracle": "explicit use_cache=false on native search; reject partial/result-cached responses, wrong values, missing ACKs and duplicate returned copies; preserve histories across faults",
+  "limits": "logical projection qualification is not lossless OTLP export, physical duplicate inventory, HA, independent backup or power-loss qualification"
+}

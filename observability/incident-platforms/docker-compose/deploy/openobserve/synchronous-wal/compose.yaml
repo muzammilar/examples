@@ -1,0 +1,12 @@
+services:
+  openobserve-sync:
+    extends:
+      file: ../base.compose.yaml
+      service: openobserve-base
+    profiles: [openobserve]
+    environment:
+      ZO_WAL_FSYNC_DISABLED: 'false'
+    volumes: [openobserve-sync:/data]
+    networks:
+      lab:
+        aliases: [openobserve]

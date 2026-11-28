@@ -1,0 +1,18 @@
+services:
+  openobserve-base:
+    image: public.ecr.aws/zinclabs/openobserve:v1.2.0@sha256:896361d533cac56ef346d940b1ddd6664e04d5f9606bd80b4a2e28069a33020e
+    pull_policy: never
+    cpus: 8
+    mem_limit: 12g
+    read_only: true
+    tmpfs: [/tmp:size=128m]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    environment:
+      ZO_ROOT_USER_EMAIL: incident@example.test
+      ZO_ROOT_USER_PASSWORD: Local-Incident-P4ssword!
+      ZO_LOCAL_MODE: 'true'
+      ZO_LOCAL_MODE_STORAGE: disk
+      ZO_DATA_DIR: /data
+      ZO_TELEMETRY: 'false'
+      AWS_EC2_METADATA_DISABLED: 'true'

@@ -1,0 +1,388 @@
+{
+  "case": "7394da0773a04d169db860d23a517b68",
+  "metadata": {
+    "kind": "ingress-crash",
+    "backend": "openobserve",
+    "backends_planned": [
+      "clickstack",
+      "openobserve",
+      "signoz",
+      "grafana"
+    ],
+    "prior": "results/cases/0c4c2fd57dc54308b618415dbb06e22c",
+    "scope": "Shared logical incident projection, not lossless OTLP or a capacity winner"
+  },
+  "fixture": {
+    "run": "7394da0773a04d169db860d23a517b68",
+    "payload_seed": "143b35bfd88e4ca4bf416d6513499596",
+    "start_ms": 1795862022000,
+    "requests": 10000,
+    "logs_per_request": 100,
+    "metric_points": 100
+  },
+  "status.json": {
+    "common_projection_passed": false,
+    "lossless_otlp_roundtrip": false,
+    "measurement_errors": [],
+    "scope": "Common logical values only; native trace projection limits are unchanged"
+  },
+  "source.json": {
+    "admission-history.go": "4903f0e4af40a86781b8de8bebd77e309e1a73d6279d2ee12a68a0558f23c780",
+    "corpus.go": "3d455e48b883f256a7e170fafa3576e99caf2e91b661339982714c3c89d3cd0c",
+    "main.go": "e7f2b84213c42538ff82f67250f9c2da7fcbadd7debeb7a463ece49853bf4055",
+    "openobserve.go": "bb5f1df83dd6ed1a8125fb15f70950897657ba6f9ad9e6608ecc18351698d92e",
+    "openobserve_oracle.go": "ea342457d1a66dc63a7a093dc7faed87e3443cbc7e2881e6b0281b77558141ee",
+    "openobserve_oracle_test.go": "48bcccfe7e9f4d4248905301ddaa3dad8134c099399ee7724b9315fe9683a076",
+    "publisher.go": "68189a4193c1ead05a0f672e58c7f6e5f4c4599e37478638dde5099d5d3bd083",
+    "publisher_test.go": "f1bd2fe1f2e55a91b66db32c443ea42a400d8ba3d3baf1437be2403258656b0d",
+    "resources.go": "5beca55107018a2aa3eca9a2624b5018e270db6deab951e0d671d00b0373af86",
+    "storage-observer.go": "337a52ae7e8c323306d795a6dd4b164761656a91fe11df9e561f1bcef67848a1",
+    "watch.go": "daade65de6cc530b00cbb8e1fa825adb2d554f723b1bb42e321f8e5dd6cdc602",
+    "go.mod": "1c5602d9aa19331922bd05ee7facde1660db55488bf6f7f0818ae4a503ae4c38",
+    "go.sum": "2c01bdcd45c6b5012d9881b961a487fcdc0c1042f23716b35bc14d313e86e8aa"
+  },
+  "disk-before-ingest.json": {
+    "volumes": {
+      "obs-incident-platforms_openobserve": {
+        "allocated_bytes": 148316160,
+        "event": "data-volume-snapshot",
+        "filesystem": {
+          "filesystem_available_bytes": 10037616640,
+          "filesystem_total_bytes": 83954712576,
+          "filesystem_type": "0xef53"
+        },
+        "logical_regular_file_bytes": 2714789212,
+        "regular_files": 28,
+        "scope": "read-only mounted owned data volume; inode-deduplicated; not a transient peak or native codec ratio"
+      }
+    },
+    "allocated_data_bytes": 148316160,
+    "logical_file_bytes": 2714789212,
+    "scope": "Read-only sampled allocation including retained fixtures; not continuous peak or codec ratio"
+  },
+  "proven_fault": {
+    "state": {
+      "Status": "exited",
+      "Running": false,
+      "Paused": false,
+      "Restarting": false,
+      "OOMKilled": false,
+      "Dead": false,
+      "Pid": 0,
+      "ExitCode": 137,
+      "Error": "",
+      "StartedAt": "2026-11-28T12:32:52.373156791Z",
+      "FinishedAt": "2026-11-28T13:12:08.825426299Z"
+    },
+    "image": "sha256:896361d533cac56ef346d940b1ddd6664e04d5f9606bd80b4a2e28069a33020e",
+    "reference": "public.ecr.aws/zinclabs/openobserve:v1.2.0@sha256:896361d533cac56ef346d940b1ddd6664e04d5f9606bd80b4a2e28069a33020e",
+    "mounts": [
+      {
+        "Type": "volume",
+        "Name": "obs-incident-platforms_openobserve",
+        "Source": "/var/lib/docker/volumes/obs-incident-platforms_openobserve/_data",
+        "Destination": "/data",
+        "Driver": "local",
+        "Mode": "rw",
+        "RW": true,
+        "Propagation": ""
+      }
+    ]
+  },
+  "failure": "Traceback (most recent call last):\n  File \"/Users/muzammil/github.com/muzammilar/examples/observability/incident-platforms/docker-compose/scripts/experiments.py\", line 357, in run\n    wait_ready(directory, actors, started)\n    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/muzammil/github.com/muzammilar/examples/observability/incident-platforms/docker-compose/scripts/experiments.py\", line 207, in wait_ready\n    raise TimeoutError(\n        \"Old/recent visibility did not recover before the declared deadline\"\n    )\nTimeoutError: Old/recent visibility did not recover before the declared deadline\n",
+  "readbacks": {
+    "results/restart-audits/7ce34bd86d694ac6b0b531d419d5f6fe/7394da0773a04d169db860d23a517b68/readback.json": {
+      "backend": "openobserve",
+      "common_projection_passed": false,
+      "fixture": {
+        "run": "7394da0773a04d169db860d23a517b68",
+        "payload_seed": "143b35bfd88e4ca4bf416d6513499596",
+        "start_ms": 1795862022000,
+        "requests": 10000,
+        "logs_per_request": 100,
+        "metric_points": 100
+      },
+      "lossless_otlp_roundtrip": false,
+      "scope": "Uncached native SQL logical-value projection; numeric span/event attributes are strings; main trace state and ordinary trace scope are absent; span flags are not qualified",
+      "signals": {
+        "logs": {
+          "complete": true,
+          "counts": {
+            "acknowledged_records": 548000,
+            "acknowledged_present": 548000,
+            "missing_acknowledged_ids": [],
+            "ambiguous_records": 58000,
+            "ambiguous_present": 0,
+            "ambiguous_absent_at_cut": 58000,
+            "unexpected_ids": [],
+            "duplicate_copies_returned_by_query": 0
+          },
+          "elapsed_s": 12.454120756,
+          "history_sha256": "a8c79eb18380ddc7ffdfe657f500ab807fe0211db002991c8b350cf481b06ad9"
+        },
+        "metrics": {
+          "complete": true,
+          "counts": {
+            "acknowledged_records": 577000,
+            "acknowledged_present": 577000,
+            "missing_acknowledged_ids": [],
+            "ambiguous_records": 59000,
+            "ambiguous_present": 0,
+            "ambiguous_absent_at_cut": 59000,
+            "unexpected_ids": [],
+            "duplicate_copies_returned_by_query": 0
+          },
+          "elapsed_s": 7.621442003,
+          "history_sha256": "a154c27950b91fe537abc089cbf5c78f70023f21bd7987a6ad511d9dc7a56641"
+        },
+        "traces": {
+          "complete": true,
+          "counts": {
+            "acknowledged_records": 17310,
+            "acknowledged_present": 17280,
+            "missing_acknowledged_ids": [
+              270,
+              271,
+              272,
+              273,
+              274,
+              275,
+              276,
+              277,
+              278,
+              279,
+              280,
+              281,
+              282,
+              283,
+              284,
+              285,
+              286,
+              287,
+              288,
+              289,
+              290,
+              291,
+              292,
+              293,
+              294,
+              295,
+              296,
+              297,
+              298,
+              299
+            ],
+            "ambiguous_records": 1770,
+            "ambiguous_present": 0,
+            "ambiguous_absent_at_cut": 1770,
+            "unexpected_ids": [],
+            "duplicate_copies_returned_by_query": 0
+          },
+          "elapsed_s": 0.361753084,
+          "error": "missing ACKs, unexpected logical IDs or duplicate returned copies",
+          "history_sha256": "7fb89feeeba3a6ae4a0992cceca775cefd49646c1a3f6d247b64ecf373d0661d"
+        }
+      }
+    }
+  },
+  "resources": [
+    {
+      "evidence": "/Users/muzammil/github.com/muzammilar/examples/observability/incident-platforms/docker-compose/results/resources-1795871493707881000.jsonl",
+      "phase_prefix": "live-publish:,fault:,recovery:",
+      "environment": {
+        "type": "environment",
+        "run_id": 1795871493707881000,
+        "fixture": null,
+        "command": [
+          "make",
+          "ingress-case",
+          "PYTHON=/Users/muzammil/.local/bin/python3.13"
+        ],
+        "environment": {
+          "NCPU": 11,
+          "MemTotal": 26216296448,
+          "KernelVersion": "6.12.76-linuxkit",
+          "OperatingSystem": "Docker Desktop",
+          "Driver": "overlayfs",
+          "ServerVersion": "29.5.3",
+          "docker_api": "1.54"
+        },
+        "cotenancy": "Only this isolated incident-platform lab; profiles run serially; previous lab stopped with data retained."
+      },
+      "sampled_aggregate_memory_peak_bytes": 2794852352,
+      "sampled_aggregate_memory_mean_bytes": 1880689774.2769232,
+      "actors": [
+        {
+          "name": "/obs-incident-platforms-7394da0773a04d169db860d23a517b68-watch",
+          "samples": 130,
+          "peak_memory_bytes": 9596928,
+          "configuration": {
+            "image_id": "sha256:2c417d8ba347cc43f7bd9df132c23f4a8cddc15a9b04eb30d05c95d71efef96f",
+            "image_reference": "obs-incident-platforms-workload:local",
+            "memory_limit_bytes": 134217728,
+            "nano_cpus": 250000000,
+            "started_at": "2026-11-28T13:12:06.978439298Z"
+          },
+          "counter_deltas": {
+            "cpu_core_s": 0.35629900000000003,
+            "network_rx_bytes": 737167,
+            "network_tx_bytes": 426446
+          },
+          "cpu_utilization_pct_one_core_min": 0.15396400919313022,
+          "cpu_utilization_pct_one_core_max": 0.6261844705378725,
+          "observed_s": 132.06542205810547,
+          "sampled_mean_memory_bytes": 8905208.123076923,
+          "cpu_utilization_pct_one_core_average": 0.26978977119630715,
+          "container_lifetime_counters_at_last_sample": {
+            "cpu_core_s": 0.36603,
+            "network_rx_bytes": 737319,
+            "network_tx_bytes": 426488
+          }
+        },
+        {
+          "name": "/obs-incident-platforms-7394da0773a04d169db860d23a517b68-publish",
+          "samples": 130,
+          "peak_memory_bytes": 18571264,
+          "configuration": {
+            "image_id": "sha256:2c417d8ba347cc43f7bd9df132c23f4a8cddc15a9b04eb30d05c95d71efef96f",
+            "image_reference": "obs-incident-platforms-workload:local",
+            "memory_limit_bytes": 402653184,
+            "nano_cpus": 750000000,
+            "started_at": "2026-11-28T13:12:06.815046506Z"
+          },
+          "counter_deltas": {
+            "cpu_core_s": 11.307524999999998,
+            "network_rx_bytes": 810018,
+            "network_tx_bytes": 23300692
+          },
+          "cpu_utilization_pct_one_core_min": 5.248324232917307,
+          "cpu_utilization_pct_one_core_max": 12.31762113213181,
+          "observed_s": 132.06333088874817,
+          "sampled_mean_memory_bytes": 14989185.96923077,
+          "cpu_utilization_pct_one_core_average": 8.562198851038826,
+          "container_lifetime_counters_at_last_sample": {
+            "cpu_core_s": 11.335968,
+            "network_rx_bytes": 813632,
+            "network_tx_bytes": 23385321
+          }
+        },
+        {
+          "name": "/obs-incident-platforms-openobserve-1",
+          "samples": 120,
+          "peak_memory_bytes": 2767986688,
+          "counter_deltas": {
+            "cpu_core_s": 50.282935999999985,
+            "network_rx_bytes": 23636383,
+            "network_tx_bytes": 1540955,
+            "disk_read_bytes": 0,
+            "disk_write_bytes": 108916736
+          },
+          "cpu_utilization_pct_one_core_min": 0.70740641815235,
+          "cpu_utilization_pct_one_core_max": 63.5641207875695,
+          "counter_resets": 3,
+          "observed_s": 132.06304788589478,
+          "sampled_mean_memory_bytes": 2011528328.5333333,
+          "cpu_utilization_pct_one_core_average": 38.07494738683109,
+          "container_lifetime_counters_at_last_sample": {
+            "cpu_core_s": 49.859658,
+            "network_rx_bytes": 23421576,
+            "network_tx_bytes": 1524380,
+            "disk_read_bytes": 0,
+            "disk_write_bytes": 113078272
+          }
+        }
+      ],
+      "limits": [
+        "Sample-window deltas exclude startup and exit outside observation. Decreasing counters are treated as restarts and the new counter is accumulated; reset intervals have no CPU utilization estimate.",
+        "Short-lived actors may be missed; use native pre-exit cgroup counters as well.",
+        "CPU utilization is interval-average percent of one core; short spikes may be missed.",
+        "Docker disk bytes are not device I/O latency; absent counters are unavailable, not zero."
+      ]
+    }
+  ],
+  "raw_witnesses": {
+    "results/cases/7394da0773a04d169db860d23a517b68/openobserve/logs/requests.jsonl": "a8c79eb18380ddc7ffdfe657f500ab807fe0211db002991c8b350cf481b06ad9",
+    "results/cases/7394da0773a04d169db860d23a517b68/openobserve/metrics/requests.jsonl": "a154c27950b91fe537abc089cbf5c78f70023f21bd7987a6ad511d9dc7a56641",
+    "results/cases/7394da0773a04d169db860d23a517b68/openobserve/traces/requests.jsonl": "7fb89feeeba3a6ae4a0992cceca775cefd49646c1a3f6d247b64ecf373d0661d"
+  },
+  "source_batches": {
+    "logs": {
+      "timing_scope": "HTTP batch admission, not durable commit, visibility or per-record latency",
+      "timer": "Go monotonic duration, reported ms; nanosecond representation does not establish nanosecond accuracy",
+      "accepted": {
+        "batches": 548,
+        "http_ms_mean": 5.866262071167884,
+        "raw_bytes": 323055774,
+        "gzip_bytes": 18975088,
+        "http_ms_p50": 5.994292,
+        "http_ms_p95": 7.910041,
+        "http_ms_p99": 12.454958,
+        "http_ms_p99.9": 19.923791,
+        "source_wire_compression_ratio": 17.02525827548204
+      },
+      "unacknowledged": {
+        "batches": 58,
+        "http_ms_mean": 0.6829195689655173,
+        "raw_bytes": 34046818,
+        "gzip_bytes": 2002878,
+        "http_ms_p50": 0.65225,
+        "http_ms_p95": 1.0455,
+        "http_ms_p99": 1.200041,
+        "http_ms_p99.9": 1.200041,
+        "source_wire_compression_ratio": 16.998947514526595
+      }
+    },
+    "metrics": {
+      "timing_scope": "HTTP batch admission, not durable commit, visibility or per-record latency",
+      "timer": "Go monotonic duration, reported ms; nanosecond representation does not establish nanosecond accuracy",
+      "accepted": {
+        "batches": 577,
+        "http_ms_mean": 2.6977473916811094,
+        "raw_bytes": 59716337,
+        "gzip_bytes": 2589738,
+        "http_ms_p50": 2.259208,
+        "http_ms_p95": 5.468125,
+        "http_ms_p99": 9.165875,
+        "http_ms_p99.9": 26.668417,
+        "source_wire_compression_ratio": 23.058833364610628
+      },
+      "unacknowledged": {
+        "batches": 59,
+        "http_ms_mean": 0.6562683559322035,
+        "raw_bytes": 6106099,
+        "gzip_bytes": 264969,
+        "http_ms_p50": 0.54925,
+        "http_ms_p95": 1.461041,
+        "http_ms_p99": 3.744042,
+        "http_ms_p99.9": 3.744042,
+        "source_wire_compression_ratio": 23.044578799784126
+      }
+    },
+    "traces": {
+      "timing_scope": "HTTP batch admission, not durable commit, visibility or per-record latency",
+      "timer": "Go monotonic duration, reported ms; nanosecond representation does not establish nanosecond accuracy",
+      "accepted": {
+        "batches": 577,
+        "http_ms_mean": 2.429158786828423,
+        "raw_bytes": 5029526,
+        "gzip_bytes": 983530,
+        "http_ms_p50": 1.767584,
+        "http_ms_p95": 5.600375,
+        "http_ms_p99": 10.503834,
+        "http_ms_p99.9": 27.344875,
+        "source_wire_compression_ratio": 5.113749453499131
+      },
+      "unacknowledged": {
+        "batches": 59,
+        "http_ms_mean": 1.5739780508474577,
+        "raw_bytes": 512815,
+        "gzip_bytes": 100073,
+        "http_ms_p50": 1.443416,
+        "http_ms_p95": 3.292542,
+        "http_ms_p99": 6.226375,
+        "http_ms_p99.9": 6.226375,
+        "source_wire_compression_ratio": 5.124409181297652
+      }
+    }
+  }
+}

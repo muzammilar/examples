@@ -1,0 +1,372 @@
+{
+  "case": "b13c086902e3479b9403459c0372e702",
+  "metadata": {
+    "kind": "healthy",
+    "backend": "openobserve",
+    "backends_planned": [
+      "clickstack",
+      "openobserve",
+      "signoz",
+      "grafana"
+    ],
+    "prior": "results/cases/0c4c2fd57dc54308b618415dbb06e22c",
+    "scope": "Shared logical incident projection, not lossless OTLP or a capacity winner"
+  },
+  "fixture": {
+    "run": "b13c086902e3479b9403459c0372e702",
+    "payload_seed": "143b35bfd88e4ca4bf416d6513499596",
+    "start_ms": 1795862022000,
+    "requests": 10000,
+    "logs_per_request": 100,
+    "metric_points": 100
+  },
+  "status.json": {
+    "common_projection_passed": true,
+    "lossless_otlp_roundtrip": false,
+    "measurement_errors": [],
+    "scope": "Common logical values only; native trace projection limits are unchanged"
+  },
+  "source.json": {
+    "admission-history.go": "4903f0e4af40a86781b8de8bebd77e309e1a73d6279d2ee12a68a0558f23c780",
+    "corpus.go": "3d455e48b883f256a7e170fafa3576e99caf2e91b661339982714c3c89d3cd0c",
+    "main.go": "e7f2b84213c42538ff82f67250f9c2da7fcbadd7debeb7a463ece49853bf4055",
+    "openobserve.go": "bb5f1df83dd6ed1a8125fb15f70950897657ba6f9ad9e6608ecc18351698d92e",
+    "openobserve_oracle.go": "ea342457d1a66dc63a7a093dc7faed87e3443cbc7e2881e6b0281b77558141ee",
+    "openobserve_oracle_test.go": "48bcccfe7e9f4d4248905301ddaa3dad8134c099399ee7724b9315fe9683a076",
+    "publisher.go": "68189a4193c1ead05a0f672e58c7f6e5f4c4599e37478638dde5099d5d3bd083",
+    "publisher_test.go": "f1bd2fe1f2e55a91b66db32c443ea42a400d8ba3d3baf1437be2403258656b0d",
+    "resources.go": "5beca55107018a2aa3eca9a2624b5018e270db6deab951e0d671d00b0373af86",
+    "storage-observer.go": "337a52ae7e8c323306d795a6dd4b164761656a91fe11df9e561f1bcef67848a1",
+    "watch.go": "daade65de6cc530b00cbb8e1fa825adb2d554f723b1bb42e321f8e5dd6cdc602",
+    "go.mod": "1c5602d9aa19331922bd05ee7facde1660db55488bf6f7f0818ae4a503ae4c38",
+    "go.sum": "2c01bdcd45c6b5012d9881b961a487fcdc0c1042f23716b35bc14d313e86e8aa"
+  },
+  "disk-before-ingest.json": {
+    "volumes": {
+      "obs-incident-platforms_openobserve": {
+        "allocated_bytes": 7770112,
+        "event": "data-volume-snapshot",
+        "filesystem": {
+          "filesystem_available_bytes": 10228723712,
+          "filesystem_total_bytes": 83954712576,
+          "filesystem_type": "0xef53"
+        },
+        "logical_regular_file_bytes": 2691723284,
+        "regular_files": 21,
+        "scope": "read-only mounted owned data volume; inode-deduplicated; not a transient peak or native codec ratio"
+      }
+    },
+    "allocated_data_bytes": 7770112,
+    "logical_file_bytes": 2691723284,
+    "scope": "Read-only sampled allocation including retained fixtures; not continuous peak or codec ratio"
+  },
+  "disk-after-actors.json": {
+    "volumes": {
+      "obs-incident-platforms_openobserve": {
+        "allocated_bytes": 148287488,
+        "event": "data-volume-snapshot",
+        "filesystem": {
+          "filesystem_available_bytes": 10048339968,
+          "filesystem_total_bytes": 83954712576,
+          "filesystem_type": "0xef53"
+        },
+        "logical_regular_file_bytes": 2714789212,
+        "regular_files": 28,
+        "scope": "read-only mounted owned data volume; inode-deduplicated; not a transient peak or native codec ratio"
+      }
+    },
+    "allocated_data_bytes": 148287488,
+    "logical_file_bytes": 2714789212,
+    "scope": "Read-only sampled allocation including retained fixtures; not continuous peak or codec ratio"
+  },
+  "readbacks": {
+    "results/cases/b13c086902e3479b9403459c0372e702/openobserve/final/readback.json": {
+      "backend": "openobserve",
+      "common_projection_passed": true,
+      "fixture": {
+        "run": "b13c086902e3479b9403459c0372e702",
+        "payload_seed": "143b35bfd88e4ca4bf416d6513499596",
+        "start_ms": 1795862022000,
+        "requests": 10000,
+        "logs_per_request": 100,
+        "metric_points": 100
+      },
+      "lossless_otlp_roundtrip": false,
+      "scope": "Uncached native SQL logical-value projection; numeric span/event attributes are strings; main trace state and ordinary trace scope are absent; span flags are not qualified",
+      "signals": {
+        "logs": {
+          "complete": true,
+          "counts": {
+            "acknowledged_records": 1000000,
+            "acknowledged_present": 1000000,
+            "missing_acknowledged_ids": [],
+            "ambiguous_records": 0,
+            "ambiguous_present": 0,
+            "ambiguous_absent_at_cut": 0,
+            "unexpected_ids": [],
+            "duplicate_copies_returned_by_query": 0
+          },
+          "elapsed_s": 15.069224049,
+          "history_sha256": "c12208145f9250472af73bdc844b4de379cc43342a4472f5b0508c163486cbd1"
+        },
+        "metrics": {
+          "complete": true,
+          "counts": {
+            "acknowledged_records": 1000000,
+            "acknowledged_present": 1000000,
+            "missing_acknowledged_ids": [],
+            "ambiguous_records": 0,
+            "ambiguous_present": 0,
+            "ambiguous_absent_at_cut": 0,
+            "unexpected_ids": [],
+            "duplicate_copies_returned_by_query": 0
+          },
+          "elapsed_s": 12.351306714,
+          "history_sha256": "42b86a8457268d91915ee3b19827e35c2f2886f028d899bca9ec0c948acf4d93"
+        },
+        "traces": {
+          "complete": true,
+          "counts": {
+            "acknowledged_records": 30000,
+            "acknowledged_present": 30000,
+            "missing_acknowledged_ids": [],
+            "ambiguous_records": 0,
+            "ambiguous_present": 0,
+            "ambiguous_absent_at_cut": 0,
+            "unexpected_ids": [],
+            "duplicate_copies_returned_by_query": 0
+          },
+          "elapsed_s": 0.565556125,
+          "history_sha256": "6a312ecfbf3c95bd4139ffce9072eda19a2cb00f51ae02ccf7873414fb01086b"
+        }
+      }
+    },
+    "results/restart-audits/7ce34bd86d694ac6b0b531d419d5f6fe/b13c086902e3479b9403459c0372e702/readback.json": {
+      "backend": "openobserve",
+      "common_projection_passed": true,
+      "fixture": {
+        "run": "b13c086902e3479b9403459c0372e702",
+        "payload_seed": "143b35bfd88e4ca4bf416d6513499596",
+        "start_ms": 1795862022000,
+        "requests": 10000,
+        "logs_per_request": 100,
+        "metric_points": 100
+      },
+      "lossless_otlp_roundtrip": false,
+      "scope": "Uncached native SQL logical-value projection; numeric span/event attributes are strings; main trace state and ordinary trace scope are absent; span flags are not qualified",
+      "signals": {
+        "logs": {
+          "complete": true,
+          "counts": {
+            "acknowledged_records": 1000000,
+            "acknowledged_present": 1000000,
+            "missing_acknowledged_ids": [],
+            "ambiguous_records": 0,
+            "ambiguous_present": 0,
+            "ambiguous_absent_at_cut": 0,
+            "unexpected_ids": [],
+            "duplicate_copies_returned_by_query": 0
+          },
+          "elapsed_s": 16.74620109,
+          "history_sha256": "c12208145f9250472af73bdc844b4de379cc43342a4472f5b0508c163486cbd1"
+        },
+        "metrics": {
+          "complete": true,
+          "counts": {
+            "acknowledged_records": 1000000,
+            "acknowledged_present": 1000000,
+            "missing_acknowledged_ids": [],
+            "ambiguous_records": 0,
+            "ambiguous_present": 0,
+            "ambiguous_absent_at_cut": 0,
+            "unexpected_ids": [],
+            "duplicate_copies_returned_by_query": 0
+          },
+          "elapsed_s": 17.969085301,
+          "history_sha256": "42b86a8457268d91915ee3b19827e35c2f2886f028d899bca9ec0c948acf4d93"
+        },
+        "traces": {
+          "complete": true,
+          "counts": {
+            "acknowledged_records": 30000,
+            "acknowledged_present": 30000,
+            "missing_acknowledged_ids": [],
+            "ambiguous_records": 0,
+            "ambiguous_present": 0,
+            "ambiguous_absent_at_cut": 0,
+            "unexpected_ids": [],
+            "duplicate_copies_returned_by_query": 0
+          },
+          "elapsed_s": 0.613789542,
+          "history_sha256": "6a312ecfbf3c95bd4139ffce9072eda19a2cb00f51ae02ccf7873414fb01086b"
+        }
+      }
+    }
+  },
+  "resources": [
+    {
+      "evidence": "/Users/muzammil/github.com/muzammilar/examples/observability/incident-platforms/docker-compose/results/resources-1795871187070811000.jsonl",
+      "phase_prefix": "live-publish:,fault:,recovery:",
+      "environment": {
+        "type": "environment",
+        "run_id": 1795871187070811000,
+        "fixture": null,
+        "command": [
+          "make",
+          "full-case",
+          "PYTHON=/Users/muzammil/.local/bin/python3.13"
+        ],
+        "environment": {
+          "NCPU": 11,
+          "MemTotal": 26216296448,
+          "KernelVersion": "6.12.76-linuxkit",
+          "OperatingSystem": "Docker Desktop",
+          "Driver": "overlayfs",
+          "ServerVersion": "29.5.3",
+          "docker_api": "1.54"
+        },
+        "cotenancy": "Only this isolated incident-platform lab; profiles run serially; previous lab stopped with data retained."
+      },
+      "sampled_aggregate_memory_peak_bytes": 2122588160,
+      "sampled_aggregate_memory_mean_bytes": 1513875759.4074075,
+      "actors": [
+        {
+          "name": "/obs-incident-platforms-b13c086902e3479b9403459c0372e702-watch",
+          "samples": 216,
+          "peak_memory_bytes": 11751424,
+          "configuration": {
+            "image_id": "sha256:2c417d8ba347cc43f7bd9df132c23f4a8cddc15a9b04eb30d05c95d71efef96f",
+            "image_reference": "obs-incident-platforms-workload:local",
+            "memory_limit_bytes": 134217728,
+            "nano_cpus": 250000000,
+            "started_at": "2026-11-28T13:06:28.555230586Z"
+          },
+          "counter_deltas": {
+            "cpu_core_s": 0.5505680000000001,
+            "network_rx_bytes": 1448551,
+            "network_tx_bytes": 782763
+          },
+          "cpu_utilization_pct_one_core_min": 0.1645607115973444,
+          "cpu_utilization_pct_one_core_max": 0.3894603333583727,
+          "counter_resets": 3,
+          "observed_s": -63931467989.1137,
+          "sampled_mean_memory_bytes": 11131600.592592593,
+          "container_lifetime_counters_at_last_sample": {
+            "cpu_core_s": 0.0,
+            "network_rx_bytes": 0,
+            "network_tx_bytes": 0
+          }
+        },
+        {
+          "name": "/obs-incident-platforms-b13c086902e3479b9403459c0372e702-publish",
+          "samples": 215,
+          "peak_memory_bytes": 17338368,
+          "configuration": {
+            "image_id": "sha256:2c417d8ba347cc43f7bd9df132c23f4a8cddc15a9b04eb30d05c95d71efef96f",
+            "image_reference": "obs-incident-platforms-workload:local",
+            "memory_limit_bytes": 402653184,
+            "nano_cpus": 750000000,
+            "started_at": "2026-11-28T13:06:28.393024919Z"
+          },
+          "counter_deltas": {
+            "cpu_core_s": 19.558014,
+            "network_rx_bytes": 1429604,
+            "network_tx_bytes": 42073372
+          },
+          "cpu_utilization_pct_one_core_min": 4.4452759687295496,
+          "cpu_utilization_pct_one_core_max": 11.13001317031115,
+          "observed_s": 219.4924509525299,
+          "sampled_mean_memory_bytes": 15378289.11627907,
+          "cpu_utilization_pct_one_core_average": 8.910563399845516,
+          "container_lifetime_counters_at_last_sample": {
+            "cpu_core_s": 19.611674,
+            "network_rx_bytes": 1436272,
+            "network_tx_bytes": 42241953
+          }
+        },
+        {
+          "name": "/obs-incident-platforms-openobserve-1",
+          "samples": 216,
+          "peak_memory_bytes": 2095386624,
+          "counter_deltas": {
+            "cpu_core_s": 63.961249,
+            "network_rx_bytes": 42930646,
+            "network_tx_bytes": 2884799,
+            "disk_read_bytes": 0,
+            "disk_write_bytes": 208351232
+          },
+          "cpu_utilization_pct_one_core_min": 9.46440507765368,
+          "cpu_utilization_pct_one_core_max": 173.60586512794302,
+          "observed_s": 220.57667112350464,
+          "sampled_mean_memory_bytes": 1487437065.4814816,
+          "cpu_utilization_pct_one_core_average": 28.99728637403681,
+          "container_lifetime_counters_at_last_sample": {
+            "cpu_core_s": 74.867241,
+            "network_rx_bytes": 43833439,
+            "network_tx_bytes": 5621594,
+            "disk_read_bytes": 36864,
+            "disk_write_bytes": 212078592
+          }
+        }
+      ],
+      "limits": [
+        "Sample-window deltas exclude startup and exit outside observation. Decreasing counters are treated as restarts and the new counter is accumulated; reset intervals have no CPU utilization estimate.",
+        "Short-lived actors may be missed; use native pre-exit cgroup counters as well.",
+        "CPU utilization is interval-average percent of one core; short spikes may be missed.",
+        "Docker disk bytes are not device I/O latency; absent counters are unavailable, not zero."
+      ]
+    }
+  ],
+  "raw_witnesses": {
+    "results/cases/b13c086902e3479b9403459c0372e702/openobserve/logs/requests.jsonl": "c12208145f9250472af73bdc844b4de379cc43342a4472f5b0508c163486cbd1",
+    "results/cases/b13c086902e3479b9403459c0372e702/openobserve/metrics/requests.jsonl": "42b86a8457268d91915ee3b19827e35c2f2886f028d899bca9ec0c948acf4d93",
+    "results/cases/b13c086902e3479b9403459c0372e702/openobserve/traces/requests.jsonl": "6a312ecfbf3c95bd4139ffce9072eda19a2cb00f51ae02ccf7873414fb01086b"
+  },
+  "source_batches": {
+    "logs": {
+      "timing_scope": "HTTP batch admission, not durable commit, visibility or per-record latency",
+      "timer": "Go monotonic duration, reported ms; nanosecond representation does not establish nanosecond accuracy",
+      "accepted": {
+        "batches": 1000,
+        "http_ms_mean": 6.461569542,
+        "raw_bytes": 589238578,
+        "gzip_bytes": 34610949,
+        "http_ms_p50": 6.703333,
+        "http_ms_p95": 8.462416,
+        "http_ms_p99": 10.797958,
+        "http_ms_p99.9": 17.878958,
+        "source_wire_compression_ratio": 17.024629344893143
+      }
+    },
+    "metrics": {
+      "timing_scope": "HTTP batch admission, not durable commit, visibility or per-record latency",
+      "timer": "Go monotonic duration, reported ms; nanosecond representation does not establish nanosecond accuracy",
+      "accepted": {
+        "batches": 1000,
+        "http_ms_mean": 3.112381434,
+        "raw_bytes": 103495100,
+        "gzip_bytes": 4486728,
+        "http_ms_p50": 2.617083,
+        "http_ms_p95": 6.109584,
+        "http_ms_p99": 12.75,
+        "http_ms_p99.9": 17.953542,
+        "source_wire_compression_ratio": 23.066943215635092
+      }
+    },
+    "traces": {
+      "timing_scope": "HTTP batch admission, not durable commit, visibility or per-record latency",
+      "timer": "Go monotonic duration, reported ms; nanosecond representation does not establish nanosecond accuracy",
+      "accepted": {
+        "batches": 1000,
+        "http_ms_mean": 2.916517836,
+        "raw_bytes": 8707199,
+        "gzip_bytes": 1701141,
+        "http_ms_p50": 2.266042,
+        "http_ms_p95": 7.017792,
+        "http_ms_p99": 12.1445,
+        "http_ms_p99.9": 20.062,
+        "source_wire_compression_ratio": 5.118446383927023
+      }
+    }
+  }
+}
