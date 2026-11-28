@@ -39,10 +39,10 @@ dependency services. MinIO is excluded from all new work in this batch.
 
 ## Pipelines after the deployment examples
 
-- [ ] **PostgreSQL → Debezium/Kafka → Flink → Doris.** Process order/customer CDC with out-of-order corrections, cancellations and dimension updates. Crash around a checkpoint and sink commit, then reconcile exact latest rows and totals at a common source watermark. Test the Doris connector's checkpoint/2PC mode separately from its asynchronous batch mode.
+- [x] **PostgreSQL → Debezium/Kafka → Flink → Doris.** Process order/customer CDC with out-of-order corrections, cancellations and dimension updates. Crash around a checkpoint and sink commit, then reconcile exact latest rows and totals at a common source watermark. Test the Doris connector's checkpoint/2PC mode separately from its asynchronous batch mode.
 - [x] **Kafka → Flink → Iceberg on SeaweedFS → Spark.** [Bounded snapshot/maintenance recovery](../../pipelines/orders-lakehouse/) ran three million acknowledged events, blocked catalog publication, active compaction-worker loss, exact current/pinned reads and orphan-candidate inventory. Eight candidates were preserved; destructive expiry and independent restore remain unrun.
-- [ ] **HDFS → Spark → Doris.** Publish daily input partitions with manifests, join and aggregate them in Spark, then load Doris under stable batch identifiers. Fail an executor and a DataNode separately. Re-run the same input partition and verify its final rows and receipt count.
-- [ ] **Live Flink path plus Spark historical correction.** Feed recent orders through the CDC path and rebuild an older interval with Spark. Publish explicit source versions so a late live update survives backfill. Compare exact results after interrupted publication and retry.
+- [x] **HDFS → Spark → Doris.** Publish daily input partitions with manifests, join and aggregate them in Spark, then load Doris under stable batch identifiers. Fail an executor and a DataNode separately. Re-run the same input partition and verify its final rows and receipt count.
+- [x] **Live Flink path plus Spark historical correction.** [Historical replay](../../pipelines/orders-cdc-analytics/projects/historical-replay/) passed source-version protection, live cancellation, publisher SIGKILL and original-label commit retry with exact reads from all three fixed replicas. Initial immediate-visibility gate failure and independent in-place recovery remain documented. This replays a corrected source snapshot, not an independently authored correction; hard-delete and dimension-merge races remain future scope.
 - [ ] **Matched ClickHouse control.** Use the same raw events, dimensions, deletion rules and settled watermark. Compare native serving queries and complete ingestion/processing/serving costs separately. Record preprocessing and materialization costs for every path, including ClickHouse.
 
 ## Comparison questions
@@ -268,3 +268,16 @@ Both fixtures are verified and removed. Ceph whole-guest/disk/restore work still
 requires the existing 25-GiB free-Docker-space gate; do not weaken it to fit the VM.
 Next cross-system work is live CDC plus Spark historical correction, then the
 matched ClickHouse control; completed Flink/Doris deployment examples stay closed.
+
+### Historical replay checkpoint
+
+[Historical replay beside live CDC](../../pipelines/orders-cdc-analytics/projects/historical-replay/)
+completed the bounded follow-up: Spark independently matched 199,672 snapshot rows;
+10,000 source rows then advanced, including 572 cancellations. Source ACKs advanced
+128 → 129 during publisher SIGKILL. Both original-label transactions became VISIBLE
+and repeated commit reconciled native finished-label errors. All 999,428 current
+active rows matched on each fixed replica, with all 330 source ACKs reconciled.
+The first controller's immediate-visibility failure remains failed; it was recovered
+in place before the separate corrected case. CPU/memory, block bytes, settled disk
+and compression limits are reported; owned teardown passed. Next is the matched
+ClickHouse control, with no throughput winner claimed from these diagnostics.

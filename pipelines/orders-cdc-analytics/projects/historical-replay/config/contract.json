@@ -1,0 +1,15 @@
+{
+  "scope": "historical source-snapshot replay beside live order CDC; level 3",
+  "source": "PostgreSQL transactional correction receipt plus external intent/ACK, followed by one repeatable-read export of orders and dimensions",
+  "version": "order_revision * 1000000 + customer_revision; retain original source values; parent constraints bound both components",
+  "input": "oldest fifth of 1,000,000 default orders, 10,000 customers; full eight-field Spark/body checks",
+  "conflict": "Doris Unique Key merge-on-write, native sequence column version, RF3",
+  "publication": "two independent Stream Load 2PC transactions, durable case-specific labels; crash before second phase; reconcile retained labels",
+  "visibility": "COMMITTED is not VISIBLE; poll permitted committed state for a 60-second visibility budget, bounded by outer application context",
+  "retries": "repeat the original commit; native VISIBLE state is required even if HTTP reports an already-completed label error; no new label",
+  "client": {"sql_pool":1,"connect_timeout_s":5,"mysql_read_timeout_s":60,"http_timeout_s":90,"application_context_s":300,"proxy":false,"redirects":"reject"},
+  "expected_fault": "publisher SIGKILL exit137 without OOM; parent source ACKs must advance while publisher is down; stream processors and required replicas stay running",
+  "recovery": "same transaction identities become VISIBLE; all source receipts reconcile and full exact source-to-sink checks pass using each fixed replica without fallback",
+  "semantics": "replay of a corrected source-of-truth snapshot; not an independently authored historical correction; source acknowledgement counts batches, not individual rows",
+  "unrun": ["lost commit response", "hard-delete versus stale replay", "independent concurrent dimension merge", "whole-node failure", "independent restore", "power loss", "competitive capacity ranking"]
+}

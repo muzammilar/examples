@@ -87,7 +87,11 @@ func source(ctx context.Context, pg *sql.DB, mode, run string, n, customers int)
 		}
 		return reference(run, n, customers)
 	case "mutate":
-		for step := 0; step < 200; step++ {
+		steps, err := count("MUTATION_STEPS", 200)
+		if err != nil || steps < 1 || steps > 2000 {
+			return fmt.Errorf("MUTATION_STEPS must be between 1 and 2000")
+		}
+		for step := 0; step < steps; step++ {
 			if _, err = os.Stat("/results/stop-writer-" + actorToken(run)); err == nil {
 				break
 			} else if !os.IsNotExist(err) {

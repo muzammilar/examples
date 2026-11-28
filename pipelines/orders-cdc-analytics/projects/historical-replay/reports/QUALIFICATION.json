@@ -1,0 +1,2853 @@
+{
+  "performance_depth": 3,
+  "lifecycle": [
+    {
+      "path": "results/down-1795834564864458000",
+      "passed": true,
+      "mode": "down"
+    },
+    {
+      "path": "results/docker-down-1795834589301896000",
+      "passed": true,
+      "mode": "docker-down"
+    }
+  ],
+  "phases": [
+    {
+      "path": "results/replay-1795834221288210000",
+      "passed": false,
+      "scope": "level-3 historical replay",
+      "identity": {
+        "fixture": {
+          "id": "ceefdbf02e344388913b3731d7119936",
+          "stage": "ready",
+          "job": "9827993f6c99eba32544cb20cdc558d4"
+        },
+        "case": "4b96e520ab2b475f94addeceef059c0e",
+        "data": "results/historical/4b96e520ab2b475f94addeceef059c0e"
+      },
+      "budgets": {
+        "setup": {
+          "cpu": 11.0,
+          "memory_bytes": 23488102400
+        },
+        "replay": {
+          "cpu": 11.0,
+          "memory_bytes": 24024973312
+        }
+      },
+      "snapshot-oracle": {
+        "rows": 200000,
+        "wrong": 0,
+        "sha256": "da7be580d6729e6cb26a3f9b2f229558010bc5ab809be04d653c08922ecac6f2",
+        "csv_bytes": 9667775,
+        "input_sha256": {
+          "orders.csv": "603fe02fd6793bcb9b5101dc1a56f2d5e65c75da7e9112efa5ce0c4d1f1acff2",
+          "customers.csv": "58c71f8566d7f365fd906d52d05e322ac22c5ef8e346a964a39c7bfbe6ddd465"
+        },
+        "reference_zlib_bytes": 1913064,
+        "reference_compression_scope": "CSV reference only, not Doris native compression"
+      },
+      "live-progress": {
+        "before": 118,
+        "after": 119
+      },
+      "fault": {
+        "before": {
+          "Status": "running",
+          "Running": true,
+          "Paused": false,
+          "Restarting": false,
+          "OOMKilled": false,
+          "Dead": false,
+          "Pid": 71361,
+          "ExitCode": 0,
+          "Error": "",
+          "StartedAt": "2026-11-28T02:50:25.015670049Z",
+          "FinishedAt": "0001-01-01T00:00:00Z"
+        },
+        "after": {
+          "Status": "exited",
+          "Running": false,
+          "Paused": false,
+          "Restarting": false,
+          "OOMKilled": false,
+          "Dead": false,
+          "Pid": 0,
+          "ExitCode": 137,
+          "Error": "",
+          "StartedAt": "2026-11-28T02:50:25.015670049Z",
+          "FinishedAt": "2026-11-28T02:51:08.416070208Z"
+        },
+        "acks_before": 118,
+        "id": "ec95916ef67e28275ee1b22a2c5ea37d7f20574010447a07f797f8a594408b87"
+      },
+      "native_transactions": [
+        {
+          "log": "status-1795834268803284000.log",
+          "event": "transaction",
+          "native": {
+            "CommitTime": "",
+            "Coordinator": "BE: 172.30.67.21",
+            "ErrMsg": "",
+            "ErrorReplicasCount": "0",
+            "FinishTime": "",
+            "Label": "historical_4b96e520ab2b475f94addeceef059c0e_checkpointed",
+            "ListenerId": "-1",
+            "LoadJobSourceType": "BACKEND_STREAMING",
+            "PreCommitTime": "2026-11-28 02:51:02",
+            "PrepareTime": "2026-11-28 02:50:57",
+            "PublishTime": "",
+            "Reason": "",
+            "TimeoutMs": "120000",
+            "TransactionId": "254",
+            "TransactionStatus": "PRECOMMITTED"
+          },
+          "table": "checkpointed"
+        },
+        {
+          "log": "status-1795834268803284000.log",
+          "event": "transaction",
+          "native": {
+            "CommitTime": "",
+            "Coordinator": "BE: 172.30.67.21",
+            "ErrMsg": "",
+            "ErrorReplicasCount": "0",
+            "FinishTime": "",
+            "Label": "historical_4b96e520ab2b475f94addeceef059c0e_asynchronous",
+            "ListenerId": "-1",
+            "LoadJobSourceType": "BACKEND_STREAMING",
+            "PreCommitTime": "2026-11-28 02:51:08",
+            "PrepareTime": "2026-11-28 02:51:02",
+            "PublishTime": "",
+            "Reason": "",
+            "TimeoutMs": "120000",
+            "TransactionId": "259",
+            "TransactionStatus": "PRECOMMITTED"
+          },
+          "table": "asynchronous"
+        },
+        {
+          "log": "status-1795834268337383000.log",
+          "event": "transaction",
+          "native": {
+            "CommitTime": "",
+            "Coordinator": "BE: 172.30.67.21",
+            "ErrMsg": "",
+            "ErrorReplicasCount": "0",
+            "FinishTime": "",
+            "Label": "historical_4b96e520ab2b475f94addeceef059c0e_checkpointed",
+            "ListenerId": "-1",
+            "LoadJobSourceType": "BACKEND_STREAMING",
+            "PreCommitTime": "2026-11-28 02:51:02",
+            "PrepareTime": "2026-11-28 02:50:57",
+            "PublishTime": "",
+            "Reason": "",
+            "TimeoutMs": "120000",
+            "TransactionId": "254",
+            "TransactionStatus": "PRECOMMITTED"
+          },
+          "table": "checkpointed"
+        },
+        {
+          "log": "status-1795834268337383000.log",
+          "event": "transaction",
+          "native": {
+            "CommitTime": "",
+            "Coordinator": "BE: 172.30.67.21",
+            "ErrMsg": "",
+            "ErrorReplicasCount": "0",
+            "FinishTime": "",
+            "Label": "historical_4b96e520ab2b475f94addeceef059c0e_asynchronous",
+            "ListenerId": "-1",
+            "LoadJobSourceType": "BACKEND_STREAMING",
+            "PreCommitTime": "2026-11-28 02:51:08",
+            "PrepareTime": "2026-11-28 02:51:02",
+            "PublishTime": "",
+            "Reason": "",
+            "TimeoutMs": "120000",
+            "TransactionId": "259",
+            "TransactionStatus": "PRECOMMITTED"
+          },
+          "table": "asynchronous"
+        }
+      ],
+      "exact_checks": [
+        {
+          "log": "verify.log",
+          "duration_ms": 1417.200876,
+          "event": "verified",
+          "rows": 1000000,
+          "table": "checkpointed",
+          "utc_ns": 1795834223347339007,
+          "wrong": 0
+        },
+        {
+          "log": "verify.log",
+          "duration_ms": 1413.619167,
+          "event": "verified",
+          "rows": 1000000,
+          "table": "asynchronous",
+          "utc_ns": 1795834224760985591,
+          "wrong": 0
+        },
+        {
+          "log": "verify.log",
+          "acknowledged_batches": 42,
+          "event": "receipts_verified",
+          "unacknowledged_absent_batches": 0,
+          "unacknowledged_committed_batches": 0,
+          "utc_ns": 1795834224765528216
+        }
+      ],
+      "source_ack_transactions": {
+        "count": 123,
+        "p50_ms": 1.126417,
+        "p95_ms": 2.754041,
+        "p99_ms": 8.604334,
+        "max_ms": 13.121708,
+        "scope": "diagnostic single trial; nearest-rank percentiles; maxima retained"
+      },
+      "source_ambiguous": [],
+      "warm_historical_reads": {
+        "checkpointed": {
+          "count": 48,
+          "p50_ms": 12.2771255,
+          "p95_ms": 101.175208,
+          "p99_ms": 127.691958,
+          "max_ms": 127.691958,
+          "scope": "diagnostic single trial; nearest-rank percentiles; maxima retained"
+        },
+        "asynchronous": {
+          "count": 48,
+          "p50_ms": 22.1038955,
+          "p95_ms": 178.976625,
+          "p99_ms": 188.848042,
+          "max_ms": 188.848042,
+          "scope": "diagnostic single trial; nearest-rank percentiles; maxima retained"
+        }
+      },
+      "read_errors": [],
+      "spark": [
+        {
+          "event": "spark_complete",
+          "spark_version": "4.3.0",
+          "duration_ms": 22778.78371899999,
+          "scope": "single bounded batch worker; not a distributed Spark capacity comparison"
+        }
+      ],
+      "prepared_batches": [
+        {
+          "body_sha256": "da7be580d6729e6cb26a3f9b2f229558010bc5ab809be04d653c08922ecac6f2",
+          "duration_ms": 5520.473877,
+          "label": "historical_4b96e520ab2b475f94addeceef059c0e_asynchronous",
+          "response": {
+            "BeginTxnTimeMs": 0,
+            "Comment": "",
+            "CommitAndPublishTimeMs": 0,
+            "Label": "historical_4b96e520ab2b475f94addeceef059c0e_asynchronous",
+            "LoadBytes": 9667775,
+            "LoadTimeMs": 5520,
+            "Message": "OK",
+            "NumberFilteredRows": 0,
+            "NumberLoadedRows": 200000,
+            "NumberTotalRows": 200000,
+            "NumberUnselectedRows": 0,
+            "ReadDataTimeMs": 118,
+            "ReceiveDataTimeMs": 7,
+            "Status": "Success",
+            "StreamLoadPutTimeMs": 4,
+            "TwoPhaseCommit": "true",
+            "TxnId": 259,
+            "WriteDataTimeMs": 5510
+          }
+        },
+        {
+          "body_sha256": "da7be580d6729e6cb26a3f9b2f229558010bc5ab809be04d653c08922ecac6f2",
+          "duration_ms": 4989.946669,
+          "label": "historical_4b96e520ab2b475f94addeceef059c0e_checkpointed",
+          "response": {
+            "BeginTxnTimeMs": 0,
+            "Comment": "",
+            "CommitAndPublishTimeMs": 0,
+            "Label": "historical_4b96e520ab2b475f94addeceef059c0e_checkpointed",
+            "LoadBytes": 9667775,
+            "LoadTimeMs": 4989,
+            "Message": "OK",
+            "NumberFilteredRows": 0,
+            "NumberLoadedRows": 200000,
+            "NumberTotalRows": 200000,
+            "NumberUnselectedRows": 0,
+            "ReadDataTimeMs": 69,
+            "ReceiveDataTimeMs": 73,
+            "Status": "Success",
+            "StreamLoadPutTimeMs": 66,
+            "TwoPhaseCommit": "true",
+            "TxnId": 254,
+            "WriteDataTimeMs": 4918
+          }
+        }
+      ]
+    },
+    {
+      "path": "results/replay-1795834452637856000",
+      "passed": true,
+      "case": "6621948fd9e74e29bdb7470895afb5f1",
+      "fixture": "ceefdbf02e344388913b3731d7119936",
+      "snapshot_rows": 199672,
+      "expected": "newer live source rows and cancellations survive stale replay; all three fixed replicas exact",
+      "identity": {
+        "fixture": {
+          "id": "ceefdbf02e344388913b3731d7119936",
+          "stage": "ready",
+          "job": "9827993f6c99eba32544cb20cdc558d4"
+        },
+        "case": "6621948fd9e74e29bdb7470895afb5f1",
+        "data": "results/historical/6621948fd9e74e29bdb7470895afb5f1"
+      },
+      "budgets": {
+        "setup": {
+          "cpu": 11.0,
+          "memory_bytes": 23488102400
+        },
+        "replay": {
+          "cpu": 11.0,
+          "memory_bytes": 24024973312
+        }
+      },
+      "snapshot-oracle": {
+        "rows": 199672,
+        "wrong": 0,
+        "sha256": "0efc06ae288a07b78039b477ea26cb0254fd2360fec24fe00d708c814b65a9ff",
+        "csv_bytes": 9728974,
+        "input_sha256": {
+          "orders.csv": "4f57241d1acd5fb101fe3078d3d8298392b88b3afbffb94d719d9f486eaf971c",
+          "customers.csv": "58c71f8566d7f365fd906d52d05e322ac22c5ef8e346a964a39c7bfbe6ddd465"
+        },
+        "reference_zlib_bytes": 1896069,
+        "reference_compression_scope": "CSV reference only, not Doris native compression"
+      },
+      "live-progress": {
+        "before": 128,
+        "after": 129
+      },
+      "fault": {
+        "before": {
+          "Status": "running",
+          "Running": true,
+          "Paused": false,
+          "Restarting": false,
+          "OOMKilled": false,
+          "Dead": false,
+          "Pid": 91162,
+          "ExitCode": 0,
+          "Error": "",
+          "StartedAt": "2026-11-28T02:53:22.589981965Z",
+          "FinishedAt": "0001-01-01T00:00:00Z"
+        },
+        "after": {
+          "Status": "exited",
+          "Running": false,
+          "Paused": false,
+          "Restarting": false,
+          "OOMKilled": false,
+          "Dead": false,
+          "Pid": 0,
+          "ExitCode": 137,
+          "Error": "",
+          "StartedAt": "2026-11-28T02:53:22.589981965Z",
+          "FinishedAt": "2026-11-28T02:55:00.422808844Z"
+        },
+        "acks_before": 128,
+        "id": "c71fbed247c4eecce0089bd1e428c5bb9e87f60cb4207940924bd45c69db4cb1"
+      },
+      "topology-verdict": {
+        "voting_frontends": 3,
+        "backends": 3,
+        "tables": {
+          "checkpointed": {
+            "tablets": 8,
+            "replicas": 24
+          },
+          "asynchronous": {
+            "tablets": 8,
+            "replicas": 24
+          }
+        }
+      },
+      "native_transactions": [
+        {
+          "log": "status-1795834500347376000.log",
+          "event": "transaction",
+          "native": {
+            "CommitTime": "",
+            "Coordinator": "BE: 172.30.67.21",
+            "ErrMsg": "",
+            "ErrorReplicasCount": "0",
+            "FinishTime": "",
+            "Label": "historical_6621948fd9e74e29bdb7470895afb5f1_checkpointed",
+            "ListenerId": "-1",
+            "LoadJobSourceType": "BACKEND_STREAMING",
+            "PreCommitTime": "2026-11-28 02:54:53",
+            "PrepareTime": "2026-11-28 02:54:48",
+            "PublishTime": "",
+            "Reason": "",
+            "TimeoutMs": "120000",
+            "TransactionId": "344",
+            "TransactionStatus": "PRECOMMITTED"
+          },
+          "table": "checkpointed"
+        },
+        {
+          "log": "status-1795834500347376000.log",
+          "event": "transaction",
+          "native": {
+            "CommitTime": "",
+            "Coordinator": "BE: 172.30.67.21",
+            "ErrMsg": "",
+            "ErrorReplicasCount": "0",
+            "FinishTime": "",
+            "Label": "historical_6621948fd9e74e29bdb7470895afb5f1_asynchronous",
+            "ListenerId": "-1",
+            "LoadJobSourceType": "BACKEND_STREAMING",
+            "PreCommitTime": "2026-11-28 02:54:59",
+            "PrepareTime": "2026-11-28 02:54:53",
+            "PublishTime": "",
+            "Reason": "",
+            "TimeoutMs": "120000",
+            "TransactionId": "347",
+            "TransactionStatus": "PRECOMMITTED"
+          },
+          "table": "asynchronous"
+        },
+        {
+          "log": "race-1795834504201823000.log",
+          "advanced_rows": 10000,
+          "cancelled_advanced_rows": 572,
+          "event": "race_source"
+        },
+        {
+          "log": "status-1795834500810594000.log",
+          "event": "transaction",
+          "native": {
+            "CommitTime": "",
+            "Coordinator": "BE: 172.30.67.21",
+            "ErrMsg": "",
+            "ErrorReplicasCount": "0",
+            "FinishTime": "",
+            "Label": "historical_6621948fd9e74e29bdb7470895afb5f1_checkpointed",
+            "ListenerId": "-1",
+            "LoadJobSourceType": "BACKEND_STREAMING",
+            "PreCommitTime": "2026-11-28 02:54:53",
+            "PrepareTime": "2026-11-28 02:54:48",
+            "PublishTime": "",
+            "Reason": "",
+            "TimeoutMs": "120000",
+            "TransactionId": "344",
+            "TransactionStatus": "PRECOMMITTED"
+          },
+          "table": "checkpointed"
+        },
+        {
+          "log": "status-1795834500810594000.log",
+          "event": "transaction",
+          "native": {
+            "CommitTime": "",
+            "Coordinator": "BE: 172.30.67.21",
+            "ErrMsg": "",
+            "ErrorReplicasCount": "0",
+            "FinishTime": "",
+            "Label": "historical_6621948fd9e74e29bdb7470895afb5f1_asynchronous",
+            "ListenerId": "-1",
+            "LoadJobSourceType": "BACKEND_STREAMING",
+            "PreCommitTime": "2026-11-28 02:54:59",
+            "PrepareTime": "2026-11-28 02:54:53",
+            "PublishTime": "",
+            "Reason": "",
+            "TimeoutMs": "120000",
+            "TransactionId": "347",
+            "TransactionStatus": "PRECOMMITTED"
+          },
+          "table": "asynchronous"
+        },
+        {
+          "log": "commit-1795834503980401000.log",
+          "duration_ms": 7.715375,
+          "event": "commit_response",
+          "label": "historical_6621948fd9e74e29bdb7470895afb5f1_checkpointed",
+          "response": {
+            "msg": "label [historical_6621948fd9e74e29bdb7470895afb5f1_checkpointed] commit successfully.",
+            "status": "Success"
+          },
+          "table": "checkpointed"
+        },
+        {
+          "log": "commit-1795834503980401000.log",
+          "event": "transaction",
+          "native": {
+            "CommitTime": "2026-11-28 02:55:00",
+            "Coordinator": "BE: 172.30.67.21",
+            "ErrMsg": "",
+            "ErrorReplicasCount": "0",
+            "FinishTime": "",
+            "Label": "historical_6621948fd9e74e29bdb7470895afb5f1_checkpointed",
+            "ListenerId": "-1",
+            "LoadJobSourceType": "BACKEND_STREAMING",
+            "PreCommitTime": "2026-11-28 02:54:53",
+            "PrepareTime": "2026-11-28 02:54:48",
+            "PublishTime": "",
+            "Reason": "",
+            "TimeoutMs": "120000",
+            "TransactionId": "344",
+            "TransactionStatus": "COMMITTED"
+          },
+          "table": "checkpointed"
+        },
+        {
+          "log": "commit-1795834503980401000.log",
+          "event": "transaction",
+          "native": {
+            "CommitTime": "2026-11-28 02:55:00",
+            "Coordinator": "BE: 172.30.67.21",
+            "ErrMsg": "",
+            "ErrorReplicasCount": "0",
+            "FinishTime": "2026-11-28 02:55:00",
+            "Label": "historical_6621948fd9e74e29bdb7470895afb5f1_checkpointed",
+            "ListenerId": "-1",
+            "LoadJobSourceType": "BACKEND_STREAMING",
+            "PreCommitTime": "2026-11-28 02:54:53",
+            "PrepareTime": "2026-11-28 02:54:48",
+            "PublishTime": "2026-11-28 02:55:00",
+            "Reason": "",
+            "TimeoutMs": "120000",
+            "TransactionId": "344",
+            "TransactionStatus": "VISIBLE"
+          },
+          "table": "checkpointed"
+        },
+        {
+          "log": "commit-1795834503980401000.log",
+          "duration_ms": 38.801792,
+          "event": "commit_response",
+          "label": "historical_6621948fd9e74e29bdb7470895afb5f1_asynchronous",
+          "response": {
+            "msg": "label [historical_6621948fd9e74e29bdb7470895afb5f1_asynchronous] commit successfully.",
+            "status": "Success"
+          },
+          "table": "asynchronous"
+        },
+        {
+          "log": "commit-1795834503980401000.log",
+          "event": "transaction",
+          "native": {
+            "CommitTime": "2026-11-28 02:55:01",
+            "Coordinator": "BE: 172.30.67.21",
+            "ErrMsg": "",
+            "ErrorReplicasCount": "0",
+            "FinishTime": "",
+            "Label": "historical_6621948fd9e74e29bdb7470895afb5f1_asynchronous",
+            "ListenerId": "-1",
+            "LoadJobSourceType": "BACKEND_STREAMING",
+            "PreCommitTime": "2026-11-28 02:54:59",
+            "PrepareTime": "2026-11-28 02:54:53",
+            "PublishTime": "",
+            "Reason": "",
+            "TimeoutMs": "120000",
+            "TransactionId": "347",
+            "TransactionStatus": "COMMITTED"
+          },
+          "table": "asynchronous"
+        },
+        {
+          "log": "commit-1795834503980401000.log",
+          "event": "transaction",
+          "native": {
+            "CommitTime": "2026-11-28 02:55:01",
+            "Coordinator": "BE: 172.30.67.21",
+            "ErrMsg": "",
+            "ErrorReplicasCount": "0",
+            "FinishTime": "",
+            "Label": "historical_6621948fd9e74e29bdb7470895afb5f1_asynchronous",
+            "ListenerId": "-1",
+            "LoadJobSourceType": "BACKEND_STREAMING",
+            "PreCommitTime": "2026-11-28 02:54:59",
+            "PrepareTime": "2026-11-28 02:54:53",
+            "PublishTime": "2026-11-28 02:55:01",
+            "Reason": "",
+            "TimeoutMs": "120000",
+            "TransactionId": "347",
+            "TransactionStatus": "COMMITTED"
+          },
+          "table": "asynchronous"
+        },
+        {
+          "log": "commit-1795834503980401000.log",
+          "event": "transaction",
+          "native": {
+            "CommitTime": "2026-11-28 02:55:01",
+            "Coordinator": "BE: 172.30.67.21",
+            "ErrMsg": "",
+            "ErrorReplicasCount": "0",
+            "FinishTime": "",
+            "Label": "historical_6621948fd9e74e29bdb7470895afb5f1_asynchronous",
+            "ListenerId": "-1",
+            "LoadJobSourceType": "BACKEND_STREAMING",
+            "PreCommitTime": "2026-11-28 02:54:59",
+            "PrepareTime": "2026-11-28 02:54:53",
+            "PublishTime": "2026-11-28 02:55:01",
+            "Reason": "",
+            "TimeoutMs": "120000",
+            "TransactionId": "347",
+            "TransactionStatus": "COMMITTED"
+          },
+          "table": "asynchronous"
+        },
+        {
+          "log": "commit-1795834503980401000.log",
+          "event": "transaction",
+          "native": {
+            "CommitTime": "2026-11-28 02:55:01",
+            "Coordinator": "BE: 172.30.67.21",
+            "ErrMsg": "",
+            "ErrorReplicasCount": "0",
+            "FinishTime": "",
+            "Label": "historical_6621948fd9e74e29bdb7470895afb5f1_asynchronous",
+            "ListenerId": "-1",
+            "LoadJobSourceType": "BACKEND_STREAMING",
+            "PreCommitTime": "2026-11-28 02:54:59",
+            "PrepareTime": "2026-11-28 02:54:53",
+            "PublishTime": "2026-11-28 02:55:01",
+            "Reason": "",
+            "TimeoutMs": "120000",
+            "TransactionId": "347",
+            "TransactionStatus": "COMMITTED"
+          },
+          "table": "asynchronous"
+        },
+        {
+          "log": "commit-1795834503980401000.log",
+          "event": "transaction",
+          "native": {
+            "CommitTime": "2026-11-28 02:55:01",
+            "Coordinator": "BE: 172.30.67.21",
+            "ErrMsg": "",
+            "ErrorReplicasCount": "0",
+            "FinishTime": "",
+            "Label": "historical_6621948fd9e74e29bdb7470895afb5f1_asynchronous",
+            "ListenerId": "-1",
+            "LoadJobSourceType": "BACKEND_STREAMING",
+            "PreCommitTime": "2026-11-28 02:54:59",
+            "PrepareTime": "2026-11-28 02:54:53",
+            "PublishTime": "2026-11-28 02:55:01",
+            "Reason": "",
+            "TimeoutMs": "120000",
+            "TransactionId": "347",
+            "TransactionStatus": "COMMITTED"
+          },
+          "table": "asynchronous"
+        },
+        {
+          "log": "commit-1795834503980401000.log",
+          "event": "transaction",
+          "native": {
+            "CommitTime": "2026-11-28 02:55:01",
+            "Coordinator": "BE: 172.30.67.21",
+            "ErrMsg": "",
+            "ErrorReplicasCount": "0",
+            "FinishTime": "",
+            "Label": "historical_6621948fd9e74e29bdb7470895afb5f1_asynchronous",
+            "ListenerId": "-1",
+            "LoadJobSourceType": "BACKEND_STREAMING",
+            "PreCommitTime": "2026-11-28 02:54:59",
+            "PrepareTime": "2026-11-28 02:54:53",
+            "PublishTime": "2026-11-28 02:55:01",
+            "Reason": "",
+            "TimeoutMs": "120000",
+            "TransactionId": "347",
+            "TransactionStatus": "COMMITTED"
+          },
+          "table": "asynchronous"
+        },
+        {
+          "log": "commit-1795834503980401000.log",
+          "event": "transaction",
+          "native": {
+            "CommitTime": "2026-11-28 02:55:01",
+            "Coordinator": "BE: 172.30.67.21",
+            "ErrMsg": "",
+            "ErrorReplicasCount": "0",
+            "FinishTime": "",
+            "Label": "historical_6621948fd9e74e29bdb7470895afb5f1_asynchronous",
+            "ListenerId": "-1",
+            "LoadJobSourceType": "BACKEND_STREAMING",
+            "PreCommitTime": "2026-11-28 02:54:59",
+            "PrepareTime": "2026-11-28 02:54:53",
+            "PublishTime": "2026-11-28 02:55:01",
+            "Reason": "",
+            "TimeoutMs": "120000",
+            "TransactionId": "347",
+            "TransactionStatus": "COMMITTED"
+          },
+          "table": "asynchronous"
+        },
+        {
+          "log": "commit-1795834503980401000.log",
+          "event": "transaction",
+          "native": {
+            "CommitTime": "2026-11-28 02:55:01",
+            "Coordinator": "BE: 172.30.67.21",
+            "ErrMsg": "",
+            "ErrorReplicasCount": "0",
+            "FinishTime": "",
+            "Label": "historical_6621948fd9e74e29bdb7470895afb5f1_asynchronous",
+            "ListenerId": "-1",
+            "LoadJobSourceType": "BACKEND_STREAMING",
+            "PreCommitTime": "2026-11-28 02:54:59",
+            "PrepareTime": "2026-11-28 02:54:53",
+            "PublishTime": "2026-11-28 02:55:01",
+            "Reason": "",
+            "TimeoutMs": "120000",
+            "TransactionId": "347",
+            "TransactionStatus": "COMMITTED"
+          },
+          "table": "asynchronous"
+        },
+        {
+          "log": "commit-1795834503980401000.log",
+          "event": "transaction",
+          "native": {
+            "CommitTime": "2026-11-28 02:55:01",
+            "Coordinator": "BE: 172.30.67.21",
+            "ErrMsg": "",
+            "ErrorReplicasCount": "0",
+            "FinishTime": "",
+            "Label": "historical_6621948fd9e74e29bdb7470895afb5f1_asynchronous",
+            "ListenerId": "-1",
+            "LoadJobSourceType": "BACKEND_STREAMING",
+            "PreCommitTime": "2026-11-28 02:54:59",
+            "PrepareTime": "2026-11-28 02:54:53",
+            "PublishTime": "2026-11-28 02:55:01",
+            "Reason": "",
+            "TimeoutMs": "120000",
+            "TransactionId": "347",
+            "TransactionStatus": "COMMITTED"
+          },
+          "table": "asynchronous"
+        },
+        {
+          "log": "commit-1795834503980401000.log",
+          "event": "transaction",
+          "native": {
+            "CommitTime": "2026-11-28 02:55:01",
+            "Coordinator": "BE: 172.30.67.21",
+            "ErrMsg": "",
+            "ErrorReplicasCount": "0",
+            "FinishTime": "",
+            "Label": "historical_6621948fd9e74e29bdb7470895afb5f1_asynchronous",
+            "ListenerId": "-1",
+            "LoadJobSourceType": "BACKEND_STREAMING",
+            "PreCommitTime": "2026-11-28 02:54:59",
+            "PrepareTime": "2026-11-28 02:54:53",
+            "PublishTime": "2026-11-28 02:55:01",
+            "Reason": "",
+            "TimeoutMs": "120000",
+            "TransactionId": "347",
+            "TransactionStatus": "COMMITTED"
+          },
+          "table": "asynchronous"
+        },
+        {
+          "log": "commit-1795834503980401000.log",
+          "event": "transaction",
+          "native": {
+            "CommitTime": "2026-11-28 02:55:01",
+            "Coordinator": "BE: 172.30.67.21",
+            "ErrMsg": "",
+            "ErrorReplicasCount": "0",
+            "FinishTime": "",
+            "Label": "historical_6621948fd9e74e29bdb7470895afb5f1_asynchronous",
+            "ListenerId": "-1",
+            "LoadJobSourceType": "BACKEND_STREAMING",
+            "PreCommitTime": "2026-11-28 02:54:59",
+            "PrepareTime": "2026-11-28 02:54:53",
+            "PublishTime": "2026-11-28 02:55:01",
+            "Reason": "",
+            "TimeoutMs": "120000",
+            "TransactionId": "347",
+            "TransactionStatus": "COMMITTED"
+          },
+          "table": "asynchronous"
+        },
+        {
+          "log": "commit-1795834503980401000.log",
+          "event": "transaction",
+          "native": {
+            "CommitTime": "2026-11-28 02:55:01",
+            "Coordinator": "BE: 172.30.67.21",
+            "ErrMsg": "",
+            "ErrorReplicasCount": "0",
+            "FinishTime": "2026-11-28 02:55:03",
+            "Label": "historical_6621948fd9e74e29bdb7470895afb5f1_asynchronous",
+            "ListenerId": "-1",
+            "LoadJobSourceType": "BACKEND_STREAMING",
+            "PreCommitTime": "2026-11-28 02:54:59",
+            "PrepareTime": "2026-11-28 02:54:53",
+            "PublishTime": "2026-11-28 02:55:01",
+            "Reason": "",
+            "TimeoutMs": "120000",
+            "TransactionId": "347",
+            "TransactionStatus": "VISIBLE"
+          },
+          "table": "asynchronous"
+        },
+        {
+          "log": "commit-1795834504065279000.log",
+          "duration_ms": 1.34875,
+          "event": "commit_response",
+          "label": "historical_6621948fd9e74e29bdb7470895afb5f1_checkpointed",
+          "response": {
+            "msg": "TStatus: errCode = 2, detailMessage = running transaction not found, label=historical_6621948fd9e74e29bdb7470895afb5f1_checkpointed",
+            "status": "ANALYSIS_ERROR"
+          },
+          "table": "checkpointed"
+        },
+        {
+          "log": "commit-1795834504065279000.log",
+          "event": "transaction",
+          "native": {
+            "CommitTime": "2026-11-28 02:55:00",
+            "Coordinator": "BE: 172.30.67.21",
+            "ErrMsg": "",
+            "ErrorReplicasCount": "0",
+            "FinishTime": "2026-11-28 02:55:00",
+            "Label": "historical_6621948fd9e74e29bdb7470895afb5f1_checkpointed",
+            "ListenerId": "-1",
+            "LoadJobSourceType": "BACKEND_STREAMING",
+            "PreCommitTime": "2026-11-28 02:54:53",
+            "PrepareTime": "2026-11-28 02:54:48",
+            "PublishTime": "2026-11-28 02:55:00",
+            "Reason": "",
+            "TimeoutMs": "120000",
+            "TransactionId": "344",
+            "TransactionStatus": "VISIBLE"
+          },
+          "table": "checkpointed"
+        },
+        {
+          "log": "commit-1795834504065279000.log",
+          "duration_ms": 1.043083,
+          "event": "commit_response",
+          "label": "historical_6621948fd9e74e29bdb7470895afb5f1_asynchronous",
+          "response": {
+            "msg": "TStatus: errCode = 2, detailMessage = running transaction not found, label=historical_6621948fd9e74e29bdb7470895afb5f1_asynchronous",
+            "status": "ANALYSIS_ERROR"
+          },
+          "table": "asynchronous"
+        },
+        {
+          "log": "commit-1795834504065279000.log",
+          "event": "transaction",
+          "native": {
+            "CommitTime": "2026-11-28 02:55:01",
+            "Coordinator": "BE: 172.30.67.21",
+            "ErrMsg": "",
+            "ErrorReplicasCount": "0",
+            "FinishTime": "2026-11-28 02:55:03",
+            "Label": "historical_6621948fd9e74e29bdb7470895afb5f1_asynchronous",
+            "ListenerId": "-1",
+            "LoadJobSourceType": "BACKEND_STREAMING",
+            "PreCommitTime": "2026-11-28 02:54:59",
+            "PrepareTime": "2026-11-28 02:54:53",
+            "PublishTime": "2026-11-28 02:55:01",
+            "Reason": "",
+            "TimeoutMs": "120000",
+            "TransactionId": "347",
+            "TransactionStatus": "VISIBLE"
+          },
+          "table": "asynchronous"
+        }
+      ],
+      "exact_checks": [
+        {
+          "log": "verify.log",
+          "duration_ms": 3512.326168,
+          "event": "verified",
+          "rows": 999428,
+          "table": "checkpointed",
+          "utc_ns": 1795834507770578930,
+          "wrong": 0
+        },
+        {
+          "log": "verify.log",
+          "duration_ms": 1472.973584,
+          "event": "verified",
+          "rows": 999428,
+          "table": "asynchronous",
+          "utc_ns": 1795834509244038500,
+          "wrong": 0
+        },
+        {
+          "log": "verify.log",
+          "acknowledged_batches": 330,
+          "event": "receipts_verified",
+          "unacknowledged_absent_batches": 0,
+          "unacknowledged_committed_batches": 0,
+          "utc_ns": 1795834509266074584
+        },
+        {
+          "log": "replica-2.log",
+          "duration_ms": 1496.103918,
+          "event": "verified",
+          "rows": 999428,
+          "table": "checkpointed",
+          "utc_ns": 1795834517067220129,
+          "wrong": 0
+        },
+        {
+          "log": "replica-2.log",
+          "duration_ms": 1392.858125,
+          "event": "verified",
+          "rows": 999428,
+          "table": "asynchronous",
+          "utc_ns": 1795834518460105338,
+          "wrong": 0
+        },
+        {
+          "log": "replica-2.log",
+          "acknowledged_batches": 330,
+          "event": "receipts_verified",
+          "unacknowledged_absent_batches": 0,
+          "unacknowledged_committed_batches": 0,
+          "utc_ns": 1795834518490279296
+        },
+        {
+          "log": "replica-1.log",
+          "duration_ms": 1467.753792,
+          "event": "verified",
+          "rows": 999428,
+          "table": "checkpointed",
+          "utc_ns": 1795834514035201836,
+          "wrong": 0
+        },
+        {
+          "log": "replica-1.log",
+          "duration_ms": 1413.863459,
+          "event": "verified",
+          "rows": 999428,
+          "table": "asynchronous",
+          "utc_ns": 1795834515449095378,
+          "wrong": 0
+        },
+        {
+          "log": "replica-1.log",
+          "acknowledged_batches": 330,
+          "event": "receipts_verified",
+          "unacknowledged_absent_batches": 0,
+          "unacknowledged_committed_batches": 0,
+          "utc_ns": 1795834515474788378
+        },
+        {
+          "log": "replica-0.log",
+          "duration_ms": 1462.987459,
+          "event": "verified",
+          "rows": 999428,
+          "table": "checkpointed",
+          "utc_ns": 1795834510965981334,
+          "wrong": 0
+        },
+        {
+          "log": "replica-0.log",
+          "duration_ms": 1482.178792,
+          "event": "verified",
+          "rows": 999428,
+          "table": "asynchronous",
+          "utc_ns": 1795834512448203085,
+          "wrong": 0
+        },
+        {
+          "log": "replica-0.log",
+          "acknowledged_batches": 330,
+          "event": "receipts_verified",
+          "unacknowledged_absent_batches": 0,
+          "unacknowledged_committed_batches": 0,
+          "utc_ns": 1795834512474445418
+        }
+      ],
+      "source_ack_transactions": {
+        "count": 163,
+        "p50_ms": 1.056791,
+        "p95_ms": 1.9235,
+        "p99_ms": 15.464209,
+        "max_ms": 46.467,
+        "scope": "diagnostic single trial; nearest-rank percentiles; maxima retained"
+      },
+      "source_ambiguous": [],
+      "warm_historical_reads": {
+        "checkpointed": {
+          "count": 86,
+          "p50_ms": 10.904333000000001,
+          "p95_ms": 94.070708,
+          "p99_ms": 289.390959,
+          "max_ms": 289.390959,
+          "scope": "diagnostic single trial; nearest-rank percentiles; maxima retained"
+        },
+        "asynchronous": {
+          "count": 86,
+          "p50_ms": 11.5365415,
+          "p95_ms": 101.059125,
+          "p99_ms": 147.361791,
+          "max_ms": 147.361791,
+          "scope": "diagnostic single trial; nearest-rank percentiles; maxima retained"
+        }
+      },
+      "read_errors": [],
+      "spark": [
+        {
+          "event": "spark_complete",
+          "spark_version": "4.3.0",
+          "duration_ms": 22592.019468999977,
+          "scope": "single bounded batch worker; not a distributed Spark capacity comparison"
+        }
+      ],
+      "prepared_batches": [
+        {
+          "body_sha256": "0efc06ae288a07b78039b477ea26cb0254fd2360fec24fe00d708c814b65a9ff",
+          "duration_ms": 6130.417711,
+          "label": "historical_6621948fd9e74e29bdb7470895afb5f1_asynchronous",
+          "response": {
+            "BeginTxnTimeMs": 0,
+            "Comment": "",
+            "CommitAndPublishTimeMs": 0,
+            "Label": "historical_6621948fd9e74e29bdb7470895afb5f1_asynchronous",
+            "LoadBytes": 9728974,
+            "LoadTimeMs": 6129,
+            "Message": "OK",
+            "NumberFilteredRows": 0,
+            "NumberLoadedRows": 199672,
+            "NumberTotalRows": 199672,
+            "NumberUnselectedRows": 0,
+            "ReadDataTimeMs": 123,
+            "ReceiveDataTimeMs": 9,
+            "Status": "Success",
+            "StreamLoadPutTimeMs": 4,
+            "TwoPhaseCommit": "true",
+            "TxnId": 347,
+            "WriteDataTimeMs": 6122
+          }
+        },
+        {
+          "body_sha256": "0efc06ae288a07b78039b477ea26cb0254fd2360fec24fe00d708c814b65a9ff",
+          "duration_ms": 4894.122835,
+          "label": "historical_6621948fd9e74e29bdb7470895afb5f1_checkpointed",
+          "response": {
+            "BeginTxnTimeMs": 0,
+            "Comment": "",
+            "CommitAndPublishTimeMs": 0,
+            "Label": "historical_6621948fd9e74e29bdb7470895afb5f1_checkpointed",
+            "LoadBytes": 9728974,
+            "LoadTimeMs": 4892,
+            "Message": "OK",
+            "NumberFilteredRows": 0,
+            "NumberLoadedRows": 199672,
+            "NumberTotalRows": 199672,
+            "NumberUnselectedRows": 0,
+            "ReadDataTimeMs": 69,
+            "ReceiveDataTimeMs": 6,
+            "Status": "Success",
+            "StreamLoadPutTimeMs": 2,
+            "TwoPhaseCommit": "true",
+            "TxnId": 344,
+            "WriteDataTimeMs": 4886
+          }
+        }
+      ]
+    }
+  ],
+  "independent_original_case_recovery": {
+    "recovery-original-commit.log": [
+      {
+        "duration_ms": 1.818083,
+        "event": "commit_response",
+        "label": "historical_4b96e520ab2b475f94addeceef059c0e_checkpointed",
+        "response": {
+          "msg": "TStatus: errCode = 2, detailMessage = running transaction not found, label=historical_4b96e520ab2b475f94addeceef059c0e_checkpointed",
+          "status": "ANALYSIS_ERROR"
+        },
+        "table": "checkpointed"
+      },
+      {
+        "event": "transaction",
+        "native": {
+          "CommitTime": "2026-11-28 02:51:08",
+          "Coordinator": "BE: 172.30.67.21",
+          "ErrMsg": "",
+          "ErrorReplicasCount": "0",
+          "FinishTime": "2026-11-28 02:51:15",
+          "Label": "historical_4b96e520ab2b475f94addeceef059c0e_checkpointed",
+          "ListenerId": "-1",
+          "LoadJobSourceType": "BACKEND_STREAMING",
+          "PreCommitTime": "2026-11-28 02:51:02",
+          "PrepareTime": "2026-11-28 02:50:57",
+          "PublishTime": "2026-11-28 02:51:08",
+          "Reason": "",
+          "TimeoutMs": "120000",
+          "TransactionId": "254",
+          "TransactionStatus": "VISIBLE"
+        },
+        "table": "checkpointed"
+      },
+      {
+        "duration_ms": 4.264709,
+        "event": "commit_response",
+        "label": "historical_4b96e520ab2b475f94addeceef059c0e_asynchronous",
+        "response": {
+          "msg": "label [historical_4b96e520ab2b475f94addeceef059c0e_asynchronous] commit successfully.",
+          "status": "Success"
+        },
+        "table": "asynchronous"
+      },
+      {
+        "event": "transaction",
+        "native": {
+          "CommitTime": "2026-11-28 02:51:36",
+          "Coordinator": "BE: 172.30.67.21",
+          "ErrMsg": "",
+          "ErrorReplicasCount": "0",
+          "FinishTime": "",
+          "Label": "historical_4b96e520ab2b475f94addeceef059c0e_asynchronous",
+          "ListenerId": "-1",
+          "LoadJobSourceType": "BACKEND_STREAMING",
+          "PreCommitTime": "2026-11-28 02:51:08",
+          "PrepareTime": "2026-11-28 02:51:02",
+          "PublishTime": "",
+          "Reason": "",
+          "TimeoutMs": "120000",
+          "TransactionId": "259",
+          "TransactionStatus": "COMMITTED"
+        },
+        "table": "asynchronous"
+      },
+      {
+        "event": "resources",
+        "peak_rss_kib": 12360,
+        "system_cpu_s": 0.005037,
+        "user_cpu_s": 0.005037
+      },
+      {
+        "error": "expected VISIBLE, got map[CommitTime:2026-11-28 02:51:36 Coordinator:BE: 172.30.67.21 ErrMsg: ErrorReplicasCount:0 FinishTime: Label:historical_4b96e520ab2b475f94addeceef059c0e_asynchronous ListenerId:-1 LoadJobSourceType:BACKEND_STREAMING PreCommitTime:2026-11-28 02:51:08 PrepareTime:2026-11-28 02:51:02 PublishTime: Reason: TimeoutMs:120000 TransactionId:259 TransactionStatus:COMMITTED]",
+        "event": "fatal"
+      }
+    ],
+    "recovery-original-visible.log": [
+      {
+        "duration_ms": 1.665375,
+        "event": "commit_response",
+        "label": "historical_4b96e520ab2b475f94addeceef059c0e_checkpointed",
+        "response": {
+          "msg": "TStatus: errCode = 2, detailMessage = running transaction not found, label=historical_4b96e520ab2b475f94addeceef059c0e_checkpointed",
+          "status": "ANALYSIS_ERROR"
+        },
+        "table": "checkpointed"
+      },
+      {
+        "event": "transaction",
+        "native": {
+          "CommitTime": "2026-11-28 02:51:08",
+          "Coordinator": "BE: 172.30.67.21",
+          "ErrMsg": "",
+          "ErrorReplicasCount": "0",
+          "FinishTime": "2026-11-28 02:51:15",
+          "Label": "historical_4b96e520ab2b475f94addeceef059c0e_checkpointed",
+          "ListenerId": "-1",
+          "LoadJobSourceType": "BACKEND_STREAMING",
+          "PreCommitTime": "2026-11-28 02:51:02",
+          "PrepareTime": "2026-11-28 02:50:57",
+          "PublishTime": "2026-11-28 02:51:08",
+          "Reason": "",
+          "TimeoutMs": "120000",
+          "TransactionId": "254",
+          "TransactionStatus": "VISIBLE"
+        },
+        "table": "checkpointed"
+      },
+      {
+        "duration_ms": 1.486625,
+        "event": "commit_response",
+        "label": "historical_4b96e520ab2b475f94addeceef059c0e_asynchronous",
+        "response": {
+          "msg": "TStatus: errCode = 2, detailMessage = running transaction not found, label=historical_4b96e520ab2b475f94addeceef059c0e_asynchronous",
+          "status": "ANALYSIS_ERROR"
+        },
+        "table": "asynchronous"
+      },
+      {
+        "event": "transaction",
+        "native": {
+          "CommitTime": "2026-11-28 02:51:36",
+          "Coordinator": "BE: 172.30.67.21",
+          "ErrMsg": "",
+          "ErrorReplicasCount": "0",
+          "FinishTime": "2026-11-28 02:51:37",
+          "Label": "historical_4b96e520ab2b475f94addeceef059c0e_asynchronous",
+          "ListenerId": "-1",
+          "LoadJobSourceType": "BACKEND_STREAMING",
+          "PreCommitTime": "2026-11-28 02:51:08",
+          "PrepareTime": "2026-11-28 02:51:02",
+          "PublishTime": "2026-11-28 02:51:36",
+          "Reason": "",
+          "TimeoutMs": "120000",
+          "TransactionId": "259",
+          "TransactionStatus": "VISIBLE"
+        },
+        "table": "asynchronous"
+      },
+      {
+        "event": "resources",
+        "peak_rss_kib": 11996,
+        "system_cpu_s": 0.005979,
+        "user_cpu_s": 0.005979
+      }
+    ],
+    "recovery-three-replicas.log": [
+      {
+        "passed": true,
+        "evidence": "/Users/muzammil/github.com/muzammilar/examples/pipelines/orders-cdc-analytics/results/verify-replicas-1795834343917383000"
+      }
+    ],
+    "recovery-transaction-state.log": [
+      {
+        "event": "transaction",
+        "native": {
+          "CommitTime": "2026-11-28 02:51:08",
+          "Coordinator": "BE: 172.30.67.21",
+          "ErrMsg": "",
+          "ErrorReplicasCount": "0",
+          "FinishTime": "2026-11-28 02:51:15",
+          "Label": "historical_4b96e520ab2b475f94addeceef059c0e_checkpointed",
+          "ListenerId": "-1",
+          "LoadJobSourceType": "BACKEND_STREAMING",
+          "PreCommitTime": "2026-11-28 02:51:02",
+          "PrepareTime": "2026-11-28 02:50:57",
+          "PublishTime": "2026-11-28 02:51:08",
+          "Reason": "",
+          "TimeoutMs": "120000",
+          "TransactionId": "254",
+          "TransactionStatus": "VISIBLE"
+        },
+        "table": "checkpointed"
+      },
+      {
+        "event": "resources",
+        "peak_rss_kib": 11772,
+        "system_cpu_s": 0.003539,
+        "user_cpu_s": 0.004719
+      },
+      {
+        "error": "expected PRECOMMITTED, got map[CommitTime:2026-11-28 02:51:08 Coordinator:BE: 172.30.67.21 ErrMsg: ErrorReplicasCount:0 FinishTime:2026-11-28 02:51:15 Label:historical_4b96e520ab2b475f94addeceef059c0e_checkpointed ListenerId:-1 LoadJobSourceType:BACKEND_STREAMING PreCommitTime:2026-11-28 02:51:02 PrepareTime:2026-11-28 02:50:57 PublishTime:2026-11-28 02:51:08 Reason: TimeoutMs:120000 TransactionId:254 TransactionStatus:VISIBLE]",
+        "event": "fatal"
+      }
+    ]
+  },
+  "resources": [
+    {
+      "evidence": "results/resources-1795834139313442000.jsonl",
+      "environment": {
+        "type": "environment",
+        "run_id": 1795834139313442000,
+        "fixture": null,
+        "command": [
+          "make",
+          "_baseline",
+          "PYTHON=/Users/muzammil/.local/bin/python3.13"
+        ],
+        "environment": {
+          "NCPU": 11,
+          "MemTotal": 26216296448,
+          "KernelVersion": "6.12.76-linuxkit",
+          "OperatingSystem": "Docker Desktop",
+          "Driver": "overlayfs",
+          "ServerVersion": "29.5.3",
+          "docker_api": "1.54"
+        },
+        "cotenancy": "Only this order CDC pipeline; no other heavy lab."
+      },
+      "sampled_aggregate_memory_peak_bytes": 15090335744,
+      "actors": [
+        {
+          "name": "/orders-cdc-analytics-orders-1",
+          "samples": 76,
+          "peak_memory_bytes": 20733952,
+          "configuration": {
+            "image_id": "sha256:115654e5b73d2a9a2c388a5bd7b8f5f30f4dcd8238ebbdfc00ab4c25fe31166e",
+            "image_reference": "examples/orders-cdc-workload:1",
+            "memory_limit_bytes": 536870912,
+            "nano_cpus": 500000000,
+            "started_at": "2026-11-28T02:47:40.633763334Z"
+          },
+          "counter_deltas": {
+            "cpu_core_s": 3.4280660000000003,
+            "network_rx_bytes": 780033580,
+            "network_tx_bytes": 1391181
+          },
+          "cpu_utilization_pct_one_core_min": 0.0,
+          "cpu_utilization_pct_one_core_max": 50.90179710144928,
+          "observed_s": 80.77544903755188,
+          "sampled_mean_memory_bytes": 8273596.631578947,
+          "cpu_utilization_pct_one_core_average": 4.24394545724694
+        },
+        {
+          "name": "/orders-cdc-analytics-connect-1",
+          "samples": 76,
+          "peak_memory_bytes": 1073737728,
+          "configuration": {
+            "image_id": "sha256:551e039eb9677a11bb1add0e561939530f8d3f25b0c4331979175bb430f6dc74",
+            "image_reference": "quay.io/debezium/connect:3.7.1.Final@sha256:551e039eb9677a11bb1add0e561939530f8d3f25b0c4331979175bb430f6dc74",
+            "memory_limit_bytes": 1073741824,
+            "nano_cpus": 500000000,
+            "started_at": "2026-11-28T02:44:08.79589Z"
+          },
+          "counter_deltas": {
+            "cpu_core_s": 31.602983000000002,
+            "network_rx_bytes": 95215377,
+            "network_tx_bytes": 67998542,
+            "disk_read_bytes": 1359872,
+            "disk_write_bytes": 1318912
+          },
+          "cpu_utilization_pct_one_core_min": 1.3216737102174878,
+          "cpu_utilization_pct_one_core_max": 51.946645038179625,
+          "observed_s": 80.77348804473877,
+          "sampled_mean_memory_bytes": 1056311296.0,
+          "cpu_utilization_pct_one_core_average": 39.125440494157885
+        },
+        {
+          "name": "/orders-cdc-analytics-be2-1",
+          "samples": 76,
+          "peak_memory_bytes": 1834016768,
+          "configuration": {
+            "image_id": "sha256:6bc32b6f60f242979005b3371d9990bbb180e964fc91323f92d468980ef30339",
+            "image_reference": "examples/orders-cdc-be:4.1.5",
+            "memory_limit_bytes": 2952790016,
+            "nano_cpus": 1000000000,
+            "started_at": "2026-11-28T02:45:33.86089972Z"
+          },
+          "counter_deltas": {
+            "cpu_core_s": 12.708714,
+            "network_rx_bytes": 110053362,
+            "network_tx_bytes": 164589923,
+            "disk_read_bytes": 561152,
+            "disk_write_bytes": 67018752
+          },
+          "cpu_utilization_pct_one_core_min": 3.4353192571564457,
+          "cpu_utilization_pct_one_core_max": 59.90331308860933,
+          "observed_s": 80.77211618423462,
+          "sampled_mean_memory_bytes": 1736886056.4210527,
+          "cpu_utilization_pct_one_core_average": 15.734036200082288
+        },
+        {
+          "name": "/orders-cdc-analytics-be1-1",
+          "samples": 76,
+          "peak_memory_bytes": 1938608128,
+          "configuration": {
+            "image_id": "sha256:6bc32b6f60f242979005b3371d9990bbb180e964fc91323f92d468980ef30339",
+            "image_reference": "examples/orders-cdc-be:4.1.5",
+            "memory_limit_bytes": 2952790016,
+            "nano_cpus": 1000000000,
+            "started_at": "2026-11-28T02:45:33.860963762Z"
+          },
+          "counter_deltas": {
+            "cpu_core_s": 12.926449999999999,
+            "network_rx_bytes": 155141970,
+            "network_tx_bytes": 248249182,
+            "disk_read_bytes": 176128,
+            "disk_write_bytes": 60870656
+          },
+          "cpu_utilization_pct_one_core_min": 3.41618881552933,
+          "cpu_utilization_pct_one_core_max": 56.2127919671786,
+          "observed_s": 80.77144384384155,
+          "sampled_mean_memory_bytes": 1757568754.5263157,
+          "cpu_utilization_pct_one_core_average": 16.003737688521685
+        },
+        {
+          "name": "/orders-cdc-analytics-be3-1",
+          "samples": 76,
+          "peak_memory_bytes": 1937260544,
+          "configuration": {
+            "image_id": "sha256:6bc32b6f60f242979005b3371d9990bbb180e964fc91323f92d468980ef30339",
+            "image_reference": "examples/orders-cdc-be:4.1.5",
+            "memory_limit_bytes": 2952790016,
+            "nano_cpus": 1000000000,
+            "started_at": "2026-11-28T02:45:33.859099137Z"
+          },
+          "counter_deltas": {
+            "cpu_core_s": 12.918631,
+            "network_rx_bytes": 104124627,
+            "network_tx_bytes": 184930161,
+            "disk_read_bytes": 131072,
+            "disk_write_bytes": 63852544
+          },
+          "cpu_utilization_pct_one_core_min": 3.3259449444412326,
+          "cpu_utilization_pct_one_core_max": 64.10771676323799,
+          "observed_s": 80.77002215385437,
+          "sampled_mean_memory_bytes": 1753250223.1578948,
+          "cpu_utilization_pct_one_core_average": 15.99433880975297
+        },
+        {
+          "name": "/orders-cdc-analytics-taskmanager-2",
+          "samples": 76,
+          "peak_memory_bytes": 1340481536,
+          "configuration": {
+            "image_id": "sha256:db35e22054e062a7d65bee03a1de52e9817787fd1dbaf897955b2a1e9c5dc499",
+            "image_reference": "examples/orders-cdc-flink:2.3.0",
+            "memory_limit_bytes": 1610612736,
+            "nano_cpus": 1000000000,
+            "started_at": "2026-11-28T02:43:52.777790173Z"
+          },
+          "counter_deltas": {
+            "cpu_core_s": 28.701783,
+            "network_rx_bytes": 114635134,
+            "network_tx_bytes": 98816654,
+            "disk_read_bytes": 0,
+            "disk_write_bytes": 699183104
+          },
+          "cpu_utilization_pct_one_core_min": 0.8600792488270411,
+          "cpu_utilization_pct_one_core_max": 102.62336483012471,
+          "observed_s": 80.76832890510559,
+          "sampled_mean_memory_bytes": 1099714829.4736843,
+          "cpu_utilization_pct_one_core_average": 35.53593764917635
+        },
+        {
+          "name": "/orders-cdc-analytics-taskmanager-1",
+          "samples": 76,
+          "peak_memory_bytes": 1311539200,
+          "configuration": {
+            "image_id": "sha256:db35e22054e062a7d65bee03a1de52e9817787fd1dbaf897955b2a1e9c5dc499",
+            "image_reference": "examples/orders-cdc-flink:2.3.0",
+            "memory_limit_bytes": 1610612736,
+            "nano_cpus": 1000000000,
+            "started_at": "2026-11-28T02:43:52.847260382Z"
+          },
+          "counter_deltas": {
+            "cpu_core_s": 29.048636000000002,
+            "network_rx_bytes": 115866070,
+            "network_tx_bytes": 98616538,
+            "disk_read_bytes": 512000,
+            "disk_write_bytes": 693059584
+          },
+          "cpu_utilization_pct_one_core_min": 0.9256618130318052,
+          "cpu_utilization_pct_one_core_max": 102.2228923139717,
+          "observed_s": 80.76698994636536,
+          "sampled_mean_memory_bytes": 1101443125.8947368,
+          "cpu_utilization_pct_one_core_average": 35.96597572757165
+        },
+        {
+          "name": "/orders-cdc-analytics-fe2-1",
+          "samples": 76,
+          "peak_memory_bytes": 625184768,
+          "configuration": {
+            "image_id": "sha256:3aec2ed072e48aeb73d8f81115225e6f2ffa756475193f502d48127983eaefdb",
+            "image_reference": "examples/orders-cdc-fe:4.1.5",
+            "memory_limit_bytes": 1342177280,
+            "nano_cpus": 500000000,
+            "started_at": "2026-11-28T02:44:10.783176209Z"
+          },
+          "counter_deltas": {
+            "cpu_core_s": 5.102781,
+            "network_rx_bytes": 636441,
+            "network_tx_bytes": 409834,
+            "disk_read_bytes": 0,
+            "disk_write_bytes": 2695168
+          },
+          "cpu_utilization_pct_one_core_min": 2.6924141666401264,
+          "cpu_utilization_pct_one_core_max": 37.052319101116765,
+          "observed_s": 80.76528596878052,
+          "sampled_mean_memory_bytes": 619881094.7368422,
+          "cpu_utilization_pct_one_core_average": 6.318037432533154
+        },
+        {
+          "name": "/orders-cdc-analytics-fe3-1",
+          "samples": 76,
+          "peak_memory_bytes": 620302336,
+          "configuration": {
+            "image_id": "sha256:3aec2ed072e48aeb73d8f81115225e6f2ffa756475193f502d48127983eaefdb",
+            "image_reference": "examples/orders-cdc-fe:4.1.5",
+            "memory_limit_bytes": 1342177280,
+            "nano_cpus": 500000000,
+            "started_at": "2026-11-28T02:44:10.781263668Z"
+          },
+          "counter_deltas": {
+            "cpu_core_s": 5.314586000000002,
+            "network_rx_bytes": 639721,
+            "network_tx_bytes": 413224,
+            "disk_read_bytes": 0,
+            "disk_write_bytes": 2703360
+          },
+          "cpu_utilization_pct_one_core_min": 2.703617399410706,
+          "cpu_utilization_pct_one_core_max": 21.910619043793382,
+          "observed_s": 80.76425004005432,
+          "sampled_mean_memory_bytes": 614116190.3157895,
+          "cpu_utilization_pct_one_core_average": 6.580369405231002
+        },
+        {
+          "name": "/orders-cdc-analytics-postgres-1",
+          "samples": 76,
+          "peak_memory_bytes": 534020096,
+          "configuration": {
+            "image_id": "sha256:64c8b0d31e4ab6ea665e8426ea406a94bf52de3c05b3a4a8bf713704eefa9328",
+            "image_reference": "postgres:18.7@sha256:64c8b0d31e4ab6ea665e8426ea406a94bf52de3c05b3a4a8bf713704eefa9328",
+            "memory_limit_bytes": 536870912,
+            "nano_cpus": 500000000,
+            "started_at": "2026-11-28T02:43:47.170928129Z"
+          },
+          "counter_deltas": {
+            "cpu_core_s": 8.778751,
+            "network_rx_bytes": 1424394,
+            "network_tx_bytes": 612295423,
+            "disk_read_bytes": 0,
+            "disk_write_bytes": 480350208
+          },
+          "cpu_utilization_pct_one_core_min": 0.002986442142074447,
+          "cpu_utilization_pct_one_core_max": 51.45204743725447,
+          "observed_s": 80.76339197158813,
+          "sampled_mean_memory_bytes": 516633168.84210527,
+          "cpu_utilization_pct_one_core_average": 10.869715579910622
+        },
+        {
+          "name": "/orders-cdc-analytics-broker2-1",
+          "samples": 76,
+          "peak_memory_bytes": 536854528,
+          "configuration": {
+            "image_id": "sha256:852a0d49fc4e656b022e7f23785411802c9a088c78a7c5e39f33969de9c227a7",
+            "image_reference": "apache/kafka:4.3.2@sha256:852a0d49fc4e656b022e7f23785411802c9a088c78a7c5e39f33969de9c227a7",
+            "memory_limit_bytes": 536870912,
+            "nano_cpus": 250000000,
+            "started_at": "2026-11-28T02:43:47.168664379Z"
+          },
+          "counter_deltas": {
+            "cpu_core_s": 11.865606999999997,
+            "network_rx_bytes": 69960512,
+            "network_tx_bytes": 102767145,
+            "disk_read_bytes": 61440,
+            "disk_write_bytes": 67858432
+          },
+          "cpu_utilization_pct_one_core_min": 1.0192921690165762,
+          "cpu_utilization_pct_one_core_max": 25.899791556445543,
+          "observed_s": 80.76178097724915,
+          "sampled_mean_memory_bytes": 467990905.2631579,
+          "cpu_utilization_pct_one_core_average": 14.692106657903665
+        },
+        {
+          "name": "/orders-cdc-analytics-controller3-1",
+          "samples": 76,
+          "peak_memory_bytes": 176275456,
+          "configuration": {
+            "image_id": "sha256:852a0d49fc4e656b022e7f23785411802c9a088c78a7c5e39f33969de9c227a7",
+            "image_reference": "apache/kafka:4.3.2@sha256:852a0d49fc4e656b022e7f23785411802c9a088c78a7c5e39f33969de9c227a7",
+            "memory_limit_bytes": 402653184,
+            "nano_cpus": 250000000,
+            "started_at": "2026-11-28T02:43:47.172395254Z"
+          },
+          "counter_deltas": {
+            "cpu_core_s": 0.7264399999999993,
+            "network_rx_bytes": 111852,
+            "network_tx_bytes": 87870,
+            "disk_read_bytes": 0,
+            "disk_write_bytes": 778240
+          },
+          "cpu_utilization_pct_one_core_min": 0.41961916797347254,
+          "cpu_utilization_pct_one_core_max": 11.766987241178395,
+          "observed_s": 80.75924682617188,
+          "sampled_mean_memory_bytes": 162628069.0526316,
+          "cpu_utilization_pct_one_core_average": 0.8995130942263566
+        },
+        {
+          "name": "/orders-cdc-analytics-broker1-1",
+          "samples": 76,
+          "peak_memory_bytes": 535687168,
+          "configuration": {
+            "image_id": "sha256:852a0d49fc4e656b022e7f23785411802c9a088c78a7c5e39f33969de9c227a7",
+            "image_reference": "apache/kafka:4.3.2@sha256:852a0d49fc4e656b022e7f23785411802c9a088c78a7c5e39f33969de9c227a7",
+            "memory_limit_bytes": 536870912,
+            "nano_cpus": 250000000,
+            "started_at": "2026-11-28T02:43:47.172228212Z"
+          },
+          "counter_deltas": {
+            "cpu_core_s": 12.295611999999998,
+            "network_rx_bytes": 69746298,
+            "network_tx_bytes": 52595784,
+            "disk_read_bytes": 6119424,
+            "disk_write_bytes": 67764224
+          },
+          "cpu_utilization_pct_one_core_min": 1.164115972235021,
+          "cpu_utilization_pct_one_core_max": 26.84555449427085,
+          "observed_s": 80.75739693641663,
+          "sampled_mean_memory_bytes": 451035297.68421054,
+          "cpu_utilization_pct_one_core_average": 15.225369398274195
+        },
+        {
+          "name": "/orders-cdc-analytics-fe1-1",
+          "samples": 76,
+          "peak_memory_bytes": 1140178944,
+          "configuration": {
+            "image_id": "sha256:3aec2ed072e48aeb73d8f81115225e6f2ffa756475193f502d48127983eaefdb",
+            "image_reference": "examples/orders-cdc-fe:4.1.5",
+            "memory_limit_bytes": 1342177280,
+            "nano_cpus": 500000000,
+            "started_at": "2026-11-28T02:43:47.166977212Z"
+          },
+          "counter_deltas": {
+            "cpu_core_s": 16.380321000000002,
+            "network_rx_bytes": 263789926,
+            "network_tx_bytes": 267237876,
+            "disk_read_bytes": 229376,
+            "disk_write_bytes": 3117056
+          },
+          "cpu_utilization_pct_one_core_min": 8.16002241550436,
+          "cpu_utilization_pct_one_core_max": 44.80031383525643,
+          "observed_s": 80.75543713569641,
+          "sampled_mean_memory_bytes": 1117729037.4736843,
+          "cpu_utilization_pct_one_core_average": 20.28386147235576
+        },
+        {
+          "name": "/orders-cdc-analytics-controller2-1",
+          "samples": 76,
+          "peak_memory_bytes": 177942528,
+          "configuration": {
+            "image_id": "sha256:852a0d49fc4e656b022e7f23785411802c9a088c78a7c5e39f33969de9c227a7",
+            "image_reference": "apache/kafka:4.3.2@sha256:852a0d49fc4e656b022e7f23785411802c9a088c78a7c5e39f33969de9c227a7",
+            "memory_limit_bytes": 402653184,
+            "nano_cpus": 250000000,
+            "started_at": "2026-11-28T02:43:47.172887879Z"
+          },
+          "counter_deltas": {
+            "cpu_core_s": 0.805371000000001,
+            "network_rx_bytes": 466167,
+            "network_tx_bytes": 573228,
+            "disk_read_bytes": 0,
+            "disk_write_bytes": 794624
+          },
+          "cpu_utilization_pct_one_core_min": 0.6262640207566909,
+          "cpu_utilization_pct_one_core_max": 2.9389997535146133,
+          "observed_s": 80.75384306907654,
+          "sampled_mean_memory_bytes": 174003577.2631579,
+          "cpu_utilization_pct_one_core_average": 0.9973160030428392
+        },
+        {
+          "name": "/orders-cdc-analytics-jobmanager-1",
+          "samples": 76,
+          "peak_memory_bytes": 812965888,
+          "configuration": {
+            "image_id": "sha256:db35e22054e062a7d65bee03a1de52e9817787fd1dbaf897955b2a1e9c5dc499",
+            "image_reference": "examples/orders-cdc-flink:2.3.0",
+            "memory_limit_bytes": 1610612736,
+            "nano_cpus": 1000000000,
+            "started_at": "2026-11-28T02:43:47.169025587Z"
+          },
+          "counter_deltas": {
+            "cpu_core_s": 1.5203900000000008,
+            "network_rx_bytes": 4593507,
+            "network_tx_bytes": 591863,
+            "disk_read_bytes": 0,
+            "disk_write_bytes": 2801664
+          },
+          "cpu_utilization_pct_one_core_min": 0.5347791467318401,
+          "cpu_utilization_pct_one_core_max": 9.383640936412228,
+          "observed_s": 80.75307583808899,
+          "sampled_mean_memory_bytes": 808764308.2105263,
+          "cpu_utilization_pct_one_core_average": 1.8827641971785734
+        },
+        {
+          "name": "/orders-cdc-analytics-controller1-1",
+          "samples": 76,
+          "peak_memory_bytes": 220385280,
+          "configuration": {
+            "image_id": "sha256:852a0d49fc4e656b022e7f23785411802c9a088c78a7c5e39f33969de9c227a7",
+            "image_reference": "apache/kafka:4.3.2@sha256:852a0d49fc4e656b022e7f23785411802c9a088c78a7c5e39f33969de9c227a7",
+            "memory_limit_bytes": 402653184,
+            "nano_cpus": 250000000,
+            "started_at": "2026-11-28T02:43:47.172301129Z"
+          },
+          "counter_deltas": {
+            "cpu_core_s": 0.6131229999999999,
+            "network_rx_bytes": 111852,
+            "network_tx_bytes": 87738,
+            "disk_read_bytes": 0,
+            "disk_write_bytes": 778240
+          },
+          "cpu_utilization_pct_one_core_min": 0.43176220273329746,
+          "cpu_utilization_pct_one_core_max": 11.840836018378452,
+          "observed_s": 80.75198698043823,
+          "sampled_mean_memory_bytes": 205045113.2631579,
+          "cpu_utilization_pct_one_core_average": 0.7592667659664224
+        },
+        {
+          "name": "/orders-cdc-analytics-broker3-1",
+          "samples": 76,
+          "peak_memory_bytes": 536424448,
+          "configuration": {
+            "image_id": "sha256:852a0d49fc4e656b022e7f23785411802c9a088c78a7c5e39f33969de9c227a7",
+            "image_reference": "apache/kafka:4.3.2@sha256:852a0d49fc4e656b022e7f23785411802c9a088c78a7c5e39f33969de9c227a7",
+            "memory_limit_bytes": 536870912,
+            "nano_cpus": 250000000,
+            "started_at": "2026-11-28T02:43:47.165031546Z"
+          },
+          "counter_deltas": {
+            "cpu_core_s": 11.476503000000001,
+            "network_rx_bytes": 69811653,
+            "network_tx_bytes": 54708821,
+            "disk_read_bytes": 8192,
+            "disk_write_bytes": 68206592
+          },
+          "cpu_utilization_pct_one_core_min": 1.2132709485682065,
+          "cpu_utilization_pct_one_core_max": 25.82094586038061,
+          "observed_s": 80.75105285644531,
+          "sampled_mean_memory_bytes": 457460035.3684211,
+          "cpu_utilization_pct_one_core_average": 14.212202310726875
+        }
+      ],
+      "limits": [
+        "Sample-window deltas exclude startup and exit outside observation. Decreasing counters are treated as restarts and the new counter is accumulated; reset intervals have no CPU utilization estimate.",
+        "Short-lived actors may be missed; use native pre-exit cgroup counters as well.",
+        "CPU utilization is interval-average percent of one core; short spikes may be missed.",
+        "Docker disk bytes are not device I/O latency; absent counters are unavailable, not zero."
+      ]
+    },
+    {
+      "evidence": "results/resources-1795834221253352000.jsonl",
+      "environment": {
+        "type": "environment",
+        "run_id": 1795834221253352000,
+        "fixture": null,
+        "command": [
+          "make",
+          "_test",
+          "PYTHON=/Users/muzammil/.local/bin/python3.13"
+        ],
+        "environment": {
+          "NCPU": 11,
+          "MemTotal": 26216296448,
+          "KernelVersion": "6.12.76-linuxkit",
+          "OperatingSystem": "Docker Desktop",
+          "Driver": "overlayfs",
+          "ServerVersion": "29.5.3",
+          "docker_api": "1.54"
+        },
+        "cotenancy": "Only this order CDC pipeline; no other heavy lab."
+      },
+      "sampled_aggregate_memory_peak_bytes": 15667892224,
+      "actors": [
+        {
+          "name": "/orders-cdc-analytics-orders-1",
+          "samples": 45,
+          "peak_memory_bytes": 15482880,
+          "configuration": {
+            "image_id": "sha256:115654e5b73d2a9a2c388a5bd7b8f5f30f4dcd8238ebbdfc00ab4c25fe31166e",
+            "image_reference": "examples/orders-cdc-workload:1",
+            "memory_limit_bytes": 536870912,
+            "nano_cpus": 500000000,
+            "started_at": "2026-11-28T02:47:40.633763334Z"
+          },
+          "counter_deltas": {
+            "cpu_core_s": 1.4782649999999995,
+            "network_rx_bytes": 312238407,
+            "network_tx_bytes": 437100
+          },
+          "cpu_utilization_pct_one_core_min": 0.0,
+          "cpu_utilization_pct_one_core_max": 49.13637460424236,
+          "observed_s": 47.476495027542114,
+          "sampled_mean_memory_bytes": 6585639.822222223,
+          "cpu_utilization_pct_one_core_average": 3.1136776190879862
+        },
+        {
+          "name": "/orders-cdc-analytics-connect-1",
+          "samples": 45,
+          "peak_memory_bytes": 1063333888,
+          "configuration": {
+            "image_id": "sha256:551e039eb9677a11bb1add0e561939530f8d3f25b0c4331979175bb430f6dc74",
+            "image_reference": "quay.io/debezium/connect:3.7.1.Final@sha256:551e039eb9677a11bb1add0e561939530f8d3f25b0c4331979175bb430f6dc74",
+            "memory_limit_bytes": 1073741824,
+            "nano_cpus": 500000000,
+            "started_at": "2026-11-28T02:44:08.79589Z"
+          },
+          "counter_deltas": {
+            "cpu_core_s": 5.891713999999993,
+            "network_rx_bytes": 33299736,
+            "network_tx_bytes": 21050542,
+            "disk_read_bytes": 114688,
+            "disk_write_bytes": 208896
+          },
+          "cpu_utilization_pct_one_core_min": 0.9809951872476282,
+          "cpu_utilization_pct_one_core_max": 51.108431955885116,
+          "observed_s": 47.47685194015503,
+          "sampled_mean_memory_bytes": 1041083596.8,
+          "cpu_utilization_pct_one_core_average": 12.409655988620617
+        },
+        {
+          "name": "/orders-cdc-analytics-be2-1",
+          "samples": 45,
+          "peak_memory_bytes": 1939709952,
+          "configuration": {
+            "image_id": "sha256:6bc32b6f60f242979005b3371d9990bbb180e964fc91323f92d468980ef30339",
+            "image_reference": "examples/orders-cdc-be:4.1.5",
+            "memory_limit_bytes": 2952790016,
+            "nano_cpus": 1000000000,
+            "started_at": "2026-11-28T02:45:33.86089972Z"
+          },
+          "counter_deltas": {
+            "cpu_core_s": 23.390015,
+            "network_rx_bytes": 92542457,
+            "network_tx_bytes": 104137812,
+            "disk_read_bytes": 659456,
+            "disk_write_bytes": 25739264
+          },
+          "cpu_utilization_pct_one_core_min": 4.130290218376132,
+          "cpu_utilization_pct_one_core_max": 100.98362656207718,
+          "observed_s": 47.47620511054993,
+          "sampled_mean_memory_bytes": 1883972585.2444444,
+          "cpu_utilization_pct_one_core_average": 49.266816809674594
+        },
+        {
+          "name": "/orders-cdc-analytics-be1-1",
+          "samples": 45,
+          "peak_memory_bytes": 1979068416,
+          "configuration": {
+            "image_id": "sha256:6bc32b6f60f242979005b3371d9990bbb180e964fc91323f92d468980ef30339",
+            "image_reference": "examples/orders-cdc-be:4.1.5",
+            "memory_limit_bytes": 2952790016,
+            "nano_cpus": 1000000000,
+            "started_at": "2026-11-28T02:45:33.860963762Z"
+          },
+          "counter_deltas": {
+            "cpu_core_s": 25.098231,
+            "network_rx_bytes": 89593395,
+            "network_tx_bytes": 146542918,
+            "disk_read_bytes": 806912,
+            "disk_write_bytes": 30171136
+          },
+          "cpu_utilization_pct_one_core_min": 4.197742474562476,
+          "cpu_utilization_pct_one_core_max": 101.79034980745315,
+          "observed_s": 47.47534799575806,
+          "sampled_mean_memory_bytes": 1917962740.6222222,
+          "cpu_utilization_pct_one_core_average": 52.865817860339924
+        },
+        {
+          "name": "/orders-cdc-analytics-be3-1",
+          "samples": 45,
+          "peak_memory_bytes": 1975083008,
+          "configuration": {
+            "image_id": "sha256:6bc32b6f60f242979005b3371d9990bbb180e964fc91323f92d468980ef30339",
+            "image_reference": "examples/orders-cdc-be:4.1.5",
+            "memory_limit_bytes": 2952790016,
+            "nano_cpus": 1000000000,
+            "started_at": "2026-11-28T02:45:33.859099137Z"
+          },
+          "counter_deltas": {
+            "cpu_core_s": 23.556259,
+            "network_rx_bytes": 68110080,
+            "network_tx_bytes": 70750519,
+            "disk_read_bytes": 720896,
+            "disk_write_bytes": 27553792
+          },
+          "cpu_utilization_pct_one_core_min": 3.9905767685562243,
+          "cpu_utilization_pct_one_core_max": 101.43898147078426,
+          "observed_s": 47.47454380989075,
+          "sampled_mean_memory_bytes": 1914018201.6,
+          "cpu_utilization_pct_one_core_average": 49.61871586239938
+        },
+        {
+          "name": "/orders-cdc-analytics-taskmanager-2",
+          "samples": 45,
+          "peak_memory_bytes": 1441075200,
+          "configuration": {
+            "image_id": "sha256:db35e22054e062a7d65bee03a1de52e9817787fd1dbaf897955b2a1e9c5dc499",
+            "image_reference": "examples/orders-cdc-flink:2.3.0",
+            "memory_limit_bytes": 1610612736,
+            "nano_cpus": 1000000000,
+            "started_at": "2026-11-28T02:43:52.777790173Z"
+          },
+          "counter_deltas": {
+            "cpu_core_s": 10.560251000000001,
+            "network_rx_bytes": 37953939,
+            "network_tx_bytes": 34681538,
+            "disk_read_bytes": 0,
+            "disk_write_bytes": 663703552
+          },
+          "cpu_utilization_pct_one_core_min": 0.8961929177498466,
+          "cpu_utilization_pct_one_core_max": 93.36511698652642,
+          "observed_s": 47.4732620716095,
+          "sampled_mean_memory_bytes": 1363449082.3111112,
+          "cpu_utilization_pct_one_core_average": 22.24462895360073
+        },
+        {
+          "name": "/orders-cdc-analytics-taskmanager-1",
+          "samples": 45,
+          "peak_memory_bytes": 1409306624,
+          "configuration": {
+            "image_id": "sha256:db35e22054e062a7d65bee03a1de52e9817787fd1dbaf897955b2a1e9c5dc499",
+            "image_reference": "examples/orders-cdc-flink:2.3.0",
+            "memory_limit_bytes": 1610612736,
+            "nano_cpus": 1000000000,
+            "started_at": "2026-11-28T02:43:52.847260382Z"
+          },
+          "counter_deltas": {
+            "cpu_core_s": 10.338788999999998,
+            "network_rx_bytes": 38213403,
+            "network_tx_bytes": 34393259,
+            "disk_read_bytes": 0,
+            "disk_write_bytes": 641658880
+          },
+          "cpu_utilization_pct_one_core_min": 0.9012921747579077,
+          "cpu_utilization_pct_one_core_max": 99.9185373765544,
+          "observed_s": 47.47156000137329,
+          "sampled_mean_memory_bytes": 1354694473.9555554,
+          "cpu_utilization_pct_one_core_average": 21.778911414962792
+        },
+        {
+          "name": "/orders-cdc-analytics-fe2-1",
+          "samples": 45,
+          "peak_memory_bytes": 630628352,
+          "configuration": {
+            "image_id": "sha256:3aec2ed072e48aeb73d8f81115225e6f2ffa756475193f502d48127983eaefdb",
+            "image_reference": "examples/orders-cdc-fe:4.1.5",
+            "memory_limit_bytes": 1342177280,
+            "nano_cpus": 500000000,
+            "started_at": "2026-11-28T02:44:10.783176209Z"
+          },
+          "counter_deltas": {
+            "cpu_core_s": 2.3075650000000003,
+            "network_rx_bytes": 283675,
+            "network_tx_bytes": 197325,
+            "disk_read_bytes": 0,
+            "disk_write_bytes": 1236992
+          },
+          "cpu_utilization_pct_one_core_min": 2.6576358395747244,
+          "cpu_utilization_pct_one_core_max": 13.546977726346016,
+          "observed_s": 47.47031092643738,
+          "sampled_mean_memory_bytes": 626452343.4666667,
+          "cpu_utilization_pct_one_core_average": 4.861069908676037
+        },
+        {
+          "name": "/orders-cdc-analytics-fe3-1",
+          "samples": 45,
+          "peak_memory_bytes": 627904512,
+          "configuration": {
+            "image_id": "sha256:3aec2ed072e48aeb73d8f81115225e6f2ffa756475193f502d48127983eaefdb",
+            "image_reference": "examples/orders-cdc-fe:4.1.5",
+            "memory_limit_bytes": 1342177280,
+            "nano_cpus": 500000000,
+            "started_at": "2026-11-28T02:44:10.781263668Z"
+          },
+          "counter_deltas": {
+            "cpu_core_s": 2.440169000000001,
+            "network_rx_bytes": 280275,
+            "network_tx_bytes": 191545,
+            "disk_read_bytes": 0,
+            "disk_write_bytes": 1257472
+          },
+          "cpu_utilization_pct_one_core_min": 2.6611545895957613,
+          "cpu_utilization_pct_one_core_max": 12.808695082435166,
+          "observed_s": 47.469117879867554,
+          "sampled_mean_memory_bytes": 621269538.1333333,
+          "cpu_utilization_pct_one_core_average": 5.140540016301666
+        },
+        {
+          "name": "/orders-cdc-analytics-postgres-1",
+          "samples": 45,
+          "peak_memory_bytes": 536678400,
+          "configuration": {
+            "image_id": "sha256:64c8b0d31e4ab6ea665e8426ea406a94bf52de3c05b3a4a8bf713704eefa9328",
+            "image_reference": "postgres:18.7@sha256:64c8b0d31e4ab6ea665e8426ea406a94bf52de3c05b3a4a8bf713704eefa9328",
+            "memory_limit_bytes": 536870912,
+            "nano_cpus": 500000000,
+            "started_at": "2026-11-28T02:43:47.170928129Z"
+          },
+          "counter_deltas": {
+            "cpu_core_s": 1.9493080000000003,
+            "network_rx_bytes": 458187,
+            "network_tx_bytes": 254820025,
+            "disk_read_bytes": 180224,
+            "disk_write_bytes": 154386432
+          },
+          "cpu_utilization_pct_one_core_min": 0.0024622991012938637,
+          "cpu_utilization_pct_one_core_max": 38.14582928227039,
+          "observed_s": 47.46833801269531,
+          "sampled_mean_memory_bytes": 515331595.37777776,
+          "cpu_utilization_pct_one_core_average": 4.106543606980008
+        },
+        {
+          "name": "/orders-cdc-analytics-broker2-1",
+          "samples": 45,
+          "peak_memory_bytes": 536743936,
+          "configuration": {
+            "image_id": "sha256:852a0d49fc4e656b022e7f23785411802c9a088c78a7c5e39f33969de9c227a7",
+            "image_reference": "apache/kafka:4.3.2@sha256:852a0d49fc4e656b022e7f23785411802c9a088c78a7c5e39f33969de9c227a7",
+            "memory_limit_bytes": 536870912,
+            "nano_cpus": 250000000,
+            "started_at": "2026-11-28T02:43:47.168664379Z"
+          },
+          "counter_deltas": {
+            "cpu_core_s": 4.031613,
+            "network_rx_bytes": 21604410,
+            "network_tx_bytes": 32022299,
+            "disk_read_bytes": 4096,
+            "disk_write_bytes": 21110784
+          },
+          "cpu_utilization_pct_one_core_min": 0.96782987960589,
+          "cpu_utilization_pct_one_core_max": 25.659529585806986,
+          "observed_s": 47.46723699569702,
+          "sampled_mean_memory_bytes": 454277802.6666667,
+          "cpu_utilization_pct_one_core_average": 8.493464661457907
+        },
+        {
+          "name": "/orders-cdc-analytics-controller3-1",
+          "samples": 45,
+          "peak_memory_bytes": 162656256,
+          "configuration": {
+            "image_id": "sha256:852a0d49fc4e656b022e7f23785411802c9a088c78a7c5e39f33969de9c227a7",
+            "image_reference": "apache/kafka:4.3.2@sha256:852a0d49fc4e656b022e7f23785411802c9a088c78a7c5e39f33969de9c227a7",
+            "memory_limit_bytes": 402653184,
+            "nano_cpus": 250000000,
+            "started_at": "2026-11-28T02:43:47.172395254Z"
+          },
+          "counter_deltas": {
+            "cpu_core_s": 0.2550669999999995,
+            "network_rx_bytes": 66160,
+            "network_tx_bytes": 51490,
+            "disk_read_bytes": 0,
+            "disk_write_bytes": 483328
+          },
+          "cpu_utilization_pct_one_core_min": 0.3529681181246735,
+          "cpu_utilization_pct_one_core_max": 1.5072204650300534,
+          "observed_s": 47.46649098396301,
+          "sampled_mean_memory_bytes": 161632893.15555555,
+          "cpu_utilization_pct_one_core_average": 0.5373622416836673
+        },
+        {
+          "name": "/orders-cdc-analytics-broker1-1",
+          "samples": 45,
+          "peak_memory_bytes": 536743936,
+          "configuration": {
+            "image_id": "sha256:852a0d49fc4e656b022e7f23785411802c9a088c78a7c5e39f33969de9c227a7",
+            "image_reference": "apache/kafka:4.3.2@sha256:852a0d49fc4e656b022e7f23785411802c9a088c78a7c5e39f33969de9c227a7",
+            "memory_limit_bytes": 536870912,
+            "nano_cpus": 250000000,
+            "started_at": "2026-11-28T02:43:47.172228212Z"
+          },
+          "counter_deltas": {
+            "cpu_core_s": 4.914306000000003,
+            "network_rx_bytes": 21552075,
+            "network_tx_bytes": 16450452,
+            "disk_read_bytes": 4096,
+            "disk_write_bytes": 21065728
+          },
+          "cpu_utilization_pct_one_core_min": 1.02563815591096,
+          "cpu_utilization_pct_one_core_max": 25.84039901533151,
+          "observed_s": 47.46589112281799,
+          "sampled_mean_memory_bytes": 454796356.26666665,
+          "cpu_utilization_pct_one_core_average": 10.353341913004934
+        },
+        {
+          "name": "/orders-cdc-analytics-fe1-1",
+          "samples": 45,
+          "peak_memory_bytes": 1156993024,
+          "configuration": {
+            "image_id": "sha256:3aec2ed072e48aeb73d8f81115225e6f2ffa756475193f502d48127983eaefdb",
+            "image_reference": "examples/orders-cdc-fe:4.1.5",
+            "memory_limit_bytes": 1342177280,
+            "nano_cpus": 500000000,
+            "started_at": "2026-11-28T02:43:47.166977212Z"
+          },
+          "counter_deltas": {
+            "cpu_core_s": 10.164024999999995,
+            "network_rx_bytes": 106320606,
+            "network_tx_bytes": 109687329,
+            "disk_read_bytes": 110592,
+            "disk_write_bytes": 1667072
+          },
+          "cpu_utilization_pct_one_core_min": 7.900009438541123,
+          "cpu_utilization_pct_one_core_max": 50.65773684634958,
+          "observed_s": 47.465461015701294,
+          "sampled_mean_memory_bytes": 1142516394.6666667,
+          "cpu_utilization_pct_one_core_average": 21.413517919140816
+        },
+        {
+          "name": "/orders-cdc-analytics-controller2-1",
+          "samples": 45,
+          "peak_memory_bytes": 196845568,
+          "configuration": {
+            "image_id": "sha256:852a0d49fc4e656b022e7f23785411802c9a088c78a7c5e39f33969de9c227a7",
+            "image_reference": "apache/kafka:4.3.2@sha256:852a0d49fc4e656b022e7f23785411802c9a088c78a7c5e39f33969de9c227a7",
+            "memory_limit_bytes": 402653184,
+            "nano_cpus": 250000000,
+            "started_at": "2026-11-28T02:43:47.172887879Z"
+          },
+          "counter_deltas": {
+            "cpu_core_s": 0.4463550000000005,
+            "network_rx_bytes": 273236,
+            "network_tx_bytes": 335595,
+            "disk_read_bytes": 11415552,
+            "disk_write_bytes": 495616
+          },
+          "cpu_utilization_pct_one_core_min": 0.5773199961218297,
+          "cpu_utilization_pct_one_core_max": 4.213686865704916,
+          "observed_s": 47.464322090148926,
+          "sampled_mean_memory_bytes": 180429346.13333333,
+          "cpu_utilization_pct_one_core_average": 0.9404010851608479
+        },
+        {
+          "name": "/orders-cdc-analytics-jobmanager-1",
+          "samples": 45,
+          "peak_memory_bytes": 830562304,
+          "configuration": {
+            "image_id": "sha256:db35e22054e062a7d65bee03a1de52e9817787fd1dbaf897955b2a1e9c5dc499",
+            "image_reference": "examples/orders-cdc-flink:2.3.0",
+            "memory_limit_bytes": 1610612736,
+            "nano_cpus": 1000000000,
+            "started_at": "2026-11-28T02:43:47.169025587Z"
+          },
+          "counter_deltas": {
+            "cpu_core_s": 0.7690680000000008,
+            "network_rx_bytes": 2619060,
+            "network_tx_bytes": 320220,
+            "disk_read_bytes": 0,
+            "disk_write_bytes": 1789952
+          },
+          "cpu_utilization_pct_one_core_min": 0.4535804233100927,
+          "cpu_utilization_pct_one_core_max": 11.389754481772853,
+          "observed_s": 47.46382784843445,
+          "sampled_mean_memory_bytes": 819363748.9777777,
+          "cpu_utilization_pct_one_core_average": 1.6203244341266667
+        },
+        {
+          "name": "/orders-cdc-analytics-controller1-1",
+          "samples": 45,
+          "peak_memory_bytes": 221085696,
+          "configuration": {
+            "image_id": "sha256:852a0d49fc4e656b022e7f23785411802c9a088c78a7c5e39f33969de9c227a7",
+            "image_reference": "apache/kafka:4.3.2@sha256:852a0d49fc4e656b022e7f23785411802c9a088c78a7c5e39f33969de9c227a7",
+            "memory_limit_bytes": 402653184,
+            "nano_cpus": 250000000,
+            "started_at": "2026-11-28T02:43:47.172301129Z"
+          },
+          "counter_deltas": {
+            "cpu_core_s": 0.39879200000000026,
+            "network_rx_bytes": 66202,
+            "network_tx_bytes": 51490,
+            "disk_read_bytes": 0,
+            "disk_write_bytes": 495616
+          },
+          "cpu_utilization_pct_one_core_min": 0.38104477340747794,
+          "cpu_utilization_pct_one_core_max": 7.475390161456955,
+          "observed_s": 47.46328806877136,
+          "sampled_mean_memory_bytes": 205560763.73333332,
+          "cpu_utilization_pct_one_core_average": 0.8402114902409951
+        },
+        {
+          "name": "/orders-cdc-analytics-broker3-1",
+          "samples": 45,
+          "peak_memory_bytes": 536686592,
+          "configuration": {
+            "image_id": "sha256:852a0d49fc4e656b022e7f23785411802c9a088c78a7c5e39f33969de9c227a7",
+            "image_reference": "apache/kafka:4.3.2@sha256:852a0d49fc4e656b022e7f23785411802c9a088c78a7c5e39f33969de9c227a7",
+            "memory_limit_bytes": 536870912,
+            "nano_cpus": 250000000,
+            "started_at": "2026-11-28T02:43:47.165031546Z"
+          },
+          "counter_deltas": {
+            "cpu_core_s": 4.139462999999999,
+            "network_rx_bytes": 21545298,
+            "network_tx_bytes": 16398247,
+            "disk_read_bytes": 4096,
+            "disk_write_bytes": 21110784
+          },
+          "cpu_utilization_pct_one_core_min": 1.004273687922275,
+          "cpu_utilization_pct_one_core_max": 25.924263272550263,
+          "observed_s": 47.46275591850281,
+          "sampled_mean_memory_bytes": 457856978.48888886,
+          "cpu_utilization_pct_one_core_average": 8.721497350696987
+        },
+        {
+          "name": "/orders-cdc-analytics-historical-1",
+          "samples": 40,
+          "peak_memory_bytes": 27144192,
+          "configuration": {
+            "image_id": "sha256:570a7b6190336b50e18db02837586c0fd3dc4f0ce41c4db6afa16bfbc6b5a7e0",
+            "image_reference": "examples/orders-historical-replay:1",
+            "memory_limit_bytes": 134217728,
+            "nano_cpus": 125000000,
+            "started_at": "2026-11-28T02:50:25.015670049Z"
+          },
+          "counter_deltas": {
+            "cpu_core_s": 0.207744,
+            "network_rx_bytes": 14891357,
+            "network_tx_bytes": 19389628
+          },
+          "cpu_utilization_pct_one_core_min": 0.0,
+          "cpu_utilization_pct_one_core_max": 8.317160745510549,
+          "observed_s": 42.05330181121826,
+          "sampled_mean_memory_bytes": 11122483.2,
+          "cpu_utilization_pct_one_core_average": 0.49400163852195217
+        },
+        {
+          "name": "/orders-cdc-analytics-historical-spark-run-380190daa53b",
+          "samples": 27,
+          "peak_memory_bytes": 485859328,
+          "configuration": {
+            "image_id": "sha256:ed2b66e981cf9d39a31e24f0c2f63b9385a716ac29095d39861aafbbe83c1f64",
+            "image_reference": "examples/orders-historical-spark:4.3.0",
+            "memory_limit_bytes": 1207959552,
+            "nano_cpus": 375000000,
+            "started_at": "2026-11-28T02:50:27.644234759Z"
+          },
+          "counter_deltas": {
+            "cpu_core_s": 10.071537,
+            "network_rx_bytes": 720,
+            "network_tx_bytes": 84,
+            "disk_read_bytes": 4128768,
+            "disk_write_bytes": 0
+          },
+          "cpu_utilization_pct_one_core_min": 34.794980806125515,
+          "cpu_utilization_pct_one_core_max": 38.75868744726818,
+          "counter_resets": 3,
+          "observed_s": -63931431027.769135,
+          "sampled_mean_memory_bytes": 274692171.8518519
+        }
+      ],
+      "limits": [
+        "Sample-window deltas exclude startup and exit outside observation. Decreasing counters are treated as restarts and the new counter is accumulated; reset intervals have no CPU utilization estimate.",
+        "Short-lived actors may be missed; use native pre-exit cgroup counters as well.",
+        "CPU utilization is interval-average percent of one core; short spikes may be missed.",
+        "Docker disk bytes are not device I/O latency; absent counters are unavailable, not zero."
+      ]
+    },
+    {
+      "evidence": "results/resources-1795834452605206000.jsonl",
+      "environment": {
+        "type": "environment",
+        "run_id": 1795834452605206000,
+        "fixture": null,
+        "command": [
+          "make",
+          "_test",
+          "PYTHON=/Users/muzammil/.local/bin/python3.13"
+        ],
+        "environment": {
+          "NCPU": 11,
+          "MemTotal": 26216296448,
+          "KernelVersion": "6.12.76-linuxkit",
+          "OperatingSystem": "Docker Desktop",
+          "Driver": "overlayfs",
+          "ServerVersion": "29.5.3",
+          "docker_api": "1.54"
+        },
+        "cotenancy": "Only this order CDC pipeline; no other heavy lab."
+      },
+      "sampled_aggregate_memory_peak_bytes": 16419332096,
+      "actors": [
+        {
+          "name": "/orders-cdc-analytics-historical-1",
+          "samples": 75,
+          "peak_memory_bytes": 29552640,
+          "configuration": {
+            "image_id": "sha256:8111ebe56d97811bbdc5f0b87de27a931bf2ccef517e577c5d9cac925befeb3f",
+            "image_reference": "examples/orders-historical-replay:1",
+            "memory_limit_bytes": 134217728,
+            "nano_cpus": 125000000,
+            "started_at": "2026-11-28T02:53:22.589981965Z"
+          },
+          "counter_deltas": {
+            "cpu_core_s": 0.270526,
+            "network_rx_bytes": 15259893,
+            "network_tx_bytes": 19526157
+          },
+          "cpu_utilization_pct_one_core_min": 0.0,
+          "cpu_utilization_pct_one_core_max": 9.41379899631842,
+          "counter_resets": 3,
+          "observed_s": 79.77454996109009,
+          "sampled_mean_memory_bytes": 9653998.933333334,
+          "cpu_utilization_pct_one_core_average": 0.3391131634486796
+        },
+        {
+          "name": "/orders-cdc-analytics-orders-1",
+          "samples": 75,
+          "peak_memory_bytes": 21655552,
+          "configuration": {
+            "image_id": "sha256:115654e5b73d2a9a2c388a5bd7b8f5f30f4dcd8238ebbdfc00ab4c25fe31166e",
+            "image_reference": "examples/orders-cdc-workload:1",
+            "memory_limit_bytes": 536870912,
+            "nano_cpus": 500000000,
+            "started_at": "2026-11-28T02:47:40.633763334Z"
+          },
+          "counter_deltas": {
+            "cpu_core_s": 6.9310030000000005,
+            "network_rx_bytes": 1560724391,
+            "network_tx_bytes": 1707264
+          },
+          "cpu_utilization_pct_one_core_min": 0.0,
+          "cpu_utilization_pct_one_core_max": 51.547720868834794,
+          "observed_s": 79.77361488342285,
+          "sampled_mean_memory_bytes": 8117015.893333334,
+          "cpu_utilization_pct_one_core_average": 8.688340136182395
+        },
+        {
+          "name": "/orders-cdc-analytics-connect-1",
+          "samples": 75,
+          "peak_memory_bytes": 1062412288,
+          "configuration": {
+            "image_id": "sha256:551e039eb9677a11bb1add0e561939530f8d3f25b0c4331979175bb430f6dc74",
+            "image_reference": "quay.io/debezium/connect:3.7.1.Final@sha256:551e039eb9677a11bb1add0e561939530f8d3f25b0c4331979175bb430f6dc74",
+            "memory_limit_bytes": 1073741824,
+            "nano_cpus": 500000000,
+            "started_at": "2026-11-28T02:44:08.79589Z"
+          },
+          "counter_deltas": {
+            "cpu_core_s": 6.436291000000011,
+            "network_rx_bytes": 34608066,
+            "network_tx_bytes": 21829628,
+            "disk_read_bytes": 24576,
+            "disk_write_bytes": 192512
+          },
+          "cpu_utilization_pct_one_core_min": 0.807685869189874,
+          "cpu_utilization_pct_one_core_max": 50.82984283590666,
+          "observed_s": 79.77185392379761,
+          "sampled_mean_memory_bytes": 1036831948.8,
+          "cpu_utilization_pct_one_core_average": 8.068373346504275
+        },
+        {
+          "name": "/orders-cdc-analytics-be2-1",
+          "samples": 75,
+          "peak_memory_bytes": 2179788800,
+          "configuration": {
+            "image_id": "sha256:6bc32b6f60f242979005b3371d9990bbb180e964fc91323f92d468980ef30339",
+            "image_reference": "examples/orders-cdc-be:4.1.5",
+            "memory_limit_bytes": 2952790016,
+            "nano_cpus": 1000000000,
+            "started_at": "2026-11-28T02:45:33.86089972Z"
+          },
+          "counter_deltas": {
+            "cpu_core_s": 31.071007999999992,
+            "network_rx_bytes": 100137545,
+            "network_tx_bytes": 245679881,
+            "disk_read_bytes": 0,
+            "disk_write_bytes": 49999872
+          },
+          "cpu_utilization_pct_one_core_min": 4.102907201491107,
+          "cpu_utilization_pct_one_core_max": 102.02318477044388,
+          "observed_s": 79.77007794380188,
+          "sampled_mean_memory_bytes": 2025876084.0533333,
+          "cpu_utilization_pct_one_core_average": 38.95070532824295
+        },
+        {
+          "name": "/orders-cdc-analytics-be1-1",
+          "samples": 75,
+          "peak_memory_bytes": 2175201280,
+          "configuration": {
+            "image_id": "sha256:6bc32b6f60f242979005b3371d9990bbb180e964fc91323f92d468980ef30339",
+            "image_reference": "examples/orders-cdc-be:4.1.5",
+            "memory_limit_bytes": 2952790016,
+            "nano_cpus": 1000000000,
+            "started_at": "2026-11-28T02:45:33.860963762Z"
+          },
+          "counter_deltas": {
+            "cpu_core_s": 31.667390000000005,
+            "network_rx_bytes": 96203222,
+            "network_tx_bytes": 279350758,
+            "disk_read_bytes": 0,
+            "disk_write_bytes": 53792768
+          },
+          "cpu_utilization_pct_one_core_min": 3.9926145543223757,
+          "cpu_utilization_pct_one_core_max": 105.23069970744069,
+          "observed_s": 79.76894617080688,
+          "sampled_mean_memory_bytes": 2046629860.6933334,
+          "cpu_utilization_pct_one_core_average": 39.698894770643655
+        },
+        {
+          "name": "/orders-cdc-analytics-be3-1",
+          "samples": 75,
+          "peak_memory_bytes": 2170044416,
+          "configuration": {
+            "image_id": "sha256:6bc32b6f60f242979005b3371d9990bbb180e964fc91323f92d468980ef30339",
+            "image_reference": "examples/orders-cdc-be:4.1.5",
+            "memory_limit_bytes": 2952790016,
+            "nano_cpus": 1000000000,
+            "started_at": "2026-11-28T02:45:33.859099137Z"
+          },
+          "counter_deltas": {
+            "cpu_core_s": 33.117626,
+            "network_rx_bytes": 120096881,
+            "network_tx_bytes": 280591270,
+            "disk_read_bytes": 131072,
+            "disk_write_bytes": 49356800
+          },
+          "cpu_utilization_pct_one_core_min": 4.153252952951894,
+          "cpu_utilization_pct_one_core_max": 104.3797086143012,
+          "observed_s": 79.76733684539795,
+          "sampled_mean_memory_bytes": 2041184037.5466666,
+          "cpu_utilization_pct_one_core_average": 41.51777821564651
+        },
+        {
+          "name": "/orders-cdc-analytics-taskmanager-2",
+          "samples": 75,
+          "peak_memory_bytes": 1482993664,
+          "configuration": {
+            "image_id": "sha256:db35e22054e062a7d65bee03a1de52e9817787fd1dbaf897955b2a1e9c5dc499",
+            "image_reference": "examples/orders-cdc-flink:2.3.0",
+            "memory_limit_bytes": 1610612736,
+            "nano_cpus": 1000000000,
+            "started_at": "2026-11-28T02:43:52.777790173Z"
+          },
+          "counter_deltas": {
+            "cpu_core_s": 11.003691000000003,
+            "network_rx_bytes": 38525091,
+            "network_tx_bytes": 36156267,
+            "disk_read_bytes": 0,
+            "disk_write_bytes": 1029230592
+          },
+          "cpu_utilization_pct_one_core_min": 0.6640124635234517,
+          "cpu_utilization_pct_one_core_max": 100.50764148391515,
+          "observed_s": 79.76615810394287,
+          "sampled_mean_memory_bytes": 1396763798.1866667,
+          "cpu_utilization_pct_one_core_average": 13.794936676856306
+        },
+        {
+          "name": "/orders-cdc-analytics-taskmanager-1",
+          "samples": 75,
+          "peak_memory_bytes": 1478295552,
+          "configuration": {
+            "image_id": "sha256:db35e22054e062a7d65bee03a1de52e9817787fd1dbaf897955b2a1e9c5dc499",
+            "image_reference": "examples/orders-cdc-flink:2.3.0",
+            "memory_limit_bytes": 1610612736,
+            "nano_cpus": 1000000000,
+            "started_at": "2026-11-28T02:43:52.847260382Z"
+          },
+          "counter_deltas": {
+            "cpu_core_s": 10.788954000000004,
+            "network_rx_bytes": 38847464,
+            "network_tx_bytes": 35930777,
+            "disk_read_bytes": 0,
+            "disk_write_bytes": 1020874752
+          },
+          "cpu_utilization_pct_one_core_min": 0.803702466884657,
+          "cpu_utilization_pct_one_core_max": 93.2769159458271,
+          "observed_s": 79.76477098464966,
+          "sampled_mean_memory_bytes": 1391204160.8533332,
+          "cpu_utilization_pct_one_core_average": 13.525963739150313
+        },
+        {
+          "name": "/orders-cdc-analytics-fe2-1",
+          "samples": 75,
+          "peak_memory_bytes": 638566400,
+          "configuration": {
+            "image_id": "sha256:3aec2ed072e48aeb73d8f81115225e6f2ffa756475193f502d48127983eaefdb",
+            "image_reference": "examples/orders-cdc-fe:4.1.5",
+            "memory_limit_bytes": 1342177280,
+            "nano_cpus": 500000000,
+            "started_at": "2026-11-28T02:44:10.783176209Z"
+          },
+          "counter_deltas": {
+            "cpu_core_s": 3.7068119999999993,
+            "network_rx_bytes": 402727,
+            "network_tx_bytes": 303607,
+            "disk_read_bytes": 0,
+            "disk_write_bytes": 1617920
+          },
+          "cpu_utilization_pct_one_core_min": 2.72472333200433,
+          "cpu_utilization_pct_one_core_max": 20.611576529440537,
+          "observed_s": 79.76319193840027,
+          "sampled_mean_memory_bytes": 636479187.6266667,
+          "cpu_utilization_pct_one_core_average": 4.647271391624731
+        },
+        {
+          "name": "/orders-cdc-analytics-fe3-1",
+          "samples": 75,
+          "peak_memory_bytes": 635011072,
+          "configuration": {
+            "image_id": "sha256:3aec2ed072e48aeb73d8f81115225e6f2ffa756475193f502d48127983eaefdb",
+            "image_reference": "examples/orders-cdc-fe:4.1.5",
+            "memory_limit_bytes": 1342177280,
+            "nano_cpus": 500000000,
+            "started_at": "2026-11-28T02:44:10.781263668Z"
+          },
+          "counter_deltas": {
+            "cpu_core_s": 3.5471920000000026,
+            "network_rx_bytes": 402135,
+            "network_tx_bytes": 301549,
+            "disk_read_bytes": 0,
+            "disk_write_bytes": 1642496
+          },
+          "cpu_utilization_pct_one_core_min": 2.751536110373335,
+          "cpu_utilization_pct_one_core_max": 9.33791412074737,
+          "observed_s": 79.76182389259338,
+          "sampled_mean_memory_bytes": 633901656.7466667,
+          "cpu_utilization_pct_one_core_average": 4.447230300019997
+        },
+        {
+          "name": "/orders-cdc-analytics-postgres-1",
+          "samples": 75,
+          "peak_memory_bytes": 536870912,
+          "configuration": {
+            "image_id": "sha256:64c8b0d31e4ab6ea665e8426ea406a94bf52de3c05b3a4a8bf713704eefa9328",
+            "image_reference": "postgres:18.7@sha256:64c8b0d31e4ab6ea665e8426ea406a94bf52de3c05b3a4a8bf713704eefa9328",
+            "memory_limit_bytes": 536870912,
+            "nano_cpus": 500000000,
+            "started_at": "2026-11-28T02:43:47.170928129Z"
+          },
+          "counter_deltas": {
+            "cpu_core_s": 5.416596,
+            "network_rx_bytes": 1459092,
+            "network_tx_bytes": 1084310407,
+            "disk_read_bytes": 28672,
+            "disk_write_bytes": 205864960
+          },
+          "cpu_utilization_pct_one_core_min": 0.05670305854469475,
+          "cpu_utilization_pct_one_core_max": 33.85067349392747,
+          "observed_s": 79.76048612594604,
+          "sampled_mean_memory_bytes": 497770222.93333334,
+          "cpu_utilization_pct_one_core_average": 6.791076964409304
+        },
+        {
+          "name": "/orders-cdc-analytics-broker2-1",
+          "samples": 75,
+          "peak_memory_bytes": 536838144,
+          "configuration": {
+            "image_id": "sha256:852a0d49fc4e656b022e7f23785411802c9a088c78a7c5e39f33969de9c227a7",
+            "image_reference": "apache/kafka:4.3.2@sha256:852a0d49fc4e656b022e7f23785411802c9a088c78a7c5e39f33969de9c227a7",
+            "memory_limit_bytes": 536870912,
+            "nano_cpus": 250000000,
+            "started_at": "2026-11-28T02:43:47.168664379Z"
+          },
+          "counter_deltas": {
+            "cpu_core_s": 7.134745000000002,
+            "network_rx_bytes": 22529698,
+            "network_tx_bytes": 33242705,
+            "disk_read_bytes": 692224,
+            "disk_write_bytes": 25411584
+          },
+          "cpu_utilization_pct_one_core_min": 0.847165587106674,
+          "cpu_utilization_pct_one_core_max": 25.83878859341763,
+          "observed_s": 79.75911092758179,
+          "sampled_mean_memory_bytes": 448429151.5733333,
+          "cpu_utilization_pct_one_core_average": 8.945366763777091
+        },
+        {
+          "name": "/orders-cdc-analytics-controller3-1",
+          "samples": 75,
+          "peak_memory_bytes": 183402496,
+          "configuration": {
+            "image_id": "sha256:852a0d49fc4e656b022e7f23785411802c9a088c78a7c5e39f33969de9c227a7",
+            "image_reference": "apache/kafka:4.3.2@sha256:852a0d49fc4e656b022e7f23785411802c9a088c78a7c5e39f33969de9c227a7",
+            "memory_limit_bytes": 402653184,
+            "nano_cpus": 250000000,
+            "started_at": "2026-11-28T02:43:47.172395254Z"
+          },
+          "counter_deltas": {
+            "cpu_core_s": 0.6028180000000001,
+            "network_rx_bytes": 111536,
+            "network_tx_bytes": 86482,
+            "disk_read_bytes": 0,
+            "disk_write_bytes": 819200
+          },
+          "cpu_utilization_pct_one_core_min": 0.3513094259277042,
+          "cpu_utilization_pct_one_core_max": 8.577505586680061,
+          "observed_s": 79.7579619884491,
+          "sampled_mean_memory_bytes": 168312449.70666668,
+          "cpu_utilization_pct_one_core_average": 0.7558091818937185
+        },
+        {
+          "name": "/orders-cdc-analytics-broker1-1",
+          "samples": 75,
+          "peak_memory_bytes": 536444928,
+          "configuration": {
+            "image_id": "sha256:852a0d49fc4e656b022e7f23785411802c9a088c78a7c5e39f33969de9c227a7",
+            "image_reference": "apache/kafka:4.3.2@sha256:852a0d49fc4e656b022e7f23785411802c9a088c78a7c5e39f33969de9c227a7",
+            "memory_limit_bytes": 536870912,
+            "nano_cpus": 250000000,
+            "started_at": "2026-11-28T02:43:47.172228212Z"
+          },
+          "counter_deltas": {
+            "cpu_core_s": 8.984610000000004,
+            "network_rx_bytes": 22471268,
+            "network_tx_bytes": 17245261,
+            "disk_read_bytes": 24952832,
+            "disk_write_bytes": 44412928
+          },
+          "cpu_utilization_pct_one_core_min": 0.9106124457928588,
+          "cpu_utilization_pct_one_core_max": 25.710581348049214,
+          "observed_s": 79.75676107406616,
+          "sampled_mean_memory_bytes": 437709974.18666667,
+          "cpu_utilization_pct_one_core_average": 11.265013622677632
+        },
+        {
+          "name": "/orders-cdc-analytics-fe1-1",
+          "samples": 75,
+          "peak_memory_bytes": 1193742336,
+          "configuration": {
+            "image_id": "sha256:3aec2ed072e48aeb73d8f81115225e6f2ffa756475193f502d48127983eaefdb",
+            "image_reference": "examples/orders-cdc-fe:4.1.5",
+            "memory_limit_bytes": 1342177280,
+            "nano_cpus": 500000000,
+            "started_at": "2026-11-28T02:43:47.166977212Z"
+          },
+          "counter_deltas": {
+            "cpu_core_s": 13.74429400000001,
+            "network_rx_bytes": 527877596,
+            "network_tx_bytes": 532814736,
+            "disk_read_bytes": 28672,
+            "disk_write_bytes": 2383872
+          },
+          "cpu_utilization_pct_one_core_min": 6.513933994669588,
+          "cpu_utilization_pct_one_core_max": 51.011998770429855,
+          "observed_s": 79.7552809715271,
+          "sampled_mean_memory_bytes": 1176403804.16,
+          "cpu_utilization_pct_one_core_average": 17.233083292511715
+        },
+        {
+          "name": "/orders-cdc-analytics-controller2-1",
+          "samples": 75,
+          "peak_memory_bytes": 216596480,
+          "configuration": {
+            "image_id": "sha256:852a0d49fc4e656b022e7f23785411802c9a088c78a7c5e39f33969de9c227a7",
+            "image_reference": "apache/kafka:4.3.2@sha256:852a0d49fc4e656b022e7f23785411802c9a088c78a7c5e39f33969de9c227a7",
+            "memory_limit_bytes": 402653184,
+            "nano_cpus": 250000000,
+            "started_at": "2026-11-28T02:43:47.172887879Z"
+          },
+          "counter_deltas": {
+            "cpu_core_s": 0.8278379999999999,
+            "network_rx_bytes": 460665,
+            "network_tx_bytes": 564983,
+            "disk_read_bytes": 86016,
+            "disk_write_bytes": 802816
+          },
+          "cpu_utilization_pct_one_core_min": 0.6011753257475847,
+          "cpu_utilization_pct_one_core_max": 7.025416488333238,
+          "observed_s": 79.75427985191345,
+          "sampled_mean_memory_bytes": 198260817.92,
+          "cpu_utilization_pct_one_core_average": 1.037985674921919
+        },
+        {
+          "name": "/orders-cdc-analytics-jobmanager-1",
+          "samples": 75,
+          "peak_memory_bytes": 850198528,
+          "configuration": {
+            "image_id": "sha256:db35e22054e062a7d65bee03a1de52e9817787fd1dbaf897955b2a1e9c5dc499",
+            "image_reference": "examples/orders-cdc-flink:2.3.0",
+            "memory_limit_bytes": 1610612736,
+            "nano_cpus": 1000000000,
+            "started_at": "2026-11-28T02:43:47.169025587Z"
+          },
+          "counter_deltas": {
+            "cpu_core_s": 1.2941219999999998,
+            "network_rx_bytes": 4789935,
+            "network_tx_bytes": 571139,
+            "disk_read_bytes": 0,
+            "disk_write_bytes": 3162112
+          },
+          "cpu_utilization_pct_one_core_min": 0.4573070933244805,
+          "cpu_utilization_pct_one_core_max": 21.486878969343163,
+          "observed_s": 79.75258493423462,
+          "sampled_mean_memory_bytes": 837719654.4,
+          "cpu_utilization_pct_one_core_average": 1.6226709153905865
+        },
+        {
+          "name": "/orders-cdc-analytics-controller1-1",
+          "samples": 75,
+          "peak_memory_bytes": 224694272,
+          "configuration": {
+            "image_id": "sha256:852a0d49fc4e656b022e7f23785411802c9a088c78a7c5e39f33969de9c227a7",
+            "image_reference": "apache/kafka:4.3.2@sha256:852a0d49fc4e656b022e7f23785411802c9a088c78a7c5e39f33969de9c227a7",
+            "memory_limit_bytes": 402653184,
+            "nano_cpus": 250000000,
+            "started_at": "2026-11-28T02:43:47.172301129Z"
+          },
+          "counter_deltas": {
+            "cpu_core_s": 0.662598,
+            "network_rx_bytes": 111536,
+            "network_tx_bytes": 86720,
+            "disk_read_bytes": 241664,
+            "disk_write_bytes": 802816
+          },
+          "cpu_utilization_pct_one_core_min": 0.3430536709331593,
+          "cpu_utilization_pct_one_core_max": 13.843927512637094,
+          "observed_s": 79.75090718269348,
+          "sampled_mean_memory_bytes": 209973411.84,
+          "cpu_utilization_pct_one_core_average": 0.8308344361301366
+        },
+        {
+          "name": "/orders-cdc-analytics-broker3-1",
+          "samples": 75,
+          "peak_memory_bytes": 533012480,
+          "configuration": {
+            "image_id": "sha256:852a0d49fc4e656b022e7f23785411802c9a088c78a7c5e39f33969de9c227a7",
+            "image_reference": "apache/kafka:4.3.2@sha256:852a0d49fc4e656b022e7f23785411802c9a088c78a7c5e39f33969de9c227a7",
+            "memory_limit_bytes": 536870912,
+            "nano_cpus": 250000000,
+            "started_at": "2026-11-28T02:43:47.165031546Z"
+          },
+          "counter_deltas": {
+            "cpu_core_s": 7.104391000000007,
+            "network_rx_bytes": 22449743,
+            "network_tx_bytes": 17153005,
+            "disk_read_bytes": 4096,
+            "disk_write_bytes": 21807104
+          },
+          "cpu_utilization_pct_one_core_min": 0.8432298076573561,
+          "cpu_utilization_pct_one_core_max": 25.688887402181486,
+          "observed_s": 79.74945402145386,
+          "sampled_mean_memory_bytes": 454623341.2266667,
+          "cpu_utilization_pct_one_core_average": 8.908388260675508
+        },
+        {
+          "name": "/orders-cdc-analytics-historical-spark-run-090cbde1aab7",
+          "samples": 26,
+          "peak_memory_bytes": 501997568,
+          "configuration": {
+            "image_id": "sha256:ed2b66e981cf9d39a31e24f0c2f63b9385a716ac29095d39861aafbbe83c1f64",
+            "image_reference": "examples/orders-historical-spark:4.3.0",
+            "memory_limit_bytes": 1207959552,
+            "nano_cpus": 375000000,
+            "started_at": "2026-11-28T02:54:18.725583838Z"
+          },
+          "counter_deltas": {
+            "cpu_core_s": 10.082976,
+            "network_rx_bytes": 676,
+            "network_tx_bytes": 84
+          },
+          "cpu_utilization_pct_one_core_min": 35.13480252300957,
+          "cpu_utilization_pct_one_core_max": 38.58352413830154,
+          "observed_s": 26.97257685661316,
+          "sampled_mean_memory_bytes": 293685405.53846157,
+          "cpu_utilization_pct_one_core_average": 37.382323734218396
+        }
+      ],
+      "limits": [
+        "Sample-window deltas exclude startup and exit outside observation. Decreasing counters are treated as restarts and the new counter is accumulated; reset intervals have no CPU utilization estimate.",
+        "Short-lived actors may be missed; use native pre-exit cgroup counters as well.",
+        "CPU utilization is interval-average percent of one core; short spikes may be missed.",
+        "Docker disk bytes are not device I/O latency; absent counters are unavailable, not zero."
+      ]
+    }
+  ],
+  "volume_inventories": [
+    {
+      "path": "results/resources-1795834530332402000",
+      "rows": [
+        {
+          "event": "source",
+          "manifest": "2cb8c6c384d3671545b376bd5e2da69bdb139ec74eeb054b40780b669b28c794  main.go\ne85c218138e327b5be3c6fac31c24d03e30cee45389817d29fe6baa916cf6cd6  measure.go\n454f6ce8825ab0c8b81cdd5d8ee8277dde96f3767a260a35c7842573cc9cbc03  source.go\n1c1bb54d4d63da3126ba6cd3ff7baa78d74abda729c3c3bea272c119d2aafdd9  verify.go\nb96ff0d70abf4dca77f03d267286b41f2f451e08851e1779928590c37b8475aa  witness.go\ncbeb7009a97c9323b65aeb958eb026c7c024de36fe49d729cd116ee7154563c2  witness_test.go\n",
+          "utc_ns": 1795834530562422719
+        },
+        {
+          "event": "volume_sizes",
+          "scope": "non-atomic owned-volume snapshot, no shared-filesystem double count",
+          "utc_ns": 1795834530784754969,
+          "volumes": {
+            "orders-cdc-analytics_be1-data": {
+              "allocated_bytes": 172867584,
+              "apparent_bytes": 93729450,
+              "files": 2948
+            },
+            "orders-cdc-analytics_be2-data": {
+              "allocated_bytes": 169984000,
+              "apparent_bytes": 85182969,
+              "files": 2966
+            },
+            "orders-cdc-analytics_be3-data": {
+              "allocated_bytes": 170663936,
+              "apparent_bytes": 88965500,
+              "files": 2973
+            },
+            "orders-cdc-analytics_broker1": {
+              "allocated_bytes": 109277184,
+              "apparent_bytes": 1953912516,
+              "files": 448
+            },
+            "orders-cdc-analytics_broker2": {
+              "allocated_bytes": 109268992,
+              "apparent_bytes": 1953912626,
+              "files": 448
+            },
+            "orders-cdc-analytics_broker3": {
+              "allocated_bytes": 109281280,
+              "apparent_bytes": 1953912650,
+              "files": 448
+            },
+            "orders-cdc-analytics_controller1": {
+              "allocated_bytes": 147456,
+              "apparent_bytes": 21086613,
+              "files": 9
+            },
+            "orders-cdc-analytics_controller2": {
+              "allocated_bytes": 147456,
+              "apparent_bytes": 21086614,
+              "files": 9
+            },
+            "orders-cdc-analytics_controller3": {
+              "allocated_bytes": 147456,
+              "apparent_bytes": 21086614,
+              "files": 9
+            },
+            "orders-cdc-analytics_fe1-meta": {
+              "allocated_bytes": 1085440,
+              "apparent_bytes": 1056179,
+              "files": 10
+            },
+            "orders-cdc-analytics_fe2-meta": {
+              "allocated_bytes": 1069056,
+              "apparent_bytes": 1045690,
+              "files": 10
+            },
+            "orders-cdc-analytics_fe3-meta": {
+              "allocated_bytes": 1069056,
+              "apparent_bytes": 1045692,
+              "files": 10
+            },
+            "orders-cdc-analytics_flink-state": {
+              "allocated_bytes": 118181888,
+              "apparent_bytes": 118097837,
+              "files": 29
+            },
+            "orders-cdc-analytics_postgres": {
+              "allocated_bytes": 522334208,
+              "apparent_bytes": 522207124,
+              "files": 1321
+            }
+          }
+        },
+        {
+          "event": "resources",
+          "peak_rss_kib": 13792,
+          "system_cpu_s": 0.025979,
+          "user_cpu_s": 0.014683,
+          "utc_ns": 1795834530784816302
+        }
+      ]
+    }
+  ],
+  "source_files_sha256": {
+    "Makefile": "ba327174e878021f02f67319b580130122ec830a2dad064229039017fec254be",
+    "README.md": "ad8fa6abdaefda25f4907387f18dda9602bead9b97ab72f1bd3f4d993116a51a",
+    ".gitignore": "4918524d5b8739e4b404ff1692f650559cffb1a8acd7403cd521dcabd2392795",
+    "compose.yaml": "617b45c201df0443d4be63821bf228be7220d5e5de2db9896206fcbce758789f",
+    "config/contract.json": "297e3695d467e1e6bdc6738fca7cc8cce3fc495fdf0fa4a311bbb6032d7d4d18",
+    "replay-workload/go.mod": "353cdaa9ade3fbd0f4bd6bccd739372606f74708c28f28258b185ff2753c0594",
+    "replay-workload/Dockerfile": "420afad14fddc6498f748c1f339e62e7359c0b69ed220e2ba605d6cc332d16eb",
+    "replay-workload/go.sum": "90501c1e739d83a45489cee94a54290eef8b311a97072ab1c0e0058e92d38a12",
+    "replay-workload/main.go": "2c813cdf288865b7f789352d68d28c235d5e9f324d30757d9644121e82e31e27",
+    "tests/test_oracle.py": "af23e1fcdc219b6fadfd4eb88b890373dd275ad5f0889bbc503be33b1b2679c3",
+    "docs/RECOVERY.md": "a7c1caf8dbbd010ac5526aba0f69e1ad30a9a7e49977923cd1ade5b2c4500a3e",
+    "scripts/run.py": "5b782764da6fb85812050b7f19b9037cba2685b7fc8b9fca75eb2a46bdcb87e7",
+    "scripts/oracle.py": "b7b4f888343294f663fb1ee38fde0d551f479a20d33f40f605d09646529caad2",
+    "scripts/report.py": "b2b1a24944e1f6403880c3c475418fbbcd4aada5d631fac2a5921ad92143d8fd",
+    "spark/Dockerfile": "f73bc8befaca5d1655d405f46cb5302ae7acb4be6f5ead2f490dcb0c29b4af89",
+    "spark/replay.py": "148f67cd6fbbec83aef9524f84126ff83ec68acb58823ed4d9e7b83c1f1b16cf"
+  },
+  "limitations": [
+    "Single Docker VM; no independent-host or power-loss proof.",
+    "Spark local[1] is a bounded historical recomputation, not Spark cluster capacity.",
+    "Separate sink transactions; no atomic publication across both tables.",
+    "CSV reference compression is not native database compression; native ZSTD ratio is unavailable.",
+    "Docker observations omit some startup/exit tails, short actors and host/build costs; do not sum overlapping counters.",
+    "Observer records initial container StartedAt only; restart attribution uses native fault evidence and counter-reset detection, not complete per-epoch sampling.",
+    "Physical disk service latency/cold-cache behavior and hard-delete/backfill races remain unrun."
+  ]
+}

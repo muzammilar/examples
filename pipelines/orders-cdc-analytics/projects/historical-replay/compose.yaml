@@ -1,0 +1,28 @@
+# Merged with the owning CDC lab; all relative paths are relative to that lab.
+services:
+  historical:
+    profiles: [historical]
+    build: ./projects/historical-replay/replay-workload
+    image: examples/orders-historical-replay:1
+    cpus: 0.125
+    mem_limit: 128m
+    networks: [lab]
+    read_only: true
+    cap_drop: [ALL]
+    volumes: ['./results:/results']
+    environment:
+      ORDER_COUNT: '${ORDER_COUNT:-1000000}'
+    command: [idle]
+  historical-spark:
+    profiles: [historical]
+    build: ./projects/historical-replay/spark
+    image: examples/orders-historical-spark:4.3.0
+    cpus: 0.375
+    mem_limit: 1152m
+    networks: [lab]
+    read_only: true
+    cap_drop: [ALL]
+    tmpfs: ['/tmp:size=256m']
+    volumes: ['./results:/results']
+    environment:
+      CASE_ID: '${CASE_ID:-not-set}'

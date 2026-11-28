@@ -19,6 +19,12 @@ under their system directories. All infrastructure and credentials are local.
   recovery, active compaction-worker loss and pinned old snapshots passed exact
   readback. Eight small unreferenced-file candidates are documented and exported.
 
+- [Historical replay beside live CDC](orders-cdc-analytics/projects/historical-replay/):
+  Spark recomputed an older snapshot while live revisions/cancellations advanced.
+  Publisher crash, original-label commit retry and exact three-copy readback passed
+  in the corrected controller; the initial visibility-gate failure and recovery
+  remain documented. This project explicitly shares the owning CDC lab.
+
 The [current batch plan](../docs/example-plans/flink-doris-spark-storage.md)
-tracks completed paths and remaining historical corrections, a matched
+tracks completed paths, a remaining matched
 ClickHouse control and bounded storage recovery follow-ups.

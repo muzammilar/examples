@@ -23,6 +23,13 @@ public service endpoints or published host ports are used. Stop other heavy labs
 fixtures need at least 10,000 orders and 100 customers. Do not delete journals or
 reseed an existing fixture after failure; use `make verify` and diagnose it.
 
+## Related project
+
+[Historical Spark replay](projects/historical-replay/) shares this owned lab and
+lifecycle. It tests stale source-version replay beside live CDC and interrupted
+native publication. Use its own Make entry points; do not run both projects
+concurrently against one fixture. Qualification is tracked in that project.
+
 ## Layout
 
 - `orders-workload/`: Go, native maintained PostgreSQL/MySQL drivers, source

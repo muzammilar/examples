@@ -7,6 +7,8 @@ Candidate databases and systems to add as examples. Branch names follow the exis
 
 Flink, Doris and Spark/Hadoop deployment examples, followed by local cross-system pipelines and storage work on Garage, SeaweedFS, CephFS and HDFS. See the [implementation sequence](docs/example-plans/flink-doris-spark-storage.md). MinIO is excluded from this batch. Earlier candidates remain available after this priority.
 
+Cross-system CDC, HDFS batch, Iceberg snapshot recovery and [historical Spark replay](pipelines/orders-cdc-analytics/projects/historical-replay/) have recorded bounded outcomes, including failed gates and recovery. The matched ClickHouse control remains next; Ceph whole-guest/disk/restore still needs its existing 25-GiB free-Docker-space preflight. [JuiceFS dependency recovery](juicefs/dependency-recovery/) is recorded and cleaned up.
+
 ## Example designs to assign
 
 Start with the [handoff guide](docs/example-plans/README.md), then choose one unchecked workload below. Each design describes the deployment, the event to trigger and how a second observer can tell whether recovery worked. The [system directory index](README.md#systems) lists existing code. The [production-test audit](PRODUCTION_TEST_AUDIT.md) records what actually ran. A design is ready to assign once its local release, license and topology prerequisites are confirmed.
